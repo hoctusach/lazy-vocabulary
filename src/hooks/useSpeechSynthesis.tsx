@@ -12,6 +12,22 @@ export const useSpeechSynthesis = () => {
   const speechRequestIdRef = useRef(0);
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const voicesLoadedTimeoutRef = useRef<number | null>(null);
+  const lastVoiceRegionRef = useRef<'US' | 'UK'>('US');
+
+  // Persist voice region selection to localStorage
+  useEffect(() => {
+    const savedRegion = localStorage.getItem('voiceRegion');
+    if (savedRegion === 'US' || savedRegion === 'UK') {
+      setVoiceRegion(savedRegion);
+      lastVoiceRegionRef.current = savedRegion;
+    }
+  }, []);
+
+  // Save voice region preferences
+  useEffect(() => {
+    localStorage.setItem('voiceRegion', voiceRegion);
+    lastVoiceRegionRef.current = voiceRegion;
+  }, [voiceRegion]);
 
   // Check if speech synthesis is supported
   useEffect(() => {
@@ -88,22 +104,25 @@ export const useSpeechSynthesis = () => {
         };
       }
     }
-  }, [toast]);
+  }, [toast, voiceRegion]);
 
   // Update voice when region changes
   useEffect(() => {
     if (isVoicesLoaded) {
-      window.speechSynthesis.cancel(); // Cancel any ongoing speech
+      stopSpeaking(); // Cancel any ongoing speech
       currentVoiceRef.current = getVoiceByRegion(voiceRegion);
       console.log(`Voice region changed to ${voiceRegion}`);
       
-      // Only announce change if not muted
-      if (!isMuted) {
+      // Only announce change if not muted and if it's not the initial load
+      if (!isMuted && lastVoiceRegionRef.current !== voiceRegion) {
         const testText = voiceRegion === 'US' ? 'American accent selected' : 'British accent selected';
         speak(testText, voiceRegion)
           .then(() => console.log('Voice region change announced'))
           .catch(err => console.warn('Could not announce voice region change:', err));
       }
+      
+      // Update last voice region reference
+      lastVoiceRegionRef.current = voiceRegion;
     }
   }, [voiceRegion, isVoicesLoaded, isMuted]);
 
@@ -117,7 +136,7 @@ export const useSpeechSynthesis = () => {
     // Only allow one speech at a time
     if (speakingRef.current) {
       console.log('Already speaking, canceling previous speech');
-      window.speechSynthesis.cancel();
+      stopSpeaking();
       await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cancellation completes
     }
 
@@ -125,7 +144,7 @@ export const useSpeechSynthesis = () => {
     const requestId = ++speechRequestIdRef.current;
     
     speakingRef.current = true;
-    console.log('Attempting to speak:', text.substring(0, 30) + '...');
+    console.log('Attempting to speak:', text.substring(0, 30) + '...', 'with voice region:', voiceRegion);
     
     try {
       // This will now properly wait until speech is complete
@@ -164,7 +183,11 @@ export const useSpeechSynthesis = () => {
 
   const handleChangeVoice = useCallback(() => {
     stopSpeaking();
-    setVoiceRegion(prev => (prev === 'US' ? 'UK' : 'US'));
+    setVoiceRegion(prev => {
+      const newRegion = prev === 'US' ? 'UK' : 'US';
+      console.log(`Changing voice region from ${prev} to ${newRegion}`);
+      return newRegion;
+    });
   }, []);
 
   return {

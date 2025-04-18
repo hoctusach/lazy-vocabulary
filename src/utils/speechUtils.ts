@@ -1,3 +1,4 @@
+
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -8,7 +9,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       return;
     }
 
-    // Cancel any ongoing speech
+    // Cancel any ongoing speech immediately
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
@@ -116,7 +117,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         }, 5000); // Run every 5 seconds to prevent Chrome from cutting off
         
-        // Set a maximum speech duration timeout as a fallback (30 seconds)
+        // Set a maximum speech duration timeout as a fallback (increased to 60 seconds)
         setTimeout(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Maximum speech duration reached, stopping speech");
@@ -124,7 +125,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             clearKeepAliveInterval();
             resolve(); // Resolve the promise even if we had to stop it early
           }
-        }, 30000);
+        }, 60000);
       } catch (err) {
         console.error('Error while setting up speech:', err);
         reject(err);
@@ -167,9 +168,9 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a larger buffer for pauses and natural speech patterns (100% buffer)
+  // Add a larger buffer for pauses and natural speech patterns (150% buffer)
   // This helps prevent cutting off longer texts
-  return milliseconds * 2;
+  return milliseconds * 2.5;
 };
 
 export const stopSpeaking = (): void => {

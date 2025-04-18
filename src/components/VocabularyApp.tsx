@@ -10,6 +10,7 @@ import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/hooks/use-toast';
+import { stopSpeaking } from '@/utils/speechUtils';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
@@ -69,6 +70,10 @@ const VocabularyApp: React.FC = () => {
   }, [isVoicesLoaded, toast, voiceRegion]);
 
   const handleToggleMuteWithSpeaking = () => {
+    // Immediately stop any ongoing speech
+    stopSpeaking();
+    
+    // Toggle mute state
     const wasMuted = isMuted;
     handleToggleMute();
     
@@ -78,29 +83,36 @@ const VocabularyApp: React.FC = () => {
         // Only speak if we were previously muted and now we're unmuted
         resetLastSpokenWord();
         speakCurrentWord(true); // Force speak the current word
+      } else if (!wasMuted) {
+        // If we're muting, move to next word without speaking
+        handleManualNext();
       }
     }, 100);
   };
   
   const handleChangeVoiceWithSpeaking = () => {
+    // Stop any ongoing speech
+    stopSpeaking();
+    resetLastSpokenWord();
+    
+    // Change voice
     handleChangeVoice();
     
     // Wait for voice to change before speaking
     setTimeout(() => {
       if (!isMuted && currentWord && !isPaused) {
-        resetLastSpokenWord();
-        speakCurrentWord(true); // Force speak the current word
+        speakCurrentWord(true); // Force speak the current word with new voice
       }
-    }, 500);
+    }, 300);
   };
   
   const handleSwitchCategoryWithState = () => {
+    // Cancel any ongoing speech and reset state
+    stopSpeaking();
+    resetLastSpokenWord();
+    
     // Change background color
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-    
-    // Cancel any ongoing speech and reset state
-    window.speechSynthesis.cancel();
-    resetLastSpokenWord();
     
     // Switch category
     handleSwitchCategory(isMuted, voiceRegion);
@@ -110,11 +122,11 @@ const VocabularyApp: React.FC = () => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true); // Force speak the new word
       }
-    }, 1000);
+    }, 500);
   };
 
   const handleNextWordClick = () => {
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     resetLastSpokenWord();
     handleManualNext();
   };
