@@ -43,15 +43,15 @@ const VocabularyApp: React.FC = () => {
   useEffect(() => {
     if (isVoicesLoaded) {
       toast({
-        title: "Voice Library Ready",
-        description: `Speech synthesis is ready with ${voiceRegion} voices.`,
+        title: "Voice System Ready",
+        description: `ElevenLabs voice with ${voiceRegion} accent is ready.`,
       });
     }
   }, [isVoicesLoaded, toast, voiceRegion]);
 
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
-    if (currentWord && !isPaused && !isMuted) {
+    if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
       // Reset speech attempts counter for new word
       setSpeechAttempts(0);
       
@@ -60,7 +60,7 @@ const VocabularyApp: React.FC = () => {
       
       // Use a timeout to ensure everything is ready for speech
       const timerId = setTimeout(() => {
-        console.log("Speaking vocabulary:", currentWord.word);
+        console.log("Speaking vocabulary with ElevenLabs:", currentWord.word);
         speakText(fullText)
           .then(() => console.log("Vocabulary speech completed"))
           .catch(error => {
@@ -80,7 +80,7 @@ const VocabularyApp: React.FC = () => {
       // Clean up timeout if component updates before speech starts
       return () => clearTimeout(timerId);
     }
-  }, [currentWord, isPaused, isMuted, speakText, speechAttempts]);
+  }, [currentWord, isPaused, isMuted, speakText, speechAttempts, isVoicesLoaded]);
 
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
