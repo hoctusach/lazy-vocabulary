@@ -23,7 +23,7 @@ const Index = () => {
                 <p>Get started in 4 easy steps:</p>
                 <ol className="list-decimal ml-4 mt-1">
                   <li>Click on Upload New File</li>
-                  <li>Download the default word set</li>
+                  <li>Download the default word set and upload it for your local browser</li>
                   <li>Enable notifications</li>
                   <li>Start learning!</li>
                 </ol>
