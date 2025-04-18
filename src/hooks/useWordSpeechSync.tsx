@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
@@ -20,6 +19,15 @@ export const useWordSpeechSync = (
   const speakAttemptCountRef = useRef(0);
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const speechLockRef = useRef(false);
+  const isPausedRef = useRef(isPaused);
+
+  useEffect(() => {
+    isPausedRef.current = isPaused;
+    if (isPaused) {
+      stopSpeaking();
+      clearSpeechTimeout();
+    }
+  }, [isPaused]);
 
   useEffect(() => {
     currentWordRef.current = currentWord;
@@ -28,12 +36,11 @@ export const useWordSpeechSync = (
       setWordFullySpoken(false);
       lastWordIdRef.current = currentWord.word;
       
-      // Display toast with word info when word changes
       if (currentWord.word && currentWord.meaning) {
         toast({
           title: currentWord.word,
           description: `${currentWord.meaning}${currentWord.example ? `\n\nExample: ${currentWord.example}` : ''}`,
-          duration: 6000, // Longer duration to read content
+          duration: 6000,
         });
       }
     }
@@ -47,6 +54,12 @@ export const useWordSpeechSync = (
   }, []);
 
   const speakCurrentWord = useCallback(async (forceSpeak = false) => {
+    if (isPausedRef.current && !forceSpeak) {
+      console.log("App is paused, stopping speech");
+      stopSpeaking();
+      return;
+    }
+    
     if (speechLockRef.current && !forceSpeak) {
       console.log("Speech is locked, waiting to complete current word");
       return;
@@ -103,15 +116,20 @@ export const useWordSpeechSync = (
       
       isSpeakingRef.current = true;
       
-      // Reduced delay to improve synchronization
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
+      if (isPausedRef.current) {
+        console.log("App was paused while preparing to speak, aborting");
+        isSpeakingRef.current = false;
+        speechLockRef.current = false;
+        return;
+      }
+      
       await speakText(fullText);
       
-      // Shorter pause after speech for better synchronization
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       console.log("Finished speaking word completely:", wordToSpeak.word);
       setWordFullySpoken(true);
@@ -125,8 +143,10 @@ export const useWordSpeechSync = (
       } else {
         speakAttemptCountRef.current++;
         speechTimeoutRef.current = window.setTimeout(() => {
-          speakCurrentWord(true);
-        }, 300); // Reduced retry delay for better responsiveness
+          if (!isPausedRef.current) {
+            speakCurrentWord(true);
+          }
+        }, 200);
       }
     } finally {
       isSpeakingRef.current = false;
@@ -138,7 +158,7 @@ export const useWordSpeechSync = (
     if (!currentWord || isPaused || !isVoicesLoaded) {
       clearSpeechTimeout();
       if (isPaused) {
-        stopSpeaking(); // Stop any ongoing speech when paused
+        stopSpeaking();
       }
       return;
     }
@@ -152,10 +172,9 @@ export const useWordSpeechSync = (
     clearSpeechTimeout();
     
     if (!isChangingWordRef.current && !isMuted) {
-      // Reduced timeout for better synchronization between display and speech
       speechTimeoutRef.current = window.setTimeout(() => {
         speakCurrentWord();
-      }, 150);
+      }, 100);
     }
     
     return () => {

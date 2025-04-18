@@ -1,3 +1,4 @@
+
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { isSpeechSynthesisSupported, stopSpeaking } from './synthesisUtils';
@@ -33,8 +34,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters - slightly increased rate for better sync
-        utterance.rate = 0.85;
+        // Configure speech parameters - reduced rate for better reliability
+        utterance.rate = 0.8;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -86,7 +87,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } else {
             clearAllTimers();
           }
-        }, 3000); // Reduced interval for more reliable speech
+        }, 2000); // More frequent interval for better reliability
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
@@ -116,7 +117,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.onvoiceschanged = null;
       };
       
-      // Reduced timeout for faster voice loading
+      // Shorter timeout for faster voice loading
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
@@ -127,7 +128,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 1000); // Reduced timeout for better responsiveness
+      }, 800); 
     }
   });
 };

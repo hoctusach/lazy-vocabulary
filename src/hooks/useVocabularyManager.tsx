@@ -5,8 +5,24 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { calculateSpeechDuration, stopSpeaking } from '@/utils/speech';
 
 export const useVocabularyManager = () => {
-  // Try to get initial pause state from localStorage
-  const initialPaused = localStorage.getItem('isPaused') === 'true';
+  // Try to get initial states from localStorage
+  const getInitialStates = () => {
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      if (storedStates) {
+        const parsedStates = JSON.parse(storedStates);
+        return {
+          initialPaused: parsedStates.isPaused === true,
+          initialCategory: parsedStates.currentCategory || null
+        };
+      }
+    } catch (error) {
+      console.error('Error reading button states from localStorage:', error);
+    }
+    return { initialPaused: false, initialCategory: null };
+  };
+
+  const { initialPaused, initialCategory } = getInitialStates();
 
   const [hasData, setHasData] = useState(false);
   const [currentWord, setCurrentWord] = useState<VocabularyWord | null>(null);
@@ -25,11 +41,16 @@ export const useVocabularyManager = () => {
     currentWordRef.current = currentWord;
   }, [currentWord]);
 
-  // Save pause state to localStorage whenever it changes
+  // Set initial category if available
   useEffect(() => {
-    localStorage.setItem('isPaused', isPaused.toString());
-    console.log("Pause state saved to localStorage:", isPaused);
-  }, [isPaused]);
+    if (initialCategory && vocabularyService.hasData()) {
+      try {
+        vocabularyService.setCurrentSheet(initialCategory);
+      } catch (error) {
+        console.error('Error setting initial category:', error);
+      }
+    }
+  }, [initialCategory]);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current !== null) {
@@ -51,14 +72,14 @@ export const useVocabularyManager = () => {
       return;
     }
     
-    // Check if there was a recent manual action (less than 2 seconds ago)
+    // Check if there was a recent manual action (less than 1.5 seconds ago)
     const now = Date.now();
     const timeSinceLastManualAction = now - lastManualActionTimeRef.current;
-    if (timeSinceLastManualAction < 2000) {
+    if (timeSinceLastManualAction < 1500) {
       console.log("Recent manual action detected, delaying auto word change");
       // Schedule this function to run again after the debounce period
       clearTimer();
-      timerRef.current = window.setTimeout(displayNextWord, 2000);
+      timerRef.current = window.setTimeout(displayNextWord, 1500);
       return;
     }
     
@@ -88,8 +109,8 @@ export const useVocabularyManager = () => {
         const duration = calculateSpeechDuration(fullText);
         lastSpeechDurationRef.current = duration;
         
-        // Add buffer time for screen transitions - increased to 10000ms for more reliable transitions
-        const totalDuration = duration + 10000;
+        // Add buffer time for screen transitions - reduced to 2000ms as requested
+        const totalDuration = duration + 2000;
         
         console.log(`Scheduled next word in ${totalDuration}ms`);
         clearTimer();
@@ -109,7 +130,7 @@ export const useVocabularyManager = () => {
       setTimeout(() => {
         isChangingWordRef.current = false;
         wordChangeInProgressRef.current = false;
-      }, 1000);
+      }, 800);
     }
   }, [isPaused, clearTimer, toast]);
 
@@ -127,8 +148,8 @@ export const useVocabularyManager = () => {
       
       if (!isPaused) {
         clearTimer();
-        // Increased initial timeout to 5 seconds to give more time before starting
-        timerRef.current = window.setTimeout(displayNextWord, 5000);
+        // Reduced initial timeout to 2 seconds
+        timerRef.current = window.setTimeout(displayNextWord, 2000);
       }
     }
     
@@ -151,8 +172,8 @@ export const useVocabularyManager = () => {
     
     if (!isPaused) {
       clearTimer();
-      // Increased timeout after file upload to 3 seconds
-      timerRef.current = window.setTimeout(displayNextWord, 3000);
+      // Reduced timeout after file upload to 2 seconds
+      timerRef.current = window.setTimeout(displayNextWord, 2000);
     }
   }, [clearTimer, displayNextWord, isPaused]);
 
@@ -207,7 +228,7 @@ export const useVocabularyManager = () => {
       // Schedule next word after this one if not paused
       if (!isPaused) {
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
+        timerRef.current = window.setTimeout(displayNextWord, duration + 2000);
       }
     }
     
@@ -215,7 +236,7 @@ export const useVocabularyManager = () => {
     setTimeout(() => {
       isChangingWordRef.current = false;
       wordChangeInProgressRef.current = false;
-    }, 1000);
+    }, 800);
   }, [clearTimer, displayNextWord, isPaused]);
 
   const handleSwitchCategory = useCallback((isMuted: boolean, voiceRegion: 'US' | 'UK') => {
@@ -253,15 +274,15 @@ export const useVocabularyManager = () => {
       // Schedule next word if not paused
       if (!isPaused) {
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
+        timerRef.current = window.setTimeout(displayNextWord, duration + 2000);
       }
     }
     
-    // Release changing word lock after UI update (longer delay for category change)
+    // Release changing word lock after UI update (shorter delay for category change)
     setTimeout(() => {
       isChangingWordRef.current = false;
       wordChangeInProgressRef.current = false;
-    }, 1500);
+    }, 1000);
   }, [clearTimer, displayNextWord, isPaused]);
 
   return {

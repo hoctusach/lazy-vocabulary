@@ -4,9 +4,24 @@ import { useToast } from '@/hooks/use-toast';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
-  // Try to get the initial mute state from localStorage
-  const initialMuted = localStorage.getItem('isMuted') === 'true';
-  const initialVoiceRegion = (localStorage.getItem('voiceRegion') as 'US' | 'UK') || 'US';
+  // Try to get stored state from localStorage
+  const getInitialStates = () => {
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      if (storedStates) {
+        const parsedStates = JSON.parse(storedStates);
+        return {
+          initialMuted: parsedStates.isMuted === true,
+          initialVoiceRegion: (parsedStates.voiceRegion as 'US' | 'UK') || 'US'
+        };
+      }
+    } catch (error) {
+      console.error('Error reading button states from localStorage:', error);
+    }
+    return { initialMuted: false, initialVoiceRegion: 'US' };
+  };
+
+  const { initialMuted, initialVoiceRegion } = getInitialStates();
 
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>(initialVoiceRegion);
@@ -19,18 +34,6 @@ export const useSpeechSynthesis = () => {
   const lastVoiceRegionRef = useRef<'US' | 'UK'>(initialVoiceRegion);
   const pendingSpeechRef = useRef<{text: string, forceSpeak: boolean} | null>(null);
   const currentTextRef = useRef<string | null>(null);
-
-  // Save mute state to localStorage immediately when changed
-  useEffect(() => {
-    localStorage.setItem('isMuted', isMuted.toString());
-  }, [isMuted]);
-
-  // Save voice region preferences immediately when changed
-  useEffect(() => {
-    localStorage.setItem('voiceRegion', voiceRegion);
-    lastVoiceRegionRef.current = voiceRegion;
-    console.log("Voice region saved to localStorage:", voiceRegion);
-  }, [voiceRegion]);
 
   // Check if speech synthesis is supported
   useEffect(() => {
@@ -59,7 +62,7 @@ export const useSpeechSynthesis = () => {
           pendingSpeechRef.current = null;
           setTimeout(() => {
             speakText(text).catch(console.error);
-          }, 300);
+          }, 200);
         }
         return true;
       }
@@ -96,7 +99,7 @@ export const useSpeechSynthesis = () => {
             }
             
             // Try multiple times with different delays
-            const retryTimes = [500, 1000, 2000, 3000];
+            const retryTimes = [300, 600, 900, 1200];
             retryTimes.forEach((delay, index) => {
               voicesLoadedTimeoutRef.current = window.setTimeout(() => {
                 const success = loadVoices();
@@ -106,7 +109,7 @@ export const useSpeechSynthesis = () => {
               }, delay);
             });
           }
-        }, 500);
+        }, 300);
         
         return () => {
           clearTimeout(timerId);
@@ -158,7 +161,7 @@ export const useSpeechSynthesis = () => {
     if (speakingRef.current) {
       console.log('Already speaking, canceling previous speech');
       stopSpeaking();
-      await new Promise(resolve => setTimeout(resolve, 200)); // Small delay to ensure cancellation completes
+      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cancellation completes
     }
 
     // Generate a unique ID for this speech request
