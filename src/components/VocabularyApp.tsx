@@ -24,6 +24,7 @@ const VocabularyApp: React.FC = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
+    handleSwitchCategory,
     setHasData,
     isSpeakingRef,
     isChangingWordRef
@@ -35,7 +36,8 @@ const VocabularyApp: React.FC = () => {
     speakText,
     handleToggleMute,
     handleChangeVoice,
-    isVoicesLoaded
+    isVoicesLoaded,
+    speakingRef
   } = useSpeechSynthesis();
 
   const { toast } = useToast();
@@ -87,6 +89,7 @@ const VocabularyApp: React.FC = () => {
     }
   };
 
+  // Speak when word changes if not muted
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && isVoicesLoaded && !isChangingWordRef.current) {
       const timer = setTimeout(() => {
@@ -97,6 +100,7 @@ const VocabularyApp: React.FC = () => {
     }
   }, [currentWord, isPaused, isMuted, isVoicesLoaded]);
   
+  // When unmuted, speak the current word
   useEffect(() => {
     if (!isMuted && currentWord && !isPaused && isVoicesLoaded) {
       setLastSpokenWordId(null);
@@ -104,28 +108,18 @@ const VocabularyApp: React.FC = () => {
     }
   }, [isMuted]);
 
+  // When unpaused, reset the last spoken word
   useEffect(() => {
     if (!isPaused && currentWord) {
       setLastSpokenWordId(null);
     }
   }, [isPaused]);
 
-  const handleSwitchCategory = () => {
-    if (!isSpeakingRef.current && !isChangingWordRef.current) {
-      const nextCategory = vocabularyService.nextSheet();
-      setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-      
-      // Reset the last spoken word ID to force a new speech
-      setLastSpokenWordId(null);
-      
-      // Get a new word from the new category and display it
-      handleManualNext();
-    } else {
-      toast({
-        title: "Please wait",
-        description: "Currently processing a word. Please wait until it completes.",
-      });
-    }
+  const handleSwitchCategoryWithState = () => {
+    setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
+    // Reset the last spoken word ID to force a new speech
+    setLastSpokenWordId(null);
+    handleSwitchCategory(isMuted, voiceRegion);
   };
 
   const handleNotificationsEnabled = () => {
@@ -138,6 +132,11 @@ const VocabularyApp: React.FC = () => {
   const toggleView = () => {
     setShowWordCard(prev => !prev);
   };
+
+  // Synchronize speech ref with speech synthesis ref
+  useEffect(() => {
+    isSpeakingRef.current = speakingRef.current;
+  }, [speakingRef.current]);
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-xl mx-auto p-4">
@@ -168,7 +167,7 @@ const VocabularyApp: React.FC = () => {
             onToggleMute={handleToggleMute}
             onTogglePause={handleTogglePause}
             onChangeVoice={handleChangeVoice}
-            onSwitchCategory={handleSwitchCategory}
+            onSwitchCategory={handleSwitchCategoryWithState}
             currentCategory={currentSheetName}
             nextCategory={nextSheetName}
           />

@@ -1,7 +1,6 @@
-
 // Simple utility to handle speech synthesis tasks
 
-export const speak = (text: string): Promise<void> => {
+export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!window.speechSynthesis) {
       console.error('Speech synthesis not supported in this browser');
@@ -15,11 +14,11 @@ export const speak = (text: string): Promise<void> => {
     const utterance = new SpeechSynthesisUtterance(text);
     
     // Get available voices
-    const voices = window.speechSynthesis.getVoices();
+    let voices = window.speechSynthesis.getVoices();
     console.log(`Available voices: ${voices.length}`);
     
     // Function to set voice
-    const setVoiceAndSpeak = (region: 'US' | 'UK' = 'US') => {
+    const setVoiceAndSpeak = () => {
       try {
         // Try to find a voice based on region
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
@@ -73,6 +72,7 @@ export const speak = (text: string): Promise<void> => {
         
         window.speechSynthesis.speak(utterance);
         
+        // Keep speech synthesis active in background (fixes Chrome bug)
         const keepAlive = () => {
           if (window.speechSynthesis.speaking) {
             window.speechSynthesis.pause();
@@ -90,17 +90,19 @@ export const speak = (text: string): Promise<void> => {
     if (voices.length > 0) {
       setVoiceAndSpeak();
     } else {
+      // For browsers that load voices asynchronously
       window.speechSynthesis.onvoiceschanged = () => {
-        const updatedVoices = window.speechSynthesis.getVoices();
-        console.log(`Voices loaded asynchronously: ${updatedVoices.length}`);
+        voices = window.speechSynthesis.getVoices();
+        console.log(`Voices loaded asynchronously: ${voices.length}`);
         setVoiceAndSpeak();
         window.speechSynthesis.onvoiceschanged = null;
       };
       
+      // Fallback in case onvoiceschanged doesn't fire
       setTimeout(() => {
         if (!utterance.voice) {
-          const fallbackVoices = window.speechSynthesis.getVoices();
-          if (fallbackVoices.length > 0) {
+          voices = window.speechSynthesis.getVoices();
+          if (voices.length > 0) {
             console.log('Using fallback voice loading method');
             setVoiceAndSpeak();
           } else {

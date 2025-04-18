@@ -77,7 +77,7 @@ export const useSpeechSynthesis = () => {
       currentVoiceRef.current = getVoiceByRegion(voiceRegion);
       console.log(`Voice region changed to ${voiceRegion}`);
       
-      // Try to speak a test phrase with the new voice
+      // Only announce change if not muted
       if (!isMuted) {
         const testText = voiceRegion === 'US' ? 'American accent selected' : 'British accent selected';
         speak(testText)
@@ -86,26 +86,6 @@ export const useSpeechSynthesis = () => {
       }
     }
   }, [voiceRegion, isVoicesLoaded, isMuted]);
-
-  // Test the speech system once voices are loaded
-  useEffect(() => {
-    if (isVoicesLoaded && !isMuted) {
-      // Small delay to ensure everything is ready
-      const timerId = setTimeout(() => {
-        // Simple test speech
-        speak("Speech system ready")
-          .then(() => {
-            console.log("Test speech successful");
-          })
-          .catch(err => {
-            console.warn("Test speech failed:", err);
-            // Don't show an error for the test speech
-          });
-      }, 500);
-      
-      return () => clearTimeout(timerId);
-    }
-  }, [isVoicesLoaded, isMuted]);
 
   // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {
@@ -130,15 +110,12 @@ export const useSpeechSynthesis = () => {
       }
     } catch (error) {
       console.error('Failed to speak text:', error);
-      // Only show error if it's not a cancel or interrupted error
+      // Only show error for significant errors, not for cancellations
       if (error instanceof Error && 
           !error.message.includes('canceled') && 
-          !error.message.includes('interrupted')) {
-        toast({
-          title: "Speech Error",
-          description: "Could not speak the text. Please check your audio settings and ensure your device has working speakers.",
-          variant: "destructive"
-        });
+          !error.message.includes('interrupted') &&
+          !error.message.includes('muted')) {
+        console.warn("Speech error but not showing toast:", error);
       }
     } finally {
       // Always mark as not speaking when done
@@ -146,7 +123,7 @@ export const useSpeechSynthesis = () => {
         speakingRef.current = false;
       }
     }
-  }, [isMuted, toast]);
+  }, [isMuted]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
@@ -169,6 +146,7 @@ export const useSpeechSynthesis = () => {
     handleToggleMute,
     voiceRegion,
     handleChangeVoice,
-    isVoicesLoaded
+    isVoicesLoaded,
+    speakingRef
   };
 };

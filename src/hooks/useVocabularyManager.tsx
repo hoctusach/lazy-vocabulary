@@ -129,6 +129,22 @@ export const useVocabularyManager = () => {
     }
   };
 
+  const handleSwitchCategory = (isMuted: boolean, voiceRegion: 'US' | 'UK') => {
+    if (!isSpeakingRef.current && !isChangingWordRef.current) {
+      const nextCategory = vocabularyService.nextSheet();
+      console.log(`Switched to category: ${nextCategory}`);
+      
+      // Get a new word from the new category and prepare to display it
+      clearTimer();
+      displayNextWord();
+    } else {
+      toast({
+        title: "Please wait",
+        description: "Currently processing a word. Please wait until it completes.",
+      });
+    }
+  };
+
   return {
     hasData,
     currentWord,
@@ -136,6 +152,7 @@ export const useVocabularyManager = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
+    handleSwitchCategory,
     setHasData,
     isSpeakingRef,
     isChangingWordRef

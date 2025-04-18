@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, RefreshCw } from 'lucide-react';
 
 interface VocabularyCardProps {
   word: string;
@@ -76,7 +76,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onChangeVoice}
-              className="min-w-[100px]"
+              className={cn(
+                "min-w-[100px]",
+                "text-blue-700"
+              )}
             >
               {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
@@ -98,8 +101,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
-              className="min-w-[140px]"
+              className={cn(
+                "min-w-[140px]",
+                "text-green-700"
+              )}
             >
+              <RefreshCw size={16} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
           </div>
