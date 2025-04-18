@@ -13,7 +13,7 @@ const Index = () => {
           Learn vocabulary effortlessly with push notifications
         </p>
         <div className="mt-2 flex items-center justify-center gap-2">
-          <p className="text-sm text-muted-foreground">Are you new user?</p>
+          <p className="text-sm text-blue-500">Are you new?</p>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
@@ -22,7 +22,7 @@ const Index = () => {
               <TooltipContent>
                 <p>Get started in 3 easy steps:</p>
                 <ol className="list-decimal ml-4 mt-1">
-                  <li>Click "Use default word set"</li>
+                  <li>Click on Upload New File</li>
                   <li>Enable notifications</li>
                   <li>Start learning!</li>
                 </ol>
