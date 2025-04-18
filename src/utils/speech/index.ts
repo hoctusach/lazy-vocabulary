@@ -5,6 +5,21 @@ import { isSpeechSynthesisSupported, stopSpeaking } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
   return new Promise((resolve, reject) => {
+    // Check for muted state in localStorage
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      if (storedStates) {
+        const parsedStates = JSON.parse(storedStates);
+        if (parsedStates.isMuted === true) {
+          console.log('Speech is muted in localStorage, not speaking');
+          resolve();
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking mute state:', error);
+    }
+
     if (!window.speechSynthesis) {
       console.error('Speech synthesis not supported in this browser');
       reject(new Error('Speech synthesis not supported'));

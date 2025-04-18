@@ -2,14 +2,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
-import VocabularyControls from './VocabularyControls';
 import FileUpload from './FileUpload';
 import VocabularyLayout from './VocabularyLayout';
 import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
-import { useToast } from '@/hooks/use-toast';
 import { stopSpeaking } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
@@ -49,8 +47,6 @@ const VocabularyApp: React.FC = () => {
     isChangingWordRef
   );
 
-  const { toast } = useToast();
-
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
@@ -58,15 +54,6 @@ const VocabularyApp: React.FC = () => {
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
   }, [speakingRef.current, isSpeakingRef]);
-
-  useEffect(() => {
-    if (isVoicesLoaded) {
-      toast({
-        title: "Voice System Ready",
-        description: `Speech system with ${voiceRegion} accent is ready.`,
-      });
-    }
-  }, [isVoicesLoaded, toast, voiceRegion]);
 
   const handleToggleMuteWithSpeaking = useCallback(() => {
     stopSpeaking();

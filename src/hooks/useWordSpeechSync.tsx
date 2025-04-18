@@ -1,6 +1,6 @@
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { useToast } from '@/hooks/use-toast';
 import { stopSpeaking } from '@/utils/speech';
 
 export const useWordSpeechSync = (
@@ -13,7 +13,6 @@ export const useWordSpeechSync = (
   isChangingWordRef: React.MutableRefObject<boolean>
 ) => {
   const lastWordIdRef = useRef<string | null>(null);
-  const { toast } = useToast();
   const speechTimeoutRef = useRef<number | null>(null);
   const [wordFullySpoken, setWordFullySpoken] = useState(false);
   const speakAttemptCountRef = useRef(0);
@@ -35,16 +34,8 @@ export const useWordSpeechSync = (
       console.log("Word changed in speech sync:", currentWord.word);
       setWordFullySpoken(false);
       lastWordIdRef.current = currentWord.word;
-      
-      if (currentWord.word && currentWord.meaning) {
-        toast({
-          title: currentWord.word,
-          description: `${currentWord.meaning}${currentWord.example ? `\n\nExample: ${currentWord.example}` : ''}`,
-          duration: 6000,
-        });
-      }
     }
-  }, [currentWord, toast]);
+  }, [currentWord]);
 
   const clearSpeechTimeout = useCallback(() => {
     if (speechTimeoutRef.current !== null) {

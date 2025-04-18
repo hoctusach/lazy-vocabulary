@@ -1,6 +1,5 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
@@ -12,7 +11,7 @@ export const useSpeechSynthesis = () => {
         const parsedStates = JSON.parse(storedStates);
         return {
           initialMuted: parsedStates.isMuted === true,
-          initialVoiceRegion: (parsedStates.voiceRegion as 'US' | 'UK') || 'US'
+          initialVoiceRegion: (parsedStates.voiceRegion === 'UK' ? 'UK' : 'US') as 'US' | 'UK'
         };
       }
     } catch (error) {
@@ -26,7 +25,6 @@ export const useSpeechSynthesis = () => {
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>(initialVoiceRegion);
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
-  const { toast } = useToast();
   const speakingRef = useRef(false);
   const speechRequestIdRef = useRef(0);
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
@@ -39,11 +37,7 @@ export const useSpeechSynthesis = () => {
   useEffect(() => {
     const supported = isSpeechSynthesisSupported();
     if (!supported) {
-      toast({
-        title: "Speech Not Supported",
-        description: "Your browser doesn't support speech synthesis.",
-        variant: "destructive"
-      });
+      console.warn("Your browser doesn't support speech synthesis.");
       return;
     }
 
@@ -119,7 +113,7 @@ export const useSpeechSynthesis = () => {
         };
       }
     }
-  }, [toast, voiceRegion, isMuted]);
+  }, [voiceRegion, isMuted]);
 
   // Update voice when region changes
   useEffect(() => {
@@ -130,10 +124,8 @@ export const useSpeechSynthesis = () => {
       
       // Only announce change if not muted and if it's not the initial load
       if (!isMuted && lastVoiceRegionRef.current !== voiceRegion) {
-        const testText = voiceRegion === 'US' ? 'American accent selected' : 'British accent selected';
-        speak(testText, voiceRegion)
-          .then(() => console.log('Voice region change announced'))
-          .catch(err => console.warn('Could not announce voice region change:', err));
+        // Don't use a voice announcement when changing voices - just log
+        console.log(`Changed to ${voiceRegion} accent`);
       }
       
       // Update last voice region reference
@@ -180,13 +172,6 @@ export const useSpeechSynthesis = () => {
       }
     } catch (error) {
       console.error('Failed to speak text:', error);
-      // Only show error for significant errors, not for cancellations
-      if (error instanceof Error && 
-          !error.message.includes('canceled') && 
-          !error.message.includes('interrupted') &&
-          !error.message.includes('muted')) {
-        console.warn("Speech error but not showing toast:", error);
-      }
     } finally {
       // Only mark as not speaking when done with this specific request
       if (requestId === speechRequestIdRef.current) {

@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
 import { calculateSpeechDuration, stopSpeaking } from '@/utils/speech';
@@ -31,7 +30,6 @@ export const useVocabularyManager = () => {
   const isSpeakingRef = useRef<boolean>(false);
   const isChangingWordRef = useRef<boolean>(false);
   const lastSpeechDurationRef = useRef<number>(0);
-  const { toast } = useToast();
   const lastManualActionTimeRef = useRef<number>(Date.now());
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const wordChangeInProgressRef = useRef(false);
@@ -45,7 +43,7 @@ export const useVocabularyManager = () => {
   useEffect(() => {
     if (initialCategory && vocabularyService.hasData()) {
       try {
-        vocabularyService.setCurrentSheet(initialCategory);
+        vocabularyService.switchSheet(initialCategory);
       } catch (error) {
         console.error('Error setting initial category:', error);
       }
@@ -120,10 +118,7 @@ export const useVocabularyManager = () => {
           timerRef.current = window.setTimeout(displayNextWord, totalDuration);
         }
       } else {
-        toast({
-          title: "No vocabulary data",
-          description: "Please upload an Excel file with vocabulary data.",
-        });
+        console.warn("No vocabulary data");
       }
     } finally {
       // Release the changing word lock after a short timeout to allow UI to update
@@ -132,7 +127,7 @@ export const useVocabularyManager = () => {
         wordChangeInProgressRef.current = false;
       }, 800);
     }
-  }, [isPaused, clearTimer, toast]);
+  }, [isPaused, clearTimer]);
 
   // This effect checks for existing data and sets up initial state
   useEffect(() => {
