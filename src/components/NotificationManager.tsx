@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { notificationService } from '@/services/notificationService';
-import { BellRing, BellOff, Info } from 'lucide-react';
+import { BellRing, BellOff, Info, BookOpen } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface NotificationManagerProps {
@@ -15,6 +14,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificatio
   const [status, setStatus] = useState<'unsupported' | 'denied' | 'default' | 'granted'>('default');
   const [isInitialized, setIsInitialized] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [showStartButton, setShowStartButton] = useState(false);
   
   useEffect(() => {
     const initializeNotifications = async () => {
@@ -33,6 +33,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificatio
         
         if (permission === 'granted' && notificationService.subscribed) {
           onNotificationsEnabled();
+          setShowStartButton(true);
         }
       }
     };
@@ -50,6 +51,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificatio
       
       if (subscribed) {
         onNotificationsEnabled();
+        setShowStartButton(true);
       }
     }
   };
@@ -61,32 +63,17 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificatio
       
       if (subscribed) {
         onNotificationsEnabled();
+        setShowStartButton(true);
       }
     } else {
       const unsubscribed = await notificationService.unsubscribe();
       setIsSubscribed(!unsubscribed);
+      setShowStartButton(false);
     }
   };
   
   if (status === 'unsupported') {
-    return (
-      <Card className="w-full max-w-xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <BellOff size={20} className="mr-2 text-muted-foreground" />
-            Notifications Not Supported
-          </CardTitle>
-          <CardDescription>
-            Your browser doesn't support push notifications.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Try using a modern browser like Chrome, Edge, or Firefox to enable vocabulary notifications.
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return null;
   }
   
   return (
@@ -121,32 +108,44 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificatio
         )}
         
         {status === 'granted' && (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="notifications" 
-                checked={isSubscribed} 
-                onCheckedChange={toggleSubscription} 
-              />
-              <label htmlFor="notifications" className="text-sm font-medium">
-                Receive vocabulary notifications
-              </label>
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="notifications" 
+                  checked={isSubscribed} 
+                  onCheckedChange={toggleSubscription} 
+                />
+                <label htmlFor="notifications" className="text-sm font-medium">
+                  Receive vocabulary notifications
+                </label>
+              </div>
+              
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Info size={16} />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">
+                      You'll receive notifications with vocabulary words even when this browser tab is closed.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Info size={16} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs">
-                    You'll receive notifications with vocabulary words even when this browser tab is closed.
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {showStartButton && (
+              <Button 
+                onClick={() => window.location.reload()} 
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold"
+              >
+                <BookOpen className="mr-2 h-5 w-5" />
+                START LEARNING!
+              </Button>
+            )}
           </div>
         )}
       </CardContent>
