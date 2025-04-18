@@ -4,13 +4,14 @@ import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
 import NotificationManager from './NotificationManager';
+import FileUpload from './FileUpload';
 import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { vocabularyService } from '@/services/vocabularyService';
-import { useToast } from '@/hooks/use-toast'; // Adding the missing import for toast
+import { useToast } from '@/hooks/use-toast';
 
 const VocabularyApp: React.FC = () => {
-  const [backgroundColorIndex, setBackgroundColorIndex] = useState(0); // Adding state for background color index
+  const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   
   const {
     hasData,
@@ -30,13 +31,12 @@ const VocabularyApp: React.FC = () => {
     handleChangeVoice
   } = useSpeechSynthesis();
 
-  const { toast } = useToast(); // Properly destructuring toast from useToast
+  const { toast } = useToast();
 
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Adding the missing handleSwitchCategory function
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
@@ -52,33 +52,35 @@ const VocabularyApp: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-xl mx-auto p-4">
-      {!hasData ? (
-        <WelcomeScreen onFileUploaded={handleFileUploaded} />
-      ) : (
+      {currentWord && hasData && (
         <>
-          {currentWord && (
-            <VocabularyCard 
-              word={currentWord.word}
-              meaning={currentWord.meaning}
-              example={currentWord.example}
-              backgroundColor={backgroundColors[backgroundColorIndex % backgroundColors.length]}
-              isMuted={isMuted}
-              isPaused={isPaused}
-              voiceRegion={voiceRegion}
-              onToggleMute={handleToggleMute}
-              onTogglePause={handleTogglePause}
-              onChangeVoice={handleChangeVoice}
-              onSwitchCategory={handleSwitchCategory}
-              currentCategory={currentSheetName}
-              nextCategory={nextSheetName}
-            />
-          )}
+          <VocabularyCard 
+            word={currentWord.word}
+            meaning={currentWord.meaning}
+            example={currentWord.example}
+            backgroundColor={backgroundColors[backgroundColorIndex % backgroundColors.length]}
+            isMuted={isMuted}
+            isPaused={isPaused}
+            voiceRegion={voiceRegion}
+            onToggleMute={handleToggleMute}
+            onTogglePause={handleTogglePause}
+            onChangeVoice={handleChangeVoice}
+            onSwitchCategory={handleSwitchCategory}
+            currentCategory={currentSheetName}
+            nextCategory={nextSheetName}
+          />
           
           <VocabularyControls 
             onReset={() => setHasData(false)}
             onNext={handleManualNext}
           />
         </>
+      )}
+      
+      {!hasData ? (
+        <WelcomeScreen onFileUploaded={handleFileUploaded} />
+      ) : (
+        <FileUpload onFileUploaded={handleFileUploaded} />
       )}
       
       <NotificationManager onNotificationsEnabled={handleNotificationsEnabled} />
