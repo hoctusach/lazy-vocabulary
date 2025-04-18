@@ -1,88 +1,130 @@
+// Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     if (!window.speechSynthesis) {
-      console.error('Speech synthesis not supported');
+      console.error('Speech synthesis not supported in this browser');
       reject(new Error('Speech synthesis not supported'));
       return;
     }
 
-    // Cancel any previous speech
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
     
     // Get available voices
-    let voices = window.speechSynthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
+    console.log(`Available voices: ${voices.length}`);
     
-    // If voices array is empty, try to get them again after a short delay
-    if (voices.length === 0) {
-      console.log('No voices available yet, trying again...');
-      setTimeout(() => {
-        voices = window.speechSynthesis.getVoices();
-        continueWithVoices(voices);
-      }, 100);
+    // Function to set voice
+    const setVoiceAndSpeak = (region: 'US' | 'UK' = 'US') => {
+      try {
+        // Try to find a voice based on region
+        const langCode = region === 'US' ? 'en-US' : 'en-GB';
+        let voice = voices.find(v => v.lang === langCode);
+        
+        // Fallback to any English voice
+        if (!voice) {
+          voice = voices.find(v => v.lang.startsWith('en'));
+        }
+        
+        // Last resort - use any voice
+        if (!voice && voices.length > 0) {
+          voice = voices[0];
+        }
+        
+        if (voice) {
+          console.log(`Using voice: ${voice.name} (${voice.lang})`);
+          utterance.voice = voice;
+        } else {
+          console.warn('No suitable voice found, using default browser voice');
+        }
+        
+        // Configure speech parameters
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Set event handlers
+        utterance.onend = () => {
+          console.log('Speech completed successfully');
+          resolve();
+        };
+        
+        utterance.onerror = (event) => {
+          console.error('Speech synthesis error:', event);
+          reject(new Error(`Speech error: ${event.error}`));
+        };
+        
+        // Start speaking
+        console.log('Starting speech:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+        
+        // Chrome bug workaround - ensure speech synthesis is not paused
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+        
+        window.speechSynthesis.speak(utterance);
+        
+        // Chrome workaround - sometimes speech gets cut off
+        // This keeps the speech synthesis object active
+        const keepAlive = () => {
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.pause();
+            window.speechSynthesis.resume();
+            setTimeout(keepAlive, 5000);
+          }
+        };
+        setTimeout(keepAlive, 5000);
+      } catch (err) {
+        console.error('Error while setting up speech:', err);
+        reject(err);
+      }
+    };
+    
+    // Execute immediately if voices are available, otherwise wait
+    if (voices.length > 0) {
+      setVoiceAndSpeak();
     } else {
-      continueWithVoices(voices);
-    }
-    
-    function continueWithVoices(availableVoices: SpeechSynthesisVoice[]) {
-      // First try to find a Google US English voice
-      let selectedVoice = availableVoices.find(voice => 
-        voice.name.includes('Google') && voice.lang === 'en-US'
-      );
-      
-      // If no Google voice, try any US English voice
-      if (!selectedVoice) {
-        selectedVoice = availableVoices.find(voice => voice.lang === 'en-US');
-      }
-      
-      // If still no voice, try any English voice
-      if (!selectedVoice) {
-        selectedVoice = availableVoices.find(voice => voice.lang.startsWith('en'));
-      }
-      
-      // Last resort - use the first available voice
-      if (!selectedVoice && availableVoices.length > 0) {
-        selectedVoice = availableVoices[0];
-      }
-      
-      if (selectedVoice) {
-        utterance.voice = selectedVoice;
-        console.log('Using voice:', selectedVoice.name);
-      } else {
-        console.warn('No suitable voice found, using default browser voice');
-      }
-      
-      utterance.rate = 1.0; // Normal speed
-      utterance.pitch = 1.0; // Normal pitch
-      utterance.volume = 1.0; // Full volume
-      
-      utterance.onend = () => {
-        console.log('Speech completed');
-        resolve();
+      // For Chrome which loads voices asynchronously
+      window.speechSynthesis.onvoiceschanged = () => {
+        const updatedVoices = window.speechSynthesis.getVoices();
+        console.log(`Voices loaded asynchronously: ${updatedVoices.length}`);
+        setVoiceAndSpeak();
+        // Remove the handler to avoid multiple calls
+        window.speechSynthesis.onvoiceschanged = null;
       };
       
-      utterance.onerror = (event) => {
-        console.error('Speech error:', event);
-        reject(event);
-      };
-      
-      // Speak the text
-      console.log('Starting speech for:', text);
-      window.speechSynthesis.speak(utterance);
+      // Fallback if onvoiceschanged doesn't fire
+      setTimeout(() => {
+        if (!utterance.voice) {
+          const fallbackVoices = window.speechSynthesis.getVoices();
+          if (fallbackVoices.length > 0) {
+            console.log('Using fallback voice loading method');
+            setVoiceAndSpeak();
+          } else {
+            reject(new Error('Could not load voices'));
+          }
+        }
+      }, 1000);
     }
   });
 };
 
-export const stopSpeaking = () => {
+export const stopSpeaking = (): void => {
   if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
     console.log('Speech stopped');
   }
 };
 
-// Find a fallback voice function
+// Function to check if speech synthesis is available
+export const isSpeechSynthesisSupported = (): boolean => {
+  return typeof window !== 'undefined' && 'speechSynthesis' in window;
+};
+
+// Find a fallback voice function - maintained for compatibility with useVoiceManager
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
   if (!voices || voices.length === 0) {
     return null;
