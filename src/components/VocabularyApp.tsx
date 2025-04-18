@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
@@ -36,6 +36,14 @@ const VocabularyApp: React.FC = () => {
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
+
+  // Speak the current word when it changes
+  useEffect(() => {
+    if (currentWord && !isPaused && !isMuted) {
+      console.log("Speaking word:", currentWord.word);
+      speakText(currentWord.word);
+    }
+  }, [currentWord, isPaused, isMuted, speakText]);
 
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
