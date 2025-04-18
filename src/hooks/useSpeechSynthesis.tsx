@@ -6,7 +6,8 @@ import {
   initializeSpeechSynthesis, 
   createUtterance, 
   cancelSpeech,
-  resetSpeechSynthesis
+  resetSpeechSynthesis,
+  handleVisibilityChange
 } from '@/utils/speechUtils';
 
 export const useSpeechSynthesis = () => {
@@ -18,14 +19,8 @@ export const useSpeechSynthesis = () => {
   
   const { isVoicesLoaded, availableVoices, selectVoiceByRegion } = useVoiceManager();
 
-  // Reset the speech synthesis service on visibility change (Firefox fix)
+  // Reset the speech synthesis service on visibility change (Firefox/Chrome fix)
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        resetSpeechSynthesis();
-      }
-    };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
     
     return () => {
@@ -44,9 +39,28 @@ export const useSpeechSynthesis = () => {
     return () => clearInterval(resetInterval);
   }, []);
 
+  // Force a speech synthesis update when voice region changes
+  useEffect(() => {
+    if (voiceRegion && isVoicesLoaded) {
+      resetSpeechSynthesis();
+    }
+  }, [voiceRegion, isVoicesLoaded]);
+
   const speakText = useCallback((text: string): Promise<void> => {
-    if (isMuted || !text || speakingRef.current) {
+    if (isMuted || !text) {
       return Promise.resolve();
+    }
+
+    // Avoid concurrent speech
+    if (speakingRef.current) {
+      cancelSpeech();
+      // Allow a small delay for the cancel to complete
+      return new Promise(resolve => {
+        setTimeout(() => {
+          speakingRef.current = false;
+          resolve();
+        }, 100);
+      });
     }
 
     // Avoid speaking the same text twice in a row (prevents loops)
@@ -73,6 +87,7 @@ export const useSpeechSynthesis = () => {
             
             // Get voice for the current region or a fallback
             const voice = selectVoiceByRegion(voiceRegion);
+            console.log(`Selected voice for ${voiceRegion}:`, voice?.name || "No voice found");
             
             // Create an utterance with the selected voice and fallback options
             const utterance = createUtterance(text, voice, availableVoices);
@@ -87,16 +102,42 @@ export const useSpeechSynthesis = () => {
               console.error("Speech error:", event);
               speakingRef.current = false;
               
-              // Try with a fallback
+              // Notify user about the issue
               toast({
-                title: "Speech system issue",
-                description: "Trying a different voice...",
+                title: "Speech issue",
+                description: "Trying with a different voice...",
               });
               
-              // Clear speaking flag to allow a retry with different voice
-              reject(event);
+              // Try again with a different voice region
+              const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
+              const fallbackVoice = selectVoiceByRegion(newRegion);
+              
+              if (fallbackVoice) {
+                // Create a new utterance with the fallback voice
+                const fallbackUtterance = createUtterance(text, fallbackVoice, availableVoices);
+                
+                fallbackUtterance.onend = () => {
+                  console.log("Fallback speech completed");
+                  speakingRef.current = false;
+                  resolve();
+                };
+                
+                fallbackUtterance.onerror = () => {
+                  console.error("Fallback speech also failed");
+                  speakingRef.current = false;
+                  reject(new Error("Speech synthesis failed with all voices"));
+                };
+                
+                // Try with the fallback voice
+                setTimeout(() => {
+                  synth.speak(fallbackUtterance);
+                }, 200);
+              } else {
+                reject(event);
+              }
             };
             
+            console.log("Attempting to speak:", text.substring(0, 50) + "...");
             synth.speak(utterance);
             
             // Safety timeout in case onend/onerror don't fire
@@ -119,7 +160,7 @@ export const useSpeechSynthesis = () => {
         reject(outerError);
       }
     });
-  }, [isMuted, voiceRegion, availableVoices, selectVoiceByRegion, toast]);
+  }, [isMuted, voiceRegion, availableVoices, selectVoiceByRegion, toast, isVoicesLoaded]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
@@ -135,8 +176,14 @@ export const useSpeechSynthesis = () => {
   const handleChangeVoice = useCallback(() => {
     setVoiceRegion(prev => {
       const newRegion = prev === 'US' ? 'UK' : 'US';
+      
+      // Reset the speech state
+      cancelSpeech();
+      speakingRef.current = false;
+      
       // Reset the last attempt so we can speak again with the new voice
       lastAttemptRef.current = null;
+      
       return newRegion;
     });
   }, []);

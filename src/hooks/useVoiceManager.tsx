@@ -1,10 +1,12 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { findFallbackVoice } from '@/utils/speechUtils';
 
 export const useVoiceManager = () => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const loadAttemptsRef = useRef(0);
+  const maxLoadAttempts = 5;
 
   const loadVoices = useCallback(() => {
     try {
@@ -15,13 +17,24 @@ export const useVoiceManager = () => {
         console.log("Speech voices loaded:", voices.length);
         setAvailableVoices(voices);
         setIsVoicesLoaded(true);
+        loadAttemptsRef.current = 0; // Reset counter on success
       } else {
-        console.log("No voices available yet, will retry");
-        // Some browsers need a manual retry
-        setTimeout(loadVoices, 500);
+        loadAttemptsRef.current++;
+        console.log(`No voices available yet, attempt ${loadAttemptsRef.current}/${maxLoadAttempts}`);
+        
+        // Only retry a limited number of times to avoid infinite loops
+        if (loadAttemptsRef.current < maxLoadAttempts) {
+          setTimeout(loadVoices, 500);
+        } else {
+          console.error("Failed to load voices after multiple attempts");
+          // Set as loaded anyway to let the app proceed with fallbacks
+          setIsVoicesLoaded(true);
+        }
       }
     } catch (error) {
       console.error("Error loading voices:", error);
+      // Set as loaded anyway to let the app proceed with fallbacks
+      setIsVoicesLoaded(true);
     }
   }, []);
   
@@ -48,22 +61,26 @@ export const useVoiceManager = () => {
   }, [loadVoices]);
 
   const selectVoiceByRegion = useCallback((voiceRegion: 'US' | 'UK'): SpeechSynthesisVoice | null => {
-    if (!isVoicesLoaded || availableVoices.length === 0) {
-      console.log("Voices not loaded yet, cannot select by region");
+    if (availableVoices.length === 0) {
+      console.log("No voices available, cannot select by region");
       return null;
     }
     
     let voice = null;
     if (voiceRegion === 'US') {
       // Try to find US voice - be more specific to increase chances of success
-      voice = availableVoices.find(v => v.lang === 'en-US' && v.name.includes('Google'));
+      voice = availableVoices.find(v => 
+        v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+      );
       
       if (!voice) {
         voice = availableVoices.find(v => v.lang === 'en-US');
       }
     } else {
       // Try to find UK voice - be more specific
-      voice = availableVoices.find(v => v.lang === 'en-GB' && v.name.includes('Google'));
+      voice = availableVoices.find(v => 
+        v.lang === 'en-GB' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+      );
       
       if (!voice) {
         voice = availableVoices.find(v => v.lang === 'en-GB');
@@ -80,8 +97,13 @@ export const useVoiceManager = () => {
       voice = findFallbackVoice(availableVoices);
     }
     
+    // If still no voice found, try to use the default voice
+    if (!voice && availableVoices.length > 0) {
+      voice = availableVoices[0];
+    }
+    
     return voice;
-  }, [isVoicesLoaded, availableVoices]);
+  }, [availableVoices]);
 
   return {
     isVoicesLoaded,
