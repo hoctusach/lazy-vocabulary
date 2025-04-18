@@ -59,6 +59,7 @@ class VocabularyService {
   private currentSheetName: string = "All words";
   private shuffledIndices: number[] = [];
   private currentIndex: number = -1;
+  private readonly MAX_STORAGE_SIZE = 1024 * 1024; // 1MB limit
   
   // Sheet options from the original app
   readonly sheetOptions = ["All words", "phrasal verbs", "idioms", "advanced words"];
@@ -68,29 +69,28 @@ class VocabularyService {
     const savedData = localStorage.getItem('vocabularyData');
     if (savedData) {
       try {
-        this.data = JSON.parse(savedData);
+        // Check size before parsing
+        if (savedData.length > this.MAX_STORAGE_SIZE) {
+          console.warn("Saved data exceeds size limit, using default data");
+          this.data = DEFAULT_VOCABULARY_DATA;
+        } else {
+          this.data = JSON.parse(savedData);
+        }
       } catch (e) {
         console.error("Failed to load data from localStorage, using default data:", e);
+        this.data = DEFAULT_VOCABULARY_DATA;
       }
     }
     this.shuffleCurrentSheet();
   }
   
-  private loadFromLocalStorage() {
-    const savedData = localStorage.getItem('vocabularyData');
-    if (savedData) {
-      try {
-        this.data = JSON.parse(savedData);
-        this.shuffleCurrentSheet();
-      } catch (e) {
-        console.error("Failed to load data from localStorage:", e);
-      }
-    }
-  }
-  
   private saveToLocalStorage() {
     try {
-      localStorage.setItem('vocabularyData', JSON.stringify(this.data));
+      const dataString = JSON.stringify(this.data);
+      if (dataString.length > this.MAX_STORAGE_SIZE) {
+        throw new Error("Data size exceeds storage limit");
+      }
+      localStorage.setItem('vocabularyData', dataString);
     } catch (e) {
       console.error("Failed to save data to localStorage:", e);
     }
