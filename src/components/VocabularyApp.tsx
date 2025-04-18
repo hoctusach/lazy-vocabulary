@@ -40,14 +40,19 @@ const VocabularyApp: React.FC = () => {
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
-      // Add a slight delay to ensure the speech synthesis is ready
-      setTimeout(() => {
-        const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
-        console.log("Speaking full text:", fullText);
+      // Construct the text to speak
+      const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
+      
+      // Use a timeout to ensure everything is ready for speech
+      const timerId = setTimeout(() => {
+        console.log("Speaking vocabulary:", currentWord.word);
         speakText(fullText)
-          .then(() => console.log("Speech promise resolved"))
-          .catch(err => console.error("Speech promise error:", err));
-      }, 100);
+          .then(() => console.log("Vocabulary speech completed"))
+          .catch(error => console.error("Speech error:", error));
+      }, 500);
+      
+      // Clean up timeout if component updates before speech starts
+      return () => clearTimeout(timerId);
     }
   }, [currentWord, isPaused, isMuted, speakText]);
 
