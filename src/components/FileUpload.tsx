@@ -115,7 +115,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
             size="sm"
             onClick={handleDownloadAndUpload}
           >
-            <Download size={16} className="mr-2" /> Use Default Template
+            <Download size={16} className="mr-2" /> Use default word set
           </Button>
         </CardDescription>
       </CardHeader>
