@@ -12,10 +12,11 @@ export const useWordSpeechSync = (
   isSpeakingRef: React.MutableRefObject<boolean>,
   isChangingWordRef: React.MutableRefObject<boolean>
 ) => {
-  const lastSpokenWordRef = useRef<string | null>(null);
+  const lastWordIdRef = useRef<string | null>(null);
   const { toast } = useToast();
   const speechTimeoutRef = useRef<number | null>(null);
   const [wordFullySpoken, setWordFullySpoken] = useState(false);
+  const speakAttemptCountRef = useRef(0);
 
   // Clear any pending speech timeouts
   const clearSpeechTimeout = () => {
@@ -37,47 +38,48 @@ export const useWordSpeechSync = (
       return;
     }
     
-    // Don't speak if we're already changing words unless forced
+    // Skip if we're already changing words unless forced
     if (isChangingWordRef.current && !forceSpeak) {
       console.log("Word is changing, cannot speak yet");
       return;
     }
 
+    // Generate a unique ID for this word instance
+    const wordId = `${currentWord.word}-${Date.now()}`;
+    
+    // Don't speak the same word again unless forced
+    if (lastWordIdRef.current === currentWord.word && !forceSpeak) {
+      console.log("Word already spoken, skipping:", currentWord.word);
+      return;
+    }
+    
     // Special case for replaying the current word
     if (forceSpeak) {
       // Cancel any previous speech
       window.speechSynthesis.cancel();
       clearSpeechTimeout();
-      // Reset states to ensure we can speak again
       isSpeakingRef.current = false;
-      isChangingWordRef.current = false;
-      lastSpokenWordRef.current = null;
+      lastWordIdRef.current = null;
       setWordFullySpoken(false);
+      speakAttemptCountRef.current = 0;
     }
     
-    const wordId = `${currentWord.word}-${Date.now()}`;
-    
-    // Don't speak the same word twice unless forced
-    if (currentWord.word === lastSpokenWordRef.current && !forceSpeak) {
-      console.log("Word already spoken, skipping:", currentWord.word);
-      return;
-    }
+    // Log the start of speaking
+    console.log("Starting to speak:", currentWord.word);
     
     // Mark this word as the last one spoken
-    lastSpokenWordRef.current = currentWord.word;
+    lastWordIdRef.current = currentWord.word;
     setWordFullySpoken(false);
     
     try {
       // Set speaking state before starting
       isSpeakingRef.current = true;
-      isChangingWordRef.current = true;
       
       // Small delay to ensure UI updates
       await new Promise(resolve => setTimeout(resolve, 300));
       
       // Construct the text to be spoken
       const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-      console.log("Starting to speak:", currentWord.word);
       
       // Speak the text
       await speakText(fullText);
@@ -89,26 +91,48 @@ export const useWordSpeechSync = (
       setWordFullySpoken(true);
     } catch (error) {
       console.error("Speech error:", error);
-      setWordFullySpoken(true); // Mark as complete even on error to prevent hanging
+      
+      // If we've tried a few times and still failed, mark as complete to prevent hanging
+      if (speakAttemptCountRef.current >= 2) {
+        console.log("Multiple speech attempts failed, marking word as spoken anyway");
+        setWordFullySpoken(true);
+        speakAttemptCountRef.current = 0;
+      } else {
+        // Try again after a short delay
+        speakAttemptCountRef.current++;
+        speechTimeoutRef.current = window.setTimeout(() => {
+          speakCurrentWord(true);
+        }, 1000);
+      }
     } finally {
-      // Reset states after speaking completes
+      // Reset states after speaking completes or fails
       isSpeakingRef.current = false;
-      isChangingWordRef.current = false;
     }
   };
 
   // Effect for auto-speaking words with proper synchronization
   useEffect(() => {
-    if (!currentWord || isPaused || isMuted || !isVoicesLoaded || isChangingWordRef.current) {
+    if (!currentWord || isPaused || isMuted || !isVoicesLoaded) {
       return () => {
         clearSpeechTimeout();
       };
     }
     
+    console.log("Word changed or conditions changed, preparing to speak:", 
+      currentWord ? currentWord.word : "no word");
+    
     // Wait for any UI updates before speaking
     clearSpeechTimeout();
     speechTimeoutRef.current = window.setTimeout(() => {
-      speakCurrentWord();
+      // Only speak if we're not in the middle of changing words
+      if (!isChangingWordRef.current) {
+        speakCurrentWord();
+      } else {
+        // If we are changing words, retry after a short delay
+        speechTimeoutRef.current = window.setTimeout(() => {
+          speakCurrentWord();
+        }, 1000);
+      }
     }, 500);
     
     return () => {
@@ -120,10 +144,10 @@ export const useWordSpeechSync = (
   const resetSpeechSystem = () => {
     window.speechSynthesis.cancel();
     clearSpeechTimeout();
-    lastSpokenWordRef.current = null;
+    lastWordIdRef.current = null;
     isSpeakingRef.current = false;
-    isChangingWordRef.current = false;
     setWordFullySpoken(false);
+    speakAttemptCountRef.current = 0;
   };
 
   return {

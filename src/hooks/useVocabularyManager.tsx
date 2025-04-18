@@ -26,6 +26,9 @@ export const useVocabularyManager = () => {
     // Don't process if already speaking or changing word
     if (isSpeakingRef.current || isChangingWordRef.current) {
       console.log("Speech is in progress or word is changing, delaying next word");
+      // Retry after a delay instead of just returning
+      clearTimer();
+      timerRef.current = window.setTimeout(displayNextWord, 2000);
       return;
     }
     
@@ -41,6 +44,7 @@ export const useVocabularyManager = () => {
     const nextWord = vocabularyService.getNextWord();
     
     if (nextWord) {
+      console.log("Displaying next word:", nextWord.word);
       setCurrentWord(nextWord);
       
       // Calculate total duration for word and add buffer time
@@ -48,14 +52,16 @@ export const useVocabularyManager = () => {
       const duration = calculateSpeechDuration(fullText);
       lastSpeechDurationRef.current = duration;
       
-      // Add buffer time for screen transitions
-      const totalDuration = duration + 2000;
+      // Add buffer time for screen transitions - increased from 2000 to 5000ms
+      const totalDuration = duration + 5000;
       
+      // Release the changing word lock after a short timeout to allow UI to update
       setTimeout(() => {
         isChangingWordRef.current = false;
-      }, 300);
+      }, 500);
       
       console.log(`Scheduled next word in ${totalDuration}ms`);
+      clearTimer();
       timerRef.current = window.setTimeout(displayNextWord, totalDuration);
     } else {
       isChangingWordRef.current = false;
@@ -108,15 +114,20 @@ export const useVocabularyManager = () => {
   };
 
   const handleTogglePause = () => {
-    setIsPaused(prev => !prev);
-    window.speechSynthesis.cancel();
-    
-    if (isPaused) {
-      // When unpausing, display next word immediately
-      displayNextWord();
-    } else {
-      clearTimer();
-    }
+    setIsPaused(prev => {
+      const newPauseState = !prev;
+      window.speechSynthesis.cancel();
+      
+      if (!newPauseState) {
+        // When unpausing, display next word after a short delay
+        clearTimer();
+        timerRef.current = window.setTimeout(displayNextWord, 1000);
+      } else {
+        clearTimer();
+      }
+      
+      return newPauseState;
+    });
   };
 
   const handleManualNext = () => {

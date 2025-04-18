@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
-import NotificationManager from './NotificationManager';
 import FileUpload from './FileUpload';
 import VocabularyLayout from './VocabularyLayout';
 import { useVocabularyManager } from '@/hooks/useVocabularyManager';
@@ -39,7 +38,7 @@ const VocabularyApp: React.FC = () => {
     speakingRef
   } = useSpeechSynthesis();
 
-  const { speakCurrentWord, resetLastSpokenWord } = useWordSpeechSync(
+  const { speakCurrentWord, resetLastSpokenWord, wordFullySpoken } = useWordSpeechSync(
     currentWord,
     isPaused,
     isMuted,
@@ -70,11 +69,13 @@ const VocabularyApp: React.FC = () => {
   }, [isVoicesLoaded, toast, voiceRegion]);
 
   const handleToggleMuteWithSpeaking = () => {
+    const wasMuted = isMuted;
     handleToggleMute();
     
     // Wait a short moment for the mute state to update
     setTimeout(() => {
-      if (!isMuted && currentWord && !isPaused) {
+      if (wasMuted && currentWord && !isPaused) {
+        // Only speak if we were previously muted and now we're unmuted
         resetLastSpokenWord();
         speakCurrentWord(true); // Force speak the current word
       }
@@ -90,7 +91,7 @@ const VocabularyApp: React.FC = () => {
         resetLastSpokenWord();
         speakCurrentWord(true); // Force speak the current word
       }
-    }, 300);
+    }, 500);
   };
   
   const handleSwitchCategoryWithState = () => {
@@ -109,7 +110,7 @@ const VocabularyApp: React.FC = () => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true); // Force speak the new word
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleNextWordClick = () => {
@@ -157,7 +158,7 @@ const VocabularyApp: React.FC = () => {
         />
       )}
       
-      {/* Notifications section temporarily hidden */}
+      {/* Notifications section is hidden per user request */}
     </VocabularyLayout>
   );
 };

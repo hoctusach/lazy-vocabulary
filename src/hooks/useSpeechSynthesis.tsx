@@ -111,7 +111,7 @@ export const useSpeechSynthesis = () => {
   const speakText = useCallback(async (text: string): Promise<void> => {
     if (isMuted || !text) {
       console.log(isMuted ? 'Speech is muted' : 'No text provided');
-      return;
+      return Promise.resolve(); // Resolve immediately if muted
     }
 
     // Only allow one speech at a time
@@ -169,9 +169,9 @@ export const useSpeechSynthesis = () => {
 
   return {
     isMuted,
+    voiceRegion,
     speakText,
     handleToggleMute,
-    voiceRegion,
     handleChangeVoice,
     isVoicesLoaded,
     speakingRef

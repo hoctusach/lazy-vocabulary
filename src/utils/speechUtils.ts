@@ -55,6 +55,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         if (voice) {
           console.log(`Using voice: ${voice.name} (${voice.lang}) for region ${region}`);
           utterance.voice = voice;
+          utterance.lang = langCode; // Explicitly set language code
         } else {
           console.warn('No suitable voice found, using default browser voice');
         }
@@ -67,11 +68,13 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         // Set event handlers
         utterance.onend = () => {
           console.log('Speech completed successfully');
+          clearKeepAliveInterval();
           resolve();
         };
         
         utterance.onerror = (event) => {
           console.error('Speech synthesis error:', event);
+          clearKeepAliveInterval();
           // Don't reject on cancel error as it's often just due to user navigation
           if (event.error === 'canceled' || event.error === 'interrupted') {
             console.log('Speech was canceled or interrupted, resolving anyway');
@@ -84,24 +87,44 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         // Start speaking
         console.log('Starting speech:', text.substring(0, 30) + '...');
         
+        // Make sure speech synthesis is not paused
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
         
         window.speechSynthesis.speak(utterance);
         
-        // This keeps the speech synthesis active in Chrome
-        const keepAlive = () => {
+        // Keep alive interval reference
+        let keepAliveInterval: number | null = null;
+        
+        // Function to clear the keep alive interval
+        const clearKeepAliveInterval = () => {
+          if (keepAliveInterval !== null) {
+            clearInterval(keepAliveInterval);
+            keepAliveInterval = null;
+          }
+        };
+        
+        // This keeps the speech synthesis active in Chrome by using setInterval instead of setTimeout
+        keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Keeping speech synthesis alive...");
             window.speechSynthesis.pause();
             window.speechSynthesis.resume();
-            setTimeout(keepAlive, 1000); // Run more frequently
+          } else {
+            clearKeepAliveInterval();
           }
-        };
+        }, 5000); // Run every 5 seconds to prevent Chrome from cutting off
         
-        // Start the keepAlive loop sooner to prevent cutoffs
-        setTimeout(keepAlive, 1000);
+        // Set a maximum speech duration timeout as a fallback (30 seconds)
+        setTimeout(() => {
+          if (window.speechSynthesis.speaking) {
+            console.log("Maximum speech duration reached, stopping speech");
+            window.speechSynthesis.cancel();
+            clearKeepAliveInterval();
+            resolve(); // Resolve the promise even if we had to stop it early
+          }
+        }, 30000);
       } catch (err) {
         console.error('Error while setting up speech:', err);
         reject(err);
@@ -144,9 +167,9 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a larger buffer for pauses and natural speech patterns (60% buffer)
+  // Add a larger buffer for pauses and natural speech patterns (100% buffer)
   // This helps prevent cutting off longer texts
-  return milliseconds * 1.6;
+  return milliseconds * 2;
 };
 
 export const stopSpeaking = (): void => {
@@ -208,5 +231,6 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     voice = voices[0];
   }
   
+  console.log(`Selected voice for ${region}:`, voice ? `${voice.name} (${voice.lang})` : "None found");
   return voice;
 };
