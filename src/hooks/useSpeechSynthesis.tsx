@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
@@ -32,16 +33,25 @@ export const useSpeechSynthesis = () => {
       window.speechSynthesis.cancel();
       
       const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
+      let voices = window.speechSynthesis.getVoices();
       
       if (voices.length === 0) {
-        // If voices aren't loaded yet, try again after a delay
-        console.log("No voices available, retrying...");
-        return new Promise<void>((resolve) => {
-          setTimeout(() => {
-            speakText(text).then(resolve);
-          }, 100);
-        });
+        // Some browsers need a small delay to load voices
+        setTimeout(() => {
+          voices = window.speechSynthesis.getVoices();
+          if (voices.length > 0) {
+            // Try speaking again if voices are now available
+            speakText(text);
+          } else {
+            console.error("No voices available after retry");
+            toast({
+              title: "Speech Issue",
+              description: "Could not find voice options. Try refreshing the page.",
+              variant: "destructive"
+            });
+          }
+        }, 200);
+        return Promise.resolve();
       }
       
       const englishVoices = voices.filter(voice => voice.lang.includes('en'));
@@ -71,13 +81,25 @@ export const useSpeechSynthesis = () => {
       // Create a promise that resolves when speech ends
       const speechPromise = new Promise<void>((resolve, reject) => {
         utterance.onend = () => {
-          console.log("Speech completed");
+          console.log("Speech completed successfully");
           resolve();
         };
         
         utterance.onerror = (event) => {
-          console.error("Speech synthesis error:", event);
-          reject(new Error("Speech synthesis failed"));
+          console.error("Speech synthesis error event:", event);
+          
+          // Don't reject the promise, just log the error and resolve
+          // This prevents errors from breaking the chain
+          resolve();
+          
+          // Try to inform the user but don't show too many errors
+          if (Math.random() < 0.3) { // Only show error 30% of the time to avoid spamming
+            toast({
+              title: "Voice Issue",
+              description: "There was a problem with speech playback. You may need to refresh.",
+              variant: "destructive"
+            });
+          }
         };
       });
       

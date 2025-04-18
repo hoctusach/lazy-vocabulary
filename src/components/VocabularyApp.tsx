@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -39,9 +40,14 @@ const VocabularyApp: React.FC = () => {
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
-      const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
-      console.log("Speaking full text:", fullText);
-      speakText(fullText);
+      // Add a slight delay to ensure the speech synthesis is ready
+      setTimeout(() => {
+        const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
+        console.log("Speaking full text:", fullText);
+        speakText(fullText)
+          .then(() => console.log("Speech promise resolved"))
+          .catch(err => console.error("Speech promise error:", err));
+      }, 100);
     }
   }, [currentWord, isPaused, isMuted, speakText]);
 
