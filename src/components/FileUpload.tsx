@@ -38,9 +38,16 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   };
   
   const processFile = async (file: File) => {
-    if (!file.name.endsWith('.xlsx')) {
+    // Check file type and extension
+    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/xlsx'];
+    const allowedExtensions = ['.xlsx'];
+    
+    const isValidType = allowedTypes.includes(file.type);
+    const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+    
+    if (!isValidType || !hasValidExtension) {
       toast({
-        title: "Invalid file format",
+        title: "Invalid file type",
         description: "Please upload an Excel file (.xlsx)",
         variant: "destructive"
       });
@@ -82,7 +89,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
       description: "Please wait while we load the default vocabulary..."
     });
 
-    // Use the default vocabulary data directly
     const success = vocabularyService.loadDefaultVocabulary();
     
     if (success) {
