@@ -21,7 +21,8 @@ const VocabularyApp: React.FC = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
-    setHasData
+    setHasData,
+    isSpeakingRef
   } = useVocabularyManager();
 
   const {
@@ -50,7 +51,7 @@ const VocabularyApp: React.FC = () => {
   }, [isVoicesLoaded, toast, voiceRegion]);
 
   // Function to speak the current word
-  const speakCurrentWord = () => {
+  const speakCurrentWord = async () => {
     if (!currentWord || isMuted || !isVoicesLoaded) {
       return;
     }
@@ -70,13 +71,20 @@ const VocabularyApp: React.FC = () => {
     
     console.log("Speaking vocabulary:", currentWord.word);
     
-    // Add a small delay before speaking to ensure UI is updated
-    setTimeout(() => {
-      speakText(fullText)
-        .catch(error => {
-          console.error("Speech error:", error);
-        });
-    }, 300);
+    // Set speaking state to true
+    isSpeakingRef.current = true;
+    
+    try {
+      // Add a small delay before speaking to ensure UI is updated
+      await new Promise(resolve => setTimeout(resolve, 300));
+      await speakText(fullText);
+      console.log("Finished speaking word completely");
+    } catch (error) {
+      console.error("Speech error:", error);
+    } finally {
+      // Set speaking state to false when done
+      isSpeakingRef.current = false;
+    }
   };
 
   // Speak word when it changes or is displayed initially

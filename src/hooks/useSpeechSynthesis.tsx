@@ -87,7 +87,7 @@ export const useSpeechSynthesis = () => {
     }
   }, [isVoicesLoaded, isMuted]);
 
-  // Speak function with debounce protection to prevent multiple calls
+  // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {
     if (isMuted || !text || speakingRef.current) {
       console.log(isMuted ? 'Speech is muted' : speakingRef.current ? 'Already speaking' : 'No text provided');
@@ -98,6 +98,7 @@ export const useSpeechSynthesis = () => {
     console.log('Attempting to speak:', text.substring(0, 30) + '...');
     
     try {
+      // This will now properly wait until speech is complete
       await speak(text);
       console.log('Speech completed successfully');
     } catch (error) {
@@ -108,6 +109,7 @@ export const useSpeechSynthesis = () => {
         variant: "destructive"
       });
     } finally {
+      // Always mark as not speaking when done
       speakingRef.current = false;
     }
   }, [isMuted, toast]);

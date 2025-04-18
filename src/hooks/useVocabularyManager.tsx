@@ -9,6 +9,7 @@ export const useVocabularyManager = () => {
   const [currentWord, setCurrentWord] = useState<VocabularyWord | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<number | null>(null);
+  const isSpeakingRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   const clearTimer = useCallback(() => {
@@ -19,6 +20,12 @@ export const useVocabularyManager = () => {
   }, []);
 
   const displayNextWord = useCallback(async () => {
+    // Don't schedule next word if we're currently speaking
+    if (isSpeakingRef.current) {
+      console.log("Speech is in progress, delaying next word");
+      return;
+    }
+    
     clearTimer();
     window.speechSynthesis.cancel();
     
@@ -99,6 +106,7 @@ export const useVocabularyManager = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
-    setHasData
+    setHasData,
+    isSpeakingRef
   };
 };
