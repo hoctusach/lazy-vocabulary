@@ -1,3 +1,4 @@
+
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string): Promise<void> => {
@@ -41,8 +42,8 @@ export const speak = (text: string): Promise<void> => {
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters
-        utterance.rate = 1.0;
+        // Configure speech parameters - slower rate for better comprehension
+        utterance.rate = 0.9; // Slightly slower rate
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         

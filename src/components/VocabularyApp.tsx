@@ -50,7 +50,7 @@ const VocabularyApp: React.FC = () => {
     }
   }, [isVoicesLoaded, toast, voiceRegion]);
 
-  // Function to speak the current word
+  // Function to speak the current word - fully awaits completion
   const speakCurrentWord = async () => {
     if (!currentWord || isMuted || !isVoicesLoaded) {
       return;
@@ -67,22 +67,29 @@ const VocabularyApp: React.FC = () => {
     setLastSpokenWordId(wordId);
     
     // Construct the text to speak with pauses between sections
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. Example: ${currentWord.example}`;
+    // Adding periods and commas to create natural pauses
+    const fullText = `${currentWord.word}. . ${currentWord.meaning}. . Example: ${currentWord.example}`;
     
     console.log("Speaking vocabulary:", currentWord.word);
     
-    // Set speaking state to true
+    // Set speaking state to true to prevent next word from being triggered
     isSpeakingRef.current = true;
     
     try {
       // Add a small delay before speaking to ensure UI is updated
       await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // This will now properly wait until speech is complete before continuing
       await speakText(fullText);
+      
       console.log("Finished speaking word completely");
+      
+      // Add a small delay after speaking before allowing next word
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
-      // Set speaking state to false when done
+      // Always mark as not speaking when done, allowing next word to be triggered
       isSpeakingRef.current = false;
     }
   };
@@ -111,10 +118,18 @@ const VocabularyApp: React.FC = () => {
   }, [isPaused]);
 
   const handleSwitchCategory = () => {
-    const nextCategory = vocabularyService.nextSheet();
-    setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-    handleManualNext();
-    setLastSpokenWordId(null); // Reset spoken state when changing categories
+    // Only switch if not currently speaking
+    if (!isSpeakingRef.current) {
+      const nextCategory = vocabularyService.nextSheet();
+      setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
+      handleManualNext();
+      setLastSpokenWordId(null); // Reset spoken state when changing categories
+    } else {
+      toast({
+        title: "Please wait",
+        description: "Currently speaking a word. Please wait until it completes.",
+      });
+    }
   };
 
   const handleNotificationsEnabled = () => {

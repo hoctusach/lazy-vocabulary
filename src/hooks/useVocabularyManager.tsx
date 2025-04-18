@@ -35,7 +35,8 @@ export const useVocabularyManager = () => {
     
     if (nextWord) {
       setCurrentWord(nextWord);
-      timerRef.current = window.setTimeout(displayNextWord, 10000);
+      // Increased timeout to 15 seconds to give more time for speech to complete
+      timerRef.current = window.setTimeout(displayNextWord, 15000);
     } else {
       toast({
         title: "No vocabulary data",
@@ -58,7 +59,8 @@ export const useVocabularyManager = () => {
       
       if (!isPaused) {
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, 2000);
+        // Increased initial timeout to 3 seconds to give more time before starting
+        timerRef.current = window.setTimeout(displayNextWord, 3000);
       }
     }
     
@@ -79,7 +81,8 @@ export const useVocabularyManager = () => {
     
     if (!isPaused) {
       clearTimer();
-      timerRef.current = window.setTimeout(displayNextWord, 1000);
+      // Increased timeout after file upload to 2 seconds
+      timerRef.current = window.setTimeout(displayNextWord, 2000);
     }
   };
 
@@ -95,8 +98,14 @@ export const useVocabularyManager = () => {
   };
 
   const handleManualNext = () => {
-    clearTimer();
-    displayNextWord();
+    // Only proceed if not currently speaking
+    if (!isSpeakingRef.current) {
+      clearTimer();
+      displayNextWord();
+    } else {
+      console.log("Currently speaking, please wait...");
+      // Optional: Could show a toast here
+    }
   };
 
   return {
