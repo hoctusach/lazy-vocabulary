@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
@@ -165,4 +166,5 @@ export const useWordSpeechSync = (
     resetLastSpokenWord: resetSpeechSystem,
     wordFullySpoken
   };
-}, []);
+};
+
