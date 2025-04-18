@@ -29,6 +29,7 @@ const Index = () => {
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
+                      download
                     >
                       Download the sample words
                     </a>
@@ -48,6 +49,17 @@ const Index = () => {
       
       <footer className="mt-12 text-center text-sm text-muted-foreground">
         <p>© 2025 Lazy Vocabulary - hoctusach</p>
+        <div className="mt-2">
+          <a 
+            href="https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true" 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500 hover:underline text-xs"
+            download
+          >
+            Download Sample Words
+          </a>
+        </div>
       </footer>
     </div>
   );

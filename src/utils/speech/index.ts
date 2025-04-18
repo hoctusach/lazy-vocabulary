@@ -1,4 +1,3 @@
-
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { isSpeechSynthesisSupported, stopSpeaking } from './synthesisUtils';
@@ -40,23 +39,28 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         utterance.volume = 1.0;
         
         let keepAliveInterval: number | null = null;
+        let maxDurationTimeout: number | null = null;
         
-        const clearKeepAliveInterval = () => {
+        const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
             clearInterval(keepAliveInterval);
             keepAliveInterval = null;
+          }
+          if (maxDurationTimeout !== null) {
+            clearTimeout(maxDurationTimeout);
+            maxDurationTimeout = null;
           }
         };
         
         utterance.onend = () => {
           console.log('Speech completed successfully');
-          clearKeepAliveInterval();
+          clearAllTimers();
           resolve();
         };
         
         utterance.onerror = (event) => {
           console.error('Speech synthesis error:', event);
-          clearKeepAliveInterval();
+          clearAllTimers();
           if (event.error === 'canceled' || event.error === 'interrupted') {
             console.log('Speech was canceled or interrupted, resolving anyway');
             resolve();
@@ -73,24 +77,29 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         
         window.speechSynthesis.speak(utterance);
         
+        // Keep speech synthesis alive for long text
         keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Keeping speech synthesis alive...");
             window.speechSynthesis.pause();
             window.speechSynthesis.resume();
           } else {
-            clearKeepAliveInterval();
+            clearAllTimers();
           }
         }, 5000);
         
-        setTimeout(() => {
+        // Set maximum speech duration to prevent blocking
+        const estimatedDuration = calculateSpeechDuration(text);
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 30000), 120000);
+        
+        maxDurationTimeout = setTimeout(() => {
           if (window.speechSynthesis.speaking) {
-            console.log("Maximum speech duration reached, stopping speech");
+            console.log(`Maximum speech duration reached (${maxDuration}ms), stopping speech`);
             window.speechSynthesis.cancel();
-            clearKeepAliveInterval();
+            clearAllTimers();
             resolve();
           }
-        }, 90000);
+        }, maxDuration);
       } catch (err) {
         console.error('Error while setting up speech:', err);
         reject(err);
@@ -117,7 +126,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 1000);
+      }, 1500);
     }
   });
 };
@@ -129,4 +138,3 @@ export {
   isSpeechSynthesisSupported,
   stopSpeaking,
 };
-

@@ -18,6 +18,7 @@ export const useSpeechSynthesis = () => {
   const voicesLoadedTimeoutRef = useRef<number | null>(null);
   const lastVoiceRegionRef = useRef<'US' | 'UK'>(initialVoiceRegion);
   const pendingSpeechRef = useRef<{text: string, forceSpeak: boolean} | null>(null);
+  const currentTextRef = useRef<string | null>(null);
 
   // Save mute state to localStorage immediately when changed
   useEffect(() => {
@@ -28,6 +29,7 @@ export const useSpeechSynthesis = () => {
   useEffect(() => {
     localStorage.setItem('voiceRegion', voiceRegion);
     lastVoiceRegionRef.current = voiceRegion;
+    console.log("Voice region saved to localStorage:", voiceRegion);
   }, [voiceRegion]);
 
   // Check if speech synthesis is supported
@@ -138,6 +140,9 @@ export const useSpeechSynthesis = () => {
 
   // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {
+    // Save the current text being spoken
+    currentTextRef.current = text;
+    
     if (!isVoicesLoaded) {
       console.log('Voices not loaded yet, queueing speech for later');
       pendingSpeechRef.current = { text, forceSpeak: true };
@@ -153,7 +158,7 @@ export const useSpeechSynthesis = () => {
     if (speakingRef.current) {
       console.log('Already speaking, canceling previous speech');
       stopSpeaking();
-      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cancellation completes
+      await new Promise(resolve => setTimeout(resolve, 200)); // Small delay to ensure cancellation completes
     }
 
     // Generate a unique ID for this speech request
@@ -180,7 +185,7 @@ export const useSpeechSynthesis = () => {
         console.warn("Speech error but not showing toast:", error);
       }
     } finally {
-      // Always mark as not speaking when done
+      // Only mark as not speaking when done with this specific request
       if (requestId === speechRequestIdRef.current) {
         speakingRef.current = false;
       }
@@ -205,6 +210,10 @@ export const useSpeechSynthesis = () => {
     });
   }, []);
 
+  const getCurrentText = useCallback(() => {
+    return currentTextRef.current;
+  }, []);
+
   return {
     isMuted,
     voiceRegion,
@@ -212,6 +221,7 @@ export const useSpeechSynthesis = () => {
     handleToggleMute,
     handleChangeVoice,
     isVoicesLoaded,
-    speakingRef
+    speakingRef,
+    getCurrentText
   };
 };

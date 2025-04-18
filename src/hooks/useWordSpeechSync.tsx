@@ -1,5 +1,4 @@
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
 import { stopSpeaking } from '@/utils/speech';
@@ -19,30 +18,44 @@ export const useWordSpeechSync = (
   const [wordFullySpoken, setWordFullySpoken] = useState(false);
   const speakAttemptCountRef = useRef(0);
   const currentWordRef = useRef<VocabularyWord | null>(null);
+  const speechLockRef = useRef(false);
 
   useEffect(() => {
     currentWordRef.current = currentWord;
     if (currentWord && lastWordIdRef.current !== currentWord.word) {
+      console.log("Word changed in speech sync:", currentWord.word);
       setWordFullySpoken(false);
+      lastWordIdRef.current = currentWord.word;
     }
   }, [currentWord]);
 
-  const clearSpeechTimeout = () => {
+  const clearSpeechTimeout = useCallback(() => {
     if (speechTimeoutRef.current !== null) {
       window.clearTimeout(speechTimeoutRef.current);
       speechTimeoutRef.current = null;
     }
-  };
+  }, []);
 
-  const speakCurrentWord = async (forceSpeak = false) => {
+  const speakCurrentWord = useCallback(async (forceSpeak = false) => {
+    if (speechLockRef.current && !forceSpeak) {
+      console.log("Speech is locked, waiting to complete current word");
+      return;
+    }
+    
     const wordToSpeak = currentWordRef.current;
     
-    if (!wordToSpeak || (!forceSpeak && isMuted) || !isVoicesLoaded) {
-      console.log("Cannot speak current word:", 
-        !wordToSpeak ? "no word" : 
-        isMuted && !forceSpeak ? "muted" : 
-        !isVoicesLoaded ? "voices not loaded" : 
-        "unknown reason");
+    if (!wordToSpeak) {
+      console.log("Cannot speak current word: no word available");
+      return;
+    }
+    
+    if (!forceSpeak && isMuted) {
+      console.log("Speech is muted, not speaking");
+      return;
+    }
+    
+    if (!isVoicesLoaded) {
+      console.log("Voices not loaded yet, cannot speak");
       return;
     }
     
@@ -61,7 +74,6 @@ export const useWordSpeechSync = (
     if (forceSpeak) {
       stopSpeaking();
       clearSpeechTimeout();
-      isSpeakingRef.current = false;
       setWordFullySpoken(false);
       speakAttemptCountRef.current = 0;
     }
@@ -69,26 +81,27 @@ export const useWordSpeechSync = (
     console.log("Starting to speak:", wordToSpeak.word);
     
     lastWordIdRef.current = wordId;
-    setWordFullySpoken(false);
+    speechLockRef.current = true;
     
     try {
       if (isMuted && !forceSpeak) {
         console.log("Speech is muted, not actually speaking");
         setWordFullySpoken(true);
+        speechLockRef.current = false;
         return;
       }
       
       isSpeakingRef.current = true;
       
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
       await speakText(fullText);
       
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      console.log("Finished speaking word completely");
+      console.log("Finished speaking word completely:", wordToSpeak.word);
       setWordFullySpoken(true);
     } catch (error) {
       console.error("Speech error:", error);
@@ -105,8 +118,9 @@ export const useWordSpeechSync = (
       }
     } finally {
       isSpeakingRef.current = false;
+      speechLockRef.current = false;
     }
-  };
+  }, [clearSpeechTimeout, isMuted, isVoicesLoaded, speakText]);
 
   useEffect(() => {
     if (!currentWord || isPaused || !isVoicesLoaded) {
@@ -117,7 +131,7 @@ export const useWordSpeechSync = (
       return;
     }
     
-    console.log("Word changed or conditions changed, preparing to speak:", 
+    console.log("Word or conditions changed, preparing to speak:", 
       currentWord ? currentWord.word : "no word",
       "isPaused:", isPaused,
       "isMuted:", isMuted);
@@ -125,33 +139,30 @@ export const useWordSpeechSync = (
     stopSpeaking();
     clearSpeechTimeout();
     
-    speechTimeoutRef.current = window.setTimeout(() => {
-      if (!isChangingWordRef.current) {
-        speakCurrentWord(!isMuted);
-      } else {
-        speechTimeoutRef.current = window.setTimeout(() => {
-          speakCurrentWord(!isMuted);
-        }, 500);
-      }
-    }, 300);
+    if (!isChangingWordRef.current && !isMuted) {
+      speechTimeoutRef.current = window.setTimeout(() => {
+        speakCurrentWord();
+      }, 300);
+    }
     
     return () => {
       clearSpeechTimeout();
     };
-  }, [currentWord, isPaused, isMuted, isVoicesLoaded]);
+  }, [currentWord, isPaused, isMuted, isVoicesLoaded, clearSpeechTimeout, speakCurrentWord]);
 
-  const resetSpeechSystem = () => {
+  const resetSpeechSystem = useCallback(() => {
     stopSpeaking();
     clearSpeechTimeout();
     lastWordIdRef.current = null;
     isSpeakingRef.current = false;
     setWordFullySpoken(false);
     speakAttemptCountRef.current = 0;
-  };
+    speechLockRef.current = false;
+  }, [clearSpeechTimeout]);
 
   return {
-    speakCurrentWord: (forceSpeak = false) => speakCurrentWord(forceSpeak),
+    speakCurrentWord,
     resetLastSpokenWord: resetSpeechSystem,
     wordFullySpoken
   };
-};
+}, []);

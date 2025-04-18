@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
@@ -68,30 +68,35 @@ const VocabularyApp: React.FC = () => {
     }
   }, [isVoicesLoaded, toast, voiceRegion]);
 
-  const handleToggleMuteWithSpeaking = () => {
+  const handleToggleMuteWithSpeaking = useCallback(() => {
     stopSpeaking();
     const wasMuted = isMuted;
     handleToggleMute();
+    
     if (wasMuted && currentWord) {
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
-      }, 300);
+      }, 500);
+    } else if (!wasMuted) {
+      // Just turned mute on, no need to speak
+      resetLastSpokenWord();
     }
-  };
+  }, [isMuted, currentWord, handleToggleMute, resetLastSpokenWord, speakCurrentWord]);
   
-  const handleChangeVoiceWithSpeaking = () => {
+  const handleChangeVoiceWithSpeaking = useCallback(() => {
     stopSpeaking();
     resetLastSpokenWord();
     handleChangeVoice();
+    
     if (!isMuted && currentWord) {
       setTimeout(() => {
         speakCurrentWord(true);
-      }, 500);
+      }, 800);
     }
-  };
+  }, [isMuted, currentWord, handleChangeVoice, resetLastSpokenWord, speakCurrentWord]);
   
-  const handleSwitchCategoryWithState = () => {
+  const handleSwitchCategoryWithState = useCallback(() => {
     stopSpeaking();
     resetLastSpokenWord();
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
@@ -102,10 +107,10 @@ const VocabularyApp: React.FC = () => {
       if (!isMuted && currentWord && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 800);
-  };
+    }, 1500);
+  }, [isMuted, voiceRegion, isPaused, currentWord, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord]);
 
-  const handleNextWordClick = () => {
+  const handleNextWordClick = useCallback(() => {
     stopSpeaking();
     resetLastSpokenWord();
     handleManualNext();
@@ -115,12 +120,12 @@ const VocabularyApp: React.FC = () => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 500);
-  };
+    }, 1000);
+  }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord]);
 
-  const toggleView = () => {
+  const toggleView = useCallback(() => {
     setShowWordCard(prev => !prev);
-  };
+  }, []);
 
   return (
     <VocabularyLayout

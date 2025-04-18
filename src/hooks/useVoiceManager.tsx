@@ -6,7 +6,7 @@ export const useVoiceManager = () => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
   const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([]);
   const loadAttemptsRef = useRef(0);
-  const maxLoadAttempts = 5;
+  const maxLoadAttempts = 10; // Increased max attempts
 
   const loadVoices = useCallback(() => {
     try {
@@ -24,7 +24,7 @@ export const useVoiceManager = () => {
         
         // Only retry a limited number of times to avoid infinite loops
         if (loadAttemptsRef.current < maxLoadAttempts) {
-          setTimeout(loadVoices, 500);
+          setTimeout(loadVoices, 750); // Increased delay between attempts
         } else {
           console.error("Failed to load voices after multiple attempts");
           // Set as loaded anyway to let the app proceed with fallbacks
@@ -102,6 +102,7 @@ export const useVoiceManager = () => {
       voice = availableVoices[0];
     }
     
+    console.log(`Selected ${voiceRegion} voice:`, voice ? `${voice.name} (${voice.lang})` : "None found");
     return voice;
   }, [availableVoices]);
 

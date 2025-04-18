@@ -18,6 +18,7 @@ export const useVocabularyManager = () => {
   const { toast } = useToast();
   const lastManualActionTimeRef = useRef<number>(Date.now());
   const currentWordRef = useRef<VocabularyWord | null>(null);
+  const wordChangeInProgressRef = useRef(false);
 
   // Keep currentWordRef updated
   useEffect(() => {
@@ -27,6 +28,7 @@ export const useVocabularyManager = () => {
   // Save pause state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('isPaused', isPaused.toString());
+    console.log("Pause state saved to localStorage:", isPaused);
   }, [isPaused]);
 
   const clearTimer = useCallback(() => {
@@ -37,24 +39,31 @@ export const useVocabularyManager = () => {
   }, []);
 
   const displayNextWord = useCallback(async () => {
+    // Prevent multiple word changes at once
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change already in progress, ignoring request");
+      return;
+    }
+    
     // Don't process if paused
     if (isPaused) {
       console.log("App is paused, not displaying next word");
       return;
     }
     
-    // Check if there was a recent manual action (less than 1 second ago)
+    // Check if there was a recent manual action (less than 2 seconds ago)
     const now = Date.now();
     const timeSinceLastManualAction = now - lastManualActionTimeRef.current;
-    if (timeSinceLastManualAction < 1000) {
+    if (timeSinceLastManualAction < 2000) {
       console.log("Recent manual action detected, delaying auto word change");
       // Schedule this function to run again after the debounce period
       clearTimer();
-      timerRef.current = window.setTimeout(displayNextWord, 1000);
+      timerRef.current = window.setTimeout(displayNextWord, 2000);
       return;
     }
     
     // Set changing word state to prevent conflicts
+    wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     clearTimer();
     stopSpeaking();
@@ -62,41 +71,45 @@ export const useVocabularyManager = () => {
     // Double-check pause state again
     if (isPaused) {
       isChangingWordRef.current = false;
+      wordChangeInProgressRef.current = false;
       return;
     }
     
-    const nextWord = vocabularyService.getNextWord();
-    
-    if (nextWord) {
-      console.log("Displaying next word:", nextWord.word);
-      setCurrentWord(nextWord);
+    // Get next word and update UI
+    try {
+      const nextWord = vocabularyService.getNextWord();
       
-      // Calculate total duration for word and add buffer time
-      const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
-      const duration = calculateSpeechDuration(fullText);
-      lastSpeechDurationRef.current = duration;
-      
-      // Add buffer time for screen transitions - increased to 8000ms for more reliable transitions
-      const totalDuration = duration + 8000;
-      
+      if (nextWord) {
+        console.log("Displaying next word:", nextWord.word);
+        setCurrentWord(nextWord);
+        
+        // Calculate total duration for word and add buffer time
+        const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
+        const duration = calculateSpeechDuration(fullText);
+        lastSpeechDurationRef.current = duration;
+        
+        // Add buffer time for screen transitions - increased to 10000ms for more reliable transitions
+        const totalDuration = duration + 10000;
+        
+        console.log(`Scheduled next word in ${totalDuration}ms`);
+        clearTimer();
+        
+        // Only schedule next word if not paused
+        if (!isPaused) {
+          timerRef.current = window.setTimeout(displayNextWord, totalDuration);
+        }
+      } else {
+        toast({
+          title: "No vocabulary data",
+          description: "Please upload an Excel file with vocabulary data.",
+        });
+      }
+    } finally {
       // Release the changing word lock after a short timeout to allow UI to update
       setTimeout(() => {
         isChangingWordRef.current = false;
-      }, 500);
-      
-      console.log(`Scheduled next word in ${totalDuration}ms`);
-      clearTimer();
-      
-      // Only schedule next word if not paused
-      if (!isPaused) {
-        timerRef.current = window.setTimeout(displayNextWord, totalDuration);
-      }
-    } else {
-      isChangingWordRef.current = false;
-      toast({
-        title: "No vocabulary data",
-        description: "Please upload an Excel file with vocabulary data.",
-      });
+        wordChangeInProgressRef.current = false;
+      }, 1000);
     }
   }, [isPaused, clearTimer, toast]);
 
@@ -114,8 +127,8 @@ export const useVocabularyManager = () => {
       
       if (!isPaused) {
         clearTimer();
-        // Increased initial timeout to 3 seconds to give more time before starting
-        timerRef.current = window.setTimeout(displayNextWord, 3000);
+        // Increased initial timeout to 5 seconds to give more time before starting
+        timerRef.current = window.setTimeout(displayNextWord, 5000);
       }
     }
     
@@ -125,7 +138,7 @@ export const useVocabularyManager = () => {
     };
   }, [displayNextWord, isPaused, clearTimer]);
 
-  const handleFileUploaded = () => {
+  const handleFileUploaded = useCallback(() => {
     console.log("File uploaded callback triggered");
     setHasData(true);
     lastManualActionTimeRef.current = Date.now();
@@ -138,12 +151,12 @@ export const useVocabularyManager = () => {
     
     if (!isPaused) {
       clearTimer();
-      // Increased timeout after file upload to 2 seconds
-      timerRef.current = window.setTimeout(displayNextWord, 2000);
+      // Increased timeout after file upload to 3 seconds
+      timerRef.current = window.setTimeout(displayNextWord, 3000);
     }
-  };
+  }, [clearTimer, displayNextWord, isPaused]);
 
-  const handleTogglePause = () => {
+  const handleTogglePause = useCallback(() => {
     lastManualActionTimeRef.current = Date.now();
     stopSpeaking();
     
@@ -154,16 +167,22 @@ export const useVocabularyManager = () => {
       if (!newPauseState) {
         // When unpausing, display next word after a short delay
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, 1000);
+        timerRef.current = window.setTimeout(displayNextWord, 1500);
       } else {
         clearTimer();
       }
       
       return newPauseState;
     });
-  };
+  }, [clearTimer, displayNextWord]);
 
-  const handleManualNext = () => {
+  const handleManualNext = useCallback(() => {
+    // Prevent multiple word changes at once
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change already in progress, ignoring manual next request");
+      return;
+    }
+    
     lastManualActionTimeRef.current = Date.now();
     clearTimer();
     
@@ -171,6 +190,7 @@ export const useVocabularyManager = () => {
     stopSpeaking();
     
     // Set changing word flag to prevent conflicts
+    wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
     // Get next word and update state
@@ -187,17 +207,24 @@ export const useVocabularyManager = () => {
       // Schedule next word after this one if not paused
       if (!isPaused) {
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, duration + 8000);
+        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
       }
     }
     
     // Release changing word lock after UI update
     setTimeout(() => {
       isChangingWordRef.current = false;
-    }, 300);
-  };
+      wordChangeInProgressRef.current = false;
+    }, 1000);
+  }, [clearTimer, displayNextWord, isPaused]);
 
-  const handleSwitchCategory = (isMuted: boolean, voiceRegion: 'US' | 'UK') => {
+  const handleSwitchCategory = useCallback((isMuted: boolean, voiceRegion: 'US' | 'UK') => {
+    // Prevent multiple operations at once
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change in progress, ignoring category switch request");
+      return;
+    }
+    
     lastManualActionTimeRef.current = Date.now();
     
     // Cancel any ongoing speech and timer
@@ -205,6 +232,7 @@ export const useVocabularyManager = () => {
     clearTimer();
     
     // Set changing category flag
+    wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
     // Switch to next category
@@ -225,15 +253,16 @@ export const useVocabularyManager = () => {
       // Schedule next word if not paused
       if (!isPaused) {
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, duration + 8000);
+        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
       }
     }
     
-    // Release changing word lock after UI update
+    // Release changing word lock after UI update (longer delay for category change)
     setTimeout(() => {
       isChangingWordRef.current = false;
-    }, 300);
-  };
+      wordChangeInProgressRef.current = false;
+    }, 1500);
+  }, [clearTimer, displayNextWord, isPaused]);
 
   return {
     hasData,
