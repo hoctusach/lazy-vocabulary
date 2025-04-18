@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -37,11 +36,12 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Speak the current word when it changes
+  // Speak the full vocabulary entry when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
-      console.log("Speaking word:", currentWord.word);
-      speakText(currentWord.word);
+      const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
+      console.log("Speaking full text:", fullText);
+      speakText(fullText);
     }
   }, [currentWord, isPaused, isMuted, speakText]);
 

@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
