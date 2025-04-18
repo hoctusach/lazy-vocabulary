@@ -1,4 +1,3 @@
-
 import React from 'react';
 import VocabularyApp from '@/components/VocabularyApp';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -29,9 +28,8 @@ const Index = () => {
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"
-                      download
                     >
-                      Download the sample word set and upload it
+                      Download and upload the sample words
                     </a>
                   </li>
                   <li>Enable notifications</li>
@@ -55,7 +53,6 @@ const Index = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 hover:underline text-xs"
-            download
           >
             Download Sample Words
           </a>

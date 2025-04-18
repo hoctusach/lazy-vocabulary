@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,12 +38,22 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   nextCategory,
   isSpeaking = false
 }) => {
+  // Save states to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('buttonStates', JSON.stringify({
+      isMuted,
+      isPaused,
+      voiceRegion,
+      currentCategory
+    }));
+  }, [isMuted, isPaused, voiceRegion, currentCategory]);
+
   return (
     <Card 
       className={cn(
         "w-full max-w-xl mx-auto transition-colors duration-300",
         "border-0 shadow-lg",
-        isSpeaking ? "ring-2 ring-blue-400" : "" // Visual indicator when speaking
+        isSpeaking ? "ring-2 ring-blue-400" : ""
       )}
       style={{ backgroundColor }}
     >
