@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -113,29 +112,22 @@ const VocabularyApp: React.FC = () => {
       onToggleView={toggleView}
     >
       {currentWord && hasData && showWordCard && (
-        <>
-          <VocabularyCard 
-            word={currentWord.word}
-            meaning={currentWord.meaning}
-            example={currentWord.example}
-            backgroundColor={backgroundColors[backgroundColorIndex % backgroundColors.length]}
-            isMuted={isMuted}
-            isPaused={isPaused}
-            voiceRegion={voiceRegion}
-            onToggleMute={handleToggleMuteWithSpeaking}
-            onTogglePause={handleTogglePause}
-            onChangeVoice={handleChangeVoiceWithSpeaking}
-            onSwitchCategory={handleSwitchCategoryWithState}
-            currentCategory={currentSheetName}
-            nextCategory={nextSheetName}
-            isSpeaking={isSpeakingRef.current}
-          />
-          
-          <VocabularyControls 
-            onReset={() => setHasData(false)}
-            onNext={handleNextWordClick}
-          />
-        </>
+        <VocabularyCard 
+          word={currentWord.word}
+          meaning={currentWord.meaning}
+          example={currentWord.example}
+          backgroundColor={backgroundColors[backgroundColorIndex % backgroundColors.length]}
+          isMuted={isMuted}
+          isPaused={isPaused}
+          voiceRegion={voiceRegion}
+          onToggleMute={handleToggleMuteWithSpeaking}
+          onTogglePause={handleTogglePause}
+          onChangeVoice={handleChangeVoiceWithSpeaking}
+          onSwitchCategory={handleSwitchCategoryWithState}
+          currentCategory={currentSheetName}
+          nextCategory={nextSheetName}
+          isSpeaking={isSpeakingRef.current}
+        />
       )}
       
       {!hasData ? (
@@ -148,6 +140,7 @@ const VocabularyApp: React.FC = () => {
         />
       )}
       
+      {/* Notifications section temporarily hidden
       <NotificationManager 
         onNotificationsEnabled={() => {
           toast({
@@ -158,6 +151,7 @@ const VocabularyApp: React.FC = () => {
         currentWord={currentWord}
         voiceRegion={voiceRegion}
       />
+      */}
     </VocabularyLayout>
   );
 };

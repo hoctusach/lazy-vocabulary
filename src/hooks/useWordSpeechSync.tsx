@@ -2,7 +2,6 @@
 import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
-import { vocabularyService } from '@/services/vocabularyService';
 
 export const useWordSpeechSync = (
   currentWord: VocabularyWord | null,
@@ -26,7 +25,7 @@ export const useWordSpeechSync = (
       return;
     }
     
-    const wordId = `${currentWord.word}-${Date.now()}`;
+    const wordId = currentWord.word;
     
     if (wordId === lastSpokenWordId.current) {
       console.log("Word already spoken, skipping:", wordId);
@@ -35,29 +34,40 @@ export const useWordSpeechSync = (
     
     lastSpokenWordId.current = wordId;
     
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-    
-    console.log("Speaking vocabulary:", currentWord.word);
-    
     try {
+      // Set speaking state before starting
       isSpeakingRef.current = true;
-      await new Promise(resolve => setTimeout(resolve, 300));
+      isChangingWordRef.current = true;
+      
+      // Small delay to ensure UI updates
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Construct the text to be spoken
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+      console.log("Starting to speak:", currentWord.word);
+      
+      // Speak the text
       await speakText(fullText);
-      console.log("Finished speaking word completely");
+      
+      // Add a small delay after speaking completes
       await new Promise(resolve => setTimeout(resolve, 300));
+      
+      console.log("Finished speaking word completely");
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
+      // Reset states after speaking completes
       isSpeakingRef.current = false;
+      isChangingWordRef.current = false;
     }
   };
 
-  // Effect for auto-speaking words
+  // Effect for auto-speaking words with proper synchronization
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && isVoicesLoaded && !isChangingWordRef.current) {
       const timer = setTimeout(() => {
         speakCurrentWord();
-      }, 200);
+      }, 300); // Increased delay for better synchronization
       
       return () => clearTimeout(timer);
     }
@@ -65,6 +75,10 @@ export const useWordSpeechSync = (
 
   return {
     speakCurrentWord,
-    resetLastSpokenWord: () => lastSpokenWordId.current = null
+    resetLastSpokenWord: () => {
+      lastSpokenWordId.current = null;
+      isSpeakingRef.current = false;
+      isChangingWordRef.current = false;
+    }
   };
 };
