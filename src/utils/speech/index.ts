@@ -72,6 +72,18 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         utterance.onend = () => {
           console.log('Speech completed successfully');
           clearAllTimers();
+          // Store successful completion in localStorage to help track state
+          try {
+            const states = JSON.parse(localStorage.getItem('buttonStates') || '{}');
+            states.lastCompletedSpeech = {
+              text: text.substring(0, 30),
+              region: region,
+              timestamp: Date.now()
+            };
+            localStorage.setItem('buttonStates', JSON.stringify(states));
+          } catch (e) {
+            console.error('Error saving speech completion state:', e);
+          }
           resolve();
         };
         

@@ -17,7 +17,7 @@ export const useSpeechSynthesis = () => {
     } catch (error) {
       console.error('Error reading button states from localStorage:', error);
     }
-    return { initialMuted: false, initialVoiceRegion: 'US' };
+    return { initialMuted: false, initialVoiceRegion: 'US' as const };
   };
 
   const { initialMuted, initialVoiceRegion } = getInitialStates();

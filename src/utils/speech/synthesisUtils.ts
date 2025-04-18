@@ -13,3 +13,14 @@ export const stopSpeaking = (): void => {
     }
   }
 };
+
+// Function to check if sound and display are in sync
+export const checkSoundDisplaySync = (
+  currentWord: string | null, 
+  currentTextBeingSpoken: string | null
+): boolean => {
+  if (!currentWord || !currentTextBeingSpoken) return true;
+  
+  // Check if the current word is included in the text being spoken
+  return currentTextBeingSpoken.includes(currentWord);
+};

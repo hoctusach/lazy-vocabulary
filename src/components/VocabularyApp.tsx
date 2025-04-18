@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import FileUpload from './FileUpload';
@@ -8,11 +8,12 @@ import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
-import { stopSpeaking } from '@/utils/speech';
+import { stopSpeaking, checkSoundDisplaySync } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   const [showWordCard, setShowWordCard] = useState(true);
+  const syncCheckTimeoutRef = useRef<number | null>(null);
   
   const {
     hasData,
@@ -34,7 +35,8 @@ const VocabularyApp: React.FC = () => {
     handleToggleMute,
     handleChangeVoice,
     isVoicesLoaded,
-    speakingRef
+    speakingRef,
+    getCurrentText
   } = useSpeechSynthesis();
 
   const { speakCurrentWord, resetLastSpokenWord, wordFullySpoken } = useWordSpeechSync(
@@ -50,6 +52,42 @@ const VocabularyApp: React.FC = () => {
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
+
+  // Check and fix synchronization between display and audio
+  useEffect(() => {
+    const checkSyncAndFix = () => {
+      if (!currentWord || isPaused || isMuted) return;
+      
+      const currentTextBeingSpoken = getCurrentText();
+      const isInSync = checkSoundDisplaySync(currentWord.word, currentTextBeingSpoken);
+      
+      if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
+        console.log("Detected sound/display mismatch. Fixing...");
+        // Reset speech and speak the current word
+        stopSpeaking();
+        setTimeout(() => {
+          if (currentWord && !isPaused && !isMuted) {
+            speakCurrentWord(true);
+          }
+        }, 300);
+      }
+      
+      // Schedule the next check
+      if (syncCheckTimeoutRef.current) {
+        clearTimeout(syncCheckTimeoutRef.current);
+      }
+      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 5000);
+    };
+    
+    // Initial check
+    checkSyncAndFix();
+    
+    return () => {
+      if (syncCheckTimeoutRef.current) {
+        clearTimeout(syncCheckTimeoutRef.current);
+      }
+    };
+  }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef]);
 
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;

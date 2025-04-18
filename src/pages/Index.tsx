@@ -1,3 +1,4 @@
+
 import React from 'react';
 import VocabularyApp from '@/components/VocabularyApp';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -9,7 +10,7 @@ const Index = () => {
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-center">Lazy Vocabulary</h1>
         <p className="text-center text-muted-foreground">
-          Learn vocabulary effortlessly with push notifications
+          Learn vocabulary effortlessly with repeating sounds
         </p>
         <div className="mt-2 flex items-center justify-center gap-2">
           <p className="text-sm text-blue-500">Are you new?</p>

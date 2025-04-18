@@ -76,17 +76,17 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
-          <div className="flex flex-wrap gap-2 pt-2 justify-end">
+          <div className="flex flex-wrap gap-1 pt-2 justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={onToggleMute}
               className={cn(
-                "h-8 text-xs px-2",
+                "h-7 text-xs px-2",
                 isMuted ? "text-purple-700 border-purple-300" : "text-gray-700"
               )}
             >
-              {isMuted ? <VolumeX size={16} className="mr-1" /> : <Volume2 size={16} className="mr-1" />}
+              {isMuted ? <VolumeX size={14} className="mr-1" /> : <Volume2 size={14} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
             </Button>
             
@@ -94,7 +94,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onChangeVoice}
-              className="h-8 text-xs px-2 text-blue-700"
+              className="h-7 text-xs px-2 text-blue-700"
             >
               {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
@@ -104,11 +104,11 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               size="sm"
               onClick={onTogglePause}
               className={cn(
-                "h-8 text-xs px-2",
+                "h-7 text-xs px-2",
                 isPaused ? "text-orange-500 border-orange-300" : "text-gray-700"
               )}
             >
-              {isPaused ? <Play size={16} className="mr-1" /> : <Pause size={16} className="mr-1" />}
+              {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
               {isPaused ? "Play" : "Pause"}
             </Button>
             
@@ -116,9 +116,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
-              className="h-8 text-xs px-2 text-green-700"
+              className="h-7 text-xs px-2 text-green-700"
             >
-              <RefreshCw size={14} className="mr-1" />
+              <RefreshCw size={12} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
           </div>
