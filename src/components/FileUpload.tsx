@@ -1,9 +1,8 @@
-
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FilePlus2 } from 'lucide-react';
+import { Upload, FilePlus2, Download } from 'lucide-react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -14,6 +13,8 @@ interface FileUploadProps {
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  const DEFAULT_VOCAB_DOWNLOAD_URL = "https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true";
   
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -76,12 +77,27 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     }
   };
   
+  const handleDownloadDefault = () => {
+    window.open(DEFAULT_VOCAB_DOWNLOAD_URL, '_blank');
+    toast({
+      title: "Default Vocabulary File",
+      description: "Right-click and select 'Download' to save the file.",
+    });
+  };
+  
   return (
     <Card className="w-full max-w-xl mx-auto">
       <CardHeader>
         <CardTitle>Upload Vocabulary</CardTitle>
-        <CardDescription>
-          Upload your Excel file containing vocabulary words, meanings, and examples.
+        <CardDescription className="flex justify-between items-center">
+          Prepare your Excel file for vocabulary learning
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleDownloadDefault}
+          >
+            <Download size={16} className="mr-2" /> Download Default File
+          </Button>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -108,10 +124,18 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           />
         </div>
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleButtonClick} className="w-full">
+      <CardFooter className="flex gap-2">
+        <Button onClick={handleButtonClick} className="flex-1">
           <Upload size={16} className="mr-2" />
           Upload Excel File
+        </Button>
+        <Button 
+          variant="secondary" 
+          onClick={handleDownloadDefault}
+          className="flex-1"
+        >
+          <Download size={16} className="mr-2" />
+          Download Template
         </Button>
       </CardFooter>
     </Card>
