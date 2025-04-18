@@ -1,4 +1,3 @@
-
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { isSpeechSynthesisSupported, stopSpeaking } from './synthesisUtils';
@@ -27,7 +26,6 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         const voice = getVoiceByRegion(region);
         
         if (voice) {
-          console.log(`Selected voice for ${region}: ${voice.name} (${voice.lang})`);
           console.log(`Using voice: ${voice.name} (${voice.lang}) for region ${region}`);
           utterance.voice = voice;
           utterance.lang = langCode;
@@ -35,8 +33,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters - slightly faster rate for better sync
-        utterance.rate = 0.85; // Slightly adjusted for better timing
+        // Configure speech parameters
+        utterance.rate = 0.8;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -88,7 +86,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } else {
             clearAllTimers();
           }
-        }, 3000); // More frequent keep-alive for better reliability
+        }, 5000);
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
@@ -118,7 +116,6 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.onvoiceschanged = null;
       };
       
-      // Fallback timeout in case voices don't load properly
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
@@ -129,7 +126,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 1000); // Reduced timeout for faster fallback
+      }, 1500);
     }
   });
 };

@@ -19,7 +19,6 @@ export const useVocabularyManager = () => {
   const lastManualActionTimeRef = useRef<number>(Date.now());
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const wordChangeInProgressRef = useRef(false);
-  const autoPlayEnabledRef = useRef(!initialPaused);
 
   // Keep currentWordRef updated
   useEffect(() => {
@@ -30,12 +29,10 @@ export const useVocabularyManager = () => {
   useEffect(() => {
     localStorage.setItem('isPaused', isPaused.toString());
     console.log("Pause state saved to localStorage:", isPaused);
-    autoPlayEnabledRef.current = !isPaused;
   }, [isPaused]);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current !== null) {
-      console.log("Clearing auto-next word timer");
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }
@@ -51,12 +48,6 @@ export const useVocabularyManager = () => {
     // Don't process if paused
     if (isPaused) {
       console.log("App is paused, not displaying next word");
-      return;
-    }
-    
-    // Check if autoplay is enabled
-    if (!autoPlayEnabledRef.current) {
-      console.log("Auto-play is disabled, not displaying next word automatically");
       return;
     }
     
@@ -77,11 +68,8 @@ export const useVocabularyManager = () => {
     clearTimer();
     stopSpeaking();
     
-    console.log("Auto-displaying next word");
-    
     // Double-check pause state again
     if (isPaused) {
-      console.log("App is now paused, aborting word change");
       isChangingWordRef.current = false;
       wordChangeInProgressRef.current = false;
       return;
@@ -100,39 +88,27 @@ export const useVocabularyManager = () => {
         const duration = calculateSpeechDuration(fullText);
         lastSpeechDurationRef.current = duration;
         
-        // Add buffer time for screen transitions - increased to 12000ms for more reliable transitions
-        const totalDuration = duration + 12000;
+        // Add buffer time for screen transitions - increased to 10000ms for more reliable transitions
+        const totalDuration = duration + 10000;
         
         console.log(`Scheduled next word in ${totalDuration}ms`);
         clearTimer();
         
         // Only schedule next word if not paused
-        if (!isPaused && autoPlayEnabledRef.current) {
-          console.log("Scheduling next automatic word display");
+        if (!isPaused) {
           timerRef.current = window.setTimeout(displayNextWord, totalDuration);
-        } else {
-          console.log("Not scheduling next word - auto-play disabled or app paused");
         }
       } else {
-        console.log("No vocabulary data available");
         toast({
           title: "No vocabulary data",
           description: "Please upload an Excel file with vocabulary data.",
         });
       }
-    } catch (error) {
-      console.error("Error displaying next word:", error);
-      toast({
-        title: "Error",
-        description: "Failed to display next word",
-        variant: "destructive"
-      });
     } finally {
       // Release the changing word lock after a short timeout to allow UI to update
       setTimeout(() => {
         isChangingWordRef.current = false;
         wordChangeInProgressRef.current = false;
-        console.log("Word change completed, locks released");
       }, 1000);
     }
   }, [isPaused, clearTimer, toast]);
@@ -152,11 +128,8 @@ export const useVocabularyManager = () => {
       if (!isPaused) {
         clearTimer();
         // Increased initial timeout to 5 seconds to give more time before starting
-        console.log("Scheduling first automatic word change");
         timerRef.current = window.setTimeout(displayNextWord, 5000);
       }
-    } else {
-      console.log("No vocabulary data found on initialization");
     }
     
     return () => {
@@ -176,18 +149,12 @@ export const useVocabularyManager = () => {
     console.log("New word after file upload:", word);
     setCurrentWord(word);
     
-    toast({
-      title: "File Uploaded",
-      description: "Vocabulary data loaded successfully",
-    });
-    
     if (!isPaused) {
       clearTimer();
       // Increased timeout after file upload to 3 seconds
-      console.log("Scheduling word display after file upload");
       timerRef.current = window.setTimeout(displayNextWord, 3000);
     }
-  }, [clearTimer, displayNextWord, isPaused, toast]);
+  }, [clearTimer, displayNextWord, isPaused]);
 
   const handleTogglePause = useCallback(() => {
     lastManualActionTimeRef.current = Date.now();
@@ -200,13 +167,9 @@ export const useVocabularyManager = () => {
       if (!newPauseState) {
         // When unpausing, display next word after a short delay
         clearTimer();
-        console.log("Unpaused - scheduling next word display");
         timerRef.current = window.setTimeout(displayNextWord, 1500);
-        autoPlayEnabledRef.current = true;
       } else {
-        console.log("Paused - stopping automatic word changes");
         clearTimer();
-        autoPlayEnabledRef.current = false;
       }
       
       return newPauseState;
@@ -220,7 +183,6 @@ export const useVocabularyManager = () => {
       return;
     }
     
-    console.log("Manual next word requested");
     lastManualActionTimeRef.current = Date.now();
     clearTimer();
     
@@ -232,46 +194,29 @@ export const useVocabularyManager = () => {
     isChangingWordRef.current = true;
     
     // Get next word and update state
-    try {
-      const nextWord = vocabularyService.getNextWord();
-      if (nextWord) {
-        console.log("Manual next word:", nextWord.word);
-        setCurrentWord(nextWord);
-        
-        // Calculate duration for scheduling next word if not paused
-        const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
-        const duration = calculateSpeechDuration(fullText);
-        lastSpeechDurationRef.current = duration;
-        
-        // Schedule next word after this one if not paused
-        if (!isPaused && autoPlayEnabledRef.current) {
-          clearTimer();
-          console.log("Scheduling next automatic word display after manual next");
-          timerRef.current = window.setTimeout(displayNextWord, duration + 12000);
-        }
-      } else {
-        console.log("No next word available");
-        toast({
-          title: "No More Words",
-          description: "You've reached the end of the vocabulary list",
-        });
+    const nextWord = vocabularyService.getNextWord();
+    if (nextWord) {
+      console.log("Manual next word:", nextWord.word);
+      setCurrentWord(nextWord);
+      
+      // Calculate duration for scheduling next word if not paused
+      const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
+      const duration = calculateSpeechDuration(fullText);
+      lastSpeechDurationRef.current = duration;
+      
+      // Schedule next word after this one if not paused
+      if (!isPaused) {
+        clearTimer();
+        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
       }
-    } catch (error) {
-      console.error("Error handling manual next:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load next word",
-        variant: "destructive"
-      });
-    } finally {
-      // Release changing word lock after UI update
-      setTimeout(() => {
-        isChangingWordRef.current = false;
-        wordChangeInProgressRef.current = false;
-        console.log("Manual word change completed, locks released");
-      }, 1000);
     }
-  }, [clearTimer, displayNextWord, isPaused, toast]);
+    
+    // Release changing word lock after UI update
+    setTimeout(() => {
+      isChangingWordRef.current = false;
+      wordChangeInProgressRef.current = false;
+    }, 1000);
+  }, [clearTimer, displayNextWord, isPaused]);
 
   const handleSwitchCategory = useCallback((isMuted: boolean, voiceRegion: 'US' | 'UK') => {
     // Prevent multiple operations at once
@@ -280,7 +225,6 @@ export const useVocabularyManager = () => {
       return;
     }
     
-    console.log("Switching vocabulary category");
     lastManualActionTimeRef.current = Date.now();
     
     // Cancel any ongoing speech and timer
@@ -291,56 +235,34 @@ export const useVocabularyManager = () => {
     wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
-    try {
-      // Switch to next category
-      const nextCategory = vocabularyService.nextSheet();
-      console.log(`Switched to category: ${nextCategory}`);
+    // Switch to next category
+    const nextCategory = vocabularyService.nextSheet();
+    console.log(`Switched to category: ${nextCategory}`);
+    
+    // Get first word from new category
+    const nextWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
+    if (nextWord) {
+      console.log("First word in new category:", nextWord.word);
+      setCurrentWord(nextWord);
       
-      toast({
-        title: "Category Changed",
-        description: `Now viewing: ${nextCategory}`,
-      });
+      // Calculate duration for scheduling next word
+      const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
+      const duration = calculateSpeechDuration(fullText);
+      lastSpeechDurationRef.current = duration;
       
-      // Get first word from new category
-      const nextWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
-      if (nextWord) {
-        console.log("First word in new category:", nextWord.word);
-        setCurrentWord(nextWord);
-        
-        // Calculate duration for scheduling next word
-        const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
-        const duration = calculateSpeechDuration(fullText);
-        lastSpeechDurationRef.current = duration;
-        
-        // Schedule next word if not paused
-        if (!isPaused && autoPlayEnabledRef.current) {
-          clearTimer();
-          console.log("Scheduling next automatic word after category change");
-          timerRef.current = window.setTimeout(displayNextWord, duration + 12000);
-        }
-      } else {
-        console.log("No words in the new category");
-        toast({
-          title: "Empty Category",
-          description: "This category has no vocabulary words",
-        });
+      // Schedule next word if not paused
+      if (!isPaused) {
+        clearTimer();
+        timerRef.current = window.setTimeout(displayNextWord, duration + 10000);
       }
-    } catch (error) {
-      console.error("Error switching category:", error);
-      toast({
-        title: "Error",
-        description: "Failed to switch category",
-        variant: "destructive"
-      });
-    } finally {
-      // Release changing word lock after UI update (longer delay for category change)
-      setTimeout(() => {
-        isChangingWordRef.current = false;
-        wordChangeInProgressRef.current = false;
-        console.log("Category change completed, locks released");
-      }, 1500);
     }
-  }, [clearTimer, displayNextWord, isPaused, toast]);
+    
+    // Release changing word lock after UI update (longer delay for category change)
+    setTimeout(() => {
+      isChangingWordRef.current = false;
+      wordChangeInProgressRef.current = false;
+    }, 1500);
+  }, [clearTimer, displayNextWord, isPaused]);
 
   return {
     hasData,
