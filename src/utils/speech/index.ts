@@ -1,7 +1,7 @@
 
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
-import { isSpeechSynthesisSupported, stopSpeaking } from './synthesisUtils';
+import { isSpeechSynthesisSupported, stopSpeaking, checkSoundDisplaySync } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -168,4 +168,5 @@ export {
   calculateSpeechDuration,
   isSpeechSynthesisSupported,
   stopSpeaking,
+  checkSoundDisplaySync,
 };
