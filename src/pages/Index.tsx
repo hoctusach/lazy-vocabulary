@@ -38,7 +38,7 @@ const Index = () => {
       </main>
       
       <footer className="mt-12 text-center text-sm text-muted-foreground">
-        <p>© 2025 Lazy Vocabulary - Web Edition</p>
+        <p>© 2025 Lazy Vocabulary - hoctusach</p>
       </footer>
     </div>
   );

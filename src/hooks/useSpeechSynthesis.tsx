@@ -11,6 +11,7 @@ export const useSpeechSynthesis = () => {
   const speakingRef = useRef(false);
   const speechRequestIdRef = useRef(0);
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const voicesLoadedTimeoutRef = useRef<number | null>(null);
 
   // Check if speech synthesis is supported
   useEffect(() => {
@@ -60,13 +61,31 @@ export const useSpeechSynthesis = () => {
         // For browsers without the event, try loading after a delay
         const timerId = setTimeout(() => {
           loadVoices();
-          // If still no voices, make one final attempt
+          // If still no voices, make multiple attempts with increasing delays
           if (!isVoicesLoaded) {
-            setTimeout(loadVoices, 1000);
+            if (voicesLoadedTimeoutRef.current) {
+              clearTimeout(voicesLoadedTimeoutRef.current);
+            }
+            
+            // Try multiple times with different delays
+            const retryTimes = [500, 1000, 2000, 3000];
+            retryTimes.forEach((delay, index) => {
+              voicesLoadedTimeoutRef.current = window.setTimeout(() => {
+                const success = loadVoices();
+                if (success) {
+                  console.log(`Voices loaded on attempt ${index + 1}`);
+                }
+              }, delay);
+            });
           }
         }, 500);
         
-        return () => clearTimeout(timerId);
+        return () => {
+          clearTimeout(timerId);
+          if (voicesLoadedTimeoutRef.current) {
+            clearTimeout(voicesLoadedTimeoutRef.current);
+          }
+        };
       }
     }
   }, [toast]);
@@ -74,6 +93,7 @@ export const useSpeechSynthesis = () => {
   // Update voice when region changes
   useEffect(() => {
     if (isVoicesLoaded) {
+      window.speechSynthesis.cancel(); // Cancel any ongoing speech
       currentVoiceRef.current = getVoiceByRegion(voiceRegion);
       console.log(`Voice region changed to ${voiceRegion}`);
       

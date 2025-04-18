@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -70,34 +71,50 @@ const VocabularyApp: React.FC = () => {
 
   const handleToggleMuteWithSpeaking = () => {
     handleToggleMute();
-    if (isMuted && currentWord && !isPaused) {
-      setTimeout(() => {
-        resetLastSpokenWord();
-        speakCurrentWord();
-      }, 50);
-    }
-  };
-  
-  const handleChangeVoiceWithSpeaking = () => {
-    handleChangeVoice();
+    
+    // Wait a short moment for the mute state to update
     setTimeout(() => {
       if (!isMuted && currentWord && !isPaused) {
         resetLastSpokenWord();
-        speakCurrentWord();
+        speakCurrentWord(true); // Force speak the current word
       }
     }, 100);
   };
   
+  const handleChangeVoiceWithSpeaking = () => {
+    handleChangeVoice();
+    
+    // Wait for voice to change before speaking
+    setTimeout(() => {
+      if (!isMuted && currentWord && !isPaused) {
+        resetLastSpokenWord();
+        speakCurrentWord(true); // Force speak the current word
+      }
+    }, 300);
+  };
+  
   const handleSwitchCategoryWithState = () => {
+    // Change background color
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
+    
+    // Cancel any ongoing speech and reset state
+    window.speechSynthesis.cancel();
     resetLastSpokenWord();
+    
+    // Switch category
     handleSwitchCategory(isMuted, voiceRegion);
+    
+    // Wait for the new word to be loaded, then speak it
+    setTimeout(() => {
+      if (!isMuted && !isPaused) {
+        speakCurrentWord(true); // Force speak the new word
+      }
+    }, 500);
   };
 
   const handleNextWordClick = () => {
     window.speechSynthesis.cancel();
-    isSpeakingRef.current = false;
-    speakingRef.current = false;
+    resetLastSpokenWord();
     handleManualNext();
   };
 
@@ -140,18 +157,7 @@ const VocabularyApp: React.FC = () => {
         />
       )}
       
-      {/* Notifications section temporarily hidden
-      <NotificationManager 
-        onNotificationsEnabled={() => {
-          toast({
-            title: "Notifications Enabled",
-            description: "You will now receive vocabulary notifications even when your browser is minimized.",
-          });
-        }}
-        currentWord={currentWord}
-        voiceRegion={voiceRegion}
-      />
-      */}
+      {/* Notifications section temporarily hidden */}
     </VocabularyLayout>
   );
 };

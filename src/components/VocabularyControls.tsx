@@ -8,7 +8,7 @@ interface VocabularyControlsProps {
 }
 
 const VocabularyControls: React.FC<VocabularyControlsProps> = () => {
-  // Component temporarily empty as buttons are removed
+  // Component empty as buttons are removed per user request
   return null;
 };
 

@@ -1,4 +1,3 @@
-
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -21,9 +20,27 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     // Function to set voice
     const setVoiceAndSpeak = () => {
       try {
-        // Try to find a voice based on region
+        // Define language code based on region
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
-        let voice = voices.find(v => v.lang === langCode);
+        
+        // Try to find a good voice that matches our criteria
+        let voice = null;
+        
+        // First, try to find Google or Microsoft voices for the selected region
+        if (region === 'US') {
+          voice = voices.find(v => 
+            v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+          );
+        } else {
+          voice = voices.find(v => 
+            v.lang === 'en-GB' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+          );
+        }
+        
+        // If no premium voice found, try any voice for that region
+        if (!voice) {
+          voice = voices.find(v => v.lang === langCode);
+        }
         
         // Fallback to any English voice
         if (!voice) {
@@ -36,14 +53,14 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         }
         
         if (voice) {
-          console.log(`Using voice: ${voice.name} (${voice.lang})`);
+          console.log(`Using voice: ${voice.name} (${voice.lang}) for region ${region}`);
           utterance.voice = voice;
         } else {
           console.warn('No suitable voice found, using default browser voice');
         }
         
         // Configure speech parameters for better comprehension
-        utterance.rate = 0.85;
+        utterance.rate = 0.8; // Slightly slower for better understanding
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -65,7 +82,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         };
         
         // Start speaking
-        console.log('Starting speech', text);
+        console.log('Starting speech:', text.substring(0, 30) + '...');
         
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
@@ -73,15 +90,18 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         
         window.speechSynthesis.speak(utterance);
         
-        // Keep speech synthesis active in background (fixes Chrome bug)
+        // This keeps the speech synthesis active in Chrome
         const keepAlive = () => {
           if (window.speechSynthesis.speaking) {
+            console.log("Keeping speech synthesis alive...");
             window.speechSynthesis.pause();
             window.speechSynthesis.resume();
-            setTimeout(keepAlive, 5000);
+            setTimeout(keepAlive, 1000); // Run more frequently
           }
         };
-        setTimeout(keepAlive, 5000);
+        
+        // Start the keepAlive loop sooner to prevent cutoffs
+        setTimeout(keepAlive, 1000);
       } catch (err) {
         console.error('Error while setting up speech:', err);
         reject(err);
@@ -124,8 +144,9 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a buffer for pauses and natural speech patterns (40% buffer)
-  return milliseconds * 1.4;
+  // Add a larger buffer for pauses and natural speech patterns (60% buffer)
+  // This helps prevent cutting off longer texts
+  return milliseconds * 1.6;
 };
 
 export const stopSpeaking = (): void => {
@@ -164,9 +185,18 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     return null;
   }
   
-  // Try to find an appropriate voice for the selected region
+  // Define language code
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
-  let voice = voices.find(v => v.lang === langCode);
+  
+  // First try to find a premium voice (Google or Microsoft)
+  let voice = voices.find(v => 
+    v.lang === langCode && (v.name.includes('Google') || v.name.includes('Microsoft'))
+  );
+  
+  // If no premium voice found, try any voice for that region
+  if (!voice) {
+    voice = voices.find(v => v.lang === langCode);
+  }
   
   // Fallback to any English voice if not found
   if (!voice) {
