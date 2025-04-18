@@ -1,4 +1,3 @@
-
 import * as XLSX from 'xlsx';
 
 export interface VocabularyWord {
@@ -12,8 +11,51 @@ export interface SheetData {
   [key: string]: VocabularyWord[];
 }
 
+// Add a default dataset that will be used if no file is uploaded
+const DEFAULT_VOCABULARY_DATA: SheetData = {
+  "All words": [
+    { 
+      word: "Serendipity", 
+      meaning: "A fortunate discovery by accident", 
+      example: "Finding that book was pure serendipity.", 
+      count: 0 
+    },
+    { 
+      word: "Ephemeral", 
+      meaning: "Lasting for a very short time", 
+      example: "Social media trends are ephemeral.", 
+      count: 0 
+    },
+    // Add more default words here
+  ],
+  "phrasal verbs": [
+    { 
+      word: "Give up", 
+      meaning: "Stop trying", 
+      example: "Don't give up on your dreams.", 
+      count: 0 
+    }
+  ],
+  "idioms": [
+    { 
+      word: "Bite the bullet", 
+      meaning: "Do something difficult or unpleasant", 
+      example: "I had to bite the bullet and study for the exam.", 
+      count: 0 
+    }
+  ],
+  "advanced words": [
+    { 
+      word: "Ubiquitous", 
+      meaning: "Present, appearing, or found everywhere", 
+      example: "Smartphones are ubiquitous in modern society.", 
+      count: 0 
+    }
+  ]
+};
+
 class VocabularyService {
-  private data: SheetData = {};
+  private data: SheetData = DEFAULT_VOCABULARY_DATA;
   private currentSheetName: string = "All words";
   private shuffledIndices: number[] = [];
   private currentIndex: number = -1;
@@ -22,8 +64,16 @@ class VocabularyService {
   readonly sheetOptions = ["All words", "phrasal verbs", "idioms", "advanced words"];
   
   constructor() {
-    // Try to load data from localStorage on initialization
-    this.loadFromLocalStorage();
+    // First, try to load from localStorage
+    const savedData = localStorage.getItem('vocabularyData');
+    if (savedData) {
+      try {
+        this.data = JSON.parse(savedData);
+      } catch (e) {
+        console.error("Failed to load data from localStorage, using default data:", e);
+      }
+    }
+    this.shuffleCurrentSheet();
   }
   
   private loadFromLocalStorage() {
@@ -46,6 +96,7 @@ class VocabularyService {
     }
   }
   
+  // Modify processExcelFile to work with default data if needed
   async processExcelFile(file: File): Promise<boolean> {
     try {
       const data = await file.arrayBuffer();
@@ -66,8 +117,8 @@ class VocabularyService {
             count: parseInt(row.Count) || 0
           }));
         } else {
-          console.warn(`Sheet "${sheetName}" not found in the uploaded file.`);
-          newData[sheetName] = [];
+          console.warn(`Sheet "${sheetName}" not found in the uploaded file. Using default data.`);
+          newData[sheetName] = DEFAULT_VOCABULARY_DATA[sheetName] || [];
         }
       }
       
