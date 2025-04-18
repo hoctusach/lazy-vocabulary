@@ -46,40 +46,50 @@ const VocabularyApp: React.FC = () => {
         title: "Voice System Ready",
         description: `Speech system with ${voiceRegion} accent is ready.`,
       });
+      
+      // Try to speak a test message when voices are loaded
+      if (!isMuted && currentWord) {
+        console.log("Testing speech with sample text");
+        speakText("Speech system is ready").catch(err => 
+          console.error("Test speech failed:", err)
+        );
+      }
     }
-  }, [isVoicesLoaded, toast, voiceRegion]);
+  }, [isVoicesLoaded, toast, voiceRegion, isMuted, currentWord, speakText]);
 
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
-    if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
-      // Create a unique identifier for this word to avoid speaking the same word multiple times
-      const wordIdentifier = `${currentWord.word}-${currentWord.meaning}`;
+    if (!currentWord || isPaused || isMuted || !isVoicesLoaded) {
+      return;
+    }
+    
+    // Create a unique identifier for this word to avoid speaking the same word multiple times
+    const wordIdentifier = `${currentWord.word}-${Date.now()}`;
+    
+    // Prevent speaking the same word multiple times in succession
+    if (wordSpoken !== wordIdentifier) {
+      setWordSpoken(wordIdentifier);
       
-      // Only speak if this is a new word
-      if (wordSpoken !== wordIdentifier) {
-        setWordSpoken(wordIdentifier);
-        
-        // Construct the text to speak
-        const fullText = `${currentWord.word}. ${currentWord.meaning}. Example: ${currentWord.example}`;
-        
-        // Use a timeout to ensure everything is ready for speech
-        const timerId = setTimeout(() => {
-          console.log("Speaking vocabulary:", currentWord.word);
-          speakText(fullText)
-            .then(() => console.log("Vocabulary speech completed"))
-            .catch(error => {
-              console.error("Speech error:", error);
-              toast({
-                title: "Speech Issue",
-                description: "Couldn't speak this word. Try a different voice or unmute if muted.",
-                variant: "destructive"
-              });
+      // Construct the text to speak
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. Example: ${currentWord.example}`;
+      
+      // Use a timeout to ensure everything is ready for speech
+      const timerId = setTimeout(() => {
+        console.log("Speaking vocabulary:", currentWord.word);
+        speakText(fullText)
+          .then(() => console.log("Vocabulary speech completed"))
+          .catch(error => {
+            console.error("Speech error:", error);
+            toast({
+              title: "Speech Issue",
+              description: "Couldn't speak this word. Try a different voice or check your audio settings.",
+              variant: "destructive"
             });
-        }, 300);
-        
-        // Clean up timeout if component updates before speech starts
-        return () => clearTimeout(timerId);
-      }
+          });
+      }, 300);
+      
+      // Clean up timeout if component updates before speech starts
+      return () => clearTimeout(timerId);
     }
   }, [currentWord, isPaused, isMuted, speakText, isVoicesLoaded, toast, wordSpoken]);
 
@@ -89,6 +99,15 @@ const VocabularyApp: React.FC = () => {
       setWordSpoken(null);
     }
   }, [isPaused]);
+
+  // Force a speak attempt when the user toggles mute to unmuted
+  useEffect(() => {
+    if (!isMuted && currentWord && !isPaused && isVoicesLoaded) {
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. Example: ${currentWord.example}`;
+      console.log("Trying to speak after unmute:", currentWord.word);
+      speakText(fullText).catch(err => console.error("Speech after unmute failed:", err));
+    }
+  }, [isMuted, currentWord, isPaused, isVoicesLoaded, speakText]);
 
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
