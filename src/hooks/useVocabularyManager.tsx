@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -33,6 +34,7 @@ export const useVocabularyManager = () => {
   const lastManualActionTimeRef = useRef<number>(Date.now());
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const wordChangeInProgressRef = useRef(false);
+  const initialLoadDoneRef = useRef(false);
 
   // Update isPaused in localStorage when it changes
   useEffect(() => {
@@ -148,15 +150,16 @@ export const useVocabularyManager = () => {
     console.log("Has existing data:", hasExistingData);
     setHasData(hasExistingData);
     
-    if (hasExistingData) {
+    if (hasExistingData && !initialLoadDoneRef.current) {
+      initialLoadDoneRef.current = true;
       const word = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
       console.log("Initial word:", word);
       setCurrentWord(word);
       
       if (!isPaused) {
         clearTimer();
-        // Reduced initial timeout to 2 seconds
-        timerRef.current = window.setTimeout(displayNextWord, 2000);
+        // Start the first word immediately to ensure sync
+        timerRef.current = window.setTimeout(displayNextWord, 500);
       }
     }
     
@@ -171,6 +174,7 @@ export const useVocabularyManager = () => {
     setHasData(true);
     lastManualActionTimeRef.current = Date.now();
     stopSpeaking();
+    initialLoadDoneRef.current = true;
     
     // Force a refresh of the current word
     const word = vocabularyService.getNextWord();
@@ -179,8 +183,8 @@ export const useVocabularyManager = () => {
     
     if (!isPaused) {
       clearTimer();
-      // Reduced timeout after file upload to 2 seconds
-      timerRef.current = window.setTimeout(displayNextWord, 2000);
+      // Show the first word immediately after upload
+      timerRef.current = window.setTimeout(displayNextWord, 500);
     }
   }, [clearTimer, displayNextWord, isPaused]);
 
@@ -195,7 +199,7 @@ export const useVocabularyManager = () => {
       if (!newPauseState) {
         // When unpausing, display next word after a short delay
         clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, 1500);
+        timerRef.current = window.setTimeout(displayNextWord, 800);
       } else {
         clearTimer();
       }

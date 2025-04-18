@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { stopSpeaking, keepSpeechAlive } from '@/utils/speech';
@@ -21,6 +22,7 @@ export const useWordSpeechSync = (
   const isMutedRef = useRef(isMuted);
   const autoRetryTimeoutRef = useRef<number | null>(null);
   const keepAliveIntervalRef = useRef<number | null>(null);
+  const initialSpeakTimeoutRef = useRef<number | null>(null);
 
   // Update refs when props change
   useEffect(() => {
@@ -44,8 +46,20 @@ export const useWordSpeechSync = (
       console.log("Word changed in speech sync:", currentWord.word);
       setWordFullySpoken(false);
       lastWordIdRef.current = currentWord.word;
+      
+      // Ensure we speak the new word immediately when it changes
+      if (initialSpeakTimeoutRef.current) {
+        clearTimeout(initialSpeakTimeoutRef.current);
+      }
+      
+      initialSpeakTimeoutRef.current = window.setTimeout(() => {
+        initialSpeakTimeoutRef.current = null;
+        if (!isPausedRef.current && !isMutedRef.current && !isChangingWordRef.current) {
+          speakCurrentWord(true);
+        }
+      }, 100);
     }
-  }, [currentWord]);
+  }, [currentWord, isChangingWordRef]);
 
   const clearAllTimeouts = useCallback(() => {
     if (speechTimeoutRef.current !== null) {
@@ -61,6 +75,11 @@ export const useWordSpeechSync = (
     if (keepAliveIntervalRef.current !== null) {
       window.clearInterval(keepAliveIntervalRef.current);
       keepAliveIntervalRef.current = null;
+    }
+    
+    if (initialSpeakTimeoutRef.current !== null) {
+      window.clearTimeout(initialSpeakTimeoutRef.current);
+      initialSpeakTimeoutRef.current = null;
     }
   }, []);
 

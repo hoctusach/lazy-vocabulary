@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -23,6 +24,7 @@ const VocabularyApp: React.FC = () => {
   const keepAliveIntervalRef = useRef<number | null>(null);
   const resyncTimeoutRef = useRef<number | null>(null);
   const resetIntervalRef = useRef<number | null>(null);
+  const initialRenderRef = useRef(true);
   
   const {
     hasData,
@@ -61,6 +63,20 @@ const VocabularyApp: React.FC = () => {
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
+
+  // Handle initial render - force sync between word and speech
+  useEffect(() => {
+    if (initialRenderRef.current && currentWord && !isPaused && !isMuted && isVoicesLoaded) {
+      initialRenderRef.current = false;
+      // Slight delay to ensure everything is loaded
+      const timer = setTimeout(() => {
+        console.log("Initial render, force speaking current word:", currentWord.word);
+        resetLastSpokenWord();
+        speakCurrentWord(true);
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
 
   useEffect(() => {
     if (keepAliveIntervalRef.current) {
