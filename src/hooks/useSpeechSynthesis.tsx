@@ -20,11 +20,6 @@ export const useSpeechSynthesis = () => {
         console.log("Speech voices loaded:", voices.length);
         setAvailableVoices(voices);
         setIsVoicesLoaded(true);
-        
-        toast({
-          title: "Speech Ready",
-          description: "Using browser's text-to-speech",
-        });
       }
     };
 
@@ -36,24 +31,13 @@ export const useSpeechSynthesis = () => {
       synth.addEventListener('voiceschanged', loadVoices);
     }
     
-    // Periodic voice loading check (some browsers need this)
-    const voiceCheckInterval = setInterval(() => {
-      if (!isVoicesLoaded) {
-        const voices = synth.getVoices();
-        if (voices.length > 0) {
-          loadVoices();
-        }
-      }
-    }, 1000);
-    
     return () => {
       synth.cancel();
       if ('onvoiceschanged' in synth) {
         synth.removeEventListener('voiceschanged', loadVoices);
       }
-      clearInterval(voiceCheckInterval);
     };
-  }, [toast, isVoicesLoaded]);
+  }, []);
 
   // Firefox needs this workaround to ensure speech works
   useEffect(() => {
@@ -85,136 +69,45 @@ export const useSpeechSynthesis = () => {
       // Avoid concurrent speech
       speakingRef.current = true;
       
-      // Split text into chunks to avoid browser limitations
-      const chunks = splitTextIntoChunks(text);
-      let currentChunk = 0;
+      const utterance = new SpeechSynthesisUtterance(text);
       
-      const speakNextChunk = () => {
-        if (currentChunk >= chunks.length) {
-          speakingRef.current = false;
-          resolve();
-          return;
-        }
-        
-        const utterance = new SpeechSynthesisUtterance(chunks[currentChunk]);
-        
-        // Select voice based on region preference
-        const preferredVoice = findPreferredVoice(availableVoices, voiceRegion);
-        
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
-          utterance.rate = 0.9; // Slightly slower for better clarity
-          utterance.pitch = 1.0;
-        }
-        
-        utterance.onend = () => {
-          console.log(`Chunk ${currentChunk + 1}/${chunks.length} completed`);
-          currentChunk++;
-          speakNextChunk();
-        };
-        
-        utterance.onerror = (event) => {
-          console.error("Speech error:", event);
-          
-          // Try a fallback voice if available
-          if (currentChunk === 0 && preferredVoice && availableVoices.length > 1) {
-            const fallbackVoice = availableVoices.find(v => v !== preferredVoice);
-            if (fallbackVoice) {
-              console.log("Trying fallback voice:", fallbackVoice.name);
-              utterance.voice = fallbackVoice;
-              synth.speak(utterance);
-              return;
-            }
-          }
-          
-          toast({
-            title: "Speech Error",
-            description: "There was an issue with the text-to-speech. Please try again.",
-            variant: "destructive"
-          });
-          
-          speakingRef.current = false;
-          reject(event);
-        };
-        
-        console.log(`Speaking chunk ${currentChunk + 1}/${chunks.length} with ${preferredVoice?.name || 'default voice'}`);
-        synth.speak(utterance);
+      // Select voice based on region preference
+      let voice = null;
+      if (voiceRegion === 'US') {
+        voice = availableVoices.find(v => v.lang === 'en-US');
+      } else {
+        voice = availableVoices.find(v => v.lang === 'en-GB');
+      }
+      
+      if (!voice) {
+        // Fallback to any English voice
+        voice = availableVoices.find(v => v.lang.startsWith('en'));
+      }
+      
+      if (voice) {
+        utterance.voice = voice;
+        utterance.rate = 0.9; // Slightly slower for better clarity
+        utterance.pitch = 1.0;
+      }
+      
+      utterance.onend = () => {
+        speakingRef.current = false;
+        resolve();
       };
       
-      speakNextChunk();
+      utterance.onerror = (event) => {
+        console.error("Speech error:", event);
+        speakingRef.current = false;
+        reject(event);
+      };
+      
+      synth.speak(utterance);
     });
-  }, [isMuted, voiceRegion, toast, availableVoices]);
-
-  // Helper function to find the best voice based on user preference
-  const findPreferredVoice = (voices: SpeechSynthesisVoice[], region: 'US' | 'UK'): SpeechSynthesisVoice | undefined => {
-    // Try to find a voice that matches the requested region
-    const regionCode = region === 'US' ? 'en-US' : 'en-GB';
-    
-    // Look for voices with exact language match
-    let match = voices.find(voice => 
-      voice.lang.toLowerCase().startsWith(regionCode.toLowerCase()) && !voice.localService
-    );
-    
-    // If no match, try any voice with the right language base
-    if (!match) {
-      match = voices.find(voice => 
-        voice.lang.toLowerCase().startsWith('en') && !voice.localService
-      );
-    }
-    
-    // Last resort: use any available voice
-    if (!match && voices.length > 0) {
-      match = voices[0];
-    }
-    
-    return match;
-  };
-
-  // Helper function to split text into manageable chunks
-  // (WebSpeech API has limitations on text length)
-  const splitTextIntoChunks = (text: string): string[] => {
-    const MAX_CHUNK_LENGTH = 150;
-    if (text.length <= MAX_CHUNK_LENGTH) return [text];
-    
-    const chunks: string[] = [];
-    let currentChunk = "";
-    
-    // Split by sentences if possible
-    const sentences = text.split(/(?<=[.!?])\s+/);
-    
-    for (const sentence of sentences) {
-      if (currentChunk.length + sentence.length <= MAX_CHUNK_LENGTH) {
-        currentChunk += (currentChunk ? " " : "") + sentence;
-      } else {
-        if (currentChunk) chunks.push(currentChunk);
-        
-        // If a single sentence is too long, split it further
-        if (sentence.length > MAX_CHUNK_LENGTH) {
-          const words = sentence.split(" ");
-          currentChunk = "";
-          
-          for (const word of words) {
-            if (currentChunk.length + word.length + 1 <= MAX_CHUNK_LENGTH) {
-              currentChunk += (currentChunk ? " " : "") + word;
-            } else {
-              chunks.push(currentChunk);
-              currentChunk = word;
-            }
-          }
-        } else {
-          currentChunk = sentence;
-        }
-      }
-    }
-    
-    if (currentChunk) chunks.push(currentChunk);
-    return chunks;
-  };
+  }, [isMuted, voiceRegion, availableVoices]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
       const newValue = !prev;
-      console.log("Mute toggled:", newValue);
       if (newValue) {
         window.speechSynthesis.cancel();
         speakingRef.current = false;
@@ -224,11 +117,7 @@ export const useSpeechSynthesis = () => {
   }, []);
 
   const handleChangeVoice = useCallback(() => {
-    setVoiceRegion(prev => {
-      const newValue = prev === 'US' ? 'UK' : 'US';
-      console.log("Voice region changed to:", newValue);
-      return newValue;
-    });
+    setVoiceRegion(prev => (prev === 'US' ? 'UK' : 'US'));
   }, []);
 
   return {
