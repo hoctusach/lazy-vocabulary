@@ -103,7 +103,13 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
       <CardHeader>
         <CardTitle>Upload Vocabulary</CardTitle>
         <CardDescription className="flex justify-between items-center">
-          Prepare your Excel file for vocabulary learning
+          <div>
+            <p>Prepare your Excel file for vocabulary learning</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Note: Your uploaded Excel file is stored only on your device. 
+              No cloud storage or external data transmission occurs.
+            </p>
+          </div>
           <Button 
             variant="outline" 
             size="sm"
@@ -127,9 +133,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
             <p className="text-xs text-muted-foreground">
               Supports .xlsx files with sheets: "All words", "phrasal verbs", "idioms", "advanced words"
             </p>
-            <p className="text-xs text-yellow-600 mt-2">
-              Note: This file is stored locally on your device. We do not save or upload it to any cloud service.
-            </p>
           </div>
           <Input
             ref={inputRef}
@@ -140,18 +143,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           />
         </div>
       </CardContent>
-      <CardFooter className="flex gap-2">
-        <Button onClick={handleButtonClick} className="flex-1">
+      <CardFooter>
+        <Button onClick={handleButtonClick} className="w-full">
           <Upload size={16} className="mr-2" />
           Upload Excel File
-        </Button>
-        <Button 
-          variant="secondary" 
-          onClick={handleDownloadAndUpload}
-          className="flex-1"
-        >
-          <Download size={16} className="mr-2" />
-          Use Default Template
         </Button>
       </CardFooter>
     </Card>
