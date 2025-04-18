@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
+  const [speechAttempts, setSpeechAttempts] = useState(0);
   
   const {
     hasData,
@@ -28,7 +29,8 @@ const VocabularyApp: React.FC = () => {
     voiceRegion,
     speakText,
     handleToggleMute,
-    handleChangeVoice
+    handleChangeVoice,
+    isVoicesLoaded
   } = useSpeechSynthesis();
 
   const { toast } = useToast();
@@ -37,24 +39,48 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
+  // Show an indicator when voices are loaded
+  useEffect(() => {
+    if (isVoicesLoaded) {
+      toast({
+        title: "Voice Library Ready",
+        description: `Speech synthesis is ready with ${voiceRegion} voices.`,
+      });
+    }
+  }, [isVoicesLoaded, toast, voiceRegion]);
+
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
+      // Reset speech attempts counter for new word
+      setSpeechAttempts(0);
+      
       // Construct the text to speak
-      const fullText = `Word: ${currentWord.word}. Meaning: ${currentWord.meaning}. Example: ${currentWord.example}`;
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. Example: ${currentWord.example}`;
       
       // Use a timeout to ensure everything is ready for speech
       const timerId = setTimeout(() => {
         console.log("Speaking vocabulary:", currentWord.word);
         speakText(fullText)
           .then(() => console.log("Vocabulary speech completed"))
-          .catch(error => console.error("Speech error:", error));
-      }, 500);
+          .catch(error => {
+            console.error("Speech error:", error);
+            
+            // If speech fails, try again with a small delay (up to 3 attempts)
+            if (speechAttempts < 3) {
+              setSpeechAttempts(prev => prev + 1);
+              setTimeout(() => {
+                console.log(`Retry speaking attempt ${speechAttempts + 1}`);
+                speakText(fullText).catch(e => console.error("Retry failed:", e));
+              }, 800);
+            }
+          });
+      }, 800); // Longer delay for better stability
       
       // Clean up timeout if component updates before speech starts
       return () => clearTimeout(timerId);
     }
-  }, [currentWord, isPaused, isMuted, speakText]);
+  }, [currentWord, isPaused, isMuted, speakText, speechAttempts]);
 
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
