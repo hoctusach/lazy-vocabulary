@@ -50,8 +50,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode; // At least set the language
         }
         
-        // Configure speech parameters - reduced rate for better reliability
-        utterance.rate = 0.8;
+        // Reduced rate for better reliability and comprehension
+        utterance.rate = 0.9;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -115,12 +115,12 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } else {
             clearAllTimers();
           }
-        }, 2000); // More frequent interval for better reliability
+        }, 1000); // More frequent interval to ensure speech doesn't stop
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
-        // Set a shorter maximum duration to ensure we don't get stuck
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.2, 10000), 60000);
+        // Set a reasonable maximum duration
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 90000);
         
         maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {

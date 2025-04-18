@@ -14,13 +14,18 @@ export const stopSpeaking = (): void => {
   }
 };
 
-// Function to check if sound and display are in sync
+// Improved function to check if sound and display are in sync
 export const checkSoundDisplaySync = (
   currentWord: string | null, 
   currentTextBeingSpoken: string | null
 ): boolean => {
   if (!currentWord || !currentTextBeingSpoken) return true;
   
+  // More robust check to handle different text formats
+  const normalizedWord = currentWord.toLowerCase().trim();
+  const normalizedText = currentTextBeingSpoken.toLowerCase().trim();
+  
   // Check if the current word is included in the text being spoken
-  return currentTextBeingSpoken.includes(currentWord);
+  // This handles cases where the word might be part of a longer sentence
+  return normalizedText.includes(normalizedWord);
 };

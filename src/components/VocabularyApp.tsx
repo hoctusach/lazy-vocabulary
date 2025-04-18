@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -53,7 +52,6 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Check and fix synchronization between display and audio
   useEffect(() => {
     const checkSyncAndFix = () => {
       if (!currentWord || isPaused || isMuted) return;
@@ -62,25 +60,23 @@ const VocabularyApp: React.FC = () => {
       const isInSync = checkSoundDisplaySync(currentWord.word, currentTextBeingSpoken);
       
       if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
-        console.log("Detected sound/display mismatch. Fixing...");
-        // Reset speech and speak the current word
+        console.log("Detected sound/display mismatch. Fixing synchronization...");
         stopSpeaking();
         setTimeout(() => {
           if (currentWord && !isPaused && !isMuted) {
+            console.log("Re-speaking current word to maintain sync:", currentWord.word);
             speakCurrentWord(true);
           }
-        }, 300);
+        }, 200);
       }
       
-      // Schedule the next check
       if (syncCheckTimeoutRef.current) {
         clearTimeout(syncCheckTimeoutRef.current);
       }
-      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 5000);
+      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 3000);
     };
     
-    // Initial check
-    checkSyncAndFix();
+    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1000);
     
     return () => {
       if (syncCheckTimeoutRef.current) {
@@ -99,13 +95,11 @@ const VocabularyApp: React.FC = () => {
     handleToggleMute();
     
     if (wasMuted && currentWord) {
-      // Reduced timeout for better responsiveness
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
       }, 300);
     } else if (!wasMuted) {
-      // Just turned mute on, no need to speak
       resetLastSpokenWord();
     }
   }, [isMuted, currentWord, handleToggleMute, resetLastSpokenWord, speakCurrentWord]);
@@ -116,7 +110,6 @@ const VocabularyApp: React.FC = () => {
     handleChangeVoice();
     
     if (!isMuted && currentWord) {
-      // Reduced timeout for better responsiveness
       setTimeout(() => {
         speakCurrentWord(true);
       }, 500);
@@ -129,7 +122,6 @@ const VocabularyApp: React.FC = () => {
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
     handleSwitchCategory(isMuted, voiceRegion);
     
-    // Force speak the new word after category change with reduced timeout
     setTimeout(() => {
       if (!isMuted && currentWord && !isPaused) {
         speakCurrentWord(true);
@@ -142,7 +134,6 @@ const VocabularyApp: React.FC = () => {
     resetLastSpokenWord();
     handleManualNext();
     
-    // Force speak the new word with reduced timeout
     setTimeout(() => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true);
