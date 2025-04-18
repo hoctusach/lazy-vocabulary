@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   const [speechAttempts, setSpeechAttempts] = useState(0);
+  const lastWordRef = useRef<string | null>(null);
   
   const {
     hasData,
@@ -44,7 +45,7 @@ const VocabularyApp: React.FC = () => {
     if (isVoicesLoaded) {
       toast({
         title: "Voice System Ready",
-        description: `ElevenLabs voice with ${voiceRegion} accent is ready.`,
+        description: `Speech system with ${voiceRegion} accent is ready.`,
       });
     }
   }, [isVoicesLoaded, toast, voiceRegion]);
@@ -52,6 +53,14 @@ const VocabularyApp: React.FC = () => {
   // Speak the full vocabulary entry when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
+      // Check if this is a new word to avoid re-speaking on re-renders
+      const wordIdentifier = `${currentWord.word}-${currentWord.meaning}`;
+      if (lastWordRef.current === wordIdentifier) {
+        return;
+      }
+      
+      lastWordRef.current = wordIdentifier;
+      
       // Reset speech attempts counter for new word
       setSpeechAttempts(0);
       
@@ -60,7 +69,7 @@ const VocabularyApp: React.FC = () => {
       
       // Use a timeout to ensure everything is ready for speech
       const timerId = setTimeout(() => {
-        console.log("Speaking vocabulary with ElevenLabs:", currentWord.word);
+        console.log("Speaking vocabulary:", currentWord.word);
         speakText(fullText)
           .then(() => console.log("Vocabulary speech completed"))
           .catch(error => {
@@ -72,15 +81,21 @@ const VocabularyApp: React.FC = () => {
               setTimeout(() => {
                 console.log(`Retry speaking attempt ${speechAttempts + 1}`);
                 speakText(fullText).catch(e => console.error("Retry failed:", e));
-              }, 800);
+              }, 1500);
+            } else {
+              toast({
+                title: "Speech Issue",
+                description: "Couldn't speak this word. Try a different voice or unmute if muted.",
+                variant: "destructive"
+              });
             }
           });
-      }, 800); // Longer delay for better stability
+      }, 1000); // Longer delay for better stability
       
       // Clean up timeout if component updates before speech starts
       return () => clearTimeout(timerId);
     }
-  }, [currentWord, isPaused, isMuted, speakText, speechAttempts, isVoicesLoaded]);
+  }, [currentWord, isPaused, isMuted, speakText, speechAttempts, isVoicesLoaded, toast]);
 
   const handleSwitchCategory = () => {
     const nextCategory = vocabularyService.nextSheet();
