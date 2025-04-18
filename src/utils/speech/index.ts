@@ -11,7 +11,12 @@ import {
   validateCurrentSpeech,
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
-  extractMainWord
+  extractMainWord,
+  getSpeechRate,
+  getSpeechPitch,
+  getSpeechVolume,
+  prepareTextForSpeech,
+  addPausesToText
 } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -37,17 +42,23 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       return;
     }
 
+    // Prepare text for better speech quality
+    const processedText = addPausesToText(prepareTextForSpeech(text));
+
     // Store the current text being spoken for sync checking
     try {
-      localStorage.setItem('currentTextBeingSpoken', text);
+      localStorage.setItem('currentTextBeingSpoken', processedText);
     } catch (error) {
       console.error('Error saving current text to localStorage:', error);
     }
 
-    // Ensure speech engine is ready before starting
+    // Make sure we have full speech readiness before starting
     await ensureSpeechEngineReady();
     
-    const utterance = new SpeechSynthesisUtterance(text);
+    // A small delay to ensure speech engine is fully ready
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    const utterance = new SpeechSynthesisUtterance(processedText);
     let voices = window.speechSynthesis.getVoices();
     
     const setVoiceAndSpeak = async () => {
@@ -63,10 +74,10 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode;
         }
         
-        // Improved speech parameters for better clarity
-        utterance.rate = 0.9;  // Slightly slower for better comprehension
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
+        // Apply the slower speech rate
+        utterance.rate = getSpeechRate();
+        utterance.pitch = getSpeechPitch();
+        utterance.volume = getSpeechVolume();
         
         let keepAliveInterval: number | null = null;
         let maxDurationTimeout: number | null = null;
@@ -75,12 +86,15 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
             clearInterval(keepAliveInterval);
+            keepAliveInterval = null;
           }
           if (maxDurationTimeout !== null) {
             clearTimeout(maxDurationTimeout);
+            maxDurationTimeout = null;
           }
           if (syncCheckInterval !== null) {
             clearInterval(syncCheckInterval);
+            syncCheckInterval = null;
           }
         };
 
@@ -101,6 +115,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         };
 
+        // Make sure speech system is ready before we begin
         await waitForSpeechReadiness();
         
         // More frequent keep-alive interval
@@ -108,16 +123,17 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           if (window.speechSynthesis.speaking) {
             keepSpeechAlive();
           } else {
-            clearInterval(keepAliveInterval);
+            clearInterval(keepAliveInterval as number);
+            keepAliveInterval = null;
           }
-        }, 150); // Very frequent checks for maximum stability
+        }, 100); // Very frequent checks for maximum stability
         
-        // Regular sync checking
+        // More frequent sync checking
         syncCheckInterval = window.setInterval(() => {
           try {
             const currentWord = localStorage.getItem('currentDisplayedWord');
             if (currentWord) {
-              forceResyncIfNeeded(currentWord, text, () => {
+              forceResyncIfNeeded(currentWord, processedText, () => {
                 // This will be called if resync is needed
                 clearAllTimers();
                 resolve(); // Resolve so caller can restart
@@ -126,11 +142,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } catch (error) {
             console.error('Error in sync check:', error);
           }
-        }, 800);
+        }, 600);
 
-        // Start speaking with a retry mechanism
+        // Start speaking with a robust retry mechanism
         const attemptSpeech = (attempts = 0) => {
-          if (attempts >= 3) {
+          if (attempts >= 4) { // Increased retry attempts
             console.error('Failed to start speech after multiple attempts');
             clearAllTimers();
             reject(new Error('Failed to start speech'));
@@ -138,27 +154,34 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
           
           try {
+            // Ensure engine is in a clean state before starting
+            if (attempts > 0) {
+              window.speechSynthesis.cancel();
+              // Longer delay between retries for stability
+              await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
             window.speechSynthesis.speak(utterance);
             
-            // Verify speech started successfully
+            // Verify speech started successfully with longer verification time
             setTimeout(() => {
               if (!window.speechSynthesis.speaking) {
                 console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
                 resetSpeechEngine();
                 attemptSpeech(attempts + 1);
               }
-            }, 200);
+            }, 400); // Longer verification window
           } catch (error) {
             console.error('Error starting speech:', error);
-            setTimeout(() => attemptSpeech(attempts + 1), 300);
+            setTimeout(() => attemptSpeech(attempts + 1), 500);
           }
         };
         
         attemptSpeech();
 
         // Set reasonable maximum duration with proper calculation
-        const estimatedDuration = calculateSpeechDuration(text);
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 120000);
+        const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
+        const maxDuration = Math.min(Math.max(estimatedDuration * 2.0, 20000), 180000);
         
         maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {
@@ -193,7 +216,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 1000);
+      }, 1500); // Longer timeout for voice loading
     }
   });
 };
@@ -211,5 +234,10 @@ export {
   validateCurrentSpeech,
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
-  extractMainWord
+  extractMainWord,
+  getSpeechRate,
+  getSpeechPitch,
+  getSpeechVolume,
+  prepareTextForSpeech,
+  addPausesToText
 };

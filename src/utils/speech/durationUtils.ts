@@ -1,5 +1,5 @@
 
-export const calculateSpeechDuration = (text: string, rate: number = 0.85): number => {
+export const calculateSpeechDuration = (text: string, rate: number = 0.72): number => {
   // Average speaking rate is about 150 words per minute at normal speed (1.0)
   // We'll estimate 150 * rate words per minute
   const wordsPerMinute = 150 * rate;
@@ -7,7 +7,6 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a larger buffer for pauses and natural speech patterns (250% buffer)
-  return milliseconds * 2.5;
+  // Add a larger buffer for pauses and natural speech patterns (300% buffer)
+  return milliseconds * 3.0;
 };
-

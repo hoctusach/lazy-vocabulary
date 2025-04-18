@@ -3,12 +3,19 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
-  // Try to get stored state from localStorage
+  // Try to get stored state from localStorage with improved retrieval
   const getInitialStates = () => {
     try {
       const storedStates = localStorage.getItem('buttonStates');
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
+        
+        // Log the retrieved values for debugging
+        console.log("Retrieved voice settings:", {
+          muted: parsedStates.isMuted === true,
+          region: parsedStates.voiceRegion
+        });
+        
         return {
           initialMuted: parsedStates.isMuted === true,
           initialVoiceRegion: (parsedStates.voiceRegion === 'UK' ? 'UK' : 'US') as 'US' | 'UK'
@@ -22,6 +29,7 @@ export const useSpeechSynthesis = () => {
 
   const { initialMuted, initialVoiceRegion } = getInitialStates();
 
+  // Update states with initial values from localStorage
   const [isMuted, setIsMuted] = useState(initialMuted);
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>(initialVoiceRegion);
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
@@ -122,12 +130,19 @@ export const useSpeechSynthesis = () => {
       currentVoiceRef.current = getVoiceByRegion(voiceRegion);
       console.log(`Voice region changed to ${voiceRegion}`);
       
-      // Save the voice region to localStorage
+      // Save the voice region to localStorage with verification
       try {
         const storedStates = localStorage.getItem('buttonStates');
         const parsedStates = storedStates ? JSON.parse(storedStates) : {};
         parsedStates.voiceRegion = voiceRegion;
         localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+        
+        // Verify the save worked
+        const verifyStorage = localStorage.getItem('buttonStates');
+        if (verifyStorage) {
+          const verifyParsed = JSON.parse(verifyStorage);
+          console.log("Verified saved voice region:", verifyParsed.voiceRegion);
+        }
       } catch (error) {
         console.error('Error saving voice region to localStorage:', error);
       }
@@ -206,10 +221,21 @@ export const useSpeechSynthesis = () => {
   }, []);
 
   const handleChangeVoice = useCallback(() => {
-    stopSpeaking();
     setVoiceRegion(prev => {
       const newRegion = prev === 'US' ? 'UK' : 'US';
       console.log(`Changing voice region from ${prev} to ${newRegion}`);
+      stopSpeaking();
+      
+      // Immediately save to localStorage for better persistence
+      try {
+        const storedStates = localStorage.getItem('buttonStates');
+        const parsedStates = storedStates ? JSON.parse(storedStates) : {};
+        parsedStates.voiceRegion = newRegion;
+        localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+      } catch (error) {
+        console.error('Error immediately saving voice region:', error);
+      }
+      
       return newRegion;
     });
   }, []);

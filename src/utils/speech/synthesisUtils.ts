@@ -1,4 +1,3 @@
-
 export const isSpeechSynthesisSupported = (): boolean => {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 };
@@ -20,11 +19,9 @@ export const checkSoundDisplaySync = (
 ): boolean => {
   if (!currentWord || !currentTextBeingSpoken) return true;
   
-  // More sophisticated sync check - normalize both strings
   const normalizedWord = currentWord.toLowerCase().trim();
   const normalizedText = currentTextBeingSpoken.toLowerCase().trim();
   
-  // Check if the text contains the word or if the word is at the beginning
   const containsWord = normalizedText.includes(normalizedWord);
   const startsWithWord = normalizedText.startsWith(normalizedWord);
   
@@ -61,7 +58,6 @@ export const resetSpeechEngine = (): void => {
   if (window.speechSynthesis) {
     try {
       window.speechSynthesis.cancel();
-      // Force a reset of the speech system
       setTimeout(() => {
         window.speechSynthesis.resume();
       }, 50);
@@ -71,25 +67,19 @@ export const resetSpeechEngine = (): void => {
   }
 };
 
-// Improved sync validation function with better word matching
 export const validateCurrentSpeech = (
   currentWord: string | null,
   currentTextBeingSpoken: string | null
 ): boolean => {
   if (!currentWord || !currentTextBeingSpoken) return false;
   
-  // Extract just the main word without phonetics or type
   const mainWord = currentWord.split('(')[0].trim().toLowerCase();
   
-  // Get the first part of the text being spoken
   const spokenText = currentTextBeingSpoken.toLowerCase().trim();
   
-  // Check if the spoken text clearly contains the main word
-  // This is more tolerant of slight variations in formatting
   return spokenText.includes(mainWord);
 };
 
-// Enhanced sync mechanism with fallback
 export const forceResyncIfNeeded = (
   currentWord: string | null,
   currentTextBeingSpoken: string | null,
@@ -105,21 +95,14 @@ export const forceResyncIfNeeded = (
   }
 };
 
-// New function to ensure speech is properly ready before starting
 export const ensureSpeechEngineReady = async (): Promise<boolean> => {
   if (!window.speechSynthesis) return false;
   
   try {
-    // Force reset the speech engine to clear any stuck states
     window.speechSynthesis.cancel();
-    
-    // Short delay to allow the engine to reset
     await new Promise(resolve => setTimeout(resolve, 150));
-    
-    // Check if the engine is responsive
     window.speechSynthesis.pause();
     window.speechSynthesis.resume();
-    
     return true;
   } catch (error) {
     console.error('Error ensuring speech engine is ready:', error);
@@ -127,8 +110,30 @@ export const ensureSpeechEngineReady = async (): Promise<boolean> => {
   }
 };
 
-// New function to extract the main word from a vocabulary entry
 export const extractMainWord = (wordText: string): string => {
-  // Remove any phonetic notation and word type
   return wordText.split('(')[0].trim().toLowerCase();
+};
+
+export const getSpeechRate = (): number => {
+  return 0.72;
+};
+
+export const getSpeechPitch = (): number => {
+  return 1.0;
+};
+
+export const prepareTextForSpeech = (text: string): string => {
+  return text.replace(/\.\s+/g, '. ').replace(/\s{2,}/g, ' ').trim();
+};
+
+export const getSpeechVolume = (): number => {
+  return 1.0;
+};
+
+export const addPausesToText = (text: string): string => {
+  return text
+    .replace(/\./g, '. ')
+    .replace(/;/g, '; ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 };
