@@ -1,4 +1,3 @@
-
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
@@ -33,15 +32,13 @@ class VocabularyService {
     return false;
   }
   
-  loadDefaultVocabulary(): boolean {
+  loadDefaultVocabulary(data?: SheetData): boolean {
     try {
-      // Load the default vocabulary data
-      this.data = JSON.parse(JSON.stringify(DEFAULT_VOCABULARY_DATA));
+      const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
       
-      // Save to storage
+      this.data = JSON.parse(JSON.stringify(vocabularyData));
       this.storage.saveData(this.data);
       
-      // Reset the current sheet and shuffle
       this.currentSheetName = "All words";
       this.shuffleCurrentSheet();
       

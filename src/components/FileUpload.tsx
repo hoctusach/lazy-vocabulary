@@ -83,24 +83,33 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     }
   };
   
-  const handleUseDefaultWordSet = () => {
+  const handleUseDefaultWordSet = async () => {
     toast({
-      title: "Loading default word set",
-      description: "Please wait while we load the default vocabulary..."
+      title: "Downloading default word set",
+      description: "Please wait while we download and import the default vocabulary..."
     });
 
-    const success = vocabularyService.loadDefaultVocabulary();
-    
-    if (success) {
-      toast({
-        title: "Success!",
-        description: "Default vocabulary data has been loaded successfully.",
-      });
-      onFileUploaded();
-    } else {
+    try {
+      // Create a Blob with the default vocabulary data
+      const response = await fetch('/defaultVocabulary.json');
+      if (!response.ok) throw new Error('Failed to download vocabulary');
+      
+      const data = await response.json();
+      const success = vocabularyService.loadDefaultVocabulary(data);
+      
+      if (success) {
+        toast({
+          title: "Success!",
+          description: "Default vocabulary data has been imported successfully.",
+        });
+        onFileUploaded();
+      } else {
+        throw new Error('Failed to import vocabulary');
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to load the default vocabulary data.",
+        description: "Failed to load the default vocabulary data. Please try again.",
         variant: "destructive"
       });
     }
@@ -123,7 +132,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
             size="sm"
             onClick={handleUseDefaultWordSet}
           >
-            <Download size={16} className="mr-2" /> Use default word set
+            <Download size={16} className="mr-2" /> Download default word set
           </Button>
         </CardDescription>
       </CardHeader>

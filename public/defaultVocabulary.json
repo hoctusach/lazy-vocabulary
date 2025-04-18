@@ -1,0 +1,35 @@
+
+{
+  "All words": [
+    {
+      "word": "Serendipity",
+      "meaning": "A fortunate discovery by accident",
+      "example": "Finding that book was pure serendipity.",
+      "count": 0
+    }
+  ],
+  "phrasal verbs": [
+    {
+      "word": "Give up",
+      "meaning": "Stop trying",
+      "example": "Don't give up on your dreams.",
+      "count": 0
+    }
+  ],
+  "idioms": [
+    {
+      "word": "Bite the bullet",
+      "meaning": "Do something difficult or unpleasant",
+      "example": "I had to bite the bullet and study for the exam.",
+      "count": 0
+    }
+  ],
+  "advanced words": [
+    {
+      "word": "Ubiquitous",
+      "meaning": "Present, appearing, or found everywhere",
+      "example": "Smartphones are ubiquitous in modern society.",
+      "count": 0
+    }
+  ]
+}
