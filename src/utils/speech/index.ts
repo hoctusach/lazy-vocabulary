@@ -1,3 +1,4 @@
+
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { 
@@ -41,7 +42,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       return;
     }
 
-    // Prepare text for better speech quality
+    // Prepare text for better speech quality with more pauses
     const processedText = addPausesToText(prepareTextForSpeech(text));
     
     console.log('Speaking with processed text:', processedText.substring(0, 100) + '...');
@@ -193,7 +194,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
 
         // Set reasonable maximum duration with proper calculation
         const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
-        const maxDuration = Math.min(Math.max(estimatedDuration * 3.0, 30000), 240000);
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 30000), 120000);
         
         console.log(`Estimated speech duration: ${estimatedDuration}ms, Max duration: ${maxDuration}ms`);
         

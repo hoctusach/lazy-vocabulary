@@ -1,7 +1,7 @@
 
 export const getSpeechRate = (): number => {
-  // Set speech rate to 1.0 as requested
-  return 1.0;
+  // Set speech rate to a much slower 0.7 to make speech clearer
+  return 0.7;
 };
 
 export const getSpeechPitch = (): number => {
@@ -19,7 +19,7 @@ export const addPausesToText = (text: string): string => {
   return text
     .replace(/\./g, '... ') // Longer pause after period
     .replace(/;/g, '... ') // Longer pause after semicolon
-    .replace(/,/g, ' ') // Slight pause after comma
+    .replace(/,/g, '... ') // Longer pause after comma
     .replace(/\?/g, '... ') // Longer pause after question mark
     .replace(/!/g, '... ') // Longer pause after exclamation
     .replace(/:/g, '... ') // Pause after colon
