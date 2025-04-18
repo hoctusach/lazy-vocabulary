@@ -41,8 +41,8 @@ export const useVocabularyManager = () => {
     if (nextWord) {
       setCurrentWord(nextWord);
       
-      // Calculate total duration for all text
-      const fullText = `${nextWord.word}... ${nextWord.meaning}... ${nextWord.example}`;
+      // Calculate total duration for all text (without the labels)
+      const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
       const duration = calculateSpeechDuration(fullText);
       
       // Add some buffer time for screen transitions
@@ -50,7 +50,7 @@ export const useVocabularyManager = () => {
       
       setTimeout(() => {
         isChangingWordRef.current = false;
-      }, 100);
+      }, 300);
       
       console.log(`Scheduled next word in ${totalDuration}ms`);
       timerRef.current = window.setTimeout(displayNextWord, totalDuration);

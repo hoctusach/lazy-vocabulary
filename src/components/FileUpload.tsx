@@ -1,142 +1,146 @@
-import React, { useRef } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FilePlus2, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Download, Upload, FileText, ArrowLeft } from 'lucide-react';
 import { vocabularyService } from '@/services/vocabularyService';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 
 interface FileUploadProps {
   onFileUploaded: () => void;
+  onShowWordCard?: () => void;
+  showBackButton?: boolean;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+const FileUpload: React.FC<FileUploadProps> = ({ 
+  onFileUploaded, 
+  onShowWordCard, 
+  showBackButton = false 
+}) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [filename, setFilename] = useState<string | null>(null);
   const { toast } = useToast();
-  
-  const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      await processFile(file);
-    }
-  };
-  
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      await processFile(file);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setFilename(file.name);
+
+    try {
+      const success = await vocabularyService.processExcelFile(file);
+      
+      if (success) {
+        toast({
+          title: "File Uploaded Successfully",
+          description: `Uploaded ${file.name}`,
+        });
+        onFileUploaded();
+      } else {
+        toast({
+          title: "Upload Failed",
+          description: "Could not process the Excel file. Please check the format.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast({
+        title: "Upload Error",
+        description: "An error occurred while uploading the file.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
     }
   };
-  
-  const processFile = async (file: File) => {
-    const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/xlsx'];
-    const allowedExtensions = ['.xlsx'];
+
+  const handleDownloadSample = () => {
+    // Create a blob of JSON data
+    const blob = new Blob([JSON.stringify(DEFAULT_VOCABULARY_DATA, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
     
-    const isValidType = allowedTypes.includes(file.type);
-    const hasValidExtension = allowedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
+    // Create a temporary link and click it
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vocabulary_sample.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     
-    if (!isValidType || !hasValidExtension) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload an Excel file (.xlsx)",
-        variant: "destructive"
-      });
-      return;
-    }
+    // Clean up
+    URL.revokeObjectURL(url);
+    
+    // Load the default vocabulary into memory
+    vocabularyService.loadDefaultVocabulary();
+    onFileUploaded();
     
     toast({
-      title: "Processing file",
-      description: "Please wait while we process your Excel file..."
+      title: "Sample Downloaded",
+      description: "Default vocabulary set has been loaded.",
     });
-    
-    const success = await vocabularyService.processExcelFile(file);
-    
-    if (success) {
-      toast({
-        title: "Success!",
-        description: "Your vocabulary data has been loaded successfully.",
-      });
-      if (inputRef.current) inputRef.current.value = '';
-      onFileUploaded();
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to process the Excel file. Please check the format and try again.",
-        variant: "destructive"
-      });
-    }
   };
-  
-  const handleButtonClick = () => {
-    if (inputRef.current) {
-      inputRef.current.click();
-    }
-  };
-  
-  const handleOpenDefaultWordSet = () => {
-    window.open('https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true', '_blank');
-  };
-  
+
   return (
     <Card className="w-full max-w-xl mx-auto">
-      <CardHeader>
-        <CardTitle>Upload Vocabulary</CardTitle>
-        <CardDescription>
-          <div>
-            <p>Prepare your Excel file for vocabulary learning</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Note: Your uploaded Excel file is stored only on your device. 
-              No cloud storage or external data transmission occurs.
-            </p>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">Upload Vocabulary</h2>
+            {showBackButton && onShowWordCard && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={onShowWordCard}
+                className="flex items-center gap-1"
+              >
+                <ArrowLeft size={16} />
+                Back
+              </Button>
+            )}
           </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleOpenDefaultWordSet}
-            className="mt-2"
-          >
-            <ExternalLink size={16} className="mr-2" /> Download default word set
-          </Button>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div 
-          className="border-2 border-dashed rounded-md p-6 flex flex-col items-center justify-center gap-4"
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-        >
-          <FilePlus2 size={40} className="text-muted-foreground" />
-          <div className="text-center space-y-2">
-            <p className="text-sm text-muted-foreground">
-              Drag and drop your Excel file here, or click to browse
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Supports .xlsx files with sheets: "All words", "phrasal verbs", "idioms", "advanced words"
-            </p>
+          
+          <div className="flex flex-col gap-3 mt-4">
+            <Button 
+              variant="outline" 
+              className="w-full flex justify-center items-center gap-2"
+              onClick={handleDownloadSample}
+            >
+              <Download size={16} /> Download Sample
+            </Button>
+            
+            <div className="relative">
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv,.json"
+                onChange={handleFileChange}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={isUploading}
+              />
+              <Button 
+                variant="default" 
+                className="w-full flex justify-center items-center gap-2"
+                disabled={isUploading}
+              >
+                <Upload size={16} /> Upload New File
+              </Button>
+            </div>
+            
+            {filename && (
+              <div className="flex items-center gap-2 mt-2">
+                <FileText size={16} className="text-blue-500" />
+                <span className="text-sm truncate">{filename}</span>
+                <Badge variant="outline" className="ml-auto">
+                  {isUploading ? 'Uploading...' : 'Uploaded'}
+                </Badge>
+              </div>
+            )}
           </div>
-          <Input
-            ref={inputRef}
-            type="file"
-            accept=".xlsx"
-            className="hidden"
-            onChange={handleFileChange}
-          />
         </div>
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleButtonClick} className="w-full">
-          <Upload size={16} className="mr-2" />
-          Upload Excel File
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -8,10 +9,13 @@ import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   const [lastSpokenWordId, setLastSpokenWordId] = useState<string | null>(null);
+  const [showWordCard, setShowWordCard] = useState(true);
   
   const {
     hasData,
@@ -62,17 +66,20 @@ const VocabularyApp: React.FC = () => {
     
     setLastSpokenWordId(wordId);
     
-    const fullText = `${currentWord.word}... ${currentWord.meaning}... ${currentWord.example}`;
+    // Directly speak the content without the labels
+    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
     
     console.log("Speaking vocabulary:", currentWord.word);
     
     isSpeakingRef.current = true;
     
     try {
+      // Add a small delay before speaking to ensure the UI is updated
       await new Promise(resolve => setTimeout(resolve, 300));
       await speakText(fullText);
       console.log("Finished speaking word completely");
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Add a small delay after speaking
+      await new Promise(resolve => setTimeout(resolve, 500));
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
@@ -107,8 +114,12 @@ const VocabularyApp: React.FC = () => {
     if (!isSpeakingRef.current && !isChangingWordRef.current) {
       const nextCategory = vocabularyService.nextSheet();
       setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-      handleManualNext();
+      
+      // Reset the last spoken word ID to force a new speech
       setLastSpokenWordId(null);
+      
+      // Get a new word from the new category and display it
+      handleManualNext();
     } else {
       toast({
         title: "Please wait",
@@ -124,9 +135,27 @@ const VocabularyApp: React.FC = () => {
     });
   };
 
+  const toggleView = () => {
+    setShowWordCard(prev => !prev);
+  };
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-xl mx-auto p-4">
-      {currentWord && hasData && (
+      {!showWordCard && hasData && (
+        <div className="flex justify-start mb-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={toggleView}
+            className="flex items-center gap-1"
+          >
+            <ArrowLeft size={16} />
+            Back to Vocabulary
+          </Button>
+        </div>
+      )}
+      
+      {currentWord && hasData && showWordCard && (
         <>
           <VocabularyCard 
             word={currentWord.word}
@@ -154,10 +183,20 @@ const VocabularyApp: React.FC = () => {
       {!hasData ? (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
       ) : (
-        <FileUpload onFileUploaded={handleFileUploaded} />
+        <>
+          <FileUpload 
+            onFileUploaded={handleFileUploaded} 
+            onShowWordCard={toggleView} 
+            showBackButton={!showWordCard}
+          />
+        </>
       )}
       
-      <NotificationManager onNotificationsEnabled={handleNotificationsEnabled} />
+      <NotificationManager 
+        onNotificationsEnabled={handleNotificationsEnabled} 
+        currentWord={currentWord}
+        voiceRegion={voiceRegion}
+      />
     </div>
   );
 };

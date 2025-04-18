@@ -1,3 +1,4 @@
+
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string): Promise<void> => {
@@ -54,7 +55,13 @@ export const speak = (text: string): Promise<void> => {
         
         utterance.onerror = (event) => {
           console.error('Speech synthesis error:', event);
-          reject(new Error(`Speech error: ${event.error}`));
+          // Don't reject on cancel error as it's often just due to user navigation
+          if (event.error === 'canceled' || event.error === 'interrupted') {
+            console.log('Speech was canceled or interrupted, resolving anyway');
+            resolve();
+          } else {
+            reject(new Error(`Speech error: ${event.error}`));
+          }
         };
         
         // Start speaking
@@ -114,8 +121,8 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a buffer for pauses and natural speech patterns (20% buffer)
-  return milliseconds * 1.2;
+  // Add a buffer for pauses and natural speech patterns (40% buffer)
+  return milliseconds * 1.4;
 };
 
 export const stopSpeaking = (): void => {
@@ -144,4 +151,29 @@ export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthes
   
   // If no English voice is available, return the first available voice
   return voices[0];
+};
+
+// Get voice by region function 
+export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
+  const voices = window.speechSynthesis.getVoices();
+  
+  if (!voices || voices.length === 0) {
+    return null;
+  }
+  
+  // Try to find an appropriate voice for the selected region
+  const langCode = region === 'US' ? 'en-US' : 'en-GB';
+  let voice = voices.find(v => v.lang === langCode);
+  
+  // Fallback to any English voice if not found
+  if (!voice) {
+    voice = voices.find(v => v.lang.startsWith('en'));
+  }
+  
+  // Last resort - use any voice
+  if (!voice && voices.length > 0) {
+    voice = voices[0];
+  }
+  
+  return voice;
 };

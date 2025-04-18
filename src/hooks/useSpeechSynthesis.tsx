@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { speak, stopSpeaking, isSpeechSynthesisSupported } from '@/utils/speechUtils';
+import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speechUtils';
 
 export const useSpeechSynthesis = () => {
   const [isMuted, setIsMuted] = useState(false);
@@ -10,6 +10,7 @@ export const useSpeechSynthesis = () => {
   const { toast } = useToast();
   const speakingRef = useRef(false);
   const speechRequestIdRef = useRef(0);
+  const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
 
   // Check if speech synthesis is supported
   useEffect(() => {
@@ -29,6 +30,8 @@ export const useSpeechSynthesis = () => {
       if (voices.length > 0) {
         console.log('Voices loaded successfully:', voices.length);
         setIsVoicesLoaded(true);
+        // Initialize current voice
+        currentVoiceRef.current = getVoiceByRegion(voiceRegion);
         return true;
       }
       return false;
@@ -67,6 +70,22 @@ export const useSpeechSynthesis = () => {
       }
     }
   }, [toast]);
+
+  // Update voice when region changes
+  useEffect(() => {
+    if (isVoicesLoaded) {
+      currentVoiceRef.current = getVoiceByRegion(voiceRegion);
+      console.log(`Voice region changed to ${voiceRegion}`);
+      
+      // Try to speak a test phrase with the new voice
+      if (!isMuted) {
+        const testText = voiceRegion === 'US' ? 'American accent selected' : 'British accent selected';
+        speak(testText)
+          .then(() => console.log('Voice region change announced'))
+          .catch(err => console.warn('Could not announce voice region change:', err));
+      }
+    }
+  }, [voiceRegion, isVoicesLoaded, isMuted]);
 
   // Test the speech system once voices are loaded
   useEffect(() => {
@@ -111,11 +130,16 @@ export const useSpeechSynthesis = () => {
       }
     } catch (error) {
       console.error('Failed to speak text:', error);
-      toast({
-        title: "Speech Error",
-        description: "Could not speak the text. Please check your audio settings and ensure your device has working speakers.",
-        variant: "destructive"
-      });
+      // Only show error if it's not a cancel or interrupted error
+      if (error instanceof Error && 
+          !error.message.includes('canceled') && 
+          !error.message.includes('interrupted')) {
+        toast({
+          title: "Speech Error",
+          description: "Could not speak the text. Please check your audio settings and ensure your device has working speakers.",
+          variant: "destructive"
+        });
+      }
     } finally {
       // Always mark as not speaking when done
       if (requestId === speechRequestIdRef.current) {

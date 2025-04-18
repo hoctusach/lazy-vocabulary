@@ -1,153 +1,198 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { notificationService } from '@/services/notificationService';
-import { BellRing, BellOff, Info, BookOpen } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Bell, BellOff } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { VocabularyWord } from '@/types/vocabulary';
+import { speak } from '@/utils/speechUtils';
+
+// Define request permission function
+const requestNotificationPermission = async () => {
+  if (!('Notification' in window)) {
+    return 'unsupported';
+  }
+  
+  if (Notification.permission === 'granted') {
+    return 'granted';
+  }
+  
+  if (Notification.permission === 'denied') {
+    return 'denied';
+  }
+  
+  const result = await Notification.requestPermission();
+  return result;
+};
 
 interface NotificationManagerProps {
   onNotificationsEnabled: () => void;
+  currentWord?: VocabularyWord | null;
+  voiceRegion?: 'US' | 'UK';
 }
 
-const NotificationManager: React.FC<NotificationManagerProps> = ({ onNotificationsEnabled }) => {
-  const [status, setStatus] = useState<'unsupported' | 'denied' | 'default' | 'granted'>('default');
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [showStartButton, setShowStartButton] = useState(false);
+const NotificationManager: React.FC<NotificationManagerProps> = ({ 
+  onNotificationsEnabled,
+  currentWord,
+  voiceRegion = 'US'
+}) => {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [permissionState, setPermissionState] = useState<string>('default');
+  const { toast } = useToast();
   
+  // Check initial permission state
   useEffect(() => {
-    const initializeNotifications = async () => {
-      if (!notificationService.isNotificationsSupported) {
-        setStatus('unsupported');
-        return;
-      }
-      
-      const initialized = await notificationService.initialize();
-      setIsInitialized(initialized);
-      
-      if (initialized) {
-        const permission = notificationService.notificationPermission;
-        setStatus(permission || 'default');
-        setIsSubscribed(notificationService.subscribed);
-        
-        if (permission === 'granted' && notificationService.subscribed) {
-          onNotificationsEnabled();
-          setShowStartButton(true);
-        }
+    const checkPermission = async () => {
+      if ('Notification' in window) {
+        const permission = Notification.permission;
+        setPermissionState(permission);
+        setNotificationsEnabled(permission === 'granted');
+      } else {
+        setPermissionState('unsupported');
       }
     };
     
-    initializeNotifications();
-  }, [onNotificationsEnabled]);
+    checkPermission();
+  }, []);
   
-  const requestPermission = async () => {
-    const granted = await notificationService.requestPermission();
-    setStatus(granted ? 'granted' : 'denied');
+  // Register service worker if notifications are enabled
+  useEffect(() => {
+    if (notificationsEnabled) {
+      const registerServiceWorker = async () => {
+        if ('serviceWorker' in navigator) {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('Service Worker registered with scope:', registration.scope);
+          } catch (error) {
+            console.error('Service Worker registration failed:', error);
+          }
+        }
+      };
+      
+      registerServiceWorker();
+    }
+  }, [notificationsEnabled]);
+  
+  const handleEnableNotifications = async () => {
+    const permission = await requestNotificationPermission();
     
-    if (granted) {
-      const subscribed = await notificationService.subscribe();
-      setIsSubscribed(subscribed);
+    setPermissionState(permission);
+    
+    if (permission === 'granted') {
+      setNotificationsEnabled(true);
+      onNotificationsEnabled();
       
-      if (subscribed) {
-        onNotificationsEnabled();
-        setShowStartButton(true);
-      }
+      // Show a test notification
+      const notification = new Notification('Vocabulary Notifications Enabled', {
+        body: 'You will now receive vocabulary notifications.',
+        icon: '/favicon.ico'
+      });
+      
+      // Close notification after 4 seconds
+      setTimeout(() => notification.close(), 4000);
+      
+    } else if (permission === 'denied') {
+      toast({
+        title: "Notification Permission Denied",
+        description: "Please enable notifications in your browser settings to receive vocabulary reminders.",
+        variant: "destructive",
+      });
+    } else if (permission === 'unsupported') {
+      toast({
+        title: "Notifications Not Supported",
+        description: "Your browser doesn't support notifications.",
+        variant: "destructive",
+      });
     }
   };
   
-  const toggleSubscription = async (checked: boolean) => {
-    if (checked) {
-      const subscribed = await notificationService.subscribe();
-      setIsSubscribed(subscribed);
-      
-      if (subscribed) {
-        onNotificationsEnabled();
-        setShowStartButton(true);
-      }
-    } else {
-      const unsubscribed = await notificationService.unsubscribe();
-      setIsSubscribed(!unsubscribed);
-      setShowStartButton(false);
-    }
+  const handleDisableNotifications = () => {
+    setNotificationsEnabled(false);
+    toast({
+      title: "Notifications Disabled",
+      description: "You will no longer receive vocabulary notifications.",
+    });
   };
   
-  if (status === 'unsupported') {
-    return null;
-  }
+  // Function to show vocabulary notification
+  const showVocabularyNotification = () => {
+    if (!notificationsEnabled || !currentWord) return;
+    
+    const { word, meaning, example } = currentWord;
+    
+    // Create and show notification
+    const notification = new Notification(`Vocabulary: ${word}`, {
+      body: `${meaning}\n\nExample: ${example}`,
+      icon: '/favicon.ico',
+      silent: false
+    });
+    
+    // Speak the word when notification is clicked
+    notification.onclick = async () => {
+      notification.close();
+      const fullText = `${word}. ${meaning}. ${example}`;
+      await speak(fullText);
+    };
+    
+    // Close notification after 10 seconds
+    setTimeout(() => {
+      notification.close();
+    }, 10000);
+  };
+  
+  // Show notification when current word changes
+  useEffect(() => {
+    if (currentWord && notificationsEnabled) {
+      // Add a delay to ensure word has been processed
+      const timer = setTimeout(() => {
+        showVocabularyNotification();
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentWord, notificationsEnabled]);
   
   return (
     <Card className="w-full max-w-xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center">
-          <BellRing size={20} className="mr-2 text-primary" />
-          Vocabulary Notifications
-        </CardTitle>
-        <CardDescription>
-          Enable notifications to receive vocabulary words even when the browser is minimized.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {status === 'default' && (
-          <div className="space-y-4">
-            <p className="text-sm">
-              Notifications allow you to receive vocabulary reminders even when this tab is closed or your browser is minimized.
-            </p>
-            <Button onClick={requestPermission} className="w-full">
-              Enable Notifications
-            </Button>
-          </div>
-        )}
-        
-        {status === 'denied' && (
-          <div className="space-y-4">
-            <p className="text-sm text-destructive">
-              Notification permission was denied. Please enable notifications in your browser settings to receive vocabulary reminders.
-            </p>
-          </div>
-        )}
-        
-        {status === 'granted' && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Switch 
-                  id="notifications" 
-                  checked={isSubscribed} 
-                  onCheckedChange={toggleSubscription} 
-                />
-                <label htmlFor="notifications" className="text-sm font-medium">
-                  Receive vocabulary notifications
-                </label>
-              </div>
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <Info size={16} />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="max-w-xs">
-                      You'll receive notifications with vocabulary words even when this browser tab is closed.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-            
-            {showStartButton && (
-              <Button 
-                onClick={() => window.location.reload()} 
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold"
-              >
-                <BookOpen className="mr-2 h-5 w-5" />
-                START LEARNING!
-              </Button>
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Notifications</h2>
+          
+          <p className="text-sm text-gray-500">
+            {notificationsEnabled
+              ? "Vocabulary notifications are enabled. You'll receive notifications even when the browser is minimized."
+              : "Enable notifications to receive vocabulary reminders even when your browser is minimized."}
+          </p>
+          
+          <Button
+            variant={notificationsEnabled ? "outline" : "default"}
+            className="w-full flex justify-center items-center gap-2"
+            onClick={notificationsEnabled ? handleDisableNotifications : handleEnableNotifications}
+            disabled={permissionState === 'unsupported'}
+          >
+            {notificationsEnabled ? (
+              <>
+                <BellOff size={16} /> Disable Notifications
+              </>
+            ) : (
+              <>
+                <Bell size={16} /> Enable Notifications
+              </>
             )}
-          </div>
-        )}
+          </Button>
+          
+          {permissionState === 'unsupported' && (
+            <p className="text-xs text-red-500 mt-2">
+              Your browser doesn't support notifications.
+            </p>
+          )}
+          
+          {permissionState === 'denied' && (
+            <p className="text-xs text-amber-500 mt-2">
+              Notification permission was denied. You need to enable notifications in your browser settings.
+            </p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
