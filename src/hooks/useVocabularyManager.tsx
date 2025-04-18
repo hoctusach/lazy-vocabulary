@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
+import { calculateSpeechDuration } from '@/utils/speechUtils';
 
 export const useVocabularyManager = () => {
   const [hasData, setHasData] = useState(false);
@@ -21,15 +22,12 @@ export const useVocabularyManager = () => {
   }, []);
 
   const displayNextWord = useCallback(async () => {
-    // Don't schedule next word if we're currently speaking or changing word
     if (isSpeakingRef.current || isChangingWordRef.current) {
       console.log("Speech is in progress or word is changing, delaying next word");
       return;
     }
     
-    // Set a flag to indicate we're changing the word
     isChangingWordRef.current = true;
-    
     clearTimer();
     window.speechSynthesis.cancel();
     
@@ -42,13 +40,20 @@ export const useVocabularyManager = () => {
     
     if (nextWord) {
       setCurrentWord(nextWord);
-      // Reset the changing word flag after a small delay to ensure UI has updated
+      
+      // Calculate total duration for all text
+      const fullText = `${nextWord.word}... ${nextWord.meaning}... ${nextWord.example}`;
+      const duration = calculateSpeechDuration(fullText);
+      
+      // Add some buffer time for screen transitions
+      const totalDuration = duration + 2000;
+      
       setTimeout(() => {
         isChangingWordRef.current = false;
       }, 100);
       
-      // Only schedule the next word after the current one is completely processed
-      timerRef.current = window.setTimeout(displayNextWord, 15000);
+      console.log(`Scheduled next word in ${totalDuration}ms`);
+      timerRef.current = window.setTimeout(displayNextWord, totalDuration);
     } else {
       isChangingWordRef.current = false;
       toast({

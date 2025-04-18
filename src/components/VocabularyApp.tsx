@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -41,7 +40,6 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Show an indicator when voices are loaded
   useEffect(() => {
     if (isVoicesLoaded) {
       toast({
@@ -51,54 +49,39 @@ const VocabularyApp: React.FC = () => {
     }
   }, [isVoicesLoaded, toast, voiceRegion]);
 
-  // Function to speak the current word - fully awaits completion
   const speakCurrentWord = async () => {
     if (!currentWord || isMuted || !isVoicesLoaded || isChangingWordRef.current) {
       return;
     }
     
-    // Create unique ID for this word including its actual content to prevent repeats
     const wordId = `${currentWord.word}-${Math.random()}`;
     
-    // Skip if we just spoke this exact word
     if (wordId === lastSpokenWordId) {
       return;
     }
     
     setLastSpokenWordId(wordId);
     
-    // Construct the text to speak with pauses between sections
-    // Adding periods and commas to create natural pauses
-    const fullText = `${currentWord.word}. . ${currentWord.meaning}. . Example: ${currentWord.example}`;
+    const fullText = `${currentWord.word}... ${currentWord.meaning}... ${currentWord.example}`;
     
     console.log("Speaking vocabulary:", currentWord.word);
     
-    // Set speaking state to true to prevent next word from being triggered
     isSpeakingRef.current = true;
     
     try {
-      // Add a small delay before speaking to ensure UI is updated
       await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // This will now properly wait until speech is complete before continuing
       await speakText(fullText);
-      
       console.log("Finished speaking word completely");
-      
-      // Add a delay after speaking before allowing next word
       await new Promise(resolve => setTimeout(resolve, 800));
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
-      // Always mark as not speaking when done, allowing next word to be triggered
       isSpeakingRef.current = false;
     }
   };
 
-  // Speak word when it changes or is displayed initially
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && isVoicesLoaded && !isChangingWordRef.current) {
-      // Small delay to ensure UI is fully updated
       const timer = setTimeout(() => {
         speakCurrentWord();
       }, 200);
@@ -107,16 +90,13 @@ const VocabularyApp: React.FC = () => {
     }
   }, [currentWord, isPaused, isMuted, isVoicesLoaded]);
   
-  // Try to speak again when unmuted
   useEffect(() => {
     if (!isMuted && currentWord && !isPaused && isVoicesLoaded) {
-      // Reset the last spoken word ID to force speaking
       setLastSpokenWordId(null);
       speakCurrentWord();
     }
   }, [isMuted]);
 
-  // Reset spoken status when unpausing
   useEffect(() => {
     if (!isPaused && currentWord) {
       setLastSpokenWordId(null);
@@ -124,12 +104,11 @@ const VocabularyApp: React.FC = () => {
   }, [isPaused]);
 
   const handleSwitchCategory = () => {
-    // Only switch if not currently speaking or changing word
     if (!isSpeakingRef.current && !isChangingWordRef.current) {
       const nextCategory = vocabularyService.nextSheet();
       setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
       handleManualNext();
-      setLastSpokenWordId(null); // Reset spoken state when changing categories
+      setLastSpokenWordId(null);
     } else {
       toast({
         title: "Please wait",
@@ -183,7 +162,6 @@ const VocabularyApp: React.FC = () => {
   );
 };
 
-// Background colors similar to the original app
 const backgroundColors = [
   "#f2f2f2", "#e6f7ff", "#fff3e6", "#f9e6f6", "#f0f8ff",
   "#faebd7", "#ffefd5", "#e6e6fa", "#dcdcdc", "#fdf5e6",

@@ -1,4 +1,3 @@
-
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string): Promise<void> => {
@@ -42,8 +41,8 @@ export const speak = (text: string): Promise<void> => {
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters - even slower rate for better comprehension
-        utterance.rate = 0.85; // Slower rate
+        // Configure speech parameters for better comprehension
+        utterance.rate = 0.85;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -59,17 +58,14 @@ export const speak = (text: string): Promise<void> => {
         };
         
         // Start speaking
-        console.log('Starting speech:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+        console.log('Starting speech');
         
-        // Chrome bug workaround - ensure speech synthesis is not paused
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();
         }
         
         window.speechSynthesis.speak(utterance);
         
-        // Chrome workaround - sometimes speech gets cut off
-        // This keeps the speech synthesis object active
         const keepAlive = () => {
           if (window.speechSynthesis.speaking) {
             window.speechSynthesis.pause();
@@ -84,20 +80,16 @@ export const speak = (text: string): Promise<void> => {
       }
     };
     
-    // Execute immediately if voices are available, otherwise wait
     if (voices.length > 0) {
       setVoiceAndSpeak();
     } else {
-      // For Chrome which loads voices asynchronously
       window.speechSynthesis.onvoiceschanged = () => {
         const updatedVoices = window.speechSynthesis.getVoices();
         console.log(`Voices loaded asynchronously: ${updatedVoices.length}`);
         setVoiceAndSpeak();
-        // Remove the handler to avoid multiple calls
         window.speechSynthesis.onvoiceschanged = null;
       };
       
-      // Fallback if onvoiceschanged doesn't fire
       setTimeout(() => {
         if (!utterance.voice) {
           const fallbackVoices = window.speechSynthesis.getVoices();
@@ -111,6 +103,19 @@ export const speak = (text: string): Promise<void> => {
       }, 1000);
     }
   });
+};
+
+// Calculate estimated speech duration in milliseconds
+export const calculateSpeechDuration = (text: string, rate: number = 0.85): number => {
+  // Average speaking rate is about 150 words per minute at normal speed (1.0)
+  // We'll estimate 150 * rate words per minute
+  const wordsPerMinute = 150 * rate;
+  const words = text.split(' ').length;
+  const minutes = words / wordsPerMinute;
+  const milliseconds = minutes * 60 * 1000;
+  
+  // Add a buffer for pauses and natural speech patterns (20% buffer)
+  return milliseconds * 1.2;
 };
 
 export const stopSpeaking = (): void => {
