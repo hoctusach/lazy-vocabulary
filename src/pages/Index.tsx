@@ -31,7 +31,7 @@ const Index = () => {
                       className="text-blue-500 hover:underline"
                       download
                     >
-                      Download the sample words
+                      Download the sample word set and upload it
                     </a>
                   </li>
                   <li>Enable notifications</li>

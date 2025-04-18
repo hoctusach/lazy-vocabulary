@@ -74,10 +74,11 @@ const VocabularyApp: React.FC = () => {
     handleToggleMute();
     
     if (wasMuted && currentWord) {
+      // Reduced timeout for better responsiveness
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
-      }, 500);
+      }, 300);
     } else if (!wasMuted) {
       // Just turned mute on, no need to speak
       resetLastSpokenWord();
@@ -90,9 +91,10 @@ const VocabularyApp: React.FC = () => {
     handleChangeVoice();
     
     if (!isMuted && currentWord) {
+      // Reduced timeout for better responsiveness
       setTimeout(() => {
         speakCurrentWord(true);
-      }, 800);
+      }, 500);
     }
   }, [isMuted, currentWord, handleChangeVoice, resetLastSpokenWord, speakCurrentWord]);
   
@@ -102,12 +104,12 @@ const VocabularyApp: React.FC = () => {
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
     handleSwitchCategory(isMuted, voiceRegion);
     
-    // Force speak the new word after category change
+    // Force speak the new word after category change with reduced timeout
     setTimeout(() => {
       if (!isMuted && currentWord && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 1500);
+    }, 800);
   }, [isMuted, voiceRegion, isPaused, currentWord, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord]);
 
   const handleNextWordClick = useCallback(() => {
@@ -115,12 +117,12 @@ const VocabularyApp: React.FC = () => {
     resetLastSpokenWord();
     handleManualNext();
     
-    // Force speak the new word
+    // Force speak the new word with reduced timeout
     setTimeout(() => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 1000);
+    }, 600);
   }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord]);
 
   const toggleView = useCallback(() => {

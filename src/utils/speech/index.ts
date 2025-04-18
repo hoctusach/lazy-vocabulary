@@ -33,13 +33,13 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters
-        utterance.rate = 0.8;
+        // Configure speech parameters - slightly increased rate for better sync
+        utterance.rate = 0.85;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
-        let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
-        let maxDurationTimeout: ReturnType<typeof setTimeout> | null = null;
+        let keepAliveInterval: number | null = null;
+        let maxDurationTimeout: number | null = null;
         
         const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
@@ -77,8 +77,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         
         window.speechSynthesis.speak(utterance);
         
-        // Keep speech synthesis alive for long text
-        keepAliveInterval = setInterval(() => {
+        // Keep speech synthesis alive for long text - more frequent checks
+        keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Keeping speech synthesis alive...");
             window.speechSynthesis.pause();
@@ -86,13 +86,13 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } else {
             clearAllTimers();
           }
-        }, 5000);
+        }, 3000); // Reduced interval for more reliable speech
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 30000), 120000);
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 20000), 90000);
         
-        maxDurationTimeout = setTimeout(() => {
+        maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {
             console.log(`Maximum speech duration reached (${maxDuration}ms), stopping speech`);
             window.speechSynthesis.cancel();
@@ -116,6 +116,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.onvoiceschanged = null;
       };
       
+      // Reduced timeout for faster voice loading
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
@@ -126,7 +127,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 1500);
+      }, 1000); // Reduced timeout for better responsiveness
     }
   });
 };

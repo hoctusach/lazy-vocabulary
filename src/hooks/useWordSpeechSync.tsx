@@ -27,8 +27,17 @@ export const useWordSpeechSync = (
       console.log("Word changed in speech sync:", currentWord.word);
       setWordFullySpoken(false);
       lastWordIdRef.current = currentWord.word;
+      
+      // Display toast with word info when word changes
+      if (currentWord.word && currentWord.meaning) {
+        toast({
+          title: currentWord.word,
+          description: `${currentWord.meaning}${currentWord.example ? `\n\nExample: ${currentWord.example}` : ''}`,
+          duration: 6000, // Longer duration to read content
+        });
+      }
     }
-  }, [currentWord]);
+  }, [currentWord, toast]);
 
   const clearSpeechTimeout = useCallback(() => {
     if (speechTimeoutRef.current !== null) {
@@ -94,13 +103,15 @@ export const useWordSpeechSync = (
       
       isSpeakingRef.current = true;
       
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Reduced delay to improve synchronization
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
       await speakText(fullText);
       
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Shorter pause after speech for better synchronization
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       console.log("Finished speaking word completely:", wordToSpeak.word);
       setWordFullySpoken(true);
@@ -115,7 +126,7 @@ export const useWordSpeechSync = (
         speakAttemptCountRef.current++;
         speechTimeoutRef.current = window.setTimeout(() => {
           speakCurrentWord(true);
-        }, 500);
+        }, 300); // Reduced retry delay for better responsiveness
       }
     } finally {
       isSpeakingRef.current = false;
@@ -141,9 +152,10 @@ export const useWordSpeechSync = (
     clearSpeechTimeout();
     
     if (!isChangingWordRef.current && !isMuted) {
+      // Reduced timeout for better synchronization between display and speech
       speechTimeoutRef.current = window.setTimeout(() => {
         speakCurrentWord();
-      }, 300);
+      }, 150);
     }
     
     return () => {
@@ -167,4 +179,3 @@ export const useWordSpeechSync = (
     wordFullySpoken
   };
 };
-

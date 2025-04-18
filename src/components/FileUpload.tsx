@@ -104,13 +104,20 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </div>
           
           <div className="flex flex-col gap-3 mt-4">
-            <Button 
-              variant="outline" 
-              className="w-full flex justify-center items-center gap-2"
-              onClick={handleDownloadSample}
+            <a 
+              href="https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true"
+              target="_blank" 
+              rel="noopener noreferrer"
+              download
             >
-              <Download size={16} /> Download Sample
-            </Button>
+              <Button 
+                variant="outline" 
+                className="w-full flex justify-center items-center gap-2"
+                onClick={handleDownloadSample}
+              >
+                <Download size={16} /> Download Sample
+              </Button>
+            </a>
             
             <div className="relative">
               <input
