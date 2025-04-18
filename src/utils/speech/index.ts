@@ -145,7 +145,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         }, 600);
 
         // Start speaking with a robust retry mechanism
-        const attemptSpeech = (attempts = 0) => {
+        // Made this function async to fix the await error
+        const attemptSpeech = async (attempts = 0) => {
           if (attempts >= 4) { // Increased retry attempts
             console.error('Failed to start speech after multiple attempts');
             clearAllTimers();
@@ -177,6 +178,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         };
         
+        // Call the async function without await since we handle completion via the utterance events
         attemptSpeech();
 
         // Set reasonable maximum duration with proper calculation
