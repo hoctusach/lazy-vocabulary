@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FilePlus2 } from 'lucide-react';
+import { Upload, FilePlus2, Download } from 'lucide-react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -13,6 +13,8 @@ interface FileUploadProps {
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  
+  const DEFAULT_VOCAB_DOWNLOAD_URL = "https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true";
   
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -75,12 +77,40 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     }
   };
   
+  const handleDownloadAndUpload = async () => {
+    try {
+      toast({
+        title: "Downloading template",
+        description: "Please wait while we download and process the template...",
+      });
+
+      const response = await fetch(DEFAULT_VOCAB_DOWNLOAD_URL);
+      const blob = await response.blob();
+      const file = new File([blob], "vocabulary_template.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      
+      await processFile(file);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to download and process the template. Please try manually downloading.",
+        variant: "destructive"
+      });
+    }
+  };
+  
   return (
     <Card className="w-full max-w-xl mx-auto">
       <CardHeader>
         <CardTitle>Upload Vocabulary</CardTitle>
-        <CardDescription>
+        <CardDescription className="flex justify-between items-center">
           Prepare your Excel file for vocabulary learning
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={handleDownloadAndUpload}
+          >
+            <Download size={16} className="mr-2" /> Use Default Template
+          </Button>
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -110,10 +140,18 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           />
         </div>
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleButtonClick} className="w-full">
+      <CardFooter className="flex gap-2">
+        <Button onClick={handleButtonClick} className="flex-1">
           <Upload size={16} className="mr-2" />
           Upload Excel File
+        </Button>
+        <Button 
+          variant="secondary" 
+          onClick={handleDownloadAndUpload}
+          className="flex-1"
+        >
+          <Download size={16} className="mr-2" />
+          Use Default Template
         </Button>
       </CardFooter>
     </Card>
