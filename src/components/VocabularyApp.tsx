@@ -5,7 +5,8 @@ import { useToast } from '@/components/ui/use-toast';
 import VocabularyCard from './VocabularyCard';
 import FileUpload from './FileUpload';
 import NotificationManager from './NotificationManager';
-import { vocabularyService, VocabularyWord } from '@/services/vocabularyService';
+import { vocabularyService } from '@/services/vocabularyService';
+import { VocabularyWord } from '@/types/vocabulary';
 import { notificationService } from '@/services/notificationService';
 import { ArrowRight } from 'lucide-react';
 
