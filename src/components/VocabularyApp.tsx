@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
 import VocabularyControls from './VocabularyControls';
@@ -7,8 +7,11 @@ import NotificationManager from './NotificationManager';
 import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { vocabularyService } from '@/services/vocabularyService';
+import { useToast } from '@/hooks/use-toast'; // Adding the missing import for toast
 
 const VocabularyApp: React.FC = () => {
+  const [backgroundColorIndex, setBackgroundColorIndex] = useState(0); // Adding state for background color index
+  
   const {
     hasData,
     currentWord,
@@ -27,9 +30,18 @@ const VocabularyApp: React.FC = () => {
     handleChangeVoice
   } = useSpeechSynthesis();
 
+  const { toast } = useToast(); // Properly destructuring toast from useToast
+
   const currentSheetName = vocabularyService.getCurrentSheetName();
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
+
+  // Adding the missing handleSwitchCategory function
+  const handleSwitchCategory = () => {
+    const nextCategory = vocabularyService.nextSheet();
+    setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
+    handleManualNext();
+  };
 
   const handleNotificationsEnabled = () => {
     toast({
