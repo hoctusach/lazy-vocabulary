@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useToast } from '@/hooks/use-toast';
@@ -36,10 +37,10 @@ export const useWordSpeechSync = (
   const speakCurrentWord = async (forceSpeak = false) => {
     const wordToSpeak = currentWordRef.current;
     
-    if (!wordToSpeak || (isMuted && !forceSpeak) || !isVoicesLoaded) {
+    if (!wordToSpeak || (!forceSpeak && isMuted) || !isVoicesLoaded) {
       console.log("Cannot speak current word:", 
         !wordToSpeak ? "no word" : 
-        isMuted ? "muted" : 
+        isMuted && !forceSpeak ? "muted" : 
         !isVoicesLoaded ? "voices not loaded" : 
         "unknown reason");
       return;
@@ -71,7 +72,7 @@ export const useWordSpeechSync = (
     setWordFullySpoken(false);
     
     try {
-      if (isMuted) {
+      if (isMuted && !forceSpeak) {
         console.log("Speech is muted, not actually speaking");
         setWordFullySpoken(true);
         return;
@@ -110,6 +111,9 @@ export const useWordSpeechSync = (
   useEffect(() => {
     if (!currentWord || isPaused || !isVoicesLoaded) {
       clearSpeechTimeout();
+      if (isPaused) {
+        stopSpeaking(); // Stop any ongoing speech when paused
+      }
       return;
     }
     

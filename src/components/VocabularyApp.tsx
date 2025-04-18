@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -75,7 +76,7 @@ const VocabularyApp: React.FC = () => {
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
-      }, 100);
+      }, 300);
     }
   };
   
@@ -86,7 +87,7 @@ const VocabularyApp: React.FC = () => {
     if (!isMuted && currentWord) {
       setTimeout(() => {
         speakCurrentWord(true);
-      }, 300);
+      }, 500);
     }
   };
   
@@ -95,12 +96,26 @@ const VocabularyApp: React.FC = () => {
     resetLastSpokenWord();
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
     handleSwitchCategory(isMuted, voiceRegion);
+    
+    // Force speak the new word after category change
+    setTimeout(() => {
+      if (!isMuted && currentWord && !isPaused) {
+        speakCurrentWord(true);
+      }
+    }, 800);
   };
 
   const handleNextWordClick = () => {
     stopSpeaking();
     resetLastSpokenWord();
     handleManualNext();
+    
+    // Force speak the new word
+    setTimeout(() => {
+      if (!isMuted && !isPaused) {
+        speakCurrentWord(true);
+      }
+    }, 500);
   };
 
   const toggleView = () => {

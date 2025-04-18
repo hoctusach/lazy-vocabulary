@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
-import { calculateSpeechDuration } from '@/utils/speech';
+import { calculateSpeechDuration, stopSpeaking } from '@/utils/speech';
 
 export const useVocabularyManager = () => {
   // Try to get initial pause state from localStorage
@@ -17,6 +17,12 @@ export const useVocabularyManager = () => {
   const lastSpeechDurationRef = useRef<number>(0);
   const { toast } = useToast();
   const lastManualActionTimeRef = useRef<number>(Date.now());
+  const currentWordRef = useRef<VocabularyWord | null>(null);
+
+  // Keep currentWordRef updated
+  useEffect(() => {
+    currentWordRef.current = currentWord;
+  }, [currentWord]);
 
   // Save pause state to localStorage whenever it changes
   useEffect(() => {
@@ -51,7 +57,7 @@ export const useVocabularyManager = () => {
     // Set changing word state to prevent conflicts
     isChangingWordRef.current = true;
     clearTimer();
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     
     // Double-check pause state again
     if (isPaused) {
@@ -115,7 +121,7 @@ export const useVocabularyManager = () => {
     
     return () => {
       clearTimer();
-      window.speechSynthesis.cancel();
+      stopSpeaking();
     };
   }, [displayNextWord, isPaused, clearTimer]);
 
@@ -123,6 +129,7 @@ export const useVocabularyManager = () => {
     console.log("File uploaded callback triggered");
     setHasData(true);
     lastManualActionTimeRef.current = Date.now();
+    stopSpeaking();
     
     // Force a refresh of the current word
     const word = vocabularyService.getNextWord();
@@ -138,11 +145,11 @@ export const useVocabularyManager = () => {
 
   const handleTogglePause = () => {
     lastManualActionTimeRef.current = Date.now();
+    stopSpeaking();
     
     setIsPaused(prev => {
       const newPauseState = !prev;
       console.log(`Pause state changed to: ${newPauseState}`);
-      window.speechSynthesis.cancel();
       
       if (!newPauseState) {
         // When unpausing, display next word after a short delay
@@ -161,7 +168,7 @@ export const useVocabularyManager = () => {
     clearTimer();
     
     // Cancel any ongoing speech
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     
     // Set changing word flag to prevent conflicts
     isChangingWordRef.current = true;
@@ -194,7 +201,7 @@ export const useVocabularyManager = () => {
     lastManualActionTimeRef.current = Date.now();
     
     // Cancel any ongoing speech and timer
-    window.speechSynthesis.cancel();
+    stopSpeaking();
     clearTimer();
     
     // Set changing category flag

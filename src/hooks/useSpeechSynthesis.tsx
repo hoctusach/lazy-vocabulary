@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
@@ -16,13 +17,14 @@ export const useSpeechSynthesis = () => {
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const voicesLoadedTimeoutRef = useRef<number | null>(null);
   const lastVoiceRegionRef = useRef<'US' | 'UK'>(initialVoiceRegion);
+  const pendingSpeechRef = useRef<{text: string, forceSpeak: boolean} | null>(null);
 
-  // Save mute state to localStorage
+  // Save mute state to localStorage immediately when changed
   useEffect(() => {
     localStorage.setItem('isMuted', isMuted.toString());
   }, [isMuted]);
 
-  // Save voice region preferences
+  // Save voice region preferences immediately when changed
   useEffect(() => {
     localStorage.setItem('voiceRegion', voiceRegion);
     lastVoiceRegionRef.current = voiceRegion;
@@ -48,6 +50,15 @@ export const useSpeechSynthesis = () => {
         setIsVoicesLoaded(true);
         // Initialize current voice
         currentVoiceRef.current = getVoiceByRegion(voiceRegion);
+        
+        // If there's pending speech, process it now
+        if (pendingSpeechRef.current && !isMuted) {
+          const { text, forceSpeak } = pendingSpeechRef.current;
+          pendingSpeechRef.current = null;
+          setTimeout(() => {
+            speakText(text).catch(console.error);
+          }, 300);
+        }
         return true;
       }
       return false;
@@ -103,7 +114,7 @@ export const useSpeechSynthesis = () => {
         };
       }
     }
-  }, [toast, voiceRegion]);
+  }, [toast, voiceRegion, isMuted]);
 
   // Update voice when region changes
   useEffect(() => {
@@ -127,6 +138,12 @@ export const useSpeechSynthesis = () => {
 
   // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {
+    if (!isVoicesLoaded) {
+      console.log('Voices not loaded yet, queueing speech for later');
+      pendingSpeechRef.current = { text, forceSpeak: true };
+      return Promise.resolve();
+    }
+
     if (isMuted || !text) {
       console.log(isMuted ? 'Speech is muted' : 'No text provided');
       return Promise.resolve(); // Resolve immediately if muted
@@ -168,15 +185,13 @@ export const useSpeechSynthesis = () => {
         speakingRef.current = false;
       }
     }
-  }, [isMuted, voiceRegion]);
+  }, [isMuted, voiceRegion, isVoicesLoaded]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
       const newState = !prev;
+      stopSpeaking();
       console.log(`Mute state changed to: ${newState}`);
-      if (newState) {
-        stopSpeaking();
-      }
       return newState;
     });
   }, []);
