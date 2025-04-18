@@ -1,4 +1,3 @@
-
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { 
@@ -126,9 +125,6 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         };
 
-        // Make sure speech system is ready before we begin
-        await waitForSpeechReadiness();
-        
         // More frequent keep-alive interval
         keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
@@ -155,10 +151,9 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         }, 400);
 
-        // Start speaking with a robust retry mechanism
-        // Made this function async to fix the await error
-        const attemptSpeech = async (attempts = 0) => {
-          if (attempts >= 4) { // Increased retry attempts
+        // More robust speech attempt function
+        const attemptSpeech = async (attempts = 0): Promise<void> => {
+          if (attempts >= 3) {
             console.error('Failed to start speech after multiple attempts');
             clearAllTimers();
             reject(new Error('Failed to start speech'));
@@ -166,37 +161,35 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
           
           try {
-            // Ensure engine is in a clean state before starting
+            // Ensure clean speech engine state
             if (attempts > 0) {
               window.speechSynthesis.cancel();
-              // Longer delay between retries for stability
-              await new Promise(resolve => setTimeout(resolve, 500));
+              await new Promise(resolve => setTimeout(resolve, 300));
             }
             
-            // Add a short delay before speaking to ensure the engine is ready
-            await new Promise(resolve => setTimeout(resolve, 200));
-            
-            console.log(`Attempt ${attempts + 1}: Starting speech`);
+            // Speak with improved stability checks
             window.speechSynthesis.speak(utterance);
             
-            // Verify speech started successfully with longer verification time
-            setTimeout(() => {
-              if (!window.speechSynthesis.speaking) {
-                console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
-                resetSpeechEngine();
-                attemptSpeech(attempts + 1);
-              } else {
-                console.log('Speech started successfully');
-              }
-            }, 600); // Longer verification window
+            // Verify speech started
+            await new Promise<void>((resolveStart, rejectStart) => {
+              setTimeout(() => {
+                if (window.speechSynthesis.speaking) {
+                  resolveStart();
+                } else {
+                  console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
+                  rejectStart(new Error('Speech not started'));
+                }
+              }, 500);
+            });
           } catch (error) {
-            console.error('Error starting speech:', error);
-            setTimeout(() => attemptSpeech(attempts + 1), 800);
+            console.error('Speech start error:', error);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await attemptSpeech(attempts + 1);
           }
         };
         
-        // Call the async function without await since we handle completion via the utterance events
-        attemptSpeech();
+        // Call the improved speech attempt
+        await attemptSpeech();
 
         // Set reasonable maximum duration with proper calculation
         const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
