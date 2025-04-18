@@ -20,6 +20,7 @@ export const useWordSpeechSync = (
   const speakAttemptCountRef = useRef(0);
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const speechLockRef = useRef(false);
+  const lastSpeakActionTimeRef = useRef<number>(0);
 
   useEffect(() => {
     currentWordRef.current = currentWord;
@@ -32,12 +33,17 @@ export const useWordSpeechSync = (
 
   const clearSpeechTimeout = useCallback(() => {
     if (speechTimeoutRef.current !== null) {
+      console.log("Clearing speech timeout");
       window.clearTimeout(speechTimeoutRef.current);
       speechTimeoutRef.current = null;
     }
   }, []);
 
   const speakCurrentWord = useCallback(async (forceSpeak = false) => {
+    // Add timestamp for this speak attempt
+    const speakActionTime = Date.now();
+    lastSpeakActionTimeRef.current = speakActionTime;
+    
     if (speechLockRef.current && !forceSpeak) {
       console.log("Speech is locked, waiting to complete current word");
       return;
@@ -73,6 +79,7 @@ export const useWordSpeechSync = (
     }
     
     if (forceSpeak) {
+      console.log("Force speaking word:", wordToSpeak.word);
       stopSpeaking();
       clearSpeechTimeout();
       setWordFullySpoken(false);
@@ -85,6 +92,13 @@ export const useWordSpeechSync = (
     speechLockRef.current = true;
     
     try {
+      // Check if a newer speak action has been requested
+      if (lastSpeakActionTimeRef.current !== speakActionTime) {
+        console.log("Newer speak action received, abandoning this one");
+        speechLockRef.current = false;
+        return;
+      }
+      
       if (isMuted && !forceSpeak) {
         console.log("Speech is muted, not actually speaking");
         setWordFullySpoken(true);
@@ -96,38 +110,65 @@ export const useWordSpeechSync = (
       
       await new Promise(resolve => setTimeout(resolve, 200));
       
+      // Build the full text with proper spacing
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
+      console.log("Speaking full text for word:", wordToSpeak.word);
       await speakText(fullText);
       
+      // Small delay after speech completion
       await new Promise(resolve => setTimeout(resolve, 200));
       
       console.log("Finished speaking word completely:", wordToSpeak.word);
       setWordFullySpoken(true);
+      
+      // Show a toast notification for word completion
+      toast({
+        title: "Word Spoken",
+        description: `Completed: ${wordToSpeak.word}`,
+        duration: 2000
+      });
     } catch (error) {
       console.error("Speech error:", error);
+      
+      // Check if a newer speak action has been requested
+      if (lastSpeakActionTimeRef.current !== speakActionTime) {
+        console.log("Newer speak action received after error, abandoning retry");
+        speechLockRef.current = false;
+        isSpeakingRef.current = false;
+        return;
+      }
       
       if (speakAttemptCountRef.current >= 2) {
         console.log("Multiple speech attempts failed, marking word as spoken anyway");
         setWordFullySpoken(true);
         speakAttemptCountRef.current = 0;
+        
+        toast({
+          title: "Speech Error",
+          description: "Could not speak the word after multiple attempts",
+          variant: "destructive"
+        });
       } else {
         speakAttemptCountRef.current++;
+        console.log(`Speech attempt failed, retrying (attempt ${speakAttemptCountRef.current})`);
+        
         speechTimeoutRef.current = window.setTimeout(() => {
           speakCurrentWord(true);
-        }, 500);
+        }, 800); // Increased retry delay
       }
     } finally {
       isSpeakingRef.current = false;
       speechLockRef.current = false;
     }
-  }, [clearSpeechTimeout, isMuted, isVoicesLoaded, speakText]);
+  }, [clearSpeechTimeout, isMuted, isVoicesLoaded, speakText, toast]);
 
   useEffect(() => {
     if (!currentWord || isPaused || !isVoicesLoaded) {
       clearSpeechTimeout();
       if (isPaused) {
-        stopSpeaking(); // Stop any ongoing speech when paused
+        console.log("App is paused, stopping any ongoing speech");
+        stopSpeaking();
       }
       return;
     }
@@ -141,9 +182,10 @@ export const useWordSpeechSync = (
     clearSpeechTimeout();
     
     if (!isChangingWordRef.current && !isMuted) {
+      console.log("Scheduling word to be spoken after short delay");
       speechTimeoutRef.current = window.setTimeout(() => {
         speakCurrentWord();
-      }, 300);
+      }, 500); // Increased delay for more reliable speech
     }
     
     return () => {
@@ -152,6 +194,7 @@ export const useWordSpeechSync = (
   }, [currentWord, isPaused, isMuted, isVoicesLoaded, clearSpeechTimeout, speakCurrentWord]);
 
   const resetSpeechSystem = useCallback(() => {
+    console.log("Resetting speech system");
     stopSpeaking();
     clearSpeechTimeout();
     lastWordIdRef.current = null;
@@ -167,4 +210,3 @@ export const useWordSpeechSync = (
     wordFullySpoken
   };
 };
-

@@ -3,7 +3,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
 
 interface VocabularyCardProps {
   word: string;
@@ -17,6 +17,7 @@ interface VocabularyCardProps {
   onTogglePause: () => void;
   onChangeVoice: () => void;
   onSwitchCategory: () => void;
+  onNextWord?: () => void;
   currentCategory: string;
   nextCategory: string;
   isSpeaking?: boolean;
@@ -34,6 +35,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onTogglePause,
   onChangeVoice,
   onSwitchCategory,
+  onNextWord,
   currentCategory,
   nextCategory,
   isSpeaking = false
@@ -106,6 +108,18 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               <RefreshCw size={16} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
+            
+            {onNextWord && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onNextWord}
+                className="min-w-[120px] text-indigo-700"
+              >
+                <SkipForward size={16} className="mr-1" />
+                Next Word
+              </Button>
+            )}
           </div>
         </div>
       </CardContent>
