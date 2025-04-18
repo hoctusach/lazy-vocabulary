@@ -19,7 +19,9 @@ export const useWordSpeechSync = (
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const speechLockRef = useRef(false);
   const isPausedRef = useRef(isPaused);
+  const isMutedRef = useRef(isMuted);
 
+  // Update refs when props change
   useEffect(() => {
     isPausedRef.current = isPaused;
     if (isPaused) {
@@ -27,6 +29,13 @@ export const useWordSpeechSync = (
       clearSpeechTimeout();
     }
   }, [isPaused]);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+    if (isMuted) {
+      stopSpeaking();
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     currentWordRef.current = currentWord;
@@ -51,6 +60,12 @@ export const useWordSpeechSync = (
       return;
     }
     
+    if (isMutedRef.current && !forceSpeak) {
+      console.log("Speech is muted, stopping and not speaking");
+      stopSpeaking();
+      return;
+    }
+    
     if (speechLockRef.current && !forceSpeak) {
       console.log("Speech is locked, waiting to complete current word");
       return;
@@ -60,11 +75,6 @@ export const useWordSpeechSync = (
     
     if (!wordToSpeak) {
       console.log("Cannot speak current word: no word available");
-      return;
-    }
-    
-    if (!forceSpeak && isMuted) {
-      console.log("Speech is muted, not speaking");
       return;
     }
     
@@ -98,7 +108,7 @@ export const useWordSpeechSync = (
     speechLockRef.current = true;
     
     try {
-      if (isMuted && !forceSpeak) {
+      if (isMutedRef.current) {
         console.log("Speech is muted, not actually speaking");
         setWordFullySpoken(true);
         speechLockRef.current = false;
@@ -111,8 +121,8 @@ export const useWordSpeechSync = (
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
-      if (isPausedRef.current) {
-        console.log("App was paused while preparing to speak, aborting");
+      if (isPausedRef.current || isMutedRef.current) {
+        console.log("App was paused or muted while preparing to speak, aborting");
         isSpeakingRef.current = false;
         speechLockRef.current = false;
         return;
@@ -133,22 +143,25 @@ export const useWordSpeechSync = (
         speakAttemptCountRef.current = 0;
       } else {
         speakAttemptCountRef.current++;
-        speechTimeoutRef.current = window.setTimeout(() => {
-          if (!isPausedRef.current) {
-            speakCurrentWord(true);
-          }
-        }, 200);
+        // Only retry if we're not muted or paused
+        if (!isMutedRef.current && !isPausedRef.current) {
+          speechTimeoutRef.current = window.setTimeout(() => {
+            if (!isPausedRef.current && !isMutedRef.current) {
+              speakCurrentWord(true);
+            }
+          }, 200);
+        }
       }
     } finally {
       isSpeakingRef.current = false;
       speechLockRef.current = false;
     }
-  }, [clearSpeechTimeout, isMuted, isVoicesLoaded, speakText]);
+  }, [clearSpeechTimeout, isVoicesLoaded, speakText]);
 
   useEffect(() => {
-    if (!currentWord || isPaused || !isVoicesLoaded) {
+    if (!currentWord || isPaused || !isVoicesLoaded || isMuted) {
       clearSpeechTimeout();
-      if (isPaused) {
+      if (isPaused || isMuted) {
         stopSpeaking();
       }
       return;

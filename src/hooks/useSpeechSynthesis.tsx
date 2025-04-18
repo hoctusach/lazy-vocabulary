@@ -122,16 +122,32 @@ export const useSpeechSynthesis = () => {
       currentVoiceRef.current = getVoiceByRegion(voiceRegion);
       console.log(`Voice region changed to ${voiceRegion}`);
       
-      // Only announce change if not muted and if it's not the initial load
-      if (!isMuted && lastVoiceRegionRef.current !== voiceRegion) {
-        // Don't use a voice announcement when changing voices - just log
-        console.log(`Changed to ${voiceRegion} accent`);
+      // Save the voice region to localStorage
+      try {
+        const storedStates = localStorage.getItem('buttonStates');
+        const parsedStates = storedStates ? JSON.parse(storedStates) : {};
+        parsedStates.voiceRegion = voiceRegion;
+        localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+      } catch (error) {
+        console.error('Error saving voice region to localStorage:', error);
       }
       
       // Update last voice region reference
       lastVoiceRegionRef.current = voiceRegion;
     }
-  }, [voiceRegion, isVoicesLoaded, isMuted]);
+  }, [voiceRegion, isVoicesLoaded]);
+
+  // Update mute state in localStorage when it changes
+  useEffect(() => {
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const parsedStates = storedStates ? JSON.parse(storedStates) : {};
+      parsedStates.isMuted = isMuted;
+      localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+    } catch (error) {
+      console.error('Error saving mute state to localStorage:', error);
+    }
+  }, [isMuted]);
 
   // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {

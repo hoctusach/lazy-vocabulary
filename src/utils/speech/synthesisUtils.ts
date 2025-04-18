@@ -5,8 +5,11 @@ export const isSpeechSynthesisSupported = (): boolean => {
 
 export const stopSpeaking = (): void => {
   if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-    console.log('Speech stopped');
+    try {
+      window.speechSynthesis.cancel();
+      console.log('Speech stopped');
+    } catch (error) {
+      console.error('Error stopping speech:', error);
+    }
   }
 };
-

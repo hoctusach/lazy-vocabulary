@@ -47,6 +47,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode;
         } else {
           console.warn('No suitable voice found, using default browser voice');
+          utterance.lang = langCode; // At least set the language
         }
         
         // Configure speech parameters - reduced rate for better reliability
@@ -106,7 +107,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 20000), 90000);
+        // Set a shorter maximum duration to ensure we don't get stuck
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.2, 10000), 60000);
         
         maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {

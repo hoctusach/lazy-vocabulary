@@ -17,6 +17,7 @@ interface VocabularyCardProps {
   onTogglePause: () => void;
   onChangeVoice: () => void;
   onSwitchCategory: () => void;
+  onNextWord: () => void;
   currentCategory: string;
   nextCategory: string;
   isSpeaking?: boolean;
@@ -34,6 +35,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onTogglePause,
   onChangeVoice,
   onSwitchCategory,
+  onNextWord,
   currentCategory,
   nextCategory,
   isSpeaking = false
@@ -57,31 +59,34 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          <h2 className="text-2xl font-bold text-blue-900 break-words">{word}</h2>
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-blue-900 break-words">{word}</h2>
+            <p className="text-xs text-gray-600 italic">Learn vocabulary effortlessly with repeating sounds.</p>
+          </div>
           
-          <div className="text-lg text-green-800 break-words">
+          <div className="text-base text-green-800 break-words">
             <span className="font-medium">* </span>
             {meaning}
           </div>
           
-          <div className="text-lg italic text-red-800 break-words">
+          <div className="text-base italic text-red-800 break-words">
             <span className="font-medium">* </span>
             {example}
           </div>
           
-          <div className="flex flex-wrap gap-2 pt-4 justify-center">
+          <div className="flex flex-wrap gap-2 pt-2 justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={onToggleMute}
               className={cn(
-                "min-w-[80px]",
+                "h-8 text-xs px-2",
                 isMuted ? "text-purple-700 border-purple-300" : "text-gray-700"
               )}
             >
-              {isMuted ? <VolumeX size={18} className="mr-1" /> : <Volume2 size={18} className="mr-1" />}
+              {isMuted ? <VolumeX size={16} className="mr-1" /> : <Volume2 size={16} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
             </Button>
             
@@ -89,7 +94,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onChangeVoice}
-              className="min-w-[100px] text-blue-700"
+              className="h-8 text-xs px-2 text-blue-700"
             >
               {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
@@ -99,21 +104,21 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               size="sm"
               onClick={onTogglePause}
               className={cn(
-                "min-w-[160px]",
+                "h-8 text-xs px-2",
                 isPaused ? "text-orange-500 border-orange-300" : "text-gray-700"
               )}
             >
-              {isPaused ? <Play size={18} className="mr-1" /> : <Pause size={18} className="mr-1" />}
-              {isPaused ? "Play next word" : "Pause & read out loud"}
+              {isPaused ? <Play size={16} className="mr-1" /> : <Pause size={16} className="mr-1" />}
+              {isPaused ? "Play" : "Pause"}
             </Button>
             
             <Button
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
-              className="min-w-[140px] text-green-700"
+              className="h-8 text-xs px-2 text-green-700"
             >
-              <RefreshCw size={16} className="mr-1" />
+              <RefreshCw size={14} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
           </div>

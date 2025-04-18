@@ -34,6 +34,18 @@ export const useVocabularyManager = () => {
   const currentWordRef = useRef<VocabularyWord | null>(null);
   const wordChangeInProgressRef = useRef(false);
 
+  // Update isPaused in localStorage when it changes
+  useEffect(() => {
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const parsedStates = storedStates ? JSON.parse(storedStates) : {};
+      parsedStates.isPaused = isPaused;
+      localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+    } catch (error) {
+      console.error('Error saving pause state to localStorage:', error);
+    }
+  }, [isPaused]);
+
   // Keep currentWordRef updated
   useEffect(() => {
     currentWordRef.current = currentWord;
@@ -107,7 +119,7 @@ export const useVocabularyManager = () => {
         const duration = calculateSpeechDuration(fullText);
         lastSpeechDurationRef.current = duration;
         
-        // Add buffer time for screen transitions - reduced to 2000ms as requested
+        // Reduced buffer time to 2 seconds as requested
         const totalDuration = duration + 2000;
         
         console.log(`Scheduled next word in ${totalDuration}ms`);
@@ -220,7 +232,7 @@ export const useVocabularyManager = () => {
       const duration = calculateSpeechDuration(fullText);
       lastSpeechDurationRef.current = duration;
       
-      // Schedule next word after this one if not paused
+      // Schedule next word after this one if not paused (use 2 second buffer)
       if (!isPaused) {
         clearTimer();
         timerRef.current = window.setTimeout(displayNextWord, duration + 2000);
@@ -255,13 +267,23 @@ export const useVocabularyManager = () => {
     const nextCategory = vocabularyService.nextSheet();
     console.log(`Switched to category: ${nextCategory}`);
     
+    // Save current category to localStorage
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const parsedStates = storedStates ? JSON.parse(storedStates) : {};
+      parsedStates.currentCategory = nextCategory;
+      localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+    } catch (error) {
+      console.error('Error saving category to localStorage:', error);
+    }
+    
     // Get first word from new category
     const nextWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
     if (nextWord) {
       console.log("First word in new category:", nextWord.word);
       setCurrentWord(nextWord);
       
-      // Calculate duration for scheduling next word
+      // Calculate duration for scheduling next word (with 2 second buffer)
       const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
       const duration = calculateSpeechDuration(fullText);
       lastSpeechDurationRef.current = duration;

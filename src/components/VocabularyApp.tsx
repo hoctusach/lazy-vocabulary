@@ -138,6 +138,7 @@ const VocabularyApp: React.FC = () => {
           currentCategory={currentSheetName}
           nextCategory={nextSheetName}
           isSpeaking={isSpeakingRef.current}
+          onNextWord={handleNextWordClick}
         />
       )}
       
