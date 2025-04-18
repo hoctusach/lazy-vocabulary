@@ -8,9 +8,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-center">Lazy Vocabulary</h1>
-        <p className="text-center text-muted-foreground">
-          {/* Removed the line "Learn vocabulary effortlessly with repeating sounds" */}
+        <h1 className="text-2xl font-bold text-center">Lazy Vocabulary</h1>
+        <p className="text-center text-muted-foreground mt-2">
+          Learn vocabulary effortlessly with repeating sounds
         </p>
         <div className="mt-2 flex items-center justify-center gap-2">
           <p className="text-sm text-blue-500">Are you new?</p>

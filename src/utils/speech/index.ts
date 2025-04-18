@@ -1,4 +1,3 @@
-
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { 
@@ -6,12 +5,12 @@ import {
   stopSpeaking, 
   checkSoundDisplaySync, 
   keepSpeechAlive,
-  waitForSpeechReadiness
+  waitForSpeechReadiness,
+  resetSpeechEngine
 } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
   return new Promise((resolve, reject) => {
-    // Check for muted state in localStorage
     try {
       const storedStates = localStorage.getItem('buttonStates');
       if (storedStates) {
@@ -27,36 +26,28 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     }
 
     if (!window.speechSynthesis) {
-      console.error('Speech synthesis not supported in this browser');
+      console.error('Speech synthesis not supported');
       reject(new Error('Speech synthesis not supported'));
       return;
     }
 
-    // Cancel any ongoing speech immediately
     window.speechSynthesis.cancel();
-    
     const utterance = new SpeechSynthesisUtterance(text);
-    
-    // Get available voices
     let voices = window.speechSynthesis.getVoices();
-    console.log(`Speaking with ${region} accent, available voices: ${voices.length}`);
     
-    // Function to set voice
     const setVoiceAndSpeak = async () => {
       try {
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
         const voice = getVoiceByRegion(region);
         
         if (voice) {
-          console.log(`Using voice: ${voice.name} (${voice.lang}) for region ${region}`);
           utterance.voice = voice;
           utterance.lang = langCode;
         } else {
-          console.warn('No suitable voice found, using default browser voice');
-          utterance.lang = langCode; // At least set the language
+          console.warn('No suitable voice found, using default');
+          utterance.lang = langCode;
         }
         
-        // Use slower rate for better reliability and comprehension
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
@@ -67,104 +58,79 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
             clearInterval(keepAliveInterval);
-            keepAliveInterval = null;
           }
           if (maxDurationTimeout !== null) {
             clearTimeout(maxDurationTimeout);
-            maxDurationTimeout = null;
           }
         };
-        
+
         utterance.onend = () => {
           console.log('Speech completed successfully');
           clearAllTimers();
-          // Store successful completion in localStorage to help track state
-          try {
-            const states = JSON.parse(localStorage.getItem('buttonStates') || '{}');
-            states.lastCompletedSpeech = {
-              text: text.substring(0, 30),
-              region: region,
-              timestamp: Date.now()
-            };
-            localStorage.setItem('buttonStates', JSON.stringify(states));
-          } catch (e) {
-            console.error('Error saving speech completion state:', e);
-          }
           resolve();
         };
-        
+
         utterance.onerror = (event) => {
-          console.error('Speech synthesis error:', event);
+          console.error('Speech error:', event);
           clearAllTimers();
+          resetSpeechEngine();
           if (event.error === 'canceled' || event.error === 'interrupted') {
-            console.log('Speech was canceled or interrupted, resolving anyway');
             resolve();
           } else {
             reject(new Error(`Speech error: ${event.error}`));
           }
         };
-        
-        // Wait a moment to ensure synthesis is ready
+
         await waitForSpeechReadiness();
         
-        console.log('Starting speech with', region, 'accent:', text.substring(0, 30) + '...');
-        
-        if (window.speechSynthesis.paused) {
-          window.speechSynthesis.resume();
-        }
-        
-        window.speechSynthesis.speak(utterance);
-        
-        // Keep speech synthesis alive for long text - more frequent checks
+        // More frequent keep-alive interval
         keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
             keepSpeechAlive();
           } else {
             clearAllTimers();
           }
-        }, 500); // More frequent interval for reliability
-        
-        // Set maximum speech duration to prevent blocking
+        }, 250); // Increased frequency
+
+        window.speechSynthesis.speak(utterance);
+
+        // Set reasonable maximum duration
         const estimatedDuration = calculateSpeechDuration(text);
-        // Set a reasonable maximum duration with buffer
         const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 120000);
         
         maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {
-            console.log(`Maximum speech duration reached (${maxDuration}ms), stopping speech`);
+            console.log('Maximum duration reached, stopping speech');
             window.speechSynthesis.cancel();
             clearAllTimers();
             resolve();
           }
         }, maxDuration);
       } catch (err) {
-        console.error('Error while setting up speech:', err);
+        console.error('Error in speech setup:', err);
         reject(err);
       }
     };
-    
+
     if (voices.length > 0) {
       setVoiceAndSpeak();
     } else {
       window.speechSynthesis.onvoiceschanged = () => {
         voices = window.speechSynthesis.getVoices();
-        console.log(`Voices loaded asynchronously: ${voices.length}`);
         setVoiceAndSpeak();
         window.speechSynthesis.onvoiceschanged = null;
       };
       
-      // Fallback if voices don't load
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
           if (voices.length > 0) {
-            console.log('Using fallback voice loading method');
             setVoiceAndSpeak();
           } else {
             reject(new Error('Could not load voices'));
           }
         }
-      }, 800); 
+      }, 1000);
     }
   });
 };
@@ -177,5 +143,6 @@ export {
   stopSpeaking,
   checkSoundDisplaySync,
   keepSpeechAlive,
-  waitForSpeechReadiness
+  waitForSpeechReadiness,
+  resetSpeechEngine
 };
