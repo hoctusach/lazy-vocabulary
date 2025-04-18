@@ -37,15 +37,20 @@ export const useVocabularyManager = () => {
     }
   }, [isPaused, clearTimer, toast]);
 
+  // This effect checks for existing data and sets up initial state
   useEffect(() => {
+    console.log("Checking for existing data");
     const hasExistingData = vocabularyService.hasData();
+    console.log("Has existing data:", hasExistingData);
     setHasData(hasExistingData);
     
     if (hasExistingData) {
       const word = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
+      console.log("Initial word:", word);
       setCurrentWord(word);
       
       if (!isPaused) {
+        clearTimer();
         timerRef.current = window.setTimeout(displayNextWord, 2000);
       }
     }
@@ -57,8 +62,12 @@ export const useVocabularyManager = () => {
   }, [displayNextWord, isPaused, clearTimer]);
 
   const handleFileUploaded = () => {
+    console.log("File uploaded callback triggered");
     setHasData(true);
+    
+    // Force a refresh of the current word
     const word = vocabularyService.getNextWord();
+    console.log("New word after file upload:", word);
     setCurrentWord(word);
     
     if (!isPaused) {

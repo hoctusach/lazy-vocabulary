@@ -2,6 +2,7 @@
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
+import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 
 class VocabularyService {
   private data: SheetData;
@@ -30,6 +31,25 @@ class VocabularyService {
       return true;
     }
     return false;
+  }
+  
+  loadDefaultVocabulary(): boolean {
+    try {
+      // Load the default vocabulary data
+      this.data = JSON.parse(JSON.stringify(DEFAULT_VOCABULARY_DATA));
+      
+      // Save to storage
+      this.storage.saveData(this.data);
+      
+      // Reset the current sheet and shuffle
+      this.currentSheetName = "All words";
+      this.shuffleCurrentSheet();
+      
+      return true;
+    } catch (error) {
+      console.error("Failed to load default vocabulary:", error);
+      return false;
+    }
   }
   
   private shuffleCurrentSheet() {

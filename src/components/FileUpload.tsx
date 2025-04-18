@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,8 +14,6 @@ interface FileUploadProps {
 const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  
-  const DEFAULT_VOCAB_DOWNLOAD_URL = "https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true";
   
   const handleDrop = async (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -77,22 +76,25 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     }
   };
   
-  const handleDownloadAndUpload = async () => {
-    try {
-      toast({
-        title: "Downloading template",
-        description: "Please wait while we download and process the template...",
-      });
+  const handleUseDefaultWordSet = () => {
+    toast({
+      title: "Loading default word set",
+      description: "Please wait while we load the default vocabulary..."
+    });
 
-      const response = await fetch(DEFAULT_VOCAB_DOWNLOAD_URL);
-      const blob = await response.blob();
-      const file = new File([blob], "vocabulary_template.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      
-      await processFile(file);
-    } catch (error) {
+    // Use the default vocabulary data directly
+    const success = vocabularyService.loadDefaultVocabulary();
+    
+    if (success) {
+      toast({
+        title: "Success!",
+        description: "Default vocabulary data has been loaded successfully.",
+      });
+      onFileUploaded();
+    } else {
       toast({
         title: "Error",
-        description: "Failed to download and process the template. Please try manually downloading.",
+        description: "Failed to load the default vocabulary data.",
         variant: "destructive"
       });
     }
@@ -102,7 +104,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     <Card className="w-full max-w-xl mx-auto">
       <CardHeader>
         <CardTitle>Upload Vocabulary</CardTitle>
-        <CardDescription className="flex justify-between items-center">
+        <CardDescription>
           <div>
             <p>Prepare your Excel file for vocabulary learning</p>
             <p className="text-xs text-muted-foreground mt-1">
@@ -113,7 +115,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={handleDownloadAndUpload}
+            onClick={handleUseDefaultWordSet}
           >
             <Download size={16} className="mr-2" /> Use default word set
           </Button>
