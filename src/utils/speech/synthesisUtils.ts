@@ -1,3 +1,4 @@
+
 export const isSpeechSynthesisSupported = (): boolean => {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 };
@@ -91,7 +92,7 @@ export const forceResyncIfNeeded = (
   if (!isInSync) {
     console.log('Speech out of sync detected, forcing resync');
     stopSpeaking();
-    setTimeout(onRestart, 100);
+    setTimeout(onRestart, 200);
   }
 };
 
@@ -100,7 +101,7 @@ export const ensureSpeechEngineReady = async (): Promise<boolean> => {
   
   try {
     window.speechSynthesis.cancel();
-    await new Promise(resolve => setTimeout(resolve, 150));
+    await new Promise(resolve => setTimeout(resolve, 200));
     window.speechSynthesis.pause();
     window.speechSynthesis.resume();
     return true;
@@ -115,7 +116,8 @@ export const extractMainWord = (wordText: string): string => {
 };
 
 export const getSpeechRate = (): number => {
-  return 0.72;
+  // Significantly slower speech rate for better clarity
+  return 0.5;
 };
 
 export const getSpeechPitch = (): number => {
@@ -123,7 +125,12 @@ export const getSpeechPitch = (): number => {
 };
 
 export const prepareTextForSpeech = (text: string): string => {
-  return text.replace(/\.\s+/g, '. ').replace(/\s{2,}/g, ' ').trim();
+  // Add extra spacing for better pronunciation
+  return text
+    .replace(/\./g, '. ')
+    .replace(/,/g, ', ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 };
 
 export const getSpeechVolume = (): number => {
@@ -131,9 +138,14 @@ export const getSpeechVolume = (): number => {
 };
 
 export const addPausesToText = (text: string): string => {
+  // Add more pauses between sentences and segments for better comprehension
   return text
-    .replace(/\./g, '. ')
-    .replace(/;/g, '; ')
+    .replace(/\./g, '... ') // Longer pause after period
+    .replace(/;/g, '... ') // Longer pause after semicolon
+    .replace(/,/g, '... ') // Pause after comma
+    .replace(/\?/g, '... ') // Longer pause after question mark
+    .replace(/!/g, '... ') // Longer pause after exclamation
+    .replace(/:/g, '... ') // Pause after colon
     .replace(/\s{2,}/g, ' ')
     .trim();
 };

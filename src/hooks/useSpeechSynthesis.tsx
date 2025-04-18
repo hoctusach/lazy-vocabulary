@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
 
@@ -132,10 +131,15 @@ export const useSpeechSynthesis = () => {
       
       // Save the voice region to localStorage with verification
       try {
-        const storedStates = localStorage.getItem('buttonStates');
-        const parsedStates = storedStates ? JSON.parse(storedStates) : {};
-        parsedStates.voiceRegion = voiceRegion;
-        localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+        // First retrieve any existing settings
+        const existingSettings = localStorage.getItem('buttonStates');
+        const settings = existingSettings ? JSON.parse(existingSettings) : {};
+        
+        // Update just the voice region
+        settings.voiceRegion = voiceRegion;
+        
+        // Save back to localStorage
+        localStorage.setItem('buttonStates', JSON.stringify(settings));
         
         // Verify the save worked
         const verifyStorage = localStorage.getItem('buttonStates');
@@ -228,10 +232,17 @@ export const useSpeechSynthesis = () => {
       
       // Immediately save to localStorage for better persistence
       try {
-        const storedStates = localStorage.getItem('buttonStates');
-        const parsedStates = storedStates ? JSON.parse(storedStates) : {};
-        parsedStates.voiceRegion = newRegion;
-        localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+        // First retrieve any existing settings
+        const existingSettings = localStorage.getItem('buttonStates');
+        const settings = existingSettings ? JSON.parse(existingSettings) : {};
+        
+        // Update just the voice region
+        settings.voiceRegion = newRegion;
+        
+        // Save back to localStorage
+        localStorage.setItem('buttonStates', JSON.stringify(settings));
+        
+        console.log(`Saved new voice region to localStorage: ${newRegion}`);
       } catch (error) {
         console.error('Error immediately saving voice region:', error);
       }
