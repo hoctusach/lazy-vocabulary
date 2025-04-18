@@ -77,17 +77,14 @@ const VocabularyApp: React.FC = () => {
     const wasMuted = isMuted;
     handleToggleMute();
     
-    // Wait a short moment for the mute state to update
-    setTimeout(() => {
-      if (wasMuted && currentWord && !isPaused) {
-        // Only speak if we were previously muted and now we're unmuted
+    // If we were muted and now unmuted, speak the current word
+    if (wasMuted && currentWord) {
+      // Give a moment for the state to update
+      setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true); // Force speak the current word
-      } else if (!wasMuted) {
-        // If we're muting, move to next word without speaking
-        handleManualNext();
-      }
-    }, 100);
+      }, 100);
+    }
   };
   
   const handleChangeVoiceWithSpeaking = () => {
@@ -98,12 +95,13 @@ const VocabularyApp: React.FC = () => {
     // Change voice
     handleChangeVoice();
     
-    // Wait for voice to change before speaking
-    setTimeout(() => {
-      if (!isMuted && currentWord && !isPaused) {
+    // If not muted, speak with new voice
+    if (!isMuted && currentWord) {
+      // Wait for voice to change
+      setTimeout(() => {
         speakCurrentWord(true); // Force speak the current word with new voice
-      }
-    }, 300);
+      }, 300);
+    }
   };
   
   const handleSwitchCategoryWithState = () => {
@@ -116,13 +114,6 @@ const VocabularyApp: React.FC = () => {
     
     // Switch category
     handleSwitchCategory(isMuted, voiceRegion);
-    
-    // Wait for the new word to be loaded, then speak it
-    setTimeout(() => {
-      if (!isMuted && !isPaused) {
-        speakCurrentWord(true); // Force speak the new word
-      }
-    }, 500);
   };
 
   const handleNextWordClick = () => {
@@ -169,8 +160,6 @@ const VocabularyApp: React.FC = () => {
           showBackButton={!showWordCard}
         />
       )}
-      
-      {/* Notifications section is hidden per user request */}
     </VocabularyLayout>
   );
 };

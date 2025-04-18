@@ -25,7 +25,7 @@ const Index = () => {
                   <li>Click on Upload New File</li>
                   <li>
                     <a 
-                      href="https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?gid=656322832#gid=656322832" 
+                      href="https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-blue-500 hover:underline"

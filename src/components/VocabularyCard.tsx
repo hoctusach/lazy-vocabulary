@@ -68,10 +68,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onToggleMute}
               className={cn(
                 "min-w-[80px]",
-                isMuted ? "text-purple-700 border-purple-300" : "text-gray-700",
-                isSpeaking ? "opacity-50" : ""
+                isMuted ? "text-purple-700 border-purple-300" : "text-gray-700"
               )}
-              disabled={isSpeaking}
             >
               {isMuted ? <VolumeX size={18} className="mr-1" /> : <Volume2 size={18} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
@@ -81,12 +79,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onChangeVoice}
-              className={cn(
-                "min-w-[100px]",
-                "text-blue-700",
-                isSpeaking ? "opacity-50" : ""
-              )}
-              disabled={isSpeaking}
+              className="min-w-[100px] text-blue-700"
             >
               {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
@@ -97,10 +90,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onTogglePause}
               className={cn(
                 "min-w-[160px]",
-                isPaused ? "text-orange-500 border-orange-300" : "text-gray-700",
-                isSpeaking ? "opacity-50" : ""
+                isPaused ? "text-orange-500 border-orange-300" : "text-gray-700"
               )}
-              disabled={isSpeaking}
             >
               {isPaused ? <Play size={18} className="mr-1" /> : <Pause size={18} className="mr-1" />}
               {isPaused ? "Play next word" : "Pause & read out loud"}
@@ -110,12 +101,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
-              className={cn(
-                "min-w-[140px]",
-                "text-green-700",
-                isSpeaking ? "opacity-50" : ""
-              )}
-              disabled={isSpeaking}
+              className="min-w-[140px] text-green-700"
             >
               <RefreshCw size={16} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}

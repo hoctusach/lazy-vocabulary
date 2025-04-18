@@ -1,4 +1,3 @@
-
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -16,7 +15,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     
     // Get available voices
     let voices = window.speechSynthesis.getVoices();
-    console.log(`Available voices: ${voices.length}`);
+    console.log(`Speaking with ${region} accent, available voices: ${voices.length}`);
     
     // Function to set voice
     const setVoiceAndSpeak = () => {
@@ -66,6 +65,17 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
+        // Keep alive interval reference
+        let keepAliveInterval: number | null = null;
+        
+        // Function to clear the keep alive interval
+        const clearKeepAliveInterval = () => {
+          if (keepAliveInterval !== null) {
+            clearInterval(keepAliveInterval);
+            keepAliveInterval = null;
+          }
+        };
+        
         // Set event handlers
         utterance.onend = () => {
           console.log('Speech completed successfully');
@@ -86,7 +96,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         };
         
         // Start speaking
-        console.log('Starting speech:', text.substring(0, 30) + '...');
+        console.log('Starting speech with', region, 'accent:', text.substring(0, 30) + '...');
         
         // Make sure speech synthesis is not paused
         if (window.speechSynthesis.paused) {
@@ -94,17 +104,6 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         }
         
         window.speechSynthesis.speak(utterance);
-        
-        // Keep alive interval reference
-        let keepAliveInterval: number | null = null;
-        
-        // Function to clear the keep alive interval
-        const clearKeepAliveInterval = () => {
-          if (keepAliveInterval !== null) {
-            clearInterval(keepAliveInterval);
-            keepAliveInterval = null;
-          }
-        };
         
         // This keeps the speech synthesis active in Chrome by using setInterval instead of setTimeout
         keepAliveInterval = window.setInterval(() => {
@@ -117,7 +116,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         }, 5000); // Run every 5 seconds to prevent Chrome from cutting off
         
-        // Set a maximum speech duration timeout as a fallback (increased to 60 seconds)
+        // Set a maximum speech duration timeout as a fallback (increased to 90 seconds)
         setTimeout(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Maximum speech duration reached, stopping speech");
@@ -125,7 +124,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             clearKeepAliveInterval();
             resolve(); // Resolve the promise even if we had to stop it early
           }
-        }, 60000);
+        }, 90000);
       } catch (err) {
         console.error('Error while setting up speech:', err);
         reject(err);
@@ -168,7 +167,7 @@ export const calculateSpeechDuration = (text: string, rate: number = 0.85): numb
   const minutes = words / wordsPerMinute;
   const milliseconds = minutes * 60 * 1000;
   
-  // Add a larger buffer for pauses and natural speech patterns (150% buffer)
+  // Add a larger buffer for pauses and natural speech patterns (250% buffer)
   // This helps prevent cutting off longer texts
   return milliseconds * 2.5;
 };

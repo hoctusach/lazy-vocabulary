@@ -4,24 +4,24 @@ import { useToast } from '@/hooks/use-toast';
 import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speechUtils';
 
 export const useSpeechSynthesis = () => {
-  const [isMuted, setIsMuted] = useState(false);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>('US');
+  // Try to get the initial mute state from localStorage
+  const initialMuted = localStorage.getItem('isMuted') === 'true';
+  const initialVoiceRegion = (localStorage.getItem('voiceRegion') as 'US' | 'UK') || 'US';
+
+  const [isMuted, setIsMuted] = useState(initialMuted);
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>(initialVoiceRegion);
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
   const { toast } = useToast();
   const speakingRef = useRef(false);
   const speechRequestIdRef = useRef(0);
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const voicesLoadedTimeoutRef = useRef<number | null>(null);
-  const lastVoiceRegionRef = useRef<'US' | 'UK'>('US');
+  const lastVoiceRegionRef = useRef<'US' | 'UK'>(initialVoiceRegion);
 
-  // Persist voice region selection to localStorage
+  // Save mute state to localStorage
   useEffect(() => {
-    const savedRegion = localStorage.getItem('voiceRegion');
-    if (savedRegion === 'US' || savedRegion === 'UK') {
-      setVoiceRegion(savedRegion);
-      lastVoiceRegionRef.current = savedRegion;
-    }
-  }, []);
+    localStorage.setItem('isMuted', isMuted.toString());
+  }, [isMuted]);
 
   // Save voice region preferences
   useEffect(() => {
@@ -174,6 +174,7 @@ export const useSpeechSynthesis = () => {
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
       const newState = !prev;
+      console.log(`Mute state changed to: ${newState}`);
       if (newState) {
         stopSpeaking();
       }
