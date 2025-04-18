@@ -1,7 +1,13 @@
 
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
-import { isSpeechSynthesisSupported, stopSpeaking, checkSoundDisplaySync } from './synthesisUtils';
+import { 
+  isSpeechSynthesisSupported, 
+  stopSpeaking, 
+  checkSoundDisplaySync, 
+  keepSpeechAlive,
+  waitForSpeechReadiness
+} from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
   return new Promise((resolve, reject) => {
@@ -36,7 +42,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     console.log(`Speaking with ${region} accent, available voices: ${voices.length}`);
     
     // Function to set voice
-    const setVoiceAndSpeak = () => {
+    const setVoiceAndSpeak = async () => {
       try {
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
         const voice = getVoiceByRegion(region);
@@ -50,7 +56,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode; // At least set the language
         }
         
-        // Reduced rate for better reliability and comprehension
+        // Use slower rate for better reliability and comprehension
         utterance.rate = 0.9;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
@@ -98,6 +104,9 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
         };
         
+        // Wait a moment to ensure synthesis is ready
+        await waitForSpeechReadiness();
+        
         console.log('Starting speech with', region, 'accent:', text.substring(0, 30) + '...');
         
         if (window.speechSynthesis.paused) {
@@ -109,18 +118,16 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         // Keep speech synthesis alive for long text - more frequent checks
         keepAliveInterval = window.setInterval(() => {
           if (window.speechSynthesis.speaking) {
-            console.log("Keeping speech synthesis alive...");
-            window.speechSynthesis.pause();
-            window.speechSynthesis.resume();
+            keepSpeechAlive();
           } else {
             clearAllTimers();
           }
-        }, 1000); // More frequent interval to ensure speech doesn't stop
+        }, 500); // More frequent interval for reliability
         
         // Set maximum speech duration to prevent blocking
         const estimatedDuration = calculateSpeechDuration(text);
-        // Set a reasonable maximum duration
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 90000);
+        // Set a reasonable maximum duration with buffer
+        const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 120000);
         
         maxDurationTimeout = window.setTimeout(() => {
           if (window.speechSynthesis.speaking) {
@@ -146,7 +153,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.onvoiceschanged = null;
       };
       
-      // Shorter timeout for faster voice loading
+      // Fallback if voices don't load
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
@@ -169,4 +176,6 @@ export {
   isSpeechSynthesisSupported,
   stopSpeaking,
   checkSoundDisplaySync,
+  keepSpeechAlive,
+  waitForSpeechReadiness
 };

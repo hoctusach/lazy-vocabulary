@@ -1,7 +1,6 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { stopSpeaking } from '@/utils/speech';
+import { stopSpeaking, keepSpeechAlive } from '@/utils/speech';
 
 export const useWordSpeechSync = (
   currentWord: VocabularyWord | null,
@@ -21,6 +20,7 @@ export const useWordSpeechSync = (
   const isPausedRef = useRef(isPaused);
   const isMutedRef = useRef(isMuted);
   const autoRetryTimeoutRef = useRef<number | null>(null);
+  const keepAliveIntervalRef = useRef<number | null>(null);
 
   // Update refs when props change
   useEffect(() => {
@@ -57,7 +57,34 @@ export const useWordSpeechSync = (
       window.clearTimeout(autoRetryTimeoutRef.current);
       autoRetryTimeoutRef.current = null;
     }
+    
+    if (keepAliveIntervalRef.current !== null) {
+      window.clearInterval(keepAliveIntervalRef.current);
+      keepAliveIntervalRef.current = null;
+    }
   }, []);
+
+  // Setup keep-alive mechanism specific to this hook's speech
+  useEffect(() => {
+    // Clear old interval if it exists
+    if (keepAliveIntervalRef.current) {
+      clearInterval(keepAliveIntervalRef.current);
+    }
+    
+    // Set up new interval
+    keepAliveIntervalRef.current = window.setInterval(() => {
+      if (isSpeakingRef.current && !isPausedRef.current && !isMutedRef.current) {
+        keepSpeechAlive();
+      }
+    }, 400); // Frequent checks to keep speech alive
+    
+    return () => {
+      if (keepAliveIntervalRef.current) {
+        clearInterval(keepAliveIntervalRef.current);
+        keepAliveIntervalRef.current = null;
+      }
+    };
+  }, [isSpeakingRef]);
 
   const speakCurrentWord = useCallback(async (forceSpeak = false) => {
     if (isPausedRef.current && !forceSpeak) {
@@ -123,6 +150,7 @@ export const useWordSpeechSync = (
       
       isSpeakingRef.current = true;
       
+      // Short delay before speaking to ensure clean start
       await new Promise(resolve => setTimeout(resolve, 50));
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
@@ -135,8 +163,23 @@ export const useWordSpeechSync = (
       }
       
       try {
+        // Start the keep-alive interval for this specific speech
+        if (keepAliveIntervalRef.current) {
+          clearInterval(keepAliveIntervalRef.current);
+        }
+        
+        keepAliveIntervalRef.current = window.setInterval(() => {
+          if (isSpeakingRef.current) {
+            keepSpeechAlive();
+          } else {
+            clearInterval(keepAliveIntervalRef.current as number);
+            keepAliveIntervalRef.current = null;
+          }
+        }, 300);
+        
         await speakText(fullText);
         
+        // Short delay after speech to ensure full completion
         await new Promise(resolve => setTimeout(resolve, 50));
         
         console.log("Finished speaking word completely:", wordToSpeak.word);
@@ -145,12 +188,12 @@ export const useWordSpeechSync = (
       } catch (error) {
         console.error("Speech error:", error);
         
-        // Auto-retry logic for failed speech
+        // Auto-retry logic for failed speech with more aggressive retries
         if (speakAttemptCountRef.current < 3 && !isMutedRef.current && !isPausedRef.current) {
           speakAttemptCountRef.current++;
           console.log(`Speech attempt ${speakAttemptCountRef.current} failed, retrying...`);
           
-          // Create auto-retry with exponential backoff
+          // Create auto-retry with shorter backoff
           if (autoRetryTimeoutRef.current) {
             clearTimeout(autoRetryTimeoutRef.current);
           }
@@ -160,12 +203,18 @@ export const useWordSpeechSync = (
               console.log("Auto-retrying speech...");
               speakCurrentWord(true);
             }
-          }, 200 * speakAttemptCountRef.current); // Increasing delay with each attempt
+          }, 150 * speakAttemptCountRef.current); // Shorter delays for quicker recovery
           
         } else if (speakAttemptCountRef.current >= 3) {
           console.log("Multiple speech attempts failed, marking word as spoken anyway");
           setWordFullySpoken(true);
           speakAttemptCountRef.current = 0;
+        }
+      } finally {
+        // Clear the keep-alive interval when speech is done
+        if (keepAliveIntervalRef.current) {
+          clearInterval(keepAliveIntervalRef.current);
+          keepAliveIntervalRef.current = null;
         }
       }
       

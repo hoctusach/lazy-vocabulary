@@ -7,12 +7,13 @@ import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
-import { stopSpeaking, checkSoundDisplaySync } from '@/utils/speech';
+import { stopSpeaking, checkSoundDisplaySync, keepSpeechAlive } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   const [showWordCard, setShowWordCard] = useState(true);
   const syncCheckTimeoutRef = useRef<number | null>(null);
+  const keepAliveIntervalRef = useRef<number | null>(null);
   
   const {
     hasData,
@@ -53,6 +54,25 @@ const VocabularyApp: React.FC = () => {
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
   useEffect(() => {
+    if (keepAliveIntervalRef.current) {
+      clearInterval(keepAliveIntervalRef.current);
+    }
+    
+    keepAliveIntervalRef.current = window.setInterval(() => {
+      if (speakingRef.current && !isPaused && !isMuted) {
+        keepSpeechAlive();
+      }
+    }, 500);
+    
+    return () => {
+      if (keepAliveIntervalRef.current) {
+        clearInterval(keepAliveIntervalRef.current);
+        keepAliveIntervalRef.current = null;
+      }
+    };
+  }, [speakingRef, isPaused, isMuted]);
+
+  useEffect(() => {
     const checkSyncAndFix = () => {
       if (!currentWord || isPaused || isMuted) return;
       
@@ -62,17 +82,19 @@ const VocabularyApp: React.FC = () => {
       if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
         console.log("Detected sound/display mismatch. Fixing synchronization...");
         stopSpeaking();
+        
         setTimeout(() => {
           if (currentWord && !isPaused && !isMuted) {
             console.log("Re-speaking current word to maintain sync:", currentWord.word);
             speakCurrentWord(true);
           }
-        }, 200);
+        }, 300);
       }
       
       if (syncCheckTimeoutRef.current) {
         clearTimeout(syncCheckTimeoutRef.current);
       }
+      
       syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 3000);
     };
     
@@ -81,6 +103,7 @@ const VocabularyApp: React.FC = () => {
     return () => {
       if (syncCheckTimeoutRef.current) {
         clearTimeout(syncCheckTimeoutRef.current);
+        syncCheckTimeoutRef.current = null;
       }
     };
   }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef]);
