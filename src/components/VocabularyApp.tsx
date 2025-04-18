@@ -7,13 +7,14 @@ import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
-import { stopSpeaking, checkSoundDisplaySync, keepSpeechAlive } from '@/utils/speech';
+import { stopSpeaking, checkSoundDisplaySync, keepSpeechAlive, validateCurrentSpeech } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
   const [showWordCard, setShowWordCard] = useState(true);
   const syncCheckTimeoutRef = useRef<number | null>(null);
   const keepAliveIntervalRef = useRef<number | null>(null);
+  const resyncTimeoutRef = useRef<number | null>(null);
   
   const {
     hasData,
@@ -62,7 +63,7 @@ const VocabularyApp: React.FC = () => {
       if (speakingRef.current && !isPaused && !isMuted) {
         keepSpeechAlive();
       }
-    }, 500);
+    }, 250);
     
     return () => {
       if (keepAliveIntervalRef.current) {
@@ -73,39 +74,50 @@ const VocabularyApp: React.FC = () => {
   }, [speakingRef, isPaused, isMuted]);
 
   useEffect(() => {
+    const clearSyncTimeouts = () => {
+      if (syncCheckTimeoutRef.current) {
+        clearTimeout(syncCheckTimeoutRef.current);
+        syncCheckTimeoutRef.current = null;
+      }
+      if (resyncTimeoutRef.current) {
+        clearTimeout(resyncTimeoutRef.current);
+        resyncTimeoutRef.current = null;
+      }
+    };
+
     const checkSyncAndFix = () => {
-      if (!currentWord || isPaused || isMuted) return;
+      if (!currentWord || isPaused || isMuted) {
+        clearSyncTimeouts();
+        return;
+      }
       
       const currentTextBeingSpoken = getCurrentText();
-      const isInSync = checkSoundDisplaySync(currentWord.word, currentTextBeingSpoken);
+      
+      const isInSync = validateCurrentSpeech(currentWord.word, currentTextBeingSpoken);
       
       if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
         console.log("Detected sound/display mismatch. Fixing synchronization...");
         stopSpeaking();
         
-        setTimeout(() => {
-          if (currentWord && !isPaused && !isMuted) {
-            console.log("Re-speaking current word to maintain sync:", currentWord.word);
-            speakCurrentWord(true);
-          }
-        }, 300);
+        if (!resyncTimeoutRef.current) {
+          resyncTimeoutRef.current = window.setTimeout(() => {
+            resyncTimeoutRef.current = null;
+            if (currentWord && !isPaused && !isMuted) {
+              console.log("Re-speaking current word to maintain sync:", currentWord.word);
+              speakCurrentWord(true);
+            }
+          }, 300);
+        }
       }
       
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-      }
-      
-      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 3000);
+      clearSyncTimeouts();
+      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1500);
     };
     
-    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1000);
+    clearSyncTimeouts();
+    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 500);
     
-    return () => {
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-        syncCheckTimeoutRef.current = null;
-      }
-    };
+    return clearSyncTimeouts;
   }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef]);
 
   useEffect(() => {

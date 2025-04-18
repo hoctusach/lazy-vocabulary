@@ -50,6 +50,17 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
     }));
   }, [isMuted, isPaused, voiceRegion, currentCategory]);
 
+  // Store current word in localStorage for sync checking
+  useEffect(() => {
+    if (word) {
+      localStorage.setItem('currentDisplayedWord', word);
+    }
+    
+    return () => {
+      localStorage.removeItem('currentDisplayedWord');
+    };
+  }, [word]);
+
   return (
     <Card 
       className={cn(
@@ -120,6 +131,15 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             >
               <RefreshCw size={12} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onNextWord}
+              className="h-7 text-xs px-2 text-indigo-700"
+            >
+              Next Word
             </Button>
           </div>
         </div>

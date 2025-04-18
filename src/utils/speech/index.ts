@@ -1,3 +1,4 @@
+
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { 
@@ -6,7 +7,9 @@ import {
   checkSoundDisplaySync, 
   keepSpeechAlive,
   waitForSpeechReadiness,
-  resetSpeechEngine
+  resetSpeechEngine,
+  validateCurrentSpeech,
+  forceResyncIfNeeded
 } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -31,6 +34,13 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       return;
     }
 
+    // Store the current text being spoken for sync checking
+    try {
+      localStorage.setItem('currentTextBeingSpoken', text);
+    } catch (error) {
+      console.error('Error saving current text to localStorage:', error);
+    }
+
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     let voices = window.speechSynthesis.getVoices();
@@ -48,12 +58,14 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode;
         }
         
-        utterance.rate = 0.9;
+        // Slow down speech rate for better clarity
+        utterance.rate = 0.85;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
         let keepAliveInterval: number | null = null;
         let maxDurationTimeout: number | null = null;
+        let syncCheckInterval: number | null = null;
         
         const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
@@ -61,6 +73,9 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           }
           if (maxDurationTimeout !== null) {
             clearTimeout(maxDurationTimeout);
+          }
+          if (syncCheckInterval !== null) {
+            clearInterval(syncCheckInterval);
           }
         };
 
@@ -90,7 +105,23 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } else {
             clearAllTimers();
           }
-        }, 250); // Increased frequency
+        }, 200); // Increased frequency for stability
+        
+        // Add regular sync checking
+        syncCheckInterval = window.setInterval(() => {
+          try {
+            const currentWord = localStorage.getItem('currentDisplayedWord');
+            if (currentWord) {
+              forceResyncIfNeeded(currentWord, text, () => {
+                // This will be called if resync is needed
+                clearAllTimers();
+                resolve(); // Resolve so caller can restart
+              });
+            }
+          } catch (error) {
+            console.error('Error in sync check:', error);
+          }
+        }, 1000);
 
         window.speechSynthesis.speak(utterance);
 
@@ -144,5 +175,7 @@ export {
   checkSoundDisplaySync,
   keepSpeechAlive,
   waitForSpeechReadiness,
-  resetSpeechEngine
+  resetSpeechEngine,
+  validateCurrentSpeech,
+  forceResyncIfNeeded
 };
