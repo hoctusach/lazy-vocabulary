@@ -1,100 +1,93 @@
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { elevenLabsSpeechService } from '@/services/elevenLabsSpeechService';
 
 export const useSpeechSynthesis = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>('US');
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
-  const [apiKeySet, setApiKeySet] = useState(false);
-  const apiKeyPromptShown = useRef(false);
   const { toast } = useToast();
-  
-  // Check local storage for API key on mount
+
+  // Initialize speech synthesis and load voices
   useEffect(() => {
-    const savedApiKey = localStorage.getItem('elevenLabsApiKey');
+    const synth = window.speechSynthesis;
     
-    if (savedApiKey) {
-      console.log("Found saved ElevenLabs API key");
-      elevenLabsSpeechService.configure({
-        apiKey: savedApiKey,
-        voiceId: elevenLabsSpeechService.getRegionalVoice(voiceRegion)
-      });
-      setApiKeySet(true);
-      setIsVoicesLoaded(true);
-    } else if (!apiKeyPromptShown.current) {
-      // Ask for API key only once
-      apiKeyPromptShown.current = true;
-      setTimeout(() => {
-        const userApiKey = window.prompt(
-          "Please enter your ElevenLabs API key for premium text-to-speech. Get a free key at https://elevenlabs.io"
-        );
+    const loadVoices = () => {
+      const voices = synth.getVoices();
+      if (voices.length > 0) {
+        console.log("Speech voices loaded:", voices.length);
+        setIsVoicesLoaded(true);
         
-        if (userApiKey) {
-          localStorage.setItem('elevenLabsApiKey', userApiKey);
-          elevenLabsSpeechService.configure({
-            apiKey: userApiKey,
-            voiceId: elevenLabsSpeechService.getRegionalVoice(voiceRegion)
-          });
-          setApiKeySet(true);
-          setIsVoicesLoaded(true);
-          
-          toast({
-            title: "ElevenLabs Voice Set Up",
-            description: `Premium voice enabled with ${voiceRegion} accent.`,
-          });
-        } else {
-          toast({
-            title: "Voice Setup Incomplete",
-            description: "ElevenLabs API key not provided. Speech will not work.",
-            variant: "destructive"
-          });
-        }
-      }, 1000);
+        toast({
+          title: "Speech Ready",
+          description: "Using browser's text-to-speech",
+        });
+      }
+    };
+
+    loadVoices();
+    
+    // Chrome loads voices asynchronously
+    if ('onvoiceschanged' in synth) {
+      synth.onvoiceschanged = loadVoices;
     }
     
     return () => {
-      elevenLabsSpeechService.cancel();
+      synth.cancel();
     };
-  }, [toast, voiceRegion]);
-
-  // Update voice when region changes
-  useEffect(() => {
-    if (apiKeySet) {
-      const voiceId = elevenLabsSpeechService.getRegionalVoice(voiceRegion);
-      elevenLabsSpeechService.setVoice(voiceId);
-      console.log(`Voice region changed to: ${voiceRegion}, voice ID: ${voiceId}`);
-    }
-  }, [voiceRegion, apiKeySet]);
+  }, [toast]);
 
   const speakText = useCallback((text: string): Promise<void> => {
-    if (isMuted || !text || !apiKeySet) {
+    if (isMuted || !text) {
       return Promise.resolve();
     }
-    
-    console.log(`Speaking with ElevenLabs: ${text.substring(0, 50)}...`);
-    
-    return elevenLabsSpeechService.speak(text)
-      .catch(error => {
-        console.error("ElevenLabs speech error:", error);
+
+    return new Promise((resolve, reject) => {
+      const synth = window.speechSynthesis;
+      synth.cancel(); // Cancel any ongoing speech
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Select voice based on region preference
+      const voices = synth.getVoices();
+      const preferredVoice = voices.find(voice => {
+        if (voiceRegion === 'US') {
+          return voice.lang.includes('en-US');
+        } else {
+          return voice.lang.includes('en-GB');
+        }
+      }) || voices[0];
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      utterance.onend = () => {
+        console.log("Speech completed:", text.substring(0, 50));
+        resolve();
+      };
+      
+      utterance.onerror = (event) => {
+        console.error("Speech error:", event);
         toast({
           title: "Speech Error",
           description: "There was an issue with the text-to-speech service.",
           variant: "destructive"
         });
-        
-        // Re-throw to allow caller to handle
-        throw error;
-      });
-  }, [isMuted, apiKeySet, toast]);
+        reject(event);
+      };
+      
+      console.log(`Speaking with ${preferredVoice?.name || 'default voice'}: ${text.substring(0, 50)}...`);
+      synth.speak(utterance);
+    });
+  }, [isMuted, voiceRegion, toast]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
       const newValue = !prev;
       console.log("Mute toggled:", newValue);
       if (newValue) {
-        elevenLabsSpeechService.cancel();
+        window.speechSynthesis.cancel();
       }
       return newValue;
     });
