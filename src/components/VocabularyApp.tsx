@@ -22,7 +22,8 @@ const VocabularyApp: React.FC = () => {
     handleTogglePause,
     handleManualNext,
     setHasData,
-    isSpeakingRef
+    isSpeakingRef,
+    isChangingWordRef
   } = useVocabularyManager();
 
   const {
@@ -52,12 +53,12 @@ const VocabularyApp: React.FC = () => {
 
   // Function to speak the current word - fully awaits completion
   const speakCurrentWord = async () => {
-    if (!currentWord || isMuted || !isVoicesLoaded) {
+    if (!currentWord || isMuted || !isVoicesLoaded || isChangingWordRef.current) {
       return;
     }
     
-    // Create unique ID for this word to prevent repeats
-    const wordId = `${currentWord.word}-${Date.now()}`;
+    // Create unique ID for this word including its actual content to prevent repeats
+    const wordId = `${currentWord.word}-${Math.random()}`;
     
     // Skip if we just spoke this exact word
     if (wordId === lastSpokenWordId) {
@@ -84,8 +85,8 @@ const VocabularyApp: React.FC = () => {
       
       console.log("Finished speaking word completely");
       
-      // Add a small delay after speaking before allowing next word
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Add a delay after speaking before allowing next word
+      await new Promise(resolve => setTimeout(resolve, 800));
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
@@ -96,8 +97,13 @@ const VocabularyApp: React.FC = () => {
 
   // Speak word when it changes or is displayed initially
   useEffect(() => {
-    if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
-      speakCurrentWord();
+    if (currentWord && !isPaused && !isMuted && isVoicesLoaded && !isChangingWordRef.current) {
+      // Small delay to ensure UI is fully updated
+      const timer = setTimeout(() => {
+        speakCurrentWord();
+      }, 200);
+      
+      return () => clearTimeout(timer);
     }
   }, [currentWord, isPaused, isMuted, isVoicesLoaded]);
   
@@ -118,8 +124,8 @@ const VocabularyApp: React.FC = () => {
   }, [isPaused]);
 
   const handleSwitchCategory = () => {
-    // Only switch if not currently speaking
-    if (!isSpeakingRef.current) {
+    // Only switch if not currently speaking or changing word
+    if (!isSpeakingRef.current && !isChangingWordRef.current) {
       const nextCategory = vocabularyService.nextSheet();
       setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
       handleManualNext();
@@ -127,7 +133,7 @@ const VocabularyApp: React.FC = () => {
     } else {
       toast({
         title: "Please wait",
-        description: "Currently speaking a word. Please wait until it completes.",
+        description: "Currently processing a word. Please wait until it completes.",
       });
     }
   };

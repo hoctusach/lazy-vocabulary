@@ -42,8 +42,8 @@ export const speak = (text: string): Promise<void> => {
           console.warn('No suitable voice found, using default browser voice');
         }
         
-        // Configure speech parameters - slower rate for better comprehension
-        utterance.rate = 0.9; // Slightly slower rate
+        // Configure speech parameters - even slower rate for better comprehension
+        utterance.rate = 0.85; // Slower rate
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         

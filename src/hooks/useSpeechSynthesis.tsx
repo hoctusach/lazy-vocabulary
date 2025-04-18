@@ -9,6 +9,7 @@ export const useSpeechSynthesis = () => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
   const { toast } = useToast();
   const speakingRef = useRef(false);
+  const speechRequestIdRef = useRef(0);
 
   // Check if speech synthesis is supported
   useEffect(() => {
@@ -94,13 +95,20 @@ export const useSpeechSynthesis = () => {
       return;
     }
 
+    // Generate a unique ID for this speech request
+    const requestId = ++speechRequestIdRef.current;
+    
     speakingRef.current = true;
     console.log('Attempting to speak:', text.substring(0, 30) + '...');
     
     try {
       // This will now properly wait until speech is complete
       await speak(text);
-      console.log('Speech completed successfully');
+      
+      // Only mark as completed if this is still the current request
+      if (requestId === speechRequestIdRef.current) {
+        console.log('Speech completed successfully');
+      }
     } catch (error) {
       console.error('Failed to speak text:', error);
       toast({
@@ -110,7 +118,9 @@ export const useSpeechSynthesis = () => {
       });
     } finally {
       // Always mark as not speaking when done
-      speakingRef.current = false;
+      if (requestId === speechRequestIdRef.current) {
+        speakingRef.current = false;
+      }
     }
   }, [isMuted, toast]);
 

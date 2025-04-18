@@ -10,6 +10,7 @@ export const useVocabularyManager = () => {
   const [isPaused, setIsPaused] = useState(false);
   const timerRef = useRef<number | null>(null);
   const isSpeakingRef = useRef<boolean>(false);
+  const isChangingWordRef = useRef<boolean>(false);
   const { toast } = useToast();
 
   const clearTimer = useCallback(() => {
@@ -20,24 +21,36 @@ export const useVocabularyManager = () => {
   }, []);
 
   const displayNextWord = useCallback(async () => {
-    // Don't schedule next word if we're currently speaking
-    if (isSpeakingRef.current) {
-      console.log("Speech is in progress, delaying next word");
+    // Don't schedule next word if we're currently speaking or changing word
+    if (isSpeakingRef.current || isChangingWordRef.current) {
+      console.log("Speech is in progress or word is changing, delaying next word");
       return;
     }
+    
+    // Set a flag to indicate we're changing the word
+    isChangingWordRef.current = true;
     
     clearTimer();
     window.speechSynthesis.cancel();
     
-    if (isPaused) return;
+    if (isPaused) {
+      isChangingWordRef.current = false;
+      return;
+    }
     
     const nextWord = vocabularyService.getNextWord();
     
     if (nextWord) {
       setCurrentWord(nextWord);
-      // Increased timeout to 15 seconds to give more time for speech to complete
+      // Reset the changing word flag after a small delay to ensure UI has updated
+      setTimeout(() => {
+        isChangingWordRef.current = false;
+      }, 100);
+      
+      // Only schedule the next word after the current one is completely processed
       timerRef.current = window.setTimeout(displayNextWord, 15000);
     } else {
+      isChangingWordRef.current = false;
       toast({
         title: "No vocabulary data",
         description: "Please upload an Excel file with vocabulary data.",
@@ -98,13 +111,16 @@ export const useVocabularyManager = () => {
   };
 
   const handleManualNext = () => {
-    // Only proceed if not currently speaking
-    if (!isSpeakingRef.current) {
+    // Only proceed if not currently speaking or changing word
+    if (!isSpeakingRef.current && !isChangingWordRef.current) {
       clearTimer();
       displayNextWord();
     } else {
-      console.log("Currently speaking, please wait...");
-      // Optional: Could show a toast here
+      console.log("Currently speaking or changing word, please wait...");
+      toast({
+        title: "Please wait",
+        description: "Currently processing a word. Please wait until it completes.",
+      });
     }
   };
 
@@ -116,6 +132,7 @@ export const useVocabularyManager = () => {
     handleTogglePause,
     handleManualNext,
     setHasData,
-    isSpeakingRef
+    isSpeakingRef,
+    isChangingWordRef
   };
 };
