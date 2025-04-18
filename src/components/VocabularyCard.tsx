@@ -19,6 +19,7 @@ interface VocabularyCardProps {
   onSwitchCategory: () => void;
   currentCategory: string;
   nextCategory: string;
+  isSpeaking?: boolean;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -34,13 +35,15 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onChangeVoice,
   onSwitchCategory,
   currentCategory,
-  nextCategory
+  nextCategory,
+  isSpeaking = false
 }) => {
   return (
     <Card 
       className={cn(
         "w-full max-w-xl mx-auto transition-colors duration-300",
-        "border-0 shadow-lg"
+        "border-0 shadow-lg",
+        isSpeaking ? "ring-2 ring-blue-400" : "" // Visual indicator when speaking
       )}
       style={{ backgroundColor }}
     >
@@ -65,8 +68,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onToggleMute}
               className={cn(
                 "min-w-[80px]",
-                isMuted ? "text-purple-700 border-purple-300" : "text-gray-700"
+                isMuted ? "text-purple-700 border-purple-300" : "text-gray-700",
+                isSpeaking ? "opacity-50" : ""
               )}
+              disabled={isSpeaking}
             >
               {isMuted ? <VolumeX size={18} className="mr-1" /> : <Volume2 size={18} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
@@ -78,8 +83,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onChangeVoice}
               className={cn(
                 "min-w-[100px]",
-                "text-blue-700"
+                "text-blue-700",
+                isSpeaking ? "opacity-50" : ""
               )}
+              disabled={isSpeaking}
             >
               {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
@@ -90,8 +97,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onTogglePause}
               className={cn(
                 "min-w-[160px]",
-                isPaused ? "text-orange-500 border-orange-300" : "text-gray-700"
+                isPaused ? "text-orange-500 border-orange-300" : "text-gray-700",
+                isSpeaking ? "opacity-50" : ""
               )}
+              disabled={isSpeaking}
             >
               {isPaused ? <Play size={18} className="mr-1" /> : <Pause size={18} className="mr-1" />}
               {isPaused ? "Play next word" : "Pause & read out loud"}
@@ -103,8 +112,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onSwitchCategory}
               className={cn(
                 "min-w-[140px]",
-                "text-green-700"
+                "text-green-700",
+                isSpeaking ? "opacity-50" : ""
               )}
+              disabled={isSpeaking}
             >
               <RefreshCw size={16} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}

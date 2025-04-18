@@ -27,7 +27,8 @@ const VocabularyApp: React.FC = () => {
     handleSwitchCategory,
     setHasData,
     isSpeakingRef,
-    isChangingWordRef
+    isChangingWordRef,
+    lastSpeechDurationRef
   } = useVocabularyManager();
 
   const {
@@ -46,6 +47,11 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
+  // Sync the speaking refs between hooks
+  useEffect(() => {
+    isSpeakingRef.current = speakingRef.current;
+  }, [speakingRef.current, isSpeakingRef]);
+
   useEffect(() => {
     if (isVoicesLoaded) {
       toast({
@@ -57,36 +63,85 @@ const VocabularyApp: React.FC = () => {
 
   const speakCurrentWord = async () => {
     if (!currentWord || isMuted || !isVoicesLoaded || isChangingWordRef.current) {
+      console.log("Cannot speak current word:", 
+        !currentWord ? "no word" : 
+        isMuted ? "muted" : 
+        !isVoicesLoaded ? "voices not loaded" : 
+        "word is changing");
       return;
     }
     
-    const wordId = `${currentWord.word}-${Math.random()}`;
+    // Generate a unique ID for this specific word instance to prevent duplicate speaking
+    const wordId = `${currentWord.word}-${Date.now()}`;
     
     if (wordId === lastSpokenWordId) {
+      console.log("Word already spoken, skipping:", wordId);
       return;
     }
     
     setLastSpokenWordId(wordId);
     
-    // Directly speak the content without the labels
+    // Only speak the content without labels
     const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
     
     console.log("Speaking vocabulary:", currentWord.word);
     
-    isSpeakingRef.current = true;
-    
     try {
+      // Set speaking flag
+      isSpeakingRef.current = true;
+      
       // Add a small delay before speaking to ensure the UI is updated
       await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Speak the text with current voice region
       await speakText(fullText);
+      
       console.log("Finished speaking word completely");
+      
       // Add a small delay after speaking
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 300));
     } catch (error) {
       console.error("Speech error:", error);
     } finally {
       isSpeakingRef.current = false;
     }
+  };
+
+  // Handle toggling mute with proper word speaking
+  const handleToggleMuteWithSpeaking = () => {
+    handleToggleMute();
+    
+    // If we're unmuting, speak the current word
+    if (isMuted && currentWord && !isPaused) {
+      // Small delay to ensure state updates first
+      setTimeout(() => {
+        setLastSpokenWordId(null); // Reset to force speaking
+        speakCurrentWord();
+      }, 50);
+    }
+  };
+  
+  // Handle voice changes with proper word speaking
+  const handleChangeVoiceWithSpeaking = () => {
+    handleChangeVoice();
+    
+    // Small delay to ensure voice changes first
+    setTimeout(() => {
+      if (!isMuted && currentWord && !isPaused) {
+        setLastSpokenWordId(null); // Reset to force speaking
+        speakCurrentWord();
+      }
+    }, 100);
+  };
+  
+  // Handle category switching with proper synchronization
+  const handleSwitchCategoryWithState = () => {
+    setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
+    // Reset the last spoken word ID to force a new speech
+    setLastSpokenWordId(null);
+    
+    // Pass the current state
+    handleSwitchCategory(isMuted, voiceRegion);
   };
 
   // Speak when word changes if not muted
@@ -99,28 +154,6 @@ const VocabularyApp: React.FC = () => {
       return () => clearTimeout(timer);
     }
   }, [currentWord, isPaused, isMuted, isVoicesLoaded]);
-  
-  // When unmuted, speak the current word
-  useEffect(() => {
-    if (!isMuted && currentWord && !isPaused && isVoicesLoaded) {
-      setLastSpokenWordId(null);
-      speakCurrentWord();
-    }
-  }, [isMuted]);
-
-  // When unpaused, reset the last spoken word
-  useEffect(() => {
-    if (!isPaused && currentWord) {
-      setLastSpokenWordId(null);
-    }
-  }, [isPaused]);
-
-  const handleSwitchCategoryWithState = () => {
-    setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-    // Reset the last spoken word ID to force a new speech
-    setLastSpokenWordId(null);
-    handleSwitchCategory(isMuted, voiceRegion);
-  };
 
   const handleNotificationsEnabled = () => {
     toast({
@@ -133,10 +166,18 @@ const VocabularyApp: React.FC = () => {
     setShowWordCard(prev => !prev);
   };
 
-  // Synchronize speech ref with speech synthesis ref
-  useEffect(() => {
-    isSpeakingRef.current = speakingRef.current;
-  }, [speakingRef.current]);
+  // Ensure proper behavior when clicking next word button
+  const handleNextWordClick = () => {
+    // Stop any current speech
+    window.speechSynthesis.cancel();
+    
+    // Reset speaking state
+    isSpeakingRef.current = false;
+    speakingRef.current = false;
+    
+    // Continue to next word
+    handleManualNext();
+  };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-xl mx-auto p-4">
@@ -164,17 +205,18 @@ const VocabularyApp: React.FC = () => {
             isMuted={isMuted}
             isPaused={isPaused}
             voiceRegion={voiceRegion}
-            onToggleMute={handleToggleMute}
+            onToggleMute={handleToggleMuteWithSpeaking}
             onTogglePause={handleTogglePause}
-            onChangeVoice={handleChangeVoice}
+            onChangeVoice={handleChangeVoiceWithSpeaking}
             onSwitchCategory={handleSwitchCategoryWithState}
             currentCategory={currentSheetName}
             nextCategory={nextSheetName}
+            isSpeaking={isSpeakingRef.current}
           />
           
           <VocabularyControls 
             onReset={() => setHasData(false)}
-            onNext={handleManualNext}
+            onNext={handleNextWordClick}
           />
         </>
       )}

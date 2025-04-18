@@ -12,6 +12,7 @@ export const useVocabularyManager = () => {
   const timerRef = useRef<number | null>(null);
   const isSpeakingRef = useRef<boolean>(false);
   const isChangingWordRef = useRef<boolean>(false);
+  const lastSpeechDurationRef = useRef<number>(0);
   const { toast } = useToast();
 
   const clearTimer = useCallback(() => {
@@ -22,6 +23,7 @@ export const useVocabularyManager = () => {
   }, []);
 
   const displayNextWord = useCallback(async () => {
+    // Don't process if already speaking or changing word
     if (isSpeakingRef.current || isChangingWordRef.current) {
       console.log("Speech is in progress or word is changing, delaying next word");
       return;
@@ -41,11 +43,12 @@ export const useVocabularyManager = () => {
     if (nextWord) {
       setCurrentWord(nextWord);
       
-      // Calculate total duration for all text (without the labels)
+      // Calculate total duration for word and add buffer time
       const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
       const duration = calculateSpeechDuration(fullText);
+      lastSpeechDurationRef.current = duration;
       
-      // Add some buffer time for screen transitions
+      // Add buffer time for screen transitions
       const totalDuration = duration + 2000;
       
       setTimeout(() => {
@@ -109,6 +112,7 @@ export const useVocabularyManager = () => {
     window.speechSynthesis.cancel();
     
     if (isPaused) {
+      // When unpausing, display next word immediately
       displayNextWord();
     } else {
       clearTimer();
@@ -134,8 +138,12 @@ export const useVocabularyManager = () => {
       const nextCategory = vocabularyService.nextSheet();
       console.log(`Switched to category: ${nextCategory}`);
       
-      // Get a new word from the new category and prepare to display it
+      // Clear any pending timers
       clearTimer();
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
+      // Get a new word from the new category immediately
       displayNextWord();
     } else {
       toast({
@@ -155,6 +163,7 @@ export const useVocabularyManager = () => {
     handleSwitchCategory,
     setHasData,
     isSpeakingRef,
-    isChangingWordRef
+    isChangingWordRef,
+    lastSpeechDurationRef
   };
 };

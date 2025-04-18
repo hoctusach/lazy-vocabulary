@@ -1,3 +1,4 @@
+
 // Simple utility to handle speech synthesis tasks
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -64,7 +65,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         };
         
         // Start speaking
-        console.log('Starting speech');
+        console.log('Starting speech', text);
         
         if (window.speechSynthesis.paused) {
           window.speechSynthesis.resume();

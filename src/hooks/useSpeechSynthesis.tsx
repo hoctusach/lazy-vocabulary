@@ -80,7 +80,7 @@ export const useSpeechSynthesis = () => {
       // Only announce change if not muted
       if (!isMuted) {
         const testText = voiceRegion === 'US' ? 'American accent selected' : 'British accent selected';
-        speak(testText)
+        speak(testText, voiceRegion)
           .then(() => console.log('Voice region change announced'))
           .catch(err => console.warn('Could not announce voice region change:', err));
       }
@@ -89,9 +89,16 @@ export const useSpeechSynthesis = () => {
 
   // Speak function with full promise handling to ensure completion
   const speakText = useCallback(async (text: string): Promise<void> => {
-    if (isMuted || !text || speakingRef.current) {
-      console.log(isMuted ? 'Speech is muted' : speakingRef.current ? 'Already speaking' : 'No text provided');
+    if (isMuted || !text) {
+      console.log(isMuted ? 'Speech is muted' : 'No text provided');
       return;
+    }
+
+    // Only allow one speech at a time
+    if (speakingRef.current) {
+      console.log('Already speaking, canceling previous speech');
+      window.speechSynthesis.cancel();
+      await new Promise(resolve => setTimeout(resolve, 100)); // Small delay to ensure cancellation completes
     }
 
     // Generate a unique ID for this speech request
@@ -102,7 +109,7 @@ export const useSpeechSynthesis = () => {
     
     try {
       // This will now properly wait until speech is complete
-      await speak(text);
+      await speak(text, voiceRegion);
       
       // Only mark as completed if this is still the current request
       if (requestId === speechRequestIdRef.current) {
@@ -123,7 +130,7 @@ export const useSpeechSynthesis = () => {
         speakingRef.current = false;
       }
     }
-  }, [isMuted]);
+  }, [isMuted, voiceRegion]);
 
   const handleToggleMute = useCallback(() => {
     setIsMuted(prev => {
@@ -136,8 +143,8 @@ export const useSpeechSynthesis = () => {
   }, []);
 
   const handleChangeVoice = useCallback(() => {
-    setVoiceRegion(prev => (prev === 'US' ? 'UK' : 'US'));
     stopSpeaking();
+    setVoiceRegion(prev => (prev === 'US' ? 'UK' : 'US'));
   }, []);
 
   return {
