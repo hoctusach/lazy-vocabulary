@@ -43,3 +43,19 @@ export const stopSpeaking = () => {
     window.speechSynthesis.cancel();
   }
 };
+
+// Add the missing findFallbackVoice function
+export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
+  if (!voices || voices.length === 0) {
+    return null;
+  }
+  
+  // Try to find any English voice first
+  const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+  if (englishVoice) {
+    return englishVoice;
+  }
+  
+  // If no English voice is available, return the first available voice
+  return voices[0];
+};
