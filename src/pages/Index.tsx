@@ -20,9 +20,10 @@ const Index = () => {
                 <HelpCircle className="h-4 w-4 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent>
-                <p>Get started in 3 easy steps:</p>
+                <p>Get started in 4 easy steps:</p>
                 <ol className="list-decimal ml-4 mt-1">
                   <li>Click on Upload New File</li>
+                  <li>Download the default word set</li>
                   <li>Enable notifications</li>
                   <li>Start learning!</li>
                 </ol>
