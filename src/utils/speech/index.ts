@@ -9,12 +9,15 @@ import {
   waitForSpeechReadiness,
   resetSpeechEngine,
   validateCurrentSpeech,
-  forceResyncIfNeeded
+  forceResyncIfNeeded,
+  ensureSpeechEngineReady,
+  extractMainWord
 } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
+      // Check for mute state in localStorage
       const storedStates = localStorage.getItem('buttonStates');
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
@@ -41,7 +44,9 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       console.error('Error saving current text to localStorage:', error);
     }
 
-    window.speechSynthesis.cancel();
+    // Ensure speech engine is ready before starting
+    await ensureSpeechEngineReady();
+    
     const utterance = new SpeechSynthesisUtterance(text);
     let voices = window.speechSynthesis.getVoices();
     
@@ -58,8 +63,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode;
         }
         
-        // Slow down speech rate for better clarity
-        utterance.rate = 0.85;
+        // Improved speech parameters for better clarity
+        utterance.rate = 0.9;  // Slightly slower for better comprehension
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -103,11 +108,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           if (window.speechSynthesis.speaking) {
             keepSpeechAlive();
           } else {
-            clearAllTimers();
+            clearInterval(keepAliveInterval);
           }
-        }, 200); // Increased frequency for stability
+        }, 150); // Very frequent checks for maximum stability
         
-        // Add regular sync checking
+        // Regular sync checking
         syncCheckInterval = window.setInterval(() => {
           try {
             const currentWord = localStorage.getItem('currentDisplayedWord');
@@ -121,11 +126,37 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } catch (error) {
             console.error('Error in sync check:', error);
           }
-        }, 1000);
+        }, 800);
 
-        window.speechSynthesis.speak(utterance);
+        // Start speaking with a retry mechanism
+        const attemptSpeech = (attempts = 0) => {
+          if (attempts >= 3) {
+            console.error('Failed to start speech after multiple attempts');
+            clearAllTimers();
+            reject(new Error('Failed to start speech'));
+            return;
+          }
+          
+          try {
+            window.speechSynthesis.speak(utterance);
+            
+            // Verify speech started successfully
+            setTimeout(() => {
+              if (!window.speechSynthesis.speaking) {
+                console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
+                resetSpeechEngine();
+                attemptSpeech(attempts + 1);
+              }
+            }, 200);
+          } catch (error) {
+            console.error('Error starting speech:', error);
+            setTimeout(() => attemptSpeech(attempts + 1), 300);
+          }
+        };
+        
+        attemptSpeech();
 
-        // Set reasonable maximum duration
+        // Set reasonable maximum duration with proper calculation
         const estimatedDuration = calculateSpeechDuration(text);
         const maxDuration = Math.min(Math.max(estimatedDuration * 1.5, 15000), 120000);
         
@@ -152,6 +183,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.onvoiceschanged = null;
       };
       
+      // Fallback if voices don't load within a timeout
       setTimeout(() => {
         if (!utterance.voice) {
           voices = window.speechSynthesis.getVoices();
@@ -177,5 +209,7 @@ export {
   waitForSpeechReadiness,
   resetSpeechEngine,
   validateCurrentSpeech,
-  forceResyncIfNeeded
+  forceResyncIfNeeded,
+  ensureSpeechEngineReady,
+  extractMainWord
 };

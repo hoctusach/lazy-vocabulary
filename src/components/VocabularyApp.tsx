@@ -7,7 +7,14 @@ import { useVocabularyManager } from '@/hooks/useVocabularyManager';
 import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
-import { stopSpeaking, checkSoundDisplaySync, keepSpeechAlive, validateCurrentSpeech } from '@/utils/speech';
+import { 
+  stopSpeaking, 
+  keepSpeechAlive, 
+  validateCurrentSpeech, 
+  resetSpeechEngine,
+  ensureSpeechEngineReady,
+  extractMainWord 
+} from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
@@ -15,6 +22,7 @@ const VocabularyApp: React.FC = () => {
   const syncCheckTimeoutRef = useRef<number | null>(null);
   const keepAliveIntervalRef = useRef<number | null>(null);
   const resyncTimeoutRef = useRef<number | null>(null);
+  const resetIntervalRef = useRef<number | null>(null);
   
   const {
     hasData,
@@ -63,12 +71,26 @@ const VocabularyApp: React.FC = () => {
       if (speakingRef.current && !isPaused && !isMuted) {
         keepSpeechAlive();
       }
-    }, 250);
+    }, 150);
+    
+    if (resetIntervalRef.current) {
+      clearInterval(resetIntervalRef.current);
+    }
+    
+    resetIntervalRef.current = window.setInterval(() => {
+      if (!speakingRef.current && !isPaused) {
+        ensureSpeechEngineReady();
+      }
+    }, 30000);
     
     return () => {
       if (keepAliveIntervalRef.current) {
         clearInterval(keepAliveIntervalRef.current);
         keepAliveIntervalRef.current = null;
+      }
+      if (resetIntervalRef.current) {
+        clearInterval(resetIntervalRef.current);
+        resetIntervalRef.current = null;
       }
     };
   }, [speakingRef, isPaused, isMuted]);
@@ -93,25 +115,31 @@ const VocabularyApp: React.FC = () => {
       
       const currentTextBeingSpoken = getCurrentText();
       
-      const isInSync = validateCurrentSpeech(currentWord.word, currentTextBeingSpoken);
-      
-      if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
-        console.log("Detected sound/display mismatch. Fixing synchronization...");
-        stopSpeaking();
+      if (currentTextBeingSpoken && currentWord) {
+        const mainWord = extractMainWord(currentWord.word);
+        const spokenText = currentTextBeingSpoken.toLowerCase();
         
-        if (!resyncTimeoutRef.current) {
-          resyncTimeoutRef.current = window.setTimeout(() => {
-            resyncTimeoutRef.current = null;
-            if (currentWord && !isPaused && !isMuted) {
-              console.log("Re-speaking current word to maintain sync:", currentWord.word);
-              speakCurrentWord(true);
-            }
-          }, 300);
+        const isInSync = spokenText.includes(mainWord);
+        
+        if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
+          console.log("Detected sound/display mismatch. Fixing synchronization...");
+          console.log(`Word on screen: "${mainWord}", Text being spoken: "${spokenText.substring(0, 30)}..."`);
+          stopSpeaking();
+          
+          if (!resyncTimeoutRef.current) {
+            resyncTimeoutRef.current = window.setTimeout(() => {
+              resyncTimeoutRef.current = null;
+              if (currentWord && !isPaused && !isMuted) {
+                console.log("Re-speaking current word to maintain sync:", currentWord.word);
+                speakCurrentWord(true);
+              }
+            }, 250);
+          }
         }
       }
       
       clearSyncTimeouts();
-      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1500);
+      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1200);
     };
     
     clearSyncTimeouts();

@@ -71,24 +71,25 @@ export const resetSpeechEngine = (): void => {
   }
 };
 
-// New function to explicitly check if current speech matches current word
+// Improved sync validation function with better word matching
 export const validateCurrentSpeech = (
   currentWord: string | null,
   currentTextBeingSpoken: string | null
 ): boolean => {
   if (!currentWord || !currentTextBeingSpoken) return false;
   
-  // Extract the first part of the speech text (usually the word)
-  const speechParts = currentTextBeingSpoken.split('.');
-  if (speechParts.length === 0) return false;
+  // Extract just the main word without phonetics or type
+  const mainWord = currentWord.split('(')[0].trim().toLowerCase();
   
-  const firstPart = speechParts[0].toLowerCase().trim();
-  const wordPart = currentWord.toLowerCase().trim().split(' ')[0]; // Get first word
+  // Get the first part of the text being spoken
+  const spokenText = currentTextBeingSpoken.toLowerCase().trim();
   
-  return firstPart.includes(wordPart);
+  // Check if the spoken text clearly contains the main word
+  // This is more tolerant of slight variations in formatting
+  return spokenText.includes(mainWord);
 };
 
-// New function to ensure synchronization
+// Enhanced sync mechanism with fallback
 export const forceResyncIfNeeded = (
   currentWord: string | null,
   currentTextBeingSpoken: string | null,
@@ -102,4 +103,32 @@ export const forceResyncIfNeeded = (
     stopSpeaking();
     setTimeout(onRestart, 100);
   }
+};
+
+// New function to ensure speech is properly ready before starting
+export const ensureSpeechEngineReady = async (): Promise<boolean> => {
+  if (!window.speechSynthesis) return false;
+  
+  try {
+    // Force reset the speech engine to clear any stuck states
+    window.speechSynthesis.cancel();
+    
+    // Short delay to allow the engine to reset
+    await new Promise(resolve => setTimeout(resolve, 150));
+    
+    // Check if the engine is responsive
+    window.speechSynthesis.pause();
+    window.speechSynthesis.resume();
+    
+    return true;
+  } catch (error) {
+    console.error('Error ensuring speech engine is ready:', error);
+    return false;
+  }
+};
+
+// New function to extract the main word from a vocabulary entry
+export const extractMainWord = (wordText: string): string => {
+  // Remove any phonetic notation and word type
+  return wordText.split('(')[0].trim().toLowerCase();
 };
