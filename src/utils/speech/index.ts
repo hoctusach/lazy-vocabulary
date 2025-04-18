@@ -38,8 +38,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
-        let keepAliveInterval: number | null = null;
-        let maxDurationTimeout: number | null = null;
+        let keepAliveInterval: ReturnType<typeof setInterval> | null = null;
+        let maxDurationTimeout: ReturnType<typeof setTimeout> | null = null;
         
         const clearAllTimers = () => {
           if (keepAliveInterval !== null) {
@@ -78,7 +78,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
         window.speechSynthesis.speak(utterance);
         
         // Keep speech synthesis alive for long text
-        keepAliveInterval = window.setInterval(() => {
+        keepAliveInterval = setInterval(() => {
           if (window.speechSynthesis.speaking) {
             console.log("Keeping speech synthesis alive...");
             window.speechSynthesis.pause();
