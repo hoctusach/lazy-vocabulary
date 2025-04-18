@@ -1,9 +1,8 @@
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
-import { calculateSpeechDuration } from '@/utils/speechUtils';
+import { calculateSpeechDuration } from '@/utils/speech';
 
 export const useVocabularyManager = () => {
   // Try to get initial pause state from localStorage

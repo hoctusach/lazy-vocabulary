@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -10,7 +9,7 @@ import { useSpeechSynthesis } from '@/hooks/useSpeechSynthesis';
 import { useWordSpeechSync } from '@/hooks/useWordSpeechSync';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/hooks/use-toast';
-import { stopSpeaking } from '@/utils/speechUtils';
+import { stopSpeaking } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
   const [backgroundColorIndex, setBackgroundColorIndex] = useState(0);
@@ -55,7 +54,6 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Sync speaking refs
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
   }, [speakingRef.current, isSpeakingRef]);
@@ -70,49 +68,32 @@ const VocabularyApp: React.FC = () => {
   }, [isVoicesLoaded, toast, voiceRegion]);
 
   const handleToggleMuteWithSpeaking = () => {
-    // Immediately stop any ongoing speech
     stopSpeaking();
-    
-    // Toggle mute state
     const wasMuted = isMuted;
     handleToggleMute();
-    
-    // If we were muted and now unmuted, speak the current word
     if (wasMuted && currentWord) {
-      // Give a moment for the state to update
       setTimeout(() => {
         resetLastSpokenWord();
-        speakCurrentWord(true); // Force speak the current word
+        speakCurrentWord(true);
       }, 100);
     }
   };
   
   const handleChangeVoiceWithSpeaking = () => {
-    // Stop any ongoing speech
     stopSpeaking();
     resetLastSpokenWord();
-    
-    // Change voice
     handleChangeVoice();
-    
-    // If not muted, speak with new voice
     if (!isMuted && currentWord) {
-      // Wait for voice to change
       setTimeout(() => {
-        speakCurrentWord(true); // Force speak the current word with new voice
+        speakCurrentWord(true);
       }, 300);
     }
   };
   
   const handleSwitchCategoryWithState = () => {
-    // Cancel any ongoing speech and reset state
     stopSpeaking();
     resetLastSpokenWord();
-    
-    // Change background color
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
-    
-    // Switch category
     handleSwitchCategory(isMuted, voiceRegion);
   };
 

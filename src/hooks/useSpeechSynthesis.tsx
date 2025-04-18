@@ -1,7 +1,6 @@
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speechUtils';
+import { speak, stopSpeaking, isSpeechSynthesisSupported, getVoiceByRegion } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
   // Try to get the initial mute state from localStorage

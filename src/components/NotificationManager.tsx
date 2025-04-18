@@ -1,13 +1,11 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Bell, BellOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak } from '@/utils/speechUtils';
+import { speak } from '@/utils/speech';
 
-// Define request permission function
 const requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
     return 'unsupported';
@@ -40,7 +38,6 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
   const [permissionState, setPermissionState] = useState<string>('default');
   const { toast } = useToast();
   
-  // Check initial permission state
   useEffect(() => {
     const checkPermission = async () => {
       if ('Notification' in window) {
@@ -55,7 +52,6 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
     checkPermission();
   }, []);
   
-  // Register service worker if notifications are enabled
   useEffect(() => {
     if (notificationsEnabled) {
       const registerServiceWorker = async () => {
@@ -82,13 +78,11 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
       setNotificationsEnabled(true);
       onNotificationsEnabled();
       
-      // Show a test notification
       const notification = new Notification('Vocabulary Notifications Enabled', {
         body: 'You will now receive vocabulary notifications.',
         icon: '/favicon.ico'
       });
       
-      // Close notification after 4 seconds
       setTimeout(() => notification.close(), 4000);
       
     } else if (permission === 'denied') {
@@ -114,36 +108,30 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
     });
   };
   
-  // Function to show vocabulary notification
   const showVocabularyNotification = () => {
     if (!notificationsEnabled || !currentWord) return;
     
     const { word, meaning, example } = currentWord;
     
-    // Create and show notification
     const notification = new Notification(`Vocabulary: ${word}`, {
       body: `${meaning}\n\nExample: ${example}`,
       icon: '/favicon.ico',
       silent: false
     });
     
-    // Speak the word when notification is clicked
     notification.onclick = async () => {
       notification.close();
       const fullText = `${word}. ${meaning}. ${example}`;
       await speak(fullText);
     };
     
-    // Close notification after 10 seconds
     setTimeout(() => {
       notification.close();
     }, 10000);
   };
   
-  // Show notification when current word changes
   useEffect(() => {
     if (currentWord && notificationsEnabled) {
-      // Add a delay to ensure word has been processed
       const timer = setTimeout(() => {
         showVocabularyNotification();
       }, 1000);

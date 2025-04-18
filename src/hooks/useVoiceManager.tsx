@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { findFallbackVoice } from '@/utils/speechUtils';
+import { findFallbackVoice } from '@/utils/speech';
 
 export const useVoiceManager = () => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
