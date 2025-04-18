@@ -1,9 +1,8 @@
-
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FilePlus2, Download } from 'lucide-react';
+import { Upload, FilePlus2, ExternalLink } from 'lucide-react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -38,7 +37,6 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   };
   
   const processFile = async (file: File) => {
-    // Check file type and extension
     const allowedTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/xlsx'];
     const allowedExtensions = ['.xlsx'];
     
@@ -83,36 +81,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     }
   };
   
-  const handleUseDefaultWordSet = async () => {
-    toast({
-      title: "Downloading default word set",
-      description: "Please wait while we download and import the default vocabulary..."
-    });
-
-    try {
-      // Create a Blob with the default vocabulary data
-      const response = await fetch('/defaultVocabulary.json');
-      if (!response.ok) throw new Error('Failed to download vocabulary');
-      
-      const data = await response.json();
-      const success = vocabularyService.loadDefaultVocabulary(data);
-      
-      if (success) {
-        toast({
-          title: "Success!",
-          description: "Default vocabulary data has been imported successfully.",
-        });
-        onFileUploaded();
-      } else {
-        throw new Error('Failed to import vocabulary');
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to load the default vocabulary data. Please try again.",
-        variant: "destructive"
-      });
-    }
+  const handleOpenDefaultWordSet = () => {
+    window.open('https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEETS_ID', '_blank');
   };
   
   return (
@@ -130,9 +100,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={handleUseDefaultWordSet}
+            onClick={handleOpenDefaultWordSet}
+            className="mt-2"
           >
-            <Download size={16} className="mr-2" /> Download default word set
+            <ExternalLink size={16} className="mr-2" /> Download default word set
           </Button>
         </CardDescription>
       </CardHeader>
