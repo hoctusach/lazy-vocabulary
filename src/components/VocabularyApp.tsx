@@ -99,7 +99,7 @@ const VocabularyApp: React.FC = () => {
         setTimeout(() => {
           resetLastSpokenWord();
           speakCurrentWord(true);
-        }, 500);
+        }, 300); // Reduced delay for better responsiveness
       } else if (!wasMuted) {
         console.log("Was unmuted, now muted - stopping speech");
         resetLastSpokenWord();
@@ -118,9 +118,9 @@ const VocabularyApp: React.FC = () => {
         console.log("Voice changed - will speak current word with new voice");
         setTimeout(() => {
           speakCurrentWord(true);
-        }, 800);
+        }, 500); // Reduced delay for better responsiveness
       }
-    });
+    }, 600); // Increased action lock time for voice changes
   }, [isMuted, currentWord, handleChangeVoice, resetLastSpokenWord, speakCurrentWord, performActionWithDelay]);
   
   const handleSwitchCategoryWithState = useCallback(() => {
@@ -137,8 +137,8 @@ const VocabularyApp: React.FC = () => {
           console.log("Category changed - speaking first word in new category");
           speakCurrentWord(true);
         }
-      }, 1500);
-    }, 800);
+      }, 1000); // Reduced delay for better responsiveness
+    }, 1000); // Longer action lock time for category changes
   }, [isMuted, voiceRegion, isPaused, currentWord, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord, performActionWithDelay]);
 
   const handleNextWordClick = useCallback(() => {
@@ -154,8 +154,8 @@ const VocabularyApp: React.FC = () => {
           console.log("Speaking new word after manual next");
           speakCurrentWord(true);
         }
-      }, 1000);
-    }, 800);
+      }, 600); // Reduced delay for better responsiveness
+    }, 800); // Keep action lock time for next word
   }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord, performActionWithDelay]);
 
   const toggleView = useCallback(() => {
@@ -169,7 +169,7 @@ const VocabularyApp: React.FC = () => {
       console.log("Word card became visible - ensuring word is spoken");
       setTimeout(() => {
         speakCurrentWord(true);
-      }, 500);
+      }, 300); // Reduced delay for better responsiveness
     }
   }, [showWordCard, currentWord, isPaused, isMuted, isChangingWordRef, speakCurrentWord]);
 

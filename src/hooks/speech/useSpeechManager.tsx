@@ -40,7 +40,8 @@ export const useSpeechManager = () => {
       if (speakingRef.current) {
         console.log('Already speaking, canceling previous speech');
         stopSpeaking();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Reduced delay to improve responsiveness
+        await new Promise(resolve => setTimeout(resolve, 150));
       }
 
       // Only proceed if this is still the most recent speak request

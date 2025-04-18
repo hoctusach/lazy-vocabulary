@@ -122,11 +122,16 @@ export const useWordSpeechSync = (
       console.log("Finished speaking word completely:", wordToSpeak.word);
       setWordFullySpoken(true);
       
-      // Show a toast notification for word completion
+      // Show enhanced toast notification with more word details
       toast({
-        title: "Word Spoken",
-        description: `Completed: ${wordToSpeak.word}`,
-        duration: 2000
+        title: wordToSpeak.word,
+        description: (
+          <>
+            <p className="font-medium text-green-800">Meaning: {wordToSpeak.meaning}</p>
+            <p className="italic text-red-800 mt-1">Example: {wordToSpeak.example}</p>
+          </>
+        ),
+        duration: 5000
       });
     } catch (error) {
       console.error("Speech error:", error);
@@ -183,9 +188,10 @@ export const useWordSpeechSync = (
     
     if (!isChangingWordRef.current && !isMuted) {
       console.log("Scheduling word to be spoken after short delay");
+      // Reduce initial delay to fix synchronization issues
       speechTimeoutRef.current = window.setTimeout(() => {
-        speakCurrentWord();
-      }, 500); // Increased delay for more reliable speech
+        speakCurrentWord(true); // Force speak to ensure synchronization
+      }, 300); // Reduced delay for better synchronization
     }
     
     return () => {
