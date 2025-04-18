@@ -82,7 +82,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   };
   
   const handleOpenDefaultWordSet = () => {
-    window.open('https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEETS_ID', '_blank');
+    window.open('https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true', '_blank');
   };
   
   return (
