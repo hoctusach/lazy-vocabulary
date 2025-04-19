@@ -3,14 +3,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Download, Upload, FileText, ArrowLeft, Lock } from 'lucide-react';
+import { Download, Upload, FileText, ArrowLeft } from 'lucide-react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useToast } from '@/hooks/use-toast';
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-
-const EXCEL_PASSWORD = "18011962";
 
 interface FileUploadProps {
   onFileUploaded: () => void;
@@ -25,21 +21,11 @@ const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [filename, setFilename] = useState<string | null>(null);
-  const [password, setPassword] = useState("");
   const { toast } = useToast();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    if (password !== EXCEL_PASSWORD) {
-      toast({
-        title: "Invalid Password",
-        description: "Please enter the correct password to upload files.",
-        variant: "destructive",
-      });
-      return;
-    }
 
     setIsUploading(true);
     setFilename(file.name);
@@ -73,15 +59,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleDownloadSample = () => {
-    if (password !== EXCEL_PASSWORD) {
-      toast({
-        title: "Invalid Password",
-        description: "Please enter the correct password to download the sample file.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     window.open(
       "https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true", 
       "_blank"
@@ -108,31 +85,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </div>
           
           <div className="flex flex-col gap-3 mt-4">
-            <div className="flex items-center gap-2">
-              <Input
-                type="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="flex-1"
-              />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Lock size={16} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-80">
-                  <div className="space-y-2">
-                    <h4 className="font-medium">Password Required</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Please enter password (18011962) to download or upload files.
-                    </p>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            </div>
-
             <Button 
               variant="outline" 
               className="w-full flex justify-center items-center gap-2"
