@@ -42,6 +42,10 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       return;
     }
 
+    // More thorough cleanup before speech
+    await ensureSpeechEngineReady();
+    stopSpeaking();
+    
     // Prepare text for better speech quality with more pauses
     const processedText = addPausesToText(prepareTextForSpeech(text));
     
@@ -53,21 +57,18 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     } catch (error) {
       console.error('Error saving current text to localStorage:', error);
     }
-
-    // Make sure we have full speech readiness before starting
-    await ensureSpeechEngineReady();
     
-    // A longer delay to ensure speech engine is fully ready
-    await new Promise(resolve => setTimeout(resolve, 800)); // Increased from 500ms to 800ms
+    // Longer wait before starting speech to ensure engine readiness
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     const utterance = new SpeechSynthesisUtterance(processedText);
     let voices = window.speechSynthesis.getVoices();
     
     const setVoiceAndSpeak = async () => {
       try {
-        // First cancel any previous speech to avoid overlap
+        // Double-check that previous speech is stopped
         stopSpeaking();
-        await new Promise(resolve => setTimeout(resolve, 300)); // Increased from 200ms to 300ms
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
         console.log(`Using voice region: ${region}, language code: ${langCode}`);
@@ -83,7 +84,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           utterance.lang = langCode;
         }
         
-        // Apply the much slower speech rate for clarity
+        // Apply even slower speech rate for clarity
         utterance.rate = getSpeechRate();
         utterance.pitch = getSpeechPitch();
         utterance.volume = getSpeechVolume();
@@ -134,7 +135,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             clearInterval(keepAliveInterval as number);
             keepAliveInterval = null;
           }
-        }, 30); // Even more frequent checks to prevent cutting off
+        }, 20); // Even more frequent to prevent any cutting off
         
         // More frequent sync checking
         syncCheckInterval = window.setInterval(() => {
@@ -150,11 +151,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } catch (error) {
             console.error('Error in sync check:', error);
           }
-        }, 300); // More frequent checks
+        }, 150); // More frequent checks
 
-        // More robust speech attempt function
+        // More robust speech attempt function with better failure detection
         const attemptSpeech = async (attempts = 0): Promise<void> => {
-          if (attempts >= 3) {
+          if (attempts >= 4) { // Increased max attempts
             console.error('Failed to start speech after multiple attempts');
             clearAllTimers();
             reject(new Error('Failed to start speech'));
@@ -165,13 +166,13 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             // Ensure clean speech engine state
             if (attempts > 0) {
               window.speechSynthesis.cancel();
-              await new Promise(resolve => setTimeout(resolve, 400)); // Increased wait time
+              await new Promise(resolve => setTimeout(resolve, 500)); // Longer wait time
             }
             
             // Speak with improved stability checks
             window.speechSynthesis.speak(utterance);
             
-            // Verify speech started
+            // More thorough verification speech started
             await new Promise<void>((resolveStart, rejectStart) => {
               setTimeout(() => {
                 if (window.speechSynthesis.speaking) {
@@ -180,11 +181,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
                   console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
                   rejectStart(new Error('Speech not started'));
                 }
-              }, 600); // Increased verification time
+              }, 700); // Increased verification time
             });
           } catch (error) {
             console.error('Speech start error:', error);
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 600));
             await attemptSpeech(attempts + 1);
           }
         };
@@ -194,7 +195,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
 
         // Set reasonable maximum duration with proper calculation
         const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
-        const maxDuration = Math.min(Math.max(estimatedDuration * 1.8, 45000), 180000); // Increased multiplier and min/max times
+        const maxDuration = Math.min(Math.max(estimatedDuration * 2.0, 60000), 240000); // Increased multiplier and min/max times
         
         console.log(`Estimated speech duration: ${estimatedDuration}ms, Max duration: ${maxDuration}ms`);
         
@@ -236,7 +237,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 3000); // Longer timeout for voice loading (increased from 2000ms)
+      }, 4000); // Longer timeout for voice loading
     }
   });
 };
