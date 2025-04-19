@@ -1,7 +1,6 @@
-
 export const getSpeechRate = (): number => {
-  // Set speech rate to a much slower 0.7 to make speech clearer
-  return 0.7;
+  // Set speech rate to a slower 0.65 to make speech clearer and less likely to cut off
+  return 0.65;
 };
 
 export const getSpeechPitch = (): number => {
@@ -15,13 +14,13 @@ export const getSpeechVolume = (): number => {
 };
 
 export const addPausesToText = (text: string): string => {
-  // Add more strategic pauses to improve comprehension
+  // Add more strategic pauses to improve comprehension and prevent cutting off
   return text
-    .replace(/\./g, '... ') // Longer pause after period
+    .replace(/\./g, '.... ') // Even longer pause after period
     .replace(/;/g, '... ') // Longer pause after semicolon
-    .replace(/,/g, '... ') // Longer pause after comma
-    .replace(/\?/g, '... ') // Longer pause after question mark
-    .replace(/!/g, '... ') // Longer pause after exclamation
+    .replace(/,/g, '.. ') // Longer pause after comma
+    .replace(/\?/g, '.... ') // Longer pause after question mark
+    .replace(/!/g, '.... ') // Longer pause after exclamation
     .replace(/:/g, '... ') // Pause after colon
     .replace(/\s{2,}/g, ' ')
     .trim();
@@ -53,8 +52,13 @@ export const checkSoundDisplaySync = (currentDisplayedWord: string, currentSpoke
 
 export const keepSpeechAlive = (): void => {
   if (window.speechSynthesis.speaking) {
+    // More frequent pause/resume to prevent browser cutting off speech
     window.speechSynthesis.pause();
-    window.speechSynthesis.resume();
+    setTimeout(() => {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    }, 10); // Very short timeout to ensure quick resume
   }
 };
 
@@ -99,10 +103,11 @@ export const forceResyncIfNeeded = (
 };
 
 export const ensureSpeechEngineReady = async (): Promise<void> => {
-  // Ensure speech engine is ready for use
-  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+  // Ensure speech engine is ready for use with additional checks
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending || window.speechSynthesis.paused) {
     stopSpeaking();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Longer wait time to ensure engine is fully reset
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
 };
 
