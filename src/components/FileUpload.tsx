@@ -59,29 +59,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleDownloadSample = () => {
-    // Create a blob of JSON data
-    const blob = new Blob([JSON.stringify(DEFAULT_VOCABULARY_DATA, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    // Create a temporary link and click it
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'vocabulary_sample.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    
-    // Clean up
-    URL.revokeObjectURL(url);
-    
-    // Load the default vocabulary into memory
-    vocabularyService.loadDefaultVocabulary();
-    onFileUploaded();
-    
-    toast({
-      title: "Sample Downloaded",
-      description: "Default vocabulary set has been loaded.",
-    });
+    window.open(
+      "https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true", 
+      "_blank"
+    );
   };
 
   return (
@@ -104,20 +85,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </div>
           
           <div className="flex flex-col gap-3 mt-4">
-            <a 
-              href="https://docs.google.com/spreadsheets/d/1xf4SdYC8885ytUcJna6klgH7tBbZFqmv/edit?usp=sharing&ouid=100038336490831315796&rtpof=true&sd=true"
-              target="_blank" 
-              rel="noopener noreferrer"
-              download
+            <Button 
+              variant="outline" 
+              className="w-full flex justify-center items-center gap-2"
+              onClick={handleDownloadSample}
             >
-              <Button 
-                variant="outline" 
-                className="w-full flex justify-center items-center gap-2"
-                onClick={handleDownloadSample}
-              >
-                <Download size={16} /> Download Sample
-              </Button>
-            </a>
+              <Download size={16} /> Download Sample
+            </Button>
             
             <div className="relative">
               <input
