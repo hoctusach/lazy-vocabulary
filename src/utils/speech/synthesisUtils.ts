@@ -1,7 +1,6 @@
-
 export const getSpeechRate = (): number => {
   // Even slower rate to prevent cutting off words
-  return 0.6;
+  return 0.5; // Reduced from 0.6 to 0.5
 };
 
 export const getSpeechPitch = (): number => {
@@ -17,12 +16,12 @@ export const getSpeechVolume = (): number => {
 export const addPausesToText = (text: string): string => {
   // Add much longer pauses to improve comprehension and prevent cutting off
   return text
-    .replace(/\./g, '..... ') // Even longer pause after period
-    .replace(/;/g, '.... ') // Longer pause after semicolon
-    .replace(/,/g, '... ') // Longer pause after comma
-    .replace(/\?/g, '..... ') // Longer pause after question mark
-    .replace(/!/g, '..... ') // Longer pause after exclamation
-    .replace(/:/g, '.... ') // Longer pause after colon
+    .replace(/\./g, '........ ') // Even longer pause after period
+    .replace(/;/g, '...... ') // Longer pause after semicolon
+    .replace(/,/g, '..... ') // Longer pause after comma
+    .replace(/\?/g, '........ ') // Longer pause after question mark
+    .replace(/!/g, '........ ') // Longer pause after exclamation
+    .replace(/:/g, '...... ') // Longer pause after colon
     .replace(/\s{2,}/g, ' ')
     .trim();
 };
@@ -54,13 +53,13 @@ export const checkSoundDisplaySync = (currentDisplayedWord: string, currentSpoke
 
 export const keepSpeechAlive = (): void => {
   if (window.speechSynthesis.speaking) {
-    // More frequent pause/resume to prevent browser cutting off speech
+    // Even more frequent pause/resume to prevent browser cutting off speech
     window.speechSynthesis.pause();
     setTimeout(() => {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-    }, 5); // Even shorter timeout for more reliable resume
+    }, 1); // Even shorter timeout for more reliable resume
   }
 };
 
@@ -95,7 +94,7 @@ export const forceResyncIfNeeded = (
   expectedText: string, 
   resyncCallback: () => void
 ): void => {
-  // Improved sync checking
+  // Improved sync checking with more detailed logging
   if (!currentWord || !expectedText) {
     console.log('Missing word or text for sync check');
     return;
@@ -108,8 +107,9 @@ export const forceResyncIfNeeded = (
   if (!lowerCaseExpectedText.includes(lowerCaseMainWord) && window.speechSynthesis.speaking) {
     console.log('Display and speech out of sync, resyncing...');
     console.log(`Current word: "${mainWord}", not found in speech text`);
+    console.log(`Speech text (excerpt): "${lowerCaseExpectedText.substring(0, 50)}..."`);
     stopSpeaking();
-    setTimeout(resyncCallback, 100); // Quicker resync response
+    setTimeout(resyncCallback, 50); // Even quicker resync response
   }
 };
 
@@ -119,7 +119,7 @@ export const ensureSpeechEngineReady = async (): Promise<void> => {
     console.log('Ensuring speech engine is ready...');
     stopSpeaking();
     // Longer wait time to ensure engine is fully reset
-    await new Promise(resolve => setTimeout(resolve, 700));
+    await new Promise(resolve => setTimeout(resolve, 900));
   }
 };
 

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { stopSpeaking, keepSpeechAlive } from '@/utils/speech';
@@ -24,6 +23,7 @@ export const useWordSpeechSync = (
   const keepAliveIntervalRef = useRef<number | null>(null);
   const initialSpeakTimeoutRef = useRef<number | null>(null);
   const wordChangeInProgressRef = useRef(false);
+  const wordProcessingTimeoutRef = useRef<number | null>(null);
 
   // Update refs when props change
   useEffect(() => {
@@ -73,14 +73,36 @@ export const useWordSpeechSync = (
         clearTimeout(initialSpeakTimeoutRef.current);
       }
       
+      // Add storage of current word immediately for better sync
+      try {
+        localStorage.setItem('currentDisplayedWord', currentWord.word);
+      } catch (error) {
+        console.error('Error storing current displayed word:', error);
+      }
+      
+      // Use two-phase approach for word change: 
+      // 1. Wait for word to be fully registered and displayed
+      // 2. Then start speaking
+      
       initialSpeakTimeoutRef.current = window.setTimeout(() => {
         initialSpeakTimeoutRef.current = null;
-        wordChangeInProgressRef.current = false;
-        if (!isPausedRef.current && !isMutedRef.current && !isChangingWordRef.current) {
-          console.log("Speaking new word after change:", currentWord.word);
-          speakCurrentWord(true);
+        
+        // Set additional timeout to ensure speech engine is fully ready
+        if (wordProcessingTimeoutRef.current) {
+          clearTimeout(wordProcessingTimeoutRef.current);
         }
-      }, 800); // Longer delay before speaking new word
+        
+        wordProcessingTimeoutRef.current = window.setTimeout(() => {
+          wordProcessingTimeoutRef.current = null;
+          wordChangeInProgressRef.current = false;
+          
+          if (!isPausedRef.current && !isMutedRef.current && !isChangingWordRef.current) {
+            console.log("Speaking new word after change:", currentWord.word);
+            speakCurrentWord(true);
+          }
+        }, 400); // Second phase delay
+        
+      }, 800); // First phase delay (longer delay before speaking new word)
     }
   }, [currentWord, isChangingWordRef]);
 
@@ -104,6 +126,11 @@ export const useWordSpeechSync = (
       window.clearTimeout(initialSpeakTimeoutRef.current);
       initialSpeakTimeoutRef.current = null;
     }
+    
+    if (wordProcessingTimeoutRef.current !== null) {
+      window.clearTimeout(wordProcessingTimeoutRef.current);
+      wordProcessingTimeoutRef.current = null;
+    }
   }, []);
 
   // Setup keep-alive mechanism specific to this hook's speech
@@ -118,7 +145,7 @@ export const useWordSpeechSync = (
       if (isSpeakingRef.current && !isPausedRef.current && !isMutedRef.current) {
         keepSpeechAlive();
       }
-    }, 25); // Much more frequent checks to prevent cutting off
+    }, 10); // Even more frequent checks to prevent cutting off
     
     return () => {
       if (keepAliveIntervalRef.current) {
@@ -154,7 +181,7 @@ export const useWordSpeechSync = (
     
     if (isChangingWordRef.current && !forceSpeak) {
       console.log("Word is changing, delaying speech");
-      setTimeout(() => speakCurrentWord(false), 500); // Try again after delay
+      setTimeout(() => speakCurrentWord(false), 800); // Try again after longer delay
       return;
     }
     
@@ -200,7 +227,7 @@ export const useWordSpeechSync = (
       isSpeakingRef.current = true;
       
       // Longer delay before speaking to ensure clean start
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Store current word in localStorage for sync checking
       try {
@@ -231,13 +258,13 @@ export const useWordSpeechSync = (
             clearInterval(keepAliveIntervalRef.current as number);
             keepAliveIntervalRef.current = null;
           }
-        }, 20); // Even more frequent to prevent cutting off
+        }, 10); // Even more frequent to prevent cutting off
         
         // Actually speak the text
         await speakText(fullText);
         
         // Longer delay after speech to ensure full completion
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 400));
         
         console.log("Finished speaking word completely:", wordToSpeak.word);
         setWordFullySpoken(true);
@@ -246,7 +273,7 @@ export const useWordSpeechSync = (
         console.error("Speech error:", error);
         
         // Auto-retry logic for failed speech with more aggressive retries
-        if (speakAttemptCountRef.current < 4 && !isMutedRef.current && !isPausedRef.current) {
+        if (speakAttemptCountRef.current < 5 && !isMutedRef.current && !isPausedRef.current) {
           speakAttemptCountRef.current++;
           console.log(`Speech attempt ${speakAttemptCountRef.current} failed, retrying...`);
           
@@ -260,9 +287,9 @@ export const useWordSpeechSync = (
               console.log("Auto-retrying speech...");
               speakCurrentWord(true);
             }
-          }, 200 * speakAttemptCountRef.current); // Shorter delays for quicker recovery
+          }, 300 * speakAttemptCountRef.current); // Shorter delays for quicker recovery
           
-        } else if (speakAttemptCountRef.current >= 4) {
+        } else if (speakAttemptCountRef.current >= 5) {
           console.log("Multiple speech attempts failed, marking word as spoken anyway");
           setWordFullySpoken(true);
           speakAttemptCountRef.current = 0;

@@ -59,7 +59,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     }
     
     // Longer wait before starting speech to ensure engine readiness
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 1200));
     
     const utterance = new SpeechSynthesisUtterance(processedText);
     let voices = window.speechSynthesis.getVoices();
@@ -68,7 +68,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       try {
         // Double-check that previous speech is stopped
         stopSpeaking();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         const langCode = region === 'US' ? 'en-US' : 'en-GB';
         console.log(`Using voice region: ${region}, language code: ${langCode}`);
@@ -135,7 +135,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             clearInterval(keepAliveInterval as number);
             keepAliveInterval = null;
           }
-        }, 20); // Even more frequent to prevent any cutting off
+        }, 10); // Even more frequent to prevent any cutting off
         
         // More frequent sync checking
         syncCheckInterval = window.setInterval(() => {
@@ -151,11 +151,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
           } catch (error) {
             console.error('Error in sync check:', error);
           }
-        }, 150); // More frequent checks
+        }, 100); // More frequent checks
 
         // More robust speech attempt function with better failure detection
         const attemptSpeech = async (attempts = 0): Promise<void> => {
-          if (attempts >= 4) { // Increased max attempts
+          if (attempts >= 5) { // Increased max attempts
             console.error('Failed to start speech after multiple attempts');
             clearAllTimers();
             reject(new Error('Failed to start speech'));
@@ -166,7 +166,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             // Ensure clean speech engine state
             if (attempts > 0) {
               window.speechSynthesis.cancel();
-              await new Promise(resolve => setTimeout(resolve, 500)); // Longer wait time
+              await new Promise(resolve => setTimeout(resolve, 800)); // Longer wait time
             }
             
             // Speak with improved stability checks
@@ -181,11 +181,11 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
                   console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
                   rejectStart(new Error('Speech not started'));
                 }
-              }, 700); // Increased verification time
+              }, 900); // Increased verification time
             });
           } catch (error) {
             console.error('Speech start error:', error);
-            await new Promise(resolve => setTimeout(resolve, 600));
+            await new Promise(resolve => setTimeout(resolve, 800));
             await attemptSpeech(attempts + 1);
           }
         };
@@ -195,7 +195,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
 
         // Set reasonable maximum duration with proper calculation
         const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
-        const maxDuration = Math.min(Math.max(estimatedDuration * 2.0, 60000), 240000); // Increased multiplier and min/max times
+        const maxDuration = Math.min(Math.max(estimatedDuration * 2.5, 60000), 300000); // Increased multiplier and max time
         
         console.log(`Estimated speech duration: ${estimatedDuration}ms, Max duration: ${maxDuration}ms`);
         
@@ -237,7 +237,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             reject(new Error('Could not load voices'));
           }
         }
-      }, 4000); // Longer timeout for voice loading
+      }, 5000); // Longer timeout for voice loading
     }
   });
 };
