@@ -12,20 +12,35 @@ export class SheetManager {
       const workbook = XLSX.read(data);
       const newData: SheetData = {};
       
+      // First, copy all sheets from default data to ensure we have all categories
       for (const sheetName of this.sheetOptions) {
-        if (workbook.SheetNames.includes(sheetName)) {
-          const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet);
+        newData[sheetName] = [...(DEFAULT_VOCABULARY_DATA[sheetName] || [])];
+      }
+      
+      // Process sheets found in the uploaded file
+      for (const sheetName of workbook.SheetNames) {
+        // Skip sheets not in our defined options
+        if (!this.sheetOptions.includes(sheetName)) {
+          console.warn(`Skipping unknown sheet "${sheetName}" in the uploaded file.`);
+          continue;
+        }
+        
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
+        
+        if (jsonData.length > 0) {
+          // Clear existing default data for this sheet as we're replacing it with imported data
+          newData[sheetName] = [];
           
+          // Parse each row from the Excel file
           newData[sheetName] = jsonData.map((row: any) => ({
-            word: row.Word || "",
-            meaning: row.Meaning || "",
-            example: row.Examples || "",
-            count: parseInt(row.Count) || 0
+            word: String(row.Word || row.word || ""),
+            meaning: String(row.Meaning || row.meaning || ""),
+            example: String(row.Examples || row.Example || row.example || ""),
+            count: parseInt(String(row.Count || row.count || "0")) || 0
           }));
-        } else {
-          console.warn(`Sheet "${sheetName}" not found in the uploaded file. Using default data.`);
-          newData[sheetName] = DEFAULT_VOCABULARY_DATA[sheetName] || [];
+          
+          console.log(`Processed ${newData[sheetName].length} words from "${sheetName}" sheet`);
         }
       }
       

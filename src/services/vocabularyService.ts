@@ -1,3 +1,4 @@
+
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
@@ -22,14 +23,53 @@ class VocabularyService {
   }
   
   async processExcelFile(file: File): Promise<boolean> {
-    const newData = await this.sheetManager.processExcelFile(file);
-    if (newData) {
-      this.data = newData;
-      this.storage.saveData(this.data);
-      this.shuffleCurrentSheet();
-      return true;
+    try {
+      const newData = await this.sheetManager.processExcelFile(file);
+      if (newData) {
+        // Merge the imported data with existing data
+        this.mergeImportedData(newData);
+        
+        // Save the merged data to storage
+        this.storage.saveData(this.data);
+        
+        // Refresh the current sheet
+        this.shuffleCurrentSheet();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error processing Excel file:", error);
+      return false;
     }
-    return false;
+  }
+  
+  // New method to merge imported data with existing data
+  private mergeImportedData(importedData: SheetData): void {
+    // Go through each sheet in the imported data
+    for (const sheetName in importedData) {
+      if (!this.data[sheetName]) {
+        // If sheet doesn't exist yet, create it
+        this.data[sheetName] = [];
+      }
+      
+      // For each word in the imported sheet
+      for (const importedWord of importedData[sheetName]) {
+        // Check if the word already exists (case-insensitive)
+        const existingWordIndex = this.data[sheetName].findIndex(
+          existingWord => existingWord.word.toLowerCase() === importedWord.word.toLowerCase()
+        );
+        
+        if (existingWordIndex >= 0) {
+          // Update existing word
+          this.data[sheetName][existingWordIndex] = importedWord;
+        } else {
+          // Add new word
+          this.data[sheetName].push(importedWord);
+        }
+      }
+    }
+    
+    console.log("Merged imported data with existing data:", this.data);
   }
   
   loadDefaultVocabulary(data?: SheetData): boolean {

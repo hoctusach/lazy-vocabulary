@@ -3,7 +3,7 @@ import { SheetData } from "@/types/vocabulary";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 
 export class VocabularyStorage {
-  private readonly MAX_STORAGE_SIZE = 1024 * 1024; // 1MB limit
+  private readonly MAX_STORAGE_SIZE = 5 * 1024 * 1024; // Increased to 5MB limit
   private readonly STORAGE_KEY = 'vocabularyData';
   private readonly LAST_UPLOADED_KEY = 'lastUploadedVocabulary';
 
@@ -16,7 +16,9 @@ export class VocabularyStorage {
           console.warn("Last uploaded data exceeds size limit, trying current session data");
           return this.loadCurrentSessionData();
         }
-        return JSON.parse(lastUploadedData);
+        const parsedData = JSON.parse(lastUploadedData);
+        console.log("Loaded last uploaded vocabulary data", parsedData);
+        return parsedData;
       } catch (e) {
         console.error("Failed to load last uploaded data, trying current session data:", e);
         return this.loadCurrentSessionData();
@@ -34,12 +36,15 @@ export class VocabularyStorage {
           console.warn("Saved data exceeds size limit, using default data");
           return DEFAULT_VOCABULARY_DATA;
         }
-        return JSON.parse(savedData);
+        const parsedData = JSON.parse(savedData);
+        console.log("Loaded current session vocabulary data", parsedData);
+        return parsedData;
       } catch (e) {
         console.error("Failed to load data from localStorage, using default data:", e);
         return DEFAULT_VOCABULARY_DATA;
       }
     }
+    console.log("No saved data found, using default vocabulary data");
     return DEFAULT_VOCABULARY_DATA;
   }
 
@@ -53,6 +58,7 @@ export class VocabularyStorage {
       // Save to both current session and last uploaded storage
       localStorage.setItem(this.STORAGE_KEY, dataString);
       localStorage.setItem(this.LAST_UPLOADED_KEY, dataString);
+      console.log("Saved vocabulary data to local storage", data);
       return true;
     } catch (e) {
       console.error("Failed to save data to localStorage:", e);
