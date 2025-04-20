@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import VocabularyCard from './VocabularyCard';
 import WelcomeScreen from './WelcomeScreen';
@@ -14,7 +13,8 @@ import {
   validateCurrentSpeech, 
   resetSpeechEngine,
   ensureSpeechEngineReady,
-  extractMainWord 
+  extractMainWord,
+  forceResyncIfNeeded
 } from '@/utils/speech';
 
 const VocabularyApp: React.FC = () => {
@@ -25,6 +25,7 @@ const VocabularyApp: React.FC = () => {
   const resyncTimeoutRef = useRef<number | null>(null);
   const resetIntervalRef = useRef<number | null>(null);
   const initialRenderRef = useRef(true);
+  const stateChangeDebounceRef = useRef<number | null>(null);
   
   const {
     hasData,
@@ -64,16 +65,51 @@ const VocabularyApp: React.FC = () => {
   const nextSheetIndex = (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) % vocabularyService.sheetOptions.length;
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
-  // Handle initial render - force sync between word and speech
+  const clearAllTimeouts = useCallback(() => {
+    if (syncCheckTimeoutRef.current) {
+      clearTimeout(syncCheckTimeoutRef.current);
+      syncCheckTimeoutRef.current = null;
+    }
+    if (resyncTimeoutRef.current) {
+      clearTimeout(resyncTimeoutRef.current);
+      resyncTimeoutRef.current = null;
+    }
+    if (keepAliveIntervalRef.current) {
+      clearInterval(keepAliveIntervalRef.current);
+      keepAliveIntervalRef.current = null;
+    }
+    if (resetIntervalRef.current) {
+      clearInterval(resetIntervalRef.current);
+      resetIntervalRef.current = null;
+    }
+    if (stateChangeDebounceRef.current) {
+      clearTimeout(stateChangeDebounceRef.current);
+      stateChangeDebounceRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
     if (initialRenderRef.current && currentWord && !isPaused && !isMuted && isVoicesLoaded) {
       initialRenderRef.current = false;
-      // Slight delay to ensure everything is loaded
+      
+      if (currentWord.word) {
+        try {
+          localStorage.setItem('currentDisplayedWord', currentWord.word);
+        } catch (error) {
+          console.error('Error storing initial word:', error);
+        }
+      }
+      
       const timer = setTimeout(() => {
         console.log("Initial render, force speaking current word:", currentWord.word);
         resetLastSpokenWord();
-        speakCurrentWord(true);
-      }, 400);
+        stopSpeaking();
+        
+        setTimeout(() => {
+          speakCurrentWord(true);
+        }, 1500);
+      }, 1000);
+      
       return () => clearTimeout(timer);
     }
   }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
@@ -87,7 +123,7 @@ const VocabularyApp: React.FC = () => {
       if (speakingRef.current && !isPaused && !isMuted) {
         keepSpeechAlive();
       }
-    }, 150);
+    }, 10);
     
     if (resetIntervalRef.current) {
       clearInterval(resetIntervalRef.current);
@@ -97,78 +133,70 @@ const VocabularyApp: React.FC = () => {
       if (!speakingRef.current && !isPaused) {
         ensureSpeechEngineReady();
       }
-    }, 30000);
+    }, 60000);
     
     return () => {
-      if (keepAliveIntervalRef.current) {
-        clearInterval(keepAliveIntervalRef.current);
-        keepAliveIntervalRef.current = null;
-      }
-      if (resetIntervalRef.current) {
-        clearInterval(resetIntervalRef.current);
-        resetIntervalRef.current = null;
-      }
+      clearAllTimeouts();
     };
-  }, [speakingRef, isPaused, isMuted]);
+  }, [speakingRef, isPaused, isMuted, clearAllTimeouts]);
 
   useEffect(() => {
-    const clearSyncTimeouts = () => {
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-        syncCheckTimeoutRef.current = null;
-      }
-      if (resyncTimeoutRef.current) {
-        clearTimeout(resyncTimeoutRef.current);
-        resyncTimeoutRef.current = null;
-      }
-    };
-
     const checkSyncAndFix = () => {
       if (!currentWord || isPaused || isMuted) {
-        clearSyncTimeouts();
+        if (syncCheckTimeoutRef.current) {
+          clearTimeout(syncCheckTimeoutRef.current);
+          syncCheckTimeoutRef.current = null;
+        }
         return;
       }
       
       const currentTextBeingSpoken = getCurrentText();
       
-      if (currentTextBeingSpoken && currentWord) {
+      if (currentTextBeingSpoken && currentWord && speakingRef.current) {
         const mainWord = extractMainWord(currentWord.word);
         const spokenText = currentTextBeingSpoken.toLowerCase();
         
-        const isInSync = spokenText.includes(mainWord);
+        console.log(`Sync check: Word="${mainWord}", Speaking=${speakingRef.current}, Changing=${isChangingWordRef.current}`);
         
-        if (!isInSync && speakingRef.current && !isChangingWordRef.current) {
-          console.log("Detected sound/display mismatch. Fixing synchronization...");
-          console.log(`Word on screen: "${mainWord}", Text being spoken: "${spokenText.substring(0, 30)}..."`);
-          stopSpeaking();
-          
+        forceResyncIfNeeded(currentWord.word, currentTextBeingSpoken, () => {
+          console.log("Resync needed, restarting speech for word:", currentWord.word);
           if (!resyncTimeoutRef.current) {
             resyncTimeoutRef.current = window.setTimeout(() => {
               resyncTimeoutRef.current = null;
               if (currentWord && !isPaused && !isMuted) {
-                console.log("Re-speaking current word to maintain sync:", currentWord.word);
+                resetLastSpokenWord();
                 speakCurrentWord(true);
               }
-            }, 250);
+            }, 600);
           }
-        }
+        });
       }
       
-      clearSyncTimeouts();
-      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1200);
+      if (syncCheckTimeoutRef.current) {
+        clearTimeout(syncCheckTimeoutRef.current);
+      }
+      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1000);
     };
     
-    clearSyncTimeouts();
-    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 500);
+    if (syncCheckTimeoutRef.current) {
+      clearTimeout(syncCheckTimeoutRef.current);
+    }
+    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 2000);
     
-    return clearSyncTimeouts;
-  }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef]);
+    return () => {
+      if (syncCheckTimeoutRef.current) {
+        clearTimeout(syncCheckTimeoutRef.current);
+        syncCheckTimeoutRef.current = null;
+      }
+    };
+  }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef, resetLastSpokenWord]);
 
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
   }, [speakingRef.current, isSpeakingRef]);
 
   const handleToggleMuteWithSpeaking = useCallback(() => {
+    clearAllTimeouts();
     stopSpeaking();
     const wasMuted = isMuted;
     handleToggleMute();
@@ -177,13 +205,14 @@ const VocabularyApp: React.FC = () => {
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
-      }, 300);
+      }, 800);
     } else if (!wasMuted) {
       resetLastSpokenWord();
     }
-  }, [isMuted, currentWord, handleToggleMute, resetLastSpokenWord, speakCurrentWord]);
+  }, [isMuted, currentWord, handleToggleMute, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
   
   const handleChangeVoiceWithSpeaking = useCallback(() => {
+    clearAllTimeouts();
     stopSpeaking();
     resetLastSpokenWord();
     handleChangeVoice();
@@ -191,38 +220,49 @@ const VocabularyApp: React.FC = () => {
     if (!isMuted && currentWord) {
       setTimeout(() => {
         speakCurrentWord(true);
-      }, 500);
+      }, 1200);
     }
-  }, [isMuted, currentWord, handleChangeVoice, resetLastSpokenWord, speakCurrentWord]);
+  }, [isMuted, currentWord, handleChangeVoice, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
   
   const handleSwitchCategoryWithState = useCallback(() => {
+    clearAllTimeouts();
     stopSpeaking();
     resetLastSpokenWord();
+    
     setBackgroundColorIndex((prevIndex) => (prevIndex + 1) % backgroundColors.length);
     handleSwitchCategory(isMuted, voiceRegion);
     
     setTimeout(() => {
-      if (!isMuted && currentWord && !isPaused) {
+      if (!isMuted && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 800);
-  }, [isMuted, voiceRegion, isPaused, currentWord, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord]);
+    }, 1500);
+  }, [isMuted, voiceRegion, isPaused, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
 
   const handleNextWordClick = useCallback(() => {
+    clearAllTimeouts();
     stopSpeaking();
     resetLastSpokenWord();
+    
     handleManualNext();
     
     setTimeout(() => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true);
       }
-    }, 600);
-  }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord]);
+    }, 1200);
+  }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
 
   const toggleView = useCallback(() => {
     setShowWordCard(prev => !prev);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      clearAllTimeouts();
+      stopSpeaking();
+    };
+  }, [clearAllTimeouts]);
 
   return (
     <VocabularyLayout

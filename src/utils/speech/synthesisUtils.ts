@@ -1,6 +1,7 @@
+
 export const getSpeechRate = (): number => {
   // Even slower rate to prevent cutting off words
-  return 0.5; // Reduced from 0.6 to 0.5
+  return 0.4; // Reduced from 0.5 to 0.4 for better clarity
 };
 
 export const getSpeechPitch = (): number => {
@@ -16,12 +17,12 @@ export const getSpeechVolume = (): number => {
 export const addPausesToText = (text: string): string => {
   // Add much longer pauses to improve comprehension and prevent cutting off
   return text
-    .replace(/\./g, '........ ') // Even longer pause after period
-    .replace(/;/g, '...... ') // Longer pause after semicolon
-    .replace(/,/g, '..... ') // Longer pause after comma
-    .replace(/\?/g, '........ ') // Longer pause after question mark
-    .replace(/!/g, '........ ') // Longer pause after exclamation
-    .replace(/:/g, '...... ') // Longer pause after colon
+    .replace(/\./g, '............. ') // Even longer pause after period
+    .replace(/;/g, '........... ') // Longer pause after semicolon
+    .replace(/,/g, '.......... ') // Longer pause after comma
+    .replace(/\?/g, '............. ') // Longer pause after question mark
+    .replace(/!/g, '............. ') // Longer pause after exclamation
+    .replace(/:/g, '........... ') // Longer pause after colon
     .replace(/\s{2,}/g, ' ')
     .trim();
 };
@@ -45,10 +46,25 @@ export const stopSpeaking = (): void => {
   }
 };
 
+// Improved sync checking that's more tolerant of word formats
 export const checkSoundDisplaySync = (currentDisplayedWord: string, currentSpokenText: string): boolean => {
   if (!currentDisplayedWord || !currentSpokenText) return false;
+  
+  // Extract main word more carefully
   const mainWord = extractMainWord(currentDisplayedWord);
-  return currentSpokenText.toLowerCase().includes(mainWord.toLowerCase());
+  
+  // Convert both to lowercase for case-insensitive comparison
+  const normalizedSpokenText = currentSpokenText.toLowerCase();
+  const normalizedMainWord = mainWord.toLowerCase();
+  
+  // Check if the word appears anywhere in the spoken text
+  const isInSync = normalizedSpokenText.includes(normalizedMainWord);
+  
+  if (!isInSync) {
+    console.log(`Sync check failed: Word "${mainWord}" not found in spoken text "${normalizedSpokenText.substring(0, 50)}..."`);
+  }
+  
+  return isInSync;
 };
 
 export const keepSpeechAlive = (): void => {
@@ -59,7 +75,7 @@ export const keepSpeechAlive = (): void => {
       if (window.speechSynthesis.paused) {
         window.speechSynthesis.resume();
       }
-    }, 1); // Even shorter timeout for more reliable resume
+    }, 1); // Keep short timeout for more reliable resume
   }
 };
 
@@ -68,7 +84,7 @@ export const waitForSpeechReadiness = async (): Promise<void> => {
   if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
     console.log('Waiting for speech engine to be clear');
     stopSpeaking();
-    await new Promise(resolve => setTimeout(resolve, 500)); // Longer wait time
+    await new Promise(resolve => setTimeout(resolve, 800)); // Longer wait time
   }
 };
 
@@ -89,27 +105,31 @@ export const validateCurrentSpeech = (expectedText: string): boolean => {
   }
 };
 
+// Improved sync checking with more detailed word extraction
 export const forceResyncIfNeeded = (
   currentWord: string, 
   expectedText: string, 
   resyncCallback: () => void
 ): void => {
-  // Improved sync checking with more detailed logging
   if (!currentWord || !expectedText) {
     console.log('Missing word or text for sync check');
     return;
   }
   
+  // Get main word without any parentheses or formatting
   const mainWord = extractMainWord(currentWord);
   const lowerCaseExpectedText = expectedText.toLowerCase();
   const lowerCaseMainWord = mainWord.toLowerCase();
   
+  // Log detailed sync info for debugging
+  console.log(`Sync check: Looking for word "${mainWord}" in speech text`);
+  
   if (!lowerCaseExpectedText.includes(lowerCaseMainWord) && window.speechSynthesis.speaking) {
-    console.log('Display and speech out of sync, resyncing...');
+    console.log('CRITICAL: Display and speech out of sync, resyncing...');
     console.log(`Current word: "${mainWord}", not found in speech text`);
-    console.log(`Speech text (excerpt): "${lowerCaseExpectedText.substring(0, 50)}..."`);
+    console.log(`Speech text (excerpt): "${lowerCaseExpectedText.substring(0, 100)}..."`);
     stopSpeaking();
-    setTimeout(resyncCallback, 50); // Even quicker resync response
+    setTimeout(resyncCallback, 100); // Quicker resync response
   }
 };
 
@@ -119,24 +139,31 @@ export const ensureSpeechEngineReady = async (): Promise<void> => {
     console.log('Ensuring speech engine is ready...');
     stopSpeaking();
     // Longer wait time to ensure engine is fully reset
-    await new Promise(resolve => setTimeout(resolve, 900));
+    await new Promise(resolve => setTimeout(resolve, 1200));
   }
 };
 
+// Greatly improved word extraction for more reliable sync checking
 export const extractMainWord = (text: string): string => {
   if (!text) return '';
   
-  // More robust word extraction
-  const cleanText = text.trim().toLowerCase();
+  // Remove leading/trailing whitespace
+  const cleanText = text.trim();
   
-  // First try to get word before any punctuation or special character
+  // First try to extract the text before any parentheses
+  // This handles cases like "put (v)" -> "put"
+  const beforeParenthesis = cleanText.split(/\s*\(/)[0].trim();
+  if (beforeParenthesis) {
+    return beforeParenthesis;
+  }
+  
+  // As a fallback, extract the first word-like sequence
   const firstWordMatch = cleanText.match(/^[a-zA-Z0-9'-]+/);
-  
   if (firstWordMatch) {
     return firstWordMatch[0];
   }
   
-  // If no simple word is found, just return the first part until a space or special character
+  // If all else fails, just use the first part until a space or special character
   const simpleMatch = cleanText.match(/^[^.,;:!?\s]+/);
   return simpleMatch ? simpleMatch[0] : cleanText;
 };
