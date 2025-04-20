@@ -1,6 +1,10 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+
+import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { stopSpeaking, keepSpeechAlive } from '@/utils/speech';
+import { stopSpeaking } from '@/utils/speech';
+import { useTimeoutManager } from './speech/useTimeoutManager';
+import { useWordStateManager } from './speech/useWordStateManager';
+import { useSpeechSync } from './speech/useSpeechSync';
 
 export const useWordSpeechSync = (
   currentWord: VocabularyWord | null,
@@ -11,164 +15,38 @@ export const useWordSpeechSync = (
   isSpeakingRef: React.MutableRefObject<boolean>,
   isChangingWordRef: React.MutableRefObject<boolean>
 ) => {
-  const lastWordIdRef = useRef<string | null>(null);
-  const speechTimeoutRef = useRef<number | null>(null);
-  const [wordFullySpoken, setWordFullySpoken] = useState(false);
-  const speakAttemptCountRef = useRef(0);
-  const currentWordRef = useRef<VocabularyWord | null>(null);
-  const speechLockRef = useRef(false);
-  const isPausedRef = useRef(isPaused);
-  const isMutedRef = useRef(isMuted);
-  const autoRetryTimeoutRef = useRef<number | null>(null);
-  const keepAliveIntervalRef = useRef<number | null>(null);
-  const initialSpeakTimeoutRef = useRef<number | null>(null);
-  const wordChangeInProgressRef = useRef(false);
-  const wordProcessingTimeoutRef = useRef<number | null>(null);
+  const {
+    speechTimeoutRef,
+    autoRetryTimeoutRef,
+    keepAliveIntervalRef,
+    initialSpeakTimeoutRef,
+    wordProcessingTimeoutRef,
+    clearAllTimeouts
+  } = useTimeoutManager();
 
-  // Update refs when props change
-  useEffect(() => {
-    isPausedRef.current = isPaused;
-    if (isPaused) {
-      stopSpeaking();
-      clearAllTimeouts();
-    }
-  }, [isPaused]);
+  const {
+    lastWordIdRef,
+    wordFullySpoken,
+    setWordFullySpoken,
+    speakAttemptCountRef,
+    currentWordRef,
+    speechLockRef,
+    wordChangeInProgressRef
+  } = useWordStateManager(currentWord);
 
-  useEffect(() => {
-    isMutedRef.current = isMuted;
-    if (isMuted) {
-      stopSpeaking();
-    }
-  }, [isMuted]);
-
-  // More careful handling of word changes to prevent desynchronization
-  useEffect(() => {
-    if (isChangingWordRef.current) {
-      // If word is changing, don't update yet to prevent race conditions
-      console.log("Word changing flag active, delaying word update");
-      return;
-    }
-    
-    if (wordChangeInProgressRef.current) {
-      console.log("Word change in progress, skipping");
-      return;
-    }
-    
-    currentWordRef.current = currentWord;
-    
-    if (currentWord && lastWordIdRef.current !== currentWord.word) {
-      // Mark that we're handling a word change
-      wordChangeInProgressRef.current = true;
-      
-      console.log("Word changed in speech sync:", currentWord.word);
-      setWordFullySpoken(false);
-      lastWordIdRef.current = currentWord.word;
-      
-      // Cancel any previous speech and timeouts 
-      stopSpeaking();
-      clearAllTimeouts();
-      
-      // Wait longer before speaking the new word to ensure complete change
-      if (initialSpeakTimeoutRef.current) {
-        clearTimeout(initialSpeakTimeoutRef.current);
-      }
-      
-      // Add storage of current word immediately for better sync
-      try {
-        localStorage.setItem('currentDisplayedWord', currentWord.word);
-      } catch (error) {
-        console.error('Error storing current displayed word:', error);
-      }
-      
-      // Use two-phase approach for word change: 
-      // 1. Wait for word to be fully registered and displayed
-      // 2. Then start speaking
-      
-      initialSpeakTimeoutRef.current = window.setTimeout(() => {
-        initialSpeakTimeoutRef.current = null;
-        
-        // Set additional timeout to ensure speech engine is fully ready
-        if (wordProcessingTimeoutRef.current) {
-          clearTimeout(wordProcessingTimeoutRef.current);
-        }
-        
-        wordProcessingTimeoutRef.current = window.setTimeout(() => {
-          wordProcessingTimeoutRef.current = null;
-          wordChangeInProgressRef.current = false;
-          
-          if (!isPausedRef.current && !isMutedRef.current && !isChangingWordRef.current) {
-            console.log("Speaking new word after change:", currentWord.word);
-            speakCurrentWord(true);
-          }
-        }, 400); // Second phase delay
-        
-      }, 800); // First phase delay (longer delay before speaking new word)
-    }
-  }, [currentWord, isChangingWordRef]);
-
-  const clearAllTimeouts = useCallback(() => {
-    if (speechTimeoutRef.current !== null) {
-      window.clearTimeout(speechTimeoutRef.current);
-      speechTimeoutRef.current = null;
-    }
-    
-    if (autoRetryTimeoutRef.current !== null) {
-      window.clearTimeout(autoRetryTimeoutRef.current);
-      autoRetryTimeoutRef.current = null;
-    }
-    
-    if (keepAliveIntervalRef.current !== null) {
-      window.clearInterval(keepAliveIntervalRef.current);
-      keepAliveIntervalRef.current = null;
-    }
-    
-    if (initialSpeakTimeoutRef.current !== null) {
-      window.clearTimeout(initialSpeakTimeoutRef.current);
-      initialSpeakTimeoutRef.current = null;
-    }
-    
-    if (wordProcessingTimeoutRef.current !== null) {
-      window.clearTimeout(wordProcessingTimeoutRef.current);
-      wordProcessingTimeoutRef.current = null;
-    }
-  }, []);
-
-  // Setup keep-alive mechanism specific to this hook's speech
-  useEffect(() => {
-    // Clear old interval if it exists
-    if (keepAliveIntervalRef.current) {
-      clearInterval(keepAliveIntervalRef.current);
-    }
-    
-    // Set up new interval with more frequent checks
-    keepAliveIntervalRef.current = window.setInterval(() => {
-      if (isSpeakingRef.current && !isPausedRef.current && !isMutedRef.current) {
-        keepSpeechAlive();
-      }
-    }, 10); // Even more frequent checks to prevent cutting off
-    
-    return () => {
-      if (keepAliveIntervalRef.current) {
-        clearInterval(keepAliveIntervalRef.current);
-        keepAliveIntervalRef.current = null;
-      }
-    };
-  }, [isSpeakingRef]);
-
-  // More robust speech function
-  const speakCurrentWord = useCallback(async (forceSpeak = false) => {
+  const speakCurrentWord = async (forceSpeak = false) => {
     if (wordChangeInProgressRef.current && !forceSpeak) {
       console.log("Word change is in progress, delaying speech");
       return;
     }
     
-    if (isPausedRef.current && !forceSpeak) {
+    if (isPaused && !forceSpeak) {
       console.log("App is paused, stopping speech");
       stopSpeaking();
       return;
     }
     
-    if (isMutedRef.current && !forceSpeak) {
+    if (isMuted && !forceSpeak) {
       console.log("Speech is muted, stopping and not speaking");
       stopSpeaking();
       return;
@@ -181,7 +59,7 @@ export const useWordSpeechSync = (
     
     if (isChangingWordRef.current && !forceSpeak) {
       console.log("Word is changing, delaying speech");
-      setTimeout(() => speakCurrentWord(false), 800); // Try again after longer delay
+      setTimeout(() => speakCurrentWord(false), 800);
       return;
     }
     
@@ -217,7 +95,7 @@ export const useWordSpeechSync = (
     speechLockRef.current = true;
     
     try {
-      if (isMutedRef.current) {
+      if (isMuted) {
         console.log("Speech is muted, not actually speaking");
         setWordFullySpoken(true);
         speechLockRef.current = false;
@@ -226,10 +104,6 @@ export const useWordSpeechSync = (
       
       isSpeakingRef.current = true;
       
-      // Longer delay before speaking to ensure clean start
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Store current word in localStorage for sync checking
       try {
         localStorage.setItem('currentDisplayedWord', wordToSpeak.word);
       } catch (error) {
@@ -238,118 +112,115 @@ export const useWordSpeechSync = (
       
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
       
-      if (isPausedRef.current || isMutedRef.current) {
+      if (isPaused || isMuted) {
         console.log("App was paused or muted while preparing to speak, aborting");
         isSpeakingRef.current = false;
         speechLockRef.current = false;
         return;
       }
       
-      try {
-        // Start the keep-alive interval for this specific speech
-        if (keepAliveIntervalRef.current) {
-          clearInterval(keepAliveIntervalRef.current);
+      await speakText(fullText);
+      
+      console.log("Finished speaking word completely:", wordToSpeak.word);
+      setWordFullySpoken(true);
+      speakAttemptCountRef.current = 0;
+    } catch (error) {
+      console.error("Speech error:", error);
+      
+      if (speakAttemptCountRef.current < 5 && !isMuted && !isPaused) {
+        speakAttemptCountRef.current++;
+        console.log(`Speech attempt ${speakAttemptCountRef.current} failed, retrying...`);
+        
+        if (autoRetryTimeoutRef.current) {
+          clearTimeout(autoRetryTimeoutRef.current);
         }
         
-        keepAliveIntervalRef.current = window.setInterval(() => {
-          if (isSpeakingRef.current) {
-            keepSpeechAlive();
-          } else {
-            clearInterval(keepAliveIntervalRef.current as number);
-            keepAliveIntervalRef.current = null;
+        autoRetryTimeoutRef.current = window.setTimeout(() => {
+          if (!isPaused && !isMuted) {
+            console.log("Auto-retrying speech...");
+            speakCurrentWord(true);
           }
-        }, 10); // Even more frequent to prevent cutting off
+        }, 300 * speakAttemptCountRef.current);
         
-        // Actually speak the text
-        await speakText(fullText);
-        
-        // Longer delay after speech to ensure full completion
-        await new Promise(resolve => setTimeout(resolve, 400));
-        
-        console.log("Finished speaking word completely:", wordToSpeak.word);
+      } else if (speakAttemptCountRef.current >= 5) {
+        console.log("Multiple speech attempts failed, marking word as spoken anyway");
         setWordFullySpoken(true);
         speakAttemptCountRef.current = 0;
-      } catch (error) {
-        console.error("Speech error:", error);
-        
-        // Auto-retry logic for failed speech with more aggressive retries
-        if (speakAttemptCountRef.current < 5 && !isMutedRef.current && !isPausedRef.current) {
-          speakAttemptCountRef.current++;
-          console.log(`Speech attempt ${speakAttemptCountRef.current} failed, retrying...`);
-          
-          // Create auto-retry with shorter backoff
-          if (autoRetryTimeoutRef.current) {
-            clearTimeout(autoRetryTimeoutRef.current);
-          }
-          
-          autoRetryTimeoutRef.current = window.setTimeout(() => {
-            if (!isPausedRef.current && !isMutedRef.current) {
-              console.log("Auto-retrying speech...");
-              speakCurrentWord(true);
-            }
-          }, 300 * speakAttemptCountRef.current); // Shorter delays for quicker recovery
-          
-        } else if (speakAttemptCountRef.current >= 5) {
-          console.log("Multiple speech attempts failed, marking word as spoken anyway");
-          setWordFullySpoken(true);
-          speakAttemptCountRef.current = 0;
-        }
-      } finally {
-        // Clear the keep-alive interval when speech is done
-        if (keepAliveIntervalRef.current) {
-          clearInterval(keepAliveIntervalRef.current);
-          keepAliveIntervalRef.current = null;
-        }
       }
-      
-    } catch (generalError) {
-      console.error("Unexpected error in speech system:", generalError);
     } finally {
       isSpeakingRef.current = false;
       speechLockRef.current = false;
     }
-  }, [clearAllTimeouts, isVoicesLoaded, speakText]);
+  };
 
-  // Handle mounting and cleanup
+  const { resetSpeechSystem } = useSpeechSync(
+    currentWord,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    isSpeakingRef,
+    isChangingWordRef,
+    keepAliveIntervalRef,
+    clearAllTimeouts,
+    speakCurrentWord,
+    setWordFullySpoken,
+    lastWordIdRef
+  );
+
+  // Handle word changes
   useEffect(() => {
-    if (!currentWord || isPaused || !isVoicesLoaded || isMuted) {
-      clearAllTimeouts();
-      if (isPaused || isMuted) {
-        stopSpeaking();
-      }
+    if (isChangingWordRef.current) {
+      console.log("Word changing flag active, delaying word update");
       return;
     }
     
-    console.log("Word or conditions changed, preparing to speak:", 
-      currentWord ? currentWord.word : "no word",
-      "isPaused:", isPaused,
-      "isMuted:", isMuted);
-    
-    stopSpeaking();
-    clearAllTimeouts();
-    
-    if (!isChangingWordRef.current && !isMuted) {
-      // Longer delay before initial speech
-      speechTimeoutRef.current = window.setTimeout(() => {
-        speakCurrentWord(true); // Force speak on initial load
-      }, 700);
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change in progress, skipping");
+      return;
     }
     
-    return () => {
+    currentWordRef.current = currentWord;
+    
+    if (currentWord && lastWordIdRef.current !== currentWord.word) {
+      wordChangeInProgressRef.current = true;
+      
+      console.log("Word changed in speech sync:", currentWord.word);
+      setWordFullySpoken(false);
+      lastWordIdRef.current = currentWord.word;
+      
+      stopSpeaking();
       clearAllTimeouts();
-    };
-  }, [currentWord, isPaused, isMuted, isVoicesLoaded, clearAllTimeouts, speakCurrentWord]);
-
-  const resetSpeechSystem = useCallback(() => {
-    stopSpeaking();
-    clearAllTimeouts();
-    lastWordIdRef.current = null;
-    isSpeakingRef.current = false;
-    setWordFullySpoken(false);
-    speakAttemptCountRef.current = 0;
-    speechLockRef.current = false;
-    wordChangeInProgressRef.current = false;
-  }, [clearAllTimeouts]);
+      
+      if (initialSpeakTimeoutRef.current) {
+        clearTimeout(initialSpeakTimeoutRef.current);
+      }
+      
+      try {
+        localStorage.setItem('currentDisplayedWord', currentWord.word);
+      } catch (error) {
+        console.error('Error storing current displayed word:', error);
+      }
+      
+      initialSpeakTimeoutRef.current = window.setTimeout(() => {
+        initialSpeakTimeoutRef.current = null;
+        
+        if (wordProcessingTimeoutRef.current) {
+          clearTimeout(wordProcessingTimeoutRef.current);
+        }
+        
+        wordProcessingTimeoutRef.current = window.setTimeout(() => {
+          wordProcessingTimeoutRef.current = null;
+          wordChangeInProgressRef.current = false;
+          
+          if (!isPaused && !isMuted && !isChangingWordRef.current) {
+            console.log("Speaking new word after change:", currentWord.word);
+            speakCurrentWord(true);
+          }
+        }, 400);
+        
+      }, 800);
+    }
+  }, [currentWord, isChangingWordRef, clearAllTimeouts, isPaused, isMuted]);
 
   return {
     speakCurrentWord,
