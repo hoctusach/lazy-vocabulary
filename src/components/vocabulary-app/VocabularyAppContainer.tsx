@@ -165,12 +165,55 @@ const VocabularyAppContainer: React.FC = () => {
       isVoicesLoaded
     ) {
       initialRenderRef.current = false;
-      resetLastSpokenWord();
-      stopSpeaking();
+
+      if (currentWord.word) {
+        try {
+          localStorage.setItem("currentDisplayedWord", currentWord.word);
+        } catch (error) {
+          console.error("Error storing initial word:", error);
+        }
+      }
+
+      const timer = setTimeout(() => {
+        console.log(
+          "Initial render, force speaking current word:",
+          currentWord.word
+        );
+        resetLastSpokenWord();
+        stopSpeaking();
+
+        setTimeout(() => {
+          speakCurrentWord(true);
+        }, 1500);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [
+    currentWord,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    resetLastSpokenWord,
+    speakCurrentWord
+  ]);
+
+  // After each spoken word, advance then speak the next
+  useEffect(() => {
+    if (
+      !initialRenderRef.current &&
+      wordFullySpoken &&
+      !isPaused &&
+      !isMuted
+    ) {
+      handleManualNext();
       setTimeout(() => {
-        speakCurrentWord(true).then(() => {
-          // after first word
-        });
+        if (!isPaused && !isMuted) {
+          speakCurrentWord(true);
+        }
+      }, 100);
+    }
+  }, [wordFullySpoken, isPaused, isMuted, handleManualNext, speakCurrentWord]);
       }, 1000);
     }
   }, [
