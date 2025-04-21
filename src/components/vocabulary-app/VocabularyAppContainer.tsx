@@ -330,27 +330,6 @@ const VocabularyAppContainer: React.FC = () => {
     }
   }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
 
-  // ─────────────────────────────────────────────────────────
-  // Now comes your return with <VocabularyLayout> … </VocabularyLayout>
-  return (
-    <VocabularyLayout>
-      {/* …JSX… */}
-    </VocabularyLayout>
-  );
-};
-
-  useEffect(() => {
-    if (
-      !initialRenderRef.current &&
-      wordFullySpoken &&
-      !isPaused &&
-      !isMuted
-    ) {
-      handleManualNext();
-    }
-  }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
-
-
   return (
     <VocabularyLayout
       showWordCard={showWordCard}
