@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -15,7 +16,8 @@ const VocabularyAppContainer: React.FC = () => {
     handleTogglePause,
     handleManualNext,
     handleSwitchCategory,
-    setHasData
+    isSpeakingRef,
+    isChangingWordRef
   } = useVocabularyManager();
 
   const {
@@ -27,21 +29,62 @@ const VocabularyAppContainer: React.FC = () => {
     isVoicesLoaded
   } = useSpeechSynthesis();
 
+  const {
+    speakCurrentWord,
+    resetLastSpokenWord,
+    wordFullySpoken
+  } = useWordSpeechSync(
+    currentWord,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    speakText,
+    isSpeakingRef,
+    isChangingWordRef
+  );
+
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  // Speak each word on load and auto-advance when done
+  // When currentWord changes, display and speak it
   useEffect(() => {
-    if (!hasData || !currentWord || isPaused || isMuted || !isVoicesLoaded) {
-      return;
+    if (
+      hasData &&
+      currentWord &&
+      !isPaused &&
+      !isMuted &&
+      isVoicesLoaded
+    ) {
+      resetLastSpokenWord();
+      speakCurrentWord(true);
     }
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-    speakText(fullText).then(() => {
+  }, [
+    hasData,
+    currentWord,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    resetLastSpokenWord,
+    speakCurrentWord
+  ]);
+
+  // After speech finishes, advance to next word
+  useEffect(() => {
+    if (
+      wordFullySpoken &&
+      !isPaused &&
+      !isMuted
+    ) {
       handleManualNext();
-    }).catch(err => console.error('Speech error:', err));
-  }, [currentWord, hasData, isPaused, isMuted, isVoicesLoaded, speakText, handleManualNext]);
+    }
+  }, [
+    wordFullySpoken,
+    isPaused,
+    isMuted,
+    handleManualNext
+  ]);
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -57,10 +100,10 @@ const VocabularyAppContainer: React.FC = () => {
           onToggleMute={handleToggleMute}
           onTogglePause={handleTogglePause}
           onChangeVoice={handleChangeVoice}
-          onSwitchCategory={( ) => handleSwitchCategory(isMuted, voiceRegion)}
+          onSwitchCategory={() => handleSwitchCategory(isMuted, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={false}
+          isSpeaking={isSpeakingRef.current}
           onNextWord={handleManualNext}
         />
       ) : (
@@ -71,6 +114,7 @@ const VocabularyAppContainer: React.FC = () => {
 };
 
 export default VocabularyAppContainer;
+
 
 // import React, { useEffect, useCallback } from "react";
 // import { useVocabularyManager } from "@/hooks/useVocabularyManager";
