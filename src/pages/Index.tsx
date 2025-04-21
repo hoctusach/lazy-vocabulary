@@ -37,6 +37,8 @@ const VocabularyAppContainer: React.FC = () => {
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
+  const soundRef = useRef<HTMLAudioElement | null>(null); // Ref to keep track of the sound
+
   // Helper function to calculate the duration of sound (word + meaning + example)
   const calculateDuration = useCallback(() => {
     const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
@@ -88,6 +90,9 @@ const VocabularyAppContainer: React.FC = () => {
     if (isMuted || !currentWord || isPaused) {
       setIsSoundPlaying(false);
       setDisplayTimeRemaining(0); // Do not play sound, but still display the word
+      if (soundRef.current) {
+        soundRef.current.pause(); // Stop sound immediately when muted
+      }
       return;
     }
 
@@ -95,6 +100,10 @@ const VocabularyAppContainer: React.FC = () => {
       setIsSoundPlaying(true);
       const duration = calculateDuration();
       setDisplayTimeRemaining(duration); // Set display time equal to the sound duration
+      // Play the sound if it's not muted
+      if (soundRef.current) {
+        soundRef.current.play();
+      }
     }
   }, [currentWord, isMuted, isPaused, isSoundPlaying, calculateDuration]);
 
@@ -107,6 +116,21 @@ const VocabularyAppContainer: React.FC = () => {
       }, displayTimeRemaining);
     }
   }, [displayTimeRemaining, handleManualNext]);
+
+  const handleMuteClick = () => {
+    if (isMuted) {
+      // If currently muted, unmute and play the word
+      if (soundRef.current) {
+        soundRef.current.play();
+      }
+    } else {
+      // If muted, stop any sound playing immediately
+      if (soundRef.current) {
+        soundRef.current.pause();
+      }
+    }
+    handleToggleMute(); // Toggle the mute state
+  };
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -121,7 +145,7 @@ const VocabularyAppContainer: React.FC = () => {
             isMuted={isMuted}
             isPaused={isPaused}
             voiceRegion={voiceRegion}
-            onToggleMute={handleToggleMute}
+            onToggleMute={handleMuteClick}
             onTogglePause={handleTogglePause}
             onChangeVoice={handleChangeVoice}
             onSwitchCategory={() => handleSwitchCategory()}
