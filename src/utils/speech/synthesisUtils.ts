@@ -1,7 +1,7 @@
 
 export const getSpeechRate = (): number => {
   // Even slower rate to prevent cutting off words
-  return 0.4; // Reduced from 0.5 to 0.4 for better clarity
+  return 1.0; 
 };
 
 export const getSpeechPitch = (): number => {
