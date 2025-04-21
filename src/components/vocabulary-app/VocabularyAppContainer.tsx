@@ -47,7 +47,9 @@ const VocabularyAppContainer: React.FC = () => {
   } = useSpeechSynthesis();
 
   const {
-    speakCurrentWord, resetLastSpokenWord
+    speakCurrentWord,
+    resetLastSpokenWord,
+    wordFullySpoken
   } = useWordSpeechSync(
     currentWord,
     isPaused,
@@ -167,6 +169,23 @@ const VocabularyAppContainer: React.FC = () => {
     isVoicesLoaded,
     resetLastSpokenWord,
     speakCurrentWord,
+    handleManualNext
+  ]);
+
+    // After each word is fully spoken, move to the next word
+  useEffect(() => {
+    if (
+      !initialRenderRef.current &&      // skip the very first run
+      wordFullySpoken &&                // speech finished
+      !isPaused &&                      // not paused
+      !isMuted                          // not muted
+    ) {
+      handleManualNext();
+    }
+  }, [
+    wordFullySpoken,
+    isPaused,
+    isMuted,
     handleManualNext
   ]);
 
