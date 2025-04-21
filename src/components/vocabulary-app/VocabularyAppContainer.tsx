@@ -1,11 +1,12 @@
+
 import React, { useRef, useEffect, useCallback } from "react";
-import { useVocabularyManager } from "@/hooks/useVocabularyManager";
+import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
 import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import FileUpload from "@/components/FileUpload"; // We'll stop using this to hide upload UI
+import FileUpload from "@/components/FileUpload"; 
 import VocabularyLayout from "@/components/VocabularyLayout";
 import { stopSpeaking, keepSpeechAlive, ensureSpeechEngineReady, extractMainWord, forceResyncIfNeeded } from "@/utils/speech";
 import { useBackgroundColor } from "./useBackgroundColor";
