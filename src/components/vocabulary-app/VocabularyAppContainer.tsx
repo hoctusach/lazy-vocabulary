@@ -1,41 +1,21 @@
 // src/components/vocabulary-app/VocabularyAppContainer.tsx
-
 import React, { useEffect } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
+import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import { vocabularyService } from "@/services/vocabularyService";
 
 const VocabularyAppContainer: React.FC = () => {
-  const {
-    hasData,
-    currentWord,
-    isPaused,
-    handleFileUploaded,
-    handleTogglePause,
-    handleManualNext,
-    handleSwitchCategory,
-    setHasData
-  } = useVocabularyManager();
+  const [speechError, setSpeechError] = React.useState<string | null>(null);
 
-  const {
-    isMuted,
-    voiceRegion,
-    speakText,
-    handleToggleMute,
-    handleChangeVoice,
-    isVoicesLoaded
-  } = useSpeechSynthesis();
-
-  const currentCategory = vocabularyService.getCurrentSheetName();
-  const sheetOptions = vocabularyService.sheetOptions;
-  const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
-  const nextCategory = sheetOptions[nextIndex];
-
-  // Speak the full text (word + meaning + example) and advance only after it finishes
+  // Detect if Web Speech API is unavailable
   useEffect(() => {
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+      return;
+    }
     if (!hasData || !currentWord || isPaused || isMuted) {
       return;
     }
@@ -63,6 +43,7 @@ const VocabularyAppContainer: React.FC = () => {
         await speakText(fullText);
       } catch (err) {
         console.error("Speech error:", err);
+        setSpeechError("Cannot play audio at this moment.");
       }
       if (!cancelled) {
         handleManualNext();
@@ -71,17 +52,92 @@ const VocabularyAppContainer: React.FC = () => {
 
     speakAndAdvance();
 
-    return () => {
+    return (
+    <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+      {/* Display audio error if any */}
+      {speechError && (
+        <div className="mb-4 p-2 bg-red-100 text-red-800 rounded">
+          {speechError}
+        </div>
+      )}
+
+      () => {
       cancelled = true;
     };
-  }, [
+  }, []);
+
+  const {
+  const {
     hasData,
+    currentWord,
+    isPaused,
+    handleFileUploaded,
+    handleTogglePause,
+    handleManualNext,
+    handleSwitchCategory,
+    setHasData,
+    isSpeakingRef,
+    isChangingWordRef
+  } = useVocabularyManager();
+
+  const {
+    isMuted,
+    voiceRegion,
+    speakText,
+    handleToggleMute,
+    handleChangeVoice,
+    isVoicesLoaded,
+    speakingRef
+  } = useSpeechSynthesis();
+
+  const { speakCurrentWord, resetLastSpokenWord } = useWordSpeechSync(
     currentWord,
     isPaused,
     isMuted,
     isVoicesLoaded,
     speakText,
-    handleManualNext
+    isSpeakingRef,
+    isChangingWordRef
+  );
+
+  const currentCategory = vocabularyService.getCurrentSheetName();
+  const sheetOptions = vocabularyService.sheetOptions;
+  const nextIndex =
+    (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
+  const nextCategory = sheetOptions[nextIndex];
+
+  // Speak and advance: on each new word, speak it then go next
+  useEffect(() => {
+    if (!hasData || !currentWord || isPaused || isMuted || !isVoicesLoaded) {
+      return;
+    }
+
+    let cancelled = false;
+
+    // Ensure any prior speech state is reset
+    resetLastSpokenWord();
+
+    // Speak the full text (word, meaning, example)
+    speakCurrentWord(true)
+      .then(() => {
+        if (!cancelled) {
+          handleManualNext();
+        }
+      })
+      .catch(err => console.error('Speech error:', err));
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    currentWord,
+    hasData,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    speakCurrentWord,
+    handleManualNext,
+    resetLastSpokenWord
   ]);
 
   return (
@@ -101,7 +157,7 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={() => handleSwitchCategory(isMuted, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={false}
+          isSpeaking={speakingRef.current}
           onNextWord={handleManualNext}
         />
       ) : (
@@ -112,6 +168,7 @@ const VocabularyAppContainer: React.FC = () => {
 };
 
 export default VocabularyAppContainer;
+
 
 
 // import React, { useEffect, useCallback } from "react";
