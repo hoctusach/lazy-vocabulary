@@ -118,25 +118,33 @@ export const useVocabularyManager = () => {
     }, 1000);
   }, [clearTimer]);
 
-  // Handle initial data check and word display
   useEffect(() => {
-    …
-    if (hasExistingData && !initialLoadDoneRef.current) {
-      initialLoadDoneRef.current = true;
-      const word = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
-      setCurrentWord(word);
+   // 1) Check if we already have data and set the flag
+   const hasExistingData = vocabularyService.hasData();
+   setHasData(hasExistingData);
 
-      // → Removed the 500 ms displayNextWord timer so we don't flip
-      //    before reading the first word aloud.
-    }
-    …
-  }, [/* no longer need displayNextWord here */ isPaused, clearTimer]);
-    
-    return () => {
-      clearTimer();
-      stopSpeaking();
-    };
-  }, [displayNextWord, isPaused, clearTimer]);
+   // 2) On first mount with data, just show the very first word
+   if (hasExistingData && !initialLoadDoneRef.current) {
+    initialLoadDoneRef.current = true;
+    const firstWord =
+      vocabularyService.getCurrentWord() ||
+      vocabularyService.getNextWord();
+    setCurrentWord(firstWord);
+  }
+
+  // 3) Cleanup: clear any pending timer and stop speech
+  return () => {
+    clearTimer();
+    stopSpeaking();
+  };
+}, [
+  // We only care about 'isPaused' so we don't accidentally re-run
+  // when pausing/unpausing—but you can even drop that if you like.
+  isPaused,
+  clearTimer,
+  setHasData,
+]);
+
 
   return {
     hasData,
