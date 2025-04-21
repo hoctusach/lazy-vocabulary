@@ -31,18 +31,17 @@ const VocabularyAppContainer: React.FC = () => {
   const [currentAudioIndex, setCurrentAudioIndex] = useState(0); // Track the current audio being played
   const [displayTimeRemaining, setDisplayTimeRemaining] = useState(0); // Track how long to display each card
   const [isSoundPlaying, setIsSoundPlaying] = useState(false); // Track if sound is currently playing
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
 
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  const soundRef = useRef<HTMLAudioElement | null>(null); // Ref to keep track of the sound
-
   // Helper function to calculate the duration of sound (word + meaning + example)
   const calculateDuration = useCallback(() => {
     const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+    // We are estimating here, based on an average speech speed of 5 words per second.
+    // You may adjust this as needed based on real data or the TTS API.
     return fullText.split(' ').length * 200; // 200ms per word
   }, [currentWord]);
 
@@ -74,7 +73,6 @@ const VocabularyAppContainer: React.FC = () => {
   // Load words and prepare them for sequential reading
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
-      setIsLoading(false); // Set loading state to false once currentWord is available
       // Initialize the queues for the current word, meaning, and example
       wordQueue.current.push(currentWord.word);
       meaningQueue.current.push(currentWord.meaning);
@@ -90,9 +88,6 @@ const VocabularyAppContainer: React.FC = () => {
     if (isMuted || !currentWord || isPaused) {
       setIsSoundPlaying(false);
       setDisplayTimeRemaining(0); // Do not play sound, but still display the word
-      if (soundRef.current) {
-        soundRef.current.pause(); // Stop sound immediately when muted
-      }
       return;
     }
 
@@ -100,10 +95,6 @@ const VocabularyAppContainer: React.FC = () => {
       setIsSoundPlaying(true);
       const duration = calculateDuration();
       setDisplayTimeRemaining(duration); // Set display time equal to the sound duration
-      // Play the sound if it's not muted
-      if (soundRef.current) {
-        soundRef.current.play();
-      }
     }
   }, [currentWord, isMuted, isPaused, isSoundPlaying, calculateDuration]);
 
@@ -116,30 +107,6 @@ const VocabularyAppContainer: React.FC = () => {
       }, displayTimeRemaining);
     }
   }, [displayTimeRemaining, handleManualNext]);
-
-  const handleMuteClick = () => {
-    if (isMuted) {
-      // If currently muted, unmute and play the word
-      if (soundRef.current) {
-        soundRef.current.play();
-      }
-    } else {
-      // If muted, stop any sound playing immediately
-      if (soundRef.current) {
-        soundRef.current.pause();
-      }
-    }
-    handleToggleMute(); // Toggle the mute state
-  };
-
-  // If the page is loading, show a loading message
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -154,7 +121,7 @@ const VocabularyAppContainer: React.FC = () => {
             isMuted={isMuted}
             isPaused={isPaused}
             voiceRegion={voiceRegion}
-            onToggleMute={handleMuteClick}
+            onToggleMute={handleToggleMute}
             onTogglePause={handleTogglePause}
             onChangeVoice={handleChangeVoice}
             onSwitchCategory={() => handleSwitchCategory()}
