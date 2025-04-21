@@ -53,16 +53,6 @@ export const useWordNavigation = (
       if (nextWord) {
         console.log("Displaying next word:", nextWord.word);
         setCurrentWord(nextWord);
-        
-        // Calculate total duration for word and add buffer time
-        const fullText = `${nextWord.word}. ${nextWord.meaning}. ${nextWord.example}`;
-        const duration = calculateSpeechDuration(fullText);
-        
-        // Schedule next word if not paused
-        if (!isPaused) {
-          clearTimer();
-          timerRef.current = window.setTimeout(displayNextWord, duration + 2000);
-        }
       }
     } finally {
       setTimeout(() => {
