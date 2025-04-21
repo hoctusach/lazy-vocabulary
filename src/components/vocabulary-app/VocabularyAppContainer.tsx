@@ -40,6 +40,11 @@ const VocabularyAppContainer: React.FC = () => {
 
   const soundRef = useRef<HTMLAudioElement | null>(null); // Ref to keep track of the sound
 
+  // Queues to track words, meanings, and examples
+  const wordQueue = useRef<string[]>([]); // Queue for words
+  const meaningQueue = useRef<string[]>([]); // Queue for meanings
+  const exampleQueue = useRef<string[]>([]); // Queue for examples
+
   // Helper function to calculate the duration of sound (word + meaning + example)
   const calculateDuration = useCallback(() => {
     const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
