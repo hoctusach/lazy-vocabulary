@@ -25,7 +25,6 @@ const VocabularyAppContainer: React.FC = () => {
   const initialRenderRef = useRef(true);
   const stateChangeDebounceRef = useRef<number | null>(null);
 
-  // We'll keep default state, but block toggle to upload view by only showing word card:
   const [showWordCard, setShowWordCard] = React.useState(true);
 
   const {
@@ -54,7 +53,8 @@ const VocabularyAppContainer: React.FC = () => {
 
   const {
     speakCurrentWord,
-    resetLastSpokenWord
+    resetLastSpokenWord,
+    wordFullySpoken
   } = useWordSpeechSync(
     currentWord,
     isPaused,
@@ -102,7 +102,6 @@ const VocabularyAppContainer: React.FC = () => {
     }
   }, []);
 
-  // Handlers (mute, voice, switch category)
   const {
     handleToggleMuteWithSpeaking,
     handleChangeVoiceWithSpeaking,
@@ -154,7 +153,6 @@ const VocabularyAppContainer: React.FC = () => {
 
   const toggleView = useCallback(() => {
     // Disabled toggling to upload view to hide upload section
-    // setShowWordCard(prev => !prev);
   }, []);
 
   // Initial speak on first render
@@ -167,29 +165,13 @@ const VocabularyAppContainer: React.FC = () => {
       isVoicesLoaded
     ) {
       initialRenderRef.current = false;
-
-      if (currentWord.word) {
-        try {
-          localStorage.setItem("currentDisplayedWord", currentWord.word);
-        } catch (error) {
-          console.error("Error storing initial word:", error);
-        }
-      }
-
-      const timer = setTimeout(() => {
-        console.log(
-          "Initial render, force speaking current word:",
-          currentWord.word
-        );
-        resetLastSpokenWord();
-        stopSpeaking();
-
-        setTimeout(() => {
-          speakCurrentWord(true);
-        }, 1500);
+      resetLastSpokenWord();
+      stopSpeaking();
+      setTimeout(() => {
+        speakCurrentWord(true).then(() => {
+          // after first word
+        });
       }, 1000);
-
-      return () => clearTimeout(timer);
     }
   }, [
     currentWord,
@@ -200,126 +182,7 @@ const VocabularyAppContainer: React.FC = () => {
     speakCurrentWord
   ]);
 
-  // Keep-alive and ensure-ready loops
-  useEffect(() => {
-    if (keepAliveIntervalRef.current) {
-      clearInterval(keepAliveIntervalRef.current);
-    }
-
-    keepAliveIntervalRef.current = window.setInterval(() => {
-      if (speakingRef.current && !isPaused && !isMuted) {
-        keepSpeechAlive();
-      }
-    }, 10);
-
-    if (resetIntervalRef.current) {
-      clearInterval(resetIntervalRef.current);
-    }
-
-    resetIntervalRef.current = window.setInterval(() => {
-      if (!speakingRef.current && !isPaused) {
-        ensureSpeechEngineReady();
-      }
-    }, 60000);
-
-    return () => {
-      clearAllTimeouts();
-    };
-  }, [speakingRef, isPaused, isMuted, clearAllTimeouts]);
-
-  // Sync-check loop
-  useEffect(() => {
-    const checkSyncAndFix = () => {
-      if (!currentWord || isPaused || isMuted) {
-        if (syncCheckTimeoutRef.current) {
-          clearTimeout(syncCheckTimeoutRef.current);
-          syncCheckTimeoutRef.current = null;
-        }
-        return;
-      }
-
-      const currentTextBeingSpoken = getCurrentText();
-
-      if (
-        currentTextBeingSpoken &&
-        currentWord &&
-        speakingRef.current
-      ) {
-        const mainWord = extractMainWord(currentWord.word);
-        const spokenText = currentTextBeingSpoken.toLowerCase();
-
-        console.log(
-          `Sync check: Word="${mainWord}", Speaking=${speakingRef.current}, Changing=${isChangingWordRef.current}`
-        );
-
-        forceResyncIfNeeded(
-          currentWord.word,
-          currentTextBeingSpoken,
-          () => {
-            console.log(
-              "Resync needed, restarting speech for word:",
-              currentWord.word
-            );
-            if (!resyncTimeoutRef.current) {
-              resyncTimeoutRef.current = window.setTimeout(() => {
-                resyncTimeoutRef.current = null;
-                if (currentWord && !isPaused && !isMuted) {
-                  resetLastSpokenWord();
-                  speakCurrentWord(true);
-                }
-              }, 600);
-            }
-          }
-        );
-      }
-
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-      }
-      syncCheckTimeoutRef.current = window.setTimeout(
-        checkSyncAndFix,
-        1000
-      );
-    };
-
-    if (syncCheckTimeoutRef.current) {
-      clearTimeout(syncCheckTimeoutRef.current);
-    }
-    syncCheckTimeoutRef.current = window.setTimeout(
-      checkSyncAndFix,
-      2000
-    );
-
-    return () => {
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-        syncCheckTimeoutRef.current = null;
-      }
-    };
-  }, [
-    currentWord,
-    isPaused,
-    isMuted,
-    getCurrentText,
-    speakCurrentWord,
-    speakingRef,
-    isChangingWordRef,
-    resetLastSpokenWord
-  ]);
-
-  // Reflect speaking state into isSpeakingRef
-  useEffect(() => {
-    isSpeakingRef.current = speakingRef.current;
-  }, [speakingRef.current, isSpeakingRef]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      clearAllTimeouts();
-      stopSpeaking();
-    };
-  }, [clearAllTimeouts]);
-  
+  // After each word is fully spoken, advance to next
   useEffect(() => {
     if (
       !initialRenderRef.current &&
