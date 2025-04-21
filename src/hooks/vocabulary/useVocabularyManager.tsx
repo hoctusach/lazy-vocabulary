@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { stopSpeaking } from '@/utils/speech';
 import { useVocabularyData } from './useVocabularyData';
