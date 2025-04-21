@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import VocabularyLayout from "@/components/VocabularyLayout";
@@ -15,7 +15,6 @@ const VocabularyAppContainer: React.FC = () => {
     handleTogglePause,
     handleManualNext,
     handleSwitchCategory,
-    setHasData
   } = useVocabularyManager();
 
   const {
@@ -24,24 +23,63 @@ const VocabularyAppContainer: React.FC = () => {
     speakText,
     handleToggleMute,
     handleChangeVoice,
-    isVoicesLoaded
+    isVoicesLoaded,
   } = useSpeechSynthesis();
+
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [speechError, setSpeechError] = useState(false);
+
+  const [words, setWords] = useState<string[]>([]);
+  const [meanings, setMeanings] = useState<string[]>([]);
+  const [examples, setExamples] = useState<string[]>([]);
+
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false); // To track if audio is playing
 
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  // Speak each word on load and auto-advance when done
-  useEffect(() => {
-    if (!hasData || !currentWord || isPaused || isMuted || !isVoicesLoaded) {
+  // Preload and play the sound after displaying the word
+  const preloadAndPlayAudio = (word: string, meaning: string, example: string) => {
+    if (!isVoicesLoaded || isPaused || isMuted) {
       return;
     }
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-    speakText(fullText).then(() => {
-      handleManualNext();
-    }).catch(err => console.error('Speech error:', err));
-  }, [currentWord, hasData, isPaused, isMuted, isVoicesLoaded, speakText, handleManualNext]);
+
+    const fullText = `${word}. ${meaning}. ${example}`;
+
+    // Speak the word, meaning, and example sequentially
+    setAudioPlaying(true);
+    speakText(fullText)
+      .then(() => {
+        setAudioPlaying(false); // Audio finished playing
+        handleManualNext(); // Proceed to the next word once the audio is finished
+      })
+      .catch((error) => {
+        console.error("Error with speech synthesis: ", error);
+        setSpeechError(true);
+        setAudioPlaying(false); // If there's an error, stop playing the audio
+      });
+  };
+
+  useEffect(() => {
+    if (hasData && currentWord && !isPaused && !isMuted && isVoicesLoaded) {
+      const word = currentWord.word;
+      const meaning = currentWord.meaning;
+      const example = currentWord.example;
+
+      // Display the word and start speaking it
+      preloadAndPlayAudio(word, meaning, example);
+    }
+  }, [currentWord, hasData, isPaused, isMuted, isVoicesLoaded]);
+
+  // Automatically advance after speech finishes
+  useEffect(() => {
+    if (!audioPlaying) {
+      handleManualNext(); // Proceed to next word if audio is not playing
+    }
+  }, [audioPlaying, handleManualNext]);
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -57,10 +95,10 @@ const VocabularyAppContainer: React.FC = () => {
           onToggleMute={handleToggleMute}
           onTogglePause={handleTogglePause}
           onChangeVoice={handleChangeVoice}
-          onSwitchCategory={( ) => handleSwitchCategory(isMuted, voiceRegion)}
+          onSwitchCategory={() => handleSwitchCategory(isMuted, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={false}
+          isSpeaking={isSpeaking}
           onNextWord={handleManualNext}
         />
       ) : (
@@ -71,112 +109,3 @@ const VocabularyAppContainer: React.FC = () => {
 };
 
 export default VocabularyAppContainer;
-
-// import React, { useEffect, useCallback } from "react";
-// import { useVocabularyManager } from "@/hooks/useVocabularyManager";
-// import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
-// import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
-// import { vocabularyService } from "@/services/vocabularyService";
-// import VocabularyCard from "@/components/VocabularyCard";
-// import WelcomeScreen from "@/components/WelcomeScreen";
-// import VocabularyLayout from "@/components/VocabularyLayout";
-// import { useBackgroundColor } from "./useBackgroundColor";
-// import { useVocabularyAppHandlers } from "./useVocabularyAppHandlers";
-
-// const VocabularyAppContainer: React.FC = () => {
-//   // Flags and simple handlers
-//   const {
-//     hasData,
-//     currentWord,
-//     isPaused,
-//     handleFileUploaded,
-//     handleTogglePause,
-//     handleManualNext,
-//     handleSwitchCategory,
-//     setHasData,
-//     isSpeakingRef,
-//     isChangingWordRef
-//   } = useVocabularyManager();
-
-//   const {
-//     isMuted,
-//     voiceRegion,
-//     speakText,
-//     handleToggleMute,
-//     handleChangeVoice,
-//     isVoicesLoaded
-//   } = useSpeechSynthesis();
-
-//   const {
-//     speakCurrentWord,
-//     resetLastSpokenWord,
-//     wordFullySpoken
-//   } = useWordSpeechSync(
-//     currentWord,
-//     isPaused,
-//     isMuted,
-//     isVoicesLoaded,
-//     speakText,
-//     isSpeakingRef,
-//     isChangingWordRef
-//   );
-
-//   const { backgroundColor, backgroundColors, setBackgroundColorIndex } = useBackgroundColor();
-
-//   const currentSheetName = vocabularyService.getCurrentSheetName();
-//   const sheetOptions = vocabularyService.sheetOptions;
-//   const nextSheetIndex = (sheetOptions.indexOf(currentSheetName) + 1) % sheetOptions.length;
-//   const nextSheetName = sheetOptions[nextSheetIndex];
-
-//   const {
-//     handleToggleMuteWithSpeaking,
-//     handleChangeVoiceWithSpeaking,
-//     handleSwitchCategoryWithState
-//   } = useVocabularyAppHandlers({
-//     isSpeakingRef,
-//     isChangingWordRef,
-//     resetLastSpokenWord,
-//     speakCurrentWord,
-//     handleToggleMute,
-//     handleChangeVoice,
-//     handleSwitchCategory,
-//     voiceRegion,
-//     setBackgroundColorIndex,
-//     backgroundColors
-//   });
-
-//   // Advance whenever a word finishes speaking
-//   useEffect(() => {
-//     if (wordFullySpoken && !isPaused && !isMuted) {
-//       handleManualNext();
-//     }
-//   }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
-
-//   return (
-//     <VocabularyLayout hasData={hasData}>
-//       {hasData && currentWord ? (
-//         <VocabularyCard
-//           word={currentWord.word}
-//           meaning={currentWord.meaning}
-//           example={currentWord.example}
-//           backgroundColor={backgroundColor}
-//           isMuted={isMuted}
-//           isPaused={isPaused}
-//           voiceRegion={voiceRegion}
-//           onToggleMute={handleToggleMuteWithSpeaking}
-//           onTogglePause={handleTogglePause}
-//           onChangeVoice={handleChangeVoiceWithSpeaking}
-//           onSwitchCategory={handleSwitchCategoryWithState}
-//           currentCategory={currentSheetName}
-//           nextCategory={nextSheetName}
-//           isSpeaking={isSpeakingRef.current}
-//           onNextWord={handleManualNext}
-//         />
-//       ) : (
-//         <WelcomeScreen onFileUploaded={handleFileUploaded} />
-//       )}
-//     </VocabularyLayout>
-//   );
-// };
-
-// export default VocabularyAppContainer;
