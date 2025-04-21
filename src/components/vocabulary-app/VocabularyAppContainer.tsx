@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
@@ -6,7 +5,7 @@ import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
 import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import FileUpload from "@/components/FileUpload";
+import FileUpload from "@/components/FileUpload"; // We'll stop using this to hide upload UI
 import VocabularyLayout from "@/components/VocabularyLayout";
 import { stopSpeaking, keepSpeechAlive, ensureSpeechEngineReady, extractMainWord, forceResyncIfNeeded } from "@/utils/speech";
 import { useBackgroundColor } from "./useBackgroundColor";
@@ -20,6 +19,7 @@ const VocabularyAppContainer: React.FC = () => {
   const initialRenderRef = useRef(true);
   const stateChangeDebounceRef = useRef<number | null>(null);
 
+  // We'll keep default state, but block toggle to upload view by only showing word card:
   const [showWordCard, setShowWordCard] = React.useState(true);
 
   const {
@@ -131,10 +131,9 @@ const VocabularyAppContainer: React.FC = () => {
   }, [isMuted, isPaused, handleManualNext, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
 
   const toggleView = useCallback(() => {
-    setShowWordCard(prev => !prev);
+    // Disabled toggling to upload view to hide upload section
+    // setShowWordCard(prev => !prev);
   }, []);
-
-  // All effect code below is just slightly formatted copies of the original
 
   useEffect(() => {
     if (initialRenderRef.current && currentWord && !isPaused && !isMuted && isVoicesLoaded) {
@@ -278,13 +277,10 @@ const VocabularyAppContainer: React.FC = () => {
 
       {!hasData ? (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
-      ) : (
-        <FileUpload 
-          onFileUploaded={handleFileUploaded} 
-          onShowWordCard={toggleView} 
-          showBackButton={!showWordCard}
-        />
-      )}
+      ) : null}
+
+      {/* Removed FileUpload UI completely from the app to hide upload section */}
+      
     </VocabularyLayout>
   );
 };
