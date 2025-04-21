@@ -1,72 +1,13 @@
 // src/components/vocabulary-app/VocabularyAppContainer.tsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
-import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
-import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
+import { vocabularyService } from "@/services/vocabularyService";
 
 const VocabularyAppContainer: React.FC = () => {
-  const [speechError, setSpeechError] = React.useState<string | null>(null);
-
-  // Detect if Web Speech API is unavailable
-  useEffect(() => {
-    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-      return;
-    }
-    if (!hasData || !currentWord || isPaused || isMuted) {
-      return;
-    }
-    let cancelled = false;
-
-    async function speakAndAdvance() {
-      // 1) Wait for voices to load
-      if (!isVoicesLoaded) {
-        await new Promise<void>(resolve => {
-          const interval = setInterval(() => {
-            if (isVoicesLoaded) {
-              clearInterval(interval);
-              resolve();
-            }
-          }, 100);
-        });
-      }
-      if (cancelled) return;
-
-      // 2) Construct full text
-      const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-
-      // 3) Speak, then advance
-      try {
-        await speakText(fullText);
-      } catch (err) {
-        console.error("Speech error:", err);
-        setSpeechError("Cannot play audio at this moment.");
-      }
-      if (!cancelled) {
-        handleManualNext();
-      }
-    }
-
-    speakAndAdvance();
-
-    return (
-    <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Display audio error if any */}
-      {speechError && (
-        <div className="mb-4 p-2 bg-red-100 text-red-800 rounded">
-          {speechError}
-        </div>
-      )}
-
-      () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const {
   const {
     hasData,
     currentWord,
@@ -75,9 +16,7 @@ const VocabularyAppContainer: React.FC = () => {
     handleTogglePause,
     handleManualNext,
     handleSwitchCategory,
-    setHasData,
-    isSpeakingRef,
-    isChangingWordRef
+    setHasData
   } = useVocabularyManager();
 
   const {
@@ -86,62 +25,85 @@ const VocabularyAppContainer: React.FC = () => {
     speakText,
     handleToggleMute,
     handleChangeVoice,
-    isVoicesLoaded,
-    speakingRef
+    isVoicesLoaded
   } = useSpeechSynthesis();
 
-  const { speakCurrentWord, resetLastSpokenWord } = useWordSpeechSync(
-    currentWord,
-    isPaused,
-    isMuted,
-    isVoicesLoaded,
-    speakText,
-    isSpeakingRef,
-    isChangingWordRef
-  );
+  const [speechError, setSpeechError] = useState<string | null>(null);
 
+  // Determine categories
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
-  const nextIndex =
-    (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
+  const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  // Speak and advance: on each new word, speak it then go next
+  // Check for speech synthesis support
   useEffect(() => {
-    if (!hasData || !currentWord || isPaused || isMuted || !isVoicesLoaded) {
+    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+      setSpeechError(
+        'Audio service is unavailable in your browser.'
+      );
+    }
+  }, []);
+
+  // Speak word + meaning + example, then advance
+  useEffect(() => {
+    if (!hasData || !currentWord || isPaused || isMuted) {
       return;
     }
-
     let cancelled = false;
 
-    // Ensure any prior speech state is reset
-    resetLastSpokenWord();
-
-    // Speak the full text (word, meaning, example)
-    speakCurrentWord(true)
-      .then(() => {
-        if (!cancelled) {
-          handleManualNext();
+    async function speakAndNext() {
+      try {
+        // wait for voices loaded
+        if (!isVoicesLoaded) {
+          await new Promise<void>((resolve) => {
+            const interval = setInterval(() => {
+              if (isVoicesLoaded) {
+                clearInterval(interval);
+                resolve();
+              }
+            }, 100);
+          });
         }
-      })
-      .catch(err => console.error('Speech error:', err));
+        if (cancelled) return;
+
+        const fullText =
+          `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+
+        await speakText(fullText);
+      } catch (err) {
+        console.error('Speech error:', err);
+        setSpeechError('Audio service error.');
+      }
+      if (!cancelled) {
+        handleManualNext();
+      }
+    }
+
+    speakAndNext();
 
     return () => {
       cancelled = true;
     };
   }, [
-    currentWord,
     hasData,
+    currentWord,
     isPaused,
     isMuted,
     isVoicesLoaded,
-    speakCurrentWord,
-    handleManualNext,
-    resetLastSpokenWord
+    speakText,
+    handleManualNext
   ]);
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+      {/* show error banner if speech unavailable */}
+      {speechError && (
+        <div className="mb-4 p-2 bg-red-100 text-red-800 rounded">
+          {speechError}
+        </div>
+      )}
+
       {hasData && currentWord ? (
         <VocabularyCard
           word={currentWord.word}
@@ -157,7 +119,7 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={() => handleSwitchCategory(isMuted, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={speakingRef.current}
+          isSpeaking={false}
           onNextWord={handleManualNext}
         />
       ) : (
@@ -168,7 +130,6 @@ const VocabularyAppContainer: React.FC = () => {
 };
 
 export default VocabularyAppContainer;
-
 
 
 
