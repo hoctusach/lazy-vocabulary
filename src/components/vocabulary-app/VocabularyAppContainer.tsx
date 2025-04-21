@@ -135,31 +135,40 @@ const VocabularyAppContainer: React.FC = () => {
     // setShowWordCard(prev => !prev);
   }, []);
 
+  // On first load: speak the shown word, then advance
   useEffect(() => {
-    if (initialRenderRef.current && currentWord && !isPaused && !isMuted && isVoicesLoaded) {
+    if (initialRenderRef.current 
+        && currentWord 
+        && !isPaused 
+        && !isMuted 
+        && isVoicesLoaded) {
       initialRenderRef.current = false;
 
-      if (currentWord.word) {
+      // 1) reset any prior speech state
+      resetLastSpokenWord();
+      stopSpeaking();
+
+      // 2) small pause for UI settle
+      setTimeout(async () => {
         try {
-          localStorage.setItem('currentDisplayedWord', currentWord.word);
-        } catch (error) {
-          console.error('Error storing initial word:', error);
+          // speakCurrentWord returns a Promise<void>
+          await speakCurrentWord(true);
+        } catch (err) {
+          console.error("Error in initial speech:", err);
         }
-      }
-
-      const timer = setTimeout(() => {
-        console.log("Initial render, force speaking current word:", currentWord.word);
-        resetLastSpokenWord();
-        stopSpeaking();
-
-        setTimeout(() => {
-          speakCurrentWord(true);
-        }, 1500);
+        // 3) once speech is done, move to next
+        handleManualNext();
       }, 1000);
-
-      return () => clearTimeout(timer);
     }
-  }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
+  }, [
+    currentWord,
+    isPaused,
+    isMuted,
+    isVoicesLoaded,
+    resetLastSpokenWord,
+    speakCurrentWord,
+    handleManualNext
+  ]);
 
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
