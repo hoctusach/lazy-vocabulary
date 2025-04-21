@@ -171,6 +171,7 @@ export default VocabularyAppContainer;
 
 
 
+
 // import React, { useEffect, useCallback } from "react";
 // import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 // import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
