@@ -120,22 +120,17 @@ export const useVocabularyManager = () => {
 
   // Handle initial data check and word display
   useEffect(() => {
-    console.log("Checking for existing data, isPaused:", isPaused);
-    const hasExistingData = vocabularyService.hasData();
-    console.log("Has existing data:", hasExistingData);
-    setHasData(hasExistingData);
-    
+    …
     if (hasExistingData && !initialLoadDoneRef.current) {
       initialLoadDoneRef.current = true;
       const word = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
-      console.log("Initial word:", word);
       setCurrentWord(word);
-      
-      if (!isPaused) {
-        clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, 500);
-      }
+
+      // → Removed the 500 ms displayNextWord timer so we don't flip
+      //    before reading the first word aloud.
     }
+    …
+  }, [/* no longer need displayNextWord here */ isPaused, clearTimer]);
     
     return () => {
       clearTimer();
