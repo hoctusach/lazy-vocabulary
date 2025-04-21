@@ -4,7 +4,6 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { stopSpeaking } from '@/utils/speech';
 import { useTimeoutManager } from './speech/useTimeoutManager';
 import { useWordStateManager } from './speech/useWordStateManager';
-import { useSpeechSync } from './speech/useSpeechSync';
 
 export const useWordSpeechSync = (
   currentWord: VocabularyWord | null,
@@ -153,19 +152,6 @@ export const useWordSpeechSync = (
     }
   };
 
-  const { resetSpeechSystem } = useSpeechSync(
-    currentWord,
-    isPaused,
-    isMuted,
-    isVoicesLoaded,
-    isSpeakingRef,
-    isChangingWordRef,
-    keepAliveIntervalRef,
-    clearAllTimeouts,
-    speakCurrentWord,
-    setWordFullySpoken,
-    lastWordIdRef
-  );
 
   // Handle word changes
   useEffect(() => {
@@ -222,9 +208,17 @@ export const useWordSpeechSync = (
     }
   }, [currentWord, isChangingWordRef, clearAllTimeouts, isPaused, isMuted]);
 
-  return {
-    speakCurrentWord,
-    resetLastSpokenWord: resetSpeechSystem,
-    wordFullySpoken
-  };
+  // We’ll just stopSpeech + clear timeouts on reset:
+  const resetLastSpokenWord = () => {
+   stopSpeaking();
+   clearAllTimeouts();
+   lastWordIdRef.current = null;
+   setWordFullySpoken(false);
+ };
+
+ return {
+  speakCurrentWord,
+  resetLastSpokenWord,
+  wordFullySpoken
+ };
 };
