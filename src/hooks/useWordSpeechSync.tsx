@@ -153,6 +153,60 @@ export const useWordSpeechSync = (
   };
 
 
+  // Handle word changes
+  useEffect(() => {
+    if (isChangingWordRef.current) {
+      console.log("Word changing flag active, delaying word update");
+      return;
+    }
+    
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change in progress, skipping");
+      return;
+    }
+    
+    currentWordRef.current = currentWord;
+    
+    if (currentWord && lastWordIdRef.current !== currentWord.word) {
+      wordChangeInProgressRef.current = true;
+      
+      console.log("Word changed in speech sync:", currentWord.word);
+      setWordFullySpoken(false);
+      lastWordIdRef.current = currentWord.word;
+      
+      stopSpeaking();
+      clearAllTimeouts();
+      
+      if (initialSpeakTimeoutRef.current) {
+        clearTimeout(initialSpeakTimeoutRef.current);
+      }
+      
+      try {
+        localStorage.setItem('currentDisplayedWord', currentWord.word);
+      } catch (error) {
+        console.error('Error storing current displayed word:', error);
+      }
+      
+      initialSpeakTimeoutRef.current = window.setTimeout(() => {
+        initialSpeakTimeoutRef.current = null;
+        
+        if (wordProcessingTimeoutRef.current) {
+          clearTimeout(wordProcessingTimeoutRef.current);
+        }
+        
+        wordProcessingTimeoutRef.current = window.setTimeout(() => {
+          wordProcessingTimeoutRef.current = null;
+          wordChangeInProgressRef.current = false;
+          
+          if (!isPaused && !isMuted && !isChangingWordRef.current) {
+            console.log("Speaking new word after change:", currentWord.word);
+            speakCurrentWord(true);
+          }
+        }, 400);
+        
+      }, 800);
+    }
+  }, [currentWord, isChangingWordRef, clearAllTimeouts, isPaused, isMuted]);
 
   // We’ll just stopSpeech + clear timeouts on reset:
   const resetLastSpokenWord = () => {
