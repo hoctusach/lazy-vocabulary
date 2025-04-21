@@ -182,13 +182,31 @@ class VocabularyService {
   
   loadDefaultVocabulary(data?: SheetData): boolean {
     try {
-      const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
-      
-      this.data = JSON.parse(JSON.stringify(vocabularyData));
-      this.storage.saveData(this.data);
-      
-      this.currentSheetName = "All words";
-      this.shuffleCurrentSheet();
+      console.log("Loading default vocabulary data");
+      // Try to fetch the updated default vocabulary from public directory
+      fetch('/defaultVocabulary.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(fetchedData => {
+          console.log("Successfully loaded updated default vocabulary from JSON file");
+          this.data = fetchedData;
+          this.storage.saveData(this.data);
+          this.currentSheetName = "All words";
+          this.shuffleCurrentSheet();
+        })
+        .catch(error => {
+          console.warn("Failed to load from JSON file, using built-in default vocabulary:", error);
+          // Fallback to built-in default vocabulary if fetch fails
+          const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
+          this.data = JSON.parse(JSON.stringify(vocabularyData));
+          this.storage.saveData(this.data);
+          this.currentSheetName = "All words";
+          this.shuffleCurrentSheet();
+        });
       
       return true;
     } catch (error) {

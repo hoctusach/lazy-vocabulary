@@ -10,6 +10,17 @@ export const useVocabularyData = () => {
   const lastManualActionTimeRef = useRef<number>(Date.now());
   const currentWordRef = useRef<VocabularyWord | null>(null);
 
+  // Force reload default vocabulary when component mounts
+  useEffect(() => {
+    if (!initialLoadDoneRef.current) {
+      console.log("Forcing reload of default vocabulary data");
+      vocabularyService.loadDefaultVocabulary();
+      setTimeout(() => {
+        setHasData(vocabularyService.hasData());
+      }, 300);
+    }
+  }, []);
+
   // Keep currentWordRef updated
   useEffect(() => {
     currentWordRef.current = currentWord;
