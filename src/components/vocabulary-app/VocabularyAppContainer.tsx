@@ -1,5 +1,5 @@
 // src/components/vocabulary-app/VocabularyAppContainer.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import VocabularyLayout from "@/components/VocabularyLayout";
@@ -15,8 +15,7 @@ const VocabularyAppContainer: React.FC = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
-    handleSwitchCategory,
-    setHasData
+    handleSwitchCategory
   } = useVocabularyManager();
 
   const {
@@ -28,59 +27,41 @@ const VocabularyAppContainer: React.FC = () => {
     isVoicesLoaded
   } = useSpeechSynthesis();
 
-  const [speechError, setSpeechError] = useState<string | null>(null);
-
-  // Determine categories
-  const currentCategory = vocabularyService.getCurrentSheetName();
-  const sheetOptions = vocabularyService.sheetOptions;
-  const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
-  const nextCategory = sheetOptions[nextIndex];
-
-  // Check for speech synthesis support
+  // Track component mount status for cleanup
+  const mountedRef = useRef(true);
   useEffect(() => {
-    if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
-      setSpeechError(
-        'Audio service is unavailable in your browser.'
-      );
-    }
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
   }, []);
 
-  // Speak word + meaning + example, then advance
+  // Speak current word (with meaning & example) then advance
   useEffect(() => {
-    if (!hasData || !currentWord || isPaused || isMuted) {
-      return;
-    }
+    if (!hasData || !currentWord || isPaused || isMuted) return;
+
+    // Construct the full speech text
+    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
     let cancelled = false;
 
-    async function speakAndNext() {
+    const playSpeech = async () => {
+      // Wait for voices to load if needed
+      while (!isVoicesLoaded && mountedRef.current && !cancelled) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      if (!mountedRef.current || cancelled) return;
+
       try {
-        // wait for voices loaded
-        if (!isVoicesLoaded) {
-          await new Promise<void>((resolve) => {
-            const interval = setInterval(() => {
-              if (isVoicesLoaded) {
-                clearInterval(interval);
-                resolve();
-              }
-            }, 100);
-          });
-        }
-        if (cancelled) return;
-
-        const fullText =
-          `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-
         await speakText(fullText);
       } catch (err) {
-        console.error('Speech error:', err);
-        setSpeechError('Audio service error.');
+        console.error("Speech error:", err);
       }
-      if (!cancelled) {
-        handleManualNext();
-      }
-    }
 
-    speakAndNext();
+      if (!mountedRef.current || cancelled) return;
+      handleManualNext();
+    };
+
+    playSpeech();
 
     return () => {
       cancelled = true;
@@ -95,15 +76,14 @@ const VocabularyAppContainer: React.FC = () => {
     handleManualNext
   ]);
 
+  // Compute categories for buttons
+  const currentCategory = vocabularyService.getCurrentSheetName();
+  const sheetOptions = vocabularyService.sheetOptions;
+  const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
+  const nextCategory = sheetOptions[nextIndex];
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* show error banner if speech unavailable */}
-      {speechError && (
-        <div className="mb-4 p-2 bg-red-100 text-red-800 rounded">
-          {speechError}
-        </div>
-      )}
-
       {hasData && currentWord ? (
         <VocabularyCard
           word={currentWord.word}
