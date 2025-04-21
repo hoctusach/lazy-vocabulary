@@ -1,4 +1,3 @@
-
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
@@ -106,25 +105,33 @@ class VocabularyService {
         // Skip empty words
         if (!importedWord.word || importedWord.word.trim() === "") continue;
         
+        // Ensure all fields are properly typed
+        const processedWord: VocabularyWord = {
+          word: String(importedWord.word),
+          meaning: String(importedWord.meaning || ""),
+          example: String(importedWord.example || ""),
+          count: typeof importedWord.count === 'number' ? importedWord.count : parseInt(String(importedWord.count || "0")) || 0
+        };
+        
         // Check if the word already exists (case-insensitive)
         const existingWordIndex = this.data[sheetName].findIndex(
-          existingWord => existingWord.word.toLowerCase() === importedWord.word.toLowerCase()
+          existingWord => existingWord.word.toLowerCase() === processedWord.word.toLowerCase()
         );
         
         if (existingWordIndex >= 0) {
           // Update existing word
           this.data[sheetName][existingWordIndex] = {
-            ...importedWord,
+            ...processedWord,
             // Preserve count if it's higher in the existing record
             count: Math.max(
-              importedWord.count || 0, 
+              processedWord.count || 0, 
               this.data[sheetName][existingWordIndex].count || 0
             )
           };
           updatedWords++;
         } else {
           // Add new word
-          this.data[sheetName].push(importedWord);
+          this.data[sheetName].push(processedWord);
           newWords++;
         }
       }
@@ -193,7 +200,8 @@ class VocabularyService {
         })
         .then(fetchedData => {
           console.log("Successfully loaded updated default vocabulary from JSON file");
-          this.data = fetchedData;
+          // Process data to ensure all fields have proper types
+          this.data = this.processDataTypes(fetchedData);
           this.storage.saveData(this.data);
           this.currentSheetName = "All words";
           this.shuffleCurrentSheet();
@@ -202,7 +210,7 @@ class VocabularyService {
           console.warn("Failed to load from JSON file, using built-in default vocabulary:", error);
           // Fallback to built-in default vocabulary if fetch fails
           const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
-          this.data = JSON.parse(JSON.stringify(vocabularyData));
+          this.data = this.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
           this.storage.saveData(this.data);
           this.currentSheetName = "All words";
           this.shuffleCurrentSheet();
@@ -213,6 +221,28 @@ class VocabularyService {
       console.error("Failed to load default vocabulary:", error);
       return false;
     }
+  }
+  
+  // Helper method to ensure all data has proper types
+  private processDataTypes(data: any): SheetData {
+    const processedData: SheetData = {};
+    
+    for (const sheetName in data) {
+      processedData[sheetName] = [];
+      
+      if (Array.isArray(data[sheetName])) {
+        for (const word of data[sheetName]) {
+          processedData[sheetName].push({
+            word: String(word.word || ""),
+            meaning: String(word.meaning || ""),
+            example: String(word.example || ""),
+            count: typeof word.count === 'number' ? word.count : parseInt(String(word.count || "0")) || 0
+          });
+        }
+      }
+    }
+    
+    return processedData;
   }
   
   private shuffleCurrentSheet() {

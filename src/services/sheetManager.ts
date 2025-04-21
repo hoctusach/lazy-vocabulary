@@ -76,10 +76,10 @@ export class SheetManager {
     return name;
   }
   
-  // Process rows with improved column name handling
+  // Process rows with improved column name handling and type conversion
   private processSheetRows(jsonData: any[]): VocabularyWord[] {
     return jsonData.map((row: any) => {
-      // Find the word column (try different possible names)
+      // Find the word column (try different possible keys)
       const wordValue = this.findValueByPossibleKeys(row, [
         'Word', 'word', 'WORD', 'Vocabulary', 'vocabulary', 'Term', 'term'
       ]);
@@ -99,11 +99,12 @@ export class SheetManager {
         'Count', 'count', 'COUNT', 'Views', 'views', 'Frequency', 'frequency'
       ]);
       
+      // Ensure proper types for all fields
       return {
         word: String(wordValue || ""),
         meaning: String(meaningValue || ""),
         example: String(exampleValue || ""),
-        count: parseInt(String(countValue || "0")) || 0
+        count: typeof countValue === 'number' ? countValue : parseInt(String(countValue || "0")) || 0
       };
     }).filter(word => word.word.trim() !== ""); // Filter out empty words
   }
