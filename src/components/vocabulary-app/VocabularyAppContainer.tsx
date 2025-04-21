@@ -1,32 +1,21 @@
-import React, { useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
 import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import FileUpload from "@/components/FileUpload"; // We'll stop using this to hide upload UI
 import VocabularyLayout from "@/components/VocabularyLayout";
-import {
-  stopSpeaking,
-  keepSpeechAlive,
-  ensureSpeechEngineReady,
-  extractMainWord,
-  forceResyncIfNeeded
-} from "@/utils/speech";
+import { stopSpeaking } from "@/utils/speech";
 import { useBackgroundColor } from "./useBackgroundColor";
 import { useVocabularyAppHandlers } from "./useVocabularyAppHandlers";
 
 const VocabularyAppContainer: React.FC = () => {
-  const syncCheckTimeoutRef = useRef<number | null>(null);
-  const keepAliveIntervalRef = useRef<number | null>(null);
-  const resyncTimeoutRef = useRef<number | null>(null);
-  const resetIntervalRef = useRef<number | null>(null);
+  // Refs and state
   const initialRenderRef = useRef(true);
-  const stateChangeDebounceRef = useRef<number | null>(null);
+  const [showWordCard] = useState(true);
 
-  const [showWordCard, setShowWordCard] = React.useState(true);
-
+  // Core hooks
   const {
     hasData,
     currentWord,
@@ -80,26 +69,7 @@ const VocabularyAppContainer: React.FC = () => {
   const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
 
   const clearAllTimeouts = useCallback(() => {
-    if (syncCheckTimeoutRef.current) {
-      clearTimeout(syncCheckTimeoutRef.current);
-      syncCheckTimeoutRef.current = null;
-    }
-    if (resyncTimeoutRef.current) {
-      clearTimeout(resyncTimeoutRef.current);
-      resyncTimeoutRef.current = null;
-    }
-    if (keepAliveIntervalRef.current) {
-      clearInterval(keepAliveIntervalRef.current);
-      keepAliveIntervalRef.current = null;
-    }
-    if (resetIntervalRef.current) {
-      clearInterval(resetIntervalRef.current);
-      resetIntervalRef.current = null;
-    }
-    if (stateChangeDebounceRef.current) {
-      clearTimeout(stateChangeDebounceRef.current);
-      stateChangeDebounceRef.current = null;
-    }
+    // no-op in simplified version
   }, []);
 
   const {
@@ -108,11 +78,6 @@ const VocabularyAppContainer: React.FC = () => {
     handleSwitchCategoryWithState
   } = useVocabularyAppHandlers({
     speakingRef,
-    syncCheckTimeoutRef,
-    keepAliveIntervalRef,
-    resetIntervalRef,
-    resyncTimeoutRef,
-    stateChangeDebounceRef,
     clearAllTimeouts,
     getCurrentText,
     isPaused,
@@ -131,31 +96,16 @@ const VocabularyAppContainer: React.FC = () => {
   });
 
   const handleNextWordClick = useCallback(() => {
-    clearAllTimeouts();
-    stopSpeaking();
     resetLastSpokenWord();
-
+    stopSpeaking();
     handleManualNext();
-
-    setTimeout(() => {
-      if (!isMuted && !isPaused) {
-        speakCurrentWord(true);
-      }
-    }, 1200);
-  }, [
-    isMuted,
-    isPaused,
-    handleManualNext,
-    resetLastSpokenWord,
-    speakCurrentWord,
-    clearAllTimeouts
-  ]);
+  }, [resetLastSpokenWord, handleManualNext]);
 
   const toggleView = useCallback(() => {
-    // Disabled toggling to upload view to hide upload section
+    // No toggle in simplified version
   }, []);
 
-  // Initial speak on first render
+  // Initial speak on load
   useEffect(() => {
     if (
       initialRenderRef.current &&
@@ -165,29 +115,12 @@ const VocabularyAppContainer: React.FC = () => {
       isVoicesLoaded
     ) {
       initialRenderRef.current = false;
-
-      if (currentWord.word) {
-        try {
-          localStorage.setItem("currentDisplayedWord", currentWord.word);
-        } catch (error) {
-          console.error("Error storing initial word:", error);
-        }
-      }
-
-      const timer = setTimeout(() => {
-        console.log(
-          "Initial render, force speaking current word:",
-          currentWord.word
-        );
-        resetLastSpokenWord();
-        stopSpeaking();
-
-        setTimeout(() => {
-          speakCurrentWord(true);
-        }, 1500);
+      resetLastSpokenWord();
+      stopSpeaking();
+      setTimeout(async () => {
+        await speakCurrentWord(true);
+        handleManualNext();
       }, 1000);
-
-      return () => clearTimeout(timer);
     }
   }, [
     currentWord,
@@ -195,10 +128,11 @@ const VocabularyAppContainer: React.FC = () => {
     isMuted,
     isVoicesLoaded,
     resetLastSpokenWord,
-    speakCurrentWord
+    speakCurrentWord,
+    handleManualNext
   ]);
 
-  // After each spoken word, advance then speak the next
+  // Advance and speak next word
   useEffect(() => {
     if (
       !initialRenderRef.current &&
@@ -211,31 +145,15 @@ const VocabularyAppContainer: React.FC = () => {
         if (!isPaused && !isMuted) {
           speakCurrentWord(true);
         }
-      }, 100);
-    }
-  }, [wordFullySpoken, isPaused, isMuted, handleManualNext, speakCurrentWord]);
-      }, 1000);
+      }, 50);
     }
   }, [
-    currentWord,
+    wordFullySpoken,
     isPaused,
     isMuted,
-    isVoicesLoaded,
-    resetLastSpokenWord,
+    handleManualNext,
     speakCurrentWord
   ]);
-
-  // After each word is fully spoken, advance to next
-  useEffect(() => {
-    if (
-      !initialRenderRef.current &&
-      wordFullySpoken &&
-      !isPaused &&
-      !isMuted
-    ) {
-      handleManualNext();
-    }
-  }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
 
   return (
     <VocabularyLayout
@@ -258,7 +176,7 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={handleSwitchCategoryWithState}
           currentCategory={currentSheetName}
           nextCategory={nextSheetName}
-          isSpeaking={isSpeakingRef.current}
+          isSpeaking={speakingRef.current}
           onNextWord={handleNextWordClick}
         />
       ) : (
