@@ -173,21 +173,31 @@ const VocabularyAppContainer: React.FC = () => {
   ]);
 
     // After each word is fully spoken, move to the next word
-  useEffect(() => {
-    if (
-      !initialRenderRef.current &&      // skip the very first run
-      wordFullySpoken &&                // speech finished
-      !isPaused &&                      // not paused
-      !isMuted                          // not muted
-    ) {
-      handleManualNext();
-    }
-  }, [
-    wordFullySpoken,
-    isPaused,
-    isMuted,
-    handleManualNext
-  ]);
+  // After each word is fully spoken, advance and then immediately speak the next
+ useEffect(() => {
+  if (
+    !initialRenderRef.current &&  // skip the very first load
+    wordFullySpoken &&
+    !isPaused &&
+    !isMuted
+  ) {
+    // 1) advance the word
+    handleManualNext();
+
+    // 2) small delay to let currentWord update in state, then speak it
+    setTimeout(() => {
+      if (!isPaused && !isMuted) {
+        speakCurrentWord(true);
+      }
+    }, 50);
+  }
+ }, [
+  wordFullySpoken,
+  isPaused,
+  isMuted,
+  handleManualNext,
+  speakCurrentWord
+ ]);
 
   useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
