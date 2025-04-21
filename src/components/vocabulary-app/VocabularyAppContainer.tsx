@@ -162,57 +162,6 @@ const VocabularyAppContainer: React.FC = () => {
   }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
 
   useEffect(() => {
-    const checkSyncAndFix = () => {
-      if (!currentWord || isPaused || isMuted) {
-        if (syncCheckTimeoutRef.current) {
-          clearTimeout(syncCheckTimeoutRef.current);
-          syncCheckTimeoutRef.current = null;
-        }
-        return;
-      }
-
-      const currentTextBeingSpoken = getCurrentText();
-
-      if (currentTextBeingSpoken && currentWord && speakingRef.current) {
-        const mainWord = extractMainWord(currentWord.word);
-        const spokenText = currentTextBeingSpoken.toLowerCase();
-
-        console.log(`Sync check: Word="${mainWord}", Speaking=${speakingRef.current}, Changing=${isChangingWordRef.current}`);
-
-        forceResyncIfNeeded(currentWord.word, currentTextBeingSpoken, () => {
-          console.log("Resync needed, restarting speech for word:", currentWord.word);
-          if (!resyncTimeoutRef.current) {
-            resyncTimeoutRef.current = window.setTimeout(() => {
-              resyncTimeoutRef.current = null;
-              if (currentWord && !isPaused && !isMuted) {
-                resetLastSpokenWord();
-                speakCurrentWord(true);
-              }
-            }, 600);
-          }
-        });
-      }
-
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-      }
-      syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 1000);
-    };
-
-    if (syncCheckTimeoutRef.current) {
-      clearTimeout(syncCheckTimeoutRef.current);
-    }
-    syncCheckTimeoutRef.current = window.setTimeout(checkSyncAndFix, 2000);
-
-    return () => {
-      if (syncCheckTimeoutRef.current) {
-        clearTimeout(syncCheckTimeoutRef.current);
-        syncCheckTimeoutRef.current = null;
-      }
-    };
-  }, [currentWord, isPaused, isMuted, getCurrentText, speakCurrentWord, speakingRef, isChangingWordRef, resetLastSpokenWord]);
-
-  useEffect(() => {
     isSpeakingRef.current = speakingRef.current;
   }, [speakingRef.current, isSpeakingRef]);
 
