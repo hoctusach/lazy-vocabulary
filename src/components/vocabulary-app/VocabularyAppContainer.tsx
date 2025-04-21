@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
@@ -6,16 +6,11 @@ import { vocabularyService } from "@/services/vocabularyService";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import VocabularyLayout from "@/components/VocabularyLayout";
-import { stopSpeaking } from "@/utils/speech";
 import { useBackgroundColor } from "./useBackgroundColor";
 import { useVocabularyAppHandlers } from "./useVocabularyAppHandlers";
 
 const VocabularyAppContainer: React.FC = () => {
-  // Refs and state
-  const initialRenderRef = useRef(true);
-  const [showWordCard] = useState(true);
-
-  // Core hooks
+  // Flags and simple handlers
   const {
     hasData,
     currentWord,
@@ -35,9 +30,7 @@ const VocabularyAppContainer: React.FC = () => {
     speakText,
     handleToggleMute,
     handleChangeVoice,
-    isVoicesLoaded,
-    speakingRef,
-    getCurrentText
+    isVoicesLoaded
   } = useSpeechSynthesis();
 
   const {
@@ -54,39 +47,22 @@ const VocabularyAppContainer: React.FC = () => {
     isChangingWordRef
   );
 
-  const {
-    backgroundColor,
-    advanceColor,
-    backgroundColorIndex,
-    setBackgroundColorIndex,
-    backgroundColors
-  } = useBackgroundColor();
+  const { backgroundColor, backgroundColors, setBackgroundColorIndex } = useBackgroundColor();
 
   const currentSheetName = vocabularyService.getCurrentSheetName();
-  const nextSheetIndex =
-    (vocabularyService.sheetOptions.indexOf(currentSheetName) + 1) %
-    vocabularyService.sheetOptions.length;
-  const nextSheetName = vocabularyService.sheetOptions[nextSheetIndex];
-
-  const clearAllTimeouts = useCallback(() => {
-    // no-op in simplified version
-  }, []);
+  const sheetOptions = vocabularyService.sheetOptions;
+  const nextSheetIndex = (sheetOptions.indexOf(currentSheetName) + 1) % sheetOptions.length;
+  const nextSheetName = sheetOptions[nextSheetIndex];
 
   const {
     handleToggleMuteWithSpeaking,
     handleChangeVoiceWithSpeaking,
     handleSwitchCategoryWithState
   } = useVocabularyAppHandlers({
-    speakingRef,
-    clearAllTimeouts,
-    getCurrentText,
-    isPaused,
-    isMuted,
-    isVoicesLoaded,
+    isSpeakingRef,
+    isChangingWordRef,
     resetLastSpokenWord,
     speakCurrentWord,
-    isChangingWordRef,
-    currentWord,
     handleToggleMute,
     handleChangeVoice,
     handleSwitchCategory,
@@ -95,73 +71,16 @@ const VocabularyAppContainer: React.FC = () => {
     backgroundColors
   });
 
-  const handleNextWordClick = useCallback(() => {
-    resetLastSpokenWord();
-    stopSpeaking();
-    handleManualNext();
-  }, [resetLastSpokenWord, handleManualNext]);
-
-  const toggleView = useCallback(() => {
-    // No toggle in simplified version
-  }, []);
-
-  // Initial speak on load
+  // Advance whenever a word finishes speaking
   useEffect(() => {
-    if (
-      initialRenderRef.current &&
-      currentWord &&
-      !isPaused &&
-      !isMuted &&
-      isVoicesLoaded
-    ) {
-      initialRenderRef.current = false;
-      resetLastSpokenWord();
-      stopSpeaking();
-      setTimeout(async () => {
-        await speakCurrentWord(true);
-        handleManualNext();
-      }, 1000);
-    }
-  }, [
-    currentWord,
-    isPaused,
-    isMuted,
-    isVoicesLoaded,
-    resetLastSpokenWord,
-    speakCurrentWord,
-    handleManualNext
-  ]);
-
-  // Advance and speak next word
-  useEffect(() => {
-    if (
-      !initialRenderRef.current &&
-      wordFullySpoken &&
-      !isPaused &&
-      !isMuted
-    ) {
+    if (wordFullySpoken && !isPaused && !isMuted) {
       handleManualNext();
-      setTimeout(() => {
-        if (!isPaused && !isMuted) {
-          speakCurrentWord(true);
-        }
-      }, 50);
     }
-  }, [
-    wordFullySpoken,
-    isPaused,
-    isMuted,
-    handleManualNext,
-    speakCurrentWord
-  ]);
+  }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
 
   return (
-    <VocabularyLayout
-      showWordCard={showWordCard}
-      hasData={hasData}
-      onToggleView={toggleView}
-    >
-      {currentWord && hasData && showWordCard ? (
+    <VocabularyLayout hasData={hasData}>
+      {hasData && currentWord ? (
         <VocabularyCard
           word={currentWord.word}
           meaning={currentWord.meaning}
@@ -176,8 +95,8 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={handleSwitchCategoryWithState}
           currentCategory={currentSheetName}
           nextCategory={nextSheetName}
-          isSpeaking={speakingRef.current}
-          onNextWord={handleNextWordClick}
+          isSpeaking={isSpeakingRef.current}
+          onNextWord={handleManualNext}
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
