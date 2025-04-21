@@ -319,6 +319,7 @@ const VocabularyAppContainer: React.FC = () => {
       stopSpeaking();
     };
   }, [clearAllTimeouts]);
+  
   useEffect(() => {
     if (
       !initialRenderRef.current &&
