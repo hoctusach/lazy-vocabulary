@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import VocabularyLayout from "@/components/VocabularyLayout";
@@ -27,154 +27,92 @@ const VocabularyAppContainer: React.FC = () => {
     isVoicesLoaded
   } = useSpeechSynthesis();
 
-  const [speechError, setSpeechError] = useState(false);
-  const [currentAudioIndex, setCurrentAudioIndex] = useState(0); // Track the current audio being played
-  const [displayTimeRemaining, setDisplayTimeRemaining] = useState(0); // Track how long to display each card
-  const [isSoundPlaying, setIsSoundPlaying] = useState(false); // Track if sound is currently playing
-  const [isLoading, setIsLoading] = useState(true); // Track loading state
-
+  const [isSoundPlaying, setIsSoundPlaying] = useState(false);
+  const [mute, setMute] = useState(isMuted);
+  const [currentAudioDuration, setCurrentAudioDuration] = useState(0);
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  const soundRef = useRef<HTMLAudioElement | null>(null); // Ref to keep track of the sound
+  const soundRef = useRef<HTMLAudioElement | null>(null);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [displayTime, setDisplayTime] = useState(0);  // Time the card stays visible
 
-  // Queues to track words, meanings, and examples
-  const wordQueue = useRef<string[]>([]); // Queue for words
-  const meaningQueue = useRef<string[]>([]); // Queue for meanings
-  const exampleQueue = useRef<string[]>([]); // Queue for examples
+  const startDisplayTime = useRef(Date.now());
 
-  // Helper function to calculate the duration of sound (word + meaning + example)
-  const calculateDuration = useCallback(() => {
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-    return fullText.split(' ').length * 200; // 200ms per word
-  }, [currentWord]);
-
-  // Function to handle mute/unmute behavior
-  const speakAndAdvance = useCallback(() => {
-    if (wordQueue.current.length > 0 && !isPaused && !isMuted) {
-      const word = wordQueue.current[0];
-      const meaning = meaningQueue.current[0];
-      const example = exampleQueue.current[0];
-      const fullText = `${word}. ${meaning}. ${example}`;
-
-      speakText(fullText)
-        .then(() => {
-          // After speaking, remove the word from the queue and move to next
-          wordQueue.current.shift();
-          meaningQueue.current.shift();
-          exampleQueue.current.shift();
-
-          // Move to the next word after speaking the current one
-          handleManualNext();
-        })
-        .catch(err => {
-          console.error('Speech error:', err);
-          setSpeechError(true); // Set error if speech fails
-        });
+  const stopAudio = () => {
+    if (soundRef.current) {
+      soundRef.current.pause();
+      soundRef.current.currentTime = 0; // Reset audio position
     }
-  }, [speakText, handleManualNext, isMuted, isPaused]);
-
-  // Load words and prepare them for sequential reading
-  useEffect(() => {
-    if (currentWord && !isPaused && !isMuted && isVoicesLoaded) {
-      setIsLoading(false); // Set loading state to false once currentWord is available
-      // Initialize the queues for the current word, meaning, and example
-      wordQueue.current.push(currentWord.word);
-      meaningQueue.current.push(currentWord.meaning);
-      exampleQueue.current.push(currentWord.example);
-
-      // Start speaking the word after a short delay
-      setTimeout(() => speakAndAdvance(), 500);
-    }
-  }, [currentWord, isPaused, isMuted, isVoicesLoaded, speakAndAdvance]);
-
-  // Logic to track sound progress and handle mute functionality
-  useEffect(() => {
-    if (isMuted || !currentWord || isPaused) {
-      setIsSoundPlaying(false);
-      setDisplayTimeRemaining(0); // Do not play sound, but still display the word
-      if (soundRef.current) {
-        soundRef.current.pause(); // Stop sound immediately when muted
-      }
-      return;
-    }
-
-    if (!isSoundPlaying) {
-      setIsSoundPlaying(true);
-      const duration = calculateDuration();
-      setDisplayTimeRemaining(duration); // Set display time equal to the sound duration
-      // Play the sound if it's not muted
-      if (soundRef.current) {
-        soundRef.current.play();
-      }
-    }
-  }, [currentWord, isMuted, isPaused, isSoundPlaying, calculateDuration]);
-
-  // Display card while ensuring the time is displayed for the estimated duration
-  useEffect(() => {
-    if (displayTimeRemaining > 0) {
-      setTimeout(() => {
-        setDisplayTimeRemaining(0);
-        handleManualNext(); // Advance after the display duration is over
-      }, displayTimeRemaining);
-    }
-  }, [displayTimeRemaining, handleManualNext]);
-
-  const handleMuteClick = () => {
-    if (isMuted) {
-      // If currently muted, unmute and play the word
-      if (soundRef.current) {
-        soundRef.current.play();
-      }
-    } else {
-      // If muted, stop any sound playing immediately
-      if (soundRef.current) {
-        soundRef.current.pause();
-      }
-    }
-    handleToggleMute(); // Toggle the mute state
+    setAudioPlaying(false);
   };
 
-  // If the page is loading, show a loading message
-  if (isLoading) {
-    return (
-      <div className="loading-screen">
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
+  const playAudio = useCallback(async (text: string) => {
+    if (mute || !text) return; // Don't play audio if muted or no text
+
+    const audio = new Audio();
+    soundRef.current = audio;
+    audio.src = await speakText(text); // This function needs to return an audio URL or data.
+    audio.play();
+
+    setAudioPlaying(true);
+
+    audio.onended = () => {
+      setAudioPlaying(false);
+      handleManualNext(); // Proceed to next word after the sound finishes
+    };
+
+    // Get the audio duration and set display time
+    audio.onloadedmetadata = () => {
+      setCurrentAudioDuration(audio.duration * 1000); // Convert to ms
+      setDisplayTime(audio.duration * 1000); // Set display duration to match audio length
+    };
+  }, [mute, speakText]);
+
+  useEffect(() => {
+    if (mute) {
+      stopAudio();
+    } else if (currentWord && !audioPlaying) {
+      // If sound is not playing and not muted, start playing the current word audio
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+      playAudio(fullText);
+    }
+
+    return () => {
+      stopAudio(); // Cleanup the audio when component unmounts
+    };
+  }, [currentWord, mute, audioPlaying, playAudio]);
+
+  const toggleMute = () => {
+    setMute(!mute); // Toggle mute state
+    if (mute) {
+      stopAudio(); // Stop playing if mute is activated
+    }
+  };
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {hasData && currentWord ? (
-        <>
-          {/* Show the word, meaning, and example */}
-          <VocabularyCard
-            word={currentWord.word}
-            meaning={currentWord.meaning}
-            example={currentWord.example}
-            backgroundColor="#ffffff"
-            isMuted={isMuted}
-            isPaused={isPaused}
-            voiceRegion={voiceRegion}
-            onToggleMute={handleMuteClick}
-            onTogglePause={handleTogglePause}
-            onChangeVoice={handleChangeVoice}
-            onSwitchCategory={() => handleSwitchCategory()}
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
-            isSpeaking={isSoundPlaying}
-            onNextWord={handleManualNext}
-          />
-          {/* Show error message if speech fails */}
-          {speechError && (
-            <div className="alert alert-danger">
-              Audio is unavailable at the moment. Please try again later.
-            </div>
-          )}
-        </>
+        <VocabularyCard
+          word={currentWord.word}
+          meaning={currentWord.meaning}
+          example={currentWord.example}
+          backgroundColor="#ffffff"
+          isMuted={mute}
+          isPaused={isPaused}
+          voiceRegion={voiceRegion}
+          onToggleMute={toggleMute}
+          onTogglePause={handleTogglePause}
+          onChangeVoice={handleChangeVoice}
+          onSwitchCategory={() => handleSwitchCategory(mute, voiceRegion)}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory}
+          isSpeaking={audioPlaying}
+          onNextWord={handleManualNext}
+          displayTime={displayTime} // Pass displayTime to the card to control visibility
+        />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
       )}
