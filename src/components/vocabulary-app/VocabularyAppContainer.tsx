@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
+import { useWordSpeechSync } from "@/hooks/useWordSpeechSync";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
@@ -15,7 +16,10 @@ const VocabularyAppContainer: React.FC = () => {
     handleFileUploaded,
     handleTogglePause,
     handleManualNext,
-    handleSwitchCategory
+    handleSwitchCategory,
+    setHasData,
+    isSpeakingRef,
+    isChangingWordRef
   } = useVocabularyManager();
 
   const {
@@ -27,60 +31,53 @@ const VocabularyAppContainer: React.FC = () => {
     isVoicesLoaded
   } = useSpeechSynthesis();
 
-  // Track component mount status for cleanup
-  const mountedRef = useRef(true);
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  // Speak current word (with meaning & example) then advance
-  useEffect(() => {
-    if (!hasData || !currentWord || isPaused || isMuted) return;
-
-    // Construct the full speech text
-    const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-    let cancelled = false;
-
-    const playSpeech = async () => {
-      // Wait for voices to load if needed
-      while (!isVoicesLoaded && mountedRef.current && !cancelled) {
-        await new Promise((r) => setTimeout(r, 100));
-      }
-      if (!mountedRef.current || cancelled) return;
-
-      try {
-        await speakText(fullText);
-      } catch (err) {
-        console.error("Speech error:", err);
-      }
-
-      if (!mountedRef.current || cancelled) return;
-      handleManualNext();
-    };
-
-    playSpeech();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    hasData,
+  const {
+    speakCurrentWord,
+    resetLastSpokenWord,
+    wordFullySpoken
+  } = useWordSpeechSync(
     currentWord,
     isPaused,
     isMuted,
     isVoicesLoaded,
     speakText,
-    handleManualNext
-  ]);
+    isSpeakingRef,
+    isChangingWordRef
+  );
 
-  // Compute categories for buttons
+  // Compute current/next category labels
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
+
+  // 1) On first word only, speak immediately
+  const initialRenderRef = useRef(true);
+  useEffect(() => {
+    if (
+      initialRenderRef.current &&
+      currentWord &&
+      !isPaused &&
+      !isMuted &&
+      isVoicesLoaded
+    ) {
+      initialRenderRef.current = false;
+      resetLastSpokenWord();
+      speakCurrentWord(true);
+    }
+  }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
+
+  // 2) After each word finishes speaking, advance to next
+  useEffect(() => {
+    if (
+      !initialRenderRef.current &&
+      wordFullySpoken &&
+      !isPaused &&
+      !isMuted
+    ) {
+      handleManualNext();
+    }
+  }, [wordFullySpoken, isPaused, isMuted, handleManualNext]);
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -99,8 +96,12 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={() => handleSwitchCategory(isMuted, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={false}
-          onNextWord={handleManualNext}
+          isSpeaking={isSpeakingRef.current}
+          onNextWord={() => {
+            resetLastSpokenWord();
+            speakCurrentWord(true);
+            handleManualNext();
+          }}
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
@@ -110,7 +111,6 @@ const VocabularyAppContainer: React.FC = () => {
 };
 
 export default VocabularyAppContainer;
-
 
 
 // import React, { useEffect, useCallback } from "react";
