@@ -162,32 +162,6 @@ const VocabularyAppContainer: React.FC = () => {
   }, [currentWord, isPaused, isMuted, isVoicesLoaded, resetLastSpokenWord, speakCurrentWord]);
 
   useEffect(() => {
-    if (keepAliveIntervalRef.current) {
-      clearInterval(keepAliveIntervalRef.current);
-    }
-
-    keepAliveIntervalRef.current = window.setInterval(() => {
-      if (speakingRef.current && !isPaused && !isMuted) {
-        keepSpeechAlive();
-      }
-    }, 10);
-
-    if (resetIntervalRef.current) {
-      clearInterval(resetIntervalRef.current);
-    }
-
-    resetIntervalRef.current = window.setInterval(() => {
-      if (!speakingRef.current && !isPaused) {
-        ensureSpeechEngineReady();
-      }
-    }, 60000);
-
-    return () => {
-      clearAllTimeouts();
-    };
-  }, [speakingRef, isPaused, isMuted, clearAllTimeouts]);
-
-  useEffect(() => {
     const checkSyncAndFix = () => {
       if (!currentWord || isPaused || isMuted) {
         if (syncCheckTimeoutRef.current) {
