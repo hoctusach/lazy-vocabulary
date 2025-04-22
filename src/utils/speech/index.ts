@@ -2,13 +2,11 @@
 import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
 import { calculateSpeechDuration } from './durationUtils';
 import { 
-  isSpeechSynthesisSupported, 
-  stopSpeaking, 
-  checkSoundDisplaySync, 
+  synthesizeAudio,
+  stopSpeaking,
   keepSpeechAlive,
   waitForSpeechReadiness,
   resetSpeechEngine,
-  validateCurrentSpeech,
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
   extractMainWord,
@@ -16,7 +14,10 @@ import {
   getSpeechPitch,
   getSpeechVolume,
   prepareTextForSpeech,
-  addPausesToText
+  addPausesToText,
+  isSpeechSynthesisSupported,
+  checkSoundDisplaySync,
+  validateCurrentSpeech
 } from './synthesisUtils';
 
 export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
@@ -260,5 +261,6 @@ export {
   getSpeechPitch,
   getSpeechVolume,
   prepareTextForSpeech,
-  addPausesToText
+  addPausesToText,
+  synthesizeAudio
 };

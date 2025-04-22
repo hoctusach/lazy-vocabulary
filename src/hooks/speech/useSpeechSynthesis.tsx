@@ -1,7 +1,8 @@
+
 import { useState, useRef, useCallback } from 'react';
 import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
-import { synthesizeAudio } from '@/utils/speech';
+import { synthesizeAudio } from '@/utils/speech/synthesisUtils';
 
 export const useSpeechSynthesis = () => {
   const { isVoicesLoaded, selectVoiceByRegion } = useVoiceManager();

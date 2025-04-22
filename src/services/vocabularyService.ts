@@ -1,3 +1,4 @@
+
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
@@ -332,7 +333,17 @@ class VocabularyService {
     
     if (wordIndex !== undefined && currentData[wordIndex]) {
       // Increment count and save
-      currentData[wordIndex].count = (currentData[wordIndex].count || 0) + 1;
+      const currentValue = currentData[wordIndex].count;
+      // Convert to number, add 1, then store in the same format (string or number)
+      let newValue: string | number;
+      
+      if (typeof currentValue === 'string') {
+        newValue = String(parseInt(currentValue || '0', 10) + 1);
+      } else {
+        newValue = (currentValue || 0) + 1;
+      }
+      
+      currentData[wordIndex].count = newValue;
       this.storage.saveData(this.data);
       
       console.log(`Moving to next word: "${currentData[wordIndex].word}" (index ${this.currentIndex}/${this.shuffledIndices.length-1})`);
