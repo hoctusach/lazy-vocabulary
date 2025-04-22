@@ -5171,10 +5171,10 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "perfect, model",
-      "meaning": ".",
+      "meaning": ",",
       "example": "a model boss; a perfect house",
       "count": 0
-    },
+    }, 
     {
       "word": "major, significant, essential, vital (= very important)",
       "meaning": "important",
@@ -17855,7 +17855,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "perfect, model",
-      "meaning": ".",
+      "meaning": ",",
       "example": "a model boss; a perfect house",
       "count": 0
     },
