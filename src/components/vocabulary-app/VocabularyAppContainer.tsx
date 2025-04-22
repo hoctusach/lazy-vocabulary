@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
@@ -24,83 +25,87 @@ const VocabularyAppContainer: React.FC = () => {
     speakText,
     handleToggleMute,
     handleChangeVoice,
-    isVoicesLoaded
+    isVoicesLoaded,
+    stopSpeaking
   } = useSpeechSynthesis();
 
   const [isSoundPlaying, setIsSoundPlaying] = useState(false);
   const [mute, setMute] = useState(isMuted);
-  const [currentAudioDuration, setCurrentAudioDuration] = useState(0);
   const currentCategory = vocabularyService.getCurrentSheetName();
   const sheetOptions = vocabularyService.sheetOptions;
   const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
   const nextCategory = sheetOptions[nextIndex];
 
-  const soundRef = useRef<HTMLAudioElement | null>(null);
-  const [audioPlaying, setAudioPlaying] = useState(false);
-  const [displayTime, setDisplayTime] = useState(0);  // Time the card stays visible
+  // Auto-advance timer
+  const autoAdvanceTimerRef = useRef<number | null>(null);
+  const [displayTime, setDisplayTime] = useState(10000);  // Default display time
 
-  const startDisplayTime = useRef(Date.now());
-
-  const stopAudio = () => {
-    if (soundRef.current) {
-      soundRef.current.pause();
-      soundRef.current.currentTime = 0; // Reset audio position
+  // Clear the auto-advance timer
+  const clearAutoAdvanceTimer = useCallback(() => {
+    if (autoAdvanceTimerRef.current) {
+      window.clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
     }
-    setAudioPlaying(false);
-  };
+  }, []);
 
-  const playAudio = useCallback(async (text: string) => {
-    if (mute || !text) return; // Don't play audio if muted or no text
-
-    try {
-      const audio = new Audio();
-      soundRef.current = audio;
-      
-      // Call speakText and get the audio source
-      const audioSource = await Promise.resolve(speakText(text));
-      
-      // Only proceed if we have a valid audio source
-      if (audioSource && typeof audioSource === 'string') {
-        audio.src = audioSource;
-        audio.play();
-
-        setAudioPlaying(true);
-
-        audio.onended = () => {
-          setAudioPlaying(false);
-          handleManualNext(); // Proceed to next word after the sound finishes
-        };
-
-        // Get the audio duration and set display time
-        audio.onloadedmetadata = () => {
-          setCurrentAudioDuration(audio.duration * 1000); // Convert to ms
-          setDisplayTime(audio.duration * 1000); // Set display duration to match audio length
-        };
-      }
-    } catch (error) {
-      console.error("Error playing audio:", error);
-      setAudioPlaying(false);
-    }
-  }, [mute, speakText, handleManualNext]);
-
+  // Handle playing audio when the current word changes
   useEffect(() => {
-    if (mute) {
-      stopAudio();
-    } else if (currentWord && !audioPlaying) {
-      // If sound is not playing and not muted, start playing the current word audio
-      const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-      playAudio(fullText);
-    }
-
-    return () => {
-      stopAudio(); // Cleanup the audio when component unmounts
+    const playWordAudio = async () => {
+      if (!currentWord || mute || isPaused) return;
+      
+      // Clear any existing timers
+      clearAutoAdvanceTimer();
+      setIsSoundPlaying(true);
+      
+      try {
+        // Create the full text to speak
+        const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+        
+        // Speak the text and wait for completion
+        await speakText(fullText);
+        
+        // After speech completes, set timer for next word
+        if (!isPaused && !mute) {
+          autoAdvanceTimerRef.current = window.setTimeout(() => {
+            if (!isPaused) {
+              handleManualNext();
+            }
+          }, 2000); // Wait 2 seconds after audio finishes before advancing
+        }
+      } catch (error) {
+        console.error("Error playing audio:", error);
+      } finally {
+        setIsSoundPlaying(false);
+      }
     };
-  }, [currentWord, mute, audioPlaying, playAudio]);
 
+    // Start playing audio when current word changes
+    playWordAudio();
+    
+    // Cleanup function
+    return () => {
+      clearAutoAdvanceTimer();
+      stopSpeaking();
+    };
+  }, [currentWord, mute, isPaused, speakText, handleManualNext, clearAutoAdvanceTimer, stopSpeaking]);
+
+  // Handle mute state changes
+  useEffect(() => {
+    setMute(isMuted);
+  }, [isMuted]);
+
+  // Toggle mute
   const toggleMute = () => {
-    setMute(!mute); // Toggle mute state
+    setMute(!mute);
+    handleToggleMute();
+    
     if (!mute) {
-      stopAudio(); // Stop playing if mute is activated
+      stopSpeaking();
+      clearAutoAdvanceTimer();
+    } else if (currentWord && !isPaused) {
+      // If unmuting, play the current word
+      const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+      speakText(fullText);
     }
   };
 
@@ -121,9 +126,9 @@ const VocabularyAppContainer: React.FC = () => {
           onSwitchCategory={() => handleSwitchCategory(mute, voiceRegion)}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
-          isSpeaking={audioPlaying}
+          isSpeaking={isSoundPlaying}
           onNextWord={handleManualNext}
-          displayTime={displayTime} // Now properly passed to VocabularyCard
+          displayTime={displayTime}
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
