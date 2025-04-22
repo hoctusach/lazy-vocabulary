@@ -1,4 +1,3 @@
-
 export interface VocabularyWord {
   word: string;
   meaning: string;
@@ -9,3 +8,6 @@ export interface VocabularyWord {
 export interface SheetData {
   [key: string]: VocabularyWord[];
 }
+
+// Add the SpeechSynthesisVoice type if it's used in the project
+export type { SpeechSynthesisVoice } from './speech';

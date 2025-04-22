@@ -1,5 +1,4 @@
-
-import { SpeechSynthesisVoice } from '@/types/vocabulary';
+import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const stopSpeaking = (): void => {
   if (window.speechSynthesis) {
@@ -44,4 +43,3 @@ export const ensureSpeechEngineReady = async (): Promise<void> => {
 export const isSpeechSynthesisSupported = (): boolean => {
   return typeof window !== 'undefined' && 'speechSynthesis' in window;
 };
-
