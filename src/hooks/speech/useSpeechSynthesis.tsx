@@ -1,93 +1,77 @@
-import { useEffect, useCallback, useRef } from 'react';
-import { speak, stopSpeaking } from '@/utils/speech';
+import { useState, useRef, useCallback } from 'react';
+import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
-import { useVoiceLoading } from './useVoiceLoading';
+import { synthesizeAudio } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
-  const { isMuted, voiceRegion, setIsMuted, setVoiceRegion } = useVoiceSettings();
-  const {
-    isVoicesLoaded,
-    currentVoiceRef,
-    lastVoiceRegionRef,
-    pendingSpeechRef
-  } = useVoiceLoading(voiceRegion);
-
-  const speakingRef = useRef(false);
-  const speechRequestIdRef = useRef(0);
-  const currentTextRef = useRef<string | null>(null);
-
-  // ▶️ When voices finish loading, replay any queued speech
-  useEffect(() => {
-    if (isVoicesLoaded && pendingSpeechRef.current) {
-      const { text, forceSpeak } = pendingSpeechRef.current;
-      pendingSpeechRef.current = null;
-      _speakText(text, forceSpeak);
+  const { isVoicesLoaded, selectVoiceByRegion } = useVoiceManager();
+  const { voiceRegion, setVoiceRegion, isMuted, setIsMuted } = useVoiceSettings();
+  const [lastSpokenText, setLastSpokenText] = useState('');
+  
+  // For keeping track of speaking state
+  const isSpeakingRef = useRef(false);
+  const audioElementRef = useRef<HTMLAudioElement | null>(null);
+  
+  // Function to stop current speech
+  const stopSpeaking = useCallback(() => {
+    if (audioElementRef.current) {
+      audioElementRef.current.pause();
+      audioElementRef.current = null;
     }
-  }, [isVoicesLoaded]);
-
-  // Internal function that does the real speak + queuing logic
-  const _speakText = useCallback(
-    async (text: string, forceSpeak: boolean): Promise<void> => {
-      currentTextRef.current = text;
-
-      // If voices not ready, queue for later
-      if (!isVoicesLoaded) {
-        pendingSpeechRef.current = { text, forceSpeak };
-        return;
+    
+    // Also cancel any ongoing speech synthesis
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    isSpeakingRef.current = false;
+  }, []);
+  
+  // Function to speak text, returns a Promise that resolves to an audio URL or empty string
+  const speakText = useCallback((text: string): Promise<string> => {
+    if (isMuted || !text) {
+      console.log("Speech is muted or text is empty");
+      return Promise.resolve('');
+    }
+    
+    // Stop any currently playing speech
+    stopSpeaking();
+    
+    try {
+      setLastSpokenText(text);
+      
+      // Get the selected voice based on region
+      const voice = selectVoiceByRegion(voiceRegion);
+      
+      if (!voice) {
+        console.warn(`No ${voiceRegion} voice available, using default fallback`);
       }
-
-      // Mute or empty text => no-op
-      if (isMuted || !text) {
-        return;
-      }
-
-      // If already speaking, cancel and wait a moment
-      if (speakingRef.current) {
-        stopSpeaking();
-        await new Promise((r) => setTimeout(r, 100));
-      }
-
-      const requestId = ++speechRequestIdRef.current;
-      speakingRef.current = true;
-
-      try {
-        await speak(text, voiceRegion);
-      } catch (error) {
-        console.error('Speech error:', error);
-      } finally {
-        // Only clear speaking flag if this is the last request
-        if (requestId === speechRequestIdRef.current) {
-          speakingRef.current = false;
-        }
-      }
-    },
-    [isMuted, voiceRegion, isVoicesLoaded]
-  );
-
-  // Public speakText matches original signature
-  const speakText = useCallback((text: string) => _speakText(text, true), [_speakText]);
-
-  // Toggle mute/unmute
+      
+      // Create the audio URL
+      const audioUrl = synthesizeAudio(text, voice);
+      console.log(`Generated audio for: "${text.substring(0, 20)}..."`);
+      
+      return Promise.resolve(audioUrl);
+    } catch (error) {
+      console.error("Error in speech synthesis:", error);
+      return Promise.resolve('');
+    }
+  }, [isMuted, selectVoiceByRegion, voiceRegion, stopSpeaking]);
+  
+  // Function to toggle mute state
   const handleToggleMute = useCallback(() => {
-    setIsMuted((prev) => {
-      const next = !prev;
-      stopSpeaking();
-      return next;
-    });
-  }, [setIsMuted]);
-
-  // Switch voice region
+    stopSpeaking();
+    setIsMuted(!isMuted);
+    console.log(`Speech ${!isMuted ? 'muted' : 'unmuted'}`);
+  }, [isMuted, setIsMuted, stopSpeaking]);
+  
+  // Function to change voice region
   const handleChangeVoice = useCallback(() => {
-    setVoiceRegion((prev) => {
-      const next = prev === 'US' ? 'UK' : 'US';
-      stopSpeaking();
-      return next;
-    });
-  }, [setVoiceRegion]);
-
-  // Expose current text (for sync checks, if needed)
-  const getCurrentText = useCallback(() => currentTextRef.current, []);
-
+    const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
+    setVoiceRegion(newRegion);
+    console.log(`Voice changed to ${newRegion}`);
+  }, [voiceRegion, setVoiceRegion]);
+  
   return {
     isMuted,
     voiceRegion,
@@ -95,7 +79,7 @@ export const useSpeechSynthesis = () => {
     handleToggleMute,
     handleChangeVoice,
     isVoicesLoaded,
-    speakingRef,
-    getCurrentText
+    isSpeakingRef,
+    stopSpeaking
   };
 };

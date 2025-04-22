@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
@@ -57,10 +56,11 @@ const VocabularyAppContainer: React.FC = () => {
       const audio = new Audio();
       soundRef.current = audio;
       
-      // Call speakText and handle both string and Promise<string> returns
-      const audioSource = await speakText(text);
+      // Call speakText and get the audio source
+      const audioSource = await Promise.resolve(speakText(text));
       
-      if (audioSource) {
+      // Only proceed if we have a valid audio source
+      if (audioSource && typeof audioSource === 'string') {
         audio.src = audioSource;
         audio.play();
 
