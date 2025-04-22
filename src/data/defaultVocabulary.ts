@@ -90,7 +90,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "be in the public eye",
       "meaning": "to be famous and written about in newspapers and magazines and seen on television",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -684,7 +684,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Pay under the table",
       "meaning": "To pay someone secretly or illegally, usually to avoid taxes or regulations.   The restaurant owner was caught paying employees under the table to avoid payroll taxes.t's illegal to pay workers under the table in many countries.   ",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -696,7 +696,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Put something on the back burner",
       "meaning": "To postpone or delay something, usually a task or project, in order to focus on more immediate or pressing matters.   I had to put my plans to start a business on the back burner because of other commitments.he company decided to put the new product development on the back burner until the market conditions improved.   ",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -3354,7 +3354,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Out of the way",
       "meaning": "Strange",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -4896,13 +4896,13 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "leverage",
       "meaning": "the mechanical advantage gained by being in a position to use a lever strategic advantage; power to act effectively investing with borrowed money as a way to amplify potential gains (at the risk of greater losses) supplement with leverage provide with leverage",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "apple",
       "meaning": "Qu\u1ea3 t\u00e1o",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -4956,7 +4956,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Subjects: Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic",
       "meaning": "Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic; Humanities; Business management; Archaeology; Agriculture",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -4986,7 +4986,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "He would - he'd - He'd like to see you now. why have - Why've. Why've you come? I will - I'll - I'll think about it. where did - Where'd - Where'd you get that? they are - they're - They're already here",
       "meaning": "Less common words/expressions",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -5526,7 +5526,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "actually",
       "meaning": "Use actually to give an unexpected or surprising response.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -6024,7 +6024,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "(A) Watercolour (adjective/noun)",
       "meaning": "A type of paint or painting style that is based in water rather than oil.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -8694,301 +8694,301 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "manifest (adjective)",
       "meaning": "Evident to the senses, especially to the sight",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "manipulate (verb)",
       "meaning": "To influence, manage, direct, or control something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "market (verb)",
       "meaning": "A formally organized system of trading in specified goods or money",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "metamorphosis (noun)",
       "meaning": "A transformation; a noticeable change in character or appearance",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "migrate (verb)",
       "meaning": "To relocate from one location to another",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "minimize (verb)",
       "meaning": "To make smaller or less significant",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "mourn (verb)",
       "meaning": "To express sadness for; to grieve",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "myriad (noun)",
       "meaning": "A countless number of specified things",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "narrative (adjective)",
       "meaning": "Story",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "native (adjective)",
       "meaning": "Belonging to somewhere or someone by birth",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "nimble (adjective)",
       "meaning": "Quick and light in movement or action; intelligent and alert",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "notable (adjective)",
       "meaning": "Worthy of noticing; worthy of being praised",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "notion (noun)",
       "meaning": "Thought or opinion",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "novel (adjective)",
       "meaning": "New, original, especially in an interesting way",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "object (verb)",
       "meaning": "To disagree with something or someone",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "oblige (verb)",
       "meaning": "Require to do something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obliterate (verb)",
       "meaning": "To remove completely; to destroy",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obscure (adjective)",
       "meaning": "Hidden, out of sight; difficult to understand",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obsolete (adjective)",
       "meaning": "No longer in use",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obstacle (noun)",
       "meaning": "Something that stops progress",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "offset (verb)",
       "meaning": "To compensate for, by applying a change in the opposite direction; to balance out",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "onset (noun)",
       "meaning": "Beginning of something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "operation (noun)",
       "meaning": "The method or practice by which actions are done; a planned undertaking",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "ordinary (adjective)",
       "meaning": "Normal; routine",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outdo (verb)",
       "meaning": "To excel; go beyond in performance",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outsource (verb)",
       "meaning": "To transfer the management and/or day-to-day execution of a business function to a third-party service provider, especially internationally",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outweigh (verb)",
       "meaning": "To exceed in importance or value",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "overcome (verb)",
       "meaning": "To win or prevail in some sort of battle, contest, etc.; to get the better of",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "overwhelm (verb)",
       "meaning": "To overpower or crush; to overpower emotionally",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "pace (noun)",
       "meaning": "Speed or velocity",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "paradox (noun)",
       "meaning": "An apparently self-contradictory statement, which can only be true if it is false, and vice versa",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "parity (noun)",
       "meaning": "Equality; comparability of strength or intensity",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "partial (adjective)",
       "meaning": "Existing as a part or portion of a whole; incomplete",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "peak (noun)",
       "meaning": "The highest value reached by some quantity in a time period",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "perception (noun)",
       "meaning": "Understanding of something; awareness of a situation",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "periodic (adjective)",
       "meaning": "Occurring at regular intervals",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "permanent (adjective)",
       "meaning": "Lasting a long time, perhaps forever",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "persist (verb)",
       "meaning": "To continue stubbornly in spite of opposition or warning",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "phase (noun)",
       "meaning": "Part of a sequence or cycle occurring over time",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "precede (verb)",
       "meaning": "To go before",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "preserve (verb)",
       "meaning": "To protect; To save from decay",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "prohibit (verb)",
       "meaning": "To forbid or disallow officially; to make illegal",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "prominent (adjective)",
       "meaning": "Standing out or projecting; distinguished above others",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "protest (verb)",
       "meaning": "To make a strong objection",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "purpose (noun)",
       "meaning": "An object to be reached; a target; an aim; a goal",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "questionable (adjective)",
       "meaning": "Problematic; open to doubt or challenge",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "radical (adjective)",
       "meaning": "Favoring fundamental change, or change at the root cause of a matter",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "ramification (noun)",
       "meaning": "A result of a decision or event",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "random (adjective)",
       "meaning": "Made, done, or chosen without method or conscious decision",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "range (noun)",
       "meaning": "Selection or array; scope of something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -9492,7 +9492,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "vindication (noun)",
       "meaning": "Roger got his vindication when the company that fired him went bankrupt a year later.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -12770,7 +12770,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "be in the public eye",
       "meaning": "to be famous and written about in newspapers and magazines and seen on television",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -13364,7 +13364,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Pay under the table",
       "meaning": "To pay someone secretly or illegally, usually to avoid taxes or regulations.   The restaurant owner was caught paying employees under the table to avoid payroll taxes.t's illegal to pay workers under the table in many countries.   ",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -13376,7 +13376,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Put something on the back burner",
       "meaning": "To postpone or delay something, usually a task or project, in order to focus on more immediate or pressing matters.   I had to put my plans to start a business on the back burner because of other commitments.he company decided to put the new product development on the back burner until the market conditions improved.   ",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -16036,7 +16036,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Out of the way",
       "meaning": "Strange",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -17580,13 +17580,13 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "leverage",
       "meaning": "the mechanical advantage gained by being in a position to use a lever strategic advantage; power to act effectively investing with borrowed money as a way to amplify potential gains (at the risk of greater losses) supplement with leverage provide with leverage",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "apple",
       "meaning": "Qu\u1ea3 t\u00e1o",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -17640,7 +17640,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Subjects: Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic",
       "meaning": "Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic; Humanities; Business management; Archaeology; Agriculture",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -17670,7 +17670,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "He would - he'd - He'd like to see you now. why have - Why've. Why've you come? I will - I'll - I'll think about it. where did - Where'd - Where'd you get that? they are - they're - They're already here",
       "meaning": "Less common words/expressions",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -18210,7 +18210,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "actually",
       "meaning": "Use actually to give an unexpected or surprising response.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -18708,7 +18708,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "(A) Watercolour (adjective/noun)",
       "meaning": "A type of paint or painting style that is based in water rather than oil.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -21378,301 +21378,301 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "manifest (adjective)",
       "meaning": "Evident to the senses, especially to the sight",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "manipulate (verb)",
       "meaning": "To influence, manage, direct, or control something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "market (verb)",
       "meaning": "A formally organized system of trading in specified goods or money",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "metamorphosis (noun)",
       "meaning": "A transformation; a noticeable change in character or appearance",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "migrate (verb)",
       "meaning": "To relocate from one location to another",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "minimize (verb)",
       "meaning": "To make smaller or less significant",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "mourn (verb)",
       "meaning": "To express sadness for; to grieve",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "myriad (noun)",
       "meaning": "A countless number of specified things",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "narrative (adjective)",
       "meaning": "Story",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "native (adjective)",
       "meaning": "Belonging to somewhere or someone by birth",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "nimble (adjective)",
       "meaning": "Quick and light in movement or action; intelligent and alert",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "notable (adjective)",
       "meaning": "Worthy of noticing; worthy of being praised",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "notion (noun)",
       "meaning": "Thought or opinion",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "novel (adjective)",
       "meaning": "New, original, especially in an interesting way",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "object (verb)",
       "meaning": "To disagree with something or someone",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "oblige (verb)",
       "meaning": "Require to do something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obliterate (verb)",
       "meaning": "To remove completely; to destroy",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obscure (adjective)",
       "meaning": "Hidden, out of sight; difficult to understand",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obsolete (adjective)",
       "meaning": "No longer in use",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "obstacle (noun)",
       "meaning": "Something that stops progress",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "offset (verb)",
       "meaning": "To compensate for, by applying a change in the opposite direction; to balance out",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "onset (noun)",
       "meaning": "Beginning of something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "operation (noun)",
       "meaning": "The method or practice by which actions are done; a planned undertaking",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "ordinary (adjective)",
       "meaning": "Normal; routine",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outdo (verb)",
       "meaning": "To excel; go beyond in performance",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outsource (verb)",
       "meaning": "To transfer the management and/or day-to-day execution of a business function to a third-party service provider, especially internationally",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "outweigh (verb)",
       "meaning": "To exceed in importance or value",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "overcome (verb)",
       "meaning": "To win or prevail in some sort of battle, contest, etc.; to get the better of",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "overwhelm (verb)",
       "meaning": "To overpower or crush; to overpower emotionally",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "pace (noun)",
       "meaning": "Speed or velocity",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "paradox (noun)",
       "meaning": "An apparently self-contradictory statement, which can only be true if it is false, and vice versa",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "parity (noun)",
       "meaning": "Equality; comparability of strength or intensity",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "partial (adjective)",
       "meaning": "Existing as a part or portion of a whole; incomplete",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "peak (noun)",
       "meaning": "The highest value reached by some quantity in a time period",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "perception (noun)",
       "meaning": "Understanding of something; awareness of a situation",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "periodic (adjective)",
       "meaning": "Occurring at regular intervals",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "permanent (adjective)",
       "meaning": "Lasting a long time, perhaps forever",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "persist (verb)",
       "meaning": "To continue stubbornly in spite of opposition or warning",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "phase (noun)",
       "meaning": "Part of a sequence or cycle occurring over time",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "precede (verb)",
       "meaning": "To go before",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "preserve (verb)",
       "meaning": "To protect; To save from decay",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "prohibit (verb)",
       "meaning": "To forbid or disallow officially; to make illegal",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "prominent (adjective)",
       "meaning": "Standing out or projecting; distinguished above others",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "protest (verb)",
       "meaning": "To make a strong objection",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "purpose (noun)",
       "meaning": "An object to be reached; a target; an aim; a goal",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "questionable (adjective)",
       "meaning": "Problematic; open to doubt or challenge",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "radical (adjective)",
       "meaning": "Favoring fundamental change, or change at the root cause of a matter",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "ramification (noun)",
       "meaning": "A result of a decision or event",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "random (adjective)",
       "meaning": "Made, done, or chosen without method or conscious decision",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
       "word": "range (noun)",
       "meaning": "Selection or array; scope of something",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
@@ -22176,7 +22176,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "vindication (noun)",
       "meaning": "Roger got his vindication when the company that fired him went bankrupt a year later.",
-      "example": "",
+      "example": ".",
       "count": 0
     },
     {
