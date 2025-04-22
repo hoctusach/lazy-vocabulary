@@ -3826,12 +3826,6 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
       "count": 0
     },
     {
-      "word": ,
-      "meaning": ,
-      "example": "",
-      "count": 0
-    },
-    {
       "word": "Consumerism (noun)",
       "meaning": "The idea or trend of people putting a lot of emphasis and importance on buying goods and spending money. Usually used as a negative.",
       "example": "The rise of mass consumerism is a direct threat to the environment.",
@@ -16511,12 +16505,6 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
       "word": "Breadwinner (noun)",
       "meaning": "The person in a household who earns money for the family.",
       "example": "In families with two breadwinners, domestic tasks are often divided more equally.",
-      "count": 0
-    },
-    {
-      "word": ,
-      "meaning": ,
-      "example": "",
       "count": 0
     },
     {
