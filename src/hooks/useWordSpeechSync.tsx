@@ -1,3 +1,4 @@
+
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { stopSpeaking } from '@/utils/speech';
@@ -10,7 +11,7 @@ export const useWordSpeechSync = (
   isPaused: boolean,
   isMuted: boolean,
   isVoicesLoaded: boolean,
-  speakText: (text: string) => Promise<void>,
+  speakText: (text: string) => Promise<string>,
   isSpeakingRef: React.MutableRefObject<boolean>,
   isChangingWordRef: React.MutableRefObject<boolean>
 ) => {
