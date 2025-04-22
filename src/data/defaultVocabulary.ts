@@ -5171,7 +5171,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "perfect, model",
-      "meaning": ,
+      "meaning": ".",
       "example": "a model boss; a perfect house",
       "count": 0
     },
@@ -17855,7 +17855,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "perfect, model",
-      "meaning": ,
+      "meaning": ".",
       "example": "a model boss; a perfect house",
       "count": 0
     },
