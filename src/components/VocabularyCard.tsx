@@ -21,6 +21,7 @@ interface VocabularyCardProps {
   currentCategory: string;
   nextCategory: string;
   isSpeaking?: boolean;
+  displayTime?: number; // Added displayTime as an optional prop
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -38,7 +39,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onNextWord,
   currentCategory,
   nextCategory,
-  isSpeaking = false
+  isSpeaking = false,
+  displayTime
 }) => {
   // Save states to localStorage whenever they change
   useEffect(() => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
@@ -52,24 +53,35 @@ const VocabularyAppContainer: React.FC = () => {
   const playAudio = useCallback(async (text: string) => {
     if (mute || !text) return; // Don't play audio if muted or no text
 
-    const audio = new Audio();
-    soundRef.current = audio;
-    audio.src = await speakText(text); // This function needs to return an audio URL or data.
-    audio.play();
+    try {
+      const audio = new Audio();
+      soundRef.current = audio;
+      
+      // Call speakText and handle both string and Promise<string> returns
+      const audioSource = await speakText(text);
+      
+      if (audioSource) {
+        audio.src = audioSource;
+        audio.play();
 
-    setAudioPlaying(true);
+        setAudioPlaying(true);
 
-    audio.onended = () => {
+        audio.onended = () => {
+          setAudioPlaying(false);
+          handleManualNext(); // Proceed to next word after the sound finishes
+        };
+
+        // Get the audio duration and set display time
+        audio.onloadedmetadata = () => {
+          setCurrentAudioDuration(audio.duration * 1000); // Convert to ms
+          setDisplayTime(audio.duration * 1000); // Set display duration to match audio length
+        };
+      }
+    } catch (error) {
+      console.error("Error playing audio:", error);
       setAudioPlaying(false);
-      handleManualNext(); // Proceed to next word after the sound finishes
-    };
-
-    // Get the audio duration and set display time
-    audio.onloadedmetadata = () => {
-      setCurrentAudioDuration(audio.duration * 1000); // Convert to ms
-      setDisplayTime(audio.duration * 1000); // Set display duration to match audio length
-    };
-  }, [mute, speakText]);
+    }
+  }, [mute, speakText, handleManualNext]);
 
   useEffect(() => {
     if (mute) {
@@ -87,7 +99,7 @@ const VocabularyAppContainer: React.FC = () => {
 
   const toggleMute = () => {
     setMute(!mute); // Toggle mute state
-    if (mute) {
+    if (!mute) {
       stopAudio(); // Stop playing if mute is activated
     }
   };
@@ -111,7 +123,7 @@ const VocabularyAppContainer: React.FC = () => {
           nextCategory={nextCategory}
           isSpeaking={audioPlaying}
           onNextWord={handleManualNext}
-          displayTime={displayTime} // Pass displayTime to the card to control visibility
+          displayTime={displayTime} // Now properly passed to VocabularyCard
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
