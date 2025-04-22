@@ -73,7 +73,6 @@ class VocabularyService {
     }
   }
   
-  // Calculate total word count across all sheets
   private getTotalWordCount(): number {
     let count = 0;
     for (const sheetName in this.data) {
@@ -85,7 +84,6 @@ class VocabularyService {
     return count;
   }
   
-  // Improved method to merge imported data with existing data
   private mergeImportedData(importedData: SheetData): void {
     console.log("Merging imported data with existing data");
     
@@ -110,7 +108,7 @@ class VocabularyService {
           word: String(importedWord.word),
           meaning: String(importedWord.meaning || ""),
           example: String(importedWord.example || ""),
-          count: typeof importedWord.count === 'number' ? importedWord.count : parseInt(String(importedWord.count || "0")) || 0
+          count: importedWord.count !== undefined ? importedWord.count : 0
         };
         
         // Check if the word already exists (case-insensitive)
@@ -123,9 +121,9 @@ class VocabularyService {
           this.data[sheetName][existingWordIndex] = {
             ...processedWord,
             // Preserve count if it's higher in the existing record
-            count: Math.max(
-              processedWord.count || 0, 
-              this.data[sheetName][existingWordIndex].count || 0
+            count: this.getHigherCount(
+              processedWord.count, 
+              this.data[sheetName][existingWordIndex].count
             )
           };
           updatedWords++;
@@ -146,7 +144,13 @@ class VocabularyService {
       Object.keys(this.data).map(key => `${key}: ${this.data[key].length} words`).join(", "));
   }
   
-  // Regenerate "All words" sheet from all other sheets
+  private getHigherCount(count1: string | number, count2: string | number): string | number {
+    const num1 = typeof count1 === 'string' ? parseInt(count1, 10) || 0 : count1 || 0;
+    const num2 = typeof count2 === 'string' ? parseInt(count2, 10) || 0 : count2 || 0;
+    
+    return Math.max(num1, num2);
+  }
+  
   private regenerateAllWordsSheet(): void {
     // Create a map to track unique words by lowercase word
     const allWordsMap = new Map<string, VocabularyWord>();
@@ -223,7 +227,6 @@ class VocabularyService {
     }
   }
   
-  // Helper method to ensure all data has proper types
   private processDataTypes(data: any): SheetData {
     const processedData: SheetData = {};
     
@@ -236,7 +239,7 @@ class VocabularyService {
             word: String(word.word || ""),
             meaning: String(word.meaning || ""),
             example: String(word.example || ""),
-            count: typeof word.count === 'number' ? word.count : parseInt(String(word.count || "0")) || 0
+            count: word.count !== undefined ? word.count : 0
           });
         }
       }
@@ -344,7 +347,6 @@ class VocabularyService {
     return Object.values(this.data).some(sheet => sheet && sheet.length > 0);
   }
   
-  // Get the time of the last word change - useful for debouncing
   getLastWordChangeTime(): number {
     return this.lastWordChangeTime;
   }

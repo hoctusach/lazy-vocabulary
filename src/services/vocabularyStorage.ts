@@ -1,4 +1,3 @@
-
 import { SheetData, VocabularyWord } from "@/types/vocabulary";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 
@@ -78,11 +77,14 @@ export class VocabularyStorage {
       
       if (Array.isArray(data[sheetName])) {
         for (const word of data[sheetName]) {
+          // Create a properly typed word object, handling both number and string count values
           const processedWord: VocabularyWord = {
             word: String(word.word || ""),
             meaning: String(word.meaning || ""),
             example: String(word.example || ""),
-            count: typeof word.count === 'number' ? word.count : parseInt(String(word.count || "0")) || 0
+            // Keep count as is if it's already a number or string
+            // This way we don't try to convert strings to numbers unnecessarily
+            count: word.count !== undefined ? word.count : 0
           };
           
           processedData[sheetName].push(processedWord);
