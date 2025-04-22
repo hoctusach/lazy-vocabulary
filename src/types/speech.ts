@@ -1,6 +1,12 @@
 
-// Re-export the built-in SpeechSynthesisVoice type for use throughout the app
-export type { SpeechSynthesisVoice } from './vocabulary';
+// Define the built-in SpeechSynthesisVoice interface type
+export interface SpeechSynthesisVoice {
+  default: boolean;
+  lang: string;
+  localService: boolean;
+  name: string;
+  voiceURI: string;
+}
 
 // Speech settings configuration
 export interface SpeechSettings {
