@@ -10,4 +10,3 @@ export const getSpeechPitch = (): number => {
 export const getSpeechVolume = (): number => {
   return 1.0; // Full volume
 };
-

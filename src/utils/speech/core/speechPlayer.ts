@@ -1,9 +1,10 @@
+
 import { validateSpeechSupport, configureUtterance } from './engineManager';
 import { TimerRefs, clearTimers, setupSpeechTimers } from './timerManager';
 import { attemptSpeech } from './speechAttempts';
 import { stopSpeaking, keepSpeechAlive, waitForSpeechReadiness, resetSpeechEngine, ensureSpeechEngineReady } from './speechEngine';
 import { prepareTextForSpeech, addPausesToText, forceResyncIfNeeded } from './speechText';
-import { getSpeechRate } from './speechSettings';
+import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { calculateSpeechDuration } from '../durationUtils';
 
@@ -223,3 +224,4 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     }
   });
 };
+
