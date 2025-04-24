@@ -45,7 +45,9 @@ const VocabularyAppContainer: React.FC = () => {
   const wordChangeProcessingRef = useRef(false);
   // Debug counter to track speech attempts
   const speechAttemptsRef = useRef(0);
-
+  // Store the last word ID to avoid repeating speech for same word
+  const lastSpokenWordRef = useRef<string | null>(null);
+  
   // Clear the auto-advance timer
   const clearAutoAdvanceTimer = useCallback(() => {
     if (autoAdvanceTimerRef.current) {
@@ -62,6 +64,12 @@ const VocabularyAppContainer: React.FC = () => {
         (!currentWord ? 'no word' : '') + 
         (mute ? ', muted' : '') + 
         (isPaused ? ', paused' : ''));
+      return;
+    }
+    
+    // Check if we're already speaking this word
+    if (lastSpokenWordRef.current === currentWord.word) {
+      console.log('[APP] Already spoke this word, skipping:', currentWord.word);
       return;
     }
     
@@ -89,6 +97,9 @@ const VocabularyAppContainer: React.FC = () => {
     // Clear any existing timers
     clearAutoAdvanceTimer();
     
+    // Save this word as the last one we processed
+    lastSpokenWordRef.current = currentWord.word;
+    
     // Give the DOM time to update with new word
     const playWordAudio = async () => {
       try {
@@ -99,8 +110,8 @@ const VocabularyAppContainer: React.FC = () => {
         stopSpeaking();
         console.log('[APP] Previous speech stopped, preparing to speak:', currentWord.word);
         
-        // IMPORTANT: Reduced delay before playing for better responsiveness
-        const prePlayDelay = 100; // Reduced from 150ms to 100ms
+        // IMPORTANT: Reduced delay before playing for better synchronization
+        const prePlayDelay = 100; // Very short delay for better sync
         console.log(`[APP] Waiting ${prePlayDelay}ms before speaking`);
         await new Promise(resolve => setTimeout(resolve, prePlayDelay));
         
@@ -135,8 +146,8 @@ const VocabularyAppContainer: React.FC = () => {
     };
 
     // Start the audio playback with a shorter delay to ensure DOM rendering is complete
-    console.log(`[APP] Scheduling speech for ${currentWord.word} in 150ms`);
-    const speechTimerRef = setTimeout(playWordAudio, 150); // Reduced from 250ms
+    console.log(`[APP] Scheduling speech for ${currentWord.word} in 100ms`); // Reduced from 150ms
+    const speechTimerRef = setTimeout(playWordAudio, 100); 
     
     // Cleanup function
     return () => {
@@ -166,6 +177,7 @@ const VocabularyAppContainer: React.FC = () => {
       setTimeout(() => {
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
         console.log('[APP] ⚡ Speaking after unmute:', currentWord.word);
+        lastSpokenWordRef.current = null; // Reset to allow speaking this word again
         speak(fullText, voiceRegion);
       }, 300); // Small delay to ensure UI is updated
     }
@@ -191,6 +203,7 @@ const VocabularyAppContainer: React.FC = () => {
           isSpeaking={isSoundPlaying}
           onNextWord={handleManualNext}
           displayTime={displayTime}
+          category={currentWord.category}
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />

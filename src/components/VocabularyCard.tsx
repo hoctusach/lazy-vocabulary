@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
@@ -44,15 +45,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   displayTime,
   category
 }) => {
-  useEffect(() => {
-    localStorage.setItem('buttonStates', JSON.stringify({
-      isMuted,
-      isPaused,
-      voiceRegion,
-      currentCategory
-    }));
-  }, [isMuted, isPaused, voiceRegion, currentCategory]);
-
+  // Store current word in localStorage to help track sync issues
   useEffect(() => {
     if (word) {
       localStorage.setItem('currentDisplayedWord', word);
@@ -62,6 +55,16 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       localStorage.removeItem('currentDisplayedWord');
     };
   }, [word]);
+
+  // Save button states to localStorage
+  useEffect(() => {
+    localStorage.setItem('buttonStates', JSON.stringify({
+      isMuted,
+      isPaused,
+      voiceRegion,
+      currentCategory
+    }));
+  }, [isMuted, isPaused, voiceRegion, currentCategory]);
 
   const wordParts = word.split(/\s*\(([^)]+)\)/);
   const mainWord = wordParts[0].trim();

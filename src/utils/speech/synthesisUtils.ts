@@ -6,6 +6,10 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     console.log(`[SYNTHESIS] Starting synthesis for: "${text.substring(0, 30)}..."`);
     console.log(`[SYNTHESIS] Using voice: ${voice ? voice.name : 'default system voice'}`);
     
+    // Make sure any previous speech is cancelled
+    window.speechSynthesis.cancel();
+    console.log('[SYNTHESIS] Cancelled previous speech');
+    
     // Create a speech utterance with properly configured settings
     const utterance = new SpeechSynthesisUtterance(text);
     
@@ -35,23 +39,19 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
       reject(new Error(`Speech error: ${event.error}`));
     };
     
-    // Make sure any previous speech is cancelled
-    window.speechSynthesis.cancel();
-    console.log('[SYNTHESIS] Cancelled previous speech');
-    
-    // IMPORTANT: Reduced delay before speaking to improve responsiveness
-    const speakDelay = 100; // Reduced from 150ms to 100ms
+    // IMPORTANT: Short delay before speaking to improve responsiveness
+    const speakDelay = 100; // Very short delay for better sync
     console.log(`[SYNTHESIS] Will speak in ${speakDelay}ms`);
     
-    // Ensure DOM has time to update before speaking (but not too long)
+    // Ensure DOM has time to update before speaking (but just a short delay)
     setTimeout(() => {
       // Log right before the actual speak call
-      console.log('[SYNTHESIS] About to call speechSynthesis.speak()');
+      console.log('[SYNTHESIS] ⚡ ABOUT TO SPEAK: About to call speechSynthesis.speak()');
       
       // Start the new speech
       window.speechSynthesis.speak(utterance);
       
-      console.log('[SYNTHESIS] speechSynthesis.speak() was called');
+      console.log('[SYNTHESIS] ✅ speechSynthesis.speak() was called');
     }, speakDelay);
   });
 };
