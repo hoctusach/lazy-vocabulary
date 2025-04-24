@@ -25,14 +25,18 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
     }
 
     try {
+      // Ensure we're not trying to speak multiple things at once
       await ensureSpeechEngineReady();
       stopSpeaking();
+
+      // Wait for DOM to update before continuing
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const processedText = addPausesToText(prepareTextForSpeech(text));
       setCurrentTextBeingSpoken(processedText);
       console.log('Speaking text:', text.substring(0, 30) + '...');
 
-      // Longer wait for speech readiness
+      // Longer wait for speech readiness and DOM updates
       await new Promise(resolve => setTimeout(resolve, 300)); 
 
       const utterance = new SpeechSynthesisUtterance(processedText);
@@ -61,14 +65,16 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       };
 
       if (voices.length > 0) {
-        console.log('Voices already loaded, speaking immediately');
-        handleSetVoiceAndSpeak();
+        console.log('Voices already loaded, speaking after short delay');
+        // Add a small delay to ensure DOM rendering completes
+        setTimeout(() => handleSetVoiceAndSpeak(), 150);
       } else {
         console.log('Waiting for voices to load');
         try {
           voices = await waitForVoices();
-          console.log('Voices loaded, now speaking');
-          handleSetVoiceAndSpeak();
+          console.log('Voices loaded, now speaking after short delay');
+          // Add a small delay to ensure DOM rendering completes
+          setTimeout(() => handleSetVoiceAndSpeak(), 150);
         } catch (err) {
           console.error('Could not load voices:', err);
           reject(new Error('Could not load voices'));

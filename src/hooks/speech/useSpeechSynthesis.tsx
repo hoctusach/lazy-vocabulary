@@ -11,6 +11,7 @@ export const useSpeechSynthesis = () => {
   
   // For keeping track of speaking state
   const isSpeakingRef = useRef(false);
+  const speakingLockRef = useRef(false);
   
   // Function to stop current speech
   const stopSpeakingLocal = useCallback(() => {
@@ -20,17 +21,35 @@ export const useSpeechSynthesis = () => {
     }
     
     isSpeakingRef.current = false;
+    speakingLockRef.current = false;
     console.log('Speech stopped');
   }, []);
   
   // Function to speak text, returns a Promise
   const speakText = useCallback((text: string): Promise<string> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       if (isMuted || !text) {
         console.log("Speech is muted or text is empty");
         resolve('');
         return;
       }
+      
+      // If we're already speaking and locked, queue this speak request
+      if (speakingLockRef.current) {
+        console.log("Speech already in progress, queuing request");
+        // Resolve after a delay to allow current speech to finish
+        setTimeout(() => {
+          if (!isMuted) {
+            speakText(text).then(resolve).catch(reject);
+          } else {
+            resolve('');
+          }
+        }, 800);
+        return;
+      }
+      
+      // Set lock to prevent overlapping speech
+      speakingLockRef.current = true;
       
       // Stop any currently playing speech
       stopSpeakingLocal();
@@ -48,25 +67,32 @@ export const useSpeechSynthesis = () => {
         // Set speaking flag
         isSpeakingRef.current = true;
         
-        // Add event listeners for speech events
-        const handleSpeechEnd = () => {
-          console.log('Speech ended in useSpeechSynthesis');
-          isSpeakingRef.current = false;
-          window.speechSynthesis.removeEventListener('end', handleSpeechEnd);
-          resolve('completed');
-        };
-        
-        // Listen for speech end event
-        window.speechSynthesis.addEventListener('end', handleSpeechEnd);
-        
-        // Create the audio using Web Speech API
-        synthesizeAudio(text, voice);
-        console.log(`Generated speech for: "${text.substring(0, 20)}..."`);
-        
+        // Make sure UI gets updated with new text before speaking
+        setTimeout(() => {
+          // Create the audio using Web Speech API
+          synthesizeAudio(text, voice)
+            .then((result) => {
+              console.log('Speech synthesis completed:', result);
+              setTimeout(() => {
+                isSpeakingRef.current = false;
+                speakingLockRef.current = false;
+                resolve(result);
+              }, 100);
+            })
+            .catch((error) => {
+              console.error("Error in speech synthesis:", error);
+              isSpeakingRef.current = false;
+              speakingLockRef.current = false;
+              reject(error);
+            });
+          
+          console.log(`Generated speech for: "${text.substring(0, 20)}..."`);
+        }, 150);
       } catch (error) {
         console.error("Error in speech synthesis:", error);
         isSpeakingRef.current = false;
-        resolve('');
+        speakingLockRef.current = false;
+        reject(error);
       }
     });
   }, [isMuted, selectVoiceByRegion, voiceRegion, stopSpeakingLocal]);

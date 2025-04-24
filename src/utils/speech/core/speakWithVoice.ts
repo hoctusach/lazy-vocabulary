@@ -23,9 +23,11 @@ export async function speakWithVoice({
   onComplete,
   onError
 }: SpeakWithVoiceParams) {
-  // Double-check that previous speech is stopped
+  // First, ensure previous speech is completely stopped
   stopSpeaking();
-  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Give the DOM time to update and speech engine to reset
+  await new Promise(resolve => setTimeout(resolve, 200));
   
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
   const voice = getVoiceByRegion(region);
@@ -67,7 +69,7 @@ export async function speakWithVoice({
       clearInterval(timers.keepAliveInterval);
       timers.keepAliveInterval = null;
     }
-  }, 5000); // Increased interval to reduce potential interference
+  }, 5000);
 
   timers.syncCheckInterval = window.setInterval(() => {
     try {
@@ -79,14 +81,13 @@ export async function speakWithVoice({
         });
       }
     } catch (error) {
-      // Just log and continue
       console.error('Error in sync check:', error);
     }
-  }, 500); // Increased to reduce unnecessary checks
+  }, 800); // Increased to reduce checks and allow more time for rendering
 
-  // Attempt speech
+  // Attempt speech with better synchronization
   const attemptSpeech = async (attempts = 0): Promise<void> => {
-    if (attempts >= 3) { // Reduced max attempts
+    if (attempts >= 2) {
       clearAllSpeechTimers(timers);
       onError(new Error('Failed to start speech'));
       return;
@@ -94,10 +95,16 @@ export async function speakWithVoice({
     try {
       if (attempts > 0) {
         window.speechSynthesis.cancel();
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
+      
+      // Extra delay before speaking to ensure card is fully rendered
+      await new Promise(resolve => setTimeout(resolve, 250));
+      
       console.log('Starting speech synthesis...');
       window.speechSynthesis.speak(utterance);
+      
+      // Verify speech started after a short delay
       await new Promise<void>((resolveStart, rejectStart) => {
         setTimeout(() => {
           if (window.speechSynthesis.speaking) {
@@ -107,7 +114,7 @@ export async function speakWithVoice({
             console.warn('Speech failed to start, will retry');
             rejectStart(new Error('Speech not started'));
           }
-        }, 900);
+        }, 800);
       });
     } catch (error) {
       console.error('Speech attempt error:', error);
