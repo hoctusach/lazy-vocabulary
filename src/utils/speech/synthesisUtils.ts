@@ -3,8 +3,8 @@ import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null): Promise<string> => {
   return new Promise((resolve, reject) => {
-    console.log(`Synthesizing audio for text: "${text.substring(0, 30)}..."`);
-    console.log(`Using voice: ${voice ? voice.name : 'default system voice'}`);
+    console.log(`[SYNTHESIS] Starting synthesis for: "${text.substring(0, 30)}..."`);
+    console.log(`[SYNTHESIS] Using voice: ${voice ? voice.name : 'default system voice'}`);
     
     // Create a speech utterance with properly configured settings
     const utterance = new SpeechSynthesisUtterance(text);
@@ -22,23 +22,36 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     
     // Set up event handlers for proper promise resolution
     utterance.onend = () => {
-      console.log('Speech synthesis ended naturally');
+      console.log('[SYNTHESIS] Speech synthesis completed naturally');
       resolve('completed');
     };
     
+    utterance.onstart = () => {
+      console.log('[SYNTHESIS] Speech synthesis actually started');
+    };
+    
     utterance.onerror = (event) => {
-      console.error('Speech synthesis error:', event.error);
+      console.error('[SYNTHESIS] Speech synthesis error:', event.error);
       reject(new Error(`Speech error: ${event.error}`));
     };
     
     // Make sure any previous speech is cancelled
     window.speechSynthesis.cancel();
+    console.log('[SYNTHESIS] Cancelled previous speech');
     
-    // Ensure DOM has time to update before speaking
+    // IMPORTANT: Reduced delay before speaking to improve responsiveness
+    const speakDelay = 100; // Reduced from 150ms to 100ms
+    console.log(`[SYNTHESIS] Will speak in ${speakDelay}ms`);
+    
+    // Ensure DOM has time to update before speaking (but not too long)
     setTimeout(() => {
+      // Log right before the actual speak call
+      console.log('[SYNTHESIS] About to call speechSynthesis.speak()');
+      
       // Start the new speech
       window.speechSynthesis.speak(utterance);
-      console.log('Speech synthesis started');
-    }, 150); // Small delay to ensure DOM rendering is complete
+      
+      console.log('[SYNTHESIS] speechSynthesis.speak() was called');
+    }, speakDelay);
   });
 };

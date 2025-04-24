@@ -43,30 +43,48 @@ const VocabularyAppContainer: React.FC = () => {
   
   // Flag to track if we're currently processing a word change
   const wordChangeProcessingRef = useRef(false);
+  // Debug counter to track speech attempts
+  const speechAttemptsRef = useRef(0);
 
   // Clear the auto-advance timer
   const clearAutoAdvanceTimer = useCallback(() => {
     if (autoAdvanceTimerRef.current) {
       window.clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
+      console.log('[APP] Auto-advance timer cleared');
     }
   }, []);
 
   // Handle playing audio when the current word changes
   useEffect(() => {
     if (!currentWord || mute || isPaused) {
-      console.log('Skipping speech: no word, muted, or paused');
+      console.log('[APP] Skipping speech: ' + 
+        (!currentWord ? 'no word' : '') + 
+        (mute ? ', muted' : '') + 
+        (isPaused ? ', paused' : ''));
       return;
     }
     
     // Set processing flag to prevent overlaps
     if (wordChangeProcessingRef.current) {
-      console.log('Still processing previous word, skipping speech');
-      return;
+      console.log('[APP] Still processing previous word, will retry shortly');
+      // Instead of skipping, retry after a short delay
+      const retryTimeout = setTimeout(() => {
+        if (currentWord && !mute && !isPaused) {
+          console.log('[APP] Retrying speech for:', currentWord.word);
+          wordChangeProcessingRef.current = false;
+          speechAttemptsRef.current += 1;
+          // This will re-trigger the useEffect as we changed the dependency
+          setDisplayTime(prev => prev + 1);
+        }
+      }, 300);
+      return () => clearTimeout(retryTimeout);
     }
     
     // Flag to track that we're processing a word
     wordChangeProcessingRef.current = true;
+    speechAttemptsRef.current += 1;
+    console.log(`[APP] Word change detected, attempt #${speechAttemptsRef.current} for: ${currentWord.word}`);
     
     // Clear any existing timers
     clearAutoAdvanceTimer();
@@ -79,11 +97,14 @@ const VocabularyAppContainer: React.FC = () => {
         
         // First, ensure previous speech is stopped
         stopSpeaking();
+        console.log('[APP] Previous speech stopped, preparing to speak:', currentWord.word);
         
-        // Additional delay before playing to ensure DOM is updated
-        await new Promise(resolve => setTimeout(resolve, 150));
+        // IMPORTANT: Reduced delay before playing for better responsiveness
+        const prePlayDelay = 100; // Reduced from 150ms to 100ms
+        console.log(`[APP] Waiting ${prePlayDelay}ms before speaking`);
+        await new Promise(resolve => setTimeout(resolve, prePlayDelay));
         
-        console.log('Starting to speak word:', currentWord.word);
+        console.log('[APP] ⚡ Starting to speak word:', currentWord.word);
         
         // Create the full text to speak
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
@@ -91,36 +112,39 @@ const VocabularyAppContainer: React.FC = () => {
         // Use the direct speak function from utils/speech for more reliability
         await speak(fullText, voiceRegion);
         
-        console.log('Speech completed for:', currentWord.word);
+        console.log('[APP] ✅ Speech completed for:', currentWord.word);
         
         // After speech completes, set timer for next word if not paused or muted
         if (!isPaused && !mute) {
-          console.log('Setting timer for next word');
+          console.log('[APP] Setting timer for next word');
           autoAdvanceTimerRef.current = window.setTimeout(() => {
             if (!isPaused) {
-              console.log('Auto-advancing to next word');
+              console.log('[APP] Auto-advancing to next word');
               handleManualNext();
             }
           }, 2000); // Wait 2 seconds after audio finishes before advancing
         }
       } catch (error) {
-        console.error("Error playing audio:", error);
+        console.error("[APP] Error playing audio:", error);
       } finally {
         setIsSoundPlaying(false);
         // Allow processing new words again
         wordChangeProcessingRef.current = false;
+        console.log('[APP] Word processing completed for:', currentWord.word);
       }
     };
 
-    // Start the audio playback with a delay to ensure DOM rendering is complete
-    setTimeout(playWordAudio, 250);
+    // Start the audio playback with a shorter delay to ensure DOM rendering is complete
+    console.log(`[APP] Scheduling speech for ${currentWord.word} in 150ms`);
+    const speechTimerRef = setTimeout(playWordAudio, 150); // Reduced from 250ms
     
     // Cleanup function
     return () => {
+      clearTimeout(speechTimerRef);
       clearAutoAdvanceTimer();
       stopSpeaking();
     };
-  }, [currentWord, mute, isPaused, voiceRegion, handleManualNext, clearAutoAdvanceTimer, stopSpeaking]);
+  }, [currentWord, mute, isPaused, voiceRegion, handleManualNext, clearAutoAdvanceTimer, stopSpeaking, displayTime]);
 
   // Handle mute state changes
   useEffect(() => {
@@ -133,14 +157,15 @@ const VocabularyAppContainer: React.FC = () => {
     handleToggleMute();
     
     if (!mute) {
-      console.log('Muting, stopping speech');
+      console.log('[APP] Muting, stopping speech');
       stopSpeaking();
       clearAutoAdvanceTimer();
     } else if (currentWord && !isPaused) {
       // If unmuting, play the current word after a short delay
-      console.log('Unmuting, playing current word');
+      console.log('[APP] Unmuting, playing current word');
       setTimeout(() => {
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+        console.log('[APP] ⚡ Speaking after unmute:', currentWord.word);
         speak(fullText, voiceRegion);
       }, 300); // Small delay to ensure UI is updated
     }
