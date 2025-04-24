@@ -6,6 +6,7 @@ import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import { vocabularyService } from "@/services/vocabularyService";
+import { speak } from "@/utils/speech";
 
 const VocabularyAppContainer: React.FC = () => {
   const {
@@ -51,23 +52,32 @@ const VocabularyAppContainer: React.FC = () => {
   // Handle playing audio when the current word changes
   useEffect(() => {
     const playWordAudio = async () => {
-      if (!currentWord || mute || isPaused) return;
+      if (!currentWord || mute || isPaused) {
+        console.log('Skipping speech: no word, muted, or paused');
+        return;
+      }
       
       // Clear any existing timers
       clearAutoAdvanceTimer();
       setIsSoundPlaying(true);
       
       try {
+        console.log('Starting to speak word:', currentWord.word);
+        
         // Create the full text to speak
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
         
-        // Speak the text and wait for completion
-        await speakText(fullText);
+        // Use the direct speak function from utils/speech for more reliability
+        await speak(fullText, voiceRegion);
+        
+        console.log('Speech completed for:', currentWord.word);
         
         // After speech completes, set timer for next word
         if (!isPaused && !mute) {
+          console.log('Setting timer for next word');
           autoAdvanceTimerRef.current = window.setTimeout(() => {
             if (!isPaused) {
+              console.log('Auto-advancing to next word');
               handleManualNext();
             }
           }, 2000); // Wait 2 seconds after audio finishes before advancing
@@ -87,7 +97,7 @@ const VocabularyAppContainer: React.FC = () => {
       clearAutoAdvanceTimer();
       stopSpeaking();
     };
-  }, [currentWord, mute, isPaused, speakText, handleManualNext, clearAutoAdvanceTimer, stopSpeaking]);
+  }, [currentWord, mute, isPaused, voiceRegion, handleManualNext, clearAutoAdvanceTimer, stopSpeaking]);
 
   // Handle mute state changes
   useEffect(() => {
@@ -95,19 +105,21 @@ const VocabularyAppContainer: React.FC = () => {
   }, [isMuted]);
 
   // Toggle mute
-  const toggleMute = () => {
+  const toggleMute = useCallback(() => {
     setMute(!mute);
     handleToggleMute();
     
     if (!mute) {
+      console.log('Muting, stopping speech');
       stopSpeaking();
       clearAutoAdvanceTimer();
     } else if (currentWord && !isPaused) {
       // If unmuting, play the current word
+      console.log('Unmuting, playing current word');
       const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-      speakText(fullText);
+      speak(fullText, voiceRegion);
     }
-  };
+  }, [mute, currentWord, isPaused, voiceRegion, handleToggleMute, stopSpeaking, clearAutoAdvanceTimer]);
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>

@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
 import { synthesizeAudio } from '@/utils/speech/synthesisUtils';
+import { stopSpeaking } from '@/utils/speech';
 
 export const useSpeechSynthesis = () => {
   const { isVoicesLoaded, selectVoiceByRegion } = useVoiceManager();
@@ -12,13 +13,14 @@ export const useSpeechSynthesis = () => {
   const isSpeakingRef = useRef(false);
   
   // Function to stop current speech
-  const stopSpeaking = useCallback(() => {
+  const stopSpeakingLocal = useCallback(() => {
     // Cancel any ongoing speech synthesis
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
     
     isSpeakingRef.current = false;
+    console.log('Speech stopped');
   }, []);
   
   // Function to speak text, returns a Promise
@@ -31,7 +33,7 @@ export const useSpeechSynthesis = () => {
       }
       
       // Stop any currently playing speech
-      stopSpeaking();
+      stopSpeakingLocal();
       
       try {
         setLastSpokenText(text);
@@ -48,6 +50,7 @@ export const useSpeechSynthesis = () => {
         
         // Add event listeners for speech events
         const handleSpeechEnd = () => {
+          console.log('Speech ended in useSpeechSynthesis');
           isSpeakingRef.current = false;
           window.speechSynthesis.removeEventListener('end', handleSpeechEnd);
           resolve('completed');
@@ -66,14 +69,14 @@ export const useSpeechSynthesis = () => {
         resolve('');
       }
     });
-  }, [isMuted, selectVoiceByRegion, voiceRegion, stopSpeaking]);
+  }, [isMuted, selectVoiceByRegion, voiceRegion, stopSpeakingLocal]);
   
   // Function to toggle mute state
   const handleToggleMute = useCallback(() => {
-    stopSpeaking();
+    stopSpeakingLocal();
     setIsMuted(!isMuted);
     console.log(`Speech ${!isMuted ? 'muted' : 'unmuted'}`);
-  }, [isMuted, setIsMuted, stopSpeaking]);
+  }, [isMuted, setIsMuted, stopSpeakingLocal]);
   
   // Function to change voice region
   const handleChangeVoice = useCallback(() => {
@@ -99,6 +102,6 @@ export const useSpeechSynthesis = () => {
     handleChangeVoice,
     isVoicesLoaded,
     isSpeakingRef,
-    stopSpeaking
+    stopSpeaking: stopSpeakingLocal
   };
 };

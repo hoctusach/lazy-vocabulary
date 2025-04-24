@@ -19,3 +19,11 @@ export const clearAllSpeechTimers = (timers: SpeechTimersRefs): void => {
     timers.syncCheckInterval = null;
   }
 };
+
+export const createSpeechTimers = (): SpeechTimersRefs => {
+  return {
+    keepAliveInterval: null,
+    maxDurationTimeout: null,
+    syncCheckInterval: null
+  };
+};
