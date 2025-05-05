@@ -104,6 +104,12 @@ const VocabularyAppContainer: React.FC = () => {
     });
   };
 
+  // Prepare data for debug panel - ensure category is always present
+  const debugPanelData = currentWord ? {
+    word: currentWord.word,
+    category: currentWord.category || currentCategory // Use the word's category if available, otherwise use the current category
+  } : null;
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {hasData && currentWord ? (
@@ -131,12 +137,12 @@ const VocabularyAppContainer: React.FC = () => {
           {/* Add Word Button */}
           <AddWordButton onClick={() => setIsAddWordModalOpen(true)} />
           
-          {/* Debug Panel */}
+          {/* Debug Panel - Use the prepared data with the guaranteed category */}
           <DebugPanel 
             isMuted={mute}
             voiceRegion={voiceRegion}
             isPaused={isPaused}
-            currentWord={currentWord}
+            currentWord={debugPanelData}
           />
           
           {/* Add Word Modal */}
