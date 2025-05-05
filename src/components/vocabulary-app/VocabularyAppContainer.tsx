@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import VocabularyLayout from "@/components/VocabularyLayout";
@@ -9,8 +9,18 @@ import { vocabularyService } from "@/services/vocabularyService";
 import { useVocabularyAudioSync } from "@/hooks/useVocabularyAudioSync";
 import { useMuteToggle } from "@/hooks/useMuteToggle";
 import { useAudioPlayback } from "./useAudioPlayback";
+import AddWordButton from "./AddWordButton";
+import AddWordModal from "./AddWordModal";
+import DebugPanel from "@/components/DebugPanel";
+import { useCustomWords } from "@/hooks/useCustomWords";
 
 const VocabularyAppContainer: React.FC = () => {
+  // Add state for modal visibility
+  const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
+  
+  // Custom words hook
+  const { addCustomWord } = useCustomWords();
+
   // Vocabulary manager for handling word navigation
   const {
     hasData,
@@ -82,28 +92,53 @@ const VocabularyAppContainer: React.FC = () => {
     displayTime
   );
 
+  // Handler for saving a new word
+  const handleSaveWord = (newWord: { word: string; meaning: string; example: string; category: string }) => {
+    addCustomWord(newWord);
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {hasData && currentWord ? (
-        <VocabularyCard
-          word={currentWord.word}
-          meaning={currentWord.meaning}
-          example={currentWord.example}
-          backgroundColor="#ffffff"
-          isMuted={mute}
-          isPaused={isPaused}
-          voiceRegion={voiceRegion}
-          onToggleMute={toggleMute}
-          onTogglePause={handleTogglePause}
-          onChangeVoice={handleChangeVoice}
-          onSwitchCategory={() => handleSwitchCategory(mute, voiceRegion)}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
-          isSpeaking={isSoundPlaying}
-          onNextWord={handleManualNext}
-          displayTime={displayTime}
-          category={currentWord.category || currentCategory}
-        />
+        <>
+          <VocabularyCard
+            word={currentWord.word}
+            meaning={currentWord.meaning}
+            example={currentWord.example}
+            backgroundColor="#ffffff"
+            isMuted={mute}
+            isPaused={isPaused}
+            voiceRegion={voiceRegion}
+            onToggleMute={toggleMute}
+            onTogglePause={handleTogglePause}
+            onChangeVoice={handleChangeVoice}
+            onSwitchCategory={() => handleSwitchCategory(mute, voiceRegion)}
+            currentCategory={currentCategory}
+            nextCategory={nextCategory}
+            isSpeaking={isSoundPlaying}
+            onNextWord={handleManualNext}
+            displayTime={displayTime}
+            category={currentWord.category || currentCategory}
+          />
+          
+          {/* Add Word Button */}
+          <AddWordButton onClick={() => setIsAddWordModalOpen(true)} />
+          
+          {/* Debug Panel */}
+          <DebugPanel 
+            isMuted={mute}
+            voiceRegion={voiceRegion}
+            isPaused={isPaused}
+            currentWord={currentWord}
+          />
+          
+          {/* Add Word Modal */}
+          <AddWordModal 
+            isOpen={isAddWordModalOpen} 
+            onClose={() => setIsAddWordModalOpen(false)} 
+            onSave={handleSaveWord} 
+          />
+        </>
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
       )}

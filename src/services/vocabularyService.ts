@@ -1,4 +1,3 @@
-
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "./vocabularyStorage";
 import { SheetManager } from "./sheetManager";
@@ -360,6 +359,63 @@ class VocabularyService {
   
   getLastWordChangeTime(): number {
     return this.lastWordChangeTime;
+  }
+  
+  // Add this new method for merging custom words
+  mergeCustomWords(customData: SheetData): void {
+    console.log("Merging custom words with existing data");
+    
+    // Add each custom category to sheetOptions if it doesn't exist already
+    for (const category in customData) {
+      if (!this.sheetOptions.includes(category) && category !== "All words") {
+        (this.sheetOptions as string[]).push(category);
+        console.log(`Added new category: ${category}`);
+      }
+    }
+    
+    // Go through each custom category and merge words
+    for (const category in customData) {
+      // Create category if it doesn't exist
+      if (!this.data[category]) {
+        this.data[category] = [];
+      }
+      
+      // Add each word, checking for duplicates
+      for (const customWord of customData[category]) {
+        // Skip empty words
+        if (!customWord.word || customWord.word.trim() === "") continue;
+        
+        // Check if the word already exists (case-insensitive)
+        const existingWordIndex = this.data[category].findIndex(
+          existingWord => existingWord.word.toLowerCase() === customWord.word.toLowerCase()
+        );
+        
+        if (existingWordIndex >= 0) {
+          // Update existing word (preserve count if needed)
+          this.data[category][existingWordIndex] = {
+            ...customWord,
+            count: this.getHigherCount(
+              customWord.count, 
+              this.data[category][existingWordIndex].count
+            )
+          };
+        } else {
+          // Add new word
+          this.data[category].push(customWord);
+        }
+      }
+      
+      console.log(`Added/updated custom words in category "${category}"`);
+    }
+    
+    // Regenerate the "All words" sheet to include custom words
+    this.regenerateAllWordsSheet();
+    
+    // Refresh the current sheet
+    this.shuffleCurrentSheet();
+    
+    // Save the updated data to storage
+    this.storage.saveData(this.data);
   }
 }
 
