@@ -103,12 +103,13 @@ class VocabularyService {
         // Skip empty words
         if (!importedWord.word || importedWord.word.trim() === "") continue;
         
-        // Ensure all fields are properly typed
+        // Ensure all fields are properly typed and add default category if missing
         const processedWord: VocabularyWord = {
           word: String(importedWord.word),
           meaning: String(importedWord.meaning || ""),
           example: String(importedWord.example || ""),
-          count: importedWord.count !== undefined ? importedWord.count : 0
+          count: importedWord.count !== undefined ? importedWord.count : 0,
+          category: importedWord.category || sheetName // Use sheet name as default category if not provided
         };
         
         // Check if the word already exists (case-insensitive)
@@ -124,7 +125,9 @@ class VocabularyService {
             count: this.getHigherCount(
               processedWord.count, 
               this.data[sheetName][existingWordIndex].count
-            )
+            ),
+            // Preserve existing category if present
+            category: this.data[sheetName][existingWordIndex].category || processedWord.category
           };
           updatedWords++;
         } else {
@@ -159,7 +162,12 @@ class VocabularyService {
     if (this.data["All words"]) {
       for (const word of this.data["All words"]) {
         if (word.word && word.word.trim() !== "") {
-          allWordsMap.set(word.word.toLowerCase(), {...word});
+          // Ensure each word has a category, use "All words" as default
+          const wordWithCategory = {
+            ...word,
+            category: word.category || "All words"
+          };
+          allWordsMap.set(word.word.toLowerCase(), wordWithCategory);
         }
       }
     }
@@ -173,15 +181,21 @@ class VocabularyService {
         
         const lowercaseWord = word.word.toLowerCase();
         
+        // Ensure the word has a category (use current sheet name if missing)
+        const wordWithCategory = {
+          ...word,
+          category: word.category || sheetName
+        };
+        
         if (allWordsMap.has(lowercaseWord)) {
           // Update count if higher
           const existingWord = allWordsMap.get(lowercaseWord)!;
-          if ((word.count || 0) > (existingWord.count || 0)) {
-            existingWord.count = word.count;
+          if ((wordWithCategory.count || 0) > (existingWord.count || 0)) {
+            existingWord.count = wordWithCategory.count;
           }
         } else {
           // Add new word
-          allWordsMap.set(lowercaseWord, {...word});
+          allWordsMap.set(lowercaseWord, wordWithCategory);
         }
       }
     }
@@ -239,7 +253,8 @@ class VocabularyService {
             word: String(word.word || ""),
             meaning: String(word.meaning || ""),
             example: String(word.example || ""),
-            count: word.count !== undefined ? word.count : 0
+            count: word.count !== undefined ? word.count : 0,
+            category: word.category || sheetName // Use sheet name as default category
           });
         }
       }
