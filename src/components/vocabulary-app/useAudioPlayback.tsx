@@ -45,7 +45,8 @@ export const useAudioPlayback = (
           wordChangeProcessingRef.current = false;
           speechAttemptsRef.current += 1;
           // This will re-trigger the useEffect as we changed the dependency
-          setIsSoundPlaying(prev => !prev); // Toggle to force re-render
+          // Fix: Pass a boolean value directly instead of a function
+          setIsSoundPlaying(!isSoundPlaying); // Toggle to force re-render
         }
       }, 300);
       return () => clearTimeout(retryTimeout);
@@ -130,6 +131,7 @@ export const useAudioPlayback = (
     autoAdvanceTimerRef,
     lastSpokenWordRef,
     wordChangeProcessingRef,
-    speechAttemptsRef
+    speechAttemptsRef,
+    isSoundPlaying // Added isSoundPlaying as a dependency since we're using it now
   ]);
 };
