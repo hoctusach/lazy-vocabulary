@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { VocabularyWord, SheetData } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 
+// We've updated this to match VocabularyWord but with count as optional
 export interface CustomWord {
   word: string;
   meaning: string;
   example: string;
-  category: string;  // This is required, not optional
+  category: string; // Required, consistent with updated VocabularyWord
   count?: number | string;
 }
 
@@ -59,13 +60,13 @@ export const useCustomWords = () => {
         dataToMerge[word.category] = [];
       }
       
-      // When adding to the SheetData, make sure category is included
+      // Now directly map the CustomWord to VocabularyWord (they're now compatible)
       const vocabularyWord: VocabularyWord = {
         word: word.word,
         meaning: word.meaning,
         example: word.example,
         count: word.count !== undefined ? word.count : 0,
-        category: word.category // Explicitly add the category
+        category: word.category
       };
       
       dataToMerge[word.category].push(vocabularyWord);

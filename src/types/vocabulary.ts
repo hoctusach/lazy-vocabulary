@@ -6,7 +6,7 @@ export interface VocabularyWord {
   meaning: string;
   example: string;
   count: number | string; // This allows both number and string types
-  category?: string; // Category remains optional for backward compatibility with existing data
+  category: string; // Making category required to match how it's used throughout the app
 }
 
 export interface SheetData {

@@ -94,7 +94,7 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Handler for saving a new word
   const handleSaveWord = (newWord: { word: string; meaning: string; example: string; category: string }) => {
-    // Explicitly provide all required fields
+    // Add the new custom word
     addCustomWord({
       word: newWord.word,
       meaning: newWord.meaning,
