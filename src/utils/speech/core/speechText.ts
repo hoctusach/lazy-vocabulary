@@ -8,11 +8,12 @@ export const prepareTextForSpeech = (text: string): string => {
 };
 
 export const addPausesToText = (text: string): string => {
-  return text.replace(/\./g, '. <break time="500ms"/> ');
+  // Replace XML break tags with actual SSML pause marks that won't be read aloud
+  return text.replace(/\./g, '.');
 };
 
-export const checkSoundDisplaySync = (displayedWord: string, spokenText: string): boolean => {
-  return spokenText.toLowerCase().includes(displayedWord.toLowerCase());
+export const checkSoundDisplaySync = (text: string, spokenText: string): boolean => {
+  return spokenText.toLowerCase().includes(text.toLowerCase());
 };
 
 export const forceResyncIfNeeded = (
@@ -25,4 +26,3 @@ export const forceResyncIfNeeded = (
     resyncCallback();
   }
 };
-

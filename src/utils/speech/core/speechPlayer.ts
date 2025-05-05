@@ -1,6 +1,6 @@
 
 // Refactored: now this file just orchestrates the helpers
-import { prepareTextForSpeech, addPausesToText } from './speechText';
+import { prepareTextForSpeech } from './speechText';
 import { ensureSpeechEngineReady, stopSpeaking } from './speechEngine';
 import { speakWithVoice } from './speakWithVoice';
 import {
@@ -32,7 +32,8 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
       // Wait for DOM to update before continuing
       await new Promise(resolve => setTimeout(resolve, 100));
 
-      const processedText = addPausesToText(prepareTextForSpeech(text));
+      // Process the text without adding XML break tags
+      const processedText = prepareTextForSpeech(text);
       setCurrentTextBeingSpoken(processedText);
       console.log('Speaking text:', text.substring(0, 30) + '...');
 

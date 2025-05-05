@@ -77,8 +77,8 @@ export const useAudioPlayback = (
         
         console.log('[APP] ⚡ Starting to speak word:', currentWord.word);
         
-        // Create the full text to speak
-        const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
+        // Create the text to speak with periods to create natural pauses
+        const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}.`;
         
         // Use the direct speak function from utils/speech for more reliability
         await speak(fullText, voiceRegion);
