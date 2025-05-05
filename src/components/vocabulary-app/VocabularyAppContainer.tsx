@@ -13,6 +13,7 @@ import AddWordButton from "./AddWordButton";
 import AddWordModal from "./AddWordModal";
 import DebugPanel from "@/components/DebugPanel";
 import { useCustomWords } from "@/hooks/useCustomWords";
+import { toast } from "sonner";
 
 const VocabularyAppContainer: React.FC = () => {
   // Add state for modal visibility
@@ -101,6 +102,11 @@ const VocabularyAppContainer: React.FC = () => {
       example: newWord.example,
       category: newWord.category, // This is always required from the modal
       count: 0 // Initialize count with 0 for new words
+    });
+    
+    // Show success notification
+    toast.success(`"${newWord.word}" added to ${newWord.category}`, {
+      description: "The word has been added to your custom vocabulary."
     });
   };
 
