@@ -7,7 +7,7 @@ export interface CustomWord {
   word: string;
   meaning: string;
   example: string;
-  category: string;
+  category: string;  // This is required, not optional
   count?: number | string;
 }
 
@@ -58,7 +58,17 @@ export const useCustomWords = () => {
       if (!dataToMerge[word.category]) {
         dataToMerge[word.category] = [];
       }
-      dataToMerge[word.category].push(word as VocabularyWord);
+      
+      // When adding to the SheetData, make sure category is included
+      const vocabularyWord: VocabularyWord = {
+        word: word.word,
+        meaning: word.meaning,
+        example: word.example,
+        count: word.count !== undefined ? word.count : 0,
+        category: word.category // Explicitly add the category
+      };
+      
+      dataToMerge[word.category].push(vocabularyWord);
     });
 
     // Use the vocabulary service to merge the data
