@@ -6,6 +6,7 @@ export interface VocabularyWord {
   meaning: string;
   example: string;
   count: number | string; // This allows both number and string types
+  category?: string; // Added category property as optional
 }
 
 export interface SheetData {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useVocabularyManager } from "@/hooks/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
@@ -203,7 +202,7 @@ const VocabularyAppContainer: React.FC = () => {
           isSpeaking={isSoundPlaying}
           onNextWord={handleManualNext}
           displayTime={displayTime}
-          category={currentWord.category}
+          category={currentWord.category || currentCategory} // Fallback to currentCategory if category isn't set
         />
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
