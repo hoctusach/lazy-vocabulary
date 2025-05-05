@@ -44,7 +44,6 @@ export const useAudioPlayback = (
           console.log('[APP] Retrying speech for:', currentWord.word);
           wordChangeProcessingRef.current = false;
           speechAttemptsRef.current += 1;
-          // This will re-trigger the useEffect as we changed the dependency
           // Fix: Pass a boolean value directly instead of a function
           setIsSoundPlaying(!isSoundPlaying); // Toggle to force re-render
         }
@@ -73,10 +72,8 @@ export const useAudioPlayback = (
         stopSpeaking();
         console.log('[APP] Previous speech stopped, preparing to speak:', currentWord.word);
         
-        // IMPORTANT: Reduced delay before playing for better synchronization
-        const prePlayDelay = 100; // Very short delay for better sync
-        console.log(`[APP] Waiting ${prePlayDelay}ms before speaking`);
-        await new Promise(resolve => setTimeout(resolve, prePlayDelay));
+        // Small delay to ensure system is ready
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         console.log('[APP] ⚡ Starting to speak word:', currentWord.word);
         
@@ -109,7 +106,7 @@ export const useAudioPlayback = (
     };
 
     // Start the audio playback with a shorter delay to ensure DOM rendering is complete
-    console.log(`[APP] Scheduling speech for ${currentWord.word} in 100ms`); 
+    console.log(`[APP] Scheduling speech for ${currentWord.word}`); 
     const speechTimerRef = setTimeout(playWordAudio, 100); 
     
     // Cleanup function

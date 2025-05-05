@@ -11,7 +11,7 @@ export const attemptSpeech = async (
   try {
     if (attempts > 0) {
       window.speechSynthesis.cancel();
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     window.speechSynthesis.speak(utterance);
@@ -20,16 +20,19 @@ export const attemptSpeech = async (
       setTimeout(() => {
         if (window.speechSynthesis.speaking) {
           resolveStart();
-        } else {
-          console.warn(`Speech failed to start, retry attempt ${attempts + 1}`);
+        } else if (attempts < 4) {
+          console.warn(`Speech did not start, retrying`);
           rejectStart(new Error('Speech not started'));
+        } else {
+          // On last attempt, just proceed even if speech isn't detected
+          console.warn('Final attempt: proceeding even though speech may not have started');
+          resolveStart();
         }
-      }, 900);
+      }, 600);
     });
   } catch (error) {
     console.error('Speech start error:', error);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 500));
     return attemptSpeech(utterance, attempts + 1);
   }
 };
-

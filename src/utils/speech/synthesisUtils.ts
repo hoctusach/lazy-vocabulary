@@ -39,19 +39,11 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
       reject(new Error(`Speech error: ${event.error}`));
     };
     
-    // IMPORTANT: Short delay before speaking to improve responsiveness
-    const speakDelay = 100; // Very short delay for better sync
-    console.log(`[SYNTHESIS] Will speak in ${speakDelay}ms`);
-    
-    // Ensure DOM has time to update before speaking (but just a short delay)
+    // Short delay before speaking to ensure system is ready
     setTimeout(() => {
-      // Log right before the actual speak call
-      console.log('[SYNTHESIS] ⚡ ABOUT TO SPEAK: About to call speechSynthesis.speak()');
-      
-      // Start the new speech
+      // Start the speech
       window.speechSynthesis.speak(utterance);
-      
-      console.log('[SYNTHESIS] ✅ speechSynthesis.speak() was called');
-    }, speakDelay);
+      console.log('[SYNTHESIS] Speech synthesis started');
+    }, 100);
   });
 };
