@@ -3,12 +3,12 @@ import { useState, useEffect } from 'react';
 import { VocabularyWord, SheetData } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 
-// We've updated this to match VocabularyWord but with count as optional
+// Define a more specific type for adding new words where category is required
 export interface CustomWord {
   word: string;
   meaning: string;
   example: string;
-  category: string; // Required, consistent with updated VocabularyWord
+  category: string; // Required for new custom words
   count?: number | string;
 }
 
@@ -34,7 +34,7 @@ export const useCustomWords = () => {
   // Function to add a new custom word
   const addCustomWord = (newWord: CustomWord) => {
     // Add count property with initial value 0
-    const wordWithCount = { ...newWord, count: 0 };
+    const wordWithCount = { ...newWord, count: newWord.count ?? 0 };
     
     // Update state with new word
     const updatedWords = [...customWords, wordWithCount];
@@ -60,13 +60,13 @@ export const useCustomWords = () => {
         dataToMerge[word.category] = [];
       }
       
-      // Now directly map the CustomWord to VocabularyWord (they're now compatible)
+      // Map the CustomWord to VocabularyWord
       const vocabularyWord: VocabularyWord = {
         word: word.word,
         meaning: word.meaning,
         example: word.example,
         count: word.count !== undefined ? word.count : 0,
-        category: word.category
+        category: word.category // Category is always required for custom words
       };
       
       dataToMerge[word.category].push(vocabularyWord);
