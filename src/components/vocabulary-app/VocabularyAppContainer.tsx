@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useVocabularyManager } from "@/hooks/useVocabularyManager";
+import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyCard from "@/components/VocabularyCard";
@@ -151,7 +151,7 @@ const VocabularyAppContainer: React.FC = () => {
             currentWord={debugPanelData}
           />
           
-          {/* Add Word Modal */}
+          {/* Add Word Modal with enhanced dictionary lookup */}
           <AddWordModal 
             isOpen={isAddWordModalOpen} 
             onClose={() => setIsAddWordModalOpen(false)} 
