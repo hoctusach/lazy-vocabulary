@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader } from 'lucide-react';
@@ -26,7 +27,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
   const [category, setCategory] = useState<string>('');
   const [isFormValid, setIsFormValid] = useState<boolean>(false);
   
-  // New state for dictionary API integration
+  // Search state
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchError, setSearchError] = useState<string>('');
 
@@ -63,33 +64,53 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
       setIsSearching(true);
       setSearchError('');
       
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.trim())}`);
+      // URL-encode the term for multi-word phrases
+      const term = encodeURIComponent(word.trim());
+      
+      // Primary dictionary API call
+      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${term}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch definition');
       }
       
       const data = await response.json();
+      let definitionFound = false;
+      let exampleFound = false;
       
       if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
         // Get first definition
         const firstDefinition = data[0].meanings[0].definitions[0];
         
-        if (firstDefinition) {
+        if (firstDefinition && firstDefinition.definition) {
           // Populate meaning field
-          setMeaning(firstDefinition.definition || '');
+          setMeaning(firstDefinition.definition);
+          definitionFound = true;
           
-          // Populate example if available
+          // Check for example
           if (firstDefinition.example) {
             setExample(firstDefinition.example);
+            exampleFound = true;
           }
         }
-      } else {
-        setSearchError('No definition found');
       }
+      
+      // If no definition was found, we could try a fallback API
+      // However, since we don't have an API key for Wordnik, we'll just display an error
+      if (!definitionFound) {
+        setMeaning('No definition found.');
+        setSearchError('No definition found. Please try another word or enter manually.');
+      }
+      
+      // If no example was found, note that
+      if (!exampleFound) {
+        setExample('No example found. Please enter manually.');
+      }
+      
     } catch (error) {
       console.error('Dictionary API error:', error);
-      setSearchError('Search failed. Please try again.');
+      setSearchError('Search failed. Please try again or enter details manually.');
+      // You would implement fallback APIs here if you had API keys
     } finally {
       setIsSearching(false);
     }
@@ -140,12 +161,13 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
             <Label htmlFor="meaning" className="text-right">
               Meaning
             </Label>
-            <Input
+            <Textarea
               id="meaning"
               value={meaning}
               onChange={(e) => setMeaning(e.target.value)}
               className="col-span-3"
               disabled={isSearching}
+              rows={2}
             />
           </div>
           
@@ -153,12 +175,13 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
             <Label htmlFor="example" className="text-right">
               Example
             </Label>
-            <Input
+            <Textarea
               id="example"
               value={example}
               onChange={(e) => setExample(e.target.value)}
               className="col-span-3"
               disabled={isSearching}
+              rows={4}
             />
           </div>
           

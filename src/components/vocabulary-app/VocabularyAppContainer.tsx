@@ -151,7 +151,7 @@ const VocabularyAppContainer: React.FC = () => {
             currentWord={debugPanelData}
           />
           
-          {/* Add Word Modal with enhanced dictionary lookup */}
+          {/* Enhanced Add Word Modal with dictionary lookup */}
           <AddWordModal 
             isOpen={isAddWordModalOpen} 
             onClose={() => setIsAddWordModalOpen(false)} 
