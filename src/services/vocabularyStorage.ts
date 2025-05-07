@@ -1,23 +1,28 @@
-import { SheetData, VocabularyWord } from "@/types/vocabulary";
+
+import { SheetData } from "@/types/vocabulary";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
+import { STORAGE_CONFIG } from "./vocabulary/storage/StorageConfig";
+import { DataValidator } from "./vocabulary/storage/DataValidator";
 
 export class VocabularyStorage {
-  private readonly MAX_STORAGE_SIZE = 5 * 1024 * 1024; // Increased to 5MB limit
-  private readonly STORAGE_KEY = 'vocabularyData';
-  private readonly LAST_UPLOADED_KEY = 'lastUploadedVocabulary';
+  private readonly config = STORAGE_CONFIG;
+  private readonly validator = new DataValidator();
 
+  /**
+   * Loads vocabulary data from local storage
+   */
   loadData(): SheetData {
     // Try to load last uploaded data first
-    const lastUploadedData = localStorage.getItem(this.LAST_UPLOADED_KEY);
+    const lastUploadedData = localStorage.getItem(this.config.LAST_UPLOADED_KEY);
     if (lastUploadedData) {
       try {
-        if (lastUploadedData.length > this.MAX_STORAGE_SIZE) {
+        if (!this.validator.validateDataSize(lastUploadedData, this.config.MAX_STORAGE_SIZE)) {
           console.warn("Last uploaded data exceeds size limit, trying current session data");
           return this.loadCurrentSessionData();
         }
         const parsedData = JSON.parse(lastUploadedData);
         console.log("Loaded last uploaded vocabulary data", parsedData);
-        return this.ensureDataTypes(parsedData);
+        return this.validator.ensureDataTypes(parsedData);
       } catch (e) {
         console.error("Failed to load last uploaded data, trying current session data:", e);
         return this.loadCurrentSessionData();
@@ -27,71 +32,50 @@ export class VocabularyStorage {
     return this.loadCurrentSessionData();
   }
 
+  /**
+   * Loads data from the current session storage
+   */
   private loadCurrentSessionData(): SheetData {
-    const savedData = localStorage.getItem(this.STORAGE_KEY);
+    const savedData = localStorage.getItem(this.config.STORAGE_KEY);
     if (savedData) {
       try {
-        if (savedData.length > this.MAX_STORAGE_SIZE) {
+        if (!this.validator.validateDataSize(savedData, this.config.MAX_STORAGE_SIZE)) {
           console.warn("Saved data exceeds size limit, using default data");
-          return this.ensureDataTypes(DEFAULT_VOCABULARY_DATA);
+          return this.validator.getDefaultData();
         }
         const parsedData = JSON.parse(savedData);
         console.log("Loaded current session vocabulary data", parsedData);
-        return this.ensureDataTypes(parsedData);
+        return this.validator.ensureDataTypes(parsedData);
       } catch (e) {
         console.error("Failed to load data from localStorage, using default data:", e);
-        return this.ensureDataTypes(DEFAULT_VOCABULARY_DATA);
+        return this.validator.getDefaultData();
       }
     }
     console.log("No saved data found, using default vocabulary data");
-    return this.ensureDataTypes(DEFAULT_VOCABULARY_DATA);
+    return this.validator.getDefaultData();
   }
 
+  /**
+   * Saves vocabulary data to local storage
+   */
   saveData(data: SheetData): boolean {
     try {
       // Ensure correct types before saving
-      const processedData = this.ensureDataTypes(data);
+      const processedData = this.validator.ensureDataTypes(data);
       const dataString = JSON.stringify(processedData);
       
-      if (dataString.length > this.MAX_STORAGE_SIZE) {
+      if (!this.validator.validateDataSize(dataString, this.config.MAX_STORAGE_SIZE)) {
         throw new Error("Data size exceeds storage limit");
       }
       
       // Save to both current session and last uploaded storage
-      localStorage.setItem(this.STORAGE_KEY, dataString);
-      localStorage.setItem(this.LAST_UPLOADED_KEY, dataString);
+      localStorage.setItem(this.config.STORAGE_KEY, dataString);
+      localStorage.setItem(this.config.LAST_UPLOADED_KEY, dataString);
       console.log("Saved vocabulary data to local storage", processedData);
       return true;
     } catch (e) {
       console.error("Failed to save data to localStorage:", e);
       return false;
     }
-  }
-  
-  // Helper method to ensure all fields have the correct types
-  private ensureDataTypes(data: any): SheetData {
-    const processedData: SheetData = {};
-    
-    for (const sheetName in data) {
-      processedData[sheetName] = [];
-      
-      if (Array.isArray(data[sheetName])) {
-        for (const word of data[sheetName]) {
-          // Create a properly typed word object, handling both number and string count values
-          const processedWord: VocabularyWord = {
-            word: String(word.word || ""),
-            meaning: String(word.meaning || ""),
-            example: String(word.example || ""),
-            // Keep count as is if it's already a number or string
-            // This way we don't try to convert strings to numbers unnecessarily
-            count: word.count !== undefined ? word.count : 0
-          };
-          
-          processedData[sheetName].push(processedWord);
-        }
-      }
-    }
-    
-    return processedData;
   }
 }
