@@ -19,6 +19,31 @@ export const useAudioPlayback = (
   stopSpeaking: () => void,
   displayTime: number
 ) => {
+  // Set up document-level interaction handler for speech permissions
+  useEffect(() => {
+    const documentClickHandler = () => {
+      // This empty handler helps enable speech in browsers that require user gesture
+      if (window.speechSynthesis && !speechSynthesis.speaking && currentWord) {
+        try {
+          // Just create a silent utterance to "unlock" speech
+          const silentUtterance = new SpeechSynthesisUtterance('');
+          silentUtterance.volume = 0;
+          window.speechSynthesis.speak(silentUtterance);
+        } catch (error) {
+          // Ignore errors here, just trying to enable speech
+        }
+      }
+    };
+
+    // Add the event listener to the document
+    document.addEventListener('click', documentClickHandler);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener('click', documentClickHandler);
+    };
+  }, []);
+
   // Handle playing audio when the current word changes
   useEffect(() => {
     if (!currentWord || mute || isPaused) {
@@ -80,23 +105,27 @@ export const useAudioPlayback = (
         // Create the text to speak with periods to create natural pauses
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}.`;
         
-        // Use the direct speak function from utils/speech for more reliability
-        await speak(fullText, voiceRegion);
-        
-        console.log('[APP] ✅ Speech completed for:', currentWord.word);
-        
-        // After speech completes, set timer for next word if not paused or muted
-        if (!isPaused && !mute) {
-          console.log('[APP] Setting timer for next word');
-          autoAdvanceTimerRef.current = window.setTimeout(() => {
-            if (!isPaused) {
-              console.log('[APP] Auto-advancing to next word');
-              handleManualNext();
-            }
-          }, 2000); // Wait 2 seconds after audio finishes before advancing
+        try {
+          // Use the direct speak function from utils/speech for more reliability
+          await speak(fullText, voiceRegion);
+          
+          console.log('[APP] ✅ Speech completed for:', currentWord.word);
+          
+          // After speech completes, set timer for next word if not paused or muted
+          if (!isPaused && !mute) {
+            console.log('[APP] Setting timer for next word');
+            autoAdvanceTimerRef.current = window.setTimeout(() => {
+              if (!isPaused) {
+                console.log('[APP] Auto-advancing to next word');
+                handleManualNext();
+              }
+            }, 2000); // Wait 2 seconds after audio finishes before advancing
+          }
+        } catch (error) {
+          console.error("[APP] Error playing audio:", error);
+          // Even if speech fails, we should still allow navigation
+          // Don't block the UI or throw errors that would prevent user from continuing
         }
-      } catch (error) {
-        console.error("[APP] Error playing audio:", error);
       } finally {
         setIsSoundPlaying(false);
         // Allow processing new words again

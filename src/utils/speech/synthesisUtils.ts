@@ -36,14 +36,39 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     
     utterance.onerror = (event) => {
       console.error('[SYNTHESIS] Speech synthesis error:', event.error);
-      reject(new Error(`Speech error: ${event.error}`));
+      
+      if (event.error === 'not-allowed') {
+        reject(new Error('not-allowed'));
+      } else if (event.error === 'interrupted') {
+        // This is often expected when stopping speech, don't treat as a failure
+        console.log('[SYNTHESIS] Speech interrupted - likely intentional');
+        resolve('interrupted');
+      } else if (event.error === 'canceled') {
+        // Similarly, cancellation is often intentional
+        console.log('[SYNTHESIS] Speech canceled - likely intentional');
+        resolve('canceled');
+      } else {
+        // For other errors, reject with details
+        reject(new Error(`Speech error: ${event.error}`));
+      }
     };
     
-    // Short delay before speaking to ensure system is ready
-    setTimeout(() => {
-      // Start the speech
-      window.speechSynthesis.speak(utterance);
-      console.log('[SYNTHESIS] Speech synthesis started');
-    }, 100);
+    // Use try-catch to handle potential errors during speech initiation
+    try {
+      // Short delay before speaking to ensure system is ready
+      setTimeout(() => {
+        try {
+          // Start the speech
+          window.speechSynthesis.speak(utterance);
+          console.log('[SYNTHESIS] Speech synthesis started');
+        } catch (error) {
+          console.error('[SYNTHESIS] Error calling speechSynthesis.speak():', error);
+          reject(error);
+        }
+      }, 100);
+    } catch (error) {
+      console.error('[SYNTHESIS] Error in speech synthesis setup:', error);
+      reject(error);
+    }
   });
 };

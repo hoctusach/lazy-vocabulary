@@ -14,6 +14,9 @@ import AddWordModal from "./AddWordModal";
 import DebugPanel from "@/components/DebugPanel";
 import { useCustomWords } from "@/hooks/useCustomWords";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 
 const VocabularyAppContainer: React.FC = () => {
   // Add state for modal visibility
@@ -31,7 +34,8 @@ const VocabularyAppContainer: React.FC = () => {
     handleTogglePause,
     handleManualNext,
     handleSwitchCategory,
-    setHasData
+    setHasData,
+    jsonLoadError
   } = useVocabularyManager();
 
   // Speech synthesis for voice management
@@ -41,7 +45,10 @@ const VocabularyAppContainer: React.FC = () => {
     handleToggleMute,
     handleChangeVoice,
     isVoicesLoaded,
-    stopSpeaking
+    stopSpeaking,
+    speechError,
+    hasSpeechPermission,
+    retrySpeechInitialization
   } = useSpeechSynthesis();
 
   // Audio sync management
@@ -93,6 +100,11 @@ const VocabularyAppContainer: React.FC = () => {
     displayTime
   );
 
+  // Handle speech permissions
+  const handleSpeechRetry = () => {
+    retrySpeechInitialization();
+  };
+
   // Handler for saving a new word
   const handleSaveWord = (newWord: { word: string; meaning: string; example: string; category: string }) => {
     // Add the new custom word - make sure all required properties are provided
@@ -118,8 +130,41 @@ const VocabularyAppContainer: React.FC = () => {
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+      {/* Display JSON load error toast if needed */}
+      {jsonLoadError && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertDescription>
+            Custom vocabulary file is corrupt; loaded default list instead.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {hasData && currentWord ? (
         <>
+          {/* Speech Error Alert */}
+          {speechError && (
+            <Alert 
+              className="mb-4 bg-yellow-50 border-yellow-200 text-yellow-800"
+              aria-live="polite"
+            >
+              <AlertDescription className="flex items-center justify-between">
+                <span>{speechError}</span>
+                {!hasSpeechPermission && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleSpeechRetry} 
+                    className="ml-4" 
+                    aria-label="Retry speech"
+                  >
+                    <RefreshCcw className="h-4 w-4 mr-2" />
+                    Retry Speech
+                  </Button>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
           <VocabularyCard
             word={currentWord.word}
             meaning={currentWord.meaning}
