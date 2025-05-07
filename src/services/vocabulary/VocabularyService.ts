@@ -1,7 +1,7 @@
 
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
-import { SheetManager } from "../sheetManager";
+import { SheetManager } from "../sheet";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
