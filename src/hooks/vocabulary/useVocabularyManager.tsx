@@ -42,28 +42,31 @@ export const useVocabularyManager = () => {
     clearTimer
   );
 
-  // Enhanced file upload handler with error handling
-  const handleFileUploaded = useCallback((file: File) => {
+  // Enhanced file upload handler with error handling - fixed to accept a File argument
+  const handleFileUploaded = useCallback((file?: File) => {
     try {
-      originalHandleFileUploaded(file).catch(error => {
-        console.error("Error processing vocabulary file:", error);
-        setJsonLoadError(true);
-        
-        // Attempt to load default vocabulary instead
-        try {
-          vocabularyService.loadDefaultVocabulary();
-          setHasData(true);
+      // Now we safely call originalHandleFileUploaded() without any arguments
+      // and properly attach the catch handler to the returned Promise
+      originalHandleFileUploaded()
+        .catch(error => {
+          console.error("Error processing vocabulary file:", error);
+          setJsonLoadError(true);
           
-          const firstWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
-          setCurrentWord(firstWord);
-          
-          toast.error("Custom vocabulary file is corrupt", {
-            description: "Loaded default vocabulary list instead."
-          });
-        } catch (fallbackError) {
-          console.error("Failed to load default vocabulary:", fallbackError);
-        }
-      });
+          // Attempt to load default vocabulary instead
+          try {
+            vocabularyService.loadDefaultVocabulary();
+            setHasData(true);
+            
+            const firstWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
+            setCurrentWord(firstWord);
+            
+            toast.error("Custom vocabulary file is corrupt", {
+              description: "Loaded default vocabulary list instead."
+            });
+          } catch (fallbackError) {
+            console.error("Failed to load default vocabulary:", fallbackError);
+          }
+        });
     } catch (outerError) {
       console.error("Error in file upload handler:", outerError);
       setJsonLoadError(true);

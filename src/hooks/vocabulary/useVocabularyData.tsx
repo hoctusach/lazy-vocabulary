@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -26,6 +27,7 @@ export const useVocabularyData = () => {
     currentWordRef.current = currentWord;
   }, [currentWord]);
 
+  // Convert this to return a Promise for proper error handling
   const handleFileUploaded = useCallback(() => {
     console.log("File uploaded callback triggered");
     setHasData(true);
@@ -37,6 +39,9 @@ export const useVocabularyData = () => {
     const word = vocabularyService.getNextWord();
     console.log("New word after file upload:", word);
     setCurrentWord(word);
+    
+    // Return resolved promise to allow proper chaining
+    return Promise.resolve();
   }, []);
 
   return {
