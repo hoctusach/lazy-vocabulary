@@ -32,6 +32,8 @@ export const useVocabularyContainerState = () => {
     handleChangeVoice,
     isVoicesLoaded,
     stopSpeaking,
+    pauseSpeaking,
+    resumeSpeaking,
     speechError,
     hasSpeechPermission,
     retrySpeechInitialization
@@ -61,6 +63,19 @@ export const useVocabularyContainerState = () => {
     stopSpeaking,
     voiceRegion
   );
+
+  // Custom pause handler that immediately stops speech
+  const handlePauseResume = () => {
+    if (isPaused) {
+      // If we're resuming, call the regular toggle function and also resume speech
+      handleTogglePause();
+      resumeSpeaking();
+    } else {
+      // If we're pausing, pause speech immediately before toggling state
+      pauseSpeaking();
+      handleTogglePause();
+    }
+  };
 
   // Current and next category information
   const currentCategory = vocabularyService.getCurrentSheetName();
@@ -97,7 +112,7 @@ export const useVocabularyContainerState = () => {
     currentWord,
     isPaused,
     handleFileUploaded,
-    handleTogglePause,
+    handleTogglePause: handlePauseResume, // Use our custom handler
     handleManualNext,
     jsonLoadError,
     

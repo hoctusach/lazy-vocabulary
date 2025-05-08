@@ -4,6 +4,8 @@ import { calculateSpeechDuration } from './durationUtils';
 import { speak } from './core/speechPlayer';
 import {
   stopSpeaking,
+  pauseSpeaking,
+  resumeSpeaking,
   keepSpeechAlive,
   waitForSpeechReadiness,
   resetSpeechEngine,
@@ -31,6 +33,8 @@ export {
   calculateSpeechDuration,
   isSpeechSynthesisSupported,
   stopSpeaking,
+  pauseSpeaking,
+  resumeSpeaking,
   checkSoundDisplaySync,
   keepSpeechAlive,
   waitForSpeechReadiness,

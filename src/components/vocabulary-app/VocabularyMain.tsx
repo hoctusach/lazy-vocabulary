@@ -53,18 +53,16 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         >
           <AlertDescription className="flex items-center justify-between">
             <span>{speechError}</span>
-            {!hasSpeechPermission && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleSpeechRetry} 
-                className="ml-4" 
-                aria-label="Retry speech"
-              >
-                <RefreshCcw className="h-4 w-4 mr-2" />
-                Retry Speech
-              </Button>
-            )}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleSpeechRetry} 
+              className="ml-4" 
+              aria-label="Retry speech"
+            >
+              <RefreshCcw className="h-4 w-4 mr-2" />
+              Retry Speech
+            </Button>
           </AlertDescription>
         </Alert>
       )}

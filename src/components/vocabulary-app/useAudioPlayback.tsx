@@ -1,7 +1,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak } from '@/utils/speech';
+import { speak, pauseSpeaking, resumeSpeaking } from '@/utils/speech';
 
 export const useAudioPlayback = (
   currentWord: VocabularyWord | null,
@@ -158,6 +158,21 @@ export const useAudioPlayback = (
     lastSpokenWordRef,
     wordChangeProcessingRef,
     speechAttemptsRef,
-    isSoundPlaying // Added isSoundPlaying as a dependency since we're using it now
+    isSoundPlaying
   ]);
+  
+  // Effect to handle pause state changes
+  useEffect(() => {
+    if (isPaused) {
+      // If paused and we're speaking, pause the speech
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
+        pauseSpeaking();
+      }
+    } else {
+      // If unpaused and we have paused speech, resume it
+      if (window.speechSynthesis && window.speechSynthesis.paused) {
+        resumeSpeaking();
+      }
+    }
+  }, [isPaused]);
 };

@@ -53,6 +53,14 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
       }
     };
     
+    utterance.onpause = () => {
+      console.log('[SYNTHESIS] Speech paused');
+    };
+    
+    utterance.onresume = () => {
+      console.log('[SYNTHESIS] Speech resumed');
+    };
+    
     // Use try-catch to handle potential errors during speech initiation
     try {
       // Short delay before speaking to ensure system is ready

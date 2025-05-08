@@ -1,3 +1,4 @@
+
 import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const stopSpeaking = (): void => {
@@ -5,6 +6,20 @@ export const stopSpeaking = (): void => {
     console.log('[ENGINE] Stopping all speech');
     window.speechSynthesis.cancel();
     console.log('[ENGINE] All speech stopped');
+  }
+};
+
+export const pauseSpeaking = (): void => {
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    console.log('[ENGINE] Pausing speech');
+    window.speechSynthesis.pause();
+  }
+};
+
+export const resumeSpeaking = (): void => {
+  if (window.speechSynthesis && window.speechSynthesis.paused) {
+    console.log('[ENGINE] Resuming speech');
+    window.speechSynthesis.resume();
   }
 };
 
