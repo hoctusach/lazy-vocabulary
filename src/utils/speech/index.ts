@@ -25,6 +25,9 @@ import {
   getSpeechPitch,
   getSpeechVolume
 } from './core/speechSettings';
+import { splitTextIntoChunks } from './core/textChunker';
+import { speakChunksInSequence } from './core/chunkSequencer';
+import { createSpeechMonitor, clearSpeechMonitor } from './core/speechMonitor';
 
 export {
   speak,
@@ -47,5 +50,9 @@ export {
   getSpeechPitch,
   getSpeechVolume,
   prepareTextForSpeech,
-  addPausesToText
+  addPausesToText,
+  splitTextIntoChunks,
+  speakChunksInSequence,
+  createSpeechMonitor,
+  clearSpeechMonitor
 };
