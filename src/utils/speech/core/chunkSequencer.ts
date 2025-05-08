@@ -10,6 +10,7 @@ interface SequenceOptions {
   onChunkComplete?: (index: number, totalChunks: number) => void;
   onSequenceComplete?: () => void;
   onError?: (error: Error, index: number) => void;
+  pauseRequestedRef?: React.MutableRefObject<boolean>;
 }
 
 /**
@@ -19,10 +20,17 @@ export async function speakChunksInSequence(
   chunks: string[], 
   options: SequenceOptions
 ): Promise<ChunkResult[]> {
-  const { langCode, voice, onChunkComplete, onSequenceComplete, onError } = options;
+  const { langCode, voice, onChunkComplete, onSequenceComplete, onError, pauseRequestedRef } = options;
   const results: ChunkResult[] = [];
   
   for (let i = 0; i < chunks.length; i++) {
+    // If a pause was requested, stop processing further chunks
+    // but mark the chunks we've already processed as successful
+    if (pauseRequestedRef?.current && i > 0) {
+      console.log(`[SEQUENCE] Pause requested, stopping after chunk ${i}`);
+      break;
+    }
+    
     const chunk = chunks[i];
     console.log(`[SEQUENCE] Speaking chunk ${i + 1}/${chunks.length}: "${chunk.substring(0, 20)}..."`);
     
@@ -74,6 +82,12 @@ export async function speakChunksInSequence(
       // Mark this chunk as successful
       results.push({ success: true });
       if (onChunkComplete) onChunkComplete(i, chunks.length);
+      
+      // Check for pause after each chunk is completed
+      if (pauseRequestedRef?.current && i < chunks.length - 1) {
+        console.log(`[SEQUENCE] Pause requested after chunk ${i + 1}, stopping sequence`);
+        break;
+      }
       
     } catch (error) {
       console.error(`[SEQUENCE] Failed at chunk ${i + 1}:`, error);

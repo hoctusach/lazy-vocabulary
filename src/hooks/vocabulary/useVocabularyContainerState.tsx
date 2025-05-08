@@ -34,6 +34,7 @@ export const useVocabularyContainerState = () => {
     stopSpeaking,
     pauseSpeaking,
     resumeSpeaking,
+    pauseRequestedRef,
     speechError,
     hasSpeechPermission,
     retrySpeechInitialization
@@ -64,15 +65,15 @@ export const useVocabularyContainerState = () => {
     voiceRegion
   );
 
-  // Custom pause handler that immediately stops speech
+  // Custom pause handler that uses the soft-pause approach
   const handlePauseResume = () => {
     if (isPaused) {
       // If we're resuming, call the regular toggle function and also resume speech
       handleTogglePause();
       resumeSpeaking();
     } else {
-      // If we're pausing, pause speech immediately before toggling state
-      pauseSpeaking();
+      // If we're pausing, use our soft-pause approach
+      pauseSpeaking(); // This now sets pauseRequestedRef.current = true
       handleTogglePause();
     }
   };
@@ -98,7 +99,8 @@ export const useVocabularyContainerState = () => {
     wordChangeProcessingRef,
     speechAttemptsRef,
     stopSpeaking,
-    displayTime
+    displayTime,
+    pauseRequestedRef
   );
 
   // Combine all state and handlers

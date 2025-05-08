@@ -1,7 +1,7 @@
 
 import { useEffect, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak, pauseSpeaking, resumeSpeaking } from '@/utils/speech';
+import { speak } from '@/utils/speech';
 
 export const useAudioPlayback = (
   currentWord: VocabularyWord | null,
@@ -17,7 +17,8 @@ export const useAudioPlayback = (
   wordChangeProcessingRef: React.MutableRefObject<boolean>,
   speechAttemptsRef: React.MutableRefObject<number>,
   stopSpeaking: () => void,
-  displayTime: number
+  displayTime: number,
+  pauseRequestedRef?: React.MutableRefObject<boolean>
 ) => {
   // Set up document-level interaction handler for speech permissions
   useEffect(() => {
@@ -107,15 +108,15 @@ export const useAudioPlayback = (
         
         try {
           // Use the direct speak function from utils/speech for more reliability
-          await speak(fullText, voiceRegion);
+          await speak(fullText, voiceRegion, pauseRequestedRef);
           
           console.log('[APP] ✅ Speech completed for:', currentWord.word);
           
           // After speech completes, set timer for next word if not paused or muted
-          if (!isPaused && !mute) {
+          if (!isPaused && !mute && !pauseRequestedRef?.current) {
             console.log('[APP] Setting timer for next word');
             autoAdvanceTimerRef.current = window.setTimeout(() => {
-              if (!isPaused) {
+              if (!isPaused && !pauseRequestedRef?.current) {
                 console.log('[APP] Auto-advancing to next word');
                 handleManualNext();
               }
@@ -158,21 +159,25 @@ export const useAudioPlayback = (
     lastSpokenWordRef,
     wordChangeProcessingRef,
     speechAttemptsRef,
-    isSoundPlaying
+    isSoundPlaying,
+    pauseRequestedRef
   ]);
   
   // Effect to handle pause state changes
   useEffect(() => {
     if (isPaused) {
-      // If paused and we're speaking, pause the speech
-      if (window.speechSynthesis && window.speechSynthesis.speaking) {
-        pauseSpeaking();
+      // If paused, update our pauseRequested flag instead of
+      // directly pausing the speech synthesis
+      if (pauseRequestedRef) {
+        pauseRequestedRef.current = true;
+        console.log('[APP] Soft pause requested - will complete current word');
       }
     } else {
-      // If unpaused and we have paused speech, resume it
-      if (window.speechSynthesis && window.speechSynthesis.paused) {
-        resumeSpeaking();
+      // If unpaused, clear the flag to allow speech to continue
+      if (pauseRequestedRef) {
+        pauseRequestedRef.current = false;
+        console.log('[APP] Pause cleared - speech will continue with next word');
       }
     }
-  }, [isPaused]);
+  }, [isPaused, pauseRequestedRef]);
 };

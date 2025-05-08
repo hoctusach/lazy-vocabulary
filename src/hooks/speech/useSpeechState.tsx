@@ -1,3 +1,4 @@
+
 import { useRef, useCallback } from 'react';
 
 export const useSpeechState = () => {
@@ -6,6 +7,7 @@ export const useSpeechState = () => {
   const speakingLockRef = useRef(false);
   const activeUtterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const lastSpokenTextRef = useRef<string>('');
+  const pauseRequestedRef = useRef(false);
 
   // Function to stop current speech
   const stopSpeakingLocal = useCallback(() => {
@@ -17,23 +19,23 @@ export const useSpeechState = () => {
     activeUtterancesRef.current = [];
     isSpeakingRef.current = false;
     speakingLockRef.current = false;
+    pauseRequestedRef.current = false;
     console.log('Speech stopped');
   }, []);
   
   // Function to pause current speech
   const pauseSpeakingLocal = useCallback(() => {
-    if (window.speechSynthesis && window.speechSynthesis.speaking) {
-      console.log('Pausing speech');
-      window.speechSynthesis.pause();
-    }
+    console.log('Soft pause requested');
+    pauseRequestedRef.current = true;
+    // Note: we no longer call speechSynthesis.pause() directly
+    // Instead we let the current utterance finish
   }, []);
   
   // Function to resume speech
   const resumeSpeakingLocal = useCallback(() => {
-    if (window.speechSynthesis && window.speechSynthesis.paused) {
-      console.log('Resuming speech');
-      window.speechSynthesis.resume();
-    }
+    console.log('Resuming speech');
+    pauseRequestedRef.current = false;
+    // The next word will be spoken when the regular flow continues
   }, []);
 
   return {
@@ -41,6 +43,7 @@ export const useSpeechState = () => {
     speakingLockRef,
     activeUtterancesRef,
     lastSpokenTextRef,
+    pauseRequestedRef,
     stopSpeakingLocal,
     pauseSpeakingLocal,
     resumeSpeakingLocal

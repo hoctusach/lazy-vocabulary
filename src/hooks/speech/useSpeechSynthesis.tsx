@@ -34,6 +34,7 @@ export const useSpeechSynthesis = () => {
     speakingLockRef,
     activeUtterancesRef,
     lastSpokenTextRef,
+    pauseRequestedRef,
     stopSpeakingLocal,
     pauseSpeakingLocal,
     resumeSpeakingLocal
@@ -72,6 +73,13 @@ export const useSpeechSynthesis = () => {
         return;
       }
       
+      // Check if pause is requested - if so, don't start new speech
+      if (pauseRequestedRef.current) {
+        console.log("Pause requested, not starting new speech");
+        resolve('');
+        return;
+      }
+      
       // Set lock to prevent overlapping speech
       speakingLockRef.current = true;
       
@@ -99,7 +107,7 @@ export const useSpeechSynthesis = () => {
         
         // Make sure UI gets updated with new text before speaking
         setTimeout(() => {
-          speakChunksSequentially(textChunks, voice, 0)
+          speakChunksSequentially(textChunks, voice, 0, pauseRequestedRef)
             .then((result) => {
               console.log('All chunks speech synthesis completed:', result);
               retryAttemptsRef.current = 0; // Reset retry counter on success
@@ -147,7 +155,8 @@ export const useSpeechSynthesis = () => {
     updateRemainingChunks,
     speakChunksSequentially,
     setSpeechError,
-    retryAttemptsRef
+    retryAttemptsRef,
+    pauseRequestedRef
   ]);
   
   // Function to toggle mute state
@@ -184,6 +193,7 @@ export const useSpeechSynthesis = () => {
     stopSpeaking: stopSpeakingLocal,
     pauseSpeaking: pauseSpeakingLocal,
     resumeSpeaking: resumeSpeakingLocal,
+    pauseRequestedRef,
     speechError,
     hasSpeechPermission,
     retrySpeechInitialization

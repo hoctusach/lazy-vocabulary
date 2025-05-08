@@ -10,7 +10,11 @@ import {
   loadVoices
 } from './speechPlayerUtils';
 
-export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> => {
+export const speak = (
+  text: string, 
+  region: 'US' | 'UK' = 'US', 
+  pauseRequestedRef?: React.MutableRefObject<boolean>
+): Promise<void> => {
   return new Promise(async (resolve, reject) => {
     if (isMutedFromLocalStorage()) {
       console.log('Speech is muted, resolving immediately');
@@ -50,6 +54,7 @@ export const speak = (text: string, region: 'US' | 'UK' = 'US'): Promise<void> =
             region,
             text,
             processedText,
+            pauseRequestedRef,
             onComplete: () => {
               console.log('Speech completed, resolving promise');
               resolve();

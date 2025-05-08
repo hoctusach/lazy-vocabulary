@@ -1,3 +1,4 @@
+
 import { getSpeechRate } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';
@@ -13,6 +14,7 @@ interface SpeakWithVoiceParams {
   processedText: string;
   onComplete: () => void;
   onError: (e: Error) => void;
+  pauseRequestedRef?: React.MutableRefObject<boolean>;
 }
 
 export async function speakWithVoice({
@@ -21,7 +23,8 @@ export async function speakWithVoice({
   text,
   processedText,
   onComplete,
-  onError
+  onError,
+  pauseRequestedRef
 }: SpeakWithVoiceParams) {
   console.log('[VOICE] Starting speakWithVoice for:', text.substring(0, 30));
   
@@ -56,6 +59,7 @@ export async function speakWithVoice({
     const results = await speakChunksInSequence(textChunks, {
       langCode,
       voice,
+      pauseRequestedRef,
       onChunkComplete: (index, total) => {
         console.log(`[VOICE] Completed chunk ${index + 1}/${total}`);
       },
@@ -67,6 +71,14 @@ export async function speakWithVoice({
     // Check if we had enough successful chunks to consider this a success
     const successfulChunks = results.filter(r => r.success).length;
     console.log(`[VOICE] ${successfulChunks}/${textChunks.length} chunks completed successfully`);
+    
+    // If we stopped because of a pause request, that's not an error
+    if (pauseRequestedRef?.current && successfulChunks > 0) {
+      console.log('[VOICE] Speech paused as requested after some chunks');
+      clearSpeechMonitor(monitorRefs);
+      onComplete();
+      return;
+    }
     
     if (successfulChunks === 0) {
       throw new Error('All speech chunks failed');

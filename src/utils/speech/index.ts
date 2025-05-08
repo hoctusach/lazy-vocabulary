@@ -28,6 +28,7 @@ import {
 import { splitTextIntoChunks } from './core/textChunker';
 import { speakChunksInSequence } from './core/chunkSequencer';
 import { createSpeechMonitor, clearSpeechMonitor } from './core/speechMonitor';
+import { synthesizeAudio } from './synthesisUtils';
 
 export {
   speak,
@@ -54,5 +55,6 @@ export {
   splitTextIntoChunks,
   speakChunksInSequence,
   createSpeechMonitor,
-  clearSpeechMonitor
+  clearSpeechMonitor,
+  synthesizeAudio
 };

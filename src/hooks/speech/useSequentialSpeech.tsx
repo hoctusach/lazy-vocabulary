@@ -1,43 +1,58 @@
+
 import { useCallback } from 'react';
-import { synthesizeAudio } from '@/utils/speech/synthesisUtils';
+import { speak } from '@/utils/speech';
 import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const useSequentialSpeech = () => {
-  // Function to speak chunks sequentially
   const speakChunksSequentially = useCallback(
-    (chunks: string[], voice: SpeechSynthesisVoice | null, startIndex: number): Promise<string> => {
-      return new Promise((resolve, reject) => {
-        if (startIndex >= chunks.length) {
-          console.log("All chunks completed");
-          resolve('completed');
-          return;
-        }
-        
-        const chunk = chunks[startIndex];
-        console.log(`Speaking chunk ${startIndex + 1}/${chunks.length}: "${chunk.substring(0, 20)}..."`);
-        
-        synthesizeAudio(chunk, voice)
-          .then(() => {
-            // Successfully spoke this chunk, move to the next
-            speakChunksSequentially(chunks, voice, startIndex + 1)
-              .then(resolve)
-              .catch(reject);
-          })
-          .catch((error) => {
-            console.warn(`Error speaking chunk ${startIndex + 1}, skipping to next:`, error);
+    async (
+      chunks: string[], 
+      voice: SpeechSynthesisVoice | null, 
+      startIndex: number = 0,
+      pauseRequestedRef?: React.MutableRefObject<boolean>
+    ): Promise<string> => {
+      if (chunks.length === 0) {
+        return 'completed';
+      }
+
+      let result = 'completed';
+      
+      try {
+        for (let i = startIndex; i < chunks.length; i++) {
+          // Check if pause is requested before each chunk
+          if (pauseRequestedRef?.current && i > startIndex) {
+            console.log("Pause requested, stopping sequential speech");
+            return 'paused';
+          }
+          
+          const chunk = chunks[i];
+          if (!chunk.trim()) continue;
+          
+          console.log(`Speaking chunk ${i + 1}/${chunks.length}`);
+          
+          try {
+            // We use speak + enqueue now to avoid initial delay
+            await speak(chunk, voice?.lang.includes('en-GB') ? 'UK' : 'US', pauseRequestedRef);
             
-            // If this is the last chunk and it failed, report the error
-            if (startIndex === chunks.length - 1) {
-              reject(error);
-            } else {
-              // Otherwise, try the next chunk
-              speakChunksSequentially(chunks, voice, startIndex + 1)
-                .then(resolve)
-                .catch(reject);
-            }
-          });
-      });
-    }, []);
+          } catch (error) {
+            console.warn(`Error in chunk ${i + 1}, continuing:`, error);
+          }
+          
+          // Check again for pause after each chunk
+          if (pauseRequestedRef?.current && i < chunks.length - 1) {
+            console.log("Pause requested, stopping after current chunk");
+            return 'paused';
+          }
+        }
+      } catch (error) {
+        console.error("Error in sequential speech:", error);
+        result = 'error';
+      }
+      
+      return result;
+    },
+    []
+  );
 
   return { speakChunksSequentially };
 };
