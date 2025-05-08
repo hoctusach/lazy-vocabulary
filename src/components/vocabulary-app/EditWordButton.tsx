@@ -1,24 +1,26 @@
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-interface AddWordButtonProps {
+interface EditWordButtonProps {
   onClick: () => void;
+  disabled: boolean;
 }
 
-const AddWordButton: React.FC<AddWordButtonProps> = ({ onClick }) => {
+const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled }) => {
   return (
     <Button 
       onClick={onClick} 
       className="flex items-center justify-center gap-2 py-1 px-2 text-sm"
       variant="outline"
       size="sm"
+      disabled={disabled}
     >
-      <Plus className="h-4 w-4" />
-      <span>Add Word</span>
+      <Edit className="h-4 w-4" />
+      <span>Edit</span>
     </Button>
   );
 };
 
-export default AddWordButton;
+export default EditWordButton;

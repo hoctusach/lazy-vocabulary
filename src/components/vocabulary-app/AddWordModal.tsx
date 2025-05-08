@@ -12,6 +12,8 @@ interface AddWordModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newWord: { word: string; meaning: string; example: string; category: string }) => void;
+  editMode?: boolean;
+  wordToEdit?: { word: string; meaning: string; example: string; category: string };
 }
 
 const CATEGORY_OPTIONS = [
@@ -20,7 +22,7 @@ const CATEGORY_OPTIONS = [
   { value: "advanced words", label: "Advanced Words" }
 ];
 
-const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) => {
+const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, editMode = false, wordToEdit }) => {
   const [word, setWord] = useState<string>('');
   const [meaning, setMeaning] = useState<string>('');
   const [example, setExample] = useState<string>('');
@@ -30,6 +32,22 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
   // Search state
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchError, setSearchError] = useState<string>('');
+
+  // Pre-populate form when in edit mode
+  useEffect(() => {
+    if (editMode && wordToEdit) {
+      setWord(wordToEdit.word);
+      setMeaning(wordToEdit.meaning);
+      setExample(wordToEdit.example);
+      setCategory(wordToEdit.category);
+    } else if (!editMode) {
+      // Reset form when not in edit mode
+      setWord('');
+      setMeaning('');
+      setExample('');
+      setCategory('');
+    }
+  }, [editMode, wordToEdit, isOpen]);
 
   useEffect(() => {
     // Check if all fields have values
@@ -120,7 +138,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Vocabulary Word</DialogTitle>
+          <DialogTitle>{editMode ? "Edit Word" : "Add New Vocabulary Word"}</DialogTitle>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
@@ -137,15 +155,17 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
                 disabled={isSearching}
                 aria-disabled={isSearching}
               />
-              <Button 
-                type="button" 
-                onClick={handleSearch}
-                disabled={isSearching || !word.trim()}
-                aria-busy={isSearching}
-                className="shrink-0"
-              >
-                {isSearching ? <Loader className="h-4 w-4 animate-spin mr-1" /> : 'Search'}
-              </Button>
+              {!editMode && (
+                <Button 
+                  type="button" 
+                  onClick={handleSearch}
+                  disabled={isSearching || !word.trim()}
+                  aria-busy={isSearching}
+                  className="shrink-0"
+                >
+                  {isSearching ? <Loader className="h-4 w-4 animate-spin mr-1" /> : 'Search'}
+                </Button>
+              )}
             </div>
           </div>
           
@@ -208,7 +228,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave }) 
         
         <DialogFooter>
           <Button type="submit" disabled={!isFormValid || isSearching} onClick={handleSave}>
-            Save
+            {editMode ? "Update" : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

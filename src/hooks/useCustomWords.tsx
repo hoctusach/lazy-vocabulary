@@ -46,6 +46,54 @@ export const useCustomWords = () => {
     // Merge the new word into the vocabulary service
     mergeCustomWords([wordWithCount]);
   };
+  
+  // Function to update an existing word
+  const updateWord = (updatedWord: CustomWord) => {
+    // Find if the word already exists in custom words
+    const wordIndex = customWords.findIndex(word => 
+      word.word.toLowerCase() === updatedWord.word.toLowerCase());
+    
+    if (wordIndex >= 0) {
+      // Word exists in custom words, update it
+      const updatedWords = [...customWords];
+      // Preserve the count
+      const count = updatedWords[wordIndex].count ?? 0;
+      updatedWords[wordIndex] = { ...updatedWord, count };
+      
+      // Update state
+      setCustomWords(updatedWords);
+      
+      // Save to localStorage
+      localStorage.setItem('customWords', JSON.stringify(updatedWords));
+      
+      // Update in vocabulary service
+      updateInVocabularyService(updatedWord);
+      
+      return true;
+    } else {
+      // Word doesn't exist in custom words
+      // Try to update in vocabulary service (might be a built-in word)
+      return updateInVocabularyService(updatedWord);
+    }
+  };
+
+  // Function to update a word in the vocabulary service
+  const updateInVocabularyService = (updatedWord: CustomWord) => {
+    // Since vocabularyService doesn't expose a direct update method,
+    // we'll merge the updated word which should overwrite the existing one
+    const dataToMerge: SheetData = {
+      [updatedWord.category]: [{ 
+        word: updatedWord.word,
+        meaning: updatedWord.meaning,
+        example: updatedWord.example,
+        count: updatedWord.count !== undefined ? updatedWord.count : 0,
+        category: updatedWord.category 
+      }]
+    };
+    
+    vocabularyService.mergeCustomWords(dataToMerge);
+    return true;
+  };
 
   // Function to merge custom words with the vocabulary service
   const mergeCustomWords = (words: CustomWord[]) => {
@@ -78,6 +126,7 @@ export const useCustomWords = () => {
 
   return {
     customWords,
-    addCustomWord
+    addCustomWord,
+    updateWord
   };
 };
