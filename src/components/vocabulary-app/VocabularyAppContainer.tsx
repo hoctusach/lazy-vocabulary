@@ -117,8 +117,33 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Handler for exporting vocabulary data
   const handleExportData = () => {
-    // Get all vocabulary data from the service
-    const allData = vocabularyService.getAllVocabularyData();
+    // Get all vocabulary data by dumping all sheet data
+    const allData = {};
+    
+    // Add each sheet category
+    vocabularyService.sheetOptions.forEach(sheetName => {
+      if (vocabularyService.switchSheet(sheetName)) {
+        const wordArray = [];
+        
+        // Get words from current sheet
+        let currentSheetWord = vocabularyService.getCurrentWord();
+        while (currentSheetWord) {
+          wordArray.push(currentSheetWord);
+          vocabularyService.getNextWord();
+          currentSheetWord = vocabularyService.getCurrentWord();
+          
+          // Emergency break if something goes wrong
+          if (wordArray.length > 10000) break;
+        }
+        
+        if (wordArray.length > 0) {
+          allData[sheetName] = wordArray;
+        }
+      }
+    });
+    
+    // Restore original sheet
+    vocabularyService.switchSheet(currentCategory);
     
     // Export the data as a TypeScript file
     exportVocabularyAsTypeScript(allData);

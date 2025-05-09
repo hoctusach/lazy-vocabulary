@@ -83,8 +83,36 @@ export const useCustomWords = () => {
 
   // Function to handle updating a word when its category changes
   const updateWordWithCategoryChange = (updatedWord: CustomWord, oldCategory: string, newCategory: string) => {
-    // Get all existing vocabulary data
-    const allData = vocabularyService.getAllVocabularyData();
+    // Get all existing vocabulary data by querying each sheet
+    const allData: SheetData = {};
+    
+    // Get list of sheets
+    const sheetNames = vocabularyService.sheetOptions;
+    
+    // Go through each sheet and gather data
+    sheetNames.forEach(sheetName => {
+      // Keep track of original sheet name to restore later
+      const originalSheet = vocabularyService.getCurrentSheetName();
+      
+      // Switch to sheet and get words
+      if (vocabularyService.switchSheet(sheetName)) {
+        allData[sheetName] = [];
+        
+        // Get current word and iterate through sheet
+        let word = vocabularyService.getCurrentWord();
+        while (word) {
+          allData[sheetName].push(word);
+          vocabularyService.getNextWord();
+          word = vocabularyService.getCurrentWord();
+          
+          // Safety check to avoid infinite loops
+          if (allData[sheetName].length > 10000) break;
+        }
+        
+        // Switch back to original sheet
+        vocabularyService.switchSheet(originalSheet);
+      }
+    });
     
     // Remove the word from its old category array
     if (allData[oldCategory]) {

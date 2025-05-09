@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FileExport } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface ExportButtonProps {
@@ -15,7 +15,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ onClick }) => {
       variant="outline"
       size="sm"
     >
-      <FileExport className="h-4 w-4" />
+      <FileText className="h-4 w-4" />
       <span>Export</span>
     </Button>
   );
