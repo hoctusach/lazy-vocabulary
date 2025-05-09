@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import WelcomeScreen from "@/components/WelcomeScreen";
-import { useCustomWords } from "@/hooks/useCustomWords";
 import { toast } from "sonner";
 import AddWordButton from "./AddWordButton";
 import EditWordButton from "./EditWordButton";
@@ -14,11 +13,9 @@ import VocabularyMain from "./VocabularyMain";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { vocabularyService } from "@/services/vocabularyService";
 import { exportVocabularyAsTypeScript } from "@/utils/exportVocabulary";
+import { VocabularyWord } from "@/types/vocabulary";
 
 const VocabularyAppContainer: React.FC = () => {
-  // Custom words hook
-  const { addCustomWord, updateWord, getAllVocabularyData } = useCustomWords();
-  
   // Modal states
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -71,16 +68,33 @@ const VocabularyAppContainer: React.FC = () => {
       // Get the original category for comparison
       const originalCategory = currentWord.category || currentCategory;
       
-      // Update existing word
-      updateWord({
+      // Create word entry to update/add
+      const updatedWord: VocabularyWord = {
         word: wordData.word,
         meaning: wordData.meaning,
         example: wordData.example,
-        category: wordData.category
-      });
+        category: wordData.category,
+        count: currentWord.count || 0
+      };
       
-      // Show success notification with proper category information
+      // Determine if category changed
       const categoryChanged = originalCategory !== wordData.category;
+      
+      // Update in All words category
+      updateWordInCategory("All words", updatedWord, currentWord.word);
+      
+      // Handle category-specific updates
+      if (categoryChanged) {
+        // Remove from old category
+        removeWordFromCategory(originalCategory, currentWord.word);
+        // Add to new category
+        updateWordInCategory(wordData.category, updatedWord);
+      } else {
+        // Update in same category
+        updateWordInCategory(wordData.category, updatedWord, currentWord.word);
+      }
+      
+      // Show appropriate toast message
       const toastMessage = categoryChanged 
         ? `"${wordData.word}" updated and moved to ${wordData.category}`
         : `"${wordData.word}" updated in ${wordData.category}`;
@@ -89,19 +103,117 @@ const VocabularyAppContainer: React.FC = () => {
         description: `The word has been updated in All words and ${wordData.category}.`
       });
     } else {
-      // Add the new custom word - make sure all required properties are provided
-      addCustomWord({
+      // Creating a new word entry
+      const newWord: VocabularyWord = {
         word: wordData.word,
         meaning: wordData.meaning,
         example: wordData.example,
-        category: wordData.category, // This is always required from the modal
-        count: 0 // Initialize count with 0 for new words
-      });
+        category: wordData.category,
+        count: 0
+      };
+      
+      // Add to All words category
+      addWordToCategory("All words", newWord);
+      
+      // Add to specific category
+      addWordToCategory(wordData.category, newWord);
       
       // Show success notification
       toast.success(`"${wordData.word}" added to ${wordData.category}`, {
         description: `The word has been added to All words and ${wordData.category}.`
       });
+    }
+    
+    // Close the modal
+    handleCloseModal();
+  };
+
+  // Helper function to add a word to a specific category
+  const addWordToCategory = (category: string, word: VocabularyWord) => {
+    try {
+      // Get current words in the category
+      let words = [];
+      const storedWords = localStorage.getItem(category);
+      if (storedWords) {
+        words = JSON.parse(storedWords);
+      }
+      
+      // Add the new word
+      words.push(word);
+      
+      // Save back to localStorage
+      localStorage.setItem(category, JSON.stringify(words));
+      
+      // Refresh the vocabulary service to see the changes
+      if (vocabularyService.getCurrentSheetName() === category) {
+        vocabularyService.loadDefaultVocabulary();
+      }
+    } catch (error) {
+      console.error(`Failed to add word to category ${category}:`, error);
+      toast.error(`Failed to add word to ${category}`);
+    }
+  };
+  
+  // Helper function to update a word in a specific category
+  const updateWordInCategory = (category: string, updatedWord: VocabularyWord, oldWordText?: string) => {
+    try {
+      // Get current words in the category
+      let words = [];
+      const storedWords = localStorage.getItem(category);
+      if (storedWords) {
+        words = JSON.parse(storedWords);
+      }
+      
+      // Find the word (if it exists)
+      const wordToUpdate = oldWordText || updatedWord.word;
+      const index = words.findIndex((w: VocabularyWord) => 
+        w.word.toLowerCase() === wordToUpdate.toLowerCase());
+      
+      if (index >= 0) {
+        // Update existing word
+        words[index] = updatedWord;
+      } else {
+        // Word doesn't exist, add it
+        words.push(updatedWord);
+      }
+      
+      // Save back to localStorage
+      localStorage.setItem(category, JSON.stringify(words));
+      
+      // Refresh the vocabulary service to see the changes
+      if (vocabularyService.getCurrentSheetName() === category) {
+        vocabularyService.loadDefaultVocabulary();
+      }
+    } catch (error) {
+      console.error(`Failed to update word in category ${category}:`, error);
+      toast.error(`Failed to update word in ${category}`);
+    }
+  };
+  
+  // Helper function to remove a word from a specific category
+  const removeWordFromCategory = (category: string, wordToRemove: string) => {
+    try {
+      // Get current words in the category
+      let words = [];
+      const storedWords = localStorage.getItem(category);
+      if (storedWords) {
+        words = JSON.parse(storedWords);
+      }
+      
+      // Filter out the word to remove
+      words = words.filter((w: VocabularyWord) => 
+        w.word.toLowerCase() !== wordToRemove.toLowerCase());
+      
+      // Save back to localStorage
+      localStorage.setItem(category, JSON.stringify(words));
+      
+      // Refresh the vocabulary service to see the changes
+      if (vocabularyService.getCurrentSheetName() === category) {
+        vocabularyService.loadDefaultVocabulary();
+      }
+    } catch (error) {
+      console.error(`Failed to remove word from category ${category}:`, error);
+      toast.error(`Failed to remove word from ${category}`);
     }
   };
 
@@ -125,35 +237,22 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Handler for exporting vocabulary data
   const handleExportData = () => {
-    // Get all vocabulary data
+    // Create an object to hold all vocabulary data
     const allData = {};
     
     // Get each sheet category
     vocabularyService.sheetOptions.forEach(sheetName => {
-      // Store original sheet to restore later
-      const originalSheet = vocabularyService.getCurrentSheetName();
-      
-      // Switch to the target sheet
-      if (vocabularyService.switchSheet(sheetName)) {
-        const wordArray = [];
-        
-        // Get words from current sheet
-        let currentSheetWord = vocabularyService.getCurrentWord();
-        while (currentSheetWord) {
-          wordArray.push(currentSheetWord);
-          vocabularyService.getNextWord();
-          currentSheetWord = vocabularyService.getCurrentWord();
-          
-          // Safety check to prevent infinite loops
-          if (wordArray.length > 10000) break;
+      // Get words from localStorage for this category
+      try {
+        const storedWords = localStorage.getItem(sheetName);
+        if (storedWords) {
+          const words = JSON.parse(storedWords);
+          if (words.length > 0) {
+            allData[sheetName] = words;
+          }
         }
-        
-        if (wordArray.length > 0) {
-          allData[sheetName] = wordArray;
-        }
-        
-        // Restore the original sheet
-        vocabularyService.switchSheet(originalSheet);
+      } catch (error) {
+        console.error(`Failed to get words for category ${sheetName}:`, error);
       }
     });
     
