@@ -17,7 +17,7 @@ import { exportVocabularyAsTypeScript } from "@/utils/exportVocabulary";
 
 const VocabularyAppContainer: React.FC = () => {
   // Custom words hook
-  const { addCustomWord, updateWord } = useCustomWords();
+  const { addCustomWord, updateWord, getAllVocabularyData } = useCustomWords();
   
   // Modal states
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
@@ -68,6 +68,9 @@ const VocabularyAppContainer: React.FC = () => {
   // Handler for saving a new word or updating an existing word
   const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
     if (isEditMode && currentWord) {
+      // Get the original category for comparison
+      const originalCategory = currentWord.category || currentCategory;
+      
       // Update existing word
       updateWord({
         word: wordData.word,
@@ -76,9 +79,14 @@ const VocabularyAppContainer: React.FC = () => {
         category: wordData.category
       });
       
-      // Show success notification
-      toast.success(`"${wordData.word}" updated successfully`, {
-        description: `The word has been updated in ${wordData.category}.`
+      // Show success notification with proper category information
+      const categoryChanged = originalCategory !== wordData.category;
+      const toastMessage = categoryChanged 
+        ? `"${wordData.word}" updated and moved to ${wordData.category}`
+        : `"${wordData.word}" updated in ${wordData.category}`;
+      
+      toast.success(toastMessage, {
+        description: `The word has been updated in All words and ${wordData.category}.`
       });
     } else {
       // Add the new custom word - make sure all required properties are provided
@@ -92,7 +100,7 @@ const VocabularyAppContainer: React.FC = () => {
       
       // Show success notification
       toast.success(`"${wordData.word}" added to ${wordData.category}`, {
-        description: "The word has been added to your custom vocabulary."
+        description: `The word has been added to All words and ${wordData.category}.`
       });
     }
   };
@@ -117,11 +125,15 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Handler for exporting vocabulary data
   const handleExportData = () => {
-    // Get all vocabulary data by dumping all sheet data
+    // Get all vocabulary data
     const allData = {};
     
-    // Add each sheet category
+    // Get each sheet category
     vocabularyService.sheetOptions.forEach(sheetName => {
+      // Store original sheet to restore later
+      const originalSheet = vocabularyService.getCurrentSheetName();
+      
+      // Switch to the target sheet
       if (vocabularyService.switchSheet(sheetName)) {
         const wordArray = [];
         
@@ -132,18 +144,18 @@ const VocabularyAppContainer: React.FC = () => {
           vocabularyService.getNextWord();
           currentSheetWord = vocabularyService.getCurrentWord();
           
-          // Emergency break if something goes wrong
+          // Safety check to prevent infinite loops
           if (wordArray.length > 10000) break;
         }
         
         if (wordArray.length > 0) {
           allData[sheetName] = wordArray;
         }
+        
+        // Restore the original sheet
+        vocabularyService.switchSheet(originalSheet);
       }
     });
-    
-    // Restore original sheet
-    vocabularyService.switchSheet(currentCategory);
     
     // Export the data as a TypeScript file
     exportVocabularyAsTypeScript(allData);
