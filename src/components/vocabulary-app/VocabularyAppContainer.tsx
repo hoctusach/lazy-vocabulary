@@ -5,14 +5,12 @@ import WelcomeScreen from "@/components/WelcomeScreen";
 import { toast } from "sonner";
 import AddWordButton from "./AddWordButton";
 import EditWordButton from "./EditWordButton";
-import ExportButton from "./ExportButton";
 import AddWordModal from "./AddWordModal";
 import DebugPanel from "@/components/DebugPanel";
 import ErrorDisplay from "./ErrorDisplay";
 import VocabularyMain from "./VocabularyMain";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { vocabularyService } from "@/services/vocabularyService";
-import { exportVocabularyAsTypeScript } from "@/utils/exportVocabulary";
 import { VocabularyWord } from "@/types/vocabulary";
 
 const VocabularyAppContainer: React.FC = () => {
@@ -223,36 +221,6 @@ const VocabularyAppContainer: React.FC = () => {
     };
   };
 
-  // Handler for exporting vocabulary data
-  const handleExportData = () => {
-    // Create an object to hold all vocabulary data
-    const allData = {};
-    
-    // Get each sheet category
-    vocabularyService.sheetOptions.forEach(sheetName => {
-      // Get words from localStorage for this category
-      try {
-        const storedWords = localStorage.getItem(sheetName);
-        if (storedWords) {
-          const words = JSON.parse(storedWords);
-          if (words.length > 0) {
-            allData[sheetName] = words;
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to get words for category ${sheetName}:`, error);
-      }
-    });
-    
-    // Export the data as a TypeScript file
-    exportVocabularyAsTypeScript(allData);
-    
-    // Show a success notification
-    toast.success("Export started", {
-      description: "Your vocabulary data is being downloaded as a TypeScript file."
-    });
-  };
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -280,14 +248,13 @@ const VocabularyAppContainer: React.FC = () => {
             handleSpeechRetry={handleSpeechRetry}
           />
           
-          {/* Action buttons container */}
+          {/* Action buttons container - Export button removed */}
           <div className="flex items-center justify-center gap-2 my-3">
             <EditWordButton 
               onClick={handleOpenEditWordModal} 
               disabled={!currentWord}
             />
             <AddWordButton onClick={handleOpenAddWordModal} />
-            <ExportButton onClick={handleExportData} />
           </div>
           
           {/* Debug Panel */}

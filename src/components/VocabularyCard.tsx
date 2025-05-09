@@ -105,8 +105,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
-          <div className="flex flex-wrap gap-1 pt-2 justify-between">
-            <div className="flex flex-wrap gap-1">
+          {/* Updated control buttons container to prevent wrapping */}
+          <div className="overflow-x-auto">
+            <div className="flex flex-nowrap gap-2 pt-2 min-w-max">
               <Button
                 variant="outline"
                 size="sm"
@@ -141,9 +142,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
                 {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
                 {isPaused ? "Play" : "Pause"}
               </Button>
-            </div>
             
-            <div className="flex flex-wrap gap-1">
               <Button
                 variant="outline"
                 size="sm"

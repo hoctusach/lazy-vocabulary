@@ -131,33 +131,10 @@ export const useCustomWords = () => {
       console.error(`Error updating word in ${category}:`, error);
     }
   };
-  
-  // This function gets all vocabulary data directly from localStorage
-  const getAllVocabularyData = () => {
-    const allData = {};
-    
-    // For each category, get the words from localStorage
-    vocabularyService.sheetOptions.forEach(category => {
-      try {
-        const storedWords = localStorage.getItem(category);
-        if (storedWords) {
-          const words = JSON.parse(storedWords);
-          if (words.length > 0) {
-            allData[category] = words;
-          }
-        }
-      } catch (error) {
-        console.error(`Error getting words for ${category}:`, error);
-      }
-    });
-    
-    return allData;
-  };
 
   return {
     customWords: [],  // Empty array since we don't use this anymore
     addCustomWord,    // Stub function for backward compatibility
     updateWord,       // Stub function for backward compatibility
-    getAllVocabularyData // Now gets data directly from localStorage
   };
 };
