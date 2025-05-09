@@ -6,11 +6,14 @@ import { useCustomWords } from "@/hooks/useCustomWords";
 import { toast } from "sonner";
 import AddWordButton from "./AddWordButton";
 import EditWordButton from "./EditWordButton";
+import ExportButton from "./ExportButton";
 import AddWordModal from "./AddWordModal";
 import DebugPanel from "@/components/DebugPanel";
 import ErrorDisplay from "./ErrorDisplay";
 import VocabularyMain from "./VocabularyMain";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
+import { vocabularyService } from "@/services/vocabularyService";
+import { exportVocabularyAsTypeScript } from "@/utils/exportVocabulary";
 
 const VocabularyAppContainer: React.FC = () => {
   // Custom words hook
@@ -75,7 +78,7 @@ const VocabularyAppContainer: React.FC = () => {
       
       // Show success notification
       toast.success(`"${wordData.word}" updated successfully`, {
-        description: "The word has been updated in your vocabulary."
+        description: `The word has been updated in ${wordData.category}.`
       });
     } else {
       // Add the new custom word - make sure all required properties are provided
@@ -112,6 +115,20 @@ const VocabularyAppContainer: React.FC = () => {
     };
   };
 
+  // Handler for exporting vocabulary data
+  const handleExportData = () => {
+    // Get all vocabulary data from the service
+    const allData = vocabularyService.getAllVocabularyData();
+    
+    // Export the data as a TypeScript file
+    exportVocabularyAsTypeScript(allData);
+    
+    // Show a success notification
+    toast.success("Export started", {
+      description: "Your vocabulary data is being downloaded as a TypeScript file."
+    });
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -146,6 +163,7 @@ const VocabularyAppContainer: React.FC = () => {
               disabled={!currentWord}
             />
             <AddWordButton onClick={handleOpenAddWordModal} />
+            <ExportButton onClick={handleExportData} />
           </div>
           
           {/* Debug Panel */}

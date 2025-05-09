@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { VocabularyWord, SheetData, EditableWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -50,8 +49,14 @@ export const useCustomWords = () => {
     if (wordIndex >= 0) {
       // Word exists in custom words, update it
       const updatedWords = [...customWords];
+      const existingWord = updatedWords[wordIndex];
+      
+      // Keep track of old category for potential category change
+      const oldCategory = existingWord.category;
+      const newCategory = updatedWord.category;
+      
       // Preserve the count
-      const count = updatedWords[wordIndex].count ?? 0;
+      const count = existingWord.count ?? 0;
       updatedWords[wordIndex] = { ...updatedWord, count };
       
       // Update state
@@ -61,7 +66,12 @@ export const useCustomWords = () => {
       localStorage.setItem('customWords', JSON.stringify(updatedWords));
       
       // Update in vocabulary service
-      updateInVocabularyService(updatedWord);
+      // If the category changed, handle moving the word between categories
+      if (oldCategory !== newCategory) {
+        updateWordWithCategoryChange(updatedWord, oldCategory, newCategory);
+      } else {
+        updateInVocabularyService(updatedWord);
+      }
       
       return true;
     } else {
@@ -69,6 +79,40 @@ export const useCustomWords = () => {
       // Try to update in vocabulary service (might be a built-in word)
       return updateInVocabularyService(updatedWord);
     }
+  };
+
+  // Function to handle updating a word when its category changes
+  const updateWordWithCategoryChange = (updatedWord: CustomWord, oldCategory: string, newCategory: string) => {
+    // Get all existing vocabulary data
+    const allData = vocabularyService.getAllVocabularyData();
+    
+    // Remove the word from its old category array
+    if (allData[oldCategory]) {
+      allData[oldCategory] = allData[oldCategory].filter(word => 
+        word.word.toLowerCase() !== updatedWord.word.toLowerCase());
+    }
+    
+    // Create or update the new category array
+    if (!allData[newCategory]) {
+      allData[newCategory] = [];
+    }
+    
+    // Convert CustomWord to VocabularyWord
+    const vocabularyWord: VocabularyWord = {
+      word: updatedWord.word,
+      meaning: updatedWord.meaning,
+      example: updatedWord.example,
+      count: updatedWord.count !== undefined ? updatedWord.count : 0,
+      category: newCategory
+    };
+    
+    // Add to new category
+    allData[newCategory].push(vocabularyWord);
+    
+    // Update the vocabulary service with the modified data
+    vocabularyService.mergeCustomWords(allData);
+    
+    return true;
   };
 
   // Function to update a word in the vocabulary service
