@@ -99,6 +99,19 @@ const VocabularyAppContainer: React.FC = () => {
     retrySpeechInitialization();
   };
 
+  // Ensure category is present when editing a word
+  const getWordForEdit = () => {
+    if (!currentWord) return undefined;
+    
+    // Make sure we have a category, using the current category as fallback
+    return {
+      word: currentWord.word,
+      meaning: currentWord.meaning,
+      example: currentWord.example,
+      category: currentWord.category || currentCategory
+    };
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -149,7 +162,7 @@ const VocabularyAppContainer: React.FC = () => {
             onClose={handleCloseModal} 
             onSave={handleSaveWord}
             editMode={isEditMode}
-            wordToEdit={isEditMode ? currentWord : undefined}
+            wordToEdit={isEditMode ? getWordForEdit() : undefined}
           />
         </>
       ) : (

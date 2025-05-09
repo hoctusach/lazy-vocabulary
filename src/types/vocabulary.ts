@@ -9,6 +9,15 @@ export interface VocabularyWord {
   category?: string; // Making category optional to support existing default vocabulary data
 }
 
+// Interface for editing or adding words where category is required
+export interface EditableWord {
+  word: string;
+  meaning: string;
+  example: string;
+  category: string; // Category is required for editable words
+  count?: number | string;
+}
+
 export interface SheetData {
   [key: string]: VocabularyWord[];
 }

@@ -1,16 +1,10 @@
 
 import { useState, useEffect } from 'react';
-import { VocabularyWord, SheetData } from '@/types/vocabulary';
+import { VocabularyWord, SheetData, EditableWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 
 // Define a more specific type for adding new words where category is required
-export interface CustomWord {
-  word: string;
-  meaning: string;
-  example: string;
-  category: string; // Required for new custom words
-  count?: number | string;
-}
+export type CustomWord = EditableWord;
 
 export const useCustomWords = () => {
   const [customWords, setCustomWords] = useState<CustomWord[]>([]);
