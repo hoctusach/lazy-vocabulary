@@ -128,7 +128,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
     } catch (error) {
       console.error('Dictionary API error:', error);
       setSearchError('Search failed. Please try again or enter details manually.');
-      // You would implement fallback APIs here if you had API keys
     } finally {
       setIsSearching(false);
     }

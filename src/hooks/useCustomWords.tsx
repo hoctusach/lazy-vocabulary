@@ -132,7 +132,7 @@ export const useCustomWords = () => {
     }
   };
   
-  // This function now just gets the data directly from localStorage
+  // This function gets all vocabulary data directly from localStorage
   const getAllVocabularyData = () => {
     const allData = {};
     

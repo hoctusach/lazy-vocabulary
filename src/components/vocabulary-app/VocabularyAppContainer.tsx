@@ -88,7 +88,7 @@ const VocabularyAppContainer: React.FC = () => {
         // Remove from old category
         removeWordFromCategory(originalCategory, currentWord.word);
         // Add to new category
-        updateWordInCategory(wordData.category, updatedWord);
+        addWordToCategory(wordData.category, updatedWord);
       } else {
         // Update in same category
         updateWordInCategory(wordData.category, updatedWord, currentWord.word);
@@ -126,6 +126,9 @@ const VocabularyAppContainer: React.FC = () => {
     
     // Close the modal
     handleCloseModal();
+    
+    // Refresh the vocabulary service to see the changes immediately
+    vocabularyService.loadDefaultVocabulary();
   };
 
   // Helper function to add a word to a specific category
@@ -143,11 +146,6 @@ const VocabularyAppContainer: React.FC = () => {
       
       // Save back to localStorage
       localStorage.setItem(category, JSON.stringify(words));
-      
-      // Refresh the vocabulary service to see the changes
-      if (vocabularyService.getCurrentSheetName() === category) {
-        vocabularyService.loadDefaultVocabulary();
-      }
     } catch (error) {
       console.error(`Failed to add word to category ${category}:`, error);
       toast.error(`Failed to add word to ${category}`);
@@ -179,11 +177,6 @@ const VocabularyAppContainer: React.FC = () => {
       
       // Save back to localStorage
       localStorage.setItem(category, JSON.stringify(words));
-      
-      // Refresh the vocabulary service to see the changes
-      if (vocabularyService.getCurrentSheetName() === category) {
-        vocabularyService.loadDefaultVocabulary();
-      }
     } catch (error) {
       console.error(`Failed to update word in category ${category}:`, error);
       toast.error(`Failed to update word in ${category}`);
@@ -206,11 +199,6 @@ const VocabularyAppContainer: React.FC = () => {
       
       // Save back to localStorage
       localStorage.setItem(category, JSON.stringify(words));
-      
-      // Refresh the vocabulary service to see the changes
-      if (vocabularyService.getCurrentSheetName() === category) {
-        vocabularyService.loadDefaultVocabulary();
-      }
     } catch (error) {
       console.error(`Failed to remove word from category ${category}:`, error);
       toast.error(`Failed to remove word from ${category}`);
