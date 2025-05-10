@@ -105,64 +105,62 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
-          {/* Updated control buttons container to prevent wrapping */}
-          <div className="overflow-x-auto">
-            <div className="flex flex-nowrap gap-2 pt-2 min-w-max">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onToggleMute}
-                className={cn(
-                  "h-7 text-xs px-2",
-                  isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
-                )}
-              >
-                {isMuted ? <VolumeX size={14} className="mr-1" /> : <Volume2 size={14} className="mr-1" />}
-                {isMuted ? "UNMUTE" : "MUTE"}
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onChangeVoice}
-                className="h-7 text-xs px-2 text-blue-700"
-              >
-                {voiceRegion === 'US' ? 'UK' : 'US'} Accent
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onTogglePause}
-                className={cn(
-                  "h-7 text-xs px-2",
-                  isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
-                )}
-              >
-                {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
-                {isPaused ? "Play" : "Pause"}
-              </Button>
+          {/* Updated control buttons container to allow wrapping */}
+          <div className="flex flex-wrap gap-1 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleMute}
+              className={cn(
+                "h-7 text-xs px-2",
+                isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
+              )}
+            >
+              {isMuted ? <VolumeX size={14} className="mr-1" /> : <Volume2 size={14} className="mr-1" />}
+              {isMuted ? "UNMUTE" : "MUTE"}
+            </Button>
             
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onNextWord}
-                className="h-7 text-xs px-2 text-indigo-700 bg-indigo-50"
-              >
-                <SkipForward size={14} className="mr-1" />
-                Next Word
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onSwitchCategory}
-                className="h-7 text-xs px-2 text-green-700"
-              >
-                <RefreshCw size={12} className="mr-1" />
-                {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
-              </Button>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onChangeVoice}
+              className="h-7 text-xs px-2 text-blue-700"
+            >
+              {voiceRegion === 'US' ? 'UK' : 'US'} Accent
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onTogglePause}
+              className={cn(
+                "h-7 text-xs px-2",
+                isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
+              )}
+            >
+              {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
+              {isPaused ? "Play" : "Pause"}
+            </Button>
+          
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onNextWord}
+              className="h-7 text-xs px-2 text-indigo-700 bg-indigo-50"
+            >
+              <SkipForward size={14} className="mr-1" />
+              Next Word
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSwitchCategory}
+              className="h-7 text-xs px-2 text-green-700"
+            >
+              <RefreshCw size={12} className="mr-1" />
+              {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
+            </Button>
           </div>
         </div>
       </CardContent>
