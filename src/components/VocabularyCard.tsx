@@ -105,7 +105,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
-          {/* Updated control buttons container to allow wrapping */}
+          {/* Control buttons wrapper - updated to flex-wrap */}
           <div className="flex flex-wrap gap-1 pt-2">
             <Button
               variant="outline"

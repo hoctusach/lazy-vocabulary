@@ -17,6 +17,7 @@ const VocabularyAppContainer: React.FC = () => {
   // Modal states
   const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [wordToEdit, setWordToEdit] = useState<VocabularyWord | null>(null);
   
   // Get all state and handlers from our custom hook
   const {
@@ -45,6 +46,7 @@ const VocabularyAppContainer: React.FC = () => {
   // Handler for opening the add word modal
   const handleOpenAddWordModal = () => {
     setIsEditMode(false);
+    setWordToEdit(null);
     setIsAddWordModalOpen(true);
   };
   
@@ -52,19 +54,21 @@ const VocabularyAppContainer: React.FC = () => {
   const handleOpenEditWordModal = () => {
     if (!currentWord) return;
     setIsEditMode(true);
+    setWordToEdit(currentWord);  // Store the current word to edit
     setIsAddWordModalOpen(true);
   };
   
   // Handler for closing the modal
   const handleCloseModal = () => {
     setIsAddWordModalOpen(false);
+    setWordToEdit(null);
   };
 
   // Handler for saving a new word or updating an existing word
   const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
-    if (isEditMode && currentWord) {
+    if (isEditMode && wordToEdit) {
       // Get the original category for comparison
-      const originalCategory = currentWord.category || currentCategory;
+      const originalCategory = wordToEdit.category || currentCategory;
       
       // Create word entry to update/add
       const updatedWord: VocabularyWord = {
@@ -72,24 +76,24 @@ const VocabularyAppContainer: React.FC = () => {
         meaning: wordData.meaning,
         example: wordData.example,
         category: wordData.category,
-        count: currentWord.count || 0
+        count: wordToEdit.count || 0
       };
       
       // Determine if category changed
       const categoryChanged = originalCategory !== wordData.category;
       
       // Update in All words category
-      updateWordInCategory("All words", updatedWord, currentWord.word);
+      updateWordInCategory("All words", updatedWord, wordToEdit.word);
       
       // Handle category-specific updates
       if (categoryChanged) {
         // Remove from old category
-        removeWordFromCategory(originalCategory, currentWord.word);
+        removeWordFromCategory(originalCategory, wordToEdit.word);
         // Add to new category
         addWordToCategory(wordData.category, updatedWord);
       } else {
         // Update in same category
-        updateWordInCategory(wordData.category, updatedWord, currentWord.word);
+        updateWordInCategory(wordData.category, updatedWord, wordToEdit.word);
       }
       
       // Show appropriate toast message
@@ -208,19 +212,6 @@ const VocabularyAppContainer: React.FC = () => {
     retrySpeechInitialization();
   };
 
-  // Ensure category is present when editing a word
-  const getWordForEdit = () => {
-    if (!currentWord) return undefined;
-    
-    // Make sure we have a category, using the current category as fallback
-    return {
-      word: currentWord.word,
-      meaning: currentWord.meaning,
-      example: currentWord.example,
-      category: currentWord.category || currentCategory
-    };
-  };
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -248,7 +239,7 @@ const VocabularyAppContainer: React.FC = () => {
             handleSpeechRetry={handleSpeechRetry}
           />
           
-          {/* Action buttons container - Export button removed */}
+          {/* Action buttons container */}
           <div className="flex items-center justify-center gap-2 my-3">
             <EditWordButton 
               onClick={handleOpenEditWordModal} 
@@ -271,7 +262,12 @@ const VocabularyAppContainer: React.FC = () => {
             onClose={handleCloseModal} 
             onSave={handleSaveWord}
             editMode={isEditMode}
-            wordToEdit={isEditMode ? getWordForEdit() : undefined}
+            wordToEdit={isEditMode && wordToEdit ? {
+              word: wordToEdit.word,
+              meaning: wordToEdit.meaning,
+              example: wordToEdit.example,
+              category: wordToEdit.category || currentCategory
+            } : undefined}
           />
         </>
       ) : (

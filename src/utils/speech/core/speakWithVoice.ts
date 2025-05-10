@@ -1,4 +1,3 @@
-
 import { getSpeechRate } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';
@@ -33,7 +32,7 @@ export async function speakWithVoice({
   console.log('[VOICE] Previous speech stopped');
   
   // Give the DOM time to update and speech engine to reset, but keep it short
-  const domUpdateDelay = 100; // Reduced from 200ms to 100ms
+  const domUpdateDelay = 150; // Increased from 100ms to 150ms to ensure full engine reset
   console.log(`[VOICE] Waiting ${domUpdateDelay}ms for DOM updates`);
   await new Promise(resolve => setTimeout(resolve, domUpdateDelay));
   
@@ -51,7 +50,7 @@ export async function speakWithVoice({
   const monitorRefs: SpeechMonitorRefs = createSpeechMonitor({
     processedText,
     onComplete,
-    estimatedDuration
+    estimatedDuration: estimatedDuration * 1.5 // Increase the estimated duration to ensure we wait long enough
   });
   
   try {

@@ -1,6 +1,6 @@
 
 export const getSpeechRate = (): number => {
-  return 0.9; // Slightly slower than normal
+  return 1.0; // Changed from 0.9 to 1.0 (normal speed)
 };
 
 export const getSpeechPitch = (): number => {

@@ -120,7 +120,7 @@ export const useAudioPlayback = (
                 console.log('[APP] Auto-advancing to next word');
                 handleManualNext();
               }
-            }, 2000); // Wait 2 seconds after audio finishes before advancing
+            }, 2500); // Wait 2.5 seconds after audio finishes before advancing
           }
         } catch (error) {
           console.error("[APP] Error playing audio:", error);
@@ -135,9 +135,9 @@ export const useAudioPlayback = (
       }
     };
 
-    // Start the audio playback with a shorter delay to ensure DOM rendering is complete
+    // Start the audio playback with a slightly longer delay to ensure DOM rendering is complete
     console.log(`[APP] Scheduling speech for ${currentWord.word}`); 
-    const speechTimerRef = setTimeout(playWordAudio, 100); 
+    const speechTimerRef = setTimeout(playWordAudio, 150); 
     
     // Cleanup function
     return () => {
