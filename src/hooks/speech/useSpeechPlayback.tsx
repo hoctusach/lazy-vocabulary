@@ -78,6 +78,7 @@ export const useSpeechPlayback = () => {
             JSON.parse(localStorage.getItem('buttonStates') || '{}').voiceRegion || 'US' : 
             'US';
 
+          // Fix the Promise type issue by explicitly handling the return value from speak()
           speak(text, voiceRegion, pauseRequestedRef)
             .then((result) => {
               console.log('Speech synthesis completed:', result);

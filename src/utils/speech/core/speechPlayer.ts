@@ -14,11 +14,11 @@ export const speak = (
   text: string, 
   region: 'US' | 'UK' = 'US', 
   pauseRequestedRef?: React.MutableRefObject<boolean>
-): Promise<void> => {
+): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     if (isMutedFromLocalStorage()) {
       console.log('Speech is muted, resolving immediately');
-      resolve();
+      resolve('skipped');
       return;
     }
 
@@ -57,7 +57,7 @@ export const speak = (
             pauseRequestedRef,
             onComplete: () => {
               console.log('Speech completed, resolving promise');
-              resolve();
+              resolve('completed');
             },
             onError: (err) => {
               console.error('Speech error in speak:', err);
