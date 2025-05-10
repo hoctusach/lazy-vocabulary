@@ -1,15 +1,32 @@
 
-import { useState } from "react";
 import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
-import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useMuteToggle } from "@/hooks/useMuteToggle";
 import { useVocabularyAudioSync } from "@/hooks/useVocabularyAudioSync";
-import { vocabularyService } from "@/services/vocabularyService";
 import { useAudioPlayback } from "@/components/vocabulary-app/useAudioPlayback";
+import { useModalState } from "./useModalState";
+import { useCategoryNavigation } from "./useCategoryNavigation";
+import { useSpeechControl } from "./useSpeechControl";
 
 export const useVocabularyContainerState = () => {
-  // Modal state
-  const [isAddWordModalOpen, setIsAddWordModalOpen] = useState(false);
+  // Get modal state
+  const { isAddWordModalOpen, setIsAddWordModalOpen } = useModalState();
+
+  // Get speech control
+  const {
+    isMuted,
+    voiceRegion,
+    handleToggleMute,
+    handleChangeVoice,
+    isVoicesLoaded,
+    stopSpeaking,
+    pauseSpeaking,
+    resumeSpeaking,
+    pauseRequestedRef,
+    speechError,
+    hasSpeechPermission,
+    retrySpeechInitialization,
+    handlePauseResume
+  } = useSpeechControl();
 
   // Vocabulary manager for handling word navigation
   const {
@@ -23,22 +40,6 @@ export const useVocabularyContainerState = () => {
     setHasData,
     jsonLoadError
   } = useVocabularyManager();
-
-  // Speech synthesis for voice management
-  const {
-    isMuted,
-    voiceRegion,
-    handleToggleMute,
-    handleChangeVoice,
-    isVoicesLoaded,
-    stopSpeaking,
-    pauseSpeaking,
-    resumeSpeaking,
-    pauseRequestedRef,
-    speechError,
-    hasSpeechPermission,
-    retrySpeechInitialization
-  } = useSpeechSynthesis();
 
   // Audio sync management
   const {
@@ -65,24 +66,14 @@ export const useVocabularyContainerState = () => {
     voiceRegion
   );
 
-  // Custom pause handler that uses the soft-pause approach
-  const handlePauseResume = () => {
-    if (isPaused) {
-      // If we're resuming, call the regular toggle function and also resume speech
-      handleTogglePause();
-      resumeSpeaking();
-    } else {
-      // If we're pausing, use our soft-pause approach
-      pauseSpeaking(); // This now sets pauseRequestedRef.current = true
-      handleTogglePause();
-    }
+  // Custom pause handler wrapper
+  const handlePauseResumeWrapper = () => {
+    const newPauseState = handlePauseResume(isPaused);
+    handleTogglePause();
   };
 
-  // Current and next category information
-  const currentCategory = vocabularyService.getCurrentSheetName();
-  const sheetOptions = vocabularyService.sheetOptions;
-  const nextIndex = (sheetOptions.indexOf(currentCategory) + 1) % sheetOptions.length;
-  const nextCategory = sheetOptions[nextIndex];
+  // Get category information
+  const { currentCategory, nextCategory } = useCategoryNavigation();
 
   // Audio playback hook to manage speech and auto-advancement
   useAudioPlayback(
@@ -114,7 +105,7 @@ export const useVocabularyContainerState = () => {
     currentWord,
     isPaused,
     handleFileUploaded,
-    handleTogglePause: handlePauseResume, // Use our custom handler
+    handleTogglePause: handlePauseResumeWrapper,
     handleManualNext,
     jsonLoadError,
     

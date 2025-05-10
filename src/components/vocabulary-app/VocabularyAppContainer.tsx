@@ -45,19 +45,19 @@ const VocabularyAppContainer: React.FC = () => {
     handleCloseModal
   } = useWordModalState();
 
+  // Handler for speech retry
+  const handleSpeechRetry = () => {
+    retrySpeechInitialization();
+  };
+
   // Word management operations
   const wordManager = currentWord 
-    ? VocabularyWordManager({
+    ? new VocabularyWordManager({
         currentWord,
         currentCategory,
         onWordSaved: handleCloseModal
       })
     : null;
-
-  // Handler for speech retry
-  const handleSpeechRetry = () => {
-    retrySpeechInitialization();
-  };
 
   const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
     if (wordManager) {
@@ -81,7 +81,7 @@ const VocabularyAppContainer: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePause}
             handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={handleSwitchCategory}
+            handleSwitchCategory={() => handleSwitchCategory()}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={isSoundPlaying}
