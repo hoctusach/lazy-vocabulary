@@ -77,7 +77,8 @@ export const useVocabularyActions = (
       console.log(`Successfully switched to category: ${nextCategory}`);
       
       // Reset playback to the first word from the new sheet
-      vocabularyService.shuffleCurrentSheet(); // Re-shuffle the sheet for fresh playback
+      // We don't need to call shuffleCurrentSheet directly since switchSheet
+      // already handles this internally in the WordNavigation class
       
       // Update current word to the first word from the new sheet
       const newWord = vocabularyService.getCurrentWord();
