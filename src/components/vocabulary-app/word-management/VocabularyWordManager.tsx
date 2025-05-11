@@ -10,7 +10,7 @@ interface VocabularyWordManagerProps {
   onWordSaved: () => void;
 }
 
-// Changed from class to object with methods
+// Function component that returns an object with methods
 const VocabularyWordManager = ({ 
   currentWord, 
   currentCategory, 

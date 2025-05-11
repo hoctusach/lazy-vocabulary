@@ -51,14 +51,14 @@ const VocabularyAppContainer: React.FC = () => {
     retrySpeechInitialization();
   };
 
-  // Word management operations - No longer instantiate with 'new'
+  // Word management operations - Using the function directly, not as a constructor
   const wordManagerProps = currentWord ? {
     currentWord,
     currentCategory,
     onWordSaved: handleCloseModal
   } : null;
   
-  // Get the word manager if we have a current word
+  // Get the word manager functionality if we have a current word
   const wordManager = wordManagerProps ? VocabularyWordManager(wordManagerProps) : null;
 
   const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
