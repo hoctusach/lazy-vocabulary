@@ -1,110 +1,68 @@
 
-import { useCallback, useRef } from 'react';
-import { vocabularyService } from '@/services/vocabularyService';
-import { stopSpeaking } from '@/utils/speech';
+import { useCallback } from "react";
+import { vocabularyService } from "@/services/vocabularyService";
+import { VocabularyWord } from "@/types/vocabulary";
 
 export const useVocabularyActions = (
-  setCurrentWord: (word: any) => void, 
+  setCurrentWord: React.Dispatch<React.SetStateAction<VocabularyWord | null>>,
   clearTimer: () => void,
   wordChangeInProgressRef: React.MutableRefObject<boolean>,
   lastManualActionTimeRef: React.MutableRefObject<number>,
   isChangingWordRef: React.MutableRefObject<boolean>,
-  setIsPaused: (isPaused: boolean | ((prev: boolean) => boolean)) => void,
+  setIsPaused: React.Dispatch<React.SetStateAction<boolean>>,
   timerRef: React.MutableRefObject<number | null>,
   displayNextWord: () => void
 ) => {
   // Toggle pause state
   const handleTogglePause = useCallback(() => {
-    lastManualActionTimeRef.current = Date.now();
-    stopSpeaking();
-    
-    setIsPaused(prev => {
-      const newPauseState = !prev;
-      console.log(`Pause state changed to: ${newPauseState}`);
-      
-      if (!newPauseState) {
-        clearTimer();
-        timerRef.current = window.setTimeout(displayNextWord, 800);
-      } else {
-        clearTimer();
-      }
-      
-      return newPauseState;
-    });
-  }, [clearTimer, displayNextWord, setIsPaused, lastManualActionTimeRef, timerRef]);
-
-  // Manually go to next word
+    setIsPaused(prevIsPaused => !prevIsPaused);
+  }, [setIsPaused]);
+  
+  // Handle manual next word request
   const handleManualNext = useCallback(() => {
     if (wordChangeInProgressRef.current) {
-      console.log("Word change already in progress, ignoring manual next request");
+      console.log("Word change already in progress, ignoring manual next");
       return;
     }
-    
-    lastManualActionTimeRef.current = Date.now();
-    clearTimer();
-    stopSpeaking();
-    
-    wordChangeInProgressRef.current = true;
-    isChangingWordRef.current = true;
-    
-    try {
-      const nextWord = vocabularyService.getNextWord();
-      if (nextWord) {
-        setCurrentWord(nextWord);
-      }
-    } catch (error) {
-      console.error("Error getting next word:", error);
-      // Don't rethrow - gracefully continue
-    } finally {
-      setTimeout(() => {
-        isChangingWordRef.current = false;
-        wordChangeInProgressRef.current = false;
-      }, 800);
-    }
-  }, [clearTimer, setCurrentWord, lastManualActionTimeRef, wordChangeInProgressRef, isChangingWordRef]);
 
-  // Switch category
-  const handleSwitchCategory = useCallback((isMuted: boolean, voiceRegion: 'US' | 'UK') => {
-    if (wordChangeInProgressRef.current) {
-      console.log("Word change in progress, ignoring category switch request");
-      return;
-    }
-    
+    console.log("Manual next word requested");
     lastManualActionTimeRef.current = Date.now();
-    stopSpeaking();
     clearTimer();
     
+    // Set flag to prevent multiple concurrent word changes
     wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
-    try {
-      const nextCategory = vocabularyService.nextSheet();
-      console.log(`Switched to category: ${nextCategory}`);
+    // Display next word with small delay to allow state updates
+    setTimeout(() => {
+      displayNextWord();
+      wordChangeInProgressRef.current = false;
+      isChangingWordRef.current = false;
+    }, 100);
+  }, [displayNextWord, clearTimer, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
+  
+  // Handle category switching
+  const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {
+    console.log(`Switching category from ${currentCategory} to ${nextCategory}`);
+    clearTimer();
+    
+    // Switch to next sheet in vocabularyService
+    const wasSuccessful = vocabularyService.switchSheet(nextCategory);
+    
+    if (wasSuccessful) {
+      console.log(`Successfully switched to category: ${nextCategory}`);
       
-      try {
-        const storedStates = localStorage.getItem('buttonStates');
-        const parsedStates = storedStates ? JSON.parse(storedStates) : {};
-        parsedStates.currentCategory = nextCategory;
-        localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
-      } catch (error) {
-        console.error('Error saving category to localStorage:', error);
-        // Continue even if localStorage fails
-      }
+      // Update current word to the first word from the new sheet
+      const newWord = vocabularyService.getCurrentWord();
+      console.log("New current word:", newWord);
+      setCurrentWord(newWord);
       
-      const nextWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
-      if (nextWord) {
-        setCurrentWord(nextWord);
-      }
-    } catch (error) {
-      console.error("Error switching category:", error);
-      // Don't rethrow - gracefully continue
-    } finally {
-      setTimeout(() => {
-        isChangingWordRef.current = false;
-        wordChangeInProgressRef.current = false;
-      }, 1000);
+      // Update last manual action time
+      lastManualActionTimeRef.current = Date.now();
+    } else {
+      console.error(`Failed to switch to category: ${nextCategory}`);
     }
-  }, [clearTimer, setCurrentWord, lastManualActionTimeRef, wordChangeInProgressRef, isChangingWordRef]);
+  }, [clearTimer, setCurrentWord, lastManualActionTimeRef]);
 
   return {
     handleTogglePause,

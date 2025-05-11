@@ -8,7 +8,8 @@ import ErrorDisplay from "./ErrorDisplay";
 import VocabularyMain from "./VocabularyMain";
 import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
-import { VocabularyWordManager, useWordModalState } from "./word-management";
+import VocabularyWordManager from "./word-management/VocabularyWordManager";
+import { useWordModalState } from "./word-management/useWordModalState";
 
 const VocabularyAppContainer: React.FC = () => {
   // Get all state and handlers from our custom hook
@@ -50,14 +51,15 @@ const VocabularyAppContainer: React.FC = () => {
     retrySpeechInitialization();
   };
 
-  // Word management operations
-  const wordManager = currentWord 
-    ? new VocabularyWordManager({
-        currentWord,
-        currentCategory,
-        onWordSaved: handleCloseModal
-      })
-    : null;
+  // Word management operations - No longer instantiate with 'new'
+  const wordManagerProps = currentWord ? {
+    currentWord,
+    currentCategory,
+    onWordSaved: handleCloseModal
+  } : null;
+  
+  // Get the word manager if we have a current word
+  const wordManager = wordManagerProps ? VocabularyWordManager(wordManagerProps) : null;
 
   const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
     if (wordManager) {
@@ -81,7 +83,7 @@ const VocabularyAppContainer: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePause}
             handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={() => handleSwitchCategory()}
+            handleSwitchCategory={() => handleSwitchCategory(currentCategory, nextCategory)}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={isSoundPlaying}

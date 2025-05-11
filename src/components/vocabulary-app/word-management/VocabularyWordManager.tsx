@@ -10,6 +10,7 @@ interface VocabularyWordManagerProps {
   onWordSaved: () => void;
 }
 
+// Changed from class to object with methods
 const VocabularyWordManager = ({ 
   currentWord, 
   currentCategory, 
@@ -22,27 +23,32 @@ const VocabularyWordManager = ({
   ) => {
     try {
       if (isEditMode && wordToEdit) {
-        // Edit existing word
-        vocabularyService.updateWord({
-          originalWord: wordToEdit.word,
-          updatedWord: {
+        // Edit existing word - using mergeCustomWords since updateWord doesn't exist
+        const updatedData = {
+          [wordData.category || currentCategory]: [{
             word: wordData.word,
             meaning: wordData.meaning,
             example: wordData.example,
-            category: wordData.category || currentCategory,
             count: wordToEdit.count || 1
-          }
-        });
+          }]
+        };
+        
+        // Use mergeCustomWords for updating
+        vocabularyService.mergeCustomWords(updatedData);
         toast.success("Word updated successfully!");
       } else {
-        // Add new word
-        vocabularyService.addWord({
-          word: wordData.word,
-          meaning: wordData.meaning,
-          example: wordData.example,
-          category: wordData.category || currentCategory,
-          count: 1
-        });
+        // Add new word - using mergeCustomWords since addWord doesn't exist
+        const newWordData = {
+          [wordData.category || currentCategory]: [{
+            word: wordData.word,
+            meaning: wordData.meaning,
+            example: wordData.example,
+            count: 1
+          }]
+        };
+        
+        // Use mergeCustomWords for adding
+        vocabularyService.mergeCustomWords(newWordData);
         toast.success("Word added successfully!");
       }
       
