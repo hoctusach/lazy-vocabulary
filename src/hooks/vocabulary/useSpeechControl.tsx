@@ -18,11 +18,11 @@ export const useSpeechControl = () => {
     retrySpeechInitialization
   } = useSpeechSynthesis();
 
-  // Enhanced pause handler that ensures speech resumes properly
+  // Enhanced pause handler that ensures speech behavior is consistent
   const handlePauseResume = (isPaused: boolean) => {
     if (isPaused) {
-      // If we're unpausing (currently paused), resume speech
-      console.log("Resuming speech playback and enabling auto-advance");
+      // If we're unpausing (currently paused)
+      console.log("Resuming speech playback");
       resumeSpeaking();
       
       // Reset pauseRequestedRef to ensure auto-advance works again
@@ -32,8 +32,8 @@ export const useSpeechControl = () => {
       
       return true; // Return the new state (unpaused)
     } else {
-      // If we're pausing (currently playing), pause speech
-      console.log("Pausing speech playback and auto-advance");
+      // If we're pausing (currently playing)
+      console.log("Pausing speech playback");
       pauseSpeaking();
       
       // Set pauseRequestedRef to prevent auto-advance

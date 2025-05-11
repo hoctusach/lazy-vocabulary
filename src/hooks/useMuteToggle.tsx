@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { stopSpeaking, speak } from '@/utils/speech';
+import { stopSpeaking } from '@/utils/speech';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useMuteToggle = (
@@ -19,25 +19,26 @@ export const useMuteToggle = (
     setMute(isMuted);
   }, [isMuted]);
   
-  // Toggle mute
+  // Toggle mute without restarting speech
   const toggleMute = useCallback(() => {
+    console.log('[APP] Toggling mute state from', mute, 'to', !mute);
     setMute(!mute);
     handleToggleMute();
     
-    if (!mute) {
-      console.log('[APP] Muting, stopping speech');
-      stopSpeaking();
-      clearAutoAdvanceTimer();
-    } else if (currentWord && !isPaused) {
-      // If unmuting, play the current word after a short delay
-      console.log('[APP] Unmuting, playing current word');
-      setTimeout(() => {
-        const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`;
-        console.log('[APP] ⚡ Speaking after unmute:', currentWord.word);
-        speak(fullText, voiceRegion);
-      }, 300); // Small delay to ensure UI is updated
+    // Don't restart speech, just update the muted state in localStorage
+    try {
+      const buttonStates = JSON.parse(localStorage.getItem('buttonStates') || '{}');
+      buttonStates.isMuted = !mute;
+      localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
+    } catch (error) {
+      console.error('Error updating mute state in localStorage:', error);
     }
-  }, [mute, currentWord, isPaused, voiceRegion, handleToggleMute, stopSpeaking, clearAutoAdvanceTimer]);
+    
+    // Clear timers when muting to prevent auto-advance
+    if (!mute) {
+      clearAutoAdvanceTimer();
+    }
+  }, [mute, handleToggleMute, clearAutoAdvanceTimer]);
   
   return { mute, toggleMute };
 };

@@ -43,6 +43,12 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   hasSpeechPermission,
   handleSpeechRetry,
 }) => {
+  // Handler to prevent rapid clicks on the category button
+  const handleCategorySwitch = () => {
+    console.log(`Switching to ${nextCategory} category`);
+    handleSwitchCategory(nextCategory);
+  };
+
   return (
     <>
       {/* Speech Error Alert */}
@@ -78,7 +84,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
         onChangeVoice={handleChangeVoice}
-        onSwitchCategory={() => handleSwitchCategory()}
+        onSwitchCategory={handleCategorySwitch}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
         isSpeaking={isSoundPlaying}

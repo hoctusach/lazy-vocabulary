@@ -14,16 +14,17 @@ export const useVocabularyActions = (
   timerRef: React.MutableRefObject<number | null>,
   displayNextWord: () => void
 ) => {
-  // Toggle pause state
+  // Toggle pause state - simple state toggle only
   const handleTogglePause = useCallback(() => {
     setIsPaused(prevIsPaused => !prevIsPaused);
   }, [setIsPaused]);
   
-  // Handle manual next word request with improved error handling
+  // Debounced next word handler to prevent rapid clicks
   const handleManualNext = useCallback(() => {
     // First, stop any ongoing speech to prevent UI freeze
     stopSpeaking();
     
+    // Prevent multiple simultaneous word changes
     if (wordChangeInProgressRef.current) {
       console.log("Word change already in progress, ignoring manual next");
       return;
@@ -33,7 +34,7 @@ export const useVocabularyActions = (
     lastManualActionTimeRef.current = Date.now();
     clearTimer();
     
-    // Set flag to prevent multiple concurrent word changes
+    // Set flags to prevent multiple concurrent word changes
     wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
@@ -50,21 +51,22 @@ export const useVocabularyActions = (
     } catch (error) {
       console.error("Error getting next word:", error);
     } finally {
-      // Ensure we always clear the in-progress flags
+      // Ensure we always clear the in-progress flags after a short delay
+      // to allow DOM updates to complete
       setTimeout(() => {
         wordChangeInProgressRef.current = false;
         isChangingWordRef.current = false;
-      }, 100);
+      }, 200);
     }
   }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
   
-  // Enhanced category switching function that ensures words load correctly
+  // Enhanced category switching with proper cleanup
   const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {
     console.log(`Switching category from ${currentCategory} to ${nextCategory}`);
-    clearTimer();
     
-    // First stop any ongoing speech
+    // First stop any ongoing speech and clear timers
     stopSpeaking();
+    clearTimer();
     
     // Set flags to indicate we're changing words
     wordChangeInProgressRef.current = true;
@@ -85,18 +87,27 @@ export const useVocabularyActions = (
       console.log("New current word after category switch:", newWord);
       setCurrentWord(newWord);
       
-      // Update last manual action time
+      // Update last manual action time to prevent auto-advance too soon
       lastManualActionTimeRef.current = Date.now();
+      
+      // Store the current category in localStorage for persistence
+      try {
+        const buttonStates = JSON.parse(localStorage.getItem('buttonStates') || '{}');
+        buttonStates.currentCategory = nextCategory;
+        localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
       
     } else {
       console.error(`Failed to switch to category: ${nextCategory}`);
     }
     
-    // Reset flags regardless of success
+    // Reset flags after a delay to ensure DOM updates complete
     setTimeout(() => {
       wordChangeInProgressRef.current = false;
       isChangingWordRef.current = false;
-    }, 100);
+    }, 300);
     
   }, [clearTimer, setCurrentWord, lastManualActionTimeRef, wordChangeInProgressRef, isChangingWordRef]);
 
