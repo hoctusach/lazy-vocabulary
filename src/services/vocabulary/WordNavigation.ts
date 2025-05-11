@@ -42,20 +42,43 @@ export class WordNavigation {
       [this.shuffledIndices[i], this.shuffledIndices[j]] = [this.shuffledIndices[j], this.shuffledIndices[i]];
     }
     
+    // Reset to start with the first word
     this.currentIndex = -1;
     console.log(`Shuffled ${this.shuffledIndices.length} words in sheet "${this.currentSheetName}"`);
   }
   
   switchSheet(sheetName: string): boolean {
-    if (this.sheetOptions.includes(sheetName)) {
-      console.log(`Switching sheet from "${this.currentSheetName}" to "${sheetName}"`);
-      this.currentSheetName = sheetName;
-      this.lastWordChangeTime = Date.now();
-      this.shuffleCurrentSheet();
+    // Ensure we never switch to an invalid category
+    if (!sheetName || !this.sheetOptions.includes(sheetName)) {
+      console.warn(`Invalid sheet name: ${sheetName}`);
+      return false;
+    }
+    
+    // Don't do anything if we're already on this sheet
+    if (this.currentSheetName === sheetName) {
+      console.log(`Already on sheet: ${sheetName}`);
       return true;
     }
-    console.warn(`Invalid sheet name: ${sheetName}`);
-    return false;
+    
+    console.log(`Switching sheet from "${this.currentSheetName}" to "${sheetName}"`);
+    this.currentSheetName = sheetName;
+    this.lastWordChangeTime = Date.now();
+    
+    // Reset index and re-shuffle the sheet
+    this.currentIndex = -1;
+    this.shuffleCurrentSheet();
+    
+    // Store current category in localStorage for persistence
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const states = storedStates ? JSON.parse(storedStates) : {};
+      states.currentCategory = sheetName;
+      localStorage.setItem('buttonStates', JSON.stringify(states));
+    } catch (error) {
+      console.error("Error saving current category to localStorage:", error);
+    }
+    
+    return true;
   }
   
   nextSheet(): string {
@@ -66,7 +89,20 @@ export class WordNavigation {
     console.log(`Changing sheet from "${this.currentSheetName}" to "${nextSheetName}"`);
     this.currentSheetName = nextSheetName;
     this.lastWordChangeTime = Date.now();
+    
+    // Reset index and re-shuffle
+    this.currentIndex = -1;
     this.shuffleCurrentSheet();
+    
+    // Store current category
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const states = storedStates ? JSON.parse(storedStates) : {};
+      states.currentCategory = nextSheetName;
+      localStorage.setItem('buttonStates', JSON.stringify(states));
+    } catch (error) {
+      console.error("Error saving current category to localStorage:", error);
+    }
     
     return this.currentSheetName;
   }
@@ -76,6 +112,11 @@ export class WordNavigation {
     if (currentData.length === 0 || this.shuffledIndices.length === 0) {
       console.log(`No words available in sheet "${this.currentSheetName}"`);
       return null;
+    }
+    
+    // If we haven't started yet, get the first word
+    if (this.currentIndex === -1) {
+      this.currentIndex = 0;
     }
     
     if (this.currentIndex >= 0 && this.currentIndex < this.shuffledIndices.length) {

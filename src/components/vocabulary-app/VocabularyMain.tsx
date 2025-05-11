@@ -14,7 +14,7 @@ interface VocabularyMainProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleChangeVoice: () => void;
-  handleSwitchCategory: () => void;
+  handleSwitchCategory: (categoryName?: string) => void;
   currentCategory: string;
   nextCategory: string;
   isSoundPlaying: boolean;
@@ -78,7 +78,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
         onChangeVoice={handleChangeVoice}
-        onSwitchCategory={handleSwitchCategory}
+        onSwitchCategory={() => handleSwitchCategory()}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
         isSpeaking={isSoundPlaying}

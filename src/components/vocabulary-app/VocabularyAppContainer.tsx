@@ -64,10 +64,13 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
-  // Handle direct category switch without opening edit modal
-  const handleCategorySwitchDirect = () => {
-    if (nextCategory) {
-      handleSwitchCategory(currentCategory, nextCategory);
+  // Direct category switch handler that properly switches categories for playback
+  const handleCategorySwitchDirect = (categoryName?: string) => {
+    // If a specific category is provided, use it; otherwise use the next category in rotation
+    const targetCategory = categoryName || nextCategory;
+    if (targetCategory) {
+      console.log(`Switching directly to category: ${targetCategory}`);
+      handleSwitchCategory(currentCategory, targetCategory);
     }
   };
 
@@ -87,7 +90,7 @@ const VocabularyAppContainer: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePause}
             handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={handleCategorySwitchDirect} // Use direct category switch handler
+            handleSwitchCategory={handleCategorySwitchDirect} // Use our direct category switch handler
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={isSoundPlaying}

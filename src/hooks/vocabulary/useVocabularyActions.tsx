@@ -58,7 +58,7 @@ export const useVocabularyActions = (
     }
   }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
   
-  // Handle category switching - fixed to properly switch category without opening edit modal
+  // Enhanced category switching function that ensures words load correctly
   const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {
     console.log(`Switching category from ${currentCategory} to ${nextCategory}`);
     clearTimer();
@@ -66,26 +66,37 @@ export const useVocabularyActions = (
     // First stop any ongoing speech
     stopSpeaking();
     
+    // Set flags to indicate we're changing words
+    wordChangeInProgressRef.current = true;
+    isChangingWordRef.current = true;
+    
     // Switch to next sheet in vocabularyService
     const wasSuccessful = vocabularyService.switchSheet(nextCategory);
     
     if (wasSuccessful) {
       console.log(`Successfully switched to category: ${nextCategory}`);
       
+      // Reset playback to the first word from the new sheet
+      vocabularyService.shuffleCurrentSheet(); // Re-shuffle the sheet for fresh playback
+      
       // Update current word to the first word from the new sheet
       const newWord = vocabularyService.getCurrentWord();
-      console.log("New current word:", newWord);
+      console.log("New current word after category switch:", newWord);
       setCurrentWord(newWord);
       
       // Update last manual action time
       lastManualActionTimeRef.current = Date.now();
       
-      // Reset any word change flags
-      wordChangeInProgressRef.current = false;
-      isChangingWordRef.current = false;
     } else {
       console.error(`Failed to switch to category: ${nextCategory}`);
     }
+    
+    // Reset flags regardless of success
+    setTimeout(() => {
+      wordChangeInProgressRef.current = false;
+      isChangingWordRef.current = false;
+    }, 100);
+    
   }, [clearTimer, setCurrentWord, lastManualActionTimeRef, wordChangeInProgressRef, isChangingWordRef]);
 
   return {
