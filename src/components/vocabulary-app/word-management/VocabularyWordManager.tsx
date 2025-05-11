@@ -10,7 +10,7 @@ interface VocabularyWordManagerProps {
   onWordSaved: () => void;
 }
 
-// Function component that returns an object with methods
+// This is a custom hook function that returns an object with methods
 const VocabularyWordManager = ({ 
   currentWord, 
   currentCategory, 
@@ -23,7 +23,7 @@ const VocabularyWordManager = ({
   ) => {
     try {
       if (isEditMode && wordToEdit) {
-        // Edit existing word - using mergeCustomWords since updateWord doesn't exist
+        // Edit existing word
         const updatedData = {
           [wordData.category || currentCategory]: [{
             word: wordData.word,
@@ -37,7 +37,7 @@ const VocabularyWordManager = ({
         vocabularyService.mergeCustomWords(updatedData);
         toast.success("Word updated successfully!");
       } else {
-        // Add new word - using mergeCustomWords since addWord doesn't exist
+        // Add new word
         const newWordData = {
           [wordData.category || currentCategory]: [{
             word: wordData.word,
