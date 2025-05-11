@@ -35,31 +35,49 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     });
   }
   
-  // First try to find an exact match for the region
-  let voice = voices.find(v => v.lang === langCode);
+  // Use a more sophisticated voice matching algorithm
+  
+  // First priority: Exact match for the language code
+  let voice = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
   
   if (voice) {
     console.log(`Selected exact match voice for ${region}: ${voice.name} (${voice.lang})`);
     return voice;
   }
   
-  // If no exact match, try to find a voice with the appropriate language prefix
-  const langPrefix = region === 'US' ? 'en-US' : 'en-GB';
-  voice = voices.find(v => v.lang.startsWith(langPrefix));
+  // Second priority: Voice that starts with the language code
+  voice = voices.find(v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
   
   if (voice) {
-    console.log(`Selected voice with prefix ${langPrefix}: ${voice.name} (${voice.lang})`);
+    console.log(`Selected voice with prefix ${langCode}: ${voice.name} (${voice.lang})`);
     return voice;
   }
   
-  // Fallback to premium voices that might have the right accent
+  // Third priority: Check for specific keywords in voice name
+  // For US voices, look for US, American, or en-US in the name
+  // For UK voices, look for UK, British, GB, or en-GB in the name
+  const keywords = region === 'US' 
+    ? ['us', 'american', 'united states', 'en-us'] 
+    : ['uk', 'british', 'england', 'gb', 'en-gb'];
+  
+  voice = voices.find(v => {
+    const name = v.name.toLowerCase();
+    return keywords.some(keyword => name.includes(keyword));
+  });
+  
+  if (voice) {
+    console.log(`Selected voice by name keyword for ${region}: ${voice.name} (${voice.lang})`);
+    return voice;
+  }
+  
+  // Fourth priority: Google or Microsoft branded voices with appropriate region
   voice = voices.find(v => 
-    (region === 'US' && v.name.includes('Google US')) || 
-    (region === 'UK' && v.name.includes('Google UK'))
+    (region === 'US' && (v.name.includes('Google US') || v.name.includes('Microsoft') && v.lang.startsWith('en'))) || 
+    (region === 'UK' && (v.name.includes('Google UK') || v.name.includes('British')))
   );
   
   if (voice) {
-    console.log(`Selected premium voice for ${region}: ${voice.name} (${voice.lang})`);
+    console.log(`Selected branded voice for ${region}: ${voice.name} (${voice.lang})`);
     return voice;
   }
   

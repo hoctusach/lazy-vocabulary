@@ -64,11 +64,10 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
-  // Handle category switch with proper edit modal
-  const handleCategoryChange = () => {
-    // First open the edit modal with the current word
-    if (currentWord) {
-      handleOpenEditWordModal(currentWord);
+  // Handle direct category switch without opening edit modal
+  const handleCategorySwitchDirect = () => {
+    if (nextCategory) {
+      handleSwitchCategory(currentCategory, nextCategory);
     }
   };
 
@@ -88,7 +87,7 @@ const VocabularyAppContainer: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePause}
             handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={handleCategoryChange} // Use our new handler
+            handleSwitchCategory={handleCategorySwitchDirect} // Use direct category switch handler
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={isSoundPlaying}

@@ -58,10 +58,13 @@ export const useVocabularyActions = (
     }
   }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
   
-  // Handle category switching
+  // Handle category switching - fixed to properly switch category without opening edit modal
   const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {
     console.log(`Switching category from ${currentCategory} to ${nextCategory}`);
     clearTimer();
+    
+    // First stop any ongoing speech
+    stopSpeaking();
     
     // Switch to next sheet in vocabularyService
     const wasSuccessful = vocabularyService.switchSheet(nextCategory);
@@ -76,10 +79,14 @@ export const useVocabularyActions = (
       
       // Update last manual action time
       lastManualActionTimeRef.current = Date.now();
+      
+      // Reset any word change flags
+      wordChangeInProgressRef.current = false;
+      isChangingWordRef.current = false;
     } else {
       console.error(`Failed to switch to category: ${nextCategory}`);
     }
-  }, [clearTimer, setCurrentWord, lastManualActionTimeRef]);
+  }, [clearTimer, setCurrentWord, lastManualActionTimeRef, wordChangeInProgressRef, isChangingWordRef]);
 
   return {
     handleTogglePause,

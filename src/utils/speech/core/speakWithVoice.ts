@@ -65,6 +65,14 @@ export async function speakWithVoice({
   });
   
   try {
+    // If pause was requested, don't speak at all
+    if (pauseRequestedRef?.current) {
+      console.log('[VOICE] Speech canceled due to pause request');
+      clearSpeechMonitor(monitorRefs);
+      onComplete();
+      return;
+    }
+    
     // Speak all chunks in sequence, passing the selected voice explicitly
     const results = await speakChunksInSequence(textChunks, {
       langCode,
