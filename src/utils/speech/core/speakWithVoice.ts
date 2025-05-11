@@ -1,3 +1,4 @@
+
 import { getSpeechRate } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';
@@ -36,8 +37,17 @@ export async function speakWithVoice({
   console.log(`[VOICE] Waiting ${domUpdateDelay}ms for DOM updates`);
   await new Promise(resolve => setTimeout(resolve, domUpdateDelay));
   
+  // Use the correct language code based on the selected region
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
+  console.log(`[VOICE] Using ${region} voice (${langCode})`);
+  
+  // Specifically get a voice for the selected region
   const voice = getVoiceByRegion(region);
+  if (voice) {
+    console.log(`[VOICE] Selected voice: ${voice.name} (${voice.lang})`);
+  } else {
+    console.warn(`[VOICE] No ${region} voice found, will use default`);
+  }
   
   // Split text into smaller chunks for better mobile compatibility
   const textChunks = splitTextIntoChunks(processedText);
@@ -45,6 +55,7 @@ export async function speakWithVoice({
   
   // Estimate speech duration for monitoring
   const estimatedDuration = calculateSpeechDuration(text, getSpeechRate());
+  console.log(`[VOICE] Estimated speech duration: ${estimatedDuration}ms`);
   
   // Set up monitoring for the speech process
   const monitorRefs: SpeechMonitorRefs = createSpeechMonitor({
@@ -54,7 +65,7 @@ export async function speakWithVoice({
   });
   
   try {
-    // Speak all chunks in sequence
+    // Speak all chunks in sequence, passing the selected voice explicitly
     const results = await speakChunksInSequence(textChunks, {
       langCode,
       voice,

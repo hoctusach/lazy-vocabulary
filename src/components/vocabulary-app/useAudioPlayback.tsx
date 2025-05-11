@@ -70,8 +70,8 @@ export const useAudioPlayback = (
           console.log('[APP] Retrying speech for:', currentWord.word);
           wordChangeProcessingRef.current = false;
           speechAttemptsRef.current += 1;
-          // Fix: Pass a boolean value directly instead of a function
-          setIsSoundPlaying(!isSoundPlaying); // Toggle to force re-render
+          setIsSoundPlaying(false);
+          setTimeout(() => setIsSoundPlaying(true), 10); // Toggle to force re-render
         }
       }, 300);
       return () => clearTimeout(retryTimeout);
@@ -107,7 +107,8 @@ export const useAudioPlayback = (
         const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}.`;
         
         try {
-          // Use the direct speak function from utils/speech for more reliability
+          // Use the direct speak function from utils/speech, passing the correct voice region
+          // This is essential for the accent selector to work properly
           await speak(fullText, voiceRegion, pauseRequestedRef);
           
           console.log('[APP] ✅ Speech completed for:', currentWord.word);
@@ -118,7 +119,12 @@ export const useAudioPlayback = (
             autoAdvanceTimerRef.current = window.setTimeout(() => {
               if (!isPaused && !pauseRequestedRef?.current) {
                 console.log('[APP] Auto-advancing to next word');
-                handleManualNext();
+                // Ensure we stop any speech first
+                stopSpeaking();
+                // Brief delay before advancing to ensure clean state
+                setTimeout(() => {
+                  handleManualNext();
+                }, 50);
               }
             }, 2500); // Wait 2.5 seconds after audio finishes before advancing
           }
@@ -149,7 +155,7 @@ export const useAudioPlayback = (
     currentWord, 
     mute, 
     isPaused, 
-    voiceRegion, 
+    voiceRegion, // Now properly tracked for voice changes
     handleManualNext, 
     clearAutoAdvanceTimer, 
     stopSpeaking, 

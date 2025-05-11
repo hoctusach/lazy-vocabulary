@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { vocabularyService } from "@/services/vocabularyService";
 import { VocabularyWord } from "@/types/vocabulary";
+import { stopSpeaking } from "@/utils/speech";
 
 export const useVocabularyActions = (
   setCurrentWord: React.Dispatch<React.SetStateAction<VocabularyWord | null>>,
@@ -18,8 +19,11 @@ export const useVocabularyActions = (
     setIsPaused(prevIsPaused => !prevIsPaused);
   }, [setIsPaused]);
   
-  // Handle manual next word request
+  // Handle manual next word request with improved error handling
   const handleManualNext = useCallback(() => {
+    // First, stop any ongoing speech to prevent UI freeze
+    stopSpeaking();
+    
     if (wordChangeInProgressRef.current) {
       console.log("Word change already in progress, ignoring manual next");
       return;
@@ -33,13 +37,26 @@ export const useVocabularyActions = (
     wordChangeInProgressRef.current = true;
     isChangingWordRef.current = true;
     
-    // Display next word with small delay to allow state updates
-    setTimeout(() => {
-      displayNextWord();
-      wordChangeInProgressRef.current = false;
-      isChangingWordRef.current = false;
-    }, 100);
-  }, [displayNextWord, clearTimer, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
+    try {
+      // Get next word from vocabulary service
+      const nextWord = vocabularyService.getNextWord();
+      if (nextWord) {
+        console.log("Found next word:", nextWord.word);
+        // Set the new word
+        setCurrentWord(nextWord);
+      } else {
+        console.warn("No next word available");
+      }
+    } catch (error) {
+      console.error("Error getting next word:", error);
+    } finally {
+      // Ensure we always clear the in-progress flags
+      setTimeout(() => {
+        wordChangeInProgressRef.current = false;
+        isChangingWordRef.current = false;
+      }, 100);
+    }
+  }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
   
   // Handle category switching
   const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {

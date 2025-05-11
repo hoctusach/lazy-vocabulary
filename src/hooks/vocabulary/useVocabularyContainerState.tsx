@@ -66,9 +66,11 @@ export const useVocabularyContainerState = () => {
     voiceRegion
   );
 
-  // Custom pause handler wrapper
+  // Improved pause handler wrapper that properly resumes speech
   const handlePauseResumeWrapper = () => {
-    const newPauseState = handlePauseResume(isPaused);
+    // Call the speech resume/pause handler first
+    handlePauseResume(isPaused);
+    // Then update the app's pause state
     handleTogglePause();
   };
 
@@ -105,7 +107,7 @@ export const useVocabularyContainerState = () => {
     currentWord,
     isPaused,
     handleFileUploaded,
-    handleTogglePause: handlePauseResumeWrapper,
+    handleTogglePause: handlePauseResumeWrapper, // Use our enhanced pause handler
     handleManualNext,
     jsonLoadError,
     

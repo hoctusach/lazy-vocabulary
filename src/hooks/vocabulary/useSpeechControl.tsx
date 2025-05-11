@@ -18,15 +18,17 @@ export const useSpeechControl = () => {
     retrySpeechInitialization
   } = useSpeechSynthesis();
 
-  // Custom pause handler that uses the soft-pause approach
+  // Enhanced pause handler that ensures speech resumes properly
   const handlePauseResume = (isPaused: boolean) => {
     if (isPaused) {
-      // If we're resuming, call the regular toggle function and also resume speech
+      // If we're unpausing (currently paused), resume speech
+      console.log("Resuming speech playback");
       resumeSpeaking();
       return true; // Return the new state (unpaused)
     } else {
-      // If we're pausing, use our soft-pause approach
-      pauseSpeaking(); // This now sets pauseRequestedRef.current = true
+      // If we're pausing (currently playing), pause speech
+      console.log("Pausing speech playback");
+      pauseSpeaking();
       return false; // Return the new state (paused)
     }
   };

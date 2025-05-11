@@ -64,6 +64,14 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
+  // Handle category switch with proper edit modal
+  const handleCategoryChange = () => {
+    // First open the edit modal with the current word
+    if (currentWord) {
+      handleOpenEditWordModal(currentWord);
+    }
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -80,7 +88,7 @@ const VocabularyAppContainer: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePause}
             handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={() => handleSwitchCategory(currentCategory, nextCategory)}
+            handleSwitchCategory={handleCategoryChange} // Use our new handler
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={isSoundPlaying}
