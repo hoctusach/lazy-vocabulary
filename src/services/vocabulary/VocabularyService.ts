@@ -1,3 +1,4 @@
+
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
@@ -5,7 +6,6 @@ import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { WordNavigation } from "./WordNavigation";
-import { spacedRepetitionService } from "./SpacedRepetitionService";
 
 export class VocabularyService {
   private data: SheetData;
@@ -20,8 +20,7 @@ export class VocabularyService {
   constructor() {
     this.storage = new VocabularyStorage();
     this.sheetManager = new SheetManager();
-    // Load data and migrate for spaced repetition
-    this.data = this.initializeWithSpacedRepetition();
+    this.data = this.storage.loadData();
     this.sheetOptions = this.sheetManager.sheetOptions;
     
     this.dataProcessor = new VocabularyDataProcessor();
@@ -46,17 +45,6 @@ export class VocabularyService {
     console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
   
-  // Initialize data with spaced repetition fields
-  private initializeWithSpacedRepetition(): SheetData {
-    const loadedData = this.storage.loadData();
-    const migratedData = spacedRepetitionService.migrateVocabularyData(loadedData);
-    
-    // Save the migrated data back to storage
-    this.storage.saveData(migratedData);
-    
-    return migratedData;
-  }
-  
   async processExcelFile(file: File): Promise<boolean> {
     console.log("Processing Excel file in VocabularyService");
     try {
@@ -65,11 +53,8 @@ export class VocabularyService {
         // Store original data length for comparison
         const originalWordCount = this.getTotalWordCount();
         
-        // Migrate imported data
-        const migratedNewData = spacedRepetitionService.migrateVocabularyData(newData);
-        
         // Merge the imported data with existing data
-        this.importer.mergeImportedData(migratedNewData, this.data);
+        this.importer.mergeImportedData(newData, this.data);
         
         // Save the merged data to storage
         const saveSuccess = this.storage.saveData(this.data);
@@ -123,8 +108,6 @@ export class VocabularyService {
           console.log("Successfully loaded updated default vocabulary from JSON file");
           // Process data to ensure all fields have proper types
           this.data = this.dataProcessor.processDataTypes(fetchedData);
-          // Migrate data for spaced repetition
-          this.data = spacedRepetitionService.migrateVocabularyData(this.data);
           this.storage.saveData(this.data);
           this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
@@ -135,8 +118,6 @@ export class VocabularyService {
           // Fallback to built-in default vocabulary if fetch fails
           const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
           this.data = this.dataProcessor.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
-          // Migrate data for spaced repetition
-          this.data = spacedRepetitionService.migrateVocabularyData(this.data);
           this.storage.saveData(this.data);
           this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
@@ -207,31 +188,5 @@ export class VocabularyService {
     
     // Save the updated data to storage
     this.storage.saveData(this.data);
-  }
-  
-  getDueWords(): VocabularyWord[] {
-    // Collect all words from all categories
-    let allWords: VocabularyWord[] = [];
-    
-    for (const category in this.data) {
-      if (category !== "All words") { // Avoid duplicating words
-        allWords = allWords.concat(this.data[category] || []);
-      }
-    }
-    
-    // Return words due today
-    const { getDueToday } = require('@/utils/spacedScheduler');
-    return getDueToday(allWords);
-  }
-  
-  updateWord(word: VocabularyWord): boolean {
-    try {
-      this.data = spacedRepetitionService.updateWordInData(this.data, word);
-      this.storage.saveData(this.data);
-      return true;
-    } catch (error) {
-      console.error("Failed to update word:", error);
-      return false;
-    }
   }
 }
