@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface VoiceOption {
   label: string;
@@ -71,6 +71,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
 
+  // Get currently selected voice option
+  const currentVoiceOption = voiceOptions.find(v => v.label === selectedVoice) || voiceOptions[0];
+
   return (
     <Card 
       className={cn(
@@ -104,25 +107,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           <div className="text-base italic text-red-800 break-words">
             <span className="font-medium">* </span>
             {example}
-          </div>
-          
-          {/* Voice selector */}
-          <div className="mb-2 mt-4">
-            <Select 
-              value={selectedVoice} 
-              onValueChange={onChangeVoice}
-            >
-              <SelectTrigger className="w-full h-8 text-sm">
-                <SelectValue placeholder="Select voice" />
-              </SelectTrigger>
-              <SelectContent>
-                {voiceOptions.map(option => (
-                  <SelectItem key={option.label} value={option.label}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
           
           {/* Control buttons wrapper - updated to flex-wrap */}
@@ -172,6 +156,33 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               <RefreshCw size={12} className="mr-1" />
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
+            
+            {/* Voice selector as dropdown button */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 text-xs px-2 text-blue-700"
+                >
+                  {currentVoiceOption?.region || "US"} {currentVoiceOption?.gender === 'female' ? '♀' : '♂'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {voiceOptions.map(option => (
+                  <DropdownMenuItem 
+                    key={option.label}
+                    onClick={() => onChangeVoice(option.label)}
+                    className={cn(
+                      "text-sm cursor-pointer",
+                      selectedVoice === option.label && "font-bold bg-blue-50"
+                    )}
+                  >
+                    {option.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </CardContent>

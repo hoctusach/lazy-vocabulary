@@ -152,6 +152,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [muted, selectedVoice]);
   
+  // Function to advance to the next word - moved before playCurrentWord to fix repetition bug
+  const advanceToNext = useCallback(() => {
+    if (wordList.length === 0) return;
+    
+    // Move to the next word, wrapping around if needed
+    setCurrentIndex(prev => (prev + 1) % wordList.length);
+  }, [wordList.length]);
+  
   // Function to play the current word
   const playCurrentWord = useCallback(() => {
     if (!currentWord) return;
@@ -192,7 +200,10 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       speechEndedRef.current = true;
       // Only auto-advance if not paused
       if (!paused && !muted) {
+        // First advance to next word, then play - fixes repetition bug
         advanceToNext();
+        // Small delay to ensure index is updated
+        setTimeout(() => playCurrentWord(), 50);
       }
     };
     
@@ -204,21 +215,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     // Start speaking
     console.log(`Speaking word: ${wordText}`);
     window.speechSynthesis.speak(utterance);
-  }, [currentWord, muted, paused, selectedVoice.voice]);
-  
-  // Function to advance to the next word
-  const advanceToNext = useCallback(() => {
-    if (wordList.length === 0) return;
-    
-    // Move to the next word, wrapping around if needed
-    setCurrentIndex(prev => (prev + 1) % wordList.length);
-    
-    // If not paused and not muted, play the new word
-    if (!paused && !muted) {
-      // Small delay to ensure state is updated
-      setTimeout(() => playCurrentWord(), 50);
-    }
-  }, [wordList.length, paused, muted, playCurrentWord]);
+  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext]);
   
   // Handle mute toggling
   const toggleMute = useCallback(() => {
@@ -255,9 +252,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     window.speechSynthesis.cancel();
     speechEndedRef.current = true;
     
-    // Advance to the next word
+    // Advance to the next word first
     advanceToNext();
-  }, [advanceToNext]);
+    
+    // Then play the new word if not muted or paused
+    if (!muted && !paused) {
+      setTimeout(() => playCurrentWord(), 50);
+    }
+  }, [advanceToNext, muted, paused, playCurrentWord]);
   
   // Handle voice selection
   const changeVoice = useCallback((voiceLabel: string) => {

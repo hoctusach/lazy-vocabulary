@@ -1,4 +1,3 @@
-
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
@@ -49,6 +48,41 @@ export class VocabularyService {
     console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
   
+  // Method to get complete word list - adding this for useVocabularyContainerState
+  getWordList(): VocabularyWord[] {
+    const currentSheet = this.wordNavigation.getCurrentSheetName();
+    if (this.data[currentSheet]) {
+      return [...this.data[currentSheet]];
+    }
+    return [];
+  }
+  
+  // Method to add a vocabulary change listener
+  addVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners.push(listener);
+  }
+  
+  // Method to remove a vocabulary change listener
+  removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
+  }
+  
+  // Method to notify all listeners about vocabulary change
+  private notifyVocabularyChange(): void {
+    this.vocabularyChangeListeners.forEach(listener => listener());
+  }
+  
+  private getTotalWordCount(): number {
+    let count = 0;
+    for (const sheetName in this.data) {
+      // Skip "All words" to avoid double counting
+      if (sheetName !== "All words") {
+        count += this.data[sheetName]?.length || 0;
+      }
+    }
+    return count;
+  }
+  
   async processExcelFile(file: File): Promise<boolean> {
     console.log("Processing Excel file in VocabularyService");
     try {
@@ -87,41 +121,6 @@ export class VocabularyService {
       console.error("Error processing Excel file in VocabularyService:", error);
       return false;
     }
-  }
-  
-  // Method to get complete word list - adding this for useVocabularyContainerState
-  getWordList(): VocabularyWord[] {
-    const currentSheet = this.wordNavigation.getCurrentSheetName();
-    if (this.data[currentSheet]) {
-      return [...this.data[currentSheet]];
-    }
-    return [];
-  }
-  
-  // Method to add a vocabulary change listener
-  addVocabularyChangeListener(listener: VocabularyChangeListener): void {
-    this.vocabularyChangeListeners.push(listener);
-  }
-  
-  // Method to remove a vocabulary change listener
-  removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
-    this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
-  }
-  
-  // Method to notify all listeners about vocabulary change
-  private notifyVocabularyChange(): void {
-    this.vocabularyChangeListeners.forEach(listener => listener());
-  }
-  
-  private getTotalWordCount(): number {
-    let count = 0;
-    for (const sheetName in this.data) {
-      // Skip "All words" to avoid double counting
-      if (sheetName !== "All words") {
-        count += this.data[sheetName]?.length || 0;
-      }
-    }
-    return count;
   }
   
   loadDefaultVocabulary(data?: SheetData): boolean {
