@@ -4,6 +4,7 @@ import { vocabularyService } from "@/services/vocabularyService";
 import { VocabularyWord } from "@/types/vocabulary";
 import { stopSpeaking } from "@/utils/speech";
 
+// The hook for next word actions
 export const useWordNavigationActions = (
   setCurrentWord: React.Dispatch<React.SetStateAction<VocabularyWord | null>>,
   clearTimer: () => void,
@@ -55,4 +56,58 @@ export const useWordNavigationActions = (
   return {
     handleManualNext
   };
+};
+
+// Create the main useWordNavigation hook that useVocabularyManager imports
+export const useWordNavigation = (
+  isPaused: boolean,
+  setCurrentWord: React.Dispatch<React.SetStateAction<VocabularyWord | null>>,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  wordChangeInProgressRef: React.MutableRefObject<boolean>,
+  clearTimer: () => void
+) => {
+  const timerRef = React.useRef<number | null>(null);
+
+  // Display next word with proper timing
+  const displayNextWord = useCallback(() => {
+    // Prevent displaying next word if paused
+    if (isPaused) {
+      console.log("Auto-advance paused, not displaying next word");
+      return;
+    }
+
+    // Don't advance if we recently had a manual action
+    const timeSinceLastManualAction = Date.now() - lastManualActionTimeRef.current;
+    if (timeSinceLastManualAction < 1000) {
+      console.log("Recent manual action, delaying auto-advance");
+      return;
+    }
+
+    // Make sure we're not already changing a word
+    if (wordChangeInProgressRef.current) {
+      console.log("Word change already in progress, delaying auto-advance");
+      return;
+    }
+
+    try {
+      // Mark word change as in progress
+      wordChangeInProgressRef.current = true;
+      
+      // Get next word from vocabulary service
+      const nextWord = vocabularyService.getNextWord();
+      if (nextWord) {
+        console.log("Auto-advancing to next word:", nextWord.word);
+        setCurrentWord(nextWord);
+      }
+    } catch (error) {
+      console.error("Error in auto-advance:", error);
+    } finally {
+      // Reset the flag when done
+      setTimeout(() => {
+        wordChangeInProgressRef.current = false;
+      }, 200);
+    }
+  }, [isPaused, lastManualActionTimeRef, setCurrentWord, wordChangeInProgressRef]);
+
+  return { displayNextWord, timerRef };
 };
