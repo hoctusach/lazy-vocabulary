@@ -1,7 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthUser, getCurrentUser } from '@/services/authService';
-import { toast } from 'sonner';
 
 interface UserContextType {
   user: AuthUser | null;

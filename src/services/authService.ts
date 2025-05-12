@@ -1,5 +1,5 @@
 
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 export interface GooglePayload { 
   email: string; 
