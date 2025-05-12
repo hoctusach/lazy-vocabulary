@@ -7,6 +7,10 @@ export interface VocabularyWord {
   example: string;
   count: number | string; // This allows both number and string types
   category?: string; // Making category optional to support existing default vocabulary data
+  // Spaced repetition fields
+  interval?: number;      // days until next review  
+  easeFactor?: number;    // growth rate, default 2.5  
+  nextDue?: string;       // ISO date string of next review  
 }
 
 // Interface for editing or adding words where category is required

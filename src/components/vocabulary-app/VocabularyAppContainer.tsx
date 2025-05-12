@@ -10,6 +10,11 @@ import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
+import { Button } from "@/components/ui/button";
+import { Clock } from "lucide-react";
+import ReviewSession from "./spaced-repetition/ReviewSession";
+import { useReviewSession } from "@/hooks/vocabulary/useReviewSession";
+import { DueCounter } from "./spaced-repetition/DueCounter";
 
 const VocabularyAppContainer: React.FC = () => {
   // Get all state and handlers from our custom hook
@@ -46,6 +51,15 @@ const VocabularyAppContainer: React.FC = () => {
     handleCloseModal
   } = useWordModalState();
 
+  // Review session state management
+  const {
+    isReviewMode,
+    reviewQueue,
+    isLoading,
+    startReviewSession,
+    endReviewSession
+  } = useReviewSession();
+
   // Handler for speech retry
   const handleSpeechRetry = () => {
     retrySpeechInitialization();
@@ -79,60 +93,83 @@ const VocabularyAppContainer: React.FC = () => {
       {/* Error display component */}
       <ErrorDisplay jsonLoadError={jsonLoadError} />
 
-      {hasData && currentWord ? (
-        <>
-          {/* Main vocabulary display */}
-          <VocabularyMain
-            currentWord={currentWord}
-            mute={mute}
-            isPaused={isPaused}
-            voiceRegion={voiceRegion}
-            toggleMute={toggleMute}
-            handleTogglePause={handleTogglePause}
-            handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={handleCategorySwitchDirect} // Use our direct category switch handler
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
-            isSoundPlaying={isSoundPlaying}
-            handleManualNext={handleManualNext}
-            displayTime={displayTime}
-            speechError={speechError}
-            hasSpeechPermission={hasSpeechPermission}
-            handleSpeechRetry={handleSpeechRetry}
+      {hasData ? (
+        isReviewMode ? (
+          // Review Mode
+          <ReviewSession
+            initialQueue={reviewQueue}
+            onComplete={endReviewSession}
+            onCancel={endReviewSession}
           />
-          
-          {/* Action buttons container */}
-          <WordActionButtons 
-            currentWord={currentWord}
-            onOpenAddModal={handleOpenAddWordModal}
-            onOpenEditModal={() => handleOpenEditWordModal(currentWord)}
-          />
-          
-          {/* Debug Panel */}
-          <DebugPanel 
-            isMuted={mute}
-            voiceRegion={voiceRegion}
-            isPaused={isPaused}
-            currentWord={debugPanelData}
-          />
-          
-          {/* Enhanced Word Modal (handles both add and edit) */}
-          <AddWordModal 
-            isOpen={isAddWordModalOpen} 
-            onClose={handleCloseModal} 
-            onSave={handleSaveWord}
-            editMode={isEditMode}
-            wordToEdit={isEditMode && wordToEdit ? {
-              word: wordToEdit.word,
-              meaning: wordToEdit.meaning,
-              example: wordToEdit.example,
-              category: wordToEdit.category || currentCategory
-            } : undefined}
-          />
-        </>
+        ) : (
+          // Normal Vocabulary Mode
+          <>
+            <div className="mb-4 flex justify-between items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={startReviewSession}
+                disabled={isLoading}
+                className="border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100"
+              >
+                <Clock className="h-4 w-4 mr-1" />
+                Start Review
+                <DueCounter />
+              </Button>
+            </div>
+
+            <VocabularyMain
+              currentWord={currentWord}
+              mute={mute}
+              isPaused={isPaused}
+              voiceRegion={voiceRegion}
+              toggleMute={toggleMute}
+              handleTogglePause={handleTogglePause}
+              handleChangeVoice={handleChangeVoice}
+              handleSwitchCategory={handleCategorySwitchDirect}
+              currentCategory={currentCategory}
+              nextCategory={nextCategory}
+              isSoundPlaying={isSoundPlaying}
+              handleManualNext={handleManualNext}
+              displayTime={displayTime}
+              speechError={speechError}
+              hasSpeechPermission={hasSpeechPermission}
+              handleSpeechRetry={handleSpeechRetry}
+            />
+            
+            {/* Action buttons container */}
+            <WordActionButtons 
+              currentWord={currentWord}
+              onOpenAddModal={handleOpenAddWordModal}
+              onOpenEditModal={() => handleOpenEditWordModal(currentWord)}
+            />
+            
+            {/* Debug Panel */}
+            <DebugPanel 
+              isMuted={mute}
+              voiceRegion={voiceRegion}
+              isPaused={isPaused}
+              currentWord={debugPanelData}
+            />
+          </>
+        )
       ) : (
         <WelcomeScreen onFileUploaded={handleFileUploaded} />
       )}
+      
+      {/* Enhanced Word Modal (handles both add and edit) */}
+      <AddWordModal 
+        isOpen={isAddWordModalOpen} 
+        onClose={handleCloseModal} 
+        onSave={handleSaveWord}
+        editMode={isEditMode}
+        wordToEdit={isEditMode && wordToEdit ? {
+          word: wordToEdit.word,
+          meaning: wordToEdit.meaning,
+          example: wordToEdit.example,
+          category: wordToEdit.category || currentCategory
+        } : undefined}
+      />
     </VocabularyLayout>
   );
 };
