@@ -10,12 +10,8 @@ import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useUser } from "@/contexts/UserContext";
 
 const VocabularyAppContainer: React.FC = () => {
-  // Get user context
-  const { user } = useUser();
-  
   // Get all state and handlers from our custom hook
   const {
     hasData,
