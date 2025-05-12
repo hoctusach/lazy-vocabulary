@@ -7,6 +7,9 @@ import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { WordNavigation } from "./WordNavigation";
 
+// Type for vocabulary change listeners
+type VocabularyChangeListener = () => void;
+
 export class VocabularyService {
   private data: SheetData;
   private storage: VocabularyStorage;
@@ -14,6 +17,7 @@ export class VocabularyService {
   private dataProcessor: VocabularyDataProcessor;
   private importer: VocabularyImporter;
   private wordNavigation: WordNavigation;
+  private vocabularyChangeListeners: VocabularyChangeListener[] = [];
   
   readonly sheetOptions: string[];
   
@@ -73,6 +77,9 @@ export class VocabularyService {
         console.log(`Excel import complete: ${newWordCount - originalWordCount} new words added, total ${newWordCount} words`);
         console.log(`Current sheet "${this.wordNavigation.getCurrentSheetName()}" has ${this.data[this.wordNavigation.getCurrentSheetName()]?.length || 0} words`);
         
+        // Notify listeners about vocabulary change
+        this.notifyVocabularyChange();
+        
         return true;
       }
       return false;
@@ -80,6 +87,30 @@ export class VocabularyService {
       console.error("Error processing Excel file in VocabularyService:", error);
       return false;
     }
+  }
+  
+  // Method to get complete word list - adding this for useVocabularyContainerState
+  getWordList(): VocabularyWord[] {
+    const currentSheet = this.wordNavigation.getCurrentSheetName();
+    if (this.data[currentSheet]) {
+      return [...this.data[currentSheet]];
+    }
+    return [];
+  }
+  
+  // Method to add a vocabulary change listener
+  addVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners.push(listener);
+  }
+  
+  // Method to remove a vocabulary change listener
+  removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
+  }
+  
+  // Method to notify all listeners about vocabulary change
+  private notifyVocabularyChange(): void {
+    this.vocabularyChangeListeners.forEach(listener => listener());
   }
   
   private getTotalWordCount(): number {
@@ -112,6 +143,9 @@ export class VocabularyService {
           this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
+          
+          // Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
         })
         .catch(error => {
           console.warn("Failed to load from JSON file, using built-in default vocabulary:", error);
@@ -122,6 +156,9 @@ export class VocabularyService {
           this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
+          
+          // Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
         });
       
       return true;
@@ -136,11 +173,19 @@ export class VocabularyService {
   }
   
   switchSheet(sheetName: string): boolean {
-    return this.wordNavigation.switchSheet(sheetName);
+    const result = this.wordNavigation.switchSheet(sheetName);
+    if (result) {
+      // Notify listeners about vocabulary change when sheet is switched
+      this.notifyVocabularyChange();
+    }
+    return result;
   }
   
   nextSheet(): string {
-    return this.wordNavigation.nextSheet();
+    const result = this.wordNavigation.nextSheet();
+    // Notify listeners about vocabulary change when sheet is changed
+    this.notifyVocabularyChange();
+    return result;
   }
   
   getCurrentWord(): VocabularyWord | null {
@@ -188,5 +233,8 @@ export class VocabularyService {
     
     // Save the updated data to storage
     this.storage.saveData(this.data);
+    
+    // Notify listeners about vocabulary change
+    this.notifyVocabularyChange();
   }
 }

@@ -4,15 +4,15 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 type VoiceOption = {
   label: string;
-  region: 'US' | 'UK';
-  gender: 'male' | 'female';
+  region: 'US' | 'UK';  // Ensuring this is a union type, not just string
+  gender: 'male' | 'female';  // Same for gender
   voice: SpeechSynthesisVoice | null;
 };
 
-const DEFAULT_VOICE_OPTION = {
+const DEFAULT_VOICE_OPTION: VoiceOption = {
   label: "US - Female",
-  region: "US",
-  gender: "female",
+  region: "US" as const,  // Using "as const" to ensure proper type
+  gender: "female" as const,
   voice: null
 };
 
@@ -58,26 +58,26 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         const voiceOptions: VoiceOption[] = [
           {
             label: "US - Female",
-            region: "US",
-            gender: "female",
+            region: "US" as const,
+            gender: "female" as const,
             voice: findVoice(availableVoices, "en-US", ["female", "woman"])
           },
           {
             label: "US - Male",
-            region: "US",
-            gender: "male",
+            region: "US" as const,
+            gender: "male" as const,
             voice: findVoice(availableVoices, "en-US", ["male", "man"])
           },
           {
             label: "UK - Female",
-            region: "UK",
-            gender: "female",
+            region: "UK" as const,
+            gender: "female" as const,
             voice: findVoice(availableVoices, "en-GB", ["female", "woman"])
           },
           {
             label: "UK - Male",
-            region: "UK",
-            gender: "male",
+            region: "UK" as const,
+            gender: "male" as const,
             voice: findVoice(availableVoices, "en-GB", ["male", "man"])
           }
         ];
