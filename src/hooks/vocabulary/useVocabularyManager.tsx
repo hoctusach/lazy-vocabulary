@@ -1,5 +1,5 @@
 
-import { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useVocabularyData } from './useVocabularyData';
 import { usePauseState } from './usePauseState';

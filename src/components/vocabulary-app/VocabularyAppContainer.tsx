@@ -9,7 +9,7 @@ import VocabularyMain from "./VocabularyMain";
 import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
-import { useWordModalState } from "./word-management/useWordModalState";
+import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 
 const VocabularyAppContainer: React.FC = () => {
   // Get all state and handlers from our custom hook
