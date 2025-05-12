@@ -1,5 +1,5 @@
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { vocabularyService } from "@/services/vocabularyService";
 import { VocabularyWord } from "@/types/vocabulary";
 import { stopSpeaking } from "@/utils/speech";
@@ -66,7 +66,7 @@ export const useWordNavigation = (
   wordChangeInProgressRef: React.MutableRefObject<boolean>,
   clearTimer: () => void
 ) => {
-  const timerRef = React.useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   // Display next word with proper timing
   const displayNextWord = useCallback(() => {
