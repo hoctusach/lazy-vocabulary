@@ -10,26 +10,31 @@ interface VocabularyMainProps {
   currentWord: VocabularyWord;
   mute: boolean;
   isPaused: boolean;
-  voiceRegion: "US" | "UK";
   toggleMute: () => void;
   handleTogglePause: () => void;
-  handleChangeVoice: () => void;
+  handleChangeVoice: (voiceLabel: string) => void;
   handleSwitchCategory: (categoryName?: string) => void;
   currentCategory: string;
   nextCategory: string;
   isSoundPlaying: boolean;
   handleManualNext: () => void;
   displayTime: number;
-  speechError: string | null;
-  hasSpeechPermission: boolean;
-  handleSpeechRetry: () => void;
+  speechError?: string | null;
+  hasSpeechPermission?: boolean;
+  handleSpeechRetry?: () => void;
+  voiceOptions: Array<{
+    label: string;
+    region: 'US' | 'UK';
+    gender: 'male' | 'female';
+    voice: SpeechSynthesisVoice | null;
+  }>;
+  selectedVoice: string;
 }
 
 const VocabularyMain: React.FC<VocabularyMainProps> = ({
   currentWord,
   mute,
   isPaused,
-  voiceRegion,
   toggleMute,
   handleTogglePause,
   handleChangeVoice,
@@ -42,6 +47,8 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   speechError,
   hasSpeechPermission,
   handleSpeechRetry,
+  voiceOptions,
+  selectedVoice
 }) => {
   // Handler to prevent rapid clicks on the category button
   const handleCategorySwitch = () => {
@@ -59,16 +66,18 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         >
           <AlertDescription className="flex items-center justify-between">
             <span>{speechError}</span>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleSpeechRetry} 
-              className="ml-4" 
-              aria-label="Retry speech"
-            >
-              <RefreshCcw className="h-4 w-4 mr-2" />
-              Retry Speech
-            </Button>
+            {handleSpeechRetry && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleSpeechRetry} 
+                className="ml-4" 
+                aria-label="Retry speech"
+              >
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Retry Speech
+              </Button>
+            )}
           </AlertDescription>
         </Alert>
       )}
@@ -80,10 +89,9 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         backgroundColor="#ffffff"
         isMuted={mute}
         isPaused={isPaused}
-        voiceRegion={voiceRegion}
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
-        onChangeVoice={handleChangeVoice}
+        onChangeVoice={(selectedOption) => handleChangeVoice(selectedOption)}
         onSwitchCategory={handleCategorySwitch}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
@@ -91,6 +99,8 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onNextWord={handleManualNext}
         displayTime={displayTime}
         category={currentWord.category || currentCategory}
+        voiceOptions={voiceOptions}
+        selectedVoice={selectedVoice}
       />
     </>
   );

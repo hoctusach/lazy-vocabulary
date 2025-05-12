@@ -4,6 +4,14 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface VoiceOption {
+  label: string;
+  region: 'US' | 'UK';
+  gender: 'male' | 'female';
+  voice: SpeechSynthesisVoice | null;
+}
 
 interface VocabularyCardProps {
   word: string;
@@ -12,10 +20,9 @@ interface VocabularyCardProps {
   backgroundColor: string;
   isMuted: boolean;
   isPaused: boolean;
-  voiceRegion: 'US' | 'UK';
   onToggleMute: () => void;
   onTogglePause: () => void;
-  onChangeVoice: () => void;
+  onChangeVoice: (voiceLabel: string) => void;
   onSwitchCategory: () => void;
   onNextWord: () => void;
   currentCategory: string;
@@ -23,6 +30,8 @@ interface VocabularyCardProps {
   isSpeaking?: boolean;
   displayTime?: number;
   category?: string;
+  voiceOptions: VoiceOption[];
+  selectedVoice: string;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -32,7 +41,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   backgroundColor,
   isMuted,
   isPaused,
-  voiceRegion,
   onToggleMute,
   onTogglePause,
   onChangeVoice,
@@ -42,7 +50,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   nextCategory,
   isSpeaking = false,
   displayTime,
-  category
+  category,
+  voiceOptions,
+  selectedVoice
 }) => {
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
@@ -55,16 +65,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
     };
   }, [word]);
 
-  // Save button states to localStorage
-  useEffect(() => {
-    localStorage.setItem('buttonStates', JSON.stringify({
-      isMuted,
-      isPaused,
-      voiceRegion,
-      currentCategory
-    }));
-  }, [isMuted, isPaused, voiceRegion, currentCategory]);
-
+  // Parse word to separate types and phonetics
   const wordParts = word.split(/\s*\(([^)]+)\)/);
   const mainWord = wordParts[0].trim();
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
@@ -105,8 +106,27 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
+          {/* Voice selector */}
+          <div className="mb-2 mt-4">
+            <Select 
+              value={selectedVoice} 
+              onValueChange={onChangeVoice}
+            >
+              <SelectTrigger className="w-full h-8 text-sm">
+                <SelectValue placeholder="Select voice" />
+              </SelectTrigger>
+              <SelectContent>
+                {voiceOptions.map(option => (
+                  <SelectItem key={option.label} value={option.label}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
           {/* Control buttons wrapper - updated to flex-wrap */}
-          <div className="flex flex-wrap gap-1 pt-2">
+          <div className="flex flex-wrap gap-1 pt-1">
             <Button
               variant="outline"
               size="sm"
@@ -118,15 +138,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             >
               {isMuted ? <VolumeX size={14} className="mr-1" /> : <Volume2 size={14} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onChangeVoice}
-              className="h-7 text-xs px-2 text-blue-700"
-            >
-              {voiceRegion === 'US' ? 'UK' : 'US'} Accent
             </Button>
             
             <Button

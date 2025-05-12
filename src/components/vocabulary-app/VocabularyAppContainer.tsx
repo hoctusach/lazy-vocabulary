@@ -10,31 +10,35 @@ import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
+import { useVocabularyPlayback } from "@/hooks/useVocabularyPlayback";
 
 const VocabularyAppContainer: React.FC = () => {
-  // Get all state and handlers from our custom hook
+  // Get base vocabulary state
   const {
     hasData,
     currentWord,
     isPaused,
     handleFileUploaded,
-    handleTogglePause,
-    handleManualNext,
     jsonLoadError,
-    mute,
-    voiceRegion,
-    toggleMute,
-    handleChangeVoice,
-    speechError,
-    hasSpeechPermission,
-    retrySpeechInitialization,
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    isSoundPlaying,
     displayTime,
-    debugPanelData
+    debugPanelData,
+    wordList
   } = useVocabularyContainerState();
+
+  // Use our new playback hook for all speech functionality
+  const {
+    muted,
+    paused,
+    voices,
+    selectedVoice,
+    toggleMute,
+    togglePause,
+    goToNextWord,
+    changeVoice
+  } = useVocabularyPlayback(wordList || []);
 
   // Modal state management
   const {
@@ -46,12 +50,7 @@ const VocabularyAppContainer: React.FC = () => {
     handleCloseModal
   } = useWordModalState();
 
-  // Handler for speech retry
-  const handleSpeechRetry = () => {
-    retrySpeechInitialization();
-  };
-
-  // Word management operations - call function with props when currentWord exists
+  // Word management operations
   const wordManager = currentWord ? VocabularyWordManager({
     currentWord,
     currentCategory,
@@ -64,9 +63,8 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
-  // Direct category switch handler that properly switches categories for playback
+  // Direct category switch handler
   const handleCategorySwitchDirect = (categoryName?: string) => {
-    // If a specific category is provided, use it; otherwise use the next category in rotation
     const targetCategory = categoryName || nextCategory;
     if (targetCategory) {
       console.log(`Switching directly to category: ${targetCategory}`);
@@ -84,21 +82,19 @@ const VocabularyAppContainer: React.FC = () => {
           {/* Main vocabulary display */}
           <VocabularyMain
             currentWord={currentWord}
-            mute={mute}
-            isPaused={isPaused}
-            voiceRegion={voiceRegion}
+            mute={muted}
+            isPaused={paused}
             toggleMute={toggleMute}
-            handleTogglePause={handleTogglePause}
-            handleChangeVoice={handleChangeVoice}
-            handleSwitchCategory={handleCategorySwitchDirect} // Use our direct category switch handler
+            handleTogglePause={togglePause}
+            handleChangeVoice={changeVoice}
+            handleSwitchCategory={handleCategorySwitchDirect}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
-            isSoundPlaying={isSoundPlaying}
-            handleManualNext={handleManualNext}
+            isSoundPlaying={!muted && !paused}
+            handleManualNext={goToNextWord}
             displayTime={displayTime}
-            speechError={speechError}
-            hasSpeechPermission={hasSpeechPermission}
-            handleSpeechRetry={handleSpeechRetry}
+            voiceOptions={voices}
+            selectedVoice={selectedVoice.label}
           />
           
           {/* Action buttons container */}
@@ -110,9 +106,9 @@ const VocabularyAppContainer: React.FC = () => {
           
           {/* Debug Panel */}
           <DebugPanel 
-            isMuted={mute}
-            voiceRegion={voiceRegion}
-            isPaused={isPaused}
+            isMuted={muted}
+            voiceRegion={selectedVoice.region}
+            isPaused={paused}
             currentWord={debugPanelData}
           />
           
