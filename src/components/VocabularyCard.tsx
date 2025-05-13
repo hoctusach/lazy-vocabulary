@@ -4,7 +4,6 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface VoiceOption {
   label: string;
@@ -70,9 +69,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const mainWord = wordParts[0].trim();
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
-
-  // Get currently selected voice option
-  const currentVoiceOption = voiceOptions.find(v => v.label === selectedVoice) || voiceOptions[0];
 
   return (
     <Card 
@@ -157,32 +153,23 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
             
-            {/* Voice selector as dropdown button */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-7 text-xs px-2 text-blue-700"
-                >
-                  {currentVoiceOption?.region || "US"} {currentVoiceOption?.gender === 'female' ? '♀' : '♂'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {voiceOptions.map(option => (
-                  <DropdownMenuItem 
-                    key={option.label}
-                    onClick={() => onChangeVoice(option.label)}
-                    className={cn(
-                      "text-sm cursor-pointer",
-                      selectedVoice === option.label && "font-bold bg-blue-50"
-                    )}
-                  >
-                    {option.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* FIXED: Voice selector as individual buttons with clear text labels */}
+            {voiceOptions.map(option => (
+              <Button 
+                key={option.label}
+                variant="outline" 
+                size="sm" 
+                onClick={() => onChangeVoice(option.label)}
+                className={cn(
+                  "h-7 text-xs px-2",
+                  selectedVoice === option.label 
+                    ? "text-blue-700 border-blue-300 bg-blue-50" 
+                    : "text-gray-700"
+                )}
+              >
+                {option.label}
+              </Button>
+            ))}
           </div>
         </div>
       </CardContent>

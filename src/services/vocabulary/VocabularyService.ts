@@ -1,3 +1,4 @@
+
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
@@ -48,7 +49,7 @@ export class VocabularyService {
     console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
   
-  // Method to get complete word list - adding this for useVocabularyContainerState
+  // FIXED: Method to get complete word list for useVocabularyContainerState
   getWordList(): VocabularyWord[] {
     const currentSheet = this.wordNavigation.getCurrentSheetName();
     if (this.data[currentSheet]) {
@@ -57,12 +58,12 @@ export class VocabularyService {
     return [];
   }
   
-  // Method to add a vocabulary change listener
+  // FIXED: Method to add a vocabulary change listener
   addVocabularyChangeListener(listener: VocabularyChangeListener): void {
     this.vocabularyChangeListeners.push(listener);
   }
   
-  // Method to remove a vocabulary change listener
+  // FIXED: Method to remove a vocabulary change listener
   removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
     this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
   }
@@ -111,7 +112,7 @@ export class VocabularyService {
         console.log(`Excel import complete: ${newWordCount - originalWordCount} new words added, total ${newWordCount} words`);
         console.log(`Current sheet "${this.wordNavigation.getCurrentSheetName()}" has ${this.data[this.wordNavigation.getCurrentSheetName()]?.length || 0} words`);
         
-        // Notify listeners about vocabulary change
+        // FIXED: Notify listeners about vocabulary change
         this.notifyVocabularyChange();
         
         return true;
@@ -143,7 +144,7 @@ export class VocabularyService {
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
-          // Notify listeners about vocabulary change
+          // FIXED: Notify listeners about vocabulary change
           this.notifyVocabularyChange();
         })
         .catch(error => {
@@ -156,7 +157,7 @@ export class VocabularyService {
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
-          // Notify listeners about vocabulary change
+          // FIXED: Notify listeners about vocabulary change
           this.notifyVocabularyChange();
         });
       
@@ -174,7 +175,7 @@ export class VocabularyService {
   switchSheet(sheetName: string): boolean {
     const result = this.wordNavigation.switchSheet(sheetName);
     if (result) {
-      // Notify listeners about vocabulary change when sheet is switched
+      // FIXED: Notify listeners about vocabulary change when sheet is switched
       this.notifyVocabularyChange();
     }
     return result;
@@ -182,7 +183,7 @@ export class VocabularyService {
   
   nextSheet(): string {
     const result = this.wordNavigation.nextSheet();
-    // Notify listeners about vocabulary change when sheet is changed
+    // FIXED: Notify listeners about vocabulary change when sheet is changed
     this.notifyVocabularyChange();
     return result;
   }
@@ -233,7 +234,7 @@ export class VocabularyService {
     // Save the updated data to storage
     this.storage.saveData(this.data);
     
-    // Notify listeners about vocabulary change
+    // FIXED: Notify listeners about vocabulary change
     this.notifyVocabularyChange();
   }
 }

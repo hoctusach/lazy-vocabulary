@@ -4,14 +4,14 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 type VoiceOption = {
   label: string;
-  region: 'US' | 'UK';  // Ensuring this is a union type, not just string
-  gender: 'male' | 'female';  // Same for gender
-  voice: SpeechSynthesisVoice | null;
+  region: 'US' | 'UK';
+  gender: 'male' | 'female';
+  voice: SpeechSynthesisUtterance['voice'];
 };
 
 const DEFAULT_VOICE_OPTION: VoiceOption = {
-  label: "US - Female",
-  region: "US" as const,  // Using "as const" to ensure proper type
+  label: "US Female",
+  region: "US" as const,
   gender: "female" as const,
   voice: null
 };
@@ -57,25 +57,25 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       if (availableVoices.length) {
         const voiceOptions: VoiceOption[] = [
           {
-            label: "US - Female",
+            label: "US Female",
             region: "US" as const,
             gender: "female" as const,
             voice: findVoice(availableVoices, "en-US", ["female", "woman"])
           },
           {
-            label: "US - Male",
+            label: "US Male",
             region: "US" as const,
             gender: "male" as const,
             voice: findVoice(availableVoices, "en-US", ["male", "man"])
           },
           {
-            label: "UK - Female",
+            label: "UK Female",
             region: "UK" as const,
             gender: "female" as const,
             voice: findVoice(availableVoices, "en-GB", ["female", "woman"])
           },
           {
-            label: "UK - Male",
+            label: "UK Male",
             region: "UK" as const,
             gender: "male" as const,
             voice: findVoice(availableVoices, "en-GB", ["male", "man"])
@@ -152,7 +152,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [muted, selectedVoice]);
   
-  // Function to advance to the next word - moved before playCurrentWord to fix repetition bug
+  // FIXED: Function to advance to the next word - moved before playCurrentWord to avoid repetition bug
   const advanceToNext = useCallback(() => {
     if (wordList.length === 0) return;
     
@@ -162,7 +162,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   
   // Function to play the current word
   const playCurrentWord = useCallback(() => {
-    if (!currentWord) return;
+    if (!currentWord || wordList.length === 0) return;
     
     // Don't play if muted
     if (muted) {
@@ -195,14 +195,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     utterance.rate = 0.9; // Slightly slower for better comprehension
     utterance.pitch = 1;
     
-    // Set up event handlers
+    // FIXED: Set up event handlers to advance to next word when speech ends
     utterance.onend = () => {
       speechEndedRef.current = true;
-      // Only auto-advance if not paused
+      // FIXED: Only auto-advance if not paused
       if (!paused && !muted) {
-        // First advance to next word, then play - fixes repetition bug
+        // FIXED: First advance to next word, then play - fixes repetition bug
         advanceToNext();
-        // Small delay to ensure index is updated
+        // Small delay to ensure index is updated before playing
         setTimeout(() => playCurrentWord(), 50);
       }
     };
@@ -215,7 +215,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     // Start speaking
     console.log(`Speaking word: ${wordText}`);
     window.speechSynthesis.speak(utterance);
-  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext]);
+  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext, wordList.length]);
   
   // Handle mute toggling
   const toggleMute = useCallback(() => {
@@ -246,7 +246,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     });
   }, [muted, playCurrentWord]);
   
-  // Handle manual next
+  // FIXED: Handle manual next - properly wired to advance and play
   const goToNextWord = useCallback(() => {
     // Cancel any current speech
     window.speechSynthesis.cancel();
@@ -278,12 +278,12 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [voices, muted, paused, playCurrentWord]);
   
-  // Start playback when first mounting
+  // Start playback when first mounting or when wordList changes
   useEffect(() => {
-    if (currentWord && !muted && !paused) {
+    if (wordList.length > 0 && currentWord && !muted && !paused) {
       playCurrentWord();
     }
-  }, [currentWord, muted, paused, playCurrentWord]);
+  }, [currentWord, muted, paused, playCurrentWord, wordList]);
   
   return {
     currentWord,
