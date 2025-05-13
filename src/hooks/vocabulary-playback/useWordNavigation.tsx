@@ -1,5 +1,5 @@
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useWordNavigation = (
