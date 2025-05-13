@@ -37,7 +37,8 @@ const VocabularyAppContainer: React.FC = () => {
     toggleMute,
     togglePause,
     goToNextWord,
-    changeVoice
+    changeVoice,
+    currentWord: playbackCurrentWord // This is the single source of truth
   } = useVocabularyPlayback(wordList || []);
 
   // Modal state management
@@ -50,9 +51,12 @@ const VocabularyAppContainer: React.FC = () => {
     handleCloseModal
   } = useWordModalState();
 
+  // Use the current word from playback system as single source of truth
+  const displayWord = playbackCurrentWord || currentWord;
+
   // Word management operations
-  const wordManager = currentWord ? VocabularyWordManager({
-    currentWord,
+  const wordManager = displayWord ? VocabularyWordManager({
+    currentWord: displayWord,
     currentCategory,
     onWordSaved: handleCloseModal
   }) : null;
@@ -77,11 +81,11 @@ const VocabularyAppContainer: React.FC = () => {
       {/* Error display component */}
       <ErrorDisplay jsonLoadError={jsonLoadError} />
 
-      {hasData && currentWord ? (
+      {hasData && displayWord ? (
         <>
           {/* Main vocabulary display */}
           <VocabularyMain
-            currentWord={currentWord}
+            currentWord={displayWord}
             mute={muted}
             isPaused={paused}
             toggleMute={toggleMute}
@@ -99,9 +103,9 @@ const VocabularyAppContainer: React.FC = () => {
           
           {/* Action buttons container */}
           <WordActionButtons 
-            currentWord={currentWord}
+            currentWord={displayWord}
             onOpenAddModal={handleOpenAddWordModal}
-            onOpenEditModal={() => handleOpenEditWordModal(currentWord)}
+            onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
           />
           
           {/* Debug Panel */}

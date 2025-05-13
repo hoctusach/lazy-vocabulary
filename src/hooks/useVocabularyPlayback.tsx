@@ -26,10 +26,16 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   
   // Refs for managing ongoing processes
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const speechEndedRef = useRef(true);
   
-  // Find the current word based on the index
+  // Find the current word based on the index - this is the single source of truth
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
+  
+  // Debug logs to track sync
+  useEffect(() => {
+    if (currentWord) {
+      console.log(`Current index: ${currentIndex}, Current word: ${currentWord.word}`);
+    }
+  }, [currentIndex, currentWord]);
   
   // Load available voices when the component mounts
   useEffect(() => {
@@ -132,23 +138,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [muted, selectedVoice.region]);
   
-  // Function to advance to the next word
-  const advanceToNext = useCallback(() => {
-    if (wordList.length === 0) return;
-    
-    // Move to the next word, wrapping around if needed
-    setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
-  }, [wordList.length]);
-  
-  // Function to play the current word
+  // Function to play the current word - unified audio and display logic
   const playCurrentWord = useCallback(() => {
     // First ensure we have a word to play and are not muted/paused
     if (!currentWord || wordList.length === 0 || muted || paused) {
-      speechEndedRef.current = true;
       return;
     }
     
-    console.log(`Playing current word at index ${currentIndex}: ${currentWord.word}`);
+    console.log(`Playing word: ${currentWord.word} (index ${currentIndex})`);
     
     // Cancel any ongoing speech to prevent queuing
     window.speechSynthesis.cancel();
@@ -163,7 +160,6 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     const exampleText = currentWord.example;
     
     utterance.text = `${wordText}. ${meaningText}. ${exampleText}`;
-    speechEndedRef.current = false;
     
     // Set the selected voice if available
     if (selectedVoice.voice) {
@@ -175,35 +171,49 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     utterance.rate = 0.9; // Slightly slower for better comprehension
     utterance.pitch = 1;
     
-    // Set up event handlers for auto-advancement and error handling
+    // Set up event handlers for auto-advancement
     utterance.onend = () => {
-      speechEndedRef.current = true;
+      console.log(`Speech ended for: ${currentWord.word}`);
       
       // Only auto-advance if not paused and not muted
       if (!paused && !muted) {
-        // First advance to next word
-        advanceToNext();
-        
-        // Then play the new word (brief delay to ensure state update)
-        setTimeout(() => playCurrentWord(), 50);
+        // Advance to the next word
+        setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
+        // Note: We don't call playCurrentWord() here - the useEffect will handle that
       }
     };
     
     utterance.onerror = (event) => {
       console.error('Speech synthesis error:', event.error);
-      speechEndedRef.current = true;
+      
+      // On error, also advance to next word to prevent getting stuck
+      if (!paused && !muted) {
+        setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
+      }
     };
     
     // Start speaking
     window.speechSynthesis.speak(utterance);
-  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext, currentIndex, wordList.length]);
+  }, [currentWord, muted, paused, selectedVoice.voice, currentIndex, wordList.length]);
   
-  // Start playback when first mounting or when wordList, paused, or muted changes
+  // This effect handles playing words whenever relevant state changes
   useEffect(() => {
-    if (wordList.length > 0 && !muted && !paused) {
+    if (wordList.length > 0 && !muted && !paused && currentWord) {
       playCurrentWord();
     }
-  }, [wordList, muted, paused, playCurrentWord]);
+  }, [wordList, muted, paused, currentIndex, playCurrentWord, currentWord]);
+  
+  // Function to advance to the next word - for manual navigation
+  const advanceToNext = useCallback(() => {
+    // Cancel any ongoing speech
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    // Move to the next word, wrapping around if needed
+    setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
+    // Note: The useEffect will handle playing the word if needed
+  }, [wordList.length]);
   
   // Handle mute toggling
   const toggleMute = useCallback(() => {
@@ -213,15 +223,11 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       if (newMuted) {
         // When muting, cancel any current speech
         window.speechSynthesis.cancel();
-        speechEndedRef.current = true;
-      } else if (!paused) {
-        // When unmuting (and not paused), start playing
-        setTimeout(() => playCurrentWord(), 50);
       }
       
       return newMuted;
     });
-  }, [paused, playCurrentWord]);
+  }, []);
   
   // Handle pause toggling
   const togglePause = useCallback(() => {
@@ -231,37 +237,23 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       if (newPaused) {
         // When pausing, cancel current speech
         window.speechSynthesis.cancel();
-        speechEndedRef.current = true;
-      } else if (!muted) {
-        // When unpausing (and not muted), start playing
-        setTimeout(() => playCurrentWord(), 50);
       }
       
       return newPaused;
     });
-  }, [muted, playCurrentWord]);
+  }, []);
   
-  // Handle manual next - properly wired to advance and play
+  // Handle manual next - properly wired to advance
   const goToNextWord = useCallback(() => {
-    // Cancel any current speech
-    window.speechSynthesis.cancel();
-    speechEndedRef.current = true;
-    
-    // Advance to the next word first
+    // Cancel any current speech and advance
     advanceToNext();
-    
-    // Then play the new word if not muted or paused
-    if (!muted && !paused) {
-      setTimeout(() => playCurrentWord(), 50);
-    }
-  }, [advanceToNext, muted, paused, playCurrentWord]);
+  }, [advanceToNext]);
   
   // Handle voice selection
   const changeVoice = useCallback((voiceRegion: 'US' | 'UK') => {
     const selectedOption = voices.find(v => v.region === voiceRegion);
     if (selectedOption) {
       setSelectedVoice(selectedOption);
-      
       // We DON'T cancel current speech when changing voice
       // It will apply on the next word as requested
     }
