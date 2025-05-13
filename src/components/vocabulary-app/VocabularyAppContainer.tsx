@@ -28,7 +28,7 @@ const VocabularyAppContainer: React.FC = () => {
     wordList
   } = useVocabularyContainerState();
 
-  // Use our new playback hook for all speech functionality
+  // Use our playback hook for all speech functionality
   const {
     muted,
     paused,
@@ -94,7 +94,7 @@ const VocabularyAppContainer: React.FC = () => {
             handleManualNext={goToNextWord}
             displayTime={displayTime}
             voiceOptions={voices}
-            selectedVoice={selectedVoice.label}
+            selectedVoice={selectedVoice.region}
           />
           
           {/* Action buttons container */}

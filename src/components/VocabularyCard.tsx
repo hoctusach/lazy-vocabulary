@@ -21,7 +21,7 @@ interface VocabularyCardProps {
   isPaused: boolean;
   onToggleMute: () => void;
   onTogglePause: () => void;
-  onChangeVoice: (voiceLabel: string) => void;
+  onChangeVoice: (voiceRegion: 'US' | 'UK') => void;
   onSwitchCategory: () => void;
   onNextWord: () => void;
   currentCategory: string;
@@ -153,21 +153,21 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
             </Button>
             
-            {/* FIXED: Voice selector as individual buttons with clear text labels */}
+            {/* Simplified accent buttons - just US and UK */}
             {voiceOptions.map(option => (
               <Button 
-                key={option.label}
+                key={option.region}
                 variant="outline" 
                 size="sm" 
-                onClick={() => onChangeVoice(option.label)}
+                onClick={() => onChangeVoice(option.region)}
                 className={cn(
                   "h-7 text-xs px-2",
-                  selectedVoice === option.label 
+                  selectedVoice === option.region 
                     ? "text-blue-700 border-blue-300 bg-blue-50" 
                     : "text-gray-700"
                 )}
               >
-                {option.label}
+                {option.region}
               </Button>
             ))}
           </div>

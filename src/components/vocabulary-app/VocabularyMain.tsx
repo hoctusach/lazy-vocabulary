@@ -12,7 +12,7 @@ interface VocabularyMainProps {
   isPaused: boolean;
   toggleMute: () => void;
   handleTogglePause: () => void;
-  handleChangeVoice: (voiceLabel: string) => void;
+  handleChangeVoice: (voiceRegion: 'US' | 'UK') => void;
   handleSwitchCategory: (categoryName?: string) => void;
   currentCategory: string;
   nextCategory: string;
@@ -91,7 +91,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         isPaused={isPaused}
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
-        onChangeVoice={(selectedOption) => handleChangeVoice(selectedOption)}
+        onChangeVoice={handleChangeVoice}
         onSwitchCategory={handleCategorySwitch}
         currentCategory={currentCategory}
         nextCategory={nextCategory}

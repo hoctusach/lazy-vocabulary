@@ -10,7 +10,7 @@ type VoiceOption = {
 };
 
 const DEFAULT_VOICE_OPTION: VoiceOption = {
-  label: "US Female",
+  label: "US",
   region: "US" as const,
   gender: "female" as const,
   voice: null
@@ -37,12 +37,12 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     try {
       const savedSettings = localStorage.getItem('vocabularySettings');
       if (savedSettings) {
-        const { muted: savedMuted, voiceLabel } = JSON.parse(savedSettings);
+        const { muted: savedMuted, voiceRegion } = JSON.parse(savedSettings);
         setMuted(!!savedMuted);
         
         // We'll set the selected voice after loading the voice list
-        if (voiceLabel) {
-          console.log(`Found saved voice preference: ${voiceLabel}`);
+        if (voiceRegion) {
+          console.log(`Found saved voice preference: ${voiceRegion}`);
         }
       }
     } catch (error) {
@@ -57,28 +57,16 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       if (availableVoices.length) {
         const voiceOptions: VoiceOption[] = [
           {
-            label: "US Female",
+            label: "US",
             region: "US" as const,
             gender: "female" as const,
-            voice: findVoice(availableVoices, "en-US", ["female", "woman"])
+            voice: findVoice(availableVoices, "en-US")
           },
           {
-            label: "US Male",
-            region: "US" as const,
-            gender: "male" as const,
-            voice: findVoice(availableVoices, "en-US", ["male", "man"])
-          },
-          {
-            label: "UK Female",
+            label: "UK",
             region: "UK" as const,
             gender: "female" as const,
-            voice: findVoice(availableVoices, "en-GB", ["female", "woman"])
-          },
-          {
-            label: "UK Male",
-            region: "UK" as const,
-            gender: "male" as const,
-            voice: findVoice(availableVoices, "en-GB", ["male", "man"])
+            voice: findVoice(availableVoices, "en-GB")
           }
         ];
         
@@ -88,8 +76,8 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         try {
           const savedSettings = localStorage.getItem('vocabularySettings');
           if (savedSettings) {
-            const { voiceLabel } = JSON.parse(savedSettings);
-            const savedVoice = voiceOptions.find(v => v.label === voiceLabel);
+            const { voiceRegion } = JSON.parse(savedSettings);
+            const savedVoice = voiceOptions.find(v => v.region === voiceRegion);
             if (savedVoice) {
               setSelectedVoice(savedVoice);
             }
@@ -100,17 +88,9 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       }
     };
 
-    // Find appropriate voice based on language and gender
-    const findVoice = (availableVoices: SpeechSynthesisVoice[], lang: string, genderHints: string[]) => {
-      // First try to find a voice with exact language match and gender hint in the name
-      const voiceWithGender = availableVoices.find(voice => 
-        voice.lang.startsWith(lang) && 
-        genderHints.some(hint => voice.name.toLowerCase().includes(hint))
-      );
-      
-      if (voiceWithGender) return voiceWithGender;
-      
-      // If no match with gender, just use any voice with the right language
+    // Find appropriate voice based on language
+    const findVoice = (availableVoices: SpeechSynthesisVoice[], lang: string) => {
+      // First try to find a voice with exact language match
       const voiceWithLang = availableVoices.find(voice => voice.lang.startsWith(lang));
       if (voiceWithLang) return voiceWithLang;
       
@@ -145,32 +125,32 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     try {
       localStorage.setItem('vocabularySettings', JSON.stringify({
         muted,
-        voiceLabel: selectedVoice.label
+        voiceRegion: selectedVoice.region
       }));
     } catch (error) {
       console.error('Error saving settings:', error);
     }
-  }, [muted, selectedVoice]);
+  }, [muted, selectedVoice.region]);
   
-  // FIXED: Function to advance to the next word - moved before playCurrentWord to avoid repetition bug
+  // Function to advance to the next word
   const advanceToNext = useCallback(() => {
     if (wordList.length === 0) return;
     
     // Move to the next word, wrapping around if needed
-    setCurrentIndex(prev => (prev + 1) % wordList.length);
+    setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
   }, [wordList.length]);
   
   // Function to play the current word
   const playCurrentWord = useCallback(() => {
-    if (!currentWord || wordList.length === 0) return;
-    
-    // Don't play if muted
-    if (muted) {
+    // First ensure we have a word to play and are not muted/paused
+    if (!currentWord || wordList.length === 0 || muted || paused) {
       speechEndedRef.current = true;
       return;
     }
     
-    // Cancel any ongoing speech
+    console.log(`Playing current word at index ${currentIndex}: ${currentWord.word}`);
+    
+    // Cancel any ongoing speech to prevent queuing
     window.speechSynthesis.cancel();
     
     // Create a new utterance
@@ -195,14 +175,16 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     utterance.rate = 0.9; // Slightly slower for better comprehension
     utterance.pitch = 1;
     
-    // FIXED: Set up event handlers to advance to next word when speech ends
+    // Set up event handlers for auto-advancement and error handling
     utterance.onend = () => {
       speechEndedRef.current = true;
-      // FIXED: Only auto-advance if not paused
+      
+      // Only auto-advance if not paused and not muted
       if (!paused && !muted) {
-        // FIXED: First advance to next word, then play - fixes repetition bug
+        // First advance to next word
         advanceToNext();
-        // Small delay to ensure index is updated before playing
+        
+        // Then play the new word (brief delay to ensure state update)
         setTimeout(() => playCurrentWord(), 50);
       }
     };
@@ -213,9 +195,15 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     };
     
     // Start speaking
-    console.log(`Speaking word: ${wordText}`);
     window.speechSynthesis.speak(utterance);
-  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext, wordList.length]);
+  }, [currentWord, muted, paused, selectedVoice.voice, advanceToNext, currentIndex, wordList.length]);
+  
+  // Start playback when first mounting or when wordList, paused, or muted changes
+  useEffect(() => {
+    if (wordList.length > 0 && !muted && !paused) {
+      playCurrentWord();
+    }
+  }, [wordList, muted, paused, playCurrentWord]);
   
   // Handle mute toggling
   const toggleMute = useCallback(() => {
@@ -226,19 +214,26 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         // When muting, cancel any current speech
         window.speechSynthesis.cancel();
         speechEndedRef.current = true;
+      } else if (!paused) {
+        // When unmuting (and not paused), start playing
+        setTimeout(() => playCurrentWord(), 50);
       }
       
       return newMuted;
     });
-  }, []);
+  }, [paused, playCurrentWord]);
   
   // Handle pause toggling
   const togglePause = useCallback(() => {
     setPaused(prev => {
       const newPaused = !prev;
       
-      if (!newPaused && speechEndedRef.current && !muted) {
-        // If unpausing and the current word has finished, play the current word
+      if (newPaused) {
+        // When pausing, cancel current speech
+        window.speechSynthesis.cancel();
+        speechEndedRef.current = true;
+      } else if (!muted) {
+        // When unpausing (and not muted), start playing
         setTimeout(() => playCurrentWord(), 50);
       }
       
@@ -246,7 +241,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     });
   }, [muted, playCurrentWord]);
   
-  // FIXED: Handle manual next - properly wired to advance and play
+  // Handle manual next - properly wired to advance and play
   const goToNextWord = useCallback(() => {
     // Cancel any current speech
     window.speechSynthesis.cancel();
@@ -262,28 +257,15 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   }, [advanceToNext, muted, paused, playCurrentWord]);
   
   // Handle voice selection
-  const changeVoice = useCallback((voiceLabel: string) => {
-    const selectedOption = voices.find(v => v.label === voiceLabel);
+  const changeVoice = useCallback((voiceRegion: 'US' | 'UK') => {
+    const selectedOption = voices.find(v => v.region === voiceRegion);
     if (selectedOption) {
       setSelectedVoice(selectedOption);
       
-      // Cancel current speech when changing voice
-      window.speechSynthesis.cancel();
-      speechEndedRef.current = true;
-      
-      // If currently playing and not muted, restart with new voice
-      if (!speechEndedRef.current && !muted && !paused) {
-        setTimeout(() => playCurrentWord(), 50);
-      }
+      // We DON'T cancel current speech when changing voice
+      // It will apply on the next word as requested
     }
-  }, [voices, muted, paused, playCurrentWord]);
-  
-  // Start playback when first mounting or when wordList changes
-  useEffect(() => {
-    if (wordList.length > 0 && currentWord && !muted && !paused) {
-      playCurrentWord();
-    }
-  }, [currentWord, muted, paused, playCurrentWord, wordList]);
+  }, [voices]);
   
   return {
     currentWord,
