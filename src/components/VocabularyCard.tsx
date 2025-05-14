@@ -70,6 +70,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
 
+  // Safety check for nextCategory - ensure it's a string
+  const safeNextCategory = nextCategory || 'Next';
+
   return (
     <Card 
       className={cn(
@@ -150,7 +153,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               className="h-7 text-xs px-2 text-green-700"
             >
               <RefreshCw size={12} className="mr-1" />
-              {nextCategory.charAt(0).toUpperCase() + nextCategory.slice(1)}
+              {safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1)}
             </Button>
             
             {/* Simplified accent buttons - just US and UK */}

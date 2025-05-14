@@ -19,7 +19,7 @@ interface VocabularyMainProps {
   nextCategory: string | null;
   isSoundPlaying: boolean;
   displayTime: number;
-  voiceOptions: Array<{ label: string, region: string }>;
+  voiceOptions: Array<{ label: string, region: 'US' | 'UK', gender: 'male' | 'female', voice: SpeechSynthesisVoice | null }>;
   selectedVoice: 'US' | 'UK';
 }
 
@@ -49,6 +49,20 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         meaning={currentWord.meaning}
         example={currentWord.example}
         backgroundColor={backgroundColor}
+        isMuted={mute}
+        isPaused={isPaused}
+        onToggleMute={toggleMute}
+        onTogglePause={handleTogglePause}
+        onChangeVoice={handleChangeVoice}
+        onSwitchCategory={() => handleSwitchCategory()}
+        onNextWord={handleManualNext}
+        currentCategory={currentCategory}
+        nextCategory={nextCategory || 'Next'}
+        isSpeaking={isSoundPlaying}
+        displayTime={displayTime}
+        category={currentWord.category || currentCategory}
+        voiceOptions={voiceOptions}
+        selectedVoice={selectedVoice}
       />
 
       <VocabularyControls
