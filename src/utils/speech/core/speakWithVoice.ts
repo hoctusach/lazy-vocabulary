@@ -1,4 +1,3 @@
-
 import { getSpeechRate } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';
@@ -40,6 +39,10 @@ export async function speakWithVoice({
   // Use the correct language code based on the selected region
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
   console.log(`[VOICE] Using ${region} voice (${langCode})`);
+  
+  // First wait for voices to load (addressing the not-allowed error)
+  await new Promise(resolve => setTimeout(resolve, 0));
+  window.speechSynthesis.getVoices(); // Trigger loading of voices
   
   // Specifically get a voice for the selected region
   const voice = getVoiceByRegion(region);
