@@ -10,14 +10,14 @@ import WordActionButtons from "./WordActionButtons";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyPlayback } from "@/hooks/useVocabularyPlayback";
+import { useVocabularyPlayback } from "@/hooks/vocabulary-playback";
 
 const VocabularyAppContainer: React.FC = () => {
   // Get base vocabulary state
   const {
     hasData,
-    currentWord,
-    isPaused,
+    currentWord: originalCurrentWord,
+    isPaused: originalIsPaused,
     handleFileUploaded,
     jsonLoadError,
     handleSwitchCategory,
@@ -28,7 +28,7 @@ const VocabularyAppContainer: React.FC = () => {
     wordList
   } = useVocabularyContainerState();
 
-  // Use our playback hook for all speech functionality
+  // Use our new unified playback hook for all speech functionality
   const {
     muted,
     paused,
@@ -43,11 +43,12 @@ const VocabularyAppContainer: React.FC = () => {
     userInteractionRef
   } = useVocabularyPlayback(wordList || []);
 
-  // Force initialization of speech synthesis
+  // Force initialization of speech synthesis on component mount
   useEffect(() => {
     if (window.speechSynthesis) {
       // Just accessing this property ensures it's initialized
-      window.speechSynthesis.getVoices();
+      const voices = window.speechSynthesis.getVoices();
+      console.log(`Initial voices load: ${voices.length} voices available`);
     }
   }, []);
 
@@ -62,7 +63,7 @@ const VocabularyAppContainer: React.FC = () => {
   } = useWordModalState();
 
   // Use the current word from playback system as single source of truth
-  const displayWord = playbackCurrentWord || currentWord;
+  const displayWord = playbackCurrentWord || originalCurrentWord;
 
   // Word management operations
   const wordManager = displayWord ? VocabularyWordManager({
@@ -77,12 +78,10 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
-  // Direct category switch handler
+  // Direct category switch handler - with explicit user interaction tracking
   const handleCategorySwitchDirect = (categoryName?: string) => {
     // Mark that we've had user interaction
-    if (userInteractionRef) {
-      userInteractionRef.current = true;
-    }
+    userInteractionRef.current = true;
     
     const targetCategory = categoryName || nextCategory;
     if (targetCategory) {
@@ -91,30 +90,47 @@ const VocabularyAppContainer: React.FC = () => {
     }
   };
 
-  // Handle manual next - ensure user interaction is recorded
+  // Handle manual next with explicit user interaction
   const handleManualNext = () => {
     // This is definitely user interaction
-    if (userInteractionRef) {
-      userInteractionRef.current = true;
-    }
+    userInteractionRef.current = true;
     goToNextWord();
   };
 
-  // Handle toggle pause - ensure user interaction is recorded
+  // Play button handler with explicit speech start
+  const handlePlayButton = () => {
+    // This is definitely user interaction
+    userInteractionRef.current = true;
+    
+    // First ensure we're not paused
+    if (paused) {
+      togglePause();
+    }
+    
+    // Ensure we're not muted
+    if (muted) {
+      toggleMute();
+    }
+    
+    // Log available voices for debugging
+    const voices = window.speechSynthesis.getVoices();
+    console.log(`Voices loaded on Play button click: ${voices.length} voices`);
+    
+    // Directly play the current word
+    playCurrentWord();
+  };
+
+  // Handle toggle pause with explicit user interaction
   const handleTogglePauseWithInteraction = () => {
     // This is definitely user interaction
-    if (userInteractionRef) {
-      userInteractionRef.current = true;
-    }
+    userInteractionRef.current = true;
     togglePause();
   };
 
-  // Handle voice change - ensure user interaction is recorded
+  // Handle voice change with explicit user interaction
   const handleChangeVoiceWithInteraction = (voiceRegion: 'US' | 'UK') => {
     // This is definitely user interaction
-    if (userInteractionRef) {
-      userInteractionRef.current = true;
-    }
+    userInteractionRef.current = true;
     changeVoice(voiceRegion);
   };
 
@@ -138,6 +154,7 @@ const VocabularyAppContainer: React.FC = () => {
             nextCategory={nextCategory}
             isSoundPlaying={!muted && !paused}
             handleManualNext={handleManualNext}
+            handlePlay={handlePlayButton} // Added explicit play handler
             displayTime={displayTime}
             voiceOptions={voices}
             selectedVoice={selectedVoice.region}
