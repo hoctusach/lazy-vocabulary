@@ -13,35 +13,42 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // Get audio control functionality
   const { muted, paused, utteranceRef, cancelSpeech, toggleMute, togglePause } = useAudioControl(wordList);
   
-  // Set up speech playback
-  const { playWord } = useSpeechPlayback(utteranceRef, selectedVoice, () => {}, muted, paused);
-  
-  // Set up word navigation
-  const { currentWord, advanceToNext, currentIndex, setCurrentIndex } = useWordNavigation(
+  // Get word navigation, passing onNextWord handler
+  const { currentWord, advanceToNext, currentIndex, setCurrentIndex, userInteractionRef } = useWordNavigation(
     wordList,
     cancelSpeech,
     muted,
     paused,
-    playWord
+    (word) => {}  // We'll handle playback separately to avoid circular dependencies
   );
-
-  // Override advance function for playWord to use
-  const playCurrentWord = () => {
-    if (currentWord) {
-      playWord(currentWord);
-    }
-  };
-
-  // This effect handles playing words whenever relevant state changes
-  useEffect(() => {
-    if (wordList.length > 0 && !muted && !paused && currentWord) {
-      playCurrentWord();
-    }
-  }, [wordList, muted, paused, currentIndex]);
   
+  // Set up speech playback
+  const { playWord } = useSpeechPlayback(utteranceRef, selectedVoice, advanceToNext, muted, paused);
+
   // Function to go to next word on manual click
   const goToNextWord = () => {
+    // Mark that we've had user interaction
+    userInteractionRef.current = true;
     advanceToNext();
+  };
+  
+  // This effect handles playing words whenever relevant state changes
+  useEffect(() => {
+    if (wordList.length > 0 && !muted && !paused && currentWord && userInteractionRef.current) {
+      console.log(`Playing current word (index ${currentIndex}): ${currentWord.word}`);
+      playWord(currentWord);
+    }
+  }, [wordList, muted, paused, currentIndex, currentWord, userInteractionRef.current, playWord]);
+  
+  // Function to play the current word, used for manual play
+  const playCurrentWord = () => {
+    // Mark that we've had user interaction
+    userInteractionRef.current = true;
+    
+    if (currentWord) {
+      console.log(`Manual play requested for: ${currentWord.word}`);
+      playWord(currentWord);
+    }
   };
   
   // Clean up on unmount
@@ -66,7 +73,8 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     toggleMute,
     togglePause,
     goToNextWord,
-    changeVoice
+    changeVoice,
+    userInteractionRef
   };
 };
 

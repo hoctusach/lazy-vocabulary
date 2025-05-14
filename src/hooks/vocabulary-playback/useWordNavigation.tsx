@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useWordNavigation = (
@@ -11,6 +11,7 @@ export const useWordNavigation = (
 ) => {
   // Navigation state
   const [currentIndex, setCurrentIndex] = useState(0);
+  const userInteractionRef = useRef(false);
   
   // Find the current word based on the index - this is the single source of truth
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
@@ -24,6 +25,9 @@ export const useWordNavigation = (
   
   // Function to advance to the next word
   const advanceToNext = useCallback(() => {
+    // Mark that we've had user interaction
+    userInteractionRef.current = true;
+    
     // Cancel any ongoing speech
     cancelSpeech();
     
@@ -41,10 +45,21 @@ export const useWordNavigation = (
     });
   }, [wordList, cancelSpeech, muted, paused, playWord]);
   
+  // Initial playback effect - now only plays if we've had user interaction
+  useEffect(() => {
+    if (currentWord && wordList.length > 0 && !muted && !paused && userInteractionRef.current) {
+      // Only auto-play if we've had at least one user interaction
+      console.log(`Auto-playing current word after user interaction: ${currentWord.word}`);
+      playWord(currentWord);
+    }
+  }, [currentWord, wordList.length, muted, paused, playWord, userInteractionRef.current]);
+  
   return {
     currentIndex,
     currentWord,
     setCurrentIndex,
-    advanceToNext
+    advanceToNext,
+    // Export this to track if we've had user interaction
+    userInteractionRef
   };
 };
