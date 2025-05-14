@@ -17,6 +17,9 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     if (voice) {
       utterance.voice = voice;
       utterance.lang = voice.lang;
+      console.log(`[SYNTHESIS] Set voice: ${voice.name} (${voice.lang})`);
+    } else {
+      console.log('[SYNTHESIS] No voice provided, using browser default');
     }
     
     // Set reasonable speech parameters
@@ -38,7 +41,19 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
       console.error('[SYNTHESIS] Speech synthesis error:', event.error);
       
       if (event.error === 'not-allowed') {
-        reject(new Error('not-allowed'));
+        // If error is 'not-allowed', try to resume speech and retry once
+        console.log('[SYNTHESIS] Attempting to resume speech after not-allowed error');
+        window.speechSynthesis.resume();
+        
+        // Wait a moment and try one more time
+        setTimeout(() => {
+          try {
+            window.speechSynthesis.speak(utterance);
+            console.log('[SYNTHESIS] Second attempt after not-allowed error');
+          } catch (secondError) {
+            reject(new Error('not-allowed'));
+          }
+        }, 100);
       } else if (event.error === 'interrupted') {
         // This is often expected when stopping speech, don't treat as a failure
         console.log('[SYNTHESIS] Speech interrupted - likely intentional');
@@ -63,12 +78,22 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     
     // Use try-catch to handle potential errors during speech initiation
     try {
+      // Ensure voices are loaded before speaking
+      window.speechSynthesis.getVoices();
+      
       // Short delay before speaking to ensure system is ready
       setTimeout(() => {
         try {
           // Start the speech
           window.speechSynthesis.speak(utterance);
           console.log('[SYNTHESIS] Speech synthesis started');
+          
+          // Verification log to confirm correct voice is being used
+          if (utterance.voice) {
+            console.log('[SYNTHESIS] Speaking with voice:', utterance.voice.name);
+          } else {
+            console.log('[SYNTHESIS] Speaking with default system voice');
+          }
         } catch (error) {
           console.error('[SYNTHESIS] Error calling speechSynthesis.speak():', error);
           reject(error);

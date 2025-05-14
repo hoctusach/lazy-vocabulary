@@ -32,7 +32,7 @@ export async function speakWithVoice({
   console.log('[VOICE] Previous speech stopped');
   
   // Give the DOM time to update and speech engine to reset, but keep it short
-  const domUpdateDelay = 150; // Increased from 100ms to 150ms to ensure full engine reset
+  const domUpdateDelay = 300; // Increased from 150ms to 300ms to ensure full engine reset
   console.log(`[VOICE] Waiting ${domUpdateDelay}ms for DOM updates`);
   await new Promise(resolve => setTimeout(resolve, domUpdateDelay));
   

@@ -37,7 +37,22 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
   
   // Use a more sophisticated voice matching algorithm
   
-  // First priority: Exact match for the language code
+  // First priority: Match UK/US Female voice pattern
+  if (region === 'UK') {
+    let ukFemale = voices.find(v => /UK English Female|en-GB.*female/i.test(v.name));
+    if (ukFemale) {
+      console.log(`Selected UK Female voice: ${ukFemale.name} (${ukFemale.lang})`);
+      return ukFemale;
+    }
+  } else if (region === 'US') {
+    let usFemale = voices.find(v => /US English Female|en-US.*female/i.test(v.name));
+    if (usFemale) {
+      console.log(`Selected US Female voice: ${usFemale.name} (${usFemale.lang})`);
+      return usFemale;
+    }
+  }
+  
+  // Second priority: Exact match for the language code
   let voice = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
   
   if (voice) {
@@ -45,7 +60,7 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     return voice;
   }
   
-  // Second priority: Voice that starts with the language code
+  // Third priority: Voice that starts with the language code
   voice = voices.find(v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
   
   if (voice) {
@@ -53,7 +68,7 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     return voice;
   }
   
-  // Third priority: Check for specific keywords in voice name
+  // Fourth priority: Check for specific keywords in voice name
   // For US voices, look for US, American, or en-US in the name
   // For UK voices, look for UK, British, GB, or en-GB in the name
   const keywords = region === 'US' 
@@ -70,7 +85,7 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     return voice;
   }
   
-  // Fourth priority: Google or Microsoft branded voices with appropriate region
+  // Fifth priority: Google or Microsoft branded voices with appropriate region
   voice = voices.find(v => 
     (region === 'US' && (v.name.includes('Google US') || v.name.includes('Microsoft') && v.lang.startsWith('en'))) || 
     (region === 'UK' && (v.name.includes('Google UK') || v.name.includes('British')))
