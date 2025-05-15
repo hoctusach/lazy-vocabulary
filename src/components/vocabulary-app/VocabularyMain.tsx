@@ -35,12 +35,12 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   nextCategory,
   isSoundPlaying,
   handleManualNext,
-  handlePlay, // Use the new play handler
+  handlePlay,
   displayTime,
   voiceOptions,
   selectedVoice,
 }) => {
-  const { backgroundColor } = useBackgroundColor(currentCategory);
+  const { backgroundColor } = useBackgroundColor();
 
   return (
     <div className="space-y-6">
@@ -71,7 +71,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
         onNext={handleManualNext}
-        onPlay={handlePlay} // Pass the play handler
+        onPlay={handlePlay}
         onChangeVoice={() => handleChangeVoice(selectedVoice === 'US' ? 'UK' : 'US')}
         onSwitchCategory={handleSwitchCategory}
         currentCategory={currentCategory}
