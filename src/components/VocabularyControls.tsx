@@ -22,7 +22,6 @@ interface VocabularyControlsProps {
 const VocabularyControls: React.FC<VocabularyControlsProps> = ({
   mute,
   isPaused,
-  isSoundPlaying,
   onToggleMute,
   onTogglePause,
   onNext,
@@ -36,9 +35,9 @@ const VocabularyControls: React.FC<VocabularyControlsProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between">
+        {/* Left controls group - simplified based on image */}
         <div className="flex gap-2">
-          {/* Sound controls */}
           <Button
             variant="outline"
             size="icon"
@@ -48,10 +47,9 @@ const VocabularyControls: React.FC<VocabularyControlsProps> = ({
           >
             {mute ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
-
-          {/* Pause/Play toggle button */}
+          
           <Button
-            variant={isPaused ? "default" : "outline"}
+            variant="outline"
             size="icon"
             onClick={onTogglePause}
             title={isPaused ? "Resume" : "Pause"}
@@ -60,7 +58,7 @@ const VocabularyControls: React.FC<VocabularyControlsProps> = ({
             {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
           </Button>
           
-          {/* Explicit Play button for direct user interaction */}
+          {/* Prominent Play button for direct user interaction */}
           {onPlay && (
             <Button
               variant="default"
@@ -73,8 +71,7 @@ const VocabularyControls: React.FC<VocabularyControlsProps> = ({
               <Play className="h-4 w-4" />
             </Button>
           )}
-
-          {/* Next button */}
+          
           <Button
             variant="outline"
             size="icon"
@@ -86,51 +83,46 @@ const VocabularyControls: React.FC<VocabularyControlsProps> = ({
           </Button>
         </div>
 
+        {/* Right controls group - simplified based on image */}
         <div className="flex gap-2">
-          {/* Voice toggle button */}
           <Button
             variant="outline"
             size="sm"
             onClick={onChangeVoice}
             title="Change Voice"
-            aria-label="Change Voice"
-            className="text-xs px-2 py-1 h-9"
+            className="text-xs px-3 h-9"
           >
             <Mic className="h-4 w-4 mr-1" />
             <span>{voiceOption}</span>
           </Button>
 
-          {/* Category switch button */}
           {nextCategory && (
             <Button
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
               title={`Switch to ${nextCategory}`}
-              aria-label={`Switch to ${nextCategory}`}
-              className="text-xs px-2 py-1 h-9"
+              className="text-xs px-3 h-9"
             >
               <Globe className="h-4 w-4 mr-1" />
               <span>
-                {currentCategory !== "All words"
-                  ? `Switch to ${nextCategory}`
-                  : nextCategory}
+                {`Switch to ${nextCategory}`}
               </span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* Display time indicator */}
+      {/* Progress bar */}
       {displayTime > 0 && (
-        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
           <div
-            className="bg-blue-600 h-2.5 rounded-full"
+            className="bg-blue-600 h-2 rounded-full"
             style={{
               width: `${Math.min(100, (displayTime / 10) * 100)}%`,
               transition: "width 0.5s linear",
             }}
-          ></div>
+          />
         </div>
       )}
     </div>

@@ -134,6 +134,14 @@ const VocabularyAppContainer: React.FC = () => {
     changeVoice(voiceRegion);
   };
 
+  // Create correctly formatted voice options for the component
+  const formattedVoiceOptions = voices.map(voice => ({
+    label: voice.label,
+    region: voice.region as 'US' | 'UK',
+    gender: 'female' as 'male' | 'female', // Default to female for now
+    voice: null  // We don't need to pass the actual voice object
+  }));
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -156,7 +164,7 @@ const VocabularyAppContainer: React.FC = () => {
             handleManualNext={handleManualNext}
             handlePlay={handlePlayButton} // Added explicit play handler
             displayTime={displayTime}
-            voiceOptions={voices}
+            voiceOptions={formattedVoiceOptions}
             selectedVoice={selectedVoice.region}
           />
           

@@ -12,7 +12,7 @@ interface VocabularyMainProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleChangeVoice: (region: 'US' | 'UK') => void;
-  handleSwitchCategory: (category?: string) => void;
+  handleSwitchCategory: () => void;
   handleManualNext: () => void;
   handlePlay?: () => void; // Added new play handler
   currentCategory: string;
@@ -54,7 +54,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
         onChangeVoice={handleChangeVoice}
-        onSwitchCategory={() => handleSwitchCategory()}
+        onSwitchCategory={handleSwitchCategory}
         onNextWord={handleManualNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory || 'Next'}
@@ -73,7 +73,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onNext={handleManualNext}
         onPlay={handlePlay} // Pass the play handler
         onChangeVoice={() => handleChangeVoice(selectedVoice === 'US' ? 'UK' : 'US')}
-        onSwitchCategory={() => handleSwitchCategory()}
+        onSwitchCategory={handleSwitchCategory}
         currentCategory={currentCategory}
         nextCategory={nextCategory || ''}
         voiceOption={selectedVoice}
