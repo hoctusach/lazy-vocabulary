@@ -1,4 +1,8 @@
-{
+
+import { SheetData } from "@/types/vocabulary";
+
+export const DEFAULT_VOCABULARY_DATA: SheetData = {
+  {
   "All words": [
     {
       "word": "to be under house arrest ",
