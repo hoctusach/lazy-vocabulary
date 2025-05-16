@@ -182,9 +182,9 @@
     },
     {
       "word": "pass out [intransitive]",
-      "meaning": "to faint or lose consciousness.",
+      "meaning": "to faint or lose consciousness. (ngất xỉu)",
       "example": "I sang and danced so much I almost passed out! He drank a lot of alcohol and passed out on the street.",
-      "count": 0
+      "count": 1
     },
     {
       "word": "carry on (doing something) [transitive/intransitive]",
@@ -194,9 +194,9 @@
     },
     {
       "word": "blow away somebody [transitive]",
-      "meaning": "to really impress someone by doing something.",
+      "meaning": "to really impress someone by doing something. (làm kinh ngạc)",
       "example": "They were incredible and blew everyone away. The beaches in Thailand really impressed me.",
-      "count": 0
+      "count": 1
     },
     {
       "word": "bring out something [transitive]",
@@ -745,9 +745,9 @@
       "count": 0
     },
     {
-      "word": "Cost an arm and a leg",
-      "meaning": "To be very expensive; to cost a lot of money.",
-      "example": "The new smartphone model looks great, but it costs an arm and a leg.Traveling during peak season can be expensive and may cost you an arm and a leg.   ",
+      "word": "Cost an Arm and a Leg",
+      "meaning": "Be very expensive",
+      "example": "The vintage car restoration ended up costing me an arm and a leg, but it was worth it to see it gleaming again.",
       "count": 0
     },
     {
@@ -944,12 +944,6 @@
     },
     {
       "word": "add up to (/æd ʌp tə/)",
-      "meaning": "combine to produce a particular result or effect: tương đương với",
-      "example": "These new measures do not add up to genuine reform.",
-      "count": 0
-    },
-    {
-      "word": "add up to (/æd ʌp tə/)",
       "meaning": "if separate amounts add up to a total amount, together they form that total: tổng cộng lên tới",
       "example": "His business expenses add up to around £4,000 a year.",
       "count": 0
@@ -980,20 +974,8 @@
     },
     {
       "word": "back up (/bæk ʌp/)",
-      "meaning": "give support to someone by telling other people that you agree with them: ủng hộ",
-      "example": "I didn’t believe Simon’s story until Janice backed him up.",
-      "count": 0
-    },
-    {
-      "word": "back up (/bæk ʌp/)",
       "meaning": "make a copy of information on your computer: sao lưu dữ liệu",
       "example": "Make sure you back all your data up, just in case you get a virus.",
-      "count": 0
-    },
-    {
-      "word": "black out (/blæk aʊt/)",
-      "meaning": "make a place dark by turning off all the lights: làm đen kịt, tối om",
-      "example": "The whole city was blacked out for nights on end during the war.",
       "count": 0
     },
     {
@@ -1006,12 +988,6 @@
       "word": "bring about (/brɪŋ əˈbaʊt/)",
       "meaning": "make something happen, especially to cause changes in a situation: gây ra, đem lại",
       "example": "It’s not something we can bring about overnight.",
-      "count": 0
-    },
-    {
-      "word": "bring out (/brɪŋ aʊt/)",
-      "meaning": "make someone or something show a quality that they have: làm nổi bật",
-      "example": "That dress really brings out the green in your eyes.",
       "count": 0
     },
     {
@@ -1034,26 +1010,14 @@
     },
     {
       "word": "build up (/bɪld ʌp/)",
-      "meaning": "gradually develop: gây dựng, phát triển",
-      "example": "Many popular writers built up their reputations during the war.",
-      "count": 0
-    },
-    {
-      "word": "build up (/bɪld ʌp/)",
-      "meaning": "increase or make something increase: tăng lên",
-      "example": "The food industry needs to build up consumer confidence again.",
-      "count": 0
-    },
-    {
-      "word": "build up (/bɪld ʌp/)",
       "meaning": "make someone bigger, healthier, and stronger by making them eat more: lớn lên, phát triển",
       "example": "You need lots of fresh fruit to help build you up.",
       "count": 0
     },
     {
       "word": "bump into",
-      "meaning": "accidentally hit against something: va phải",
-      "example": "It was a surprise when I bumped into her downtown.",
+      "meaning": "meet someone unexpectedly: tình cờ gặp.",
+      "example": "Guess who I bumped into in town?",
       "count": 0
     },
     {
@@ -1082,38 +1046,14 @@
     },
     {
       "word": "break up",
-      "meaning": "if a meeting or other event breaks up, or if you break it up, it ends and people leave: kết thúc.",
-      "example": "The meeting finally broke up after three hours.",
-      "count": 0
-    },
-    {
-      "word": "break up",
       "meaning": "if two people break up, they end their relationship: chia tay.",
       "example": "When did Diana and James break up?",
       "count": 0
     },
     {
       "word": "brighten up",
-      "meaning": "if the weather brightens up, it becomes sunnier: trở nên tốt hơn.",
-      "example": "It’s brightening up, at last.",
-      "count": 0
-    },
-    {
-      "word": "brighten up",
-      "meaning": "start looking or feeling happier: trở nên rạng rõ hơn.",
-      "example": "Sarah brightened up considerably as she thought of Emily’s words.",
-      "count": 0
-    },
-    {
-      "word": "brighten up",
       "meaning": "start to have more colour or light, give something more colour or light: trở nên đẹp/hấp dẫn hơn.",
       "example": "You could brighten up that skirt with a red blouse.",
-      "count": 0
-    },
-    {
-      "word": "bump into",
-      "meaning": "meet someone unexpectedly: tình cờ gặp.",
-      "example": "Guess who I bumped into in town?",
       "count": 0
     },
     {
@@ -1465,18 +1405,6 @@
       "count": 0
     },
     {
-      "word": "fade away /feɪd əˈweɪ/",
-      "meaning": "disappear slowly: dần biến mất",
-      "example": "To my amazement, the letters on the page slowly faded away.",
-      "count": 0
-    },
-    {
-      "word": "fall behind /fɔːl bɪˈhaɪnd/",
-      "meaning": "make less progress or be less successful than other people who are doing a similar job or activity: tụt hậu",
-      "example": "I was off school for two months with my illness and I fell behind the others.",
-      "count": 0
-    },
-    {
       "word": "fall behind /fɔːl bɪˈhaɪnd/",
       "meaning": "move more slowly than other people so that you are behind them: tụt lại phía sau",
       "example": "I got tired on the walk and gradually fell behind the rest.",
@@ -1492,12 +1420,6 @@
       "word": "fix up /fɪks ʌp/",
       "meaning": "clean, repair or decorate something: sửa chữa, phục hồi",
       "example": "Why don’t we try to fix up that old bike of yours?",
-      "count": 0
-    },
-    {
-      "word": "follow up /ˈfɑːləʊ ʌp/",
-      "meaning": "check the health of someone who has received medical treatment in order to be certain that it was effective: theo dõi sức khỏe",
-      "example": "The study followed up over 200 heart patients.",
       "count": 0
     },
     {
@@ -1532,32 +1454,8 @@
     },
     {
       "word": "get into /ɡet ˈɪntuː/",
-      "meaning": "become involved in a bad situation: dính phải, vướng vào",
-      "example": "Craig started to get into crime while he was still at school.",
-      "count": 0
-    },
-    {
-      "word": "get into /ɡet ˈɪntuː/",
-      "meaning": "if a train, plane, etc. gets into a place, it arrives there: đến nơi",
-      "example": "What time do we get into Norwich?",
-      "count": 0
-    },
-    {
-      "word": "get into /ɡet ˈɪntuː/",
       "meaning": "start enjoying something or become enthusiastic about it: bắt đầu thích",
       "example": "It took me a while to get into this CD, but now I listen to it all the time.",
-      "count": 0
-    },
-    {
-      "word": "get off /ɡet ɒf/",
-      "meaning": "have a particular period of time as a holiday: được nghỉ vào dịp",
-      "example": "Will you get Easter off?",
-      "count": 0
-    },
-    {
-      "word": "get off /ɡet ɒf/",
-      "meaning": "not be punished severely or at all for something you have been accused of in court: thoát tội",
-      "example": "I can’t believe he got off when there was so much evidence against him.",
       "count": 0
     },
     {
@@ -1568,26 +1466,8 @@
     },
     {
       "word": "get over /ɡet ˈəʊvə(r)/",
-      "meaning": "find a way to solve or deal with a difficult problem: giải quyết",
-      "example": "There are many hurdles still to get over before the new restaurant can open.",
-      "count": 0
-    },
-    {
-      "word": "get over /ɡet ˈəʊvə(r)/",
       "meaning": "start to feel happy or well again after something bad has happened to you, start to forget someone and feel happy again after a relationship has ended: vượt qua (chuyện buồn)",
       "example": "It can take weeks to get over an illness like that.",
-      "count": 0
-    },
-    {
-      "word": "get through /ɡet θruː/",
-      "meaning": "finish dealing with some work, a subject, etc: hoàn thành",
-      "example": "I’ve got a lot of work to get through.",
-      "count": 0
-    },
-    {
-      "word": "get through /ɡet θruː/",
-      "meaning": "manage to deal with a difficult situation or stay alive until it is over: thoát được khỏi, sống sót",
-      "example": "How we got through it I’ll never know.",
       "count": 0
     },
     {
@@ -1598,20 +1478,8 @@
     },
     {
       "word": "get through (to) /ɡet θruː/",
-      "meaning": "be connected to a place by telephone: được nối máy",
-      "example": "I tried calling him but I couldn’t get through for some reason.",
-      "count": 0
-    },
-    {
-      "word": "get through (to) /ɡet θruː/",
       "meaning": "make someone understand what you are trying to say: truyền đạt, giải thích",
       "example": "The teacher feels he is not getting through to some of the kids in his class.",
-      "count": 0
-    },
-    {
-      "word": "give in /ɡɪv ɪn/",
-      "meaning": "if you give in to something, you can no longer control the feeling of wanting it: thỏa hiệp",
-      "example": "I finally gave in and had a cream cake.",
       "count": 0
     },
     {
@@ -1634,44 +1502,14 @@
     },
     {
       "word": "go in for /ɡəʊ ɪn fə(r)/",
-      "meaning": "choose something as a subject of study or as your career: theo đuổi ngành/nghề",
-      "example": "I’m going to go in for dentistry.",
-      "count": 0
-    },
-    {
-      "word": "go in for /ɡəʊ ɪn fə(r)/",
       "meaning": "enjoy a particular thing or activity: thích, hưởng ứng",
       "example": "My dad doesn’t really go in for parties.",
       "count": 0
     },
     {
       "word": "go off /ɡəʊ ɒf/",
-      "meaning": "explode or be fired: phát nổ",
-      "example": "A bomb has gone off in the shopping mall.",
-      "count": 0
-    },
-    {
-      "word": "go off /ɡəʊ ɒf/",
-      "meaning": "if food or drink goes off, it is no longer fresh: bị ôi thiu",
-      "example": "Does this milk smell like it’s gone off to you?",
-      "count": 0
-    },
-    {
-      "word": "go off /ɡəʊ ɒf/",
-      "meaning": "leave a place, especially for a particular purpose: rời đi",
-      "example": "Pete’s just gone off to get some chewing gum.",
-      "count": 0
-    },
-    {
-      "word": "go off /ɡəʊ ɒf/",
       "meaning": "stop liking someone or something: chán, không còn ưa thích",
       "example": "I’ve gone off peanuts, for some reason.",
-      "count": 0
-    },
-    {
-      "word": "go together /ɡəʊ təˈɡeðə(r)/",
-      "meaning": "if two or more things go together, they frequently exist together: đi liền với nhau",
-      "example": "Why do poverty and crime go together so often?",
       "count": 0
     },
     {
@@ -1688,20 +1526,8 @@
     },
     {
       "word": "hang out /hæŋ aʊt/",
-      "meaning": "lean out of a window so that the top part of your body is outside: thò đầu/ người ra khỏi (cửa sổ)",
-      "example": "Don’t hang out of the window or you’ll fall!",
-      "count": 0
-    },
-    {
-      "word": "hang out /hæŋ aʊt/",
       "meaning": "spend time in a particular place or with particular people: hẹn hò, đi chơi",
       "example": "We often just hang out at each other’s houses.",
-      "count": 0
-    },
-    {
-      "word": "head off /hed ɒf/",
-      "meaning": "prevent someone from going somewhere by getting in front of them: chặn đường",
-      "example": "One police officer chased the robber while the other went to head him off.",
       "count": 0
     },
     {
@@ -1714,12 +1540,6 @@
       "word": "heat up /hiːt ʌp/",
       "meaning": "make something hot; become hot: (làm) nóng lên",
       "example": "Heat up the baby’s milk, would you?",
-      "count": 0
-    },
-    {
-      "word": "hit back /hɪt bæk/",
-      "meaning": "criticise someone who has criticised you: phản pháo",
-      "example": "The Minister hit back at his critics.",
       "count": 0
     },
     {
@@ -1742,20 +1562,8 @@
     },
     {
       "word": "lash out /læʃ aʊt/",
-      "meaning": "speak angrily to or against someone: chỉ trích, đả kích",
-      "example": "They lashed out at the council’s move to stop free parking.",
-      "count": 0
-    },
-    {
-      "word": "lash out /læʃ aʊt/",
       "meaning": "try to hit or attack someone suddenly and violently: tấn công",
       "example": "Occasionally the patients will lash out at the nurses.",
-      "count": 0
-    },
-    {
-      "word": "lay off /leɪ ɒf/",
-      "meaning": "end someone’s employment, especially temporarily, because there is not enough work for them: sa thải",
-      "example": "They’ve had to cut back production and lay off workers.",
       "count": 0
     },
     {
@@ -1784,20 +1592,8 @@
     },
     {
       "word": "liven up /ˈlaɪvn ʌp/",
-      "meaning": "give something a more interesting appearance, taste or other quality: làm đẹp hơn",
-      "example": "You can liven up a plain shirt with a colourful scarf.",
-      "count": 0
-    },
-    {
-      "word": "liven up /ˈlaɪvn ʌp/",
       "meaning": "make something more interesting or exciting, or become more interesting or exciting: làm thú vị hơn, cải thiện",
       "example": "What we needed was some music to liven things up.",
-      "count": 0
-    },
-    {
-      "word": "hit upon /hɪt əˈpɒn/",
-      "meaning": "discover something by chance: tình cờ phát hiện. She was scared he might hit upon the truth.",
-      "example": "She was scared he might hit upon the truth.",
       "count": 0
     },
     {
@@ -1810,12 +1606,6 @@
       "word": "hold back /həʊld bæk/",
       "meaning": "stop someone or something from moving forwards: giữ lại. The police held back the crowd.",
       "example": "The police held back the crowd.",
-      "count": 0
-    },
-    {
-      "word": "keep up /kiːp ʌp/",
-      "meaning": "continue to do something: tiếp tục. I don’t think I can afford to keep up my piano lessons.",
-      "example": "I don’t think I can afford to keep up my piano lessons.",
       "count": 0
     },
     {
@@ -1846,12 +1636,6 @@
       "word": "knock off /nɒk ɒf/",
       "meaning": "stop working: ngừng làm việc. Do you want to knock off early tonight?",
       "example": "Do you want to knock off early tonight?",
-      "count": 0
-    },
-    {
-      "word": "lock up /lɒk ʌp/",
-      "meaning": "lock all the doors and windows of a building so that no one can get in: khóa toàn bộ cửa. I must have forgotten to lock up when I left this morning.",
-      "example": "I must have forgotten to lock up when I left this morning.",
       "count": 0
     },
     {
@@ -1892,26 +1676,20 @@
     },
     {
       "word": "mess about/around /mes əˈbaʊt əˈraʊnd/",
-      "meaning": "behave in a silly way: hành xử ngớ ngẩn. Mrs Evans asked the children to stop messing around.",
-      "example": "Mrs Evans asked the children to stop messing around.",
+      "meaning": "spend time doing things in a relaxed way: thư giãn.",
+      "example": "There's nothing I like better than messing about in the garden.",
       "count": 0
     },
     {
       "word": "step aside /step əˈsaɪd/",
-      "meaning": "move so that sb can pass you: nhường đường.",
-      "example": "We stepped aside to let someone in a wheelchair through.",
+      "meaning": "leave a job so that sb else can take over: từ chức.",
+      "example": "The chairman stepped aside to let the younger manager take over.",
       "count": 0
     },
     {
       "word": "stop off /stɒp ɒf/",
       "meaning": "visit somewhere before continuing to another place: nghỉ giữa đường.",
       "example": "We can stop off at the bakery on the way to school.",
-      "count": 0
-    },
-    {
-      "word": "store up /stɔː(r) ʌp/",
-      "meaning": "do something that will cause problems in the future: tích lũy, dồn nén.",
-      "example": "If you ignore it, you’re just storing up problems for the future.",
       "count": 0
     },
     {
@@ -1958,18 +1736,6 @@
     },
     {
       "word": "take in /teɪk ɪn/",
-      "meaning": "write down information or a statement: ghi chép lại.",
-      "example": "The police took down my details.",
-      "count": 0
-    },
-    {
-      "word": "take in /teɪk ɪn/",
-      "meaning": "accept something as real or true: chấp nhận.",
-      "example": "He still hasn’t really taken in his father’s death.",
-      "count": 0
-    },
-    {
-      "word": "take in /teɪk ɪn/",
       "meaning": "include something: bao gồm.",
       "example": "The tour takes in some incredible scenery.",
       "count": 0
@@ -1994,20 +1760,8 @@
     },
     {
       "word": "take over /teɪk ˈəʊvə(r)/",
-      "meaning": "begin to do something that someone else was doing: tiếp quản.",
-      "example": "When my dad retired, I took over the business.",
-      "count": 0
-    },
-    {
-      "word": "take over /teɪk ˈəʊvə(r)/",
       "meaning": "gain control of something: nắm quyền kiểm soát.",
       "example": "Whenever we start organising something, you always want to take over.",
-      "count": 0
-    },
-    {
-      "word": "take to /teɪk tə/",
-      "meaning": "begin to like someone or something: bắt đầu thích.",
-      "example": "I didn’t take to living here straight away.",
       "count": 0
     },
     {
@@ -2060,20 +1814,8 @@
     },
     {
       "word": "throw out /θrəʊ aʊt/",
-      "meaning": "force someone to leave a place or group: đuổi, tống cổ.",
-      "example": "Charlie was thrown out of the Scouts.",
-      "count": 0
-    },
-    {
-      "word": "throw out /θrəʊ aʊt/",
-      "meaning": "get rid of something that you no longer want, for example by putting it in a dustbin: vứt bỏ.",
-      "example": "We’re throwing these things out.",
-      "count": 0
-    },
-    {
-      "word": "throw up /θrəʊ ʌp/",
-      "meaning": "cause something such as dust or water to rise into the air: làm bắn tung lên.",
-      "example": "As the helicopter landed, it threw up a lot of dust.",
+      "meaning": "eject or remove forcibly: đuổi ra.",
+      "example": "They threw out the old furniture to make space.",
       "count": 0
     },
     {
@@ -2086,12 +1828,6 @@
       "word": "tide over /taɪd ˈəʊvə(r)/",
       "meaning": "help someone to get to the end of a difficult period of time, especially by giving them enough money: giúp vượt qua khó khăn.",
       "example": "Ed lent me £50 to tide me over until payday.",
-      "count": 0
-    },
-    {
-      "word": "tip up /tɪp ʌp/",
-      "meaning": "(of an object) have one end move upwards, especially because something heavy has been put at the other end: nghiêng.",
-      "example": "The bench began to tip up and he sat on it.",
       "count": 0
     },
     {
@@ -2114,32 +1850,20 @@
     },
     {
       "word": "turn into /tɜːn ˈɪntuː/",
-      "meaning": "change or develop into something different: chuyển thành.",
-      "example": "The sofa turns into a bed, so you can stay with us, if you like.",
-      "count": 0
-    },
-    {
-      "word": "turn into /tɜːn ˈɪntuː/",
       "meaning": "change or develop into something different: biến thành.",
       "example": "They’ve turned the old factory into luxury flats.",
       "count": 0
     },
     {
       "word": "use up /juːz ʌp/",
-      "meaning": "use all of a supply of something: dùng hết, dùng cạn sạch.",
-      "example": "Did you use the butter up when you were making cakes?",
+      "meaning": "consume completely: sử dụng hết.",
+      "example": "We've used up all the milk.",
       "count": 0
     },
     {
       "word": "walk out /wɔːk aʊt/",
-      "meaning": "leave a meeting, performance, etc. before the end, usually because you are angry or bored: rời đi (vì giận).",
-      "example": "I walked out halfway through the film.",
-      "count": 0
-    },
-    {
-      "word": "walk out /wɔːk aʊt/",
-      "meaning": "suddenly leave a relationship, your family, your job, etc: dứt ngọt bỏ đi, rời khỏi.",
-      "example": "You can’t just walk out like this!",
+      "meaning": "leave suddenly or unexpectedly: rời đi bất ngờ.",
+      "example": "The workers walked out in protest of the new policies.",
       "count": 0
     },
     {
@@ -2162,20 +1886,8 @@
     },
     {
       "word": "water down /ˈwɔːtə daʊn/",
-      "meaning": "add water to a drink or liquid in order to make it less strong, dilute: pha loãng.",
-      "example": "If it’s too strong, water it down.",
-      "count": 0
-    },
-    {
-      "word": "water down /ˈwɔːtə daʊn/",
       "meaning": "make something such as a statement or newspaper article less offensive, powerful or detailed: làm dịu.",
       "example": "The editor watered my article down.",
-      "count": 0
-    },
-    {
-      "word": "wear down /weə daʊn/",
-      "meaning": "make someone gradually lose their energy or confidence: làm hao mòn.",
-      "example": "This constant criticism at work is really wearing me down.",
       "count": 0
     },
     {
@@ -2192,12 +1904,6 @@
     },
     {
       "word": "weigh down /weɪ daʊn/",
-      "meaning": "cause problems for someone or something or make someone worried: đè nén, gây lo âu.",
-      "example": "The entire industry has been weighed down by economic uncertainty.",
-      "count": 0
-    },
-    {
-      "word": "weigh down /weɪ daʊn/",
       "meaning": "make someone heavy and unable to move easily: đè nặng lên.",
       "example": "The waiters were weighed down by huge trays of food.",
       "count": 0
@@ -2210,26 +1916,8 @@
     },
     {
       "word": "wind down /waɪnd daʊn/",
-      "meaning": "end or finish something gradually: dần tàn, dần chấm dứt.",
-      "example": "The party started to wind down around 2 a.m.",
-      "count": 0
-    },
-    {
-      "word": "wind down /waɪnd daʊn/",
-      "meaning": "gradually reduce work before stopping completely: dần đóng cửa.",
-      "example": "The factory will wind down production before closing next year.",
-      "count": 0
-    },
-    {
-      "word": "wind down /waɪnd daʊn/",
       "meaning": "relax after a period of excitement or worry: thả giãn, xả hơi.",
       "example": "It’s hard to wind down after doing such a stressful job all day.",
-      "count": 0
-    },
-    {
-      "word": "write off /raɪt ɒf/",
-      "meaning": "damage a vehicle so badly that it is not worth repairing: làm hỏng nặng.",
-      "example": "My uncle wrote his car off in an accident last weekend.",
       "count": 0
     },
     {
@@ -2330,8 +2018,8 @@
     },
     {
       "word": "put your feet up",
-      "meaning": "sit down and relax, especially with your feet raised off the ground: thư giãn.",
-      "example": "Put your feet up and I’ll make dinner.",
+      "meaning": "sit down and relax: nghỉ ngơi, thư giãn.",
+      "example": "Put your feet up for half an hour – you look absolutely exhausted.",
       "count": 0
     },
     {
@@ -2354,14 +2042,14 @@
     },
     {
       "word": "reinvent the wheel",
-      "meaning": "waste time and effort trying to do something that someone else has already done well: phí công tái tạo.",
+      "meaning": "waste time and effort doing something that has already been done well: phí công tái tạo.",
       "example": "Just use the same document you used last time, because there’s no point reinventing the wheel.",
       "count": 0
     },
     {
       "word": "ring a bell",
-      "meaning": "something that rings a bell sounds familiar to you, although you cannot remember the exact details: nghe hơi quen.",
-      "example": "The name rings a bell but I’m not sure if I’ve ever met her.",
+      "meaning": "sound familiar to you: nghe quen quen.",
+      "example": "The name rings a bell, but I’m not sure if I’ve ever met her.",
       "count": 0
     },
     {
@@ -2497,9 +2185,9 @@
       "count": 0
     },
     {
-      "word": "lock, stock and barrel",
-      "meaning": "including everything: tất thảy.",
-      "example": "They’ve sold all their possessions, lock, stock and barrel.",
+      "word": "Lock, stock and barrel",
+      "meaning": "The whole of everything",
+      "example": "After years of negotiations, they finally decided to buy the company lock, stock, and barrel.",
       "count": 0
     },
     {
@@ -2623,12 +2311,6 @@
       "count": 0
     },
     {
-      "word": "put your feet up",
-      "meaning": "sit down and relax: nghỉ ngơi, thư giãn.",
-      "example": "Put your feet up for half an hour – you look absolutely exhausted.",
-      "count": 0
-    },
-    {
       "word": "put your money where your mouth is",
       "meaning": "show by action that you support or believe something: thể hiện niềm tin bằng hành động.",
       "example": "If you’re really serious about quitting your job, it’s time to put your money where your mouth is and hand in your resignation.",
@@ -2656,18 +2338,6 @@
       "word": "red-letter day",
       "meaning": "a very important or exciting day: ngày đáng nhớ.",
       "example": "It was a red-letter day when we moved into our new house.",
-      "count": 0
-    },
-    {
-      "word": "reinvent the wheel",
-      "meaning": "waste time and effort doing something that has already been done well: phí công tái tạo.",
-      "example": "Just use the same document you used last time, because there’s no point reinventing the wheel.",
-      "count": 0
-    },
-    {
-      "word": "ring a bell",
-      "meaning": "sound familiar to you: nghe quen quen.",
-      "example": "The name rings a bell, but I’m not sure if I’ve ever met her.",
       "count": 0
     },
     {
@@ -3013,12 +2683,6 @@
       "count": 0
     },
     {
-      "word": "step aside /step əˈsaɪd/",
-      "meaning": "leave a job so that sb else can take over: từ chức.",
-      "example": "The chairman stepped aside to let the younger manager take over.",
-      "count": 0
-    },
-    {
       "word": "step down /step daʊn/",
       "meaning": "leave a position of power: từ bỏ chức vụ.",
       "example": "She decided to step down after ten years as CEO.",
@@ -3103,12 +2767,6 @@
       "count": 0
     },
     {
-      "word": "throw out /θrəʊ aʊt/",
-      "meaning": "eject or remove forcibly: đuổi ra.",
-      "example": "They threw out the old furniture to make space.",
-      "count": 0
-    },
-    {
       "word": "tick off /tɪk ɒf/",
       "meaning": "reprimand or scold: trách mắng.",
       "example": "She ticked off the items on the checklist.",
@@ -3145,27 +2803,9 @@
       "count": 0
     },
     {
-      "word": "use up /juːz ʌp/",
-      "meaning": "consume completely: sử dụng hết.",
-      "example": "We've used up all the milk.",
-      "count": 0
-    },
-    {
-      "word": "walk out /wɔːk aʊt/",
-      "meaning": "leave suddenly or unexpectedly: rời đi bất ngờ.",
-      "example": "The workers walked out in protest of the new policies.",
-      "count": 0
-    },
-    {
       "word": "wear out /weər aʊt/",
       "meaning": "become very tired: mệt mỏi rã rời.",
       "example": "These shoes have completely worn out after years of use.",
-      "count": 0
-    },
-    {
-      "word": "mess about/around /mes əˈbaʊt əˈraʊnd/",
-      "meaning": "spend time doing things in a relaxed way: thư giãn.",
-      "example": "There's nothing I like better than messing about in the garden.",
       "count": 0
     },
     {
@@ -3373,12 +3013,6 @@
       "count": 0
     },
     {
-      "word": "Cost an Arm and a Leg",
-      "meaning": "Be very expensive",
-      "example": "The vintage car restoration ended up costing me an arm and a leg, but it was worth it to see it gleaming again.",
-      "count": 0
-    },
-    {
       "word": "Smell a rat",
       "meaning": "Suspect something foul",
       "example": "After seeing how eager he was to sell his car for such a low price, I began to smell a rat and suspected that there might be something wrong.",
@@ -3466,12 +3100,6 @@
       "word": "A miss is as good as a mile",
       "meaning": "Comes nowhere near the target",
       "example": "She didn’t win the race, but her coach reminded her that in the end, a miss is as good as a mile.",
-      "count": 0
-    },
-    {
-      "word": "Lock, stock and barrel",
-      "meaning": "The whole of everything",
-      "example": "After years of negotiations, they finally decided to buy the company lock, stock, and barrel.",
       "count": 0
     },
     {
@@ -4471,9 +4099,9 @@
       "count": 0
     },
     {
-      "word": "Obsolete (adjective)",
-      "meaning": "A piece of technology (or a person) that is too old or technologically limited to be useful.",
-      "example": "The rise of self-driving cars may render human drivers obsolete in the near future.",
+      "word": "obsolete (adjective)",
+      "meaning": "No longer in use",
+      "example": ".",
       "count": 0
     },
     {
@@ -5311,12 +4939,6 @@
       "count": 0
     },
     {
-      "word": "favourable, beneficial, constructive",
-      "meaning": "positive (impact)",
-      "example": "I think technology has had a constructive impact on society.",
-      "count": 0
-    },
-    {
       "word": "A LAWNMOWER",
       "meaning": "A LAWNMOWER",
       "example": "I don’t know what you call it, but you use it to cut grass.",
@@ -5839,9 +5461,9 @@
       "count": 0
     },
     {
-      "word": "Manipulate (verb)",
-      "meaning": "Control someone without them knowing they are being controlled.",
-      "example": "Children can be easily manipulated into desiring certain products.",
+      "word": "manipulate (verb)",
+      "meaning": "To influence, manage, direct, or control something",
+      "example": ".",
       "count": 0
     },
     {
@@ -5935,9 +5557,9 @@
       "count": 0
     },
     {
-      "word": "Migrate (verb)",
-      "meaning": "Travel long distances on a regular basis (e.g. yearly) for a specific purpose, often at a fixed time of the year.",
-      "example": "Many types of birds in the northern hemisphere migrate southwards in the winter.",
+      "word": "migrate (verb)",
+      "meaning": "To relocate from one location to another",
+      "example": ".",
       "count": 0
     },
     {
@@ -7213,9 +6835,9 @@
       "count": 0
     },
     {
-      "word": "Outsource (verb)",
-      "meaning": "Employ people in other countries to do the work previously done by employees in a company’s home country. Usually done to cut costs, sending the jobs to countries with lower cost of labour.",
-      "example": "An increasing number of multinational companies have outsourced production of their products to developing countries.",
+      "word": "outsource (verb)",
+      "meaning": "To transfer the management and/or day-to-day execution of a business function to a third-party service provider, especially internationally",
+      "example": ".",
       "count": 0
     },
     {
@@ -7249,9 +6871,9 @@
       "count": 0
     },
     {
-      "word": "Ubiquitous (adjective)",
-      "meaning": "Something that exists or can be seen everywhere.",
-      "example": "Given how ubiquitous American brands like McDonald’s and Disney are, it’s no surprise that America is still a very influential country.",
+      "word": "ubiquitous (adjective)",
+      "meaning": "present everywhere",
+      "example": "Water may seem ubiquitous, until a drought comes along.",
       "count": 0
     },
     {
@@ -7279,9 +6901,9 @@
       "count": 0
     },
     {
-      "word": "Prohibit (verb)",
-      "meaning": "To ban something or make it illegal.",
-      "example": "In the 1920s, the American government prohibited the production and sale of alcohol.",
+      "word": "prohibit (verb)",
+      "meaning": "To forbid or disallow officially; to make illegal",
+      "example": ".",
       "count": 0
     },
     {
@@ -7621,9 +7243,9 @@
       "count": 0
     },
     {
-      "word": "Vulnerable (adjective)",
-      "meaning": "Being in a situation of danger or without protection.",
-      "example": "Countries with limited rainfall and no access to reliable sources of fresh water are particularly vulnerable to the effects of climate change.",
+      "word": "vulnerable (adjective)",
+      "meaning": "more or most likely to be exposed to the chance of being attacked or harmed, either physically or emotionally",
+      "example": "Many kids are vulnerable to being bullied by someone at school.",
       "count": 0
     },
     {
@@ -8695,12 +8317,6 @@
       "count": 0
     },
     {
-      "word": "manipulate (verb)",
-      "meaning": "To influence, manage, direct, or control something",
-      "example": ".",
-      "count": 0
-    },
-    {
       "word": "market (verb)",
       "meaning": "A formally organized system of trading in specified goods or money",
       "example": ".",
@@ -8709,12 +8325,6 @@
     {
       "word": "metamorphosis (noun)",
       "meaning": "A transformation; a noticeable change in character or appearance",
-      "example": ".",
-      "count": 0
-    },
-    {
-      "word": "migrate (verb)",
-      "meaning": "To relocate from one location to another",
       "example": ".",
       "count": 0
     },
@@ -8797,12 +8407,6 @@
       "count": 0
     },
     {
-      "word": "obsolete (adjective)",
-      "meaning": "No longer in use",
-      "example": ".",
-      "count": 0
-    },
-    {
       "word": "obstacle (noun)",
       "meaning": "Something that stops progress",
       "example": ".",
@@ -8835,12 +8439,6 @@
     {
       "word": "outdo (verb)",
       "meaning": "To excel; go beyond in performance",
-      "example": ".",
-      "count": 0
-    },
-    {
-      "word": "outsource (verb)",
-      "meaning": "To transfer the management and/or day-to-day execution of a business function to a third-party service provider, especially internationally",
       "example": ".",
       "count": 0
     },
@@ -8931,12 +8529,6 @@
     {
       "word": "preserve (verb)",
       "meaning": "To protect; To save from decay",
-      "example": ".",
-      "count": 0
-    },
-    {
-      "word": "prohibit (verb)",
-      "meaning": "To forbid or disallow officially; to make illegal",
       "example": ".",
       "count": 0
     },
@@ -9343,12 +8935,6 @@
       "count": 0
     },
     {
-      "word": "ubiquitous (adjective)",
-      "meaning": "present everywhere",
-      "example": "Water may seem ubiquitous, until a drought comes along.",
-      "count": 0
-    },
-    {
       "word": "ultimately (adverb)",
       "meaning": "indicating the last item; finally; lastly",
       "example": "Ultimately, he will have to make a decision before the end of the week.",
@@ -9499,12 +9085,6 @@
       "count": 0
     },
     {
-      "word": "vulnerable (adjective)",
-      "meaning": "more or most likely to be exposed to the chance of being attacked or harmed, either physically or emotionally",
-      "example": "Many kids are vulnerable to being bullied by someone at school.",
-      "count": 0
-    },
-    {
       "word": "waive (verb)",
       "meaning": "to give up",
       "example": "He waived his rights to have a lawyer present, but ultimately that was the wrong decision.",
@@ -9620,12 +9200,6 @@
     },
     {
       "word": "convert (v)",
-      "meaning": "to change from one system to another: chuyển đổi",
-      "example": "We’re changing to a new computer system at work, so it’s chaos at the moment.",
-      "count": 0
-    },
-    {
-      "word": "convert (v)",
       "meaning": "to change your beliefs, especially religious: thay đổi tín ngưỡng",
       "example": "I was rather shocked when she did convert to Buddhism.",
       "count": 0
@@ -9668,20 +9242,8 @@
     },
     {
       "word": "endure (v)",
-      "meaning": "to suffer something unpleasant or difficult: chịu đựng",
-      "example": "I don't think he could endure living under those conditions.",
-      "count": 0
-    },
-    {
-      "word": "endure (v)",
       "meaning": "to last for a long time: kéo dài",
       "example": "Shakespeare's works have endured for over 400 years.",
-      "count": 0
-    },
-    {
-      "word": "evolve (v)",
-      "meaning": "to change or develop gradually over a period: tiến hóa",
-      "example": "The computer industry has evolved rapidly.",
       "count": 0
     },
     {
@@ -9848,8 +9410,8 @@
     },
     {
       "word": "speculate (v) /ˈspekjuleɪt/",
-      "meaning": "to consider or discuss why something has happened: suy xét.",
-      "example": "We can only speculate on the reasons for his sudden resignation.",
+      "meaning": "to consider or discuss why something has happened: suy đoán. He refused to speculate on what might happen.",
+      "example": "He refused to speculate on what might happen.",
       "count": 0
     },
     {
@@ -10088,12 +9650,6 @@
     },
     {
       "word": "contemporary (adj)",
-      "meaning": "modern or relating to the present time: đương đại.",
-      "example": "I’m not very keen on contemporary art.",
-      "count": 0
-    },
-    {
-      "word": "contemporary (adj)",
       "meaning": "alive or existing at the same time as a particular event or person: cùng thời.",
       "example": "Contemporary accounts offer a very different interpretation.",
       "count": 0
@@ -10150,48 +9706,6 @@
       "word": "interval (n)",
       "meaning": "a short break between the parts of something such as a play or concert: giờ giải lao.",
       "example": "How long is the interval?",
-      "count": 0
-    },
-    {
-      "word": "lapse (n)",
-      "meaning": "a period of time between two events: khoảng thời gian giữa 2 sự việc.",
-      "example": "There was a lapse of ten years between his visits.",
-      "count": 0
-    },
-    {
-      "word": "lapse (v)",
-      "meaning": "to stop gradually or for a short time: dần ngưng lại.",
-      "example": "At this point the waiter came up with Maggie’s drink and conversation lapsed.",
-      "count": 0
-    },
-    {
-      "word": "lifetime (n)",
-      "meaning": "the period of time when someone is alive: cuộc đời.",
-      "example": "He achieved a lot in his short lifetime.",
-      "count": 0
-    },
-    {
-      "word": "long-standing (adj)",
-      "meaning": "having existed for a long time: lâu đời, lâu dài.",
-      "example": "There’s a long-standing tradition in our family of giving presents on Christmas Eve.",
-      "count": 0
-    },
-    {
-      "word": "millennium (n)",
-      "meaning": "a period of 1,000 years or the beginning of a period of 1,000 years: thiên niên kỷ.",
-      "example": "People celebrating the millennium filled the streets.",
-      "count": 0
-    },
-    {
-      "word": "obsolete (adj)",
-      "meaning": "no longer used because of being replaced by something newer and more effective: lỗi thời.",
-      "example": "Most computer hardware rapidly becomes obsolete.",
-      "count": 0
-    },
-    {
-      "word": "overdue (adj)",
-      "meaning": "if something is overdue, it should have arrived or been done, paid etc before now: quá chậm, quá hạn.",
-      "example": "This change in attitude is long overdue.",
       "count": 0
     },
     {
@@ -10394,8 +9908,8 @@
     },
     {
       "word": "headhunt (v)",
-      "meaning": "to persuade someone to leave their job by offering them another job: săn đầu người. He was headhunted by a rival firm.",
-      "example": "He was headhunted by a rival firm.",
+      "meaning": "/ˈhɛdhʌnt/",
+      "example": "to persuade someone to leave their job and go to work for another company: săn đầu người.",
       "count": 0
     },
     {
@@ -10408,54 +9922,6 @@
       "word": "industry (n)",
       "meaning": "the production of goods, especially in factories: ngành công nghiệp. Most industries now use technology.",
       "example": "Most industries now use technology.",
-      "count": 0
-    },
-    {
-      "word": "leave (n)",
-      "meaning": "a period of time away from your job: nghỉ phép. I’ve applied for three days’ leave to visit my mother.",
-      "example": "I’ve applied for three days’ leave to visit my mother.",
-      "count": 0
-    },
-    {
-      "word": "marketing (n)",
-      "meaning": "a job that involves encouraging people to buy a product or service: tiếp thị. We are running a big marketing campaign.",
-      "example": "We are running a big marketing campaign.",
-      "count": 0
-    },
-    {
-      "word": "multinational (n)",
-      "meaning": "a large company operating in several countries: đa quốc gia. He works for a multinational.",
-      "example": "He works for a multinational.",
-      "count": 0
-    },
-    {
-      "word": "multinational (adj)",
-      "meaning": "involving people or ideas from several countries: đa quốc gia. The company is multinational.",
-      "example": "The company is multinational.",
-      "count": 0
-    },
-    {
-      "word": "promotion (n)",
-      "meaning": "a move to a more important job: thăng chức. His promotion to Head of Marketing.",
-      "example": "His promotion to Head of Marketing.",
-      "count": 0
-    },
-    {
-      "word": "prospects (n pl)",
-      "meaning": "the chances of being successful in the future: triển vọng. She spoke about her career prospects.",
-      "example": "She spoke about her career prospects.",
-      "count": 0
-    },
-    {
-      "word": "fire (v)",
-      "meaning": "/ˈfaɪər/",
-      "example": "to make someone leave their job, sometimes as a punishment: sa thải.",
-      "count": 0
-    },
-    {
-      "word": "headhunt (v)",
-      "meaning": "/ˈhɛdhʌnt/",
-      "example": "to persuade someone to leave their job and go to work for another company: săn đầu người.",
       "count": 0
     },
     {
@@ -10483,21 +9949,27 @@
       "count": 0
     },
     {
-      "word": "private sector (n)",
-      "meaning": "/ˈpraɪvət ˈsɛktər/",
-      "example": "all the businesses not controlled by the government: khối tư nhân.",
-      "count": 0
-    },
-    {
-      "word": "promotion (n)",
-      "meaning": "/prəˈmoʊʃən/",
-      "example": "a move to a higher level in an organization: sự thăng tiến.",
-      "count": 0
-    },
-    {
       "word": "promotion (n)",
       "meaning": "/prəˈmoʊʃən/",
       "example": "the activity of attracting people's attention to a product: sự quảng cáo.",
+      "count": 0
+    },
+    {
+      "word": "prospects (n pl)",
+      "meaning": "the chances of being successful in the future: triển vọng. She spoke about her career prospects.",
+      "example": "She spoke about her career prospects.",
+      "count": 0
+    },
+    {
+      "word": "fire (v)",
+      "meaning": "/ˈfaɪər/",
+      "example": "to make someone leave their job, sometimes as a punishment: sa thải.",
+      "count": 0
+    },
+    {
+      "word": "private sector (n)",
+      "meaning": "/ˈpraɪvət ˈsɛktər/",
+      "example": "all the businesses not controlled by the government: khối tư nhân.",
       "count": 0
     },
     {
@@ -10558,12 +10030,6 @@
       "word": "accelerate (v)",
       "meaning": "/əkˈsɛləˌreɪt/",
       "example": "to happen or make something happen faster: tăng tốc.",
-      "count": 0
-    },
-    {
-      "word": "approach (v)",
-      "meaning": "/əˈproʊʧ/",
-      "example": "to move closer to someone: tiến gần.",
       "count": 0
     },
     {
@@ -10640,8 +10106,8 @@
     },
     {
       "word": "drift (v)",
-      "meaning": "/drɪft/",
-      "example": "to be pushed along very slowly: trôi dạt.",
+      "meaning": "the meaning that someone is trying to express: ý nghĩ. I don't speak French very well, but I got his drift.",
+      "example": "I don't speak French very well, but I got his drift.",
       "count": 0
     },
     {
@@ -10654,12 +10120,6 @@
       "word": "crawl (n)",
       "meaning": "/krɔːl/",
       "example": "to move along the ground on your hands: bò.",
-      "count": 0
-    },
-    {
-      "word": "strike (n)",
-      "meaning": "/straɪk/",
-      "example": "a period of time when people refuse to work: đình công.",
       "count": 0
     },
     {
@@ -10702,12 +10162,6 @@
       "word": "private sector (n) /ˈpraɪvət ˈsektər/",
       "meaning": "all the businesses, industries that are not owned or managed by the government: khu vực tư nhân.",
       "example": "There is less job security in the private sector.",
-      "count": 0
-    },
-    {
-      "word": "promotion (n) /prəˈmoʊʃn/",
-      "meaning": "a move to a higher level in a company or sport: sự thăng tiến.",
-      "example": "The government’s planning to introduce a ban on the promotion of tobacco.",
       "count": 0
     },
     {
@@ -10774,12 +10228,6 @@
       "word": "accelerate (v) /əkˈseləreɪt/",
       "meaning": "to happen or make something happen faster: tăng tốc.",
       "example": "I started to feel nervous as we accelerated.",
-      "count": 0
-    },
-    {
-      "word": "approach (v) /əˈproʊtʃ/",
-      "meaning": "to move closer to someone or something: tiến lại gần.",
-      "example": "We approached the village from the south.",
       "count": 0
     },
     {
@@ -10873,12 +10321,6 @@
       "count": 0
     },
     {
-      "word": "drift (v)",
-      "meaning": "the meaning that someone is trying to express: ý nghĩ. I don't speak French very well, but I got his drift.",
-      "example": "I don't speak French very well, but I got his drift.",
-      "count": 0
-    },
-    {
       "word": "emigrate (v)",
       "meaning": "to leave your country in order to live in another country, on a permanent basis: di cư. My brother is thinking of emigrating to Australia.",
       "example": "My brother is thinking of emigrating to Australia.",
@@ -10922,8 +10364,8 @@
     },
     {
       "word": "grasp (v)",
-      "meaning": "to take and hold something or someone very tightly: nắm chặt. Vicky grasped my hand as we crossed the busy road.",
-      "example": "Vicky grasped my hand as we crossed the busy road.",
+      "meaning": "to understand something fully: hiểu thấu.",
+      "example": "He couldn't grasp the rules of the game.",
       "count": 0
     },
     {
@@ -11204,19 +10646,19 @@
     },
     {
       "word": "pier (n) /pɪər/",
-      "meaning": "a structure built out into the water and used as a landing place for boats: bến tàu.",
-      "example": "We walked along the pier and watched the boats come in.",
+      "meaning": "a structure built out into the water and used for getting on and off boats: bến tàu.",
+      "example": "We walked along the pier and watched the boats sail past.",
       "count": 0
     },
     {
       "word": "pilot (v) /ˈpaɪ.lət/",
-      "meaning": "to pilot a plane: lái máy bay.",
-      "example": "I wonder what it's like to pilot a jet.",
+      "meaning": "to steer or control the course of something, especially a plane or a ship: lái.",
+      "example": "I wonder what it’s like to pilot a jet.",
       "count": 0
     },
     {
       "word": "quay (n) /kiː/",
-      "meaning": "a structure where boats can stop: bến cảng.",
+      "meaning": "a platform in a harbor where boats can be moored for loading or unloading: bến cảng.",
       "example": "There were fishing boats tied up at the quay.",
       "count": 0
     },
@@ -11300,20 +10742,8 @@
     },
     {
       "word": "confirm (v) /kənˈfɜːm/",
-      "meaning": "to tell someone that something is true: chứng thực.",
-      "example": "The study confirms the findings of earlier research.",
-      "count": 0
-    },
-    {
-      "word": "confirm (v) /kənˈfɜːm/",
       "meaning": "to tell someone, usually by writing or talking to them, that something is true: xác nhận.",
       "example": "We cannot confirm whether the meeting is still on schedule.",
-      "count": 0
-    },
-    {
-      "word": "context (n) /ˈkɒn.tekst/",
-      "meaning": "the situation in which something happens, which helps explain it: bối cảnh.",
-      "example": "The meaning of the text depends on its historical context.",
       "count": 0
     },
     {
@@ -11324,32 +10754,8 @@
     },
     {
       "word": "contradict (v) /ˌkɒn.trəˈdɪkt/",
-      "meaning": "to say that the opposite of what someone has said is true: cải lại.",
-      "example": "He didn't dare to contradict his parents.",
-      "count": 0
-    },
-    {
-      "word": "contradict (v) /ˌkɒn.trəˈdɪkt/",
       "meaning": "to argue that two ideas, statements, etc. are different and cannot both be true: mâu thuẫn.",
       "example": "Her version of events contradicts that of the other driver.",
-      "count": 0
-    },
-    {
-      "word": "pier (n) /pɪər/",
-      "meaning": "a structure built out into the water and used for getting on and off boats: bến tàu.",
-      "example": "We walked along the pier and watched the boats sail past.",
-      "count": 0
-    },
-    {
-      "word": "pilot (v) /ˈpaɪ.lət/",
-      "meaning": "to steer or control the course of something, especially a plane or a ship: lái.",
-      "example": "I wonder what it’s like to pilot a jet.",
-      "count": 0
-    },
-    {
-      "word": "quay (n) /kiː/",
-      "meaning": "a platform in a harbor where boats can be moored for loading or unloading: bến cảng.",
-      "example": "There were fishing boats tied up at the quay.",
       "count": 0
     },
     {
@@ -11414,12 +10820,6 @@
     },
     {
       "word": "appreciate (/əˈpriːʃieɪt/)",
-      "meaning": "to understand the true nature of a situation, and realize why it is important or serious: đánh giá đúng.",
-      "example": "I really appreciate your hard work.",
-      "count": 0
-    },
-    {
-      "word": "appreciate (/əˈpriːʃieɪt/)",
       "meaning": "to be grateful for something: cảm kích.",
       "example": "I really appreciate your help.",
       "count": 0
@@ -11458,12 +10858,6 @@
       "word": "famine (/ˈfæmɪn/)",
       "meaning": "a serious lack of food that continues for a long time: nạn đói.",
       "example": "We're raising money to help victims of famine.",
-      "count": 0
-    },
-    {
-      "word": "flood (/flʌd/)",
-      "meaning": "if water floods a place, it covers it: gây ngập nước.",
-      "example": "The river flooded the whole area.",
       "count": 0
     },
     {
@@ -11552,26 +10946,8 @@
     },
     {
       "word": "average (/ˈævərɪdʒ/)",
-      "meaning": "calculated by adding a group of numbers together: trung bình.",
-      "example": "His scores were above average.",
-      "count": 0
-    },
-    {
-      "word": "average (/ˈævərɪdʒ/)",
-      "meaning": "not very good: tầm thường.",
-      "example": "He's about average height.",
-      "count": 0
-    },
-    {
-      "word": "average (/ˈævərɪdʒ/)",
       "meaning": "a usual level, standard: tiêu chuẩn.",
       "example": "Incomes here are much lower than average.",
-      "count": 0
-    },
-    {
-      "word": "batch (/bætʃ/)",
-      "meaning": "an amount that is collected together and treated as one group: nhóm.",
-      "example": "Let's do a batch of cookies.",
       "count": 0
     },
     {
@@ -11773,12 +11149,6 @@
       "count": 0
     },
     {
-      "word": "speculate (v) /ˈspekjuleɪt/",
-      "meaning": "to consider or discuss why something has happened: suy đoán. He refused to speculate on what might happen.",
-      "example": "He refused to speculate on what might happen.",
-      "count": 0
-    },
-    {
       "word": "spontaneous (adj) /spɒnˈteɪniəs/",
       "meaning": "happening in a natural way without being planned or thought about: tự phát. Leaving my job was a spontaneous decision.",
       "example": "Leaving my job was a spontaneous decision.",
@@ -11828,8 +11198,8 @@
     },
     {
       "word": "stutter (v)",
-      "meaning": "to repeat the sounds of words in an uncontrolled way when you speak because you are nervous or have a speech problem.",
-      "example": "Richard stuttered as he spoke.",
+      "meaning": "to repeat sounds of words, especially involuntarily",
+      "example": "When I was small, I spoke with a stutter.",
       "count": 0
     },
     {
@@ -11840,8 +11210,8 @@
     },
     {
       "word": "utter (v)",
-      "meaning": "to say something.",
-      "example": "She uttered a sound between joy and pain.",
+      "meaning": "to say something, especially formally",
+      "example": "She uttered a few words and then stopped.",
       "count": 0
     },
     {
@@ -11900,14 +11270,14 @@
     },
     {
       "word": "ghostwriter (n)",
-      "meaning": "someone who writes something for someone else.",
+      "meaning": "someone who writes something for someone else whose name will appear on it.",
       "example": "He didn’t really write his autobiography himself – a ghostwriter did it.",
       "count": 0
     },
     {
       "word": "handbook (n)",
-      "meaning": "a small book that gives information.",
-      "example": "It’s a very good handbook for finding jobs.",
+      "meaning": "a small book that gives information about a subject or instructions about how to use something.",
+      "example": "It’s a very good handbook for learning windsurfing.",
       "count": 0
     },
     {
@@ -11998,18 +11368,6 @@
       "word": "assign (v)",
       "meaning": "to send someone to a particular place.",
       "example": "He’s been assigned to the office in Manchester.",
-      "count": 0
-    },
-    {
-      "word": "ghostwriter (n)",
-      "meaning": "someone who writes something for someone else whose name will appear on it.",
-      "example": "He didn’t really write his autobiography himself – a ghostwriter did it.",
-      "count": 0
-    },
-    {
-      "word": "handbook (n)",
-      "meaning": "a small book that gives information about a subject or instructions about how to use something.",
-      "example": "It’s a very good handbook for learning windsurfing.",
       "count": 0
     },
     {
@@ -12157,12 +11515,6 @@
       "count": 0
     },
     {
-      "word": "stutter (v)",
-      "meaning": "to repeat sounds of words, especially involuntarily",
-      "example": "When I was small, I spoke with a stutter.",
-      "count": 0
-    },
-    {
       "word": "imply (v)",
       "meaning": "to communicate something indirectly",
       "example": "The letter implies that she loves him.",
@@ -12196,12 +11548,6 @@
       "word": "state (v)",
       "meaning": "to express something formally",
       "example": "He stated his opinion strongly.",
-      "count": 0
-    },
-    {
-      "word": "utter (v)",
-      "meaning": "to say something, especially formally",
-      "example": "She uttered a few words and then stopped.",
       "count": 0
     },
     {
@@ -12254,12 +11600,6 @@
     },
     {
       "word": "revolution (n)",
-      "meaning": "a sudden or major change, especially in ideas or methods: cuộc cách mạng.",
-      "example": "This invention will lead to a revolution in housework.",
-      "count": 0
-    },
-    {
-      "word": "revolution (n)",
       "meaning": "a situation in which people completely change their government or political system, usually by force: cách mạng chính trị.",
       "example": "Life was quite difficult in the country following the revolution.",
       "count": 0
@@ -12296,12 +11636,6 @@
     },
     {
       "word": "steady (adj)",
-      "meaning": "firmly held in a particular position without moving or shaking: (có tính) vững vàng.",
-      "example": "Imogen gave me a steady look.",
-      "count": 0
-    },
-    {
-      "word": "steady (adj)",
       "meaning": "staying at the same level, speed, value, etc: đều đều.",
       "example": "Prices should remain steady over the next few months.",
       "count": 0
@@ -12328,12 +11662,6 @@
       "word": "switch (v)",
       "meaning": "to replace one object with another: hoán đổi.",
       "example": "Someone switched their briefcase for mine when I wasn't looking.",
-      "count": 0
-    },
-    {
-      "word": "switch (n)",
-      "meaning": "a change from one thing to another: hoán đổi.",
-      "example": "I knew the magician had changed the cards but didn't see the switch.",
       "count": 0
     },
     {
@@ -12547,12 +11875,6 @@
       "count": 0
     },
     {
-      "word": "grasp (v)",
-      "meaning": "to understand something fully: hiểu thấu.",
-      "example": "He couldn't grasp the rules of the game.",
-      "count": 0
-    },
-    {
       "word": "guesswork (n)",
       "meaning": "the process of finding the answer by guessing: đoán mò.",
       "example": "The answer to the puzzle is pure guesswork.",
@@ -12676,6 +11998,12 @@
       "word": "Absorb (verb)",
       "meaning": "Take in liquid or energy",
       "example": "Solar panels absorb the sun’s energy and create electricity.",
+      "count": 0
+    },
+    {
+      "word": "Go down to the wire (idiom, verb)",
+      "meaning": "A sports game or competition in which the result is in doubt until the very end.",
+      "example": "The most exhilarating sports games are the ones that go right down to the wire.",
       "count": 0
     }
   ],
@@ -12874,7 +12202,7 @@
     },
     {
       "word": "blow away somebody [transitive]",
-      "meaning": "to really impress someone by doing something.",
+      "meaning": "to really impress someone by doing something. (làm kinh ngạc)",
       "example": "They were incredible and blew everyone away. The beaches in Thailand really impressed me.",
       "count": 0
     },
