@@ -2,7 +2,6 @@
 import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyCard from './VocabularyCard';
-import VocabularyControls from '@/components/VocabularyControls';
 import { useBackgroundColor } from './useBackgroundColor';
 
 interface VocabularyMainProps {
@@ -14,7 +13,7 @@ interface VocabularyMainProps {
   handleChangeVoice: (region: 'US' | 'UK') => void;
   handleSwitchCategory: () => void;
   handleManualNext: () => void;
-  handlePlay?: () => void; // Added new play handler
+  handlePlay?: () => void;
   currentCategory: string;
   nextCategory: string | null;
   isSoundPlaying: boolean;
@@ -63,22 +62,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         category={currentWord.category || currentCategory}
         voiceOptions={voiceOptions}
         selectedVoice={selectedVoice}
-      />
-
-      <VocabularyControls
-        mute={mute}
-        isPaused={isPaused}
-        onToggleMute={toggleMute}
-        onTogglePause={handleTogglePause}
-        onNext={handleManualNext}
         onPlay={handlePlay}
-        onChangeVoice={() => handleChangeVoice(selectedVoice === 'US' ? 'UK' : 'US')}
-        onSwitchCategory={handleSwitchCategory}
-        currentCategory={currentCategory}
-        nextCategory={nextCategory || ''}
-        voiceOption={selectedVoice}
-        isSoundPlaying={isSoundPlaying}
-        displayTime={displayTime}
       />
     </div>
   );

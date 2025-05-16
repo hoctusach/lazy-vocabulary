@@ -24,6 +24,7 @@ interface VocabularyCardProps {
   onChangeVoice: (voiceRegion: 'US' | 'UK') => void;
   onSwitchCategory: () => void;
   onNextWord: () => void;
+  onPlay?: () => void; // Added play handler
   currentCategory: string;
   nextCategory: string;
   isSpeaking?: boolean;
@@ -45,6 +46,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onChangeVoice,
   onSwitchCategory,
   onNextWord,
+  onPlay,
   currentCategory,
   nextCategory,
   isSpeaking = false,
@@ -135,6 +137,19 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
               {isPaused ? "Play" : "Pause"}
             </Button>
+            
+            {/* Add specific Play button */}
+            {onPlay && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={onPlay}
+                className="h-7 text-xs px-2 text-green-700 bg-green-50"
+              >
+                <Play size={14} className="mr-1" />
+                Speak
+              </Button>
+            )}
           
             <Button
               variant="outline"
@@ -153,7 +168,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               className="h-7 text-xs px-2 text-green-700"
             >
               <RefreshCw size={12} className="mr-1" />
-              {safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1)}
+              {typeof safeNextCategory === 'string' ? 
+                safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1) : 
+                'Next'}
             </Button>
             
             {/* Simplified accent buttons - just US and UK */}
@@ -174,6 +191,19 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               </Button>
             ))}
           </div>
+          
+          {/* Progress bar */}
+          {displayTime > 0 && (
+            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+              <div
+                className="bg-blue-600 h-2 rounded-full"
+                style={{
+                  width: `${Math.min(100, (displayTime / 10) * 100)}%`,
+                  transition: "width 0.5s linear",
+                }}
+              />
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

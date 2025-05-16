@@ -74,3 +74,92 @@ export const isSpeechSynthesisSupported = (): boolean => {
   console.log(`[ENGINE] Speech synthesis supported: ${isSupported}`);
   return isSupported;
 };
+
+// Ensure voices are loaded before speaking
+export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
+  return new Promise((resolve) => {
+    // Try to get voices immediately
+    let voices = window.speechSynthesis.getVoices();
+    
+    if (voices.length > 0) {
+      console.log('[ENGINE] Voices already loaded:', voices.length);
+      resolve(voices);
+      return;
+    }
+    
+    console.log('[ENGINE] Waiting for voices to load');
+    
+    // Set up an event listener for when voices change (are loaded)
+    const voicesChangedHandler = () => {
+      voices = window.speechSynthesis.getVoices();
+      console.log('[ENGINE] Voices loaded via event:', voices.length);
+      window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+      resolve(voices);
+    };
+    
+    window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    
+    // Fallback: If event doesn't fire within a reasonable time, resolve anyway
+    setTimeout(() => {
+      window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+      voices = window.speechSynthesis.getVoices();
+      console.log('[ENGINE] Voices loaded via timeout:', voices.length);
+      resolve(voices);
+    }, 1000);
+  });
+};
+
+// Safe speech function that ensures voices are loaded first
+export const speakWithRetry = async (
+  utterance: SpeechSynthesisUtterance, 
+  maxRetries: number = 3
+): Promise<boolean> => {
+  // Ensure voices are loaded
+  await loadVoicesAndWait();
+  
+  let attempts = 0;
+  let success = false;
+  
+  while (attempts < maxRetries && !success) {
+    attempts++;
+    
+    try {
+      if (attempts > 1) {
+        console.log(`[ENGINE] Retry attempt ${attempts} for speech`);
+        // Reset speech synthesis before retrying
+        window.speechSynthesis.cancel();
+        await new Promise(r => setTimeout(r, 300));
+      }
+      
+      window.speechSynthesis.speak(utterance);
+      
+      // Check if speech actually started
+      await new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+          if (window.speechSynthesis.speaking) {
+            console.log('[ENGINE] Speech successfully started');
+            success = true;
+            resolve();
+          } else {
+            console.warn('[ENGINE] Speech did not start properly');
+            reject(new Error('Speech did not start'));
+          }
+        }, 200);
+      });
+      
+      break; // Exit loop on success
+    } catch (error) {
+      console.error(`[ENGINE] Speech attempt ${attempts} failed:`, error);
+      
+      if (attempts >= maxRetries) {
+        console.error('[ENGINE] Max retries reached, giving up');
+        return false;
+      }
+      
+      // Wait before next attempt
+      await new Promise(r => setTimeout(r, 300));
+    }
+  }
+  
+  return success;
+};
