@@ -83,7 +83,8 @@ const VocabularyAppContainer: React.FC = () => {
     // Mark that we've had user interaction
     userInteractionRef.current = true;
     
-    const targetCategory = categoryName || nextCategory;
+    // Fixed: Ensure we're passing a string, not an object
+    const targetCategory = typeof categoryName === 'string' ? categoryName : nextCategory;
     if (targetCategory) {
       console.log(`Switching directly to category: ${targetCategory}`);
       handleSwitchCategory(currentCategory, targetCategory);

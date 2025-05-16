@@ -12,7 +12,14 @@ export const useCategoryActions = (
 ) => {
   // Enhanced category switching with proper cleanup
   const handleSwitchCategory = useCallback((currentCategory: string = "", nextCategory: string = "") => {
-    console.log(`Switching category from ${currentCategory} to ${nextCategory}`);
+    // Fixed: Added debug logging to track category values
+    console.log(`Switching category from "${currentCategory}" to "${nextCategory}" (types: ${typeof currentCategory}, ${typeof nextCategory})`);
+    
+    // Ensure nextCategory is a string
+    if (typeof nextCategory !== 'string') {
+      console.error(`Invalid category type: ${typeof nextCategory}`, nextCategory);
+      return;
+    }
     
     // First stop any ongoing speech and clear timers
     stopSpeaking();
