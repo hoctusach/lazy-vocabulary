@@ -4,13 +4,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
-
-interface VoiceOption {
-  label: string;
-  region: 'US' | 'UK';
-  gender: 'male' | 'female';
-  voice: SpeechSynthesisVoice | null;
-}
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
 interface VocabularyCardProps {
   word: string;
@@ -21,7 +15,7 @@ interface VocabularyCardProps {
   isPaused: boolean;
   onToggleMute: () => void;
   onTogglePause: () => void;
-  onChangeVoice: (voiceRegion: 'US' | 'UK') => void;
+  onCycleVoice: () => void;
   onSwitchCategory: () => void;
   onNextWord: () => void;
   currentCategory: string;
@@ -29,8 +23,7 @@ interface VocabularyCardProps {
   isSpeaking?: boolean;
   displayTime?: number;
   category?: string;
-  voiceOptions: VoiceOption[];
-  selectedVoice: string;
+  selectedVoice: VoiceSelection;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -42,7 +35,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   isPaused,
   onToggleMute,
   onTogglePause,
-  onChangeVoice,
+  onCycleVoice,
   onSwitchCategory,
   onNextWord,
   currentCategory,
@@ -50,7 +43,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   isSpeaking = false,
   displayTime,
   category,
-  voiceOptions,
   selectedVoice
 }) => {
   // Store current word in localStorage to help track sync issues
@@ -156,23 +148,15 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               {safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1)}
             </Button>
             
-            {/* Simplified accent buttons - just US and UK */}
-            {voiceOptions.map(option => (
-              <Button 
-                key={option.region}
-                variant="outline" 
-                size="sm" 
-                onClick={() => onChangeVoice(option.region)}
-                className={cn(
-                  "h-7 text-xs px-2",
-                  selectedVoice === option.region 
-                    ? "text-blue-700 border-blue-300 bg-blue-50" 
-                    : "text-gray-700"
-                )}
-              >
-                {option.region}
-              </Button>
-            ))}
+            {/* New voice toggle button that cycles through all 4 voice options */}
+            <Button
+              variant="outline" 
+              size="sm" 
+              onClick={onCycleVoice}
+              className="h-7 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+            >
+              Voice: {selectedVoice.label}
+            </Button>
           </div>
         </div>
       </CardContent>

@@ -3,6 +3,7 @@ import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyCard from './VocabularyCard';
 import { useBackgroundColor } from './useBackgroundColor';
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
 interface VocabularyMainProps {
   currentWord: VocabularyWord;
@@ -10,15 +11,14 @@ interface VocabularyMainProps {
   isPaused: boolean;
   toggleMute: () => void;
   handleTogglePause: () => void;
-  handleChangeVoice: (region: 'US' | 'UK') => void;
+  handleCycleVoice: () => void;
   handleSwitchCategory: () => void;
   handleManualNext: () => void;
   currentCategory: string;
   nextCategory: string | null;
   isSoundPlaying: boolean;
   displayTime: number;
-  voiceOptions: Array<{ label: string, region: 'US' | 'UK', gender: 'male' | 'female', voice: SpeechSynthesisVoice | null }>;
-  selectedVoice: 'US' | 'UK';
+  selectedVoice: VoiceSelection;
 }
 
 const VocabularyMain: React.FC<VocabularyMainProps> = ({
@@ -27,14 +27,13 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   isPaused,
   toggleMute,
   handleTogglePause,
-  handleChangeVoice,
+  handleCycleVoice,
   handleSwitchCategory,
   currentCategory,
   nextCategory,
   isSoundPlaying,
   handleManualNext,
   displayTime,
-  voiceOptions,
   selectedVoice,
 }) => {
   const { backgroundColor } = useBackgroundColor();
@@ -50,14 +49,13 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         isPaused={isPaused}
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
-        onChangeVoice={handleChangeVoice}
+        onCycleVoice={handleCycleVoice}
         onSwitchCategory={handleSwitchCategory}
         onNextWord={handleManualNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory || 'Next'}
         isSpeaking={isSoundPlaying}
         category={currentWord.category || currentCategory}
-        voiceOptions={voiceOptions}
         selectedVoice={selectedVoice}
       />
     </div>

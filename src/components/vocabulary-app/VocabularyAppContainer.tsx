@@ -37,10 +37,11 @@ const VocabularyAppContainer: React.FC = () => {
     toggleMute,
     togglePause,
     goToNextWord,
-    changeVoice,
+    cycleVoice,
     playCurrentWord,
     currentWord: playbackCurrentWord, // This is the single source of truth
-    userInteractionRef
+    userInteractionRef,
+    allVoiceOptions
   } = useVocabularyPlayback(wordList || []);
 
   // Force initialization of speech synthesis on component mount
@@ -105,20 +106,12 @@ const VocabularyAppContainer: React.FC = () => {
     togglePause();
   };
 
-  // Handle voice change with explicit user interaction
-  const handleChangeVoiceWithInteraction = (voiceRegion: 'US' | 'UK') => {
+  // Handle voice cycling with explicit user interaction
+  const handleCycleVoiceWithInteraction = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
-    changeVoice(voiceRegion);
+    cycleVoice();
   };
-
-  // Create correctly formatted voice options for the component
-  const formattedVoiceOptions = voices.map(voice => ({
-    label: voice.label,
-    region: voice.region as 'US' | 'UK',
-    gender: 'female' as 'male' | 'female', // Default to female for now
-    voice: null  // We don't need to pass the actual voice object
-  }));
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -134,15 +127,14 @@ const VocabularyAppContainer: React.FC = () => {
             isPaused={paused}
             toggleMute={toggleMute}
             handleTogglePause={handleTogglePauseWithInteraction}
-            handleChangeVoice={handleChangeVoiceWithInteraction}
+            handleCycleVoice={handleCycleVoiceWithInteraction}
             handleSwitchCategory={handleCategorySwitchDirect}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSoundPlaying={!muted && !paused}
             handleManualNext={handleManualNext}
             displayTime={displayTime}
-            voiceOptions={formattedVoiceOptions}
-            selectedVoice={selectedVoice.region}
+            selectedVoice={selectedVoice}
           />
           
           {/* Action buttons container */}

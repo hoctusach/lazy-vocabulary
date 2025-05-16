@@ -1,11 +1,11 @@
 
 import { useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { VoiceOption } from './useVoiceSelection';
+import { VoiceSelection } from './useVoiceSelection';
 
 export const useSpeechPlayback = (
   utteranceRef: React.MutableRefObject<SpeechSynthesisUtterance | null>,
-  selectedVoice: VoiceOption,
+  selectedVoice: VoiceSelection,
   advanceToNext: () => void,
   muted: boolean,
   paused: boolean
@@ -55,6 +55,67 @@ export const useSpeechPlayback = (
     });
   }, []);
 
+  // Find most appropriate voice based on region and gender
+  const findVoice = useCallback((voices: SpeechSynthesisVoice[], voiceSelection: VoiceSelection): SpeechSynthesisVoice | null => {
+    console.log(`Finding ${voiceSelection.region} ${voiceSelection.gender} voice among ${voices.length} voices`);
+    
+    // Log first few voices for debugging
+    voices.slice(0, 5).forEach((v, i) => {
+      console.log(`Voice ${i}: ${v.name} (${v.lang})`);
+    });
+    
+    const { region, gender } = voiceSelection;
+    const langCode = region === 'US' ? 'en-US' : 'en-GB';
+    const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
+    
+    console.log(`Looking for ${region} ${gender} voice`);
+    
+    // First try to find exact match by language and gender pattern in name
+    let voice = voices.find(v => 
+      v.lang === langCode && 
+      genderPattern.test(v.name)
+    );
+    
+    if (voice) {
+      console.log(`Found exact match: ${voice.name} ${voice.lang}`);
+      return voice;
+    }
+    
+    // Try by language only
+    voice = voices.find(v => v.lang === langCode);
+    if (voice) {
+      console.log(`Found language match: ${voice.name} ${voice.lang}`);
+      return voice;
+    }
+    
+    // Try by region pattern in name and language prefix
+    voice = voices.find(v => 
+      v.lang.startsWith(langCode.split('-')[0]) &&
+      (region === 'US' ? /us|united states|american/i : /uk|british|england|london/i).test(v.name)
+    );
+    
+    if (voice) {
+      console.log(`Found region name match: ${voice.name} ${voice.lang}`);
+      return voice;
+    }
+    
+    // Last resort - any voice with matching language prefix
+    voice = voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
+    if (voice) {
+      console.log(`Found language prefix match: ${voice.name} ${voice.lang}`);
+      return voice;
+    }
+    
+    // Absolute fallback - first voice in the list
+    if (voices.length > 0) {
+      console.log(`No matching voice found, using first available: ${voices[0].name}`);
+      return voices[0];
+    }
+    
+    console.log('No voices available at all');
+    return null;
+  }, []);
+
   // Function to play the current word
   const playWord = useCallback(async (wordToPlay: VocabularyWord | null) => {
     // First ensure we have a word to play and are not muted/paused
@@ -95,13 +156,18 @@ export const useSpeechPlayback = (
       
       utterance.text = `${wordText}. ${meaningText}. ${exampleText}`;
       
+      // Find the correct voice based on selected voice settings
+      const voice = findVoice(voices, selectedVoice);
+      
       // Set the selected voice if available
-      if (selectedVoice.voice) {
-        utterance.voice = selectedVoice.voice;
-        utterance.lang = selectedVoice.voice.lang;
-        console.log(`Using voice: ${selectedVoice.voice.name} (${selectedVoice.voice.lang})`);
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = voice.lang;
+        console.log(`Using voice: ${voice.name} (${voice.lang})`);
       } else {
         console.log('No voice available, using browser default');
+        // Set at least the language based on region
+        utterance.lang = selectedVoice.region === 'US' ? 'en-US' : 'en-GB';
       }
       
       // Configure speech properties
@@ -243,7 +309,7 @@ export const useSpeechPlayback = (
         setTimeout(advanceToNext, 1000);
       }
     }
-  }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, ensureVoicesLoaded, maxRetryAttempts]);
+  }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, ensureVoicesLoaded, maxRetryAttempts, findVoice]);
   
   return {
     playWord

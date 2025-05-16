@@ -1,4 +1,6 @@
 
+import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
+
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
   if (!voices || voices.length === 0) {
     return null;
@@ -14,7 +16,7 @@ export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthes
   return voices[0];
 };
 
-export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
+export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
   
   if (!voices || voices.length === 0) {
@@ -25,34 +27,37 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
   // Important: Use the exact language code for the requested region
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
   
-  console.log(`Searching for voice with region=${region}, langCode=${langCode} among ${voices.length} voices`);
+  console.log(`Searching for ${gender} voice with region=${region}, langCode=${langCode} among ${voices.length} voices`);
   
   // Log all available voices for debugging
   if (voices.length > 0) {
     console.log(`Available voices: ${voices.length}`);
     voices.forEach((v, i) => {
-      console.log(`Voice ${i+1}: name="${v.name}", lang="${v.lang}"`);
+      if (i < 10) { // Log just the first 10 to avoid spam
+        console.log(`Voice ${i+1}: name="${v.name}", lang="${v.lang}"`);
+      }
     });
   }
   
-  // Use a more sophisticated voice matching algorithm
+  // Use a more sophisticated voice matching algorithm with gender awareness
+  const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
   
-  // First priority: Match UK/US Female voice pattern
+  // First priority: Match region and gender pattern
   if (region === 'UK') {
-    let ukFemale = voices.find(v => /UK English Female|en-GB.*female/i.test(v.name));
-    if (ukFemale) {
-      console.log(`Selected UK Female voice: ${ukFemale.name} (${ukFemale.lang})`);
-      return ukFemale;
+    let ukVoiceWithGender = voices.find(v => v.lang === 'en-GB' && genderPattern.test(v.name));
+    if (ukVoiceWithGender) {
+      console.log(`Selected UK ${gender} voice: ${ukVoiceWithGender.name} (${ukVoiceWithGender.lang})`);
+      return ukVoiceWithGender;
     }
   } else if (region === 'US') {
-    let usFemale = voices.find(v => /US English Female|en-US.*female/i.test(v.name));
-    if (usFemale) {
-      console.log(`Selected US Female voice: ${usFemale.name} (${usFemale.lang})`);
-      return usFemale;
+    let usVoiceWithGender = voices.find(v => v.lang === 'en-US' && genderPattern.test(v.name));
+    if (usVoiceWithGender) {
+      console.log(`Selected US ${gender} voice: ${usVoiceWithGender.name} (${usVoiceWithGender.lang})`);
+      return usVoiceWithGender;
     }
   }
   
-  // Second priority: Exact match for the language code
+  // Second priority: Exact match for the language code ignoring gender
   let voice = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
   
   if (voice) {
@@ -111,6 +116,10 @@ export const getVoiceByRegion = (region: 'US' | 'UK'): SpeechSynthesisVoice | nu
     return voice;
   }
   
-  console.warn(`No suitable voice found for ${region}`);
+  console.warn(`No suitable voice found for ${region} ${gender}`);
   return null;
+};
+
+export const getVoiceBySelection = (voiceSelection: VoiceSelection): SpeechSynthesisVoice | null => {
+  return getVoiceByRegion(voiceSelection.region, voiceSelection.gender);
 };

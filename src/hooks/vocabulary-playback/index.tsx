@@ -7,8 +7,8 @@ import { useWordNavigation } from './useWordNavigation';
 import { useSpeechPlayback } from './useSpeechPlayback';
 
 export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
-  // Get voice selection functionality
-  const { voices, selectedVoice, changeVoice } = useVoiceSelection();
+  // Get voice selection functionality - now with cycling through 4 voices
+  const { voices, selectedVoice, cycleVoice, allVoiceOptions } = useVoiceSelection();
   
   // Get audio control functionality
   const { muted, paused, utteranceRef, cancelSpeech, toggleMute, togglePause } = useAudioControl(wordList);
@@ -73,7 +73,8 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     toggleMute,
     togglePause,
     goToNextWord,
-    changeVoice,
+    cycleVoice,
+    allVoiceOptions,
     userInteractionRef
   };
 };
