@@ -162,7 +162,6 @@ const VocabularyAppContainer: React.FC = () => {
             nextCategory={nextCategory}
             isSoundPlaying={!muted && !paused}
             handleManualNext={handleManualNext}
-            handlePlay={handlePlayButton} // Added explicit play handler
             displayTime={displayTime}
             voiceOptions={formattedVoiceOptions}
             selectedVoice={selectedVoice.region}

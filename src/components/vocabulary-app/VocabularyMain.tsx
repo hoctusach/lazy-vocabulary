@@ -33,6 +33,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   nextCategory,
   isSoundPlaying,
   handleManualNext,
+  displayTime,
   voiceOptions,
   selectedVoice,
 }) => {
