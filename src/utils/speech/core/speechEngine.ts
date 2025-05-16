@@ -75,47 +75,65 @@ export const isSpeechSynthesisSupported = (): boolean => {
   return isSupported;
 };
 
-// Ensure voices are loaded before speaking
+// Enhanced voices loading with explicit success/failure tracking
 export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise((resolve) => {
+    let voicesLoaded = false;
+    console.log('[ENGINE] Starting voice loading process');
+    
     // Try to get voices immediately
     let voices = window.speechSynthesis.getVoices();
     
     if (voices.length > 0) {
       console.log('[ENGINE] Voices already loaded:', voices.length);
+      voicesLoaded = true;
       resolve(voices);
       return;
     }
     
-    console.log('[ENGINE] Waiting for voices to load');
+    console.log('[ENGINE] Waiting for voices to load via event');
     
     // Set up an event listener for when voices change (are loaded)
     const voicesChangedHandler = () => {
       voices = window.speechSynthesis.getVoices();
       console.log('[ENGINE] Voices loaded via event:', voices.length);
+      voicesLoaded = true;
       window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
       resolve(voices);
     };
     
     window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
     
-    // Fallback: If event doesn't fire within a reasonable time, resolve anyway
-    setTimeout(() => {
-      window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
-      voices = window.speechSynthesis.getVoices();
-      console.log('[ENGINE] Voices loaded via timeout:', voices.length);
-      resolve(voices);
-    }, 1000);
+    // Multi-stage fallback with increasingly longer timeouts
+    const fallbackTimeouts = [500, 1000, 1500];
+    
+    fallbackTimeouts.forEach((timeout, index) => {
+      setTimeout(() => {
+        if (!voicesLoaded) {
+          voices = window.speechSynthesis.getVoices();
+          console.log(`[ENGINE] Voices check at ${timeout}ms:`, voices.length);
+          
+          // If we've found voices or this is our last attempt, resolve
+          if (voices.length > 0 || index === fallbackTimeouts.length - 1) {
+            window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+            console.log(`[ENGINE] Voices loaded via ${voices.length > 0 ? 'check' : 'final timeout'}:`, voices.length);
+            voicesLoaded = true;
+            resolve(voices);
+          }
+        }
+      }, timeout);
+    });
   });
 };
 
-// Safe speech function that ensures voices are loaded first
+// Improved speech function with better retry logic
 export const speakWithRetry = async (
   utterance: SpeechSynthesisUtterance, 
   maxRetries: number = 3
 ): Promise<boolean> => {
-  // Ensure voices are loaded
-  await loadVoicesAndWait();
+  // Ensure voices are loaded first
+  const voices = await loadVoicesAndWait();
+  console.log(`[ENGINE] Loaded ${voices.length} voices for speech`);
   
   let attempts = 0;
   let success = false;
@@ -132,6 +150,7 @@ export const speakWithRetry = async (
       }
       
       window.speechSynthesis.speak(utterance);
+      console.log(`[ENGINE] Speech initiated, attempt ${attempts}`);
       
       // Check if speech actually started
       await new Promise<void>((resolve, reject) => {
@@ -156,8 +175,8 @@ export const speakWithRetry = async (
         return false;
       }
       
-      // Wait before next attempt
-      await new Promise(r => setTimeout(r, 300));
+      // Wait before next attempt with exponential backoff
+      await new Promise(r => setTimeout(r, 300 * attempts));
     }
   }
   

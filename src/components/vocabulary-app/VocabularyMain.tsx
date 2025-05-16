@@ -13,7 +13,6 @@ interface VocabularyMainProps {
   handleChangeVoice: (region: 'US' | 'UK') => void;
   handleSwitchCategory: () => void;
   handleManualNext: () => void;
-  handlePlay?: () => void;
   currentCategory: string;
   nextCategory: string | null;
   isSoundPlaying: boolean;
@@ -34,8 +33,6 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   nextCategory,
   isSoundPlaying,
   handleManualNext,
-  handlePlay,
-  displayTime,
   voiceOptions,
   selectedVoice,
 }) => {
@@ -58,11 +55,9 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         currentCategory={currentCategory}
         nextCategory={nextCategory || 'Next'}
         isSpeaking={isSoundPlaying}
-        displayTime={displayTime}
         category={currentWord.category || currentCategory}
         voiceOptions={voiceOptions}
         selectedVoice={selectedVoice}
-        onPlay={handlePlay}
       />
     </div>
   );
