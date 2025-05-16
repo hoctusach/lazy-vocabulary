@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { stopSpeaking } from '@/utils/speech';
+import { toast } from "sonner";
 
 export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // State for managing playback
@@ -13,8 +13,9 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // Important refs for tracking state
   const userInteractionRef = useRef(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const voiceInitializedRef = useRef(false);
+  const speakingRef = useRef(false);
   const retryAttemptsRef = useRef(0);
+  const maxRetries = 3;
   
   // Get the current word based on the index
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
@@ -48,8 +49,34 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [muted, selectedVoice]);
   
-  // Function to find the appropriate voice
+  // Ensure speech synthesis is canceled when component unmounts
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  // Function to cancel any current speech and reset state
+  const cancelSpeech = useCallback(() => {
+    if (window.speechSynthesis) {
+      console.log('Cancelling any ongoing speech');
+      window.speechSynthesis.cancel();
+      speakingRef.current = false;
+      
+      // Clear utterance reference to avoid memory leaks
+      if (utteranceRef.current) {
+        utteranceRef.current.onend = null;
+        utteranceRef.current.onerror = null;
+        utteranceRef.current = null;
+      }
+    }
+  }, []);
+  
+  // Function to find the appropriate voice with logging
   const findVoice = useCallback((region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
+    // Always get fresh voices
     const voices = window.speechSynthesis.getVoices();
     console.log(`Finding ${region} voice among ${voices.length} voices`);
     
@@ -58,28 +85,33 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       return null;
     }
     
-    // Try to find a voice that matches the region and is female
+    // Log first few voices to help with debugging
+    voices.slice(0, 5).forEach((v, i) => {
+      console.log(`Voice ${i}: ${v.name} (${v.lang})`);
+    });
+    
+    // Try to find a voice that matches the region
     let voice: SpeechSynthesisVoice | null = null;
     
     if (region === 'UK') {
-      console.log('Looking for UK female voice');
+      console.log('Looking for UK voice');
       // Try to find UK female voice by name patterns
       voice = voices.find(v => 
-        /UK English Female|en-GB.*female|Google UK|British/i.test(v.name)
+        /UK English|en-GB|Google UK|British/i.test(v.name)
       );
       
-      // If no specific female voice found, try any en-GB voice
+      // If no specific voice found, try any en-GB voice
       if (!voice) {
         voice = voices.find(v => v.lang === 'en-GB');
       }
     } else {
-      console.log('Looking for US female voice');
+      console.log('Looking for US voice');
       // Try to find US female voice by name patterns
       voice = voices.find(v => 
-        /US English Female|en-US.*female|Google US|Samantha/i.test(v.name)
+        /US English|en-US|Google US|Samantha/i.test(v.name)
       );
       
-      // If no specific female voice found, try any en-US voice
+      // If no specific voice found, try any en-US voice
       if (!voice) {
         voice = voices.find(v => v.lang === 'en-US');
       }
@@ -99,178 +131,172 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     
     if (voice) {
       console.log(`Selected ${region} voice:`, voice.name, voice.lang);
+    } else {
+      console.warn('No suitable voice found');
     }
     
     return voice;
   }, []);
   
-  // Function to cancel any current speech
-  const cancelSpeech = useCallback(() => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      utteranceRef.current = null;
-      console.log('Speech canceled');
-    }
-  }, []);
-  
-  // Function to play the current word with proper voice selection
-  const playCurrentWord = useCallback(() => {
-    // Mark that we've had user interaction - crucial for browser audio permissions
-    userInteractionRef.current = true;
-    
-    if (!currentWord || muted || paused) {
-      console.log('Cannot play word: muted, paused, or no word available');
-      return;
-    }
-    
-    console.log(`Playing word: ${currentWord.word}`);
-    
-    // IMPORTANT: Cancel any ongoing speech to prevent queuing
-    cancelSpeech();
-    
-    // Wait a tick to ensure voices are loaded and cancellation is complete
-    setTimeout(() => {
-      try {
-        // Ensure voices are loaded (critical for iOS/Safari)
-        const voices = window.speechSynthesis.getVoices();
-        console.log(`Voices loaded: ${voices.length} voices available`);
-        
-        // Create a fresh utterance for each word (don't reuse old ones)
-        const utterance = new SpeechSynthesisUtterance();
-        utteranceRef.current = utterance;
-        
-        // Set the text with proper concatenation and pauses
-        const wordText = currentWord.word;
-        const meaningText = currentWord.meaning || '';
-        const exampleText = currentWord.example || '';
-        
-        utterance.text = `${wordText}. ${meaningText}. ${exampleText}`.trim();
-        
-        // Set the language based on selected region
-        utterance.lang = selectedVoice === 'UK' ? 'en-GB' : 'en-US';
-        
-        // Find and set the appropriate voice
-        const voice = findVoice(selectedVoice);
-        if (voice) {
-          utterance.voice = voice;
-          console.log(`Using voice: ${voice.name} (${voice.lang})`);
-        } else {
-          console.log('No matching voice found, using browser default');
-        }
-        
-        // Set speech parameters
-        utterance.rate = 0.9; // Slightly slower for better comprehension
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0; // Full volume
-        
-        // Handle events for auto-advancement
-        utterance.onend = () => {
-          console.log(`Speech ended for: ${currentWord.word}`);
-          retryAttemptsRef.current = 0;
-          
-          // Only auto-advance if not paused and not muted
-          if (!paused && !muted) {
-            goToNextWord();
-          }
-        };
-        
-        utterance.onerror = (event) => {
-          console.error(`Speech synthesis error: ${event.error}`, event);
-          
-          // Handle not-allowed error (permission issue) with retry
-          if (event.error === 'not-allowed') {
-            console.log('Detected not-allowed error, attempting to retry...');
-            
-            // For not-allowed errors, try to resume speech and retry once
-            window.speechSynthesis.resume();
-            
-            // Increment retry counter
-            retryAttemptsRef.current++;
-            
-            // Only retry a limited number of times
-            if (retryAttemptsRef.current <= 2) {
-              // Wait a moment and try one more time
-              setTimeout(() => {
-                try {
-                  // Ensure voices are loaded before retry
-                  window.speechSynthesis.getVoices();
-                  window.speechSynthesis.speak(utterance);
-                  console.log(`Retry attempt ${retryAttemptsRef.current} after not-allowed error`);
-                } catch (secondError) {
-                  console.error('Retry failed:', secondError);
-                  // On repeated failure, still advance to prevent getting stuck
-                  if (!paused && !muted) {
-                    goToNextWord();
-                  }
-                }
-              }, 150);
-            } else {
-              console.log('Max retries reached, advancing to next word');
-              // On repeated failures, just advance to next word
-              if (!paused && !muted) {
-                goToNextWord();
-              }
-            }
-          } else {
-            // For other errors, also advance to next word to prevent getting stuck
-            if (!paused && !muted) {
-              goToNextWord();
-            }
-          }
-        };
-        
-        // For debugging
-        utterance.onstart = () => {
-          console.log(`Speech started for: ${currentWord.word}`);
-        };
-        
-        // Ensure voices are loaded one more time just before speaking
-        window.speechSynthesis.getVoices();
-        
-        // Speak the text
-        window.speechSynthesis.speak(utterance);
-        console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
-        
-        // Verify speech is actually working
-        setTimeout(() => {
-          if (window.speechSynthesis.speaking) {
-            console.log('Speech synthesis is actively speaking');
-          } else {
-            console.log('Speech synthesis not speaking, may be blocked');
-            
-            // If speech isn't happening after 100ms, try one more time
-            if (retryAttemptsRef.current === 0) {
-              retryAttemptsRef.current++;
-              console.log('Attempting one more time to speak');
-              window.speechSynthesis.speak(utterance);
-            }
-          }
-        }, 100);
-      } catch (error) {
-        console.error('Error starting speech:', error);
-        // Still advance to prevent getting stuck
-        if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 1000);
-        }
-      }
-    }, 50);
-  }, [currentWord, muted, paused, selectedVoice, cancelSpeech, findVoice]);
-  
-  // Function to advance to next word
+  // Function to advance to next word with full cleanup
   const goToNextWord = useCallback(() => {
     if (wordList.length === 0) return;
     
     // Cancel any ongoing speech
     cancelSpeech();
     
-    // Move to next word
+    // Move to next word with a circular index
     setCurrentIndex(prevIndex => {
       const nextIndex = (prevIndex + 1) % wordList.length;
+      console.log(`Moving to word ${nextIndex}: ${wordList[nextIndex]?.word || 'unknown'}`);
       return nextIndex;
     });
-  }, [wordList.length, cancelSpeech]);
+    
+    // Reset retry attempts for the new word
+    retryAttemptsRef.current = 0;
+  }, [wordList, cancelSpeech]);
+
+  // Core function to play the current word
+  const playCurrentWord = useCallback(() => {
+    // Mark that we've had user interaction
+    userInteractionRef.current = true;
+    
+    // Basic checks
+    if (!currentWord) {
+      console.log('No current word to play');
+      return;
+    }
+    
+    if (muted) {
+      console.log('Speech is muted');
+      return;
+    }
+    
+    if (paused) {
+      console.log('Playback is paused');
+      return;
+    }
+    
+    console.log(`Attempting to play word: ${currentWord.word}`);
+    
+    // CRITICAL: Cancel any ongoing speech to prevent queuing
+    cancelSpeech();
+    
+    // Ensure speech synthesis is available
+    if (!window.speechSynthesis) {
+      console.error('Speech synthesis not supported in this browser');
+      toast.error("Speech synthesis isn't supported in your browser");
+      return;
+    }
+    
+    // Small delay to ensure cancellation completes
+    setTimeout(() => {
+      try {
+        // Reload voices (critical step)
+        const voices = window.speechSynthesis.getVoices();
+        console.log(`Voices loaded: ${voices.length} voices available`);
+        
+        // Create a fresh utterance for this word
+        const utterance = new SpeechSynthesisUtterance();
+        utteranceRef.current = utterance;
+        
+        // Set up the text with proper structure
+        const wordText = currentWord.word;
+        const meaningText = currentWord.meaning || '';
+        const exampleText = currentWord.example || '';
+        
+        utterance.text = `${wordText}. ${meaningText}. ${exampleText}`.trim();
+        
+        // Set language based on selected voice
+        utterance.lang = selectedVoice === 'UK' ? 'en-GB' : 'en-US';
+        
+        // Find and apply the voice
+        const voice = findVoice(selectedVoice);
+        if (voice) {
+          utterance.voice = voice;
+        }
+        
+        // Set speech parameters for better clarity
+        utterance.rate = 0.95; // Slightly slower
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        // Set up event handlers BEFORE calling speak()
+        utterance.onstart = () => {
+          console.log(`Speech started for: ${currentWord.word}`);
+          speakingRef.current = true;
+        };
+        
+        utterance.onend = () => {
+          console.log(`Speech ended successfully for: ${currentWord.word}`);
+          speakingRef.current = false;
+          
+          // Only auto-advance if not paused and not muted
+          if (!paused && !muted) {
+            console.log('Auto-advancing to next word');
+            goToNextWord();
+          }
+        };
+        
+        utterance.onerror = (event) => {
+          console.error(`Speech synthesis error:`, event);
+          speakingRef.current = false;
+          
+          // Increment retry counter
+          retryAttemptsRef.current++;
+          
+          if (retryAttemptsRef.current <= maxRetries) {
+            console.log(`Retry attempt ${retryAttemptsRef.current}/${maxRetries}`);
+            
+            // Wait briefly then retry
+            setTimeout(() => {
+              if (!paused && !muted) {
+                console.log('Retrying speech after error');
+                playCurrentWord();
+              }
+            }, 300);
+          } else {
+            console.log(`Max retries (${maxRetries}) reached, advancing to next word`);
+            if (!paused && !muted) {
+              // Move on after too many failures
+              goToNextWord();
+            }
+          }
+        };
+        
+        // Actually start speaking
+        window.speechSynthesis.speak(utterance);
+        console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
+        
+        // Verify speech is working after a short delay
+        setTimeout(() => {
+          if (!window.speechSynthesis.speaking && !paused && !muted) {
+            console.warn("Speech synthesis not speaking after 100ms");
+            
+            // If we haven't exceeded retry attempts, try again
+            if (retryAttemptsRef.current < maxRetries) {
+              retryAttemptsRef.current++;
+              console.log(`Silent failure detected, retry ${retryAttemptsRef.current}/${maxRetries}`);
+              playCurrentWord();
+            } else {
+              // If we've tried enough times, move on
+              console.log("Moving to next word after silent failures");
+              goToNextWord();
+            }
+          }
+        }, 100);
+        
+      } catch (error) {
+        console.error('Error in speech playback:', error);
+        // Still try to advance to prevent getting stuck
+        if (!paused && !muted) {
+          setTimeout(() => goToNextWord(), 1000);
+        }
+      }
+    }, 50); // Small delay to ensure cancellation completes
+  }, [currentWord, muted, paused, selectedVoice, cancelSpeech, findVoice, goToNextWord, maxRetries]);
   
-  // Function to toggle mute
+  // Function to toggle mute with full speech handling
   const toggleMute = useCallback(() => {
     setMuted(prev => {
       const newMuted = !prev;
@@ -284,7 +310,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     });
   }, [cancelSpeech]);
   
-  // Function to toggle pause
+  // Function to toggle pause with full speech handling
   const togglePause = useCallback(() => {
     setPaused(prev => {
       const newPaused = !prev;
@@ -292,46 +318,51 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       if (newPaused) {
         // When pausing, cancel current speech
         cancelSpeech();
+      } else if (currentWord && userInteractionRef.current) {
+        // When unpausing, play the current word after a brief delay
+        setTimeout(() => playCurrentWord(), 50);
       }
       
       return newPaused;
     });
-  }, [cancelSpeech]);
+  }, [cancelSpeech, playCurrentWord, currentWord]);
   
-  // Function to change voice
+  // Function to change voice with speech handling
   const changeVoice = useCallback((voiceRegion: 'US' | 'UK') => {
     setSelectedVoice(voiceRegion);
     console.log(`Voice changed to ${voiceRegion}`);
     
-    // Note: We deliberately don't cancel speech here
-    // The new voice will be used for the next word
-  }, []);
+    // If we have a current word and we're not paused/muted, replay with new voice
+    if (currentWord && !paused && !muted && userInteractionRef.current) {
+      // Short delay to ensure state update completes
+      setTimeout(() => playCurrentWord(), 50);
+    }
+  }, [currentWord, paused, muted, playCurrentWord]);
   
-  // Clean up speech synthesis when component unmounts
+  // Essential cleanup on unmount
   useEffect(() => {
     return () => {
       cancelSpeech();
     };
   }, [cancelSpeech]);
   
-  // Effect to automatically play the next word when needed
+  // Effect to handle auto-play only AFTER user interaction
   useEffect(() => {
-    // Only auto-play after we've had user interaction
-    if (currentWord && wordList.length > 0 && !muted && !paused && userInteractionRef.current) {
-      // Don't play automatically on first load or when manually advanced
-      if (voiceInitializedRef.current) {
-        console.log(`Auto-playing word after state change: ${currentWord.word}`);
+    if (currentWord && !muted && !paused && userInteractionRef.current) {
+      // Small delay to ensure state is settled
+      const timer = setTimeout(() => {
+        console.log('Auto-playing word after state change:', currentWord.word);
         playCurrentWord();
-      } else {
-        voiceInitializedRef.current = true;
-      }
+      }, 50);
+      
+      return () => clearTimeout(timer);
     }
-  }, [currentWord, wordList.length, muted, paused, playCurrentWord]);
+  }, [currentIndex, currentWord, muted, paused, playCurrentWord]);
   
-  // Combined data structure for voice options
+  // Create voice options array for UI
   const voices = [
-    { label: "US", region: "US" as const },
-    { label: "UK", region: "UK" as const }
+    { label: "US", region: "US" as const, gender: "female" as const, voice: null },
+    { label: "UK", region: "UK" as const, gender: "female" as const, voice: null }
   ];
   
   return {

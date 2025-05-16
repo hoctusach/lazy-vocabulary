@@ -97,29 +97,6 @@ const VocabularyAppContainer: React.FC = () => {
     goToNextWord();
   };
 
-  // Play button handler with explicit speech start
-  const handlePlayButton = () => {
-    // This is definitely user interaction
-    userInteractionRef.current = true;
-    
-    // First ensure we're not paused
-    if (paused) {
-      togglePause();
-    }
-    
-    // Ensure we're not muted
-    if (muted) {
-      toggleMute();
-    }
-    
-    // Log available voices for debugging
-    const voices = window.speechSynthesis.getVoices();
-    console.log(`Voices loaded on Play button click: ${voices.length} voices`);
-    
-    // Directly play the current word
-    playCurrentWord();
-  };
-
   // Handle toggle pause with explicit user interaction
   const handleTogglePauseWithInteraction = () => {
     // This is definitely user interaction
