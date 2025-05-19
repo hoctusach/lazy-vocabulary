@@ -1,5 +1,5 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from './useVoiceSelection';
 
@@ -15,6 +15,7 @@ export const useSpeechPlayback = (
   const maxRetryAttempts = 3;
   const voicesLoadedRef = useRef(false);
   const speakingFailedRef = useRef(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   // Function to ensure voices are loaded before speaking
   const ensureVoicesLoaded = useCallback((): Promise<SpeechSynthesisVoice[]> => {
@@ -178,6 +179,7 @@ export const useSpeechPlayback = (
       // Set up event handlers for auto-advancement
       utterance.onend = () => {
         console.log(`Speech ended successfully for: ${wordToPlay.word}`);
+        setIsSpeaking(false);
         retryAttemptsRef.current = 0;
         
         // Only auto-advance if not paused and not muted
@@ -189,10 +191,12 @@ export const useSpeechPlayback = (
       
       utterance.onstart = () => {
         console.log(`Speech started for: ${wordToPlay.word}`);
+        setIsSpeaking(true);
       };
       
       utterance.onerror = (event) => {
         console.error(`Speech synthesis error: ${event.error} for word ${wordToPlay.word}`);
+        setIsSpeaking(false);
         
         // Mark that we had a failure
         speakingFailedRef.current = true;
@@ -218,8 +222,10 @@ export const useSpeechPlayback = (
               try {
                 console.log(`Retry attempt ${retryAttemptsRef.current}/${maxRetryAttempts}`);
                 window.speechSynthesis.speak(utterance);
+                setIsSpeaking(true);
               } catch (err) {
                 console.error("Speech retry failed:", err);
+                setIsSpeaking(false);
                 // If retry fails, advance to next word
                 if (!paused && !muted) {
                   console.log("Advancing to next word after failed retry");
@@ -246,8 +252,10 @@ export const useSpeechPlayback = (
               if (!paused && !muted) {
                 try {
                   window.speechSynthesis.speak(utterance);
+                  setIsSpeaking(true);
                 } catch (e) {
                   console.error("Retry failed:", e);
+                  setIsSpeaking(false);
                   // Move on if retry fails
                   advanceToNext();
                 }
@@ -267,12 +275,14 @@ export const useSpeechPlayback = (
       setTimeout(() => {
         try {
           window.speechSynthesis.speak(utterance);
+          setIsSpeaking(true);
           console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
           
           // Verify speech is working after a short delay
           setTimeout(() => {
             if (!window.speechSynthesis.speaking && !speakingFailedRef.current) {
               console.warn("Speech synthesis not speaking after 200ms - potential silent failure");
+              setIsSpeaking(false);
               
               // If not speaking and we haven't seen an error, try again once
               if (retryAttemptsRef.current === 0) {
@@ -280,8 +290,10 @@ export const useSpeechPlayback = (
                 retryAttemptsRef.current++;
                 try {
                   window.speechSynthesis.speak(utterance);
+                  setIsSpeaking(true);
                 } catch (e) {
                   console.error("Silent failure retry failed:", e);
+                  setIsSpeaking(false);
                   // If retry fails, advance to next word
                   if (!paused && !muted) {
                     advanceToNext();
@@ -296,6 +308,7 @@ export const useSpeechPlayback = (
           }, 200);
         } catch (error) {
           console.error('Error starting speech:', error);
+          setIsSpeaking(false);
           // Still advance to next word after a delay to prevent getting stuck
           if (!paused && !muted) {
             setTimeout(advanceToNext, 1000);
@@ -304,6 +317,7 @@ export const useSpeechPlayback = (
       }, 100);
     } catch (error) {
       console.error("Error in playWord function:", error);
+      setIsSpeaking(false);
       // Always advance to prevent getting stuck
       if (!paused && !muted) {
         setTimeout(advanceToNext, 1000);
@@ -312,6 +326,7 @@ export const useSpeechPlayback = (
   }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, ensureVoicesLoaded, maxRetryAttempts, findVoice]);
   
   return {
-    playWord
+    playWord,
+    isSpeaking
   };
 };

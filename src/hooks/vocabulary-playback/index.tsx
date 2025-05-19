@@ -23,7 +23,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   );
   
   // Set up speech playback
-  const { playWord } = useSpeechPlayback(utteranceRef, selectedVoice, advanceToNext, muted, paused);
+  const { playWord, isSpeaking } = useSpeechPlayback(utteranceRef, selectedVoice, advanceToNext, muted, paused);
 
   // Function to go to next word on manual click
   const goToNextWord = () => {
@@ -75,7 +75,8 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     goToNextWord,
     cycleVoice,
     allVoiceOptions,
-    userInteractionRef
+    userInteractionRef,
+    isSpeaking
   };
 };
 

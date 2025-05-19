@@ -39,9 +39,9 @@ const VocabularyAppContainer: React.FC = () => {
     goToNextWord,
     cycleVoice,
     playCurrentWord,
-    currentWord: playbackCurrentWord, // This is the single source of truth
+    currentWord: playbackCurrentWord,
     userInteractionRef,
-    allVoiceOptions
+    isSpeaking
   } = useVocabularyPlayback(wordList || []);
 
   // Force initialization of speech synthesis on component mount
@@ -80,15 +80,13 @@ const VocabularyAppContainer: React.FC = () => {
   };
 
   // Direct category switch handler - with explicit user interaction tracking
-  const handleCategorySwitchDirect = (categoryName?: string) => {
+  const handleCategorySwitchDirect = () => {
     // Mark that we've had user interaction
     userInteractionRef.current = true;
     
-    // Fixed: Ensure we're passing a string, not an object
-    const targetCategory = typeof categoryName === 'string' ? categoryName : nextCategory;
-    if (targetCategory) {
-      console.log(`Switching directly to category: ${targetCategory}`);
-      handleSwitchCategory(currentCategory, targetCategory);
+    if (typeof nextCategory === 'string') {
+      console.log(`Switching directly to category: ${nextCategory}`);
+      handleSwitchCategory(currentCategory, nextCategory);
     }
   };
 
@@ -131,7 +129,7 @@ const VocabularyAppContainer: React.FC = () => {
             handleSwitchCategory={handleCategorySwitchDirect}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
-            isSoundPlaying={!muted && !paused}
+            isSoundPlaying={isSpeaking}
             handleManualNext={handleManualNext}
             displayTime={displayTime}
             selectedVoice={selectedVoice}
