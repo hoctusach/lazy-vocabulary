@@ -11,6 +11,7 @@ import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyCon
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useVocabularyPlayback } from "@/hooks/vocabulary-playback";
+import { toast } from "sonner";
 
 const VocabularyAppContainer: React.FC = () => {
   // Get base vocabulary state
@@ -59,27 +60,49 @@ const VocabularyAppContainer: React.FC = () => {
       loadVoices();
       window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
       
-      // Initialize speech synthesis with a silent utterance
-      // This helps wake up the speech system in some browsers
-      setTimeout(() => {
-        try {
-          const wakeupUtterance = new SpeechSynthesisUtterance('');
-          wakeupUtterance.volume = 0;
-          wakeupUtterance.rate = 1;
-          wakeupUtterance.onend = () => console.log('Speech system initialized');
-          window.speechSynthesis.speak(wakeupUtterance);
-        } catch (e) {
-          console.warn('Failed to initialize speech system:', e);
-        }
-      }, 500);
+      // Initialize speech synthesis with a silent utterance to force permission prompt
+      document.addEventListener('click', initSpeechWithUserInteraction, { once: true });
       
       // Clean up
       return () => {
         window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
         window.speechSynthesis.cancel();
+        document.removeEventListener('click', initSpeechWithUserInteraction);
       };
     }
   }, []);
+  
+  // Function to initialize speech with user interaction
+  const initSpeechWithUserInteraction = () => {
+    console.log("User interaction detected, initializing speech");
+    // Mark that we've had user interaction
+    userInteractionRef.current = true;
+    
+    try {
+      // Create a short, silent utterance to initialize speech system with user gesture
+      const initUtterance = new SpeechSynthesisUtterance("");
+      initUtterance.volume = 0.01;  // Nearly silent
+      initUtterance.onend = () => {
+        console.log("Speech system successfully initialized with user interaction");
+        // Try to play the current word after initialization
+        if (playbackCurrentWord && !muted) {
+          setTimeout(() => {
+            playCurrentWord();
+          }, 300);
+        }
+      };
+      
+      initUtterance.onerror = (err) => {
+        console.error("Error initializing speech system:", err);
+        toast.error("Please allow audio playback for this site to hear the vocabulary words");
+      };
+      
+      // Speak the silent utterance with user interaction context
+      window.speechSynthesis.speak(initUtterance);
+    } catch (e) {
+      console.error("Failed to initialize speech system:", e);
+    }
+  };
   
   // Simulate user interaction on first data load
   useEffect(() => {
@@ -152,6 +175,11 @@ const VocabularyAppContainer: React.FC = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
     toggleMute();
+    
+    // When unmuting, try to play current word
+    if (!muted && playbackCurrentWord) {
+      setTimeout(() => playCurrentWord(), 100);
+    }
   };
 
   return (

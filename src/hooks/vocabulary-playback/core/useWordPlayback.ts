@@ -1,7 +1,8 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
+import { toast } from 'sonner';
 
 /**
  * Hook for managing word playback functionality
@@ -28,8 +29,14 @@ export const useWordPlayback = (
   // Reference to track if we're currently in a word transition
   const wordTransitionRef = useRef<boolean>(false);
   
+  // Track if we've shown a permission error already
+  const permissionErrorShownRef = useRef<boolean>(false);
+  
   // Get the current word based on the index
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
+  
+  // Track permission state
+  const [hasSpeechPermission, setHasSpeechPermission] = useState(true);
   
   // Function to advance to next word with full cleanup
   const goToNextWord = useCallback(() => {
@@ -54,7 +61,7 @@ export const useWordPlayback = (
     // Clear the transition flag after a short delay
     setTimeout(() => {
       wordTransitionRef.current = false;
-    }, 200);
+    }, 300);
   }, [wordList, cancelSpeech, setCurrentIndex, resetRetryAttempts]);
 
   // Core function to play the current word
@@ -90,7 +97,13 @@ export const useWordPlayback = (
     cancelSpeech();
     
     // Ensure speech synthesis is available
-    if (!checkSpeechSupport()) return;
+    if (!checkSpeechSupport()) {
+      if (!permissionErrorShownRef.current) {
+        toast.error("Please click anywhere on the page to enable audio playback");
+        permissionErrorShownRef.current = true;
+      }
+      return;
+    }
     
     // Small delay to ensure cancellation completes
     setTimeout(() => {
@@ -119,7 +132,7 @@ export const useWordPlayback = (
         }
         
         // Set speech parameters for better clarity
-        utterance.rate = 0.95; // Slightly slower
+        utterance.rate = 0.9; // Slightly slower for better comprehension
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -128,6 +141,8 @@ export const useWordPlayback = (
           console.log(`Speech started for: ${currentWord.word}`);
           speakingRef.current = true;
           setIsSpeaking(true);
+          setHasSpeechPermission(true);
+          permissionErrorShownRef.current = false;
         };
         
         utterance.onend = () => {
@@ -138,7 +153,7 @@ export const useWordPlayback = (
           // Only auto-advance if not paused and not muted
           if (!paused && !muted) {
             console.log('Auto-advancing to next word');
-            goToNextWord();
+            setTimeout(() => goToNextWord(), 500);
           }
         };
         
@@ -146,6 +161,16 @@ export const useWordPlayback = (
           console.error(`Speech synthesis error:`, event);
           speakingRef.current = false;
           setIsSpeaking(false);
+          
+          // Handle permission errors specially
+          if (event.error === 'not-allowed') {
+            setHasSpeechPermission(false);
+            if (!permissionErrorShownRef.current) {
+              toast.error("Please click anywhere on the page to enable audio playback");
+              permissionErrorShownRef.current = true;
+            }
+            return;
+          }
           
           // If error is "canceled" and we're in a word transition, don't retry
           if (event.error === 'canceled' && wordTransitionRef.current) {
@@ -163,7 +188,7 @@ export const useWordPlayback = (
                 console.log('Retrying speech after error');
                 playCurrentWord();
               }
-            }, 300);
+            }, 500);
           } else {
             console.log(`Max retries reached, advancing to next word`);
             if (!paused && !muted) {
@@ -202,7 +227,7 @@ export const useWordPlayback = (
           setTimeout(() => goToNextWord(), 1000);
         }
       }
-    }, 50); // Small delay to ensure cancellation completes
+    }, 100); // Small delay to ensure cancellation completes
   }, [
     currentWord, 
     muted, 
@@ -219,10 +244,20 @@ export const useWordPlayback = (
     wordTransitionRef
   ]);
   
+  // Try to play the current word when hasSpeechPermission changes to true
+  useEffect(() => {
+    if (hasSpeechPermission && currentWord && !muted && !paused && userInteractionRef.current) {
+      console.log("Speech permission granted, attempting to play word");
+      const timerId = setTimeout(() => playCurrentWord(), 500);
+      return () => clearTimeout(timerId);
+    }
+  }, [hasSpeechPermission, currentWord, muted, paused, userInteractionRef, playCurrentWord]);
+  
   return {
     utteranceRef,
     currentWord,
     playCurrentWord,
-    goToNextWord
+    goToNextWord,
+    hasSpeechPermission
   };
 };

@@ -1,5 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 
 /**
  * Hook for managing playback controls like mute and pause functionality
@@ -43,15 +44,24 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (newMuted) {
         // When muting, cancel any current speech
         cancelSpeech();
+        console.log('Audio muted, speech canceled');
       } else {
         // When unmuting, don't cancel speech - this was a key issue
-        // Instead, just let the playback continue with the next auto-play
-        console.log('Unmuted, playback will resume with next word');
+        // Instead, restart playback of current word
+        console.log('Unmuted, playback will resume with current word');
+        
+        // Short delay to ensure state is updated before playing
+        setTimeout(() => {
+          if (!paused) {
+            playCurrentWord();
+            toast.success("Audio playback resumed");
+          }
+        }, 150);
       }
       
       return newMuted;
     });
-  }, [cancelSpeech]);
+  }, [cancelSpeech, paused, playCurrentWord]);
   
   // Function to toggle pause with full speech handling
   const togglePause = useCallback(() => {
@@ -61,11 +71,20 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (newPaused) {
         // When pausing, cancel current speech
         cancelSpeech();
+        console.log('Playback paused, speech canceled');
+      } else {
+        // When unpausing, play current word after a short delay
+        console.log('Playback unpaused, will resume with current word');
+        if (!muted) {
+          setTimeout(() => {
+            playCurrentWord();
+          }, 150);
+        }
       }
       
       return newPaused;
     });
-  }, [cancelSpeech]);
+  }, [cancelSpeech, muted, playCurrentWord]);
   
   return {
     muted,
