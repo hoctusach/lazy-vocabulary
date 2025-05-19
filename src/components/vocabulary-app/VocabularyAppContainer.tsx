@@ -47,12 +47,47 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Force initialization of speech synthesis on component mount
   useEffect(() => {
+    // Initialize speech synthesis and pre-load voices
     if (window.speechSynthesis) {
-      // Just accessing this property ensures it's initialized
-      const voices = window.speechSynthesis.getVoices();
-      console.log(`Initial voices load: ${voices.length} voices available`);
+      // Try to force voices to load early
+      const loadVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        console.log(`Voices loaded in VocabularyAppContainer: ${voices.length}`);
+      };
+      
+      // Try to load immediately and also listen for the voiceschanged event
+      loadVoices();
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      
+      // Initialize speech synthesis with a silent utterance
+      // This helps wake up the speech system in some browsers
+      setTimeout(() => {
+        try {
+          const wakeupUtterance = new SpeechSynthesisUtterance('');
+          wakeupUtterance.volume = 0;
+          wakeupUtterance.rate = 1;
+          wakeupUtterance.onend = () => console.log('Speech system initialized');
+          window.speechSynthesis.speak(wakeupUtterance);
+        } catch (e) {
+          console.warn('Failed to initialize speech system:', e);
+        }
+      }, 500);
+      
+      // Clean up
+      return () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+        window.speechSynthesis.cancel();
+      };
     }
   }, []);
+  
+  // Simulate user interaction on first data load
+  useEffect(() => {
+    if (hasData && wordList && wordList.length > 0) {
+      // Mark that we've had user interaction when data first loads
+      userInteractionRef.current = true;
+    }
+  }, [hasData, wordList, userInteractionRef]);
 
   // Modal state management
   const {
@@ -112,6 +147,13 @@ const VocabularyAppContainer: React.FC = () => {
     cycleVoice();
   };
 
+  // Handle toggle mute with explicit user interaction
+  const handleToggleMuteWithInteraction = () => {
+    // This is definitely user interaction
+    userInteractionRef.current = true;
+    toggleMute();
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -124,7 +166,7 @@ const VocabularyAppContainer: React.FC = () => {
             currentWord={displayWord}
             mute={muted}
             isPaused={paused}
-            toggleMute={toggleMute}
+            toggleMute={handleToggleMuteWithInteraction}
             handleTogglePause={handleTogglePauseWithInteraction}
             handleCycleVoice={handleCycleVoiceWithInteraction}
             handleSwitchCategory={handleCategorySwitchDirect}

@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useCorePlayback, useVoiceManagement, usePlaybackControls, useWordPlayback } from './core';
 
@@ -30,6 +30,9 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     cycleVoice,
     allVoiceOptions
   } = useVoiceManagement();
+  
+  // Reference to store if voices have been loaded
+  const voicesLoadedRef = useRef(false);
   
   // Function to cancel any current speech and reset state
   const cancelSpeech = useCallback(() => {
@@ -72,6 +75,38 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     checkSpeechSupport
   );
   
+  // Make sure voices are loaded before attempting to speak
+  useEffect(() => {
+    if (!voicesLoadedRef.current && window.speechSynthesis) {
+      console.log('Loading voices...');
+      
+      const loadVoices = () => {
+        const availableVoices = window.speechSynthesis.getVoices();
+        if (availableVoices.length > 0) {
+          console.log(`Initial voices loaded: ${availableVoices.length} voices available`);
+          voicesLoadedRef.current = true;
+          
+          // If we have a current word and we're not muted/paused, try to speak it
+          if (currentWord && !muted && !paused && userInteractionRef.current) {
+            // Use a small delay to ensure everything is ready
+            setTimeout(() => playCurrentWordInternal(), 100);
+          }
+        }
+      };
+      
+      // Try to load voices immediately
+      loadVoices();
+      
+      // Also set up event listener for when voices change
+      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      
+      // Cleanup
+      return () => {
+        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      };
+    }
+  }, [currentWord, muted, paused, playCurrentWordInternal, userInteractionRef]);
+  
   // Ensure speech synthesis is canceled when component unmounts
   useEffect(() => {
     return () => {
@@ -81,17 +116,25 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     };
   }, []);
   
-  // Effect to handle auto-play only AFTER user interaction
+  // Effect to handle auto-play with improved state handling
   useEffect(() => {
-    if (currentWord && !muted && !paused && userInteractionRef.current) {
-      // Small delay to ensure state is settled
-      const timer = setTimeout(() => {
-        console.log('Auto-playing word after state change:', currentWord.word);
-        playCurrentWordInternal();
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    }
+    // Don't attempt to play if we don't have a word or voices aren't loaded
+    if (!currentWord || !voicesLoadedRef.current) return;
+    
+    // Don't play if muted or paused
+    if (muted || paused) return;
+    
+    // Don't auto-play until we've had user interaction
+    if (!userInteractionRef.current) return;
+    
+    console.log(`Auto-playing word after state change: ${currentWord.word}`);
+    
+    // Small delay to ensure state is settled
+    const timer = setTimeout(() => {
+      playCurrentWordInternal();
+    }, 150);
+    
+    return () => clearTimeout(timer);
   }, [currentIndex, currentWord, muted, paused, playCurrentWordInternal, userInteractionRef]);
   
   return {

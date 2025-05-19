@@ -35,7 +35,7 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
     }
   }, [muted]);
   
-  // Function to toggle mute with full speech handling
+  // Function to toggle mute with improved behavior
   const toggleMute = useCallback(() => {
     setMuted(prev => {
       const newMuted = !prev;
@@ -43,6 +43,10 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (newMuted) {
         // When muting, cancel any current speech
         cancelSpeech();
+      } else {
+        // When unmuting, don't cancel speech - this was a key issue
+        // Instead, just let the playback continue with the next auto-play
+        console.log('Unmuted, playback will resume with next word');
       }
       
       return newMuted;

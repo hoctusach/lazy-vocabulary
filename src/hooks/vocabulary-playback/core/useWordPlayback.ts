@@ -25,12 +25,18 @@ export const useWordPlayback = (
   // Reference to the current utterance
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
+  // Reference to track if we're currently in a word transition
+  const wordTransitionRef = useRef<boolean>(false);
+  
   // Get the current word based on the index
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
   
   // Function to advance to next word with full cleanup
   const goToNextWord = useCallback(() => {
     if (wordList.length === 0) return;
+    
+    // Set the transition flag to prevent multiple word changes
+    wordTransitionRef.current = true;
     
     // Cancel any ongoing speech
     cancelSpeech();
@@ -44,10 +50,21 @@ export const useWordPlayback = (
     
     // Reset retry attempts for the new word
     resetRetryAttempts();
+    
+    // Clear the transition flag after a short delay
+    setTimeout(() => {
+      wordTransitionRef.current = false;
+    }, 200);
   }, [wordList, cancelSpeech, setCurrentIndex, resetRetryAttempts]);
 
   // Core function to play the current word
   const playCurrentWord = useCallback(() => {
+    // Don't try to play during word transitions
+    if (wordTransitionRef.current) {
+      console.log('Word transition in progress, delaying playback');
+      return;
+    }
+    
     // Mark that we've had user interaction
     userInteractionRef.current = true;
     
@@ -78,10 +95,6 @@ export const useWordPlayback = (
     // Small delay to ensure cancellation completes
     setTimeout(() => {
       try {
-        // Reload voices (critical step)
-        const voices = window.speechSynthesis.getVoices();
-        console.log(`Voices loaded: ${voices.length} voices available`);
-        
         // Create a fresh utterance for this word
         const utterance = new SpeechSynthesisUtterance();
         utteranceRef.current = utterance;
@@ -100,6 +113,9 @@ export const useWordPlayback = (
         const voice = findVoice(selectedVoice.region);
         if (voice) {
           utterance.voice = voice;
+          console.log(`Using voice: ${voice.name}`);
+        } else {
+          console.log('No matching voice found, using system default');
         }
         
         // Set speech parameters for better clarity
@@ -131,13 +147,19 @@ export const useWordPlayback = (
           speakingRef.current = false;
           setIsSpeaking(false);
           
+          // If error is "canceled" and we're in a word transition, don't retry
+          if (event.error === 'canceled' && wordTransitionRef.current) {
+            console.log('Speech canceled due to word transition, not retrying');
+            return;
+          }
+          
           // Handle retry logic
           if (incrementRetryAttempts()) {
             console.log(`Retry attempt in progress`);
             
             // Wait briefly then retry
             setTimeout(() => {
-              if (!paused && !muted) {
+              if (!paused && !muted && !wordTransitionRef.current) {
                 console.log('Retrying speech after error');
                 playCurrentWord();
               }
@@ -157,7 +179,7 @@ export const useWordPlayback = (
         
         // Verify speech is working after a short delay
         setTimeout(() => {
-          if (!window.speechSynthesis.speaking && !paused && !muted) {
+          if (!window.speechSynthesis.speaking && !paused && !muted && !wordTransitionRef.current) {
             console.warn("Speech synthesis not speaking after 100ms");
             
             // If we haven't exceeded retry attempts, try again
@@ -193,7 +215,8 @@ export const useWordPlayback = (
     setIsSpeaking,
     speakingRef,
     incrementRetryAttempts,
-    checkSpeechSupport
+    checkSpeechSupport,
+    wordTransitionRef
   ]);
   
   return {
