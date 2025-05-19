@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useCorePlayback, useVoiceManagement, usePlaybackControls, useWordPlayback } from './core';
+import { toast } from 'sonner';
 
 /**
  * Main hook that combines all the playback functionality
@@ -43,14 +44,11 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
       setIsSpeaking(false);
     }
   }, [speakingRef, setIsSpeaking]);
-  
-  // Get playback controls (mute/pause)
-  const { 
-    muted, 
-    paused, 
-    toggleMute, 
-    togglePause 
-  } = usePlaybackControls(cancelSpeech, () => {});  // We'll fix this circular reference below
+
+  // Initialize playCurrentWord as an empty function that will be updated with the actual implementation
+  const playCurrentWordRef = useRef<() => void>(() => {
+    console.log('playCurrentWord not yet initialized');
+  });
   
   // Get word playback functionality
   const { 
@@ -62,8 +60,8 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     wordList,
     currentIndex,
     setCurrentIndex,
-    muted,
-    paused,
+    false, // We'll get the actual muted state from usePlaybackControls
+    false, // We'll get the actual paused state from usePlaybackControls
     cancelSpeech,
     findVoice,
     selectedVoice,
@@ -75,6 +73,37 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     checkSpeechSupport
   );
   
+  // Update the playCurrentWordRef with the actual implementation
+  playCurrentWordRef.current = playCurrentWordInternal;
+  
+  // Get playback controls (mute/pause) with the updated playCurrentWord function
+  const { 
+    muted, 
+    paused, 
+    toggleMute, 
+    togglePause 
+  } = usePlaybackControls(
+    cancelSpeech, 
+    () => {
+      console.log('Calling playCurrentWord from controls');
+      playCurrentWordRef.current();
+    }
+  );
+  
+  // Trigger playback when user interacts with the page for the first time
+  useEffect(() => {
+    if (userInteractionRef.current && currentWord && !muted && !paused) {
+      console.log('User interaction detected, trying to play word');
+      
+      // Small delay to ensure everything is ready
+      const timerId = setTimeout(() => {
+        playCurrentWordRef.current();
+      }, 500);
+      
+      return () => clearTimeout(timerId);
+    }
+  }, [userInteractionRef, currentWord, muted, paused]);
+  
   // Make sure voices are loaded before attempting to speak
   useEffect(() => {
     if (!voicesLoadedRef.current && window.speechSynthesis) {
@@ -82,15 +111,23 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
       
       const loadVoices = () => {
         const availableVoices = window.speechSynthesis.getVoices();
+        console.log(`Voices loaded: found ${availableVoices.length} voices`);
+        
         if (availableVoices.length > 0) {
-          console.log(`Initial voices loaded: ${availableVoices.length} voices available`);
           voicesLoadedRef.current = true;
           
           // If we have a current word and we're not muted/paused, try to speak it
           if (currentWord && !muted && !paused && userInteractionRef.current) {
             // Use a small delay to ensure everything is ready
-            setTimeout(() => playCurrentWordInternal(), 100);
+            setTimeout(() => {
+              console.log('Playing word after voices loaded');
+              playCurrentWordRef.current();
+            }, 300);
           }
+        } else {
+          console.log('No voices available yet, will retry');
+          // Try again after a delay
+          setTimeout(loadVoices, 500);
         }
       };
       
@@ -98,14 +135,26 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
       loadVoices();
       
       // Also set up event listener for when voices change
-      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis.addEventListener('voiceschanged', () => {
+        console.log('Voices changed event fired');
+        loadVoices();
+      });
+      
+      // Display a toast when voices are loaded
+      const checkVoicesLoadedInterval = setInterval(() => {
+        if (voicesLoadedRef.current) {
+          toast.success("Voice system ready");
+          clearInterval(checkVoicesLoadedInterval);
+        }
+      }, 1000);
       
       // Cleanup
       return () => {
         window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+        clearInterval(checkVoicesLoadedInterval);
       };
     }
-  }, [currentWord, muted, paused, playCurrentWordInternal, userInteractionRef]);
+  }, [currentWord, muted, paused, userInteractionRef]);
   
   // Ensure speech synthesis is canceled when component unmounts
   useEffect(() => {
@@ -125,17 +174,20 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     if (muted || paused) return;
     
     // Don't auto-play until we've had user interaction
-    if (!userInteractionRef.current) return;
+    if (!userInteractionRef.current) {
+      toast.info("Click anywhere on the page to start audio playback");
+      return;
+    }
     
     console.log(`Auto-playing word after state change: ${currentWord.word}`);
     
     // Small delay to ensure state is settled
     const timer = setTimeout(() => {
-      playCurrentWordInternal();
-    }, 150);
+      playCurrentWordRef.current();
+    }, 250);
     
     return () => clearTimeout(timer);
-  }, [currentIndex, currentWord, muted, paused, playCurrentWordInternal, userInteractionRef]);
+  }, [currentIndex, currentWord, muted, paused, userInteractionRef]);
   
   return {
     currentWord,
@@ -144,7 +196,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     paused,
     voices,
     selectedVoice,
-    playCurrentWord: playCurrentWordInternal,
+    playCurrentWord: () => playCurrentWordRef.current(),
     goToNextWord,
     toggleMute,
     togglePause,

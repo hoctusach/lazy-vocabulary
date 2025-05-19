@@ -16,51 +16,67 @@ export const useCorePlayback = () => {
   
   // Initialize speech synthesis on mount
   useEffect(() => {
-    const initSpeechSynthesis = () => {
-      if (!window.speechSynthesis || speechInitializedRef.current) return;
-      
-      try {
-        // Try to get initial voices - this might prompt permission on some browsers
-        window.speechSynthesis.getVoices();
+    // Create our own user interaction detection
+    const detectUserInteraction = (e: MouseEvent | TouchEvent) => {
+      if (!userInteractionRef.current) {
+        console.log('User interaction detected in useCorePlayback');
+        userInteractionRef.current = true;
         
-        // Create a silent utterance to help initialize the speech system
-        const initUtterance = new SpeechSynthesisUtterance(' ');
-        initUtterance.volume = 0; // Silent
-        initUtterance.onend = () => {
-          console.log("Speech synthesis initialized successfully");
-          speechInitializedRef.current = true;
-        };
-        initUtterance.onerror = () => {
-          console.log("Speech synthesis initialization error - may need user interaction");
-        };
-        
-        // Add user interaction listener to help with speech permission
-        const handleUserInteraction = () => {
-          userInteractionRef.current = true;
-          // Only try speaking once
-          if (!speechInitializedRef.current) {
-            window.speechSynthesis.speak(initUtterance);
-          }
-          // Remove the event listener after first interaction
-          document.removeEventListener('click', handleUserInteraction);
-          document.removeEventListener('touchstart', handleUserInteraction);
-        };
-        
-        // Listen for user interaction
-        document.addEventListener('click', handleUserInteraction);
-        document.addEventListener('touchstart', handleUserInteraction);
-        
-        // Clean up
-        return () => {
-          document.removeEventListener('click', handleUserInteraction);
-          document.removeEventListener('touchstart', handleUserInteraction);
-        };
-      } catch (error) {
-        console.error("Error initializing speech synthesis", error);
+        // Initialize speech synthesis after user interaction
+        if (!speechInitializedRef.current) {
+          initSpeechWithPermission();
+        }
       }
     };
     
-    initSpeechSynthesis();
+    // Try to initialize speech synthesis
+    const initSpeechWithPermission = () => {
+      if (speechInitializedRef.current) return;
+      
+      try {
+        console.log('Initializing speech synthesis after user interaction');
+        // Create a silent utterance to initialize speech system
+        const silentUtterance = new SpeechSynthesisUtterance(' ');
+        silentUtterance.volume = 0; // Silent
+        silentUtterance.rate = 1;
+        
+        silentUtterance.onend = () => {
+          console.log("Speech initialization completed");
+          speechInitializedRef.current = true;
+        };
+        
+        silentUtterance.onerror = (e) => {
+          console.log("Speech initialization error", e);
+          // Still mark as initialized to avoid infinite retries
+          speechInitializedRef.current = true;
+        };
+        
+        // Try to speak the silent utterance
+        window.speechSynthesis.cancel(); // Clear any pending speech
+        window.speechSynthesis.speak(silentUtterance);
+      } catch (err) {
+        console.error('Error initializing speech:', err);
+      }
+    };
+    
+    // Listen for user interaction
+    document.addEventListener('click', detectUserInteraction);
+    document.addEventListener('touchstart', detectUserInteraction);
+    
+    // Try to preload voices to improve first-time playback
+    if (window.speechSynthesis) {
+      try {
+        const voices = window.speechSynthesis.getVoices();
+        console.log(`Preloaded ${voices.length} voices at init`);
+      } catch (e) {
+        console.log('Voice preloading failed:', e);
+      }
+    }
+    
+    return () => {
+      document.removeEventListener('click', detectUserInteraction);
+      document.removeEventListener('touchstart', detectUserInteraction);
+    };
   }, []);
 
   // Function to check browser speech support

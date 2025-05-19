@@ -38,6 +38,60 @@ export const useWordPlayback = (
   // Track permission state
   const [hasSpeechPermission, setHasSpeechPermission] = useState(true);
   
+  // Track if the user has interacted with the page
+  useEffect(() => {
+    // Add a click handler to the document to detect user interaction
+    const handleUserInteraction = () => {
+      if (!userInteractionRef.current) {
+        console.log('User interaction detected, enabling audio playback');
+        userInteractionRef.current = true;
+        
+        // Try to enable audio after user interaction
+        setTimeout(() => {
+          // Create and play a silent utterance to overcome permission issues
+          try {
+            const silentUtterance = new SpeechSynthesisUtterance(' ');
+            silentUtterance.volume = 0;
+            silentUtterance.onend = () => {
+              console.log('Permission test succeeded');
+              setHasSpeechPermission(true);
+              
+              // If we're not muted or paused, try to play the current word
+              if (!muted && !paused && currentWord) {
+                setTimeout(() => playCurrentWord(), 500);
+              }
+            };
+            silentUtterance.onerror = (e) => {
+              console.log('Permission test failed', e);
+              // Still set permission to true to allow retries
+              setHasSpeechPermission(true);
+            };
+            
+            // Cancel any existing speech first
+            window.speechSynthesis.cancel();
+            
+            // Wait a moment then try the test utterance
+            setTimeout(() => {
+              window.speechSynthesis.speak(silentUtterance);
+            }, 300);
+          } catch (err) {
+            console.error('Error during permission test:', err);
+          }
+        }, 300);
+      }
+    };
+    
+    // Add event listeners for user interaction
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+    };
+  }, [currentWord, muted, paused, userInteractionRef]);
+  
   // Function to advance to next word with full cleanup
   const goToNextWord = useCallback(() => {
     if (wordList.length === 0) return;
@@ -49,7 +103,7 @@ export const useWordPlayback = (
     cancelSpeech();
     
     // Move to next word with a circular index
-    setCurrentIndex((prevIndex: number) => {
+    setCurrentIndex((prevIndex) => {
       const nextIndex = (prevIndex + 1) % wordList.length;
       console.log(`Moving to word ${nextIndex}: ${wordList[nextIndex]?.word || 'unknown'}`);
       return nextIndex;
@@ -72,9 +126,6 @@ export const useWordPlayback = (
       return;
     }
     
-    // Mark that we've had user interaction
-    userInteractionRef.current = true;
-    
     // Basic checks
     if (!currentWord) {
       console.log('No current word to play');
@@ -96,16 +147,23 @@ export const useWordPlayback = (
     // CRITICAL: Cancel any ongoing speech to prevent queuing
     cancelSpeech();
     
+    // Force user interaction check
+    if (!userInteractionRef.current) {
+      toast.error("Please click anywhere on the page to enable audio");
+      userInteractionRef.current = true; // Set this anyway to avoid repeating messages
+      return;
+    }
+    
     // Ensure speech synthesis is available
     if (!checkSpeechSupport()) {
       if (!permissionErrorShownRef.current) {
-        toast.error("Please click anywhere on the page to enable audio playback");
+        toast.error("Your browser doesn't support speech synthesis");
         permissionErrorShownRef.current = true;
       }
       return;
     }
     
-    // Small delay to ensure cancellation completes
+    // Add a small delay before playing to ensure cancellation has completed
     setTimeout(() => {
       try {
         // Create a fresh utterance for this word
@@ -132,7 +190,7 @@ export const useWordPlayback = (
         }
         
         // Set speech parameters for better clarity
-        utterance.rate = 0.9; // Slightly slower for better comprehension
+        utterance.rate = 0.95; // Slightly slower for better comprehension
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
         
@@ -159,6 +217,15 @@ export const useWordPlayback = (
         
         utterance.onerror = (event) => {
           console.error(`Speech synthesis error:`, event);
+          
+          // Check if we're already in a word transition - if so, don't retry
+          if (wordTransitionRef.current) {
+            console.log('Error occurred during word transition, not retrying');
+            speakingRef.current = false;
+            setIsSpeaking(false);
+            return;
+          }
+          
           speakingRef.current = false;
           setIsSpeaking(false);
           
@@ -172,9 +239,9 @@ export const useWordPlayback = (
             return;
           }
           
-          // If error is "canceled" and we're in a word transition, don't retry
-          if (event.error === 'canceled' && wordTransitionRef.current) {
-            console.log('Speech canceled due to word transition, not retrying');
+          // If error is "canceled" but it was intentional (during muting/pausing), don't retry
+          if (event.error === 'canceled' && (muted || paused)) {
+            console.log('Speech canceled due to muting or pausing, not retrying');
             return;
           }
           
@@ -198,26 +265,32 @@ export const useWordPlayback = (
           }
         };
         
-        // Actually start speaking
-        window.speechSynthesis.speak(utterance);
-        console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
-        
-        // Verify speech is working after a short delay
+        // Attempt to wait for any potential race conditions to resolve
         setTimeout(() => {
-          if (!window.speechSynthesis.speaking && !paused && !muted && !wordTransitionRef.current) {
-            console.warn("Speech synthesis not speaking after 100ms");
-            
-            // If we haven't exceeded retry attempts, try again
-            if (incrementRetryAttempts()) {
-              console.log(`Silent failure detected, retrying`);
-              playCurrentWord();
-            } else {
-              // If we've tried enough times, move on
-              console.log("Moving to next word after silent failures");
-              goToNextWord();
+          // Cancel any existing speech just before speaking
+          window.speechSynthesis.cancel();
+          
+          // Actually start speaking
+          window.speechSynthesis.speak(utterance);
+          console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
+          
+          // Verify speech is working after a short delay
+          setTimeout(() => {
+            if (!window.speechSynthesis.speaking && !paused && !muted && !wordTransitionRef.current) {
+              console.warn("Speech synthesis not speaking after 200ms - potential silent failure");
+              
+              // If we haven't exceeded retry attempts, try again
+              if (incrementRetryAttempts()) {
+                console.log(`Silent failure detected, retrying`);
+                playCurrentWord();
+              } else {
+                // If we've tried enough times, move on
+                console.log("Moving to next word after silent failures");
+                goToNextWord();
+              }
             }
-          }
-        }, 100);
+          }, 200);  // Increased from 100ms to 200ms for better detection
+        }, 150);  // Added delay before speaking to reduce race conditions
         
       } catch (error) {
         console.error('Error in speech playback:', error);

@@ -56,7 +56,7 @@ export const useVoiceManagement = () => {
       }
     };
     
-    // Try to load voices immediately
+    // Try to load voices right away
     loadVoicesAndNotify();
     
     // Set up event listener for async voice loading
@@ -69,79 +69,76 @@ export const useVoiceManagement = () => {
     }
   }, [allVoiceOptions]);
   
-  // Function to find the appropriate voice with improved logging
+  // Function to find the appropriate voice
   const findVoice = useCallback((region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
-    // Always get fresh voices
-    const voices = window.speechSynthesis.getVoices();
-    console.log(`Finding ${region} voice among ${voices.length} voices`);
+    const currentOption = allVoiceOptions[voiceIndex];
+    const gender = currentOption.gender;
+    const targetRegion = currentOption.region;
+    console.log(`Looking for ${targetRegion} ${gender} voice`);
     
-    if (voices.length === 0) {
+    // Always get fresh voices
+    const allVoices = window.speechSynthesis.getVoices();
+    console.log(`Finding voice among ${allVoices.length} voices`);
+    
+    if (allVoices.length === 0) {
       console.warn('No voices available');
       return null;
     }
     
     // Log first few voices to help with debugging
-    voices.slice(0, 5).forEach((v, i) => {
+    allVoices.slice(0, 5).forEach((v, i) => {
       console.log(`Voice ${i}: ${v.name} (${v.lang})`);
     });
     
-    // Get gender preference from current voice index
-    const gender = allVoiceOptions[voiceIndex].gender;
     const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
     
-    // Try to find a voice that matches the region and gender
+    // Try multiple strategies to find the best voice
     let voice: SpeechSynthesisVoice | null = null;
     
-    // First priority: exact language match with gender preference
+    // Strategy 1: Find exact language match with gender
     if (region === 'UK') {
-      console.log(`Looking for UK ${gender} voice`);
-      voice = voices.find(v => 
+      voice = allVoices.find(v => 
         v.lang === 'en-GB' && genderPattern.test(v.name)
       );
     } else {
-      console.log(`Looking for US ${gender} voice`);
-      voice = voices.find(v => 
+      voice = allVoices.find(v => 
         v.lang === 'en-US' && genderPattern.test(v.name)
       );
     }
     
-    // Second priority: exact language match without gender
+    // Strategy 2: Exact language match without gender check
     if (!voice) {
-      voice = voices.find(v => 
+      voice = allVoices.find(v => 
         v.lang === (region === 'UK' ? 'en-GB' : 'en-US')
       );
     }
     
-    // Third priority: name-based match
+    // Strategy 3: Any English voice with gender match
     if (!voice) {
-      const regionPattern = region === 'UK' 
-        ? /uk|british|england|gb/i 
-        : /us|american|united states/i;
-      
-      voice = voices.find(v => 
-        v.lang.startsWith('en') && 
-        regionPattern.test(v.name)
+      voice = allVoices.find(v => 
+        v.lang.startsWith('en') && genderPattern.test(v.name)
       );
     }
     
-    // Fourth priority: any English voice
+    // Strategy 4: Any English voice
     if (!voice) {
-      voice = voices.find(v => v.lang.startsWith('en'));
+      voice = allVoices.find(v => v.lang.startsWith('en'));
     }
     
-    // Last resort: first voice
-    if (!voice && voices.length > 0) {
-      voice = voices[0];
+    // Strategy 5: First voice in the list
+    if (!voice && allVoices.length > 0) {
+      console.log('No suitable English voice found, using first available voice');
+      voice = allVoices[0];
     }
     
     if (voice) {
-      console.log(`Selected ${region} ${gender} voice:`, voice.name, voice.lang);
+      console.log(`Selected ${region} voice:`, voice.name, voice.lang);
     } else {
       console.warn('No suitable voice found');
     }
     
     return voice;
-  }, [allVoiceOptions, voiceIndex]);
+  }, [voiceIndex, allVoiceOptions]);
   
   // Function to cycle through voices
   const cycleVoice = useCallback(() => {

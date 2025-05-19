@@ -38,25 +38,26 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
   
   // Function to toggle mute with improved behavior
   const toggleMute = useCallback(() => {
+    console.log('Toggle mute called');
     setMuted(prev => {
       const newMuted = !prev;
       
       if (newMuted) {
         // When muting, cancel any current speech
-        cancelSpeech();
         console.log('Audio muted, speech canceled');
+        cancelSpeech();
+        toast.info("Audio playback muted");
       } else {
         // When unmuting, don't cancel speech - this was a key issue
         // Instead, restart playback of current word
         console.log('Unmuted, playback will resume with current word');
         
-        // Short delay to ensure state is updated before playing
-        setTimeout(() => {
-          if (!paused) {
-            playCurrentWord();
-            toast.success("Audio playback resumed");
-          }
-        }, 150);
+        // Don't use setTimeout here - it causes race conditions
+        // Check paused state immediately and play if not paused
+        if (!paused) {
+          playCurrentWord();
+          toast.success("Audio playback resumed");
+        }
       }
       
       return newMuted;
@@ -71,14 +72,14 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (newPaused) {
         // When pausing, cancel current speech
         cancelSpeech();
+        toast.info("Playback paused");
         console.log('Playback paused, speech canceled');
       } else {
-        // When unpausing, play current word after a short delay
+        // When unpausing, play current word immediately
         console.log('Playback unpaused, will resume with current word');
         if (!muted) {
-          setTimeout(() => {
-            playCurrentWord();
-          }, 150);
+          playCurrentWord();
+          toast.success("Playback resumed");
         }
       }
       
