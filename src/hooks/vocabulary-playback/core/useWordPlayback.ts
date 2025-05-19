@@ -9,7 +9,7 @@ import { VoiceSelection } from '../useVoiceSelection';
 export const useWordPlayback = (
   wordList: VocabularyWord[],
   currentIndex: number,
-  setCurrentIndex: (index: number) => void,
+  setCurrentIndex: (index: number | ((prevIndex: number) => number)) => void,
   muted: boolean,
   paused: boolean,
   cancelSpeech: () => void,
@@ -36,7 +36,7 @@ export const useWordPlayback = (
     cancelSpeech();
     
     // Move to next word with a circular index
-    setCurrentIndex((prevIndex) => {
+    setCurrentIndex((prevIndex: number) => {
       const nextIndex = (prevIndex + 1) % wordList.length;
       console.log(`Moving to word ${nextIndex}: ${wordList[nextIndex]?.word || 'unknown'}`);
       return nextIndex;
