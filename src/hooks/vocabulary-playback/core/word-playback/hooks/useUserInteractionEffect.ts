@@ -1,5 +1,6 @@
 
 import { useEffect } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
 
 /**
  * Hook to initialize voice and handle user interaction
