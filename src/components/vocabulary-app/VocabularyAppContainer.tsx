@@ -41,7 +41,8 @@ const VocabularyAppContainer: React.FC = () => {
     playCurrentWord,
     currentWord: playbackCurrentWord,
     userInteractionRef,
-    isSpeaking
+    isSpeaking,
+    allVoiceOptions
   } = useVocabularyPlayback(wordList || []);
 
   // Force initialization of speech synthesis on component mount

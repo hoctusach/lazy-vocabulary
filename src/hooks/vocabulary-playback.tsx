@@ -2,13 +2,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { toast } from "sonner";
+import { VoiceSelection } from './vocabulary-playback/useVoiceSelection';
 
 export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // State for managing playback
   const [currentIndex, setCurrentIndex] = useState(0);
   const [muted, setMuted] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [selectedVoice, setSelectedVoice] = useState<'US' | 'UK'>('US');
+  const [selectedVoiceRegion, setSelectedVoiceRegion] = useState<'US' | 'UK'>('US');
+  const [isSpeaking, setIsSpeaking] = useState(false);
   
   // Important refs for tracking state
   const userInteractionRef = useRef(false);
@@ -16,19 +18,31 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const speakingRef = useRef(false);
   const retryAttemptsRef = useRef(0);
   const maxRetries = 3;
+  const [voiceIndex, setVoiceIndex] = useState(0);
   
   // Get the current word based on the index
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
+  
+  // Define voice options array with appropriate structure
+  const allVoiceOptions: VoiceSelection[] = [
+    { label: "US-F", region: "US", gender: "female", index: 0 },
+    { label: "US-M", region: "US", gender: "male", index: 1 },
+    { label: "UK-F", region: "UK", gender: "female", index: 2 },
+    { label: "UK-M", region: "UK", gender: "male", index: 3 }
+  ];
   
   // Load initial settings from localStorage
   useEffect(() => {
     try {
       const savedSettings = localStorage.getItem('vocabularySettings');
       if (savedSettings) {
-        const { muted: savedMuted, voiceRegion } = JSON.parse(savedSettings);
+        const { muted: savedMuted, voiceIndex: savedVoiceIndex } = JSON.parse(savedSettings);
         setMuted(!!savedMuted);
-        if (voiceRegion === 'UK' || voiceRegion === 'US') {
-          setSelectedVoice(voiceRegion);
+        
+        // Set voice index if valid
+        if (typeof savedVoiceIndex === 'number' && savedVoiceIndex >= 0 && 
+            savedVoiceIndex < allVoiceOptions.length) {
+          setVoiceIndex(savedVoiceIndex);
         }
       }
     } catch (error) {
@@ -41,13 +55,22 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     try {
       const settings = {
         muted,
-        voiceRegion: selectedVoice
+        voiceIndex
       };
       localStorage.setItem('vocabularySettings', JSON.stringify(settings));
     } catch (error) {
       console.error('Error saving settings:', error);
     }
-  }, [muted, selectedVoice]);
+  }, [muted, voiceIndex]);
+  
+  // Function to cycle through voices
+  const cycleVoice = useCallback(() => {
+    setVoiceIndex(prevIndex => {
+      const nextIndex = (prevIndex + 1) % allVoiceOptions.length;
+      console.log(`Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`);
+      return nextIndex;
+    });
+  }, [allVoiceOptions]);
   
   // Ensure speech synthesis is canceled when component unmounts
   useEffect(() => {
@@ -64,6 +87,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       console.log('Cancelling any ongoing speech');
       window.speechSynthesis.cancel();
       speakingRef.current = false;
+      setIsSpeaking(false);
       
       // Clear utterance reference to avoid memory leaks
       if (utteranceRef.current) {
@@ -177,7 +201,9 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
       return;
     }
     
-    console.log(`Attempting to play word: ${currentWord.word}`);
+    // Get the current selected voice from options
+    const currentVoiceSelection = allVoiceOptions[voiceIndex];
+    console.log(`Attempting to play word with voice: ${currentVoiceSelection.label}`);
     
     // CRITICAL: Cancel any ongoing speech to prevent queuing
     cancelSpeech();
@@ -208,10 +234,10 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         utterance.text = `${wordText}. ${meaningText}. ${exampleText}`.trim();
         
         // Set language based on selected voice
-        utterance.lang = selectedVoice === 'UK' ? 'en-GB' : 'en-US';
+        utterance.lang = currentVoiceSelection.region === 'UK' ? 'en-GB' : 'en-US';
         
         // Find and apply the voice
-        const voice = findVoice(selectedVoice);
+        const voice = findVoice(currentVoiceSelection.region);
         if (voice) {
           utterance.voice = voice;
         }
@@ -225,11 +251,13 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         utterance.onstart = () => {
           console.log(`Speech started for: ${currentWord.word}`);
           speakingRef.current = true;
+          setIsSpeaking(true);
         };
         
         utterance.onend = () => {
           console.log(`Speech ended successfully for: ${currentWord.word}`);
           speakingRef.current = false;
+          setIsSpeaking(false);
           
           // Only auto-advance if not paused and not muted
           if (!paused && !muted) {
@@ -241,6 +269,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         utterance.onerror = (event) => {
           console.error(`Speech synthesis error:`, event);
           speakingRef.current = false;
+          setIsSpeaking(false);
           
           // Increment retry counter
           retryAttemptsRef.current++;
@@ -288,13 +317,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
         
       } catch (error) {
         console.error('Error in speech playback:', error);
+        setIsSpeaking(false);
         // Still try to advance to prevent getting stuck
         if (!paused && !muted) {
           setTimeout(() => goToNextWord(), 1000);
         }
       }
     }, 50); // Small delay to ensure cancellation completes
-  }, [currentWord, muted, paused, selectedVoice, cancelSpeech, findVoice, goToNextWord, maxRetries]);
+  }, [currentWord, muted, paused, cancelSpeech, findVoice, goToNextWord, maxRetries, allVoiceOptions, voiceIndex]);
   
   // Function to toggle mute with full speech handling
   const toggleMute = useCallback(() => {
@@ -327,17 +357,14 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     });
   }, [cancelSpeech, playCurrentWord, currentWord]);
   
-  // Function to change voice with speech handling
-  const changeVoice = useCallback((voiceRegion: 'US' | 'UK') => {
-    setSelectedVoice(voiceRegion);
-    console.log(`Voice changed to ${voiceRegion}`);
-    
-    // If we have a current word and we're not paused/muted, replay with new voice
-    if (currentWord && !paused && !muted && userInteractionRef.current) {
-      // Short delay to ensure state update completes
-      setTimeout(() => playCurrentWord(), 50);
-    }
-  }, [currentWord, paused, muted, playCurrentWord]);
+  // Get the current selected voice
+  const selectedVoice = allVoiceOptions[voiceIndex];
+  
+  // Create voice options array for UI - compatibility format
+  const voices = [
+    { label: "US", region: "US" as const, gender: "female" as const, voice: null },
+    { label: "UK", region: "UK" as const, gender: "female" as const, voice: null }
+  ];
   
   // Essential cleanup on unmount
   useEffect(() => {
@@ -359,27 +386,20 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [currentIndex, currentWord, muted, paused, playCurrentWord]);
   
-  // Create voice options array for UI
-  const voices = [
-    { label: "US", region: "US" as const, gender: "female" as const, voice: null },
-    { label: "UK", region: "UK" as const, gender: "female" as const, voice: null }
-  ];
-  
   return {
     currentWord,
     currentIndex,
     muted,
     paused,
     voices,
-    selectedVoice: { 
-      label: selectedVoice, 
-      region: selectedVoice 
-    },
+    selectedVoice,
     playCurrentWord,
     goToNextWord,
     toggleMute,
     togglePause,
-    changeVoice,
-    userInteractionRef
+    cycleVoice,
+    userInteractionRef,
+    isSpeaking,
+    allVoiceOptions
   };
 };
