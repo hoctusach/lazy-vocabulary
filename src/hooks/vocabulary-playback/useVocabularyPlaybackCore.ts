@@ -1,16 +1,24 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { useCorePlayback, useVoiceManagement, usePlaybackControls, useWordPlayback } from './core';
-import { toast } from 'sonner';
+import { 
+  useCorePlayback, 
+  useVoiceManagement, 
+  usePlaybackControls, 
+  useWordPlayback 
+} from './core';
+import { 
+  usePlaybackState, 
+  useUserInteraction,
+  useSpeechCancellation,
+  useAutoPlay
+} from './core/playback-states';
+import { useSafariSupport } from './core/ios-support';
 
 /**
  * Main hook that combines all the playback functionality
  */
 export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
-  // Basic state for current word index
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
   // Get core playback functionality
   const { 
     isSpeaking, 
@@ -32,19 +40,18 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     allVoiceOptions
   } = useVoiceManagement();
   
+  // Basic state for current word index from our refactored state
+  const { 
+    currentIndex, 
+    setCurrentIndex 
+  } = usePlaybackState();
+  
   // Reference to store if voices have been loaded
   const voicesLoadedRef = useRef(false);
   
-  // Function to cancel any current speech and reset state
-  const cancelSpeech = useCallback(() => {
-    if (window.speechSynthesis) {
-      console.log('Cancelling any ongoing speech');
-      window.speechSynthesis.cancel();
-      speakingRef.current = false;
-      setIsSpeaking(false);
-    }
-  }, [speakingRef, setIsSpeaking]);
-
+  // Handle speech cancellation
+  const { cancelSpeech } = useSpeechCancellation(speakingRef, setIsSpeaking);
+  
   // Initialize playCurrentWord as an empty function that will be updated with the actual implementation
   const playCurrentWordRef = useRef<() => void>(() => {
     console.log('playCurrentWord not yet initialized');
@@ -55,7 +62,8 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     utteranceRef,
     currentWord, 
     playCurrentWord: playCurrentWordInternal, 
-    goToNextWord 
+    goToNextWord,
+    hasSpeechPermission
   } = useWordPlayback(
     wordList,
     currentIndex,
@@ -90,108 +98,16 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     }
   );
   
-  // Always try to pre-load voices as early as possible
-  useEffect(() => {
-    if (!voicesLoadedRef.current && window.speechSynthesis) {
-      console.log('Pre-loading voices for later use...');
-      
-      const loadVoices = () => {
-        // Force browser to load voices
-        const availableVoices = window.speechSynthesis.getVoices();
-        if (availableVoices.length > 0) {
-          console.log(`Voices loaded: ${availableVoices.length} voices available`);
-          voicesLoadedRef.current = true;
-          
-          // Try a silent utterance to initialize speech engine
-          try {
-            const silentUtterance = new SpeechSynthesisUtterance(' ');  // Just a space
-            silentUtterance.volume = 0.01;  // Nearly silent
-            window.speechSynthesis.speak(silentUtterance);
-          } catch (e) {
-            console.warn('Silent utterance failed:', e);
-          }
-          
-          return true;
-        }
-        return false;
-      };
-      
-      // Try loading voices immediately
-      if (!loadVoices()) {
-        // Set up event listener for when voices change
-        window.speechSynthesis.addEventListener('voiceschanged', () => {
-          console.log('Voices changed event fired');
-          loadVoices();
-        });
-        
-        // Also try again after a delay for browsers that don't fire the event
-        const reloadTimers = [500, 1000, 2000, 3000];
-        reloadTimers.forEach(delay => {
-          setTimeout(() => {
-            if (!voicesLoadedRef.current) {
-              loadVoices();
-            }
-          }, delay);
-        });
-      }
-    }
-  }, []);
+  // Handle iOS and Safari-specific initialization
+  useSafariSupport(userInteractionRef);
   
-  // Always attempt to auto-play the current word when it changes
-  useEffect(() => {
-    if (currentWord && !muted && !paused) {
-      console.log(`Auto-playing word after state change: ${currentWord.word}`);
-      
-      // Small delay to ensure state is settled
-      const timer = setTimeout(() => {
-        playCurrentWordRef.current();
-      }, 250);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, currentWord, muted, paused]);
-  
-  // Special iOS and Safari initialization
-  useEffect(() => {
-    // iOS needs user interaction to enable audio
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    
-    if (isIOS || isSafari) {
-      if (!userInteractionRef.current) {
-        toast.error("Please tap anywhere to enable audio playback", { duration: 5000 });
-      }
-    }
-    
-    // Try to force browser to preload speech synthesis
-    const preloadSpeech = () => {
-      if ('speechSynthesis' in window) {
-        try {
-          // Create a minimal utterance - just a space
-          const utterance = new SpeechSynthesisUtterance(' ');
-          utterance.volume = 0.01;
-          utterance.rate = 1;
-          utterance.pitch = 1;
-          
-          // Try to speak it
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(utterance);
-        } catch (e) {
-          console.warn('Speech preload failed:', e);
-        }
-      }
-    };
-    
-    // Try preloading once on mount
-    preloadSpeech();
-    
-    // Clean up
-    return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [userInteractionRef]);
+  // Auto-play the current word when it changes
+  useAutoPlay(
+    currentWord, 
+    muted, 
+    paused, 
+    () => playCurrentWordRef.current()
+  );
   
   return {
     currentWord,
@@ -207,6 +123,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     cycleVoice,
     userInteractionRef,
     isSpeaking,
+    hasSpeechPermission,
     allVoiceOptions
   };
 };

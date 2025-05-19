@@ -7,6 +7,7 @@ import { usePermissionState } from './usePermissionState';
 import { useUtteranceSetup } from './useUtteranceSetup';
 import { useWordTransition } from './useWordTransition';
 import { useSpeechErrorHandling } from './useSpeechErrorHandling';
+import { toast } from 'sonner';
 
 /**
  * Core hook for managing word playback functionality
