@@ -38,59 +38,51 @@ export const useWordPlayback = (
   // Track permission state
   const [hasSpeechPermission, setHasSpeechPermission] = useState(true);
   
-  // Track if the user has interacted with the page
-  useEffect(() => {
-    // Add a click handler to the document to detect user interaction
-    const handleUserInteraction = () => {
-      if (!userInteractionRef.current) {
-        console.log('User interaction detected, enabling audio playback');
-        userInteractionRef.current = true;
-        
-        // Try to enable audio after user interaction
-        setTimeout(() => {
-          // Create and play a silent utterance to overcome permission issues
-          try {
-            const silentUtterance = new SpeechSynthesisUtterance(' ');
-            silentUtterance.volume = 0;
-            silentUtterance.onend = () => {
-              console.log('Permission test succeeded');
-              setHasSpeechPermission(true);
-              
-              // If we're not muted or paused, try to play the current word
-              if (!muted && !paused && currentWord) {
-                setTimeout(() => playCurrentWord(), 500);
-              }
-            };
-            silentUtterance.onerror = (e) => {
-              console.log('Permission test failed', e);
-              // Still set permission to true to allow retries
-              setHasSpeechPermission(true);
-            };
-            
-            // Cancel any existing speech first
-            window.speechSynthesis.cancel();
-            
-            // Wait a moment then try the test utterance
-            setTimeout(() => {
-              window.speechSynthesis.speak(silentUtterance);
-            }, 300);
-          } catch (err) {
-            console.error('Error during permission test:', err);
-          }
-        }, 300);
+  // Track if voices have been loaded
+  const voicesLoadedRef = useRef<boolean>(false);
+  
+  // Ensure voices are loaded before attempting speech
+  const ensureVoicesLoaded = useCallback((): Promise<boolean> => {
+    return new Promise((resolve) => {
+      // If voices are already loaded, resolve immediately
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        voicesLoadedRef.current = true;
+        console.log(`Voices already loaded: ${voices.length} voices available`);
+        resolve(true);
+        return;
       }
-    };
-    
-    // Add event listeners for user interaction
-    document.addEventListener('click', handleUserInteraction);
-    document.addEventListener('touchstart', handleUserInteraction);
-    
-    // Clean up
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-      document.removeEventListener('touchstart', handleUserInteraction);
-    };
-  }, [currentWord, muted, paused, userInteractionRef]);
+      
+      // Set up event listener for voices changed
+      const voiceChangedHandler = () => {
+        const newVoices = window.speechSynthesis.getVoices();
+        if (newVoices.length > 0) {
+          console.log(`Voices loaded via event: ${newVoices.length} voices`);
+          voicesLoadedRef.current = true;
+          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          resolve(true);
+        }
+      };
+      
+      // Listen for voices changed event
+      window.speechSynthesis.addEventListener('voiceschanged', voiceChangedHandler);
+      
+      // Fallback timeout - try to get voices directly after a delay
+      setTimeout(() => {
+        const fallbackVoices = window.speechSynthesis.getVoices();
+        if (fallbackVoices.length > 0 && !voicesLoadedRef.current) {
+          console.log(`Fallback voices loaded: ${fallbackVoices.length} voices`);
+          voicesLoadedRef.current = true;
+          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          resolve(true);
+        } else if (!voicesLoadedRef.current) {
+          console.warn('No voices available after timeout, continuing anyway');
+          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          resolve(false);
+        }
+      }, 2000);
+    });
+  }, []);
   
   // Function to advance to next word with full cleanup
   const goToNextWord = useCallback(() => {
@@ -118,8 +110,8 @@ export const useWordPlayback = (
     }, 300);
   }, [wordList, cancelSpeech, setCurrentIndex, resetRetryAttempts]);
 
-  // Core function to play the current word
-  const playCurrentWord = useCallback(() => {
+  // Core function to play the current word - no longer gated by any "unmute" or "play" button
+  const playCurrentWord = useCallback(async () => {
     // Don't try to play during word transitions
     if (wordTransitionRef.current) {
       console.log('Word transition in progress, delaying playback');
@@ -133,7 +125,9 @@ export const useWordPlayback = (
     }
     
     if (muted) {
-      console.log('Speech is muted');
+      console.log('Speech is muted, but continuing to show words');
+      // We don't return here as we want to auto-advance even when muted
+      setTimeout(() => goToNextWord(), 3000);
       return;
     }
     
@@ -142,17 +136,16 @@ export const useWordPlayback = (
       return;
     }
     
+    // CRITICAL: Ensure voices are loaded before attempting speech
+    if (!voicesLoadedRef.current) {
+      console.log('Ensuring voices are loaded before speaking');
+      await ensureVoicesLoaded();
+    }
+    
     console.log(`Attempting to play word with voice: ${selectedVoice.label}`);
     
     // CRITICAL: Cancel any ongoing speech to prevent queuing
     cancelSpeech();
-    
-    // Force user interaction check
-    if (!userInteractionRef.current) {
-      toast.error("Please click anywhere on the page to enable audio");
-      userInteractionRef.current = true; // Set this anyway to avoid repeating messages
-      return;
-    }
     
     // Ensure speech synthesis is available
     if (!checkSpeechSupport()) {
@@ -160,6 +153,8 @@ export const useWordPlayback = (
         toast.error("Your browser doesn't support speech synthesis");
         permissionErrorShownRef.current = true;
       }
+      // Auto-advance even if speech isn't supported
+      setTimeout(() => goToNextWord(), 3000);
       return;
     }
     
@@ -208,11 +203,8 @@ export const useWordPlayback = (
           speakingRef.current = false;
           setIsSpeaking(false);
           
-          // Only auto-advance if not paused and not muted
-          if (!paused && !muted) {
-            console.log('Auto-advancing to next word');
-            setTimeout(() => goToNextWord(), 500);
-          }
+          // Auto-advance to next word after speech completes
+          setTimeout(() => goToNextWord(), 500);
         };
         
         utterance.onerror = (event) => {
@@ -236,12 +228,16 @@ export const useWordPlayback = (
               toast.error("Please click anywhere on the page to enable audio playback");
               permissionErrorShownRef.current = true;
             }
+            // Continue to next word even without audio
+            setTimeout(() => goToNextWord(), 2000);
             return;
           }
           
           // If error is "canceled" but it was intentional (during muting/pausing), don't retry
           if (event.error === 'canceled' && (muted || paused)) {
             console.log('Speech canceled due to muting or pausing, not retrying');
+            // Still auto-advance after a short delay
+            setTimeout(() => goToNextWord(), 2000);
             return;
           }
           
@@ -251,17 +247,15 @@ export const useWordPlayback = (
             
             // Wait briefly then retry
             setTimeout(() => {
-              if (!paused && !muted && !wordTransitionRef.current) {
+              if (!paused && !wordTransitionRef.current) {
                 console.log('Retrying speech after error');
                 playCurrentWord();
               }
             }, 500);
           } else {
             console.log(`Max retries reached, advancing to next word`);
-            if (!paused && !muted) {
-              // Move on after too many failures
-              goToNextWord();
-            }
+            // Move on after too many failures
+            setTimeout(() => goToNextWord(), 1000);
           }
         };
         
@@ -289,18 +283,16 @@ export const useWordPlayback = (
                 goToNextWord();
               }
             }
-          }, 200);  // Increased from 100ms to 200ms for better detection
-        }, 150);  // Added delay before speaking to reduce race conditions
+          }, 200);
+        }, 150);
         
       } catch (error) {
         console.error('Error in speech playback:', error);
         setIsSpeaking(false);
         // Still try to advance to prevent getting stuck
-        if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 1000);
-        }
+        setTimeout(() => goToNextWord(), 1000);
       }
-    }, 100); // Small delay to ensure cancellation completes
+    }, 100);
   }, [
     currentWord, 
     muted, 
@@ -314,17 +306,103 @@ export const useWordPlayback = (
     speakingRef,
     incrementRetryAttempts,
     checkSpeechSupport,
-    wordTransitionRef
+    wordTransitionRef,
+    ensureVoicesLoaded
   ]);
   
-  // Try to play the current word when hasSpeechPermission changes to true
+  // Auto-play on word change - no longer relying on user interaction flag
   useEffect(() => {
-    if (hasSpeechPermission && currentWord && !muted && !paused && userInteractionRef.current) {
-      console.log("Speech permission granted, attempting to play word");
-      const timerId = setTimeout(() => playCurrentWord(), 500);
+    if (currentWord) {
+      console.log(`Auto-playing word after change: ${currentWord.word}`);
+      const timerId = setTimeout(() => {
+        playCurrentWord();
+      }, 200);
       return () => clearTimeout(timerId);
     }
-  }, [hasSpeechPermission, currentWord, muted, paused, userInteractionRef, playCurrentWord]);
+  }, [currentWord, playCurrentWord]);
+  
+  // Global user interaction detection - one-time setup for the entire app
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      if (!userInteractionRef.current) {
+        console.log('First user interaction detected - enabling speech');
+        userInteractionRef.current = true;
+        
+        // Try to play a silent sound to initialize audio context
+        try {
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          oscillator.frequency.value = 0; // Silent
+          oscillator.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.001);
+        } catch (e) {
+          console.warn('Could not initialize audio context:', e);
+        }
+        
+        // Initialize speech synthesis with a silent utterance
+        try {
+          const initUtterance = new SpeechSynthesisUtterance(' '); // Just a space
+          initUtterance.volume = 0.01; // Nearly silent
+          initUtterance.onend = () => {
+            console.log('Speech initialization successful');
+            // Load voices and then attempt to speak the current word
+            ensureVoicesLoaded().then(() => {
+              if (currentWord) {
+                playCurrentWord();
+              }
+            });
+          };
+          
+          initUtterance.onerror = (e) => {
+            console.error('Speech initialization error:', e);
+            // Try to play current word anyway after a moment
+            setTimeout(() => {
+              if (currentWord) {
+                playCurrentWord();
+              }
+            }, 500);
+          };
+          
+          // Speak the silent utterance to initialize the speech system
+          window.speechSynthesis.cancel(); // Clear any pending speech
+          window.speechSynthesis.speak(initUtterance);
+        } catch (e) {
+          console.error('Error initializing speech:', e);
+        }
+        
+        // Remove event listeners after first interaction
+        document.removeEventListener('click', handleUserInteraction);
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('keydown', handleUserInteraction);
+      }
+    };
+    
+    // Add event listeners for various user interaction types
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('touchstart', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+    
+    // Check for previous interactions
+    if (localStorage.getItem('hadUserInteraction') === 'true') {
+      console.log('Previous user interaction detected from localStorage');
+      userInteractionRef.current = true;
+      handleUserInteraction();
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, [userInteractionRef, currentWord, playCurrentWord, ensureVoicesLoaded]);
+  
+  // When user interacts, save that fact to localStorage
+  useEffect(() => {
+    if (userInteractionRef.current) {
+      localStorage.setItem('hadUserInteraction', 'true');
+    }
+  }, [userInteractionRef.current]);
   
   return {
     utteranceRef,

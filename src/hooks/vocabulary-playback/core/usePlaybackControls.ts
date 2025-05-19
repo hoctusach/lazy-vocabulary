@@ -4,8 +4,10 @@ import { toast } from 'sonner';
 
 /**
  * Hook for managing playback controls like mute and pause functionality
+ * Now designed to start unmuted by default with auto-playback
  */
 export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: () => void) => {
+  // Start with auto-playback enabled
   const [muted, setMuted] = useState(false);
   const [paused, setPaused] = useState(false);
   

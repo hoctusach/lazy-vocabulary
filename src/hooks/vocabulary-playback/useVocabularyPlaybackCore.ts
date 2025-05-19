@@ -50,7 +50,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     console.log('playCurrentWord not yet initialized');
   });
   
-  // Get word playback functionality
+  // Get word playback functionality - start unmuted and unpaused
   const { 
     utteranceRef,
     currentWord, 
@@ -60,8 +60,8 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     wordList,
     currentIndex,
     setCurrentIndex,
-    false, // We'll get the actual muted state from usePlaybackControls
-    false, // We'll get the actual paused state from usePlaybackControls
+    false, // Start unmuted for auto-play
+    false, // Start unpaused for auto-play
     cancelSpeech,
     findVoice,
     selectedVoice,
@@ -76,7 +76,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
   // Update the playCurrentWordRef with the actual implementation
   playCurrentWordRef.current = playCurrentWordInternal;
   
-  // Get playback controls (mute/pause) with the updated playCurrentWord function
+  // Get playback controls with the updated playCurrentWord function
   const { 
     muted, 
     paused, 
@@ -90,104 +90,108 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     }
   );
   
-  // Trigger playback when user interacts with the page for the first time
-  useEffect(() => {
-    if (userInteractionRef.current && currentWord && !muted && !paused) {
-      console.log('User interaction detected, trying to play word');
-      
-      // Small delay to ensure everything is ready
-      const timerId = setTimeout(() => {
-        playCurrentWordRef.current();
-      }, 500);
-      
-      return () => clearTimeout(timerId);
-    }
-  }, [userInteractionRef, currentWord, muted, paused]);
-  
-  // Make sure voices are loaded before attempting to speak
+  // Always try to pre-load voices as early as possible
   useEffect(() => {
     if (!voicesLoadedRef.current && window.speechSynthesis) {
-      console.log('Loading voices...');
+      console.log('Pre-loading voices for later use...');
       
       const loadVoices = () => {
+        // Force browser to load voices
         const availableVoices = window.speechSynthesis.getVoices();
-        console.log(`Voices loaded: found ${availableVoices.length} voices`);
-        
         if (availableVoices.length > 0) {
+          console.log(`Voices loaded: ${availableVoices.length} voices available`);
           voicesLoadedRef.current = true;
           
-          // If we have a current word and we're not muted/paused, try to speak it
-          if (currentWord && !muted && !paused && userInteractionRef.current) {
-            // Use a small delay to ensure everything is ready
-            setTimeout(() => {
-              console.log('Playing word after voices loaded');
-              playCurrentWordRef.current();
-            }, 300);
+          // Try a silent utterance to initialize speech engine
+          try {
+            const silentUtterance = new SpeechSynthesisUtterance(' ');  // Just a space
+            silentUtterance.volume = 0.01;  // Nearly silent
+            window.speechSynthesis.speak(silentUtterance);
+          } catch (e) {
+            console.warn('Silent utterance failed:', e);
           }
-        } else {
-          console.log('No voices available yet, will retry');
-          // Try again after a delay
-          setTimeout(loadVoices, 500);
+          
+          return true;
         }
+        return false;
       };
       
-      // Try to load voices immediately
-      loadVoices();
-      
-      // Also set up event listener for when voices change
-      window.speechSynthesis.addEventListener('voiceschanged', () => {
-        console.log('Voices changed event fired');
-        loadVoices();
-      });
-      
-      // Display a toast when voices are loaded
-      const checkVoicesLoadedInterval = setInterval(() => {
-        if (voicesLoadedRef.current) {
-          toast.success("Voice system ready");
-          clearInterval(checkVoicesLoadedInterval);
-        }
-      }, 1000);
-      
-      // Cleanup
-      return () => {
-        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
-        clearInterval(checkVoicesLoadedInterval);
-      };
+      // Try loading voices immediately
+      if (!loadVoices()) {
+        // Set up event listener for when voices change
+        window.speechSynthesis.addEventListener('voiceschanged', () => {
+          console.log('Voices changed event fired');
+          loadVoices();
+        });
+        
+        // Also try again after a delay for browsers that don't fire the event
+        const reloadTimers = [500, 1000, 2000, 3000];
+        reloadTimers.forEach(delay => {
+          setTimeout(() => {
+            if (!voicesLoadedRef.current) {
+              loadVoices();
+            }
+          }, delay);
+        });
+      }
     }
-  }, [currentWord, muted, paused, userInteractionRef]);
+  }, []);
   
-  // Ensure speech synthesis is canceled when component unmounts
+  // Always attempt to auto-play the current word when it changes
   useEffect(() => {
+    if (currentWord && !muted && !paused) {
+      console.log(`Auto-playing word after state change: ${currentWord.word}`);
+      
+      // Small delay to ensure state is settled
+      const timer = setTimeout(() => {
+        playCurrentWordRef.current();
+      }, 250);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentIndex, currentWord, muted, paused]);
+  
+  // Special iOS and Safari initialization
+  useEffect(() => {
+    // iOS needs user interaction to enable audio
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    
+    if (isIOS || isSafari) {
+      if (!userInteractionRef.current) {
+        toast.error("Please tap anywhere to enable audio playback", { duration: 5000 });
+      }
+    }
+    
+    // Try to force browser to preload speech synthesis
+    const preloadSpeech = () => {
+      if ('speechSynthesis' in window) {
+        try {
+          // Create a minimal utterance - just a space
+          const utterance = new SpeechSynthesisUtterance(' ');
+          utterance.volume = 0.01;
+          utterance.rate = 1;
+          utterance.pitch = 1;
+          
+          // Try to speak it
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn('Speech preload failed:', e);
+        }
+      }
+    };
+    
+    // Try preloading once on mount
+    preloadSpeech();
+    
+    // Clean up
     return () => {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
-  
-  // Effect to handle auto-play with improved state handling
-  useEffect(() => {
-    // Don't attempt to play if we don't have a word or voices aren't loaded
-    if (!currentWord || !voicesLoadedRef.current) return;
-    
-    // Don't play if muted or paused
-    if (muted || paused) return;
-    
-    // Don't auto-play until we've had user interaction
-    if (!userInteractionRef.current) {
-      toast.info("Click anywhere on the page to start audio playback");
-      return;
-    }
-    
-    console.log(`Auto-playing word after state change: ${currentWord.word}`);
-    
-    // Small delay to ensure state is settled
-    const timer = setTimeout(() => {
-      playCurrentWordRef.current();
-    }, 250);
-    
-    return () => clearTimeout(timer);
-  }, [currentIndex, currentWord, muted, paused, userInteractionRef]);
+  }, [userInteractionRef]);
   
   return {
     currentWord,
