@@ -3,6 +3,10 @@ import { useState, useEffect, useCallback } from 'react';
 import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
 
+// Hard-coded voice names from previously working version
+const US_VOICE_NAME = "Samantha";
+const UK_VOICE_NAME = "Google UK English Female";
+
 /**
  * Hook for managing voice selection and finding appropriate voices
  */
@@ -10,9 +14,7 @@ export const useVoiceManagement = () => {
   // Define voice options with consistent structure
   const allVoiceOptions: VoiceSelection[] = [
     { label: "US-F", region: "US", gender: "female", index: 0 },
-    { label: "US-M", region: "US", gender: "male", index: 1 },
-    { label: "UK-F", region: "UK", gender: "female", index: 2 },
-    { label: "UK-M", region: "UK", gender: "male", index: 3 }
+    { label: "UK-F", region: "UK", gender: "female", index: 2 }
   ];
   
   const [voiceIndex, setVoiceIndex] = useState(0);
@@ -48,10 +50,12 @@ export const useVoiceManagement = () => {
         console.log(`Voices loaded: found ${availableVoices.length} voices`);
         setVoicesLoaded(true);
         
-        // Check if we have English voices
-        const hasEnglishVoices = availableVoices.some(v => v.lang.startsWith('en'));
-        if (!hasEnglishVoices) {
-          toast.warning("No English voices found. Speech may not work correctly.");
+        // Check if our required voices are available
+        const hasUSVoice = availableVoices.some(v => v.name === US_VOICE_NAME || v.name.includes(US_VOICE_NAME));
+        const hasUKVoice = availableVoices.some(v => v.name === UK_VOICE_NAME || v.name.includes(UK_VOICE_NAME));
+        
+        if (!hasUSVoice || !hasUKVoice) {
+          toast.warning("Some required voices may not be available. Speech quality might be affected.");
         }
       }
     };
@@ -69,12 +73,9 @@ export const useVoiceManagement = () => {
     }
   }, [allVoiceOptions]);
   
-  // Function to find the appropriate voice
+  // Function to find the appropriate voice with hardcoded names
   const findVoice = useCallback((region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
-    const currentOption = allVoiceOptions[voiceIndex];
-    const gender = currentOption.gender;
-    const targetRegion = currentOption.region;
-    console.log(`Looking for ${targetRegion} ${gender} voice`);
+    console.log(`Looking for ${region} voice`);
     
     // Always get fresh voices
     const allVoices = window.speechSynthesis.getVoices();
@@ -85,65 +86,57 @@ export const useVoiceManagement = () => {
       return null;
     }
     
-    // Log first few voices to help with debugging
-    allVoices.slice(0, 5).forEach((v, i) => {
-      console.log(`Voice ${i}: ${v.name} (${v.lang})`);
-    });
+    // Use hardcoded voice names
+    const targetVoiceName = region === 'US' ? US_VOICE_NAME : UK_VOICE_NAME;
     
-    const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
+    // Strategy 1: Find exact name match
+    let voice = allVoices.find(v => v.name === targetVoiceName);
     
-    // Try multiple strategies to find the best voice
-    let voice: SpeechSynthesisVoice | null = null;
-    
-    // Strategy 1: Find exact language match with gender
-    if (region === 'UK') {
-      voice = allVoices.find(v => 
-        v.lang === 'en-GB' && genderPattern.test(v.name)
-      );
-    } else {
-      voice = allVoices.find(v => 
-        v.lang === 'en-US' && genderPattern.test(v.name)
-      );
+    if (voice) {
+      console.log(`Found exact match for ${region}: ${voice.name} (${voice.lang})`);
+      return voice;
     }
     
-    // Strategy 2: Exact language match without gender check
-    if (!voice) {
-      voice = allVoices.find(v => 
-        v.lang === (region === 'UK' ? 'en-GB' : 'en-US')
-      );
+    // Strategy 2: Partial name match
+    voice = allVoices.find(v => v.name.includes(targetVoiceName));
+    
+    if (voice) {
+      console.log(`Found partial match for ${region}: ${voice.name} (${voice.lang})`);
+      return voice;
     }
     
-    // Strategy 3: Any English voice with gender match
-    if (!voice) {
-      voice = allVoices.find(v => 
-        v.lang.startsWith('en') && genderPattern.test(v.name)
-      );
+    // Fallback strategies
+    
+    // Strategy 3: Match by language code
+    voice = allVoices.find(v => v.lang === (region === 'US' ? 'en-US' : 'en-GB'));
+    
+    if (voice) {
+      console.log(`Selected ${region} voice by language code: ${voice.name} (${voice.lang})`);
+      return voice;
     }
     
     // Strategy 4: Any English voice
-    if (!voice) {
-      voice = allVoices.find(v => v.lang.startsWith('en'));
+    voice = allVoices.find(v => v.lang.startsWith('en'));
+    
+    if (voice) {
+      console.log(`Selected any English voice for ${region}: ${voice.name} (${voice.lang})`);
+      return voice;
     }
     
     // Strategy 5: First voice in the list
-    if (!voice && allVoices.length > 0) {
+    if (allVoices.length > 0) {
       console.log('No suitable English voice found, using first available voice');
-      voice = allVoices[0];
+      return allVoices[0];
     }
     
-    if (voice) {
-      console.log(`Selected ${region} voice:`, voice.name, voice.lang);
-    } else {
-      console.warn('No suitable voice found');
-    }
-    
-    return voice;
-  }, [voiceIndex, allVoiceOptions]);
+    console.warn('No suitable voice found');
+    return null;
+  }, []);
   
-  // Function to cycle through voices
+  // Function to cycle through voices (simplified to just toggle between US and UK)
   const cycleVoice = useCallback(() => {
     setVoiceIndex(prevIndex => {
-      const nextIndex = (prevIndex + 1) % allVoiceOptions.length;
+      const nextIndex = prevIndex === 0 ? 1 : 0;  // Toggle between 0 (US) and 1 (UK)
       console.log(`Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`);
       
       // Save to localStorage
@@ -166,7 +159,7 @@ export const useVoiceManagement = () => {
   }, [allVoiceOptions]);
   
   // Get the current selected voice
-  const selectedVoice = allVoiceOptions[voiceIndex];
+  const selectedVoice = allVoiceOptions[voiceIndex % allVoiceOptions.length];
   
   return {
     voices,

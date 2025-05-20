@@ -1,6 +1,10 @@
 
 import { useState, useEffect } from 'react';
 
+// Hard-coded voice names from previously working version
+const US_VOICE_NAME = "Samantha";
+const UK_VOICE_NAME = "Google UK English Female";
+
 export type VoiceOption = {
   label: string;
   region: 'US' | 'UK';
@@ -16,11 +20,10 @@ export interface VoiceSelection {
   index: number;
 }
 
+// Simplified voice options - only using female voices since those are the ones we've identified
 const VOICE_OPTIONS: VoiceSelection[] = [
   { label: "US-F", region: "US", gender: "female", index: 0 },
-  { label: "US-M", region: "US", gender: "male", index: 1 },
   { label: "UK-F", region: "UK", gender: "female", index: 2 },
-  { label: "UK-M", region: "UK", gender: "male", index: 3 },
 ];
 
 const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[0];
@@ -53,108 +56,37 @@ export const useVoiceSelection = () => {
       const synth = window.speechSynthesis;
       const availableVoices = synth.getVoices();
       
-      // Ensure voices are properly loaded by logging them
       console.log(`Loading ${availableVoices.length} voices`);
-      if (availableVoices.length > 0) {
-        availableVoices.forEach((v, i) => {
-          if (i < 10) { // Log just the first 10 to avoid console spam
-            console.log(`Voice ${i+1}: ${v.name} (${v.lang})`);
-          }
-        });
-      }
       
       if (availableVoices.length) {
-        // Find voices for all our options
-        const findVoiceByPattern = (
-          pattern: RegExp, 
-          langPrefix: string,
-          gender: string
-        ): SpeechSynthesisVoice | null => {
-          // First try by name pattern with gender
-          const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
-          const matchByNameAndGender = availableVoices.find(v => 
-            pattern.test(v.name) && genderPattern.test(v.name)
-          );
-          if (matchByNameAndGender) return matchByNameAndGender;
-          
-          // Then try by name pattern only
-          const matchByName = availableVoices.find(v => pattern.test(v.name));
-          if (matchByName) return matchByName;
-          
-          // Then try by language with gender hint
-          const matchByLangAndGender = availableVoices.find(v => 
-            v.lang.startsWith(langPrefix) && genderPattern.test(v.name)
-          );
-          if (matchByLangAndGender) return matchByLangAndGender;
-          
-          // Then try by language only
-          const matchByLang = availableVoices.find(v => v.lang.startsWith(langPrefix));
-          if (matchByLang) return matchByLang;
-          
-          // Fallback to any English voice
-          return availableVoices.find(v => v.lang.startsWith('en')) || null;
-        };
+        // Look specifically for our hardcoded voices
+        const usVoice = availableVoices.find(v => v.name === US_VOICE_NAME) || 
+                       availableVoices.find(v => v.name.includes(US_VOICE_NAME)) ||
+                       availableVoices.find(v => v.lang === 'en-US');
+                       
+        const ukVoice = availableVoices.find(v => v.name === UK_VOICE_NAME) || 
+                       availableVoices.find(v => v.name.includes(UK_VOICE_NAME)) ||
+                       availableVoices.find(v => v.lang === 'en-GB');
         
-        // Find US female voice
-        const usFemaleVoice = findVoiceByPattern(
-          /US English Female|en-US.*female|Samantha|Google US.*female|US-F/i, 
-          'en-US',
-          'female'
-        );
-        
-        // Find US male voice
-        const usMaleVoice = findVoiceByPattern(
-          /US English Male|en-US.*male|Daniel|Google US.*male|US-M/i, 
-          'en-US',
-          'male'
-        );
-        
-        // Find UK female voice
-        const ukFemaleVoice = findVoiceByPattern(
-          /UK English Female|en-GB.*female|Catherine|Google UK.*female|UK-F/i, 
-          'en-GB',
-          'female'
-        );
-        
-        // Find UK male voice
-        const ukMaleVoice = findVoiceByPattern(
-          /UK English Male|en-GB.*male|Charles|Google UK.*male|UK-M/i, 
-          'en-GB',
-          'male'
-        );
-        
+        // Create simplified voice options
         const voiceOptions: VoiceOption[] = [
           {
             label: "US-F",
             region: "US" as const,
             gender: "female" as const,
-            voice: usFemaleVoice
-          },
-          {
-            label: "US-M",
-            region: "US" as const,
-            gender: "male" as const,
-            voice: usMaleVoice
+            voice: usVoice || null
           },
           {
             label: "UK-F",
             region: "UK" as const,
             gender: "female" as const,
-            voice: ukFemaleVoice
-          },
-          {
-            label: "UK-M",
-            region: "UK" as const,
-            gender: "male" as const,
-            voice: ukMaleVoice
+            voice: ukVoice || null
           }
         ];
         
         console.log('Voice options created:');
         console.log(`US-F voice: ${voiceOptions[0].voice?.name || 'not found'}`);
-        console.log(`US-M voice: ${voiceOptions[1].voice?.name || 'not found'}`);
-        console.log(`UK-F voice: ${voiceOptions[2].voice?.name || 'not found'}`);
-        console.log(`UK-M voice: ${voiceOptions[3].voice?.name || 'not found'}`);
+        console.log(`UK-F voice: ${voiceOptions[1].voice?.name || 'not found'}`);
         
         setVoices(voiceOptions);
         
@@ -194,9 +126,9 @@ export const useVoiceSelection = () => {
     };
   }, []);
   
-  // Function to change voice selection - now cycles through all 4 voices
+  // Function to change voice selection - toggle between US and UK
   const cycleVoice = () => {
-    const nextIndex = (voiceIndex + 1) % VOICE_OPTIONS.length;
+    const nextIndex = voiceIndex === 0 ? 1 : 0;  // Toggle between 0 and 1
     const nextVoice = VOICE_OPTIONS[nextIndex];
     
     console.log(`Cycling voice from ${selectedVoice.label} to ${nextVoice.label}`);

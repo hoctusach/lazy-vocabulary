@@ -1,6 +1,10 @@
 
 import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
 
+// Hard-coded voice names based on previously working version
+const US_VOICE_NAME = "Samantha"; // For US voice
+const UK_VOICE_NAME = "Google UK English Female"; // For UK voice
+
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
   if (!voices || voices.length === 0) {
     return null;
@@ -16,6 +20,7 @@ export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthes
   return voices[0];
 };
 
+// Simplified function to get voice by region using hardcoded voice names
 export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
   
@@ -24,99 +29,51 @@ export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' 
     return null;
   }
   
-  // Important: Use the exact language code for the requested region
+  console.log(`Looking for ${region} voice with ${voices.length} voices available`);
+  
+  // Use the hardcoded voice names
+  const targetVoiceName = region === 'US' ? US_VOICE_NAME : UK_VOICE_NAME;
+  
+  // First try: exact name match
+  let voice = voices.find(v => v.name === targetVoiceName);
+  
+  if (voice) {
+    console.log(`Found exact match for ${region} voice: ${voice.name} (${voice.lang})`);
+    return voice;
+  }
+  
+  // If exact match fails, try partial name match
+  voice = voices.find(v => v.name.includes(targetVoiceName));
+  
+  if (voice) {
+    console.log(`Found partial match for ${region} voice: ${voice.name} (${voice.lang})`);
+    return voice;
+  }
+  
+  // Fallbacks based on language code if specific voices not found
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
-  
-  console.log(`Searching for ${gender} voice with region=${region}, langCode=${langCode} among ${voices.length} voices`);
-  
-  // Log all available voices for debugging
-  if (voices.length > 0) {
-    console.log(`Available voices: ${voices.length}`);
-    voices.forEach((v, i) => {
-      if (i < 10) { // Log just the first 10 to avoid spam
-        console.log(`Voice ${i+1}: name="${v.name}", lang="${v.lang}"`);
-      }
-    });
-  }
-  
-  // Use a more sophisticated voice matching algorithm with gender awareness
-  const genderPattern = gender === 'female' ? /female|woman|girl|f$/i : /male|man|boy|m$/i;
-  
-  // First priority: Match region and gender pattern
-  if (region === 'UK') {
-    let ukVoiceWithGender = voices.find(v => v.lang === 'en-GB' && genderPattern.test(v.name));
-    if (ukVoiceWithGender) {
-      console.log(`Selected UK ${gender} voice: ${ukVoiceWithGender.name} (${ukVoiceWithGender.lang})`);
-      return ukVoiceWithGender;
-    }
-  } else if (region === 'US') {
-    let usVoiceWithGender = voices.find(v => v.lang === 'en-US' && genderPattern.test(v.name));
-    if (usVoiceWithGender) {
-      console.log(`Selected US ${gender} voice: ${usVoiceWithGender.name} (${usVoiceWithGender.lang})`);
-      return usVoiceWithGender;
-    }
-  }
-  
-  // Second priority: Exact match for the language code ignoring gender
-  let voice = voices.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
+  voice = voices.find(v => v.lang === langCode);
   
   if (voice) {
-    console.log(`Selected exact match voice for ${region}: ${voice.name} (${voice.lang})`);
+    console.log(`Fallback to language code for ${region}: ${voice.name} (${voice.lang})`);
     return voice;
   }
   
-  // Third priority: Voice that starts with the language code
-  voice = voices.find(v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
-  
-  if (voice) {
-    console.log(`Selected voice with prefix ${langCode}: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Fourth priority: Check for specific keywords in voice name
-  // For US voices, look for US, American, or en-US in the name
-  // For UK voices, look for UK, British, GB, or en-GB in the name
-  const keywords = region === 'US' 
-    ? ['us', 'american', 'united states', 'en-us'] 
-    : ['uk', 'british', 'england', 'gb', 'en-gb'];
-  
-  voice = voices.find(v => {
-    const name = v.name.toLowerCase();
-    return keywords.some(keyword => name.includes(keyword));
-  });
-  
-  if (voice) {
-    console.log(`Selected voice by name keyword for ${region}: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Fifth priority: Google or Microsoft branded voices with appropriate region
-  voice = voices.find(v => 
-    (region === 'US' && (v.name.includes('Google US') || v.name.includes('Microsoft') && v.lang.startsWith('en'))) || 
-    (region === 'UK' && (v.name.includes('Google UK') || v.name.includes('British')))
-  );
-  
-  if (voice) {
-    console.log(`Selected branded voice for ${region}: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Fallback to any English voice if specific region not found
+  // Last resort - any English voice
   voice = voices.find(v => v.lang.startsWith('en'));
   
   if (voice) {
-    console.log(`Selected fallback English voice: ${voice.name} (${voice.lang})`);
+    console.log(`Last resort - any English voice: ${voice.name} (${voice.lang})`);
     return voice;
   }
   
-  // Last resort - use any voice
+  // Absolute fallback - first available voice
   if (voices.length > 0) {
-    voice = voices[0];
-    console.log(`Selected last resort voice: ${voice.name} (${voice.lang})`);
-    return voice;
+    console.log(`No matching voice found, using first available: ${voices[0].name}`);
+    return voices[0];
   }
   
-  console.warn(`No suitable voice found for ${region} ${gender}`);
+  console.log('No voices available at all');
   return null;
 };
 
