@@ -75,6 +75,52 @@ export const isSpeechSynthesisSupported = (): boolean => {
   return isSupported;
 };
 
+// Improved unlockAudio function that doesn't rely on loading an audio file
+export const unlockAudio = (): Promise<boolean> => {
+  return new Promise((resolve) => {
+    // Try to create a silent AudioContext instead of loading a file
+    try {
+      console.log('[ENGINE] Attempting to unlock audio...');
+      
+      // Create a short silent audio buffer
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) {
+        console.log('[ENGINE] AudioContext not supported, using fallback');
+        // If AudioContext is not supported, just resolve and use speech directly
+        resolve(true);
+        return;
+      }
+      
+      const context = new AudioContext();
+      const buffer = context.createBuffer(1, 1, 22050);
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(context.destination);
+      
+      // Play the silent sound
+      source.start(0);
+      console.log('[ENGINE] Audio context unlocked');
+      
+      // Resume the audio context if needed (newer browsers require this)
+      if (context.state === 'suspended') {
+        context.resume().then(() => {
+          console.log('[ENGINE] AudioContext resumed');
+          resolve(true);
+        }).catch(err => {
+          console.warn('[ENGINE] Failed to resume AudioContext:', err);
+          resolve(true); // Still consider it unlocked as we can try speech
+        });
+      } else {
+        resolve(true);
+      }
+    } catch (e) {
+      console.warn('[ENGINE] Audio unlock failed, continuing anyway:', e);
+      // Even if unlock fails, allow speech synthesis to try
+      resolve(true);
+    }
+  });
+};
+
 // Enhanced voices loading with explicit success/failure tracking
 export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise((resolve) => {
@@ -131,7 +177,10 @@ export const speakWithRetry = async (
   utterance: SpeechSynthesisUtterance, 
   maxRetries: number = 3
 ): Promise<boolean> => {
-  // Ensure voices are loaded first
+  // Unlock audio first to ensure browser allows speech
+  await unlockAudio();
+  
+  // Ensure voices are loaded
   const voices = await loadVoicesAndWait();
   console.log(`[ENGINE] Loaded ${voices.length} voices for speech`);
   

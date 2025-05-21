@@ -6,6 +6,8 @@ import { ensureVoicesLoaded } from './ensureVoices';
 import { findVoice } from './findVoice';
 import { createUtterance } from './utteranceSetup';
 import { handleSpeechError, handleNotAllowedError, handleSilentFailure } from './errorHandling';
+import { unlockAudio } from '@/utils/speech/core/speechEngine';
+import { toast } from 'sonner';
 
 export const useSpeechPlaybackCore = (
   utteranceRef: React.MutableRefObject<SpeechSynthesisUtterance | null>,
@@ -20,6 +22,27 @@ export const useSpeechPlaybackCore = (
   const voicesLoadedRef = useRef(false);
   const speakingFailedRef = useRef(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const networkErrorRef = useRef(false);
+
+  // Function to handle network connectivity issues
+  const checkNetworkConnectivity = useCallback(() => {
+    // Simple check if we're online
+    if (!navigator.onLine) {
+      if (!networkErrorRef.current) {
+        toast.error("Network connection lost. Speech playback may be affected.");
+        networkErrorRef.current = true;
+      }
+      return false;
+    }
+    
+    // Reset network error flag if we're back online
+    if (networkErrorRef.current && navigator.onLine) {
+      toast.success("Network connection restored.");
+      networkErrorRef.current = false;
+    }
+    
+    return true;
+  }, []);
 
   // Function to play the current word
   const playWord = useCallback(async (wordToPlay: VocabularyWord | null) => {
@@ -29,9 +52,20 @@ export const useSpeechPlaybackCore = (
       return;
     }
     
+    // Check network connectivity (for Firebase errors)
+    checkNetworkConnectivity();
+    
     console.log(`Playing word: ${wordToPlay.word}`);
     retryAttemptsRef.current = 0;
     speakingFailedRef.current = false;
+    
+    // Unlock audio first to ensure browser permissions
+    try {
+      await unlockAudio();
+    } catch (e) {
+      console.warn("Audio unlock failed but continuing:", e);
+      // Continue anyway - unlockAudio has fallbacks
+    }
     
     // Cancel any ongoing speech to prevent queuing
     window.speechSynthesis.cancel();
@@ -102,8 +136,15 @@ export const useSpeechPlaybackCore = (
               setTimeout(() => {
                 if (!paused && !muted) {
                   try {
-                    window.speechSynthesis.speak(utterance);
-                    setIsSpeaking(true);
+                    // Try to unlock audio again before retrying
+                    unlockAudio().then(() => {
+                      window.speechSynthesis.speak(utterance);
+                      setIsSpeaking(true);
+                    }).catch(() => {
+                      // If unlock fails, try anyway
+                      window.speechSynthesis.speak(utterance);
+                      setIsSpeaking(true);
+                    });
                   } catch (e) {
                     console.error("Retry failed:", e);
                     setIsSpeaking(false);
@@ -164,7 +205,29 @@ export const useSpeechPlaybackCore = (
         setTimeout(advanceToNext, 1000);
       }
     }
-  }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, maxRetryAttempts]);
+  }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, maxRetryAttempts, checkNetworkConnectivity]);
+  
+  // Listen for online/offline events
+  useState(() => {
+    const handleOnline = () => {
+      console.log("Network connection restored");
+      networkErrorRef.current = false;
+      // Could potentially retry speech here
+    };
+    
+    const handleOffline = () => {
+      console.log("Network connection lost");
+      networkErrorRef.current = true;
+    };
+    
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  });
   
   return {
     playWord,

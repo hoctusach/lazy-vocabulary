@@ -1,35 +1,70 @@
 
-import { VoiceSelection } from '../useVoiceSelection';
+import { unlockAudio } from '@/utils/speech/core/speechEngine';
 
-// Function to ensure voices are loaded before speaking
+// Maximum number of attempts to load voices
+const MAX_VOICE_LOAD_ATTEMPTS = 10;
+
+// Function to load voices with retries
 export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
-  return new Promise((resolve) => {
-    console.log("Ensuring voices are loaded...");
-    const voices = window.speechSynthesis.getVoices();
+  return new Promise(async (resolve) => {
+    console.log('Ensuring voices are loaded...');
     
+    // First try to unlock audio to ensure proper browser permissions
+    await unlockAudio();
+    
+    // Helper function to check if voices are available
+    const checkVoices = (): SpeechSynthesisVoice[] => {
+      if (window.speechSynthesis) {
+        const availableVoices = window.speechSynthesis.getVoices();
+        return availableVoices;
+      }
+      return [];
+    };
+    
+    // Try to get voices immediately
+    let voices = checkVoices();
     if (voices.length > 0) {
       console.log(`Voices already loaded: ${voices.length} voices available`);
       resolve(voices);
       return;
     }
-
-    // If no voices available, wait for the voiceschanged event
-    console.log("No voices available yet, waiting for voiceschanged event...");
+    
+    // Set up event listener for voices changed event
     const voicesChangedHandler = () => {
-      const newVoices = window.speechSynthesis.getVoices();
-      console.log(`Voices loaded via event: ${newVoices.length} voices available`);
+      voices = checkVoices();
+      console.log(`Voices loaded via event: ${voices.length} voices available`);
       window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
-      resolve(newVoices);
+      resolve(voices);
     };
-
-    window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
-
-    // Fallback timeout in case the event never fires
-    setTimeout(() => {
-      const availableVoices = window.speechSynthesis.getVoices();
-      console.log(`Fallback voices: ${availableVoices.length} voices available`);
-      window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
-      resolve(availableVoices);
-    }, 2000);
+    
+    if (window.speechSynthesis) {
+      window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    }
+    
+    // Fallback: try loading voices with increasing delays
+    let attempts = 0;
+    const tryLoadingVoices = () => {
+      voices = checkVoices();
+      
+      if (voices.length > 0) {
+        console.log(`Voices loaded after ${attempts + 1} attempts: ${voices.length} voices`);
+        window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+        resolve(voices);
+        return;
+      }
+      
+      attempts++;
+      if (attempts < MAX_VOICE_LOAD_ATTEMPTS) {
+        console.log(`No voices yet, attempt ${attempts}/${MAX_VOICE_LOAD_ATTEMPTS}`);
+        setTimeout(tryLoadingVoices, 300 * attempts); // Increasing delay
+      } else {
+        console.log(`Failed to load voices after ${MAX_VOICE_LOAD_ATTEMPTS} attempts`);
+        window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+        resolve([]); // Resolve with empty array after max attempts
+      }
+    };
+    
+    // Start trying to load voices
+    setTimeout(tryLoadingVoices, 100);
   });
 };

@@ -5,7 +5,11 @@ import { VoiceSelection } from '../useVoiceSelection';
 const US_VOICE_NAME = "Samantha"; // For US voice
 const UK_VOICE_NAME = "Google UK English Female"; // For UK voice
 
-// Simplified voice finding function using hardcoded voice names
+// Backup voice names in case primary ones aren't found
+const BACKUP_US_VOICES = ["Google US English", "Microsoft David", "Alex"];
+const BACKUP_UK_VOICES = ["Microsoft Susan", "Daniel", "Kate"];
+
+// Simplified voice finding function using hardcoded voice names and better fallbacks
 export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceSelection): SpeechSynthesisVoice | null => {
   console.log(`Finding ${voiceSelection.region} voice among ${voices.length} voices`);
   
@@ -21,6 +25,7 @@ export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceS
   
   const { region } = voiceSelection;
   const targetVoiceName = region === 'US' ? US_VOICE_NAME : UK_VOICE_NAME;
+  const backupVoices = region === 'US' ? BACKUP_US_VOICES : BACKUP_UK_VOICES;
   
   console.log(`Looking for ${region} voice with name: ${targetVoiceName}`);
   
@@ -38,6 +43,15 @@ export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceS
   if (voice) {
     console.log(`Found partial match: ${voice.name} (${voice.lang})`);
     return voice;
+  }
+  
+  // Third try: check for backup voice options
+  for (const backupName of backupVoices) {
+    voice = voices.find(v => v.name === backupName || v.name.includes(backupName));
+    if (voice) {
+      console.log(`Found backup voice: ${voice.name} (${voice.lang})`);
+      return voice;
+    }
   }
   
   // Fallback to language code
