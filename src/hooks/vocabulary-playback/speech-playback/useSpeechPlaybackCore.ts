@@ -16,17 +16,17 @@ export const useSpeechPlaybackCore = (
   muted: boolean,
   paused: boolean
 ) => {
-  // Track retry attempts
+  // Track retry attempts and prevent overlapping speech
   const retryAttemptsRef = useRef(0);
-  const maxRetryAttempts = 3;
+  const maxRetryAttempts = 2; // Reduced retry attempts
   const voicesLoadedRef = useRef(false);
   const speakingFailedRef = useRef(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const networkErrorRef = useRef(false);
+  const isPlayingRef = useRef(false); // Prevent overlapping speech
 
   // Function to handle network connectivity issues
   const checkNetworkConnectivity = useCallback(() => {
-    // Simple check if we're online
     if (!navigator.onLine) {
       if (!networkErrorRef.current) {
         toast.error("Network connection lost. Speech playback may be affected.");
@@ -35,7 +35,6 @@ export const useSpeechPlaybackCore = (
       return false;
     }
     
-    // Reset network error flag if we're back online
     if (networkErrorRef.current && navigator.onLine) {
       toast.success("Network connection restored.");
       networkErrorRef.current = false;
@@ -46,44 +45,53 @@ export const useSpeechPlaybackCore = (
 
   // Function to play the current word
   const playWord = useCallback(async (wordToPlay: VocabularyWord | null) => {
-    // First ensure we have a word to play and are not muted/paused
+    // Prevent overlapping speech
+    if (isPlayingRef.current) {
+      console.log('Speech already in progress, skipping');
+      return;
+    }
+
+    // Basic checks
     if (!wordToPlay || muted || paused) {
       console.log(`Cannot play word: ${!wordToPlay ? 'No word' : muted ? 'Muted' : 'Paused'}`);
       return;
     }
     
-    // Check network connectivity (for Firebase errors)
+    // Check network connectivity
     checkNetworkConnectivity();
     
     console.log(`Playing word: ${wordToPlay.word}`);
+    isPlayingRef.current = true;
     retryAttemptsRef.current = 0;
     speakingFailedRef.current = false;
     
-    // Unlock audio first to ensure browser permissions
-    try {
-      await unlockAudio();
-    } catch (e) {
-      console.warn("Audio unlock failed but continuing:", e);
-      // Continue anyway - unlockAudio has fallbacks
-    }
-    
-    // Cancel any ongoing speech to prevent queuing
+    // Cancel any ongoing speech completely
     window.speechSynthesis.cancel();
     
+    // Wait for cancellation to complete
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
     try {
-      // Wait for voices to load before attempting to speak
+      // Unlock audio first
+      try {
+        await unlockAudio();
+      } catch (e) {
+        console.warn("Audio unlock failed but continuing:", e);
+      }
+      
+      // Wait for voices to load
       console.log("Loading voices before speaking...");
       const voices = await ensureVoicesLoaded();
       console.log(`Loaded ${voices.length} voices, proceeding with speech...`);
       
-      // Clear any previous utterance references to prevent memory leaks
+      // Clear any previous utterance references
       if (utteranceRef.current) {
         utteranceRef.current.onend = null;
         utteranceRef.current.onerror = null;
         utteranceRef.current.onstart = null;
       }
       
-      // Set up the utterance with all its event handlers
+      // Set up the utterance with slower speech
       const utterance = createUtterance(
         wordToPlay,
         selectedVoice,
@@ -92,12 +100,13 @@ export const useSpeechPlaybackCore = (
         () => {
           console.log(`Speech ended successfully for: ${wordToPlay.word}`);
           setIsSpeaking(false);
+          isPlayingRef.current = false;
           retryAttemptsRef.current = 0;
           
-          // Only auto-advance if not paused and not muted
+          // Auto-advance with longer delay for slower speech
           if (!paused && !muted) {
             console.log("Auto-advancing to next word after successful speech");
-            advanceToNext();
+            setTimeout(() => advanceToNext(), 1500); // Longer delay
           }
         },
         // onStart callback
@@ -109,8 +118,7 @@ export const useSpeechPlaybackCore = (
         (event) => {
           console.error(`Speech synthesis error: ${event.error} for word ${wordToPlay.word}`);
           setIsSpeaking(false);
-          
-          // Mark that we had a failure
+          isPlayingRef.current = false;
           speakingFailedRef.current = true;
           
           // For not-allowed errors, try to recover
@@ -125,39 +133,22 @@ export const useSpeechPlaybackCore = (
               muted,
               paused
             );
-          } 
-          // For other error types
-          else {
+          } else {
             retryAttemptsRef.current++;
             
-            // If we haven't tried too many times already, retry
+            // Reduced retry attempts and longer delays
             if (retryAttemptsRef.current <= maxRetryAttempts) {
               console.log(`Attempting retry ${retryAttemptsRef.current}/${maxRetryAttempts} after error`);
               setTimeout(() => {
                 if (!paused && !muted) {
-                  try {
-                    // Try to unlock audio again before retrying
-                    unlockAudio().then(() => {
-                      window.speechSynthesis.speak(utterance);
-                      setIsSpeaking(true);
-                    }).catch(() => {
-                      // If unlock fails, try anyway
-                      window.speechSynthesis.speak(utterance);
-                      setIsSpeaking(true);
-                    });
-                  } catch (e) {
-                    console.error("Retry failed:", e);
-                    setIsSpeaking(false);
-                    // Move on if retry fails
-                    advanceToNext();
-                  }
+                  isPlayingRef.current = false; // Allow retry
+                  playWord(wordToPlay);
                 }
-              }, 300);
+              }, 1000); // Longer delay between retries
             } else {
-              // Too many retries, just move on
               console.log("Too many retries, advancing to next word");
               if (!paused && !muted) {
-                advanceToNext();
+                setTimeout(() => advanceToNext(), 1000);
               }
             }
           }
@@ -166,14 +157,14 @@ export const useSpeechPlaybackCore = (
       
       utteranceRef.current = utterance;
       
-      // Start speaking with a small delay to ensure setup is complete
+      // Start speaking with longer delay to ensure setup is complete
       setTimeout(() => {
         try {
           window.speechSynthesis.speak(utterance);
           setIsSpeaking(true);
           console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
           
-          // Verify speech is working after a short delay
+          // Check if speech is working after delay
           setTimeout(() => {
             if (!window.speechSynthesis.speaking && !speakingFailedRef.current) {
               handleSilentFailure(
@@ -187,22 +178,22 @@ export const useSpeechPlaybackCore = (
                 paused
               );
             }
-          }, 200);
+          }, 500); // Longer check delay
         } catch (error) {
           console.error('Error starting speech:', error);
           setIsSpeaking(false);
-          // Still advance to next word after a delay to prevent getting stuck
+          isPlayingRef.current = false;
           if (!paused && !muted) {
-            setTimeout(advanceToNext, 1000);
+            setTimeout(advanceToNext, 1500);
           }
         }
-      }, 100);
+      }, 300); // Longer initial delay
     } catch (error) {
       console.error("Error in playWord function:", error);
       setIsSpeaking(false);
-      // Always advance to prevent getting stuck
+      isPlayingRef.current = false;
       if (!paused && !muted) {
-        setTimeout(advanceToNext, 1000);
+        setTimeout(advanceToNext, 1500);
       }
     }
   }, [utteranceRef, selectedVoice, advanceToNext, muted, paused, maxRetryAttempts, checkNetworkConnectivity]);
@@ -212,7 +203,6 @@ export const useSpeechPlaybackCore = (
     const handleOnline = () => {
       console.log("Network connection restored");
       networkErrorRef.current = false;
-      // Could potentially retry speech here
     };
     
     const handleOffline = () => {

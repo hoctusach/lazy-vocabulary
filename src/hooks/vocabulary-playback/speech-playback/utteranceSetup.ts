@@ -16,8 +16,7 @@ export const createUtterance = (
   const utterance = new SpeechSynthesisUtterance();
   
   try {
-    // Construct the text to speak
-    // Add periods to create pauses between sections
+    // Construct the text to speak with pauses
     let textToSpeak = `${word.word}`;
     
     if (word.meaning && word.meaning.trim().length > 0) {
@@ -37,7 +36,7 @@ export const createUtterance = (
     // Apply voice if found
     if (voice) {
       utterance.voice = voice;
-      utterance.lang = voice.lang; // Use the voice's language setting
+      utterance.lang = voice.lang;
       console.log(`Using voice: ${voice.name} (${voice.lang})`);
     } else {
       // Fallback language settings if no voice is found
@@ -45,8 +44,8 @@ export const createUtterance = (
       console.log(`No voice found, using default with language: ${utterance.lang}`);
     }
     
-    // Configure speech properties for better clarity
-    utterance.rate = 0.95;  // Slightly slower than default for better comprehension
+    // Configure speech properties for much slower, clearer speech
+    utterance.rate = 0.7;   // Much slower rate for better comprehension
     utterance.pitch = 1.0;  // Default pitch
     utterance.volume = 1.0; // Full volume
     
@@ -68,8 +67,6 @@ export const createUtterance = (
     
   } catch (error) {
     console.error('Error creating utterance:', error);
-    // Still return the utterance even if there was an error in setup
-    // This allows the caller to handle the error gracefully
   }
   
   return utterance;
