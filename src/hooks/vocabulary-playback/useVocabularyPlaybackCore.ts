@@ -8,11 +8,11 @@ import {
   useWordPlayback 
 } from './core';
 import { 
-  usePlaybackState, 
   useUserInteraction,
   useSpeechCancellation,
   useAutoPlay
 } from './core/playback-states';
+import { usePlaybackState } from './core/word-playback/hooks/usePlaybackState';
 import { useSafariSupport } from './core/ios-support';
 
 /**
@@ -40,7 +40,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     allVoiceOptions
   } = useVoiceManagement();
   
-  // Basic state for current word index from our refactored state
+  // Use the consolidated playback state from word-playback hooks
   const { 
     currentIndex, 
     setCurrentIndex 
