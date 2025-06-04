@@ -14,7 +14,7 @@ export {
 } from './validationTypes';
 
 // Export sanitization utilities
-export { sanitizeInput } from './sanitization';
+export { sanitizeInput, sanitizeUserInput } from './sanitization';
 
 // Export vocabulary validation functions
 export { 
@@ -28,3 +28,6 @@ export { validateFileUpload } from './fileValidation';
 
 // Export rate limiter
 export { RateLimiter } from './rateLimiter';
+
+// Export test utilities (for debugging)
+export { testValidationPatterns } from './validationTest';
