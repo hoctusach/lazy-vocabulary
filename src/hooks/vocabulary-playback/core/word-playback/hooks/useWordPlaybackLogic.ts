@@ -1,11 +1,12 @@
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import { speechController } from '@/utils/speech/core/speechController';
 import { toast } from 'sonner';
 
 /**
- * Core logic for playing words with speech synthesis
+ * Core logic for playing words with centralized speech controller
  */
 export const useWordPlaybackLogic = (
   wordList: VocabularyWord[],
@@ -42,60 +43,54 @@ export const useWordPlaybackLogic = (
   // State for speech permission
   const [hasSpeechPermission, setHasSpeechPermission] = useState(true);
   
-  // Track if we're currently attempting to speak to prevent overlaps
-  const [isAttemptingToSpeak, setIsAttemptingToSpeak] = useState(false);
+  // Prevent multiple simultaneous play attempts
+  const playInProgressRef = useRef(false);
   
-  // Core function to play the current word
+  // Core function to play the current word using the controller
   const playCurrentWord = useCallback(async () => {
-    // Prevent overlapping speech attempts
-    if (isAttemptingToSpeak) {
-      console.log('Already attempting to speak, skipping');
+    // Prevent overlapping play attempts
+    if (playInProgressRef.current) {
+      console.log('[PLAYBACK] Play already in progress, skipping');
+      return;
+    }
+
+    // Check if controller is already active
+    if (speechController.isActive()) {
+      console.log('[PLAYBACK] Speech controller already active, skipping');
       return;
     }
     
     // Don't try to play during word transitions
     if (wordTransitionRef.current) {
-      console.log('Word transition in progress, delaying playback');
+      console.log('[PLAYBACK] Word transition in progress, delaying playback');
       return;
     }
     
     // Basic checks
     if (!currentWord) {
-      console.log('No current word to play');
+      console.log('[PLAYBACK] No current word to play');
       return;
     }
     
     if (muted) {
-      console.log('Speech is muted, but continuing to show words');
-      // We don't return here as we want to auto-advance even when muted
+      console.log('[PLAYBACK] Speech is muted, auto-advancing after delay');
       setTimeout(() => goToNextWord(), 3000);
       return;
     }
     
     if (paused) {
-      console.log('Playback is paused');
+      console.log('[PLAYBACK] Playback is paused');
       return;
     }
-    
-    // Set attempting flag to prevent overlaps
-    setIsAttemptingToSpeak(true);
+
+    // Set play in progress flag
+    playInProgressRef.current = true;
     
     try {
-      // CRITICAL: Ensure voices are loaded before attempting speech
+      // Ensure voices are loaded
       if (!voicesLoadedRef.current) {
-        console.log('Ensuring voices are loaded before speaking');
+        console.log('[PLAYBACK] Ensuring voices are loaded');
         await ensureVoicesLoaded();
-      }
-      
-      console.log(`Attempting to play word with voice: ${selectedVoice.label}`);
-      
-      // CRITICAL: Stop any ongoing speech and wait for it to actually stop
-      if (window.speechSynthesis.speaking) {
-        console.log('Stopping ongoing speech before starting new speech');
-        window.speechSynthesis.cancel();
-        
-        // Wait longer for the cancellation to take effect
-        await new Promise(resolve => setTimeout(resolve, 500));
       }
       
       // Ensure speech synthesis is available
@@ -104,125 +99,100 @@ export const useWordPlaybackLogic = (
           toast.error("Your browser doesn't support speech synthesis");
           permissionErrorShownRef.current = true;
         }
-        // Auto-advance even if speech isn't supported
         setTimeout(() => goToNextWord(), 3000);
         return;
       }
+
+      console.log(`[PLAYBACK] Playing word: ${currentWord.word}`);
+
+      // Find appropriate voice
+      const voice = findVoice(selectedVoice.region);
       
-      // Create utterance with all callbacks
-      const utterance = createUtterance(
-        currentWord,
-        selectedVoice,
-        findVoice,
-        // onStart callback
-        () => {
-          console.log(`Speech started for: ${currentWord.word}`);
+      // Construct text to speak
+      let textToSpeak = currentWord.word;
+      if (currentWord.meaning) {
+        textToSpeak += `. ${currentWord.meaning}`;
+      }
+      if (currentWord.example) {
+        textToSpeak += `. ${currentWord.example}`;
+      }
+
+      // Use the centralized speech controller
+      const success = await speechController.speak(textToSpeak, {
+        voice,
+        rate: 0.8,
+        pitch: 1.0,
+        volume: 1.0,
+        onStart: () => {
+          console.log(`[PLAYBACK] Speech started for: ${currentWord.word}`);
           speakingRef.current = true;
           setIsSpeaking(true);
         },
-        // onEnd callback
-        () => {
-          console.log(`Speech ended for: ${currentWord.word}`);
+        onEnd: () => {
+          console.log(`[PLAYBACK] Speech ended for: ${currentWord.word}`);
           speakingRef.current = false;
           setIsSpeaking(false);
-          setIsAttemptingToSpeak(false);
+          playInProgressRef.current = false;
           resetRetryAttempts();
           
-          // Only auto-advance if not paused or muted
+          // Auto-advance if not paused or muted
           if (!paused && !muted) {
             setTimeout(() => {
               goToNextWord();
-            }, 1500); // Longer delay to prevent rushing
+            }, 1500);
           }
         },
-        // onError callback
-        (event) => {
-          console.error(`Speech synthesis error:`, event);
-          
-          // Reset attempting flag
-          setIsAttemptingToSpeak(false);
-          
-          // Check if we're already in a word transition
-          if (wordTransitionRef.current) {
-            console.log('Error occurred during word transition, not retrying');
-            speakingRef.current = false;
-            setIsSpeaking(false);
-            return;
-          }
+        onError: (event) => {
+          console.error(`[PLAYBACK] Speech error:`, event);
           
           speakingRef.current = false;
           setIsSpeaking(false);
+          playInProgressRef.current = false;
           
-          // Handle permission errors specially
+          // Handle permission errors
           if (event.error === 'not-allowed') {
             setHasSpeechPermission(false);
             if (!permissionErrorShownRef.current) {
               toast.error("Please click anywhere on the page to enable audio playback");
               permissionErrorShownRef.current = true;
             }
-            // Continue to next word even without audio
-            setTimeout(() => goToNextWord(), 3000);
-            return;
           }
           
-          // If error is "canceled" - don't retry immediately as this creates loops
+          // Don't retry on cancel errors to prevent loops
           if (event.error === 'canceled') {
-            console.log('Speech was canceled, advancing to next word without retry');
-            setTimeout(() => goToNextWord(), 2000);
+            console.log('[PLAYBACK] Speech was canceled, advancing without retry');
+            setTimeout(() => goToNextWord(), 1000);
             return;
           }
           
           // Handle retry logic for other errors
           if (incrementRetryAttempts()) {
-            console.log(`Retry attempt in progress`);
-            
-            // Wait longer then retry
+            console.log('[PLAYBACK] Retrying after error');
             setTimeout(() => {
               if (!paused && !muted && !wordTransitionRef.current) {
-                console.log('Retrying speech after error');
-                setIsAttemptingToSpeak(false); // Reset flag to allow retry
+                playInProgressRef.current = false; // Reset flag to allow retry
                 playCurrentWord();
               }
-            }, 1000); // Longer delay between retries
+            }, 1000);
           } else {
-            console.log(`Max retries reached, advancing to next word`);
-            // Move on after too many failures
+            console.log('[PLAYBACK] Max retries reached, advancing');
             setTimeout(() => goToNextWord(), 1500);
           }
         }
-      );
-      
-      // Store the utterance reference
-      utteranceRef.current = utterance;
-      
-      // Start speaking with a delay to ensure everything is ready
-      setTimeout(() => {
-        try {
-          // Double-check we're still in a valid state
-          if (muted || paused || wordTransitionRef.current) {
-            console.log('State changed before speaking, aborting');
-            setIsAttemptingToSpeak(false);
-            return;
-          }
-          
-          window.speechSynthesis.speak(utterance);
-          console.log(`Starting to speak: ${currentWord.word}`);
-        } catch (e) {
-          console.error('Error starting speech:', e);
-          setIsSpeaking(false);
-          setIsAttemptingToSpeak(false);
-          speakingRef.current = false;
-          
-          // Still auto-advance to prevent getting stuck
-          if (!paused && !muted) {
-            setTimeout(() => goToNextWord(), 3000);
-          }
+      });
+
+      if (!success) {
+        console.warn('[PLAYBACK] Speech failed to start');
+        playInProgressRef.current = false;
+        // Still auto-advance to prevent getting stuck
+        if (!paused && !muted) {
+          setTimeout(() => goToNextWord(), 3000);
         }
-      }, 300); // Give time for cleanup to complete
+      }
       
     } catch (error) {
-      console.error('Error in playCurrentWord:', error);
-      setIsAttemptingToSpeak(false);
+      console.error('[PLAYBACK] Error in playCurrentWord:', error);
+      playInProgressRef.current = false;
       setIsSpeaking(false);
       speakingRef.current = false;
       
@@ -239,18 +209,15 @@ export const useWordPlaybackLogic = (
     findVoice, 
     goToNextWord, 
     selectedVoice,
-    userInteractionRef,
     setIsSpeaking,
     speakingRef,
     incrementRetryAttempts,
     checkSpeechSupport,
     wordTransitionRef,
     ensureVoicesLoaded,
-    createUtterance,
     resetRetryAttempts,
     permissionErrorShownRef,
-    voicesLoadedRef,
-    isAttemptingToSpeak
+    voicesLoadedRef
   ]);
   
   return {

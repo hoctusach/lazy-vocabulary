@@ -1,42 +1,26 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
+import { speechController } from '@/utils/speech/core/speechController';
 
 /**
- * Hook for handling speech cancellation
+ * Hook for handling speech cancellation using the centralized controller
  */
 export const useSpeechCancellation = (
   speakingRef: React.MutableRefObject<boolean>,
   setIsSpeaking: (isSpeaking: boolean) => void
 ) => {
-  // Track when we last canceled to avoid excessive cancellation
-  const lastCancelTimeRef = useRef<number>(0);
-  
   // Function to cancel any current speech and reset state
   const cancelSpeech = useCallback(() => {
-    const now = Date.now();
+    console.log('[CANCELLATION] Cancelling speech via controller');
     
-    // Don't cancel too frequently to avoid creating loops
-    if (now - lastCancelTimeRef.current < 300) {
-      console.log('Cancellation throttled to prevent loops');
-      return;
-    }
+    // Use the centralized controller to stop speech
+    speechController.stop();
     
-    lastCancelTimeRef.current = now;
+    // Update local state
+    speakingRef.current = false;
+    setIsSpeaking(false);
     
-    if (window.speechSynthesis && window.speechSynthesis.speaking) {
-      console.log('Cancelling ongoing speech');
-      window.speechSynthesis.cancel();
-      
-      // Wait a moment for cancellation to take effect
-      setTimeout(() => {
-        speakingRef.current = false;
-        setIsSpeaking(false);
-      }, 100);
-    } else {
-      // No speech to cancel, just reset state
-      speakingRef.current = false;
-      setIsSpeaking(false);
-    }
+    console.log('[CANCELLATION] Speech cancelled and state reset');
   }, [speakingRef, setIsSpeaking]);
 
   return { cancelSpeech };

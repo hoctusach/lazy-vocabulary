@@ -1,9 +1,11 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
+import { speechController } from '@/utils/speech/core/speechController';
 
 /**
  * Hook to initialize voice and handle user interaction
+ * Now coordinated with the centralized speech controller
  */
 export const useUserInteractionEffect = (
   userInteractionRef: React.MutableRefObject<boolean>,
@@ -11,55 +13,67 @@ export const useUserInteractionEffect = (
   playCurrentWord: () => void,
   ensureVoicesLoaded: () => Promise<boolean>
 ) => {
+  const initializationDoneRef = useRef(false);
+
   // Setup global user interaction detection
   useEffect(() => {
-    // Handle user interaction - implemented in useUserInteractionDetection
     const handleUserInteraction = () => {
-      if (!userInteractionRef.current) {
-        console.log('First user interaction detected - enabling speech');
+      if (!userInteractionRef.current && !initializationDoneRef.current) {
+        console.log('[USER-INTERACTION] First user interaction detected');
         userInteractionRef.current = true;
+        initializationDoneRef.current = true;
         
-        // Try to play a silent sound to initialize audio context
+        // Save interaction state
+        localStorage.setItem('hadUserInteraction', 'true');
+        
+        // Initialize audio context
         try {
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          oscillator.frequency.value = 0; // Silent
-          oscillator.connect(audioContext.destination);
-          oscillator.start();
-          oscillator.stop(audioContext.currentTime + 0.001);
+          const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioContext) {
+            const audioContext = new AudioContext();
+            if (audioContext.state === 'suspended') {
+              audioContext.resume();
+            }
+          }
         } catch (e) {
-          console.warn('Could not initialize audio context:', e);
+          console.warn('[USER-INTERACTION] Audio context initialization failed:', e);
         }
         
         // Initialize speech synthesis with a silent utterance
         try {
-          const initUtterance = new SpeechSynthesisUtterance(' '); // Just a space
-          initUtterance.volume = 0.01; // Nearly silent
+          const initUtterance = new SpeechSynthesisUtterance(' ');
+          initUtterance.volume = 0.01;
+          
           initUtterance.onend = () => {
-            console.log('Speech initialization successful');
-            // Load voices and then attempt to speak the current word
+            console.log('[USER-INTERACTION] Speech initialization complete');
+            // Load voices and then attempt to speak current word if available
             ensureVoicesLoaded().then(() => {
-              if (currentWord) {
-                playCurrentWord();
+              if (currentWord && !speechController.isActive()) {
+                setTimeout(() => {
+                  playCurrentWord();
+                }, 500);
               }
             });
           };
           
           initUtterance.onerror = (e) => {
-            console.error('Speech initialization error:', e);
-            // Try to play current word anyway after a moment
-            setTimeout(() => {
-              if (currentWord) {
+            console.warn('[USER-INTERACTION] Speech initialization error:', e);
+            // Still try to play current word after a delay
+            if (currentWord && !speechController.isActive()) {
+              setTimeout(() => {
                 playCurrentWord();
-              }
-            }, 500);
+              }, 1000);
+            }
           };
           
-          // Speak the silent utterance to initialize the speech system
-          window.speechSynthesis.cancel(); // Clear any pending speech
-          window.speechSynthesis.speak(initUtterance);
+          // Stop any existing speech before initialization
+          speechController.stop();
+          setTimeout(() => {
+            window.speechSynthesis.speak(initUtterance);
+          }, 100);
+          
         } catch (e) {
-          console.error('Error initializing speech:', e);
+          console.error('[USER-INTERACTION] Error initializing speech:', e);
         }
         
         // Remove event listeners after first interaction
@@ -69,17 +83,18 @@ export const useUserInteractionEffect = (
       }
     };
     
-    // Add event listeners for various user interaction types
+    // Check for previous interactions
+    if (localStorage.getItem('hadUserInteraction') === 'true') {
+      console.log('[USER-INTERACTION] Previous interaction detected from localStorage');
+      userInteractionRef.current = true;
+      initializationDoneRef.current = true;
+      return;
+    }
+    
+    // Add event listeners for user interaction
     document.addEventListener('click', handleUserInteraction);
     document.addEventListener('touchstart', handleUserInteraction);
     document.addEventListener('keydown', handleUserInteraction);
-    
-    // Check for previous interactions
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
-      console.log('Previous user interaction detected from localStorage');
-      userInteractionRef.current = true;
-      handleUserInteraction();
-    }
     
     return () => {
       document.removeEventListener('click', handleUserInteraction);
@@ -87,11 +102,4 @@ export const useUserInteractionEffect = (
       document.removeEventListener('keydown', handleUserInteraction);
     };
   }, [userInteractionRef, currentWord, playCurrentWord, ensureVoicesLoaded]);
-
-  // When user interacts, save that fact to localStorage
-  useEffect(() => {
-    if (userInteractionRef.current) {
-      localStorage.setItem('hadUserInteraction', 'true');
-    }
-  }, [userInteractionRef.current]);
 };
