@@ -2,12 +2,11 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { speechController } from '@/utils/speech/core/speechController';
+import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 import { useSpeechPermissionManager } from './useSpeechPermissionManager';
 
 /**
- * Hook for executing speech with proper error handling and state management
- * Enhanced with better permission handling and debugging
+ * Simplified speech execution hook with basic error handling
  */
 export const useSpeechExecution = (
   findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
@@ -30,8 +29,7 @@ export const useSpeechExecution = (
     speechableText: string,
     setPlayInProgress: (inProgress: boolean) => void
   ) => {
-    console.log('[SPEECH-EXECUTION] Starting speech execution for:', currentWord.word);
-    console.log('[SPEECH-EXECUTION] Speechable text preview:', speechableText.substring(0, 100) + '...');
+    console.log('[SPEECH-EXECUTION] Starting speech for:', currentWord.word);
     
     // Check permissions first
     const hasPermission = await checkSpeechPermissions();
@@ -46,19 +44,19 @@ export const useSpeechExecution = (
     const voice = findVoice(selectedVoice.region);
     console.log('[SPEECH-EXECUTION] Selected voice:', voice?.name || 'default');
 
-    // Enhanced speech controller usage with better error handling
-    const success = await speechController.speak(speechableText, {
+    // Use simplified speech controller
+    const success = await simpleSpeechController.speak(speechableText, {
       voice,
       rate: 0.8,
       pitch: 1.0,
       volume: 1.0,
       onStart: () => {
-        console.log(`[SPEECH-EXECUTION] Speech started successfully for: ${currentWord.word}`);
+        console.log(`[SPEECH-EXECUTION] Speech started for: ${currentWord.word}`);
         speakingRef.current = true;
         setIsSpeaking(true);
       },
       onEnd: () => {
-        console.log(`[SPEECH-EXECUTION] Speech ended successfully for: ${currentWord.word}`);
+        console.log(`[SPEECH-EXECUTION] Speech ended for: ${currentWord.word}`);
         speakingRef.current = false;
         setIsSpeaking(false);
         setPlayInProgress(false);
@@ -70,15 +68,10 @@ export const useSpeechExecution = (
           setTimeout(() => {
             goToNextWord();
           }, 1500);
-        } else {
-          console.log('[SPEECH-EXECUTION] Not auto-advancing due to pause/mute state');
         }
       },
       onError: (event) => {
-        console.error(`[SPEECH-EXECUTION] Speech error for "${currentWord.word}":`, {
-          error: event.error,
-          elapsed: event.elapsedTime
-        });
+        console.error(`[SPEECH-EXECUTION] Speech error for "${currentWord.word}":`, event);
         
         speakingRef.current = false;
         setIsSpeaking(false);
@@ -93,25 +86,24 @@ export const useSpeechExecution = (
           case 'network':
             handlePermissionError('network');
             break;
-          case 'interrupted':
-            console.log('[SPEECH-EXECUTION] Speech was interrupted, advancing without retry');
+          case 'canceled':
+            console.log('[SPEECH-EXECUTION] Speech was canceled, advancing without retry');
             setTimeout(() => goToNextWord(), 1000);
             return;
           default:
             console.log('[SPEECH-EXECUTION] Handling generic speech error');
         }
         
-        // Handle retry logic for retryable errors
-        if (event.error !== 'interrupted' && incrementRetryAttempts()) {
+        // Simple retry logic
+        if (event.error !== 'canceled' && incrementRetryAttempts()) {
           console.log('[SPEECH-EXECUTION] Retrying after error');
           setTimeout(() => {
             if (!paused && !muted && !wordTransitionRef.current) {
-              setPlayInProgress(false); // Reset flag to allow retry
-              // The main hook should handle the retry
+              setPlayInProgress(false);
             }
           }, 1000);
-        } else if (event.error !== 'interrupted') {
-          console.log('[SPEECH-EXECUTION] Max retries reached or non-retryable error, advancing');
+        } else if (event.error !== 'canceled') {
+          console.log('[SPEECH-EXECUTION] Max retries reached, advancing');
           setTimeout(() => goToNextWord(), 1500);
         }
       }
@@ -120,12 +112,9 @@ export const useSpeechExecution = (
     if (!success) {
       console.warn('[SPEECH-EXECUTION] Speech failed to start');
       setPlayInProgress(false);
-      // Still auto-advance to prevent getting stuck
       if (!paused && !muted) {
         setTimeout(() => goToNextWord(), 3000);
       }
-    } else {
-      console.log('[SPEECH-EXECUTION] Speech started successfully');
     }
 
     return success;
