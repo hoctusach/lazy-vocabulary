@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { speechController } from '@/utils/speech/core/speechController';
 
@@ -11,7 +10,9 @@ export const useSpeechController = () => {
   // Subscribe to controller state changes
   useEffect(() => {
     const unsubscribe = speechController.subscribe(setSpeechState);
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // Speak function with controller
