@@ -1,15 +1,14 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { stopSpeaking } from '@/utils/speech';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useMuteToggle = (
-  isMuted: boolean, 
+  isMuted: boolean,
   handleToggleMute: () => void,
   currentWord: VocabularyWord | null,
   isPaused: boolean,
   clearAutoAdvanceTimer: () => void,
-  stopSpeaking: () => void,
+  stopSpeech: () => void,
   voiceRegion: 'US' | 'UK'
 ) => {
   const [mute, setMute] = useState(isMuted);
@@ -34,11 +33,12 @@ export const useMuteToggle = (
       console.error('Error updating mute state in localStorage:', error);
     }
     
-    // Clear timers when muting to prevent auto-advance
+    // Clear timers and stop any speech when muting to prevent auto-advance
     if (!mute) {
       clearAutoAdvanceTimer();
+      stopSpeech();
     }
-  }, [mute, handleToggleMute, clearAutoAdvanceTimer]);
+  }, [mute, handleToggleMute, clearAutoAdvanceTimer, stopSpeech]);
   
   return { mute, toggleMute };
 };
