@@ -87,6 +87,9 @@ export const useSpeechExecution = (
           case 'network':
             handlePermissionError('network');
             break;
+          case 'canceled':
+            console.log('[SPEECH-EXECUTION] Speech was canceled');
+            return;
           case 'interrupted':
             console.log('[SPEECH-EXECUTION] Speech was interrupted, advancing without retry');
             setTimeout(() => goToNextWord(), 1000);

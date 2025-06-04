@@ -80,3 +80,14 @@ export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' 
 export const getVoiceBySelection = (voiceSelection: VoiceSelection): SpeechSynthesisVoice | null => {
   return getVoiceByRegion(voiceSelection.region, voiceSelection.gender);
 };
+
+export const hasAvailableVoices = (): boolean => {
+  try {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      return false;
+    }
+    return window.speechSynthesis.getVoices().length > 0;
+  } catch {
+    return false;
+  }
+};
