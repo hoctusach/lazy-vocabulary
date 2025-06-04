@@ -2,6 +2,7 @@
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
 import { findVoice } from './findVoice';
+import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
 
 // Function to create and configure a speech utterance
 export const createUtterance = (
@@ -16,15 +17,33 @@ export const createUtterance = (
   const utterance = new SpeechSynthesisUtterance();
   
   try {
-    // Construct the text to speak with pauses
-    let textToSpeak = `${word.word}`;
+    // Sanitize input text for security
+    const sanitizedWord = sanitizeForDisplay(word.word || '');
+    const sanitizedMeaning = sanitizeForDisplay(word.meaning || '');
+    const sanitizedExample = sanitizeForDisplay(word.example || '');
     
-    if (word.meaning && word.meaning.trim().length > 0) {
-      textToSpeak += `. ${word.meaning}`;
+    // Construct the text to speak with pauses
+    let textToSpeak = sanitizedWord;
+    
+    if (sanitizedMeaning && sanitizedMeaning.trim().length > 0) {
+      textToSpeak += `. ${sanitizedMeaning}`;
     }
     
-    if (word.example && word.example.trim().length > 0) {
-      textToSpeak += `. ${word.example}`;
+    if (sanitizedExample && sanitizedExample.trim().length > 0) {
+      textToSpeak += `. ${sanitizedExample}`;
+    }
+    
+    // Additional sanitization for speech synthesis
+    // Remove any remaining HTML entities and control characters
+    textToSpeak = textToSpeak
+      .replace(/&[#\w]+;/g, '') // Remove HTML entities
+      .replace(/[\x00-\x1F\x7F]/g, '') // Remove control characters
+      .trim();
+    
+    // Limit text length for speech synthesis (some engines have limits)
+    if (textToSpeak.length > 1000) {
+      textToSpeak = textToSpeak.substring(0, 997) + '...';
+      console.warn('Text truncated for speech synthesis due to length limit');
     }
     
     // Set the final text

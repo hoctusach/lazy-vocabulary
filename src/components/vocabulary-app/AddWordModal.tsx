@@ -6,7 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader } from 'lucide-react';
+import { Loader, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { validateVocabularyWord, validateMeaning, validateExample, RateLimiter } from '@/utils/security/inputValidation';
+import { htmlEncode, isValidUrl } from '@/utils/security/contentSecurity';
 
 interface AddWordModalProps {
   isOpen: boolean;
@@ -22,6 +25,9 @@ const CATEGORY_OPTIONS = [
   { value: "advanced words", label: "Advanced Words" }
 ];
 
+// Rate limiter for API calls
+const searchRateLimiter = new RateLimiter(5, 60000); // 5 searches per minute
+
 const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, editMode = false, wordToEdit }) => {
   const [word, setWord] = useState<string>('');
   const [meaning, setMeaning] = useState<string>('');
@@ -32,13 +38,21 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
   // Search state
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchError, setSearchError] = useState<string>('');
+  
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   // Pre-populate form when in edit mode
   useEffect(() => {
     if (editMode && wordToEdit) {
-      setWord(wordToEdit.word);
-      setMeaning(wordToEdit.meaning);
-      setExample(wordToEdit.example);
+      // Sanitize input when loading for edit
+      const wordValidation = validateVocabularyWord(wordToEdit.word);
+      const meaningValidation = validateMeaning(wordToEdit.meaning);
+      const exampleValidation = validateExample(wordToEdit.example);
+      
+      setWord(wordValidation.sanitizedValue || wordToEdit.word);
+      setMeaning(meaningValidation.sanitizedValue || wordToEdit.meaning);
+      setExample(exampleValidation.sanitizedValue || wordToEdit.example);
       setCategory(wordToEdit.category);
     } else if (!editMode) {
       // Reset form when not in edit mode
@@ -46,29 +60,63 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       setMeaning('');
       setExample('');
       setCategory('');
+      setValidationErrors([]);
     }
   }, [editMode, wordToEdit, isOpen]);
 
+  // Validate form inputs
   useEffect(() => {
-    // Check if all fields have values
-    setIsFormValid(!!word && !!meaning && !!example && !!category);
+    const errors: string[] = [];
+    
+    if (word) {
+      const wordValidation = validateVocabularyWord(word);
+      if (!wordValidation.isValid) {
+        errors.push(...wordValidation.errors.map(err => `Word: ${err}`));
+      }
+    }
+    
+    if (meaning) {
+      const meaningValidation = validateMeaning(meaning);
+      if (!meaningValidation.isValid) {
+        errors.push(...meaningValidation.errors.map(err => `Meaning: ${err}`));
+      }
+    }
+    
+    if (example) {
+      const exampleValidation = validateExample(example);
+      if (!exampleValidation.isValid) {
+        errors.push(...exampleValidation.errors.map(err => `Example: ${err}`));
+      }
+    }
+    
+    setValidationErrors(errors);
+    setIsFormValid(!!word && !!meaning && !!example && !!category && errors.length === 0);
   }, [word, meaning, example, category]);
 
   const handleSave = () => {
     if (isFormValid) {
-      onSave({
-        word,
-        meaning,
-        example,
-        category
-      });
-      // Reset form
-      setWord('');
-      setMeaning('');
-      setExample('');
-      setCategory('');
-      setSearchError('');
-      onClose();
+      // Final validation and sanitization before save
+      const wordValidation = validateVocabularyWord(word);
+      const meaningValidation = validateMeaning(meaning);
+      const exampleValidation = validateExample(example);
+      
+      if (wordValidation.isValid && meaningValidation.isValid && exampleValidation.isValid) {
+        onSave({
+          word: wordValidation.sanitizedValue!,
+          meaning: meaningValidation.sanitizedValue!,
+          example: exampleValidation.sanitizedValue!,
+          category
+        });
+        
+        // Reset form
+        setWord('');
+        setMeaning('');
+        setExample('');
+        setCategory('');
+        setSearchError('');
+        setValidationErrors([]);
+        onClose();
+      }
     }
   };
   
@@ -78,15 +126,44 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       return;
     }
     
+    // Rate limiting check
+    if (!searchRateLimiter.isAllowed('dictionary-search')) {
+      setSearchError('Too many search requests. Please wait a moment before trying again.');
+      return;
+    }
+    
+    // Validate word before searching
+    const wordValidation = validateVocabularyWord(word.trim());
+    if (!wordValidation.isValid) {
+      setSearchError('Invalid word format for search');
+      return;
+    }
+    
     try {
       setIsSearching(true);
       setSearchError('');
       
       // URL-encode the term for multi-word phrases
-      const term = encodeURIComponent(word.trim());
+      const term = encodeURIComponent(wordValidation.sanitizedValue!);
       
-      // Primary dictionary API call
-      const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${term}`);
+      // Validate URL before making request
+      const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${term}`;
+      if (!isValidUrl(apiUrl)) {
+        throw new Error('Invalid API URL');
+      }
+      
+      // Primary dictionary API call with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(apiUrl, {
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json',
+        }
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to fetch definition');
@@ -101,36 +178,64 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
         const firstDefinition = data[0].meanings[0].definitions[0];
         
         if (firstDefinition && firstDefinition.definition) {
-          // Populate meaning field
-          setMeaning(firstDefinition.definition);
-          definitionFound = true;
+          // Validate and sanitize the definition
+          const definitionValidation = validateMeaning(firstDefinition.definition);
+          if (definitionValidation.isValid) {
+            setMeaning(definitionValidation.sanitizedValue!);
+            definitionFound = true;
+          }
           
           // Check for example
           if (firstDefinition.example) {
-            setExample(firstDefinition.example);
-            exampleFound = true;
+            const exampleValidation = validateExample(firstDefinition.example);
+            if (exampleValidation.isValid) {
+              setExample(exampleValidation.sanitizedValue!);
+              exampleFound = true;
+            }
           }
         }
       }
       
-      // If no definition was found, we could try a fallback API
-      // However, since we don't have an API key for Wordnik, we'll just display an error
       if (!definitionFound) {
         setMeaning('No definition found.');
         setSearchError('No definition found. Please try another word or enter manually.');
       }
       
-      // If no example was found, note that
       if (!exampleFound) {
         setExample('No example found. Please enter manually.');
       }
       
     } catch (error) {
       console.error('Dictionary API error:', error);
-      setSearchError('Search failed. Please try again or enter details manually.');
+      if (error instanceof Error && error.name === 'AbortError') {
+        setSearchError('Search request timed out. Please try again.');
+      } else {
+        setSearchError('Search failed. Please try again or enter details manually.');
+      }
     } finally {
       setIsSearching(false);
     }
+  };
+
+  const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Basic real-time sanitization
+    const sanitized = value.replace(/[<>]/g, '');
+    setWord(sanitized);
+  };
+
+  const handleMeaningChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    // Basic real-time sanitization
+    const sanitized = value.replace(/[<>]/g, '');
+    setMeaning(sanitized);
+  };
+
+  const handleExampleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    // Basic real-time sanitization
+    const sanitized = value.replace(/[<>]/g, '');
+    setExample(sanitized);
   };
 
   return (
@@ -139,6 +244,19 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
         <DialogHeader>
           <DialogTitle>{editMode ? "Edit Word" : "Add New Vocabulary Word"}</DialogTitle>
         </DialogHeader>
+        
+        {validationErrors.length > 0 && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              <ul className="list-disc list-inside">
+                {validationErrors.map((error, index) => (
+                  <li key={index}>{htmlEncode(error)}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
@@ -149,10 +267,11 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
               <Input
                 id="word"
                 value={word}
-                onChange={(e) => setWord(e.target.value)}
+                onChange={handleWordChange}
                 className="flex-grow"
                 disabled={isSearching}
                 aria-disabled={isSearching}
+                maxLength={100}
               />
               {!editMode && (
                 <Button 
@@ -171,7 +290,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
           {searchError && (
             <div className="grid grid-cols-4 items-center gap-4">
               <div className="col-start-2 col-span-3">
-                <p className="text-sm text-destructive" aria-live="polite">{searchError}</p>
+                <p className="text-sm text-destructive" aria-live="polite">{htmlEncode(searchError)}</p>
               </div>
             </div>
           )}
@@ -183,10 +302,11 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
             <Textarea
               id="meaning"
               value={meaning}
-              onChange={(e) => setMeaning(e.target.value)}
+              onChange={handleMeaningChange}
               className="col-span-3"
               disabled={isSearching}
               rows={2}
+              maxLength={500}
             />
           </div>
           
@@ -197,10 +317,11 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
             <Textarea
               id="example"
               value={example}
-              onChange={(e) => setExample(e.target.value)}
+              onChange={handleExampleChange}
               className="col-span-3"
               disabled={isSearching}
               rows={4}
+              maxLength={1000}
             />
           </div>
           
