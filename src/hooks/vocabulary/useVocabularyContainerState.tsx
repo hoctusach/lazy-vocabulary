@@ -1,6 +1,5 @@
 
 import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
-import { useMuteToggle } from "@/hooks/useMuteToggle";
 import { useVocabularyAudioSync } from "@/hooks/useVocabularyAudioSync";
 import { useModalState } from "./useModalState";
 import { useCategoryNavigation } from "./useCategoryNavigation";
