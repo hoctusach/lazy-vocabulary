@@ -1,5 +1,5 @@
 
-import { ValidationResult } from './validationTypes';
+import { ValidationResult, VOCABULARY_CHAR_CLASS } from './validationTypes';
 import { sanitizeInput } from './sanitization';
 
 /**
@@ -32,18 +32,15 @@ export const validateVocabularyWord = (word: string): ValidationResult => {
     errors.push('Word must be less than 100 characters');
   }
   
-  // Comprehensive regex for vocabulary words including:
-  // - Basic Latin letters (a-z, A-Z)
-  // - Extended Latin characters with diacritics
-  // - IPA phonetic symbols (ɑɒæʌʊɪɛɔəɨɯɤɘɞɜɐɶœɾɹɻɭɽʈɖɟɲɴɳʔʕʢʡħʁʀʙⱱʋɻɭɽʈɖɟɲɴɳʃʒʂʐçʝɣχɦʱʰʷʲʼ˞ˤ˥˦˧˨˩ˈˌːˑ)
-  // - Common punctuation and symbols
-  // - Mathematical and special symbols
-  // - Square brackets, parentheses, slashes for notation
-  // - Stress marks, tone marks, length marks
-  if (!/^[a-zA-Z0-9\s\-'.,!?()[\]/~""`àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžƀƁƂƃƄƅƆƇƈƉƊƋƌƍƎƏƐƑƒƓƔƕƖƗƘƙƚƛƜƝƞƟƠơƢƣƤƥƦƧƨƩƪƫƬƭƮƯưƱƲƳƴƵƶƷƸƹƺƻƼƽƾƿǀǁǂǃǄǅǆǇǈǉǊǋǌǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǝǞǟǠǡǢǣǤǥǦǧǨǩǪǫǬǭǮǯǰǱǲǳǴǵǶǷǸǹǺǻǼǽǾǿȀȁȂȃȄȅȆȇȈȉȊȋȌȍȎȏȐȑȒȓȔȕȖȗȘșȚțȜȝȞȟȠȡȢȣȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳɑɒɓɔɕɖɗɘəɚɛɜɝɞɟɠɡɢɣɤɥɦɧɨɩɪɫɬɭɮɯɰɱɲɳɴɵɶɷɸɹɺɻɼɽɾɿʀʁʂʃʄʅʆʇʈʉʊʋʌʍʎʏʐʑʒʓʔʕʖʗʘʙʚʛʜʝʞʟʠʡʢʣʤʥʦʧʨʩʪʫʬʭʮʯˀˁ˂˃˄˅ˆˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́͆͊͋͌̕̚͏͓͔͕͖͙͚͐͑͒͗͛͘͜͟͝͞͠͡]+$/.test(sanitized)) {
+  // Use the comprehensive character class that includes Unicode ranges
+  const wordPattern = new RegExp(`^${VOCABULARY_CHAR_CLASS}+$`);
+  
+  if (!wordPattern.test(sanitized)) {
+    // Get the invalid characters for debugging
+    const invalidChars = sanitized.split('').filter(char => !wordPattern.test(char));
     console.log('[WORD-VALIDATION] Character validation failed for:', sanitized);
-    console.log('[WORD-VALIDATION] Failed characters:', sanitized.split('').filter(char => !/[a-zA-Z0-9\s\-'.,!?()[\]/~""`àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžƀƁƂƃƄƅƆƇƈƉƊƋƌƍƎƏƐƑƒƓƔƕƖƗƘƙƚƛƜƝƞƟƠơƢƣƤƥƦƧƨƩƪƫƬƭƮƯưƱƲƳƴƵƶƷƸƹƺƻƼƽƾƿǀǁǂǃǄǅǆǇǈǉǊǋǌǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǝǞǟǠǡǢǣǤǥǦǧǨǩǪǫǬǭǮǯǰǱǲǳǴǵǶǷǸǹǺǻǼǽǾǿȀȁȂȃȄȅȆȇȈȉȊȋȌȍȎȏȐȑȒȓȔȕȖȗȘșȚțȜȝȞȟȠȡȢȣȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳɑɒɓɔɕɖɗɘəɚɛɜɝɞɟɠɡɢɣɤɥɦɧɨɩɪɫɬɭɮɯɰɱɲɳɴɵɶɷɸɹɺɻɼɽɾɿʀʁʂʃʄʅʆʇʈʉʊʋʌʍʎʏʐʑʒʓʔʕʖʗʘʙʚʛʜʝʞʟʠʡʢʣʤʥʦʧʨʩʪʫʬʭʮʯˀˁ˂˃˄˅ˆˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́͆͊͋͌̕̚͏͓͔͕͖͙͚͐͑͒͗͛͘͜͟͝͞͠͡]/.test(char)));
-    errors.push('Word contains unsupported characters for vocabulary notation');
+    console.log('[WORD-VALIDATION] Invalid characters found:', invalidChars);
+    errors.push(`Word contains unsupported characters: ${invalidChars.join(', ')}`);
   }
   
   const result = {
@@ -81,10 +78,14 @@ export const validateMeaning = (meaning: string): ValidationResult => {
     errors.push('Meaning must be less than 500 characters');
   }
   
-  // Even more permissive for meanings - include symbols, numbers, and extended punctuation
-  if (!/^[a-zA-Z0-9\s\-'.,!?;:()[\]/~""`àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžƀƁƂƃƄƅƆƇƈƉƊƋƌƍƎƏƐƑƒƓƔƕƖƗƘƙƚƛƜƝƞƟƠơƢƣƤƥƦƧƨƩƪƫƬƭƮƯưƱƲƳƴƵƶƷƸƹƺƻƼƽƾƿǀǁǂǃǄǅǆǇǈǉǊǋǌǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǝǞǟǠǡǢǣǤǥǦǧǨǩǪǫǬǭǮǯǰǱǲǳǴǵǶǷǸǹǺǻǼǽǾǿȀȁȂȃȄȅȆȇȈȉȊȋȌȍȎȏȐȑȒȓȔȕȖȗȘșȚțȜȝȞȟȠȡȢȣȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳɑɒɓɔɕɖɗɘəɚɛɜɝɞɟɠɡɢɣɤɥɦɧɨɩɪɫɬɭɮɯɰɱɲɳɴɵɶɷɸɹɺɻɼɽɾɿʀʁʂʃʄʅʆʇʈʉʊʋʌʍʎʏʐʑʒʓʔʕʖʗʘʙʚʛʜʝʞʟʠʡʢʣʤʥʦʧʨʩʪʫʬʭʮʯˀˁ˂˃˄˅ˆˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́͆͊͋͌̕̚͏͓͔͕͖͙͚͐͑͒͗͛͘͜͟͝͞͠͡%&*+=@#$^_|\\{}]+$/.test(sanitized)) {
+  // Use the comprehensive character class for meanings as well
+  const meaningPattern = new RegExp(`^${VOCABULARY_CHAR_CLASS}+$`);
+  
+  if (!meaningPattern.test(sanitized)) {
+    const invalidChars = sanitized.split('').filter(char => !meaningPattern.test(char));
     console.log('[MEANING-VALIDATION] Character validation failed for:', sanitized);
-    errors.push('Meaning contains unsupported characters');
+    console.log('[MEANING-VALIDATION] Invalid characters found:', invalidChars);
+    errors.push(`Meaning contains unsupported characters: ${invalidChars.join(', ')}`);
   }
   
   const result = {
@@ -122,11 +123,14 @@ export const validateExample = (example: string): ValidationResult => {
     errors.push('Example must be less than 1000 characters');
   }
   
-  // Most permissive for examples - allow almost all printable characters
-  // except dangerous HTML/script characters (handled by sanitization)
-  if (!/^[a-zA-Z0-9\s\-'.,!?;:()[\]/~""`àáâãäåæçèéêëìíîïñòóôõöøùúûüýÿĀāĂăĄąĆćĈĉĊċČčĎďĐđĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħĨĩĪīĬĭĮįİıĲĳĴĵĶķĸĹĺĻļĽľĿŀŁłŃńŅņŇňŉŊŋŌōŎŏŐőŒœŔŕŖŗŘřŚśŜŝŞşŠšŢţŤťŦŧŨũŪūŬŭŮůŰűŲųŴŵŶŷŸŹźŻżŽžƀƁƂƃƄƅƆƇƈƉƊƋƌƍƎƏƐƑƒƓƔƕƖƗƘƙƚƛƜƝƞƟƠơƢƣƤƥƦƧƨƩƪƫƬƭƮƯưƱƲƳƴƵƶƷƸƹƺƻƼƽƾƿǀǁǂǃǄǅǆǇǈǉǊǋǌǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛǜǝǞǟǠǡǢǣǤǥǦǧǨǩǪǫǬǭǮǯǰǱǲǳǴǵǶǷǸǹǺǻǼǽǾǿȀȁȂȃȄȅȆȇȈȉȊȋȌȍȎȏȐȑȒȓȔȕȖȗȘșȚțȜȝȞȟȠȡȢȣȤȥȦȧȨȩȪȫȬȭȮȯȰȱȲȳɑɒɓɔɕɖɗɘəɚɛɜɝɞɟɠɡɢɣɤɥɦɧɨɩɪɫɬɭɮɯɰɱɲɳɴɵɶɷɸɹɺɻɼɽɾɿʀʁʂʃʄʅʆʇʈʉʊʋʌʍʎʏʐʑʒʓʔʕʖʗʘʙʚʛʜʝʞʟʠʡʢʣʤʥʦʧʨʩʪʫʬʭʮʯˀˁ˂˃˄˅ˆˇˈˉˊˋˌˍˎˏːˑ˒˓˔˕˖˗˘˙˚˛˜˝˞˟ˠˡˢˣˤ˥˦˧˨˩˪˫ˬ˭ˮ˯˰˱˲˳˴˵˶˷˸˹˺˻˼˽˾˿̴̵̶̷̸̡̢̧̨̛̖̗̘̙̜̝̞̟̠̣̤̥̦̩̪̫̬̭̮̯̰̱̲̳̹̺̻̼͇͈͉͍͎̀́̂̃̄̅̆̇̈̉̊̋̌̍̎̏̐̑̒̓̔̽̾̿̀́͂̓̈́͆͊͋͌̕̚͏͓͔͕͖͙͚͐͑͒͗͛͘͜͟͝͞͠͡%&*+=@#$^_|\\{}]+$/.test(sanitized)) {
+  // Most permissive for examples - use the same comprehensive character class
+  const examplePattern = new RegExp(`^${VOCABULARY_CHAR_CLASS}+$`);
+  
+  if (!examplePattern.test(sanitized)) {
+    const invalidChars = sanitized.split('').filter(char => !examplePattern.test(char));
     console.log('[EXAMPLE-VALIDATION] Character validation failed for:', sanitized);
-    errors.push('Example contains unsupported characters');
+    console.log('[EXAMPLE-VALIDATION] Invalid characters found:', invalidChars);
+    errors.push(`Example contains unsupported characters: ${invalidChars.join(', ')}`);
   }
   
   const result = {

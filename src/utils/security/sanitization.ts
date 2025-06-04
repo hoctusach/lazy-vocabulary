@@ -40,9 +40,9 @@ export const sanitizeInput = (input: string): string => {
   // Only remove the most dangerous control characters, preserve others that might be linguistic
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   
-  // Be more selective about HTML entities - only remove clearly dangerous ones
+  // Be much more selective about HTML entities - only remove clearly dangerous ones
   // Preserve entities that might be legitimate linguistic notation
-  sanitized = sanitized.replace(/&(?!amp;|lt;|gt;|quot;|#39;|#\d+;)[^;]+;/g, '');
+  sanitized = sanitized.replace(/&(?!amp;|lt;|gt;|quot;|#39;|#x27;|#8217;|#8216;|#8220;|#8221;|#\d+;|#x[0-9a-fA-F]+;)[^;]+;/g, '');
   
   // Normalize whitespace but preserve structure - be gentler
   sanitized = sanitized.trim().replace(/\s+/g, ' ');
@@ -61,7 +61,7 @@ export const sanitizeUserInput = (input: string): string => {
   
   console.log('[USER-SANITIZATION] Input received:', input);
   
-  // Remove HTML tags but be more selective
+  // Remove HTML tags but be more selective - preserve safe formatting
   let sanitized = input.replace(/<(?!\/?(b|i|em|strong|span)\b)[^>]*>/gi, '');
   
   // Only remove the most dangerous characters, preserve linguistic notation

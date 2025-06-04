@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 /**
  * Core logic for playing words with centralized speech controller
+ * Updated with improved debugging and state management
  */
 export const useWordPlaybackLogic = (
   wordList: VocabularyWord[],
@@ -46,18 +47,45 @@ export const useWordPlaybackLogic = (
   // Prevent multiple simultaneous play attempts
   const playInProgressRef = useRef(false);
   
-  // Core function to play the current word using the controller
+  // Core function to play the current word using the improved controller
   const playCurrentWord = useCallback(async () => {
+    console.log('[PLAYBACK] === Starting playCurrentWord ===');
+    console.log('[PLAYBACK] Current conditions:', {
+      hasCurrentWord: !!currentWord,
+      wordText: currentWord?.word,
+      muted,
+      paused,
+      playInProgress: playInProgressRef.current,
+      wordTransition: wordTransitionRef.current,
+      controllerActive: speechController.isActive(),
+      browserSpeaking: window.speechSynthesis?.speaking,
+      browserPaused: window.speechSynthesis?.paused
+    });
+
     // Prevent overlapping play attempts
     if (playInProgressRef.current) {
       console.log('[PLAYBACK] Play already in progress, skipping');
       return;
     }
 
-    // Check if controller is already active
-    if (speechController.isActive()) {
-      console.log('[PLAYBACK] Speech controller already active, skipping');
-      return;
+    // Check controller state with improved logic
+    const controllerActive = speechController.isActive();
+    console.log('[PLAYBACK] Speech controller state check:', {
+      controllerActive,
+      shouldBlock: controllerActive
+    });
+
+    if (controllerActive) {
+      console.log('[PLAYBACK] Speech controller active, checking if we should force reset...');
+      
+      // If muted or paused, force reset the controller to allow new operations
+      if (muted || paused) {
+        console.log('[PLAYBACK] Forcing controller reset due to mute/pause state');
+        speechController.forceReset();
+      } else {
+        console.log('[PLAYBACK] Controller legitimately active, skipping');
+        return;
+      }
     }
     
     // Don't try to play during word transitions
@@ -85,6 +113,7 @@ export const useWordPlaybackLogic = (
 
     // Set play in progress flag
     playInProgressRef.current = true;
+    console.log('[PLAYBACK] Starting speech process for:', currentWord.word);
     
     try {
       // Ensure voices are loaded
@@ -100,6 +129,7 @@ export const useWordPlaybackLogic = (
           permissionErrorShownRef.current = true;
         }
         setTimeout(() => goToNextWord(), 3000);
+        playInProgressRef.current = false;
         return;
       }
 
@@ -107,6 +137,7 @@ export const useWordPlaybackLogic = (
 
       // Find appropriate voice
       const voice = findVoice(selectedVoice.region);
+      console.log('[PLAYBACK] Selected voice:', voice?.name || 'default');
       
       // Construct text to speak
       let textToSpeak = currentWord.word;
@@ -117,7 +148,9 @@ export const useWordPlaybackLogic = (
         textToSpeak += `. ${currentWord.example}`;
       }
 
-      // Use the centralized speech controller
+      console.log('[PLAYBACK] Text to speak:', textToSpeak.substring(0, 100) + '...');
+
+      // Use the improved centralized speech controller
       const success = await speechController.speak(textToSpeak, {
         voice,
         rate: 0.8,
@@ -137,9 +170,12 @@ export const useWordPlaybackLogic = (
           
           // Auto-advance if not paused or muted
           if (!paused && !muted) {
+            console.log('[PLAYBACK] Auto-advancing to next word');
             setTimeout(() => {
               goToNextWord();
             }, 1500);
+          } else {
+            console.log('[PLAYBACK] Not auto-advancing due to pause/mute state');
           }
         },
         onError: (event) => {

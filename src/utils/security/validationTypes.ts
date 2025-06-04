@@ -66,3 +66,45 @@ export const SQL_INJECTION_PATTERNS = [
 // File upload validation constants
 export const ALLOWED_FILE_EXTENSIONS = ['.xlsx', '.xls', '.csv', '.json'];
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+// Valid characters for vocabulary notation - comprehensive Unicode ranges
+export const VOCABULARY_CHAR_RANGES = [
+  // Basic Latin and Latin-1 Supplement
+  '\\u0020-\\u007E',  // Basic Latin printable
+  '\\u00A0-\\u00FF',  // Latin-1 Supplement
+  
+  // Extended Latin
+  '\\u0100-\\u017F',  // Latin Extended-A
+  '\\u0180-\\u024F',  // Latin Extended-B
+  '\\u1E00-\\u1EFF',  // Latin Extended Additional
+  
+  // IPA Extensions and Phonetic Extensions
+  '\\u0250-\\u02AF',  // IPA Extensions
+  '\\u1D00-\\u1D7F',  // Phonetic Extensions
+  '\\u1D80-\\u1DBF',  // Phonetic Extensions Supplement
+  
+  // Combining Diacritical Marks
+  '\\u0300-\\u036F',  // Combining Diacritical Marks
+  '\\u1AB0-\\u1AFF',  // Combining Diacritical Marks Extended
+  '\\u1DC0-\\u1DFF',  // Combining Diacritical Marks Supplement
+  
+  // Spacing Modifier Letters
+  '\\u02B0-\\u02FF',  // Spacing Modifier Letters
+  
+  // General Punctuation (includes smart quotes)
+  '\\u2000-\\u206F',  // General Punctuation
+  
+  // Currency and Mathematical symbols
+  '\\u20A0-\\u20CF',  // Currency Symbols
+  '\\u2100-\\u214F',  // Letterlike Symbols
+  '\\u2190-\\u21FF',  // Arrows
+  '\\u2200-\\u22FF',  // Mathematical Operators
+  '\\u2300-\\u23FF',  // Miscellaneous Technical
+  
+  // Additional symbols commonly used in linguistics
+  '\\u25A0-\\u25FF',  // Geometric Shapes
+  '\\u2600-\\u26FF',  // Miscellaneous Symbols
+];
+
+// Create the comprehensive character class for vocabulary validation
+export const VOCABULARY_CHAR_CLASS = `[${VOCABULARY_CHAR_RANGES.join('')}]`;

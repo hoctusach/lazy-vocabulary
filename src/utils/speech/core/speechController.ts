@@ -1,7 +1,7 @@
 
 /**
  * Centralized Speech Controller - Single source of truth for all speech operations
- * This eliminates race conditions and overlapping speech attempts
+ * Fixed version that properly manages state and prevents blocking issues
  */
 
 interface SpeechState {
@@ -19,8 +19,46 @@ class SpeechController {
     lastOperationTime: 0
   };
 
-  private readonly MIN_OPERATION_INTERVAL = 300; // Prevent rapid operations
+  private readonly MIN_OPERATION_INTERVAL = 100; // Reduced from 300ms to be less restrictive
   private listeners: Set<(state: SpeechState) => void> = new Set();
+  private stateCheckInterval: number | null = null;
+
+  constructor() {
+    // Start periodic state validation to prevent stuck states
+    this.startStateValidation();
+  }
+
+  // Periodic validation to ensure state matches reality
+  private startStateValidation() {
+    if (this.stateCheckInterval) {
+      clearInterval(this.stateCheckInterval);
+    }
+    
+    this.stateCheckInterval = window.setInterval(() => {
+      this.validateAndSyncState();
+    }, 1000); // Check every second
+  }
+
+  private validateAndSyncState() {
+    const actualSpeaking = window.speechSynthesis?.speaking || false;
+    const actualPaused = window.speechSynthesis?.paused || false;
+    
+    // If we think we're active but speech synthesis isn't actually speaking
+    if (this.state.isActive && !actualSpeaking && !actualPaused) {
+      console.log('[CONTROLLER] State desync detected - resetting to inactive');
+      this.state.isActive = false;
+      this.state.currentUtterance = null;
+      this.state.isPaused = false;
+      this.notifyListeners();
+    }
+    
+    // Update pause state to match reality
+    if (this.state.isActive && this.state.isPaused !== actualPaused) {
+      console.log(`[CONTROLLER] Pause state sync: ${actualPaused}`);
+      this.state.isPaused = actualPaused;
+      this.notifyListeners();
+    }
+  }
 
   // Subscribe to state changes
   subscribe(listener: (state: SpeechState) => void) {
@@ -35,7 +73,7 @@ class SpeechController {
   private canPerformOperation(): boolean {
     const now = Date.now();
     if (now - this.state.lastOperationTime < this.MIN_OPERATION_INTERVAL) {
-      console.log('[CONTROLLER] Operation throttled to prevent race conditions');
+      console.log('[CONTROLLER] Operation throttled - too frequent');
       return false;
     }
     this.state.lastOperationTime = now;
@@ -47,9 +85,25 @@ class SpeechController {
     return { ...this.state };
   }
 
-  // Check if speech is currently active
+  // Check if speech is currently active - improved logic
   isActive(): boolean {
-    return this.state.isActive || window.speechSynthesis?.speaking || false;
+    // Always check actual browser state as well as our internal state
+    const browserSpeaking = window.speechSynthesis?.speaking || false;
+    const browserPaused = window.speechSynthesis?.paused || false;
+    
+    // If browser says nothing is happening, we shouldn't be active
+    if (!browserSpeaking && !browserPaused) {
+      if (this.state.isActive) {
+        console.log('[CONTROLLER] Correcting stuck active state');
+        this.state.isActive = false;
+        this.state.currentUtterance = null;
+        this.state.isPaused = false;
+        this.notifyListeners();
+      }
+      return false;
+    }
+    
+    return this.state.isActive || browserSpeaking;
   }
 
   // Stop all speech immediately
@@ -70,10 +124,35 @@ class SpeechController {
       this.state.currentUtterance.onstart = null;
     }
 
-    // Reset state
+    // Reset state immediately
     this.state.isActive = false;
     this.state.currentUtterance = null;
     this.state.isPaused = false;
+
+    this.notifyListeners();
+  }
+
+  // Force reset - more aggressive cleanup
+  forceReset(): void {
+    console.log('[CONTROLLER] Force resetting speech controller');
+    
+    // Cancel everything
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    // Clear any utterance references
+    if (this.state.currentUtterance) {
+      this.state.currentUtterance.onend = null;
+      this.state.currentUtterance.onerror = null;
+      this.state.currentUtterance.onstart = null;
+    }
+
+    // Reset all state
+    this.state.isActive = false;
+    this.state.currentUtterance = null;
+    this.state.isPaused = false;
+    this.state.lastOperationTime = 0;
 
     this.notifyListeners();
   }
@@ -98,7 +177,7 @@ class SpeechController {
     }
   }
 
-  // Speak text with proper state management
+  // Speak text with proper state management - improved version
   async speak(
     text: string,
     options: {
@@ -111,6 +190,21 @@ class SpeechController {
       onError?: (error: SpeechSynthesisErrorEvent) => void;
     } = {}
   ): Promise<boolean> {
+    console.log(`[CONTROLLER] Speak request: "${text.substring(0, 50)}..."`);
+    
+    // Check if we're actually blocked or just think we are
+    const actualSpeaking = window.speechSynthesis?.speaking || false;
+    if (this.state.isActive && actualSpeaking) {
+      console.log('[CONTROLLER] Actually speaking, rejecting new request');
+      return false;
+    }
+    
+    // If we think we're active but aren't actually speaking, reset state
+    if (this.state.isActive && !actualSpeaking) {
+      console.log('[CONTROLLER] Correcting incorrect active state');
+      this.forceReset();
+    }
+
     if (!this.canPerformOperation()) {
       console.log('[CONTROLLER] Speech operation throttled');
       return false;
@@ -120,7 +214,7 @@ class SpeechController {
     this.stop();
 
     // Wait for stop to complete
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     return new Promise((resolve) => {
       try {
@@ -132,7 +226,7 @@ class SpeechController {
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;
 
-        // Set up event handlers
+        // Set up event handlers with proper cleanup
         utterance.onstart = () => {
           console.log('[CONTROLLER] Speech started successfully');
           this.state.isActive = true;
@@ -166,8 +260,19 @@ class SpeechController {
         
         // Start speaking
         window.speechSynthesis.speak(utterance);
-        
         console.log('[CONTROLLER] Speech initiated');
+
+        // Fallback timeout in case events don't fire
+        setTimeout(() => {
+          if (this.state.currentUtterance === utterance && !window.speechSynthesis.speaking) {
+            console.warn('[CONTROLLER] Speech may have failed silently, cleaning up');
+            this.state.isActive = false;
+            this.state.currentUtterance = null;
+            this.state.isPaused = false;
+            this.notifyListeners();
+            resolve(false);
+          }
+        }, 500);
 
       } catch (error) {
         console.error('[CONTROLLER] Error setting up speech:', error);
@@ -176,6 +281,16 @@ class SpeechController {
         resolve(false);
       }
     });
+  }
+
+  // Cleanup method
+  destroy() {
+    if (this.stateCheckInterval) {
+      clearInterval(this.stateCheckInterval);
+      this.stateCheckInterval = null;
+    }
+    this.stop();
+    this.listeners.clear();
   }
 }
 
