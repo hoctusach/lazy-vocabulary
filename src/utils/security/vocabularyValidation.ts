@@ -1,15 +1,15 @@
 
 import { ValidationResult, VOCABULARY_CHAR_CLASS } from './validationTypes';
 import { sanitizeInput } from './sanitization';
+import { shouldBypassValidation, hasValidSpeechableContent } from '../text/contentFilters';
 
 /**
  * Vocabulary-specific validation functions
- * Updated with comprehensive support for linguistic notation and IPA symbols
+ * Updated with IPA notation and Vietnamese content support
  */
 
 /**
- * Validates vocabulary word input
- * Updated to allow extensive grammatical notation, IPA symbols, and linguistic characters
+ * Validates vocabulary word input with content filtering support
  */
 export const validateVocabularyWord = (word: string): ValidationResult => {
   const errors: string[] = [];
@@ -21,6 +21,38 @@ export const validateVocabularyWord = (word: string): ValidationResult => {
     return { isValid: false, errors };
   }
   
+  // Check if content should bypass validation
+  if (shouldBypassValidation(word)) {
+    console.log('[WORD-VALIDATION] Content contains IPA/Vietnamese, bypassing character validation');
+    
+    // Still apply basic sanitization but skip character validation
+    const sanitized = sanitizeInput(word);
+    
+    if (sanitized.length === 0) {
+      errors.push('Word cannot be empty after sanitization');
+    }
+    
+    if (sanitized.length > 100) {
+      errors.push('Word must be less than 100 characters');
+    }
+    
+    // Check if there's any speechable content remaining
+    if (!hasValidSpeechableContent(sanitized)) {
+      console.log('[WORD-VALIDATION] Warning: No speechable content after filtering');
+      // This is just a warning, not an error - allow the word to pass
+    }
+    
+    const result = {
+      isValid: errors.length === 0,
+      sanitizedValue: sanitized,
+      errors
+    };
+    
+    console.log('[WORD-VALIDATION] Bypass validation result:', result);
+    return result;
+  }
+  
+  // Standard validation path for regular content
   const sanitized = sanitizeInput(word);
   console.log('[WORD-VALIDATION] After sanitization:', sanitized);
   
@@ -54,8 +86,7 @@ export const validateVocabularyWord = (word: string): ValidationResult => {
 };
 
 /**
- * Validates meaning/definition input
- * Updated to allow comprehensive linguistic notation
+ * Validates meaning/definition input with content filtering support
  */
 export const validateMeaning = (meaning: string): ValidationResult => {
   const errors: string[] = [];
@@ -67,6 +98,31 @@ export const validateMeaning = (meaning: string): ValidationResult => {
     return { isValid: false, errors };
   }
   
+  // Check if content should bypass validation
+  if (shouldBypassValidation(meaning)) {
+    console.log('[MEANING-VALIDATION] Content contains IPA/Vietnamese, bypassing character validation');
+    
+    const sanitized = sanitizeInput(meaning);
+    
+    if (sanitized.length === 0) {
+      errors.push('Meaning cannot be empty after sanitization');
+    }
+    
+    if (sanitized.length > 500) {
+      errors.push('Meaning must be less than 500 characters');
+    }
+    
+    const result = {
+      isValid: errors.length === 0,
+      sanitizedValue: sanitized,
+      errors
+    };
+    
+    console.log('[MEANING-VALIDATION] Bypass validation result:', result);
+    return result;
+  }
+  
+  // Standard validation path
   const sanitized = sanitizeInput(meaning);
   console.log('[MEANING-VALIDATION] After sanitization:', sanitized);
   
@@ -99,8 +155,7 @@ export const validateMeaning = (meaning: string): ValidationResult => {
 };
 
 /**
- * Validates example input
- * Most permissive validation for example sentences with full linguistic support
+ * Validates example input with content filtering support
  */
 export const validateExample = (example: string): ValidationResult => {
   const errors: string[] = [];
@@ -112,6 +167,31 @@ export const validateExample = (example: string): ValidationResult => {
     return { isValid: false, errors };
   }
   
+  // Check if content should bypass validation
+  if (shouldBypassValidation(example)) {
+    console.log('[EXAMPLE-VALIDATION] Content contains IPA/Vietnamese, bypassing character validation');
+    
+    const sanitized = sanitizeInput(example);
+    
+    if (sanitized.length === 0) {
+      errors.push('Example cannot be empty after sanitization');
+    }
+    
+    if (sanitized.length > 1000) {
+      errors.push('Example must be less than 1000 characters');
+    }
+    
+    const result = {
+      isValid: errors.length === 0,
+      sanitizedValue: sanitized,
+      errors
+    };
+    
+    console.log('[EXAMPLE-VALIDATION] Bypass validation result:', result);
+    return result;
+  }
+  
+  // Standard validation path
   const sanitized = sanitizeInput(example);
   console.log('[EXAMPLE-VALIDATION] After sanitization:', sanitized);
   

@@ -3,11 +3,12 @@ import { useCallback, useState, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { speechController } from '@/utils/speech/core/speechController';
+import { extractSpeechableContent, hasValidSpeechableContent } from '@/utils/text/contentFilters';
 import { toast } from 'sonner';
 
 /**
- * Core logic for playing words with centralized speech controller
- * Updated with improved debugging and state management
+ * Core logic for playing words with centralized speech controller and content filtering
+ * Updated with IPA notation and Vietnamese content filtering
  */
 export const useWordPlaybackLogic = (
   wordList: VocabularyWord[],
@@ -47,7 +48,7 @@ export const useWordPlaybackLogic = (
   // Prevent multiple simultaneous play attempts
   const playInProgressRef = useRef(false);
   
-  // Core function to play the current word using the improved controller
+  // Core function to play the current word using the improved controller with content filtering
   const playCurrentWord = useCallback(async () => {
     console.log('[PLAYBACK] === Starting playCurrentWord ===');
     console.log('[PLAYBACK] Current conditions:', {
@@ -133,25 +134,39 @@ export const useWordPlaybackLogic = (
         return;
       }
 
-      console.log(`[PLAYBACK] Playing word: ${currentWord.word}`);
+      console.log(`[PLAYBACK] Processing word for speech: ${currentWord.word}`);
 
       // Find appropriate voice
       const voice = findVoice(selectedVoice.region);
       console.log('[PLAYBACK] Selected voice:', voice?.name || 'default');
       
-      // Construct text to speak
-      let textToSpeak = currentWord.word;
+      // Construct text to speak with content filtering
+      let rawTextToSpeak = currentWord.word;
       if (currentWord.meaning) {
-        textToSpeak += `. ${currentWord.meaning}`;
+        rawTextToSpeak += `. ${currentWord.meaning}`;
       }
       if (currentWord.example) {
-        textToSpeak += `. ${currentWord.example}`;
+        rawTextToSpeak += `. ${currentWord.example}`;
       }
 
-      console.log('[PLAYBACK] Text to speak:', textToSpeak.substring(0, 100) + '...');
+      // Apply content filtering to extract speechable content
+      const speechableText = extractSpeechableContent(rawTextToSpeak);
+      
+      console.log('[PLAYBACK] Original text length:', rawTextToSpeak.length);
+      console.log('[PLAYBACK] Speechable text length:', speechableText.length);
+      console.log('[PLAYBACK] Text to speak:', speechableText.substring(0, 100) + '...');
+
+      // Check if we have any content to speak after filtering
+      if (!hasValidSpeechableContent(rawTextToSpeak)) {
+        console.log('[PLAYBACK] No speechable content after filtering, auto-advancing');
+        toast.info("This word contains only IPA notation or Vietnamese text - skipping speech");
+        setTimeout(() => goToNextWord(), 2000);
+        playInProgressRef.current = false;
+        return;
+      }
 
       // Use the improved centralized speech controller
-      const success = await speechController.speak(textToSpeak, {
+      const success = await speechController.speak(speechableText, {
         voice,
         rate: 0.8,
         pitch: 1.0,

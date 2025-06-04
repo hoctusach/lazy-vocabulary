@@ -1,22 +1,24 @@
 
 import { SheetData, VocabularyWord } from "@/types/vocabulary";
 import { sanitizeInput, validateVocabularyWord, validateMeaning, validateExample } from "@/utils/security/inputValidation";
+import { shouldBypassValidation, prepareTextForDisplay } from "@/utils/text/contentFilters";
 import { WordValidator } from "./WordValidator";
 
 /**
  * Handles type processing and sanitization for vocabulary data
- * Updated with comprehensive validation logging and error handling
+ * Updated with IPA notation and Vietnamese content filtering support
  */
 export class TypeProcessor {
   private wordValidator = new WordValidator();
 
   /**
    * Ensures all fields in the data have the correct types and are sanitized
+   * Now includes content filtering for IPA notation and Vietnamese text
    */
   ensureDataTypes(data: any): SheetData {
     const processedData: SheetData = {};
     
-    console.log('[TYPE-PROCESSOR] Starting comprehensive data processing');
+    console.log('[TYPE-PROCESSOR] Starting comprehensive data processing with content filtering');
     
     for (const sheetName in data) {
       // Sanitize sheet name
@@ -38,46 +40,66 @@ export class TypeProcessor {
           // Log the original word for debugging
           console.log(`[TYPE-PROCESSOR] Processing word ${i + 1}: "${word.word}"`);
           
-          // Validate and sanitize each field with detailed logging
-          const wordValidation = validateVocabularyWord(String(word.word || ""));
-          const meaningValidation = validateMeaning(String(word.meaning || ""));
-          const exampleValidation = validateExample(String(word.example || ""));
+          // Check if any field contains IPA or Vietnamese content
+          const wordText = String(word.word || "");
+          const meaningText = String(word.meaning || "");
+          const exampleText = String(word.example || "");
+          
+          const containsSpecialContent = shouldBypassValidation(wordText) || 
+                                       shouldBypassValidation(meaningText) || 
+                                       shouldBypassValidation(exampleText);
+          
+          if (containsSpecialContent) {
+            console.log(`[TYPE-PROCESSOR] Word "${wordText}" contains IPA/Vietnamese content, using bypass validation`);
+          }
+          
+          // Validate and sanitize each field with enhanced logging
+          const wordValidation = validateVocabularyWord(wordText);
+          const meaningValidation = validateMeaning(meaningText);
+          const exampleValidation = validateExample(exampleText);
           
           // Detailed validation logging
           if (!wordValidation.isValid) {
             console.warn(`[TYPE-PROCESSOR] Word validation failed for "${word.word}":`, {
               originalWord: word.word,
               sanitizedWord: wordValidation.sanitizedValue,
-              errors: wordValidation.errors
+              errors: wordValidation.errors,
+              containsSpecialContent
             });
           }
           if (!meaningValidation.isValid) {
             console.warn(`[TYPE-PROCESSOR] Meaning validation failed for "${word.word}":`, {
               originalMeaning: word.meaning,
               sanitizedMeaning: meaningValidation.sanitizedValue,
-              errors: meaningValidation.errors
+              errors: meaningValidation.errors,
+              containsSpecialContent
             });
           }
           if (!exampleValidation.isValid) {
             console.warn(`[TYPE-PROCESSOR] Example validation failed for "${word.word}":`, {
               originalExample: word.example,
               sanitizedExample: exampleValidation.sanitizedValue,
-              errors: exampleValidation.errors
+              errors: exampleValidation.errors,
+              containsSpecialContent
             });
           }
           
           // Include words that pass validation OR provide detailed error information
           if (wordValidation.isValid && meaningValidation.isValid && exampleValidation.isValid) {
             const processedWord: VocabularyWord = {
-              word: wordValidation.sanitizedValue!,
-              meaning: meaningValidation.sanitizedValue!,
-              example: exampleValidation.sanitizedValue!,
+              word: prepareTextForDisplay(wordValidation.sanitizedValue!),
+              meaning: prepareTextForDisplay(meaningValidation.sanitizedValue!),
+              example: prepareTextForDisplay(exampleValidation.sanitizedValue!),
               count: this.wordValidator.sanitizeCount(word.count),
               category: sanitizeInput(String(word.category || sanitizedSheetName))
             };
             
             processedData[sanitizedSheetName].push(processedWord);
             console.log(`[TYPE-PROCESSOR] ✅ Successfully processed: "${processedWord.word}"`);
+            
+            if (containsSpecialContent) {
+              console.log(`[TYPE-PROCESSOR] 🔤 Word contains IPA/Vietnamese content and will be filtered during speech`);
+            }
           } else {
             // Provide detailed information about why the word was rejected
             console.error(`[TYPE-PROCESSOR] ❌ Rejecting word "${word.word}" due to validation failures:`, {
@@ -86,6 +108,12 @@ export class TypeProcessor {
                 meaning: word.meaning,
                 example: word.example,
                 category: word.category
+              },
+              contentAnalysis: {
+                containsSpecialContent,
+                wordHasSpecial: shouldBypassValidation(wordText),
+                meaningHasSpecial: shouldBypassValidation(meaningText),
+                exampleHasSpecial: shouldBypassValidation(exampleText)
               },
               validationResults: {
                 word: {
@@ -112,7 +140,7 @@ export class TypeProcessor {
       console.log(`[TYPE-PROCESSOR] Sheet "${sanitizedSheetName}" processing complete: ${processedData[sanitizedSheetName].length} valid words out of ${data[sheetName]?.length || 0} total`);
     }
     
-    console.log('[TYPE-PROCESSOR] Comprehensive data processing complete');
+    console.log('[TYPE-PROCESSOR] Comprehensive data processing with content filtering complete');
     console.log('[TYPE-PROCESSOR] Final result:', Object.keys(processedData).map(sheetName => `${sheetName}: ${processedData[sheetName].length} words`));
     
     return processedData;
