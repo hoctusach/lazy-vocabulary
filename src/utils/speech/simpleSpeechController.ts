@@ -80,6 +80,11 @@ class SimpleSpeechController {
 
   stop(): void {
     console.log('SimpleSpeechController: Stopping speech');
+    console.log('SimpleSpeechController: Current state before stop', {
+      isActive: this.isActive,
+      speaking: window.speechSynthesis?.speaking,
+      paused: window.speechSynthesis?.paused
+    });
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
