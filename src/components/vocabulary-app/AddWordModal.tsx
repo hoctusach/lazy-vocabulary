@@ -139,6 +139,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       return;
     }
     
+    let timeoutId: number | undefined;
     try {
       setIsSearching(true);
       setSearchError('');
@@ -154,7 +155,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       
       // Primary dictionary API call with timeout
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       const response = await fetch(apiUrl, {
         signal: controller.signal,
@@ -162,8 +163,6 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
           'Accept': 'application/json',
         }
       });
-      
-      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error('Failed to fetch definition');
@@ -213,6 +212,9 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
         setSearchError('Search failed. Please try again or enter details manually.');
       }
     } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       setIsSearching(false);
     }
   };
