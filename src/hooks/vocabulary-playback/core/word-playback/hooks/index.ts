@@ -10,3 +10,4 @@ export * from './usePlaybackFlow';
 export * from './usePlaybackState';
 export * from './usePlaybackConditions';
 export * from './usePlaybackOrchestrator';
+export * from './useSpeechPermissionManager';

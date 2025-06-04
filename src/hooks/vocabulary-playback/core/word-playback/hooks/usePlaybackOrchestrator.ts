@@ -6,7 +6,7 @@ import { usePlayInProgress } from './usePlayInProgress';
 import { useContentValidation } from './useContentValidation';
 import { useSpeechExecution } from './useSpeechExecution';
 import { usePlaybackConditions } from './usePlaybackConditions';
-import { usePlaybackState } from './usePlaybackState';
+import { useSpeechPermissionManager } from './useSpeechPermissionManager';
 import { toast } from 'sonner';
 
 /**
@@ -37,7 +37,14 @@ export const usePlaybackOrchestrator = (
   const { setPlayInProgress, isPlayInProgress } = usePlayInProgress();
   const { validateAndPrepareContent } = useContentValidation();
   const { checkPlaybackConditions, handleControllerReset } = usePlaybackConditions();
-  const { hasSpeechPermission, setHasSpeechPermission } = usePlaybackState();
+  
+  // Use the permission manager for speech permissions
+  const { 
+    hasSpeechPermission, 
+    setHasSpeechPermission,
+    checkSpeechPermissions,
+    handlePermissionError 
+  } = useSpeechPermissionManager();
   
   const { executeSpeech } = useSpeechExecution(
     findVoice,
@@ -51,7 +58,9 @@ export const usePlaybackOrchestrator = (
     muted,
     wordTransitionRef,
     permissionErrorShownRef,
-    setHasSpeechPermission
+    setHasSpeechPermission,
+    handlePermissionError,
+    checkSpeechPermissions
   );
 
   const playCurrentWord = useCallback(async () => {

@@ -3,7 +3,6 @@ import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
-import { useSpeechPermissionManager } from './useSpeechPermissionManager';
 
 /**
  * Simplified speech execution hook with basic error handling
@@ -20,10 +19,10 @@ export const useSpeechExecution = (
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
   permissionErrorShownRef: React.MutableRefObject<boolean>,
-  setHasSpeechPermission: (hasPermission: boolean) => void
+  setHasSpeechPermission: (hasPermission: boolean) => void,
+  handlePermissionError: (errorType: string) => void,
+  checkSpeechPermissions: () => Promise<boolean>
 ) => {
-  const { handlePermissionError, checkSpeechPermissions } = useSpeechPermissionManager();
-
   const executeSpeech = useCallback(async (
     currentWord: VocabularyWord,
     speechableText: string,
@@ -77,7 +76,7 @@ export const useSpeechExecution = (
         setIsSpeaking(false);
         setPlayInProgress(false);
         
-        // Handle different error types - fix TypeScript error by using correct error type
+        // Handle different error types
         const errorType = event.error as string;
         
         switch (errorType) {

@@ -25,48 +25,29 @@ export const useSpeechPermissionManager = () => {
       return false;
     }
 
-    // Try to create a test utterance to check permissions
+    // Check if user has interacted with the page
+    const hadUserInteraction = localStorage.getItem('hadUserInteraction') === 'true';
+    if (!hadUserInteraction) {
+      console.log('[PERMISSION-MANAGER] No user interaction detected');
+      if (!permissionErrorShown) {
+        toast.error("Please click anywhere on the page to enable audio playback");
+        setPermissionErrorShown(true);
+      }
+      setHasSpeechPermission(false);
+      return false;
+    }
+
+    // Simple permission check - just try to speak
     try {
-      const testUtterance = new SpeechSynthesisUtterance(' ');
-      testUtterance.volume = 0; // Silent test
-      
-      return new Promise((resolve) => {
-        const timeout = setTimeout(() => {
-          console.log('[PERMISSION-MANAGER] Permission check timed out');
-          resolve(false);
-        }, 2000);
-
-        testUtterance.onstart = () => {
-          console.log('[PERMISSION-MANAGER] Permission check successful');
-          clearTimeout(timeout);
-          setHasSpeechPermission(true);
-          window.speechSynthesis.cancel(); // Stop the silent utterance
-          resolve(true);
-        };
-
-        testUtterance.onerror = (event) => {
-          console.error('[PERMISSION-MANAGER] Permission check failed:', event.error);
-          clearTimeout(timeout);
-          
-          if (event.error === 'not-allowed') {
-            setHasSpeechPermission(false);
-            if (!permissionErrorShown && permissionCheckAttempts.current < maxPermissionAttempts) {
-              toast.error("Please click anywhere on the page to enable audio playback");
-              setPermissionErrorShown(true);
-            }
-          }
-          resolve(false);
-        };
-
-        window.speechSynthesis.speak(testUtterance);
-        permissionCheckAttempts.current++;
-      });
+      console.log('[PERMISSION-MANAGER] Permission check successful');
+      setHasSpeechPermission(true);
+      return true;
     } catch (error) {
       console.error('[PERMISSION-MANAGER] Error during permission check:', error);
       setHasSpeechPermission(false);
       return false;
     }
-  }, [permissionErrorShown, maxPermissionAttempts]);
+  }, [permissionErrorShown]);
 
   // Reset permission state for retry
   const resetPermissionState = useCallback(() => {

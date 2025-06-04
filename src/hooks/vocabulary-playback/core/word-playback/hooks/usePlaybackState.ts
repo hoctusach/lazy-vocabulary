@@ -2,14 +2,8 @@
 import { useState } from 'react';
 
 /**
- * Hook for managing playback state and speech permissions
+ * Hook for managing playback state (no longer manages speech permissions)
  */
 export const usePlaybackState = () => {
-  // State for speech permission
-  const [hasSpeechPermission, setHasSpeechPermission] = useState(true);
-  
-  return {
-    hasSpeechPermission,
-    setHasSpeechPermission
-  };
+  return {};
 };
