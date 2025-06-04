@@ -77,8 +77,10 @@ export const useSpeechExecution = (
         setIsSpeaking(false);
         setPlayInProgress(false);
         
-        // Handle different error types
-        switch (event.error) {
+        // Handle different error types - fix TypeScript error by checking error type properly
+        const errorType = event.error as string;
+        
+        switch (errorType) {
           case 'not-allowed':
             setHasSpeechPermission(false);
             handlePermissionError('not-allowed');
@@ -95,14 +97,14 @@ export const useSpeechExecution = (
         }
         
         // Simple retry logic
-        if (event.error !== 'canceled' && incrementRetryAttempts()) {
+        if (errorType !== 'canceled' && incrementRetryAttempts()) {
           console.log('[SPEECH-EXECUTION] Retrying after error');
           setTimeout(() => {
             if (!paused && !muted && !wordTransitionRef.current) {
               setPlayInProgress(false);
             }
           }, 1000);
-        } else if (event.error !== 'canceled') {
+        } else if (errorType !== 'canceled') {
           console.log('[SPEECH-EXECUTION] Max retries reached, advancing');
           setTimeout(() => goToNextWord(), 1500);
         }
