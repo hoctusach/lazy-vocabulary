@@ -1,6 +1,5 @@
 
 import { useEffect, useCallback } from 'react';
-import { stopSpeaking } from '@/utils/speech';
 
 export const useAudioCleanup = (
   clearAutoAdvanceTimer: () => void,
