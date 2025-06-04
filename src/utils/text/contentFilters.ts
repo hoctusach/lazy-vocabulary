@@ -1,79 +1,111 @@
 /**
- * Text processing utilities for handling IPA notation and Vietnamese content
- * These utilities help identify content that should bypass validation or be excluded from speech
+ * Enhanced content filtering for speech synthesis
+ * Improved to preserve more speechable content while filtering out problematic elements
  */
 
-/**
- * Detects if text contains IPA notation (content within /.../ brackets)
- */
-export const containsIPANotation = (text: string): boolean => {
-  if (!text || typeof text !== 'string') return false;
-  // Match IPA notation patterns like /ˈhæpɪ/ or /pronunciation/
-  const ipaPattern = /\/[^\/]+\//g;
-  return ipaPattern.test(text);
-};
+// IPA (International Phonetic Alphabet) character ranges
+const IPA_RANGES = [
+  /[\u0250-\u02AF]/g,  // IPA Extensions
+  /[\u1D00-\u1D7F]/g,  // Phonetic Extensions
+  /[\u1D80-\u1DBF]/g,  // Phonetic Extensions Supplement
+  /[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]/g  // Common IPA symbols
+];
+
+// Vietnamese diacritics and characters
+const VIETNAMESE_RANGES = [
+  /[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/gi,
+  /[ÀÁẠẢÃÂẦẤẬẨẪĂẰẮẶẲẴÈÉẸẺẼÊỀẾỆỂỄÌÍỊỈĨÒÓỌỎÕÔỒỐỘỔỖƠỜỚỢỞỠÙÚỤỦŨƯỪỨỰỬỮỲÝỴỶỸĐ]/g
+];
+
+// Patterns that should trigger bypass validation
+const BYPASS_PATTERNS = [
+  ...IPA_RANGES,
+  ...VIETNAMESE_RANGES,
+  /\[.*?\]/g, // Content in square brackets (often IPA)
+  /\/.*?\//g  // Content between forward slashes (often phonetic)
+];
 
 /**
- * Detects if text contains Vietnamese characters
- */
-export const containsVietnamese = (text: string): boolean => {
-  if (!text || typeof text !== 'string') return false;
-  // Vietnamese Unicode ranges including diacritics
-  const vietnamesePattern = /[\u00C0-\u00C3\u00C8-\u00CA\u00CC-\u00CD\u00D2-\u00D5\u00D9-\u00DA\u00DD\u0102\u0103\u0110\u0111\u0128\u0129\u0168\u0169\u01A0\u01A1\u01AF\u01B0\u1EA0-\u1EF9]/;
-  return vietnamesePattern.test(text);
-};
-
-/**
- * Checks if content should bypass validation (contains IPA or Vietnamese)
+ * Check if text contains IPA notation or Vietnamese characters that should bypass validation
  */
 export const shouldBypassValidation = (text: string): boolean => {
-  return containsIPANotation(text) || containsVietnamese(text);
+  if (!text || typeof text !== 'string') return false;
+  
+  return BYPASS_PATTERNS.some(pattern => pattern.test(text));
 };
 
 /**
- * Extracts speechable content by removing IPA notation and Vietnamese words
+ * Extract content that can be spoken by speech synthesis
+ * More conservative filtering - only removes obvious problematic content
  */
 export const extractSpeechableContent = (text: string): string => {
   if (!text || typeof text !== 'string') return '';
   
-  console.log('[CONTENT-FILTER] Processing text for speech:', text.substring(0, 50) + '...');
+  console.log('[CONTENT-FILTER] Processing text for speech:', text.substring(0, 100) + '...');
+  console.log('[CONTENT-FILTER] Original text length:', text.length);
   
-  let processed = text;
+  let processedText = text;
   
-  // Remove IPA notation (content within /.../ brackets)
-  processed = processed.replace(/\/[^\/]+\//g, '').trim();
+  // Remove content in square brackets (often IPA notation)
+  processedText = processedText.replace(/\[([^\]]*)\]/g, (match, content) => {
+    // If the bracketed content is short and looks like a word type, keep it
+    if (content.length < 20 && /^[a-zA-Z\s]+$/.test(content)) {
+      return `(${content})`;
+    }
+    return ''; // Remove IPA notation in brackets
+  });
   
-  // Remove Vietnamese words (words containing Vietnamese characters)
-  // Split by whitespace, filter out Vietnamese words, rejoin
-  const words = processed.split(/\s+/);
-  const filteredWords = words.filter(word => !containsVietnamese(word));
-  processed = filteredWords.join(' ').trim();
+  // Remove content between forward slashes (phonetic transcription)
+  processedText = processedText.replace(/\/([^\/]*)\//g, '');
+  
+  // Remove standalone IPA characters but preserve words containing them
+  // Only remove if the entire word consists mainly of IPA characters
+  processedText = processedText.replace(/\b\w*[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]\w*\b/g, (match) => {
+    // Only remove if more than 50% of the word is IPA characters
+    const ipaCount = (match.match(/[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]/g) || []).length;
+    if (ipaCount / match.length > 0.5) {
+      return '';
+    }
+    return match;
+  });
   
   // Clean up extra whitespace
-  processed = processed.replace(/\s+/g, ' ').trim();
+  processedText = processedText.replace(/\s+/g, ' ').trim();
   
-  console.log('[CONTENT-FILTER] Original text length:', text.length);
-  console.log('[CONTENT-FILTER] Processed text length:', processed.length);
-  console.log('[CONTENT-FILTER] Filtered content:', processed.substring(0, 50) + '...');
+  console.log('[CONTENT-FILTER] Processed text length:', processedText.length);
+  console.log('[CONTENT-FILTER] Filtered content:', processedText.substring(0, 100) + '...');
   
-  return processed;
+  return processedText;
 };
 
 /**
- * Prepares text for display (keeps all content but marks filtered sections)
+ * Check if text has valid content for speech after filtering
+ */
+export const hasValidSpeechableContent = (text: string): boolean => {
+  const filtered = extractSpeechableContent(text);
+  
+  // Check if we have meaningful content (not just punctuation and spaces)
+  const meaningfulContent = filtered.replace(/[^\w]/g, '');
+  const hasContent = meaningfulContent.length > 0;
+  
+  console.log('[CONTENT-FILTER] Speechable content check:', {
+    originalLength: text.length,
+    filteredLength: filtered.length,
+    meaningfulLength: meaningfulContent.length,
+    hasContent
+  });
+  
+  return hasContent;
+};
+
+/**
+ * Prepare text for display (less aggressive than speech filtering)
  */
 export const prepareTextForDisplay = (text: string): string => {
   if (!text || typeof text !== 'string') return '';
   
-  // For display, we keep everything as-is
-  // This function exists for consistency and future display enhancements
-  return text.trim();
-};
-
-/**
- * Validates that filtered content is not empty after processing
- */
-export const hasValidSpeechableContent = (text: string): boolean => {
-  const speechable = extractSpeechableContent(text);
-  return speechable.length > 0;
+  // For display, we keep most content but clean up formatting
+  return text
+    .replace(/\s+/g, ' ')  // Normalize whitespace
+    .trim();
 };

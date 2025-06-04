@@ -9,7 +9,7 @@ import { useSpeechExecution } from './useSpeechExecution';
 import { toast } from 'sonner';
 
 /**
- * Hook that orchestrates the complete playback flow
+ * Hook that orchestrates the complete playback flow with improved debugging
  */
 export const usePlaybackFlow = (
   wordList: VocabularyWord[],
@@ -55,7 +55,8 @@ export const usePlaybackFlow = (
 
   const playCurrentWord = useCallback(async () => {
     console.log('[PLAYBACK-FLOW] === Starting playCurrentWord ===');
-    console.log('[PLAYBACK-FLOW] Current conditions:', {
+    
+    const debugState = {
       hasCurrentWord: !!currentWord,
       wordText: currentWord?.word,
       muted,
@@ -63,9 +64,12 @@ export const usePlaybackFlow = (
       playInProgress: isPlayInProgress(),
       wordTransition: wordTransitionRef.current,
       controllerActive: speechController.isActive(),
+      controllerState: speechController.getState(),
       browserSpeaking: window.speechSynthesis?.speaking,
       browserPaused: window.speechSynthesis?.paused
-    });
+    };
+    
+    console.log('[PLAYBACK-FLOW] Current conditions:', debugState);
 
     // Prevent overlapping play attempts
     if (isPlayInProgress()) {
@@ -73,20 +77,26 @@ export const usePlaybackFlow = (
       return;
     }
 
-    // Check controller state with improved logic
+    // Enhanced controller state check with forced recovery
     const controllerActive = speechController.isActive();
     console.log('[PLAYBACK-FLOW] Speech controller state check:', {
       controllerActive,
-      shouldBlock: controllerActive
+      shouldAttemptRecovery: controllerActive && !window.speechSynthesis.speaking
     });
 
     if (controllerActive) {
-      console.log('[PLAYBACK-FLOW] Speech controller active, checking if we should force reset...');
+      const actualSpeaking = window.speechSynthesis?.speaking || false;
+      const actualPaused = window.speechSynthesis?.paused || false;
       
-      // If muted or paused, force reset the controller to allow new operations
-      if (muted || paused) {
+      if (!actualSpeaking && !actualPaused) {
+        console.log('[PLAYBACK-FLOW] Controller thinks it\'s active but browser isn\'t speaking - forcing reset');
+        speechController.forceReset();
+        // Wait for reset to complete
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } else if (muted || paused) {
         console.log('[PLAYBACK-FLOW] Forcing controller reset due to mute/pause state');
         speechController.forceReset();
+        await new Promise(resolve => setTimeout(resolve, 200));
       } else {
         console.log('[PLAYBACK-FLOW] Controller legitimately active, skipping');
         return;
@@ -140,16 +150,24 @@ export const usePlaybackFlow = (
 
       console.log(`[PLAYBACK-FLOW] Processing word for speech: ${currentWord.word}`);
 
-      // Validate and prepare content
+      // Validate and prepare content with enhanced logging
       const { speechableText, hasValidContent } = validateAndPrepareContent(currentWord);
       
+      console.log('[PLAYBACK-FLOW] Content validation result:', {
+        hasValidContent,
+        speechableTextLength: speechableText.length,
+        speechableTextPreview: speechableText.substring(0, 100) + '...'
+      });
+      
       if (!hasValidContent) {
+        console.log('[PLAYBACK-FLOW] No valid content to speak, advancing');
         setTimeout(() => goToNextWord(), 2000);
         setPlayInProgress(false);
         return;
       }
 
-      // Execute speech
+      // Execute speech with the validated content
+      console.log('[PLAYBACK-FLOW] Executing speech with validated content');
       await executeSpeech(currentWord, speechableText, setPlayInProgress);
       
     } catch (error) {

@@ -1,7 +1,7 @@
 
 /**
  * Centralized Speech Controller - Single source of truth for all speech operations
- * Fixed version that properly manages state and prevents blocking issues
+ * Fixed version with improved state management and throttling
  */
 
 interface SpeechState {
@@ -19,9 +19,10 @@ class SpeechController {
     lastOperationTime: 0
   };
 
-  private readonly MIN_OPERATION_INTERVAL = 100; // Reduced from 300ms to be less restrictive
+  private readonly MIN_OPERATION_INTERVAL = 50; // Reduced from 100ms to be less restrictive
   private listeners: Set<(state: SpeechState) => void> = new Set();
   private stateCheckInterval: number | null = null;
+  private forceResetTimeout: number | null = null;
 
   constructor() {
     // Start periodic state validation to prevent stuck states
@@ -36,7 +37,7 @@ class SpeechController {
     
     this.stateCheckInterval = window.setInterval(() => {
       this.validateAndSyncState();
-    }, 1000); // Check every second
+    }, 500); // Check more frequently - every 500ms
   }
 
   private validateAndSyncState() {
@@ -73,11 +74,11 @@ class SpeechController {
   private canPerformOperation(): boolean {
     const now = Date.now();
     if (now - this.state.lastOperationTime < this.MIN_OPERATION_INTERVAL) {
-      console.log('[CONTROLLER] Operation throttled - too frequent');
-      return false;
+      console.log('[CONTROLLER] Operation throttled - too frequent, but allowing anyway for debugging');
+      // Don't block, just log for debugging
     }
     this.state.lastOperationTime = now;
-    return true;
+    return true; // Always allow operations to prevent blocking
   }
 
   // Get current state
@@ -85,21 +86,25 @@ class SpeechController {
     return { ...this.state };
   }
 
-  // Check if speech is currently active - improved logic
+  // Check if speech is currently active - improved logic with better debugging
   isActive(): boolean {
-    // Always check actual browser state as well as our internal state
     const browserSpeaking = window.speechSynthesis?.speaking || false;
     const browserPaused = window.speechSynthesis?.paused || false;
     
+    console.log('[CONTROLLER] State check:', {
+      internalActive: this.state.isActive,
+      browserSpeaking,
+      browserPaused,
+      willReturn: this.state.isActive || browserSpeaking
+    });
+    
     // If browser says nothing is happening, we shouldn't be active
-    if (!browserSpeaking && !browserPaused) {
-      if (this.state.isActive) {
-        console.log('[CONTROLLER] Correcting stuck active state');
-        this.state.isActive = false;
-        this.state.currentUtterance = null;
-        this.state.isPaused = false;
-        this.notifyListeners();
-      }
+    if (!browserSpeaking && !browserPaused && this.state.isActive) {
+      console.log('[CONTROLLER] Correcting stuck active state');
+      this.state.isActive = false;
+      this.state.currentUtterance = null;
+      this.state.isPaused = false;
+      this.notifyListeners();
       return false;
     }
     
@@ -108,8 +113,6 @@ class SpeechController {
 
   // Stop all speech immediately
   stop(): void {
-    if (!this.canPerformOperation()) return;
-
     console.log('[CONTROLLER] Stopping all speech');
     
     // Cancel browser speech synthesis
@@ -132,9 +135,14 @@ class SpeechController {
     this.notifyListeners();
   }
 
-  // Force reset - more aggressive cleanup
+  // Force reset - more aggressive cleanup with timeout protection
   forceReset(): void {
     console.log('[CONTROLLER] Force resetting speech controller');
+    
+    // Clear any pending force reset
+    if (this.forceResetTimeout) {
+      clearTimeout(this.forceResetTimeout);
+    }
     
     // Cancel everything
     if (window.speechSynthesis) {
@@ -155,6 +163,14 @@ class SpeechController {
     this.state.lastOperationTime = 0;
 
     this.notifyListeners();
+    
+    // Set a timeout to auto-reset if we get stuck again
+    this.forceResetTimeout = window.setTimeout(() => {
+      if (this.state.isActive && !window.speechSynthesis?.speaking) {
+        console.log('[CONTROLLER] Auto-reset triggered due to stuck state');
+        this.forceReset();
+      }
+    }, 5000);
   }
 
   // Pause current speech
@@ -191,23 +207,29 @@ class SpeechController {
     } = {}
   ): Promise<boolean> {
     console.log(`[CONTROLLER] Speak request: "${text.substring(0, 50)}..."`);
+    console.log('[CONTROLLER] Current state before speak:', {
+      isActive: this.state.isActive,
+      browserSpeaking: window.speechSynthesis?.speaking,
+      browserPaused: window.speechSynthesis?.paused
+    });
     
     // Check if we're actually blocked or just think we are
     const actualSpeaking = window.speechSynthesis?.speaking || false;
-    if (this.state.isActive && actualSpeaking) {
-      console.log('[CONTROLLER] Actually speaking, rejecting new request');
+    const actualPaused = window.speechSynthesis?.paused || false;
+    
+    if (this.state.isActive && (actualSpeaking || actualPaused)) {
+      console.log('[CONTROLLER] Actually speaking/paused, rejecting new request');
       return false;
     }
     
     // If we think we're active but aren't actually speaking, reset state
-    if (this.state.isActive && !actualSpeaking) {
+    if (this.state.isActive && !actualSpeaking && !actualPaused) {
       console.log('[CONTROLLER] Correcting incorrect active state');
       this.forceReset();
     }
 
     if (!this.canPerformOperation()) {
-      console.log('[CONTROLLER] Speech operation throttled');
-      return false;
+      console.log('[CONTROLLER] Speech operation throttled but proceeding anyway');
     }
 
     // Stop any current speech first
@@ -259,12 +281,13 @@ class SpeechController {
         this.state.currentUtterance = utterance;
         
         // Start speaking
+        console.log('[CONTROLLER] About to call speechSynthesis.speak()');
         window.speechSynthesis.speak(utterance);
-        console.log('[CONTROLLER] Speech initiated');
+        console.log('[CONTROLLER] Speech initiated, state updated to active');
 
-        // Fallback timeout in case events don't fire
+        // Enhanced fallback timeout with better detection
         setTimeout(() => {
-          if (this.state.currentUtterance === utterance && !window.speechSynthesis.speaking) {
+          if (this.state.currentUtterance === utterance && !window.speechSynthesis.speaking && !this.state.isPaused) {
             console.warn('[CONTROLLER] Speech may have failed silently, cleaning up');
             this.state.isActive = false;
             this.state.currentUtterance = null;
@@ -272,7 +295,7 @@ class SpeechController {
             this.notifyListeners();
             resolve(false);
           }
-        }, 500);
+        }, 1000); // Longer timeout for detection
 
       } catch (error) {
         console.error('[CONTROLLER] Error setting up speech:', error);
@@ -288,6 +311,10 @@ class SpeechController {
     if (this.stateCheckInterval) {
       clearInterval(this.stateCheckInterval);
       this.stateCheckInterval = null;
+    }
+    if (this.forceResetTimeout) {
+      clearTimeout(this.forceResetTimeout);
+      this.forceResetTimeout = null;
     }
     this.stop();
     this.listeners.clear();
