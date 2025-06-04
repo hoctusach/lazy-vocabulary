@@ -1,7 +1,7 @@
 
 /**
  * Common types and interfaces for validation
- * Updated with improved XSS patterns that don't interfere with grammatical notation
+ * Updated with more precise XSS patterns that preserve linguistic notation
  */
 
 export interface ValidationResult {
@@ -10,46 +10,57 @@ export interface ValidationResult {
   errors: string[];
 }
 
-// XSS prevention patterns - updated to be more specific and not interfere with legitimate brackets
+// XSS prevention patterns - made more specific to avoid interfering with linguistic notation
 export const XSS_PATTERNS = [
-  // Script tags
+  // Script tags (case insensitive)
   /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
   // JavaScript protocols
   /javascript\s*:/gi,
-  // Event handlers (on* attributes)
-  /\son\w+\s*=/gi,
+  // Event handlers (on* attributes) - more specific
+  /\s+on\w+\s*=\s*["'][^"']*["']/gi,
+  /\s+on\w+\s*=\s*[^>\s]+/gi,
   // Dangerous HTML elements
-  /<iframe[^>]*>/gi,
-  /<object[^>]*>/gi,
-  /<embed[^>]*>/gi,
-  /<link[^>]*>/gi,
-  /<meta[^>]*>/gi,
-  // Data URLs with HTML content
-  /data:text\/html/gi,
+  /<iframe\b[^>]*>/gi,
+  /<object\b[^>]*>/gi,
+  /<embed\b[^>]*>/gi,
+  /<link\b[^>]*>/gi,
+  /<meta\b[^>]*>/gi,
+  /<style\b[^>]*>/gi,
+  // Data URLs with HTML/JavaScript content
+  /data:\s*text\/html/gi,
+  /data:\s*application\/javascript/gi,
   // VBScript
   /vbscript\s*:/gi,
   // CSS expressions
   /expression\s*\(/gi,
   // Form elements (to prevent form injection)
-  /<form[^>]*>/gi,
-  /<input[^>]*>/gi,
-  /<button[^>]*>/gi,
+  /<form\b[^>]*>/gi,
+  /<input\b[^>]*>/gi,
+  /<button\b[^>]*>/gi,
+  /<textarea\b[^>]*>/gi,
   // Comment-based attacks
-  /<!--[\s\S]*?-->/g
+  /<!--[\s\S]*?-->/g,
+  // Base64 encoded scripts
+  /data:\s*[^;]+;base64,/gi
 ];
 
-// SQL injection patterns - kept more conservative
+// SQL injection patterns - kept conservative but more precise
 export const SQL_INJECTION_PATTERNS = [
-  // SQL keywords (case-insensitive, word boundaries)
-  /\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b/gi,
-  // SQL comment indicators
-  /(--|\#|\/\*|\*\/)/g,
-  // Common SQL injection patterns
-  /(\b(OR|AND)\b.*[=<>])/gi,
-  // Quote-based injections
-  /['"]\s*(OR|AND)\s*['"]/gi,
-  // Semicolon-based command separation (be careful with this)
-  /;\s*(SELECT|INSERT|UPDATE|DELETE|DROP)/gi
+  // SQL keywords with clear attack patterns (case-insensitive, word boundaries)
+  /\b(SELECT\s+\*\s+FROM|INSERT\s+INTO|UPDATE\s+.*\s+SET|DELETE\s+FROM|DROP\s+TABLE|CREATE\s+TABLE|ALTER\s+TABLE|EXEC|UNION\s+SELECT)\b/gi,
+  // SQL comment indicators at start of injection attempts
+  /^\s*(--|\#|\/\*)/g,
+  /;\s*(--|\#|\/\*)/g,
+  // Clear injection patterns
+  /'\s*(OR|AND)\s+.*[=<>]/gi,
+  /"\s*(OR|AND)\s+.*[=<>]/gi,
+  // Semicolon-based command separation with dangerous keywords
+  /;\s*(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)/gi,
+  // Classic injection patterns
+  /'\s*OR\s+'?1'?\s*='?1/gi,
+  /'\s*OR\s+'?true'?\s*--/gi,
+  // UNION injection attempts
+  /UNION\s+(ALL\s+)?SELECT/gi
 ];
 
 // File upload validation constants
