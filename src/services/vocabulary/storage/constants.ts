@@ -1,0 +1,12 @@
+
+/**
+ * Constants for data validation limits
+ */
+export const VALIDATION_LIMITS = {
+  MAX_WORDS_PER_SHEET: 10000,
+  MAX_TOTAL_WORDS: 50000,
+  MAX_WORD_LENGTH: 100,
+  MAX_MEANING_LENGTH: 500,
+  MAX_EXAMPLE_LENGTH: 1000,
+  MAX_COUNT: 1000000,
+};
