@@ -23,7 +23,7 @@ export interface VoiceSelection {
 // Simplified voice options - only using female voices since those are the ones we've identified
 const VOICE_OPTIONS: VoiceSelection[] = [
   { label: "US-F", region: "US", gender: "female", index: 0 },
-  { label: "UK-F", region: "UK", gender: "female", index: 2 },
+  { label: "UK-F", region: "UK", gender: "female", index: 1 },
 ];
 
 const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[0];
