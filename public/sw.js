@@ -1,7 +1,19 @@
 
 // Service worker for push notifications
 self.addEventListener('push', function(event) {
-  const data = event.data.json();
+  if (!event.data) {
+    console.error('Push event received but no data');
+    return;
+  }
+
+  let data;
+  try {
+    data = event.data.json();
+  } catch (err) {
+    console.error('Unable to parse push data:', err);
+    return;
+  }
+
   const options = {
     body: data.meaning,
     icon: '/favicon.ico',
