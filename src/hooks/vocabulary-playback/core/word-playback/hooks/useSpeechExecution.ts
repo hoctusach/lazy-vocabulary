@@ -93,8 +93,8 @@ export const useSpeechExecution = (
           case 'network':
             handlePermissionError('network');
             break;
-          case 'interrupted':
-            console.log('[SPEECH-EXECUTION] Speech was interrupted, advancing without retry');
+          case 'canceled':
+            console.log('[SPEECH-EXECUTION] Speech was canceled, advancing without retry');
             setTimeout(() => goToNextWord(), 1000);
             return;
           default:
@@ -102,7 +102,7 @@ export const useSpeechExecution = (
         }
         
         // Handle retry logic for retryable errors
-        if (event.error !== 'interrupted' && incrementRetryAttempts()) {
+        if (event.error !== 'canceled' && incrementRetryAttempts()) {
           console.log('[SPEECH-EXECUTION] Retrying after error');
           setTimeout(() => {
             if (!paused && !muted && !wordTransitionRef.current) {
@@ -110,7 +110,7 @@ export const useSpeechExecution = (
               // The main hook should handle the retry
             }
           }, 1000);
-        } else if (event.error !== 'interrupted') {
+        } else if (event.error !== 'canceled') {
           console.log('[SPEECH-EXECUTION] Max retries reached or non-retryable error, advancing');
           setTimeout(() => goToNextWord(), 1500);
         }
