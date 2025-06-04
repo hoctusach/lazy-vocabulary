@@ -1,5 +1,5 @@
 
-import { validateVocabularyWord, validateMeaning, validateExample } from './vocabularyValidation';
+import { validateVocabularyWord, validateMeaning, validateExample } from './validation';
 
 /**
  * Test function to validate that our patterns work with comprehensive dictionary notation

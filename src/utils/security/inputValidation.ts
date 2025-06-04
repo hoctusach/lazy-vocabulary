@@ -16,12 +16,12 @@ export {
 // Export sanitization utilities
 export { sanitizeInput, sanitizeUserInput } from './sanitization';
 
-// Export vocabulary validation functions
+// Export vocabulary validation functions from the new modular structure
 export { 
   validateVocabularyWord, 
   validateMeaning, 
   validateExample 
-} from './vocabularyValidation';
+} from './validation';
 
 // Export file validation
 export { validateFileUpload } from './fileValidation';
