@@ -11,22 +11,24 @@ export const usePlaybackConditions = () => {
     muted: boolean,
     paused: boolean,
     isPlayInProgress: () => boolean,
+    resetPlayInProgress: () => void,
     wordTransitionRef: React.MutableRefObject<boolean>
   ) => {
     console.log('[PLAYBACK-CONDITIONS] Checking conditions for playback');
-    
-    // Prevent overlapping play attempts
-    if (isPlayInProgress()) {
-      console.log('[PLAYBACK-CONDITIONS] Play already in progress, skipping');
-      return { canPlay: false, reason: 'play-in-progress' };
-    }
 
-    // Enhanced controller state check with forced recovery
+    // First, check controller state
     const controllerActive = speechController.isActive();
     console.log('[PLAYBACK-CONDITIONS] Speech controller state check:', {
       controllerActive,
       shouldAttemptRecovery: controllerActive && !window.speechSynthesis.speaking
     });
+
+    if (!controllerActive && isPlayInProgress()) {
+      console.log('[PLAYBACK-CONDITIONS] Controller inactive but play-in-progress flag set, resetting');
+      resetPlayInProgress();
+      console.log('[PLAYBACK-CONDITIONS] Play in progress flag cleared');
+      return { canPlay: true };
+    }
 
     if (controllerActive) {
       const actualSpeaking = window.speechSynthesis?.speaking || false;
@@ -42,6 +44,12 @@ export const usePlaybackConditions = () => {
         console.log('[PLAYBACK-CONDITIONS] Controller legitimately active, skipping');
         return { canPlay: false, reason: 'controller-active' };
       }
+    }
+
+    // Prevent overlapping play attempts if nothing is speaking
+    if (isPlayInProgress()) {
+      console.log('[PLAYBACK-CONDITIONS] Play already in progress, skipping');
+      return { canPlay: false, reason: 'play-in-progress' };
     }
     
     // Don't try to play during word transitions
