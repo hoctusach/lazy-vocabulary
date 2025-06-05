@@ -34,7 +34,11 @@ export const usePlaybackOrchestrator = (
   const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
   
   // Use our smaller hooks
-  const { setPlayInProgress, isPlayInProgress } = usePlayInProgress();
+  const { playInProgressRef, setPlayInProgress, isPlayInProgress } = usePlayInProgress();
+
+  const resetPlayInProgress = useCallback(() => {
+    playInProgressRef.current = false;
+  }, [playInProgressRef]);
   const { validateAndPrepareContent } = useContentValidation();
   const { checkPlaybackConditions, handleControllerReset } = usePlaybackConditions();
   
@@ -174,6 +178,7 @@ export const usePlaybackOrchestrator = (
   return {
     currentWord,
     playCurrentWord,
-    hasSpeechPermission
+    hasSpeechPermission,
+    resetPlayInProgress
   };
 };

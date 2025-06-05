@@ -37,7 +37,7 @@ export const useWordPlaybackLogic = (
   ) => SpeechSynthesisUtterance
 ) => {
   // Use the orchestrated playback flow hook
-  const { currentWord, playCurrentWord, hasSpeechPermission } = usePlaybackFlow(
+  const { currentWord, playCurrentWord, hasSpeechPermission, resetPlayInProgress } = usePlaybackFlow(
     wordList,
     currentIndex,
     muted,
@@ -59,6 +59,7 @@ export const useWordPlaybackLogic = (
   return {
     currentWord,
     playCurrentWord,
-    hasSpeechPermission
+    hasSpeechPermission,
+    resetPlayInProgress
   };
 };
