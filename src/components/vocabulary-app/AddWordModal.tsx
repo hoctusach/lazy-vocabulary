@@ -139,7 +139,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       return;
     }
     
-    let timeoutId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
     try {
       setIsSearching(true);
       setSearchError('');
