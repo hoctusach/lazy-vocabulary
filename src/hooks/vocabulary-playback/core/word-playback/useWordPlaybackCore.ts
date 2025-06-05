@@ -45,7 +45,7 @@ export const useWordPlaybackCore = (
   );
   
   // Core playback logic
-  const { currentWord, playCurrentWord } = useWordPlaybackLogic(
+  const { currentWord, playCurrentWord, resetPlayInProgress } = useWordPlaybackLogic(
     wordList,
     currentIndex,
     muted,
@@ -84,6 +84,7 @@ export const useWordPlaybackCore = (
     currentWord,
     playCurrentWord,
     goToNextWord,
-    hasSpeechPermission
+    hasSpeechPermission,
+    resetPlayInProgress
   };
 };

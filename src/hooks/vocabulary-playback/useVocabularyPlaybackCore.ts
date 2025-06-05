@@ -41,16 +41,16 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
   } = useVoiceManagement();
   
   // Use the consolidated playback state from word-playback hooks
-  const { 
-    currentIndex, 
-    setCurrentIndex 
+  const {
+    currentIndex,
+    setCurrentIndex
   } = usePlaybackState();
-  
+
   // Reference to store if voices have been loaded
   const voicesLoadedRef = useRef(false);
-  
-  // Handle speech cancellation
-  const { cancelSpeech } = useSpeechCancellation(speakingRef, setIsSpeaking);
+
+  // Mutable reference for the cancelSpeech function provided to other hooks
+  const cancelSpeechRef = useRef<() => void>(() => {});
   
   // Initialize playCurrentWord as an empty function that will be updated with the actual implementation
   const playCurrentWordRef = useRef<() => void>(() => {
@@ -58,19 +58,20 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
   });
   
   // Get word playback functionality - start unmuted and unpaused
-  const { 
+  const {
     utteranceRef,
-    currentWord, 
-    playCurrentWord: playCurrentWordInternal, 
+    currentWord,
+    playCurrentWord: playCurrentWordInternal,
     goToNextWord,
-    hasSpeechPermission
+    hasSpeechPermission,
+    resetPlayInProgress
   } = useWordPlayback(
     wordList,
     currentIndex,
     setCurrentIndex,
     false, // Start unmuted for auto-play
     false, // Start unpaused for auto-play
-    cancelSpeech,
+    () => cancelSpeechRef.current(),
     findVoice,
     selectedVoice,
     userInteractionRef,
@@ -80,6 +81,15 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     incrementRetryAttempts,
     checkSpeechSupport
   );
+
+  // Obtain the cancelSpeech function now that resetPlayInProgress is available
+  const { cancelSpeech } = useSpeechCancellation(
+    speakingRef,
+    setIsSpeaking,
+    resetPlayInProgress
+  );
+  // Update the ref so other hooks use the latest implementation
+  cancelSpeechRef.current = cancelSpeech;
   
   // Update the playCurrentWordRef with the actual implementation
   playCurrentWordRef.current = playCurrentWordInternal;
