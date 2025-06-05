@@ -8,9 +8,13 @@ export interface NotificationOptions {
 class NotificationService {
   private swRegistration: ServiceWorkerRegistration | null = null;
   private isSubscribed: boolean = false;
-  private applicationServerPublicKey: string = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U'; // Replace with your VAPID key
+  private applicationServerPublicKey: string | undefined = import.meta.env.VITE_VAPID_PUBLIC_KEY; // VAPID key loaded from environment
   
   async initialize() {
+    if (!this.applicationServerPublicKey) {
+      console.warn('VAPID public key is missing. Push notification setup skipped.');
+      return false;
+    }
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
@@ -54,7 +58,11 @@ class NotificationService {
   
   async subscribe(): Promise<boolean> {
     if (!this.swRegistration) return false;
-    
+    if (!this.applicationServerPublicKey) {
+      console.error('Cannot subscribe: VAPID public key is missing.');
+      return false;
+    }
+
     try {
       const applicationServerKey = this.urlB64ToUint8Array(this.applicationServerPublicKey);
       const subscription = await this.swRegistration.pushManager.subscribe({
