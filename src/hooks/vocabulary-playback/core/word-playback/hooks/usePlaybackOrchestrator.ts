@@ -37,6 +37,7 @@ export const usePlaybackOrchestrator = (
   const { playInProgressRef, setPlayInProgress, isPlayInProgress } = usePlayInProgress();
 
   const resetPlayInProgress = useCallback(() => {
+    console.log('[PLAYBACK-ORCHESTRATOR] Resetting play in progress flag');
     playInProgressRef.current = false;
   }, [playInProgressRef]);
   const { validateAndPrepareContent } = useContentValidation();
@@ -87,6 +88,7 @@ export const usePlaybackOrchestrator = (
       muted,
       paused,
       isPlayInProgress,
+      resetPlayInProgress,
       wordTransitionRef
     );
 
