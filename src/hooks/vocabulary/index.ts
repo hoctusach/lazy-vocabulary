@@ -5,7 +5,6 @@ export * from './useWordNavigation';
 export * from './useCategoryActions';
 export * from './useVocabularyData';
 export * from './useErrorHandling';
-export * from './useModalState';
 export * from './usePauseState';
 export * from './useVocabularyFileHandler';
 export * from './useVocabularyManager';
