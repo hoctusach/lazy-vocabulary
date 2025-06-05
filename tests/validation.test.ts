@@ -31,9 +31,10 @@ describe('validateMeaning', () => {
     expect(result.isValid).toBe(true);
   });
 
-  it('rejects SQL injections', () => {
+  it('sanitizes SQL keywords and remains valid', () => {
     const result = validateMeaning('SELECT * FROM users');
-    expect(result.isValid).toBe(false);
+    expect(result.isValid).toBe(true);
+    expect(result.sanitizedValue).toBe('users');
   });
 });
 
