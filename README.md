@@ -50,6 +50,21 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+## Running tests and lint checks
+
+First, ensure dependencies are installed so that **vitest** and **ESLint** are available:
+
+```sh
+npm i
+```
+
+Then run the test suite and linter:
+
+```sh
+npm test       # execute unit tests with vitest
+npm run lint   # check code style with ESLint
+```
+
 ## What technologies are used for this project?
 
 This project is built with:
