@@ -30,8 +30,30 @@ export const usePlaybackOrchestrator = (
   ensureVoicesLoaded: () => Promise<boolean>,
   permissionErrorShownRef: React.MutableRefObject<boolean>
 ) => {
-  // Get the current word based on the index
-  const currentWord = wordList.length > 0 ? wordList[currentIndex] : null;
+  // Enhanced current word calculation with comprehensive debugging
+  const currentWord = (() => {
+    console.log('[PLAYBACK-ORCHESTRATOR] === Current Word Calculation Debug ===');
+    console.log('[PLAYBACK-ORCHESTRATOR] Word list length:', wordList?.length || 0);
+    console.log('[PLAYBACK-ORCHESTRATOR] Current index:', currentIndex);
+    console.log('[PLAYBACK-ORCHESTRATOR] Word list sample:', wordList?.slice(0, 3).map(w => w.word));
+    
+    if (!wordList || wordList.length === 0) {
+      console.log('[PLAYBACK-ORCHESTRATOR] No word list available');
+      return null;
+    }
+    
+    if (currentIndex < 0 || currentIndex >= wordList.length) {
+      console.log('[PLAYBACK-ORCHESTRATOR] Index out of bounds, clamping to valid range');
+      const clampedIndex = Math.max(0, Math.min(currentIndex, wordList.length - 1));
+      const word = wordList[clampedIndex];
+      console.log('[PLAYBACK-ORCHESTRATOR] Clamped index:', clampedIndex, 'Word:', word?.word);
+      return word;
+    }
+    
+    const word = wordList[currentIndex];
+    console.log('[PLAYBACK-ORCHESTRATOR] Selected word at index', currentIndex, ':', word?.word);
+    return word;
+  })();
   
   // Use our smaller hooks
   const { playInProgressRef, setPlayInProgress, isPlayInProgress } = usePlayInProgress();
@@ -40,6 +62,7 @@ export const usePlaybackOrchestrator = (
     console.log('[PLAYBACK-ORCHESTRATOR] Resetting play in progress flag');
     playInProgressRef.current = false;
   }, [playInProgressRef]);
+  
   const { validateAndPrepareContent } = useContentValidation();
   const { checkPlaybackConditions, handleControllerReset } = usePlaybackConditions();
   
@@ -74,6 +97,8 @@ export const usePlaybackOrchestrator = (
     const debugState = {
       hasCurrentWord: !!currentWord,
       wordText: currentWord?.word,
+      wordListLength: wordList?.length || 0,
+      currentIndex,
       muted,
       paused,
       playInProgress: isPlayInProgress(),
@@ -159,6 +184,8 @@ export const usePlaybackOrchestrator = (
     }
   }, [
     currentWord,
+    wordList,
+    currentIndex,
     muted,
     paused,
     isPlayInProgress,
@@ -176,6 +203,8 @@ export const usePlaybackOrchestrator = (
     checkPlaybackConditions,
     handleControllerReset
   ]);
+
+  console.log('[PLAYBACK-ORCHESTRATOR] Final return - currentWord:', currentWord?.word);
 
   return {
     currentWord,

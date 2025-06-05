@@ -8,13 +8,28 @@ import { useState, useEffect } from "react";
 import { vocabularyService } from "@/services/vocabularyService";
 
 export const useVocabularyContainerState = () => {
+  console.log('[VOCAB-CONTAINER-STATE] === Hook Initialization ===');
+  
   // State for the current vocabulary list
   const [wordList, setWordList] = useState(vocabularyService.getWordList() || []);
+  
+  console.log('[VOCAB-CONTAINER-STATE] Initial word list:', {
+    length: wordList?.length || 0,
+    firstWord: wordList?.[0]?.word,
+    sample: wordList?.slice(0, 3).map(w => w.word)
+  });
   
   // Update word list when vocabulary changes
   useEffect(() => {
     const handleVocabularyChange = () => {
-      setWordList(vocabularyService.getWordList() || []);
+      console.log('[VOCAB-CONTAINER-STATE] Vocabulary change detected');
+      const newWordList = vocabularyService.getWordList() || [];
+      console.log('[VOCAB-CONTAINER-STATE] New word list:', {
+        length: newWordList.length,
+        firstWord: newWordList[0]?.word,
+        sample: newWordList.slice(0, 3).map(w => w.word)
+      });
+      setWordList(newWordList);
     };
     
     // Set up the listener
@@ -42,6 +57,12 @@ export const useVocabularyContainerState = () => {
     jsonLoadError
   } = useVocabularyManager();
 
+  console.log('[VOCAB-CONTAINER-STATE] Vocabulary manager state:', {
+    hasData,
+    currentWord: currentWord?.word,
+    isPaused
+  });
+
   // Audio sync management
   const {
     isSoundPlaying,
@@ -52,6 +73,15 @@ export const useVocabularyContainerState = () => {
 
   // Get category information
   const { currentCategory, nextCategory } = useCategoryNavigation();
+
+  console.log('[VOCAB-CONTAINER-STATE] Final state summary:', {
+    hasData,
+    currentWord: currentWord?.word,
+    wordListLength: wordList?.length || 0,
+    currentCategory,
+    isPaused,
+    isSoundPlaying
+  });
 
   // Combine all state and handlers
   return {

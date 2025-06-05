@@ -14,6 +14,8 @@ import { useAutoPlayOnDataLoad } from "@/hooks/vocabulary-app/useAutoPlayOnDataL
 import { useUserInteractionHandlers } from "./interactive/UserInteractionHandlers";
 
 const VocabularyAppContainer: React.FC = () => {
+  console.log('[VOCAB-CONTAINER] === Component Render ===');
+  
   // Get base vocabulary state
   const {
     hasData,
@@ -28,6 +30,13 @@ const VocabularyAppContainer: React.FC = () => {
     debugPanelData,
     wordList
   } = useVocabularyContainerState();
+
+  console.log('[VOCAB-CONTAINER] Container state:', {
+    hasData,
+    originalCurrentWord: originalCurrentWord?.word,
+    wordListLength: wordList?.length || 0,
+    currentCategory
+  });
 
   // Use our new unified playback hook for all speech functionality
   const {
@@ -45,6 +54,13 @@ const VocabularyAppContainer: React.FC = () => {
     isSpeaking,
     allVoiceOptions
   } = useVocabularyPlayback(wordList || []);
+
+  console.log('[VOCAB-CONTAINER] Playback state:', {
+    playbackCurrentWord: playbackCurrentWord?.word,
+    muted,
+    paused,
+    isSpeaking
+  });
 
   // Use our extracted hooks for audio initialization and interaction handling
   useAudioInitialization({
@@ -77,7 +93,36 @@ const VocabularyAppContainer: React.FC = () => {
   } = useWordModalState();
 
   // Use the current word from playback system as single source of truth
-  const displayWord = playbackCurrentWord || originalCurrentWord;
+  // But add fallback logic for better reliability
+  const displayWord = (() => {
+    console.log('[VOCAB-CONTAINER] Determining display word:', {
+      playbackCurrentWord: playbackCurrentWord?.word,
+      originalCurrentWord: originalCurrentWord?.word,
+      hasData,
+      wordListLength: wordList?.length || 0
+    });
+    
+    if (playbackCurrentWord) {
+      console.log('[VOCAB-CONTAINER] Using playback current word:', playbackCurrentWord.word);
+      return playbackCurrentWord;
+    }
+    
+    if (originalCurrentWord) {
+      console.log('[VOCAB-CONTAINER] Falling back to original current word:', originalCurrentWord.word);
+      return originalCurrentWord;
+    }
+    
+    // Final fallback - use first word from list if available
+    if (wordList && wordList.length > 0) {
+      console.log('[VOCAB-CONTAINER] Using first word from list as fallback:', wordList[0].word);
+      return wordList[0];
+    }
+    
+    console.log('[VOCAB-CONTAINER] No display word available');
+    return null;
+  })();
+
+  console.log('[VOCAB-CONTAINER] Final display word:', displayWord?.word);
 
   // Word management operations
   const wordManager = displayWord ? VocabularyWordManager({
