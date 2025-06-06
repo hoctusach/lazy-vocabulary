@@ -22,8 +22,8 @@ export interface VoiceSelection {
 
 // Simplified voice options - only using female voices since those are the ones we've identified
 const VOICE_OPTIONS: VoiceSelection[] = [
-  { label: "US-F", region: "US", gender: "female", index: 0 },
-  { label: "UK-F", region: "UK", gender: "female", index: 1 },
+  { label: "US", region: "US", gender: "female", index: 0 },
+  { label: "UK", region: "UK", gender: "female", index: 1 },
 ];
 
 const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[0];
@@ -71,13 +71,13 @@ export const useVoiceSelection = () => {
         // Create simplified voice options
         const voiceOptions: VoiceOption[] = [
           {
-            label: "US-F",
+            label: "US",
             region: "US" as const,
             gender: "female" as const,
             voice: usVoice || null
           },
           {
-            label: "UK-F",
+            label: "UK",
             region: "UK" as const,
             gender: "female" as const,
             voice: ukVoice || null
@@ -85,8 +85,8 @@ export const useVoiceSelection = () => {
         ];
         
         console.log('Voice options created:');
-        console.log(`US-F voice: ${voiceOptions[0].voice?.name || 'not found'}`);
-        console.log(`UK-F voice: ${voiceOptions[1].voice?.name || 'not found'}`);
+        console.log(`US voice: ${voiceOptions[0].voice?.name || 'not found'}`);
+        console.log(`UK voice: ${voiceOptions[1].voice?.name || 'not found'}`);
         
         setVoices(voiceOptions);
         
