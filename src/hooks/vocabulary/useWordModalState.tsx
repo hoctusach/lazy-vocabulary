@@ -31,6 +31,7 @@ export const useWordModalState = () => {
 
   return {
     isAddWordModalOpen,
+    setIsAddWordModalOpen,
     isEditMode,
     wordToEdit,
     handleOpenAddWordModal,
