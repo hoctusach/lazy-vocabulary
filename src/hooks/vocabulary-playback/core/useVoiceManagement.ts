@@ -13,8 +13,8 @@ const UK_VOICE_NAME = "Google UK English Female";
 export const useVoiceManagement = () => {
   // Define voice options with consistent structure
   const allVoiceOptions: VoiceSelection[] = [
-    { label: "US-F", region: "US", gender: "female", index: 0 },
-    { label: "UK-F", region: "UK", gender: "female", index: 1 }
+    { label: "US", region: "US", gender: "female", index: 0 },
+    { label: "UK", region: "UK", gender: "female", index: 1 }
   ];
   
   const [voiceIndex, setVoiceIndex] = useState(0);
