@@ -125,5 +125,5 @@ if (typeof window !== 'undefined') {
   interface WindowWithValidation extends Window {
     testValidationPatterns: typeof testValidationPatterns;
   }
-  (window as WindowWithValidation).testValidationPatterns = testValidationPatterns;
+  (window as unknown as WindowWithValidation).testValidationPatterns = testValidationPatterns;
 }
