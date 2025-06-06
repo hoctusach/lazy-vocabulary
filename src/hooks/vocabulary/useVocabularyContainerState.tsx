@@ -1,7 +1,7 @@
 
 import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
 import { useVocabularyAudioSync } from "@/hooks/useVocabularyAudioSync";
-import { useModalState } from "./useModalState";
+import { useWordModalState } from "./useWordModalState";
 import { useCategoryNavigation } from "./useCategoryNavigation";
 import { useSpeechControl } from "./useSpeechControl";
 import { useState, useEffect } from "react";
@@ -41,8 +41,8 @@ export const useVocabularyContainerState = () => {
     };
   }, []);
   
-  // Get modal state
-  const { isAddWordModalOpen, setIsAddWordModalOpen } = useModalState();
+  // Get modal state using the correct hook
+  const { isAddWordModalOpen, setIsAddWordModalOpen } = useWordModalState();
 
   // Vocabulary manager for handling word navigation
   const {
