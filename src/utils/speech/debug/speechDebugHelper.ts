@@ -88,6 +88,6 @@ if (typeof window !== 'undefined') {
   interface WindowWithSpeechDebug extends Window {
     speechDebugHelper: typeof speechDebugHelper;
   }
-  (window as WindowWithSpeechDebug).speechDebugHelper = speechDebugHelper;
+  (window as unknown as WindowWithSpeechDebug).speechDebugHelper = speechDebugHelper;
   console.log('Speech debug helper available as window.speechDebugHelper');
 }
