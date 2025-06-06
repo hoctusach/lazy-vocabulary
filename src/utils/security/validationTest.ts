@@ -122,5 +122,8 @@ export const testValidationPatterns = () => {
 
 // Make it available globally for console testing
 if (typeof window !== 'undefined') {
-  (window as any).testValidationPatterns = testValidationPatterns;
+  interface WindowWithValidation extends Window {
+    testValidationPatterns: typeof testValidationPatterns;
+  }
+  (window as WindowWithValidation).testValidationPatterns = testValidationPatterns;
 }

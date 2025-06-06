@@ -15,23 +15,24 @@ export const speak = (
   region: 'US' | 'UK' = 'US', 
   pauseRequestedRef?: React.MutableRefObject<boolean>
 ): Promise<string> => {
-  return new Promise(async (resolve, reject) => {
-    if (isMutedFromLocalStorage()) {
-      console.log('Speech is muted, resolving immediately');
-      resolve('skipped');
-      return;
-    }
+  return new Promise((resolve, reject) => {
+    const run = async () => {
+      if (isMutedFromLocalStorage()) {
+        console.log('Speech is muted, resolving immediately');
+        resolve('skipped');
+        return;
+      }
 
-    if (!window.speechSynthesis) {
-      console.error('Speech synthesis not supported');
-      reject(new Error('Speech synthesis not supported'));
-      return;
-    }
+      if (!window.speechSynthesis) {
+        console.error('Speech synthesis not supported');
+        reject(new Error('Speech synthesis not supported'));
+        return;
+      }
 
-    try {
-      // Ensure we're not trying to speak multiple things at once
-      await ensureSpeechEngineReady();
-      stopSpeaking();
+      try {
+        // Ensure we're not trying to speak multiple things at once
+        await ensureSpeechEngineReady();
+        stopSpeaking();
 
       // Wait for DOM to update before continuing
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -86,9 +87,12 @@ export const speak = (
           reject(new Error('Could not load voices'));
         }
       }
-    } catch (err) {
-      console.error('Unexpected error in speak function:', err);
-      reject(err);
-    }
+      } catch (err) {
+        console.error('Unexpected error in speak function:', err);
+        reject(err);
+      }
+    };
+
+    void run();
   });
 };

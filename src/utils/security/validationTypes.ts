@@ -49,8 +49,8 @@ export const SQL_INJECTION_PATTERNS = [
   // SQL keywords with clear attack patterns (case-insensitive, word boundaries)
   /\b(SELECT\s+\*\s+FROM|INSERT\s+INTO|UPDATE\s+.*\s+SET|DELETE\s+FROM|DROP\s+TABLE|CREATE\s+TABLE|ALTER\s+TABLE|EXEC|UNION\s+SELECT)\b/gi,
   // SQL comment indicators at start of injection attempts
-  /^\s*(--|\#|\/\*)/g,
-  /;\s*(--|\#|\/\*)/g,
+  /^\s*(--|#|\/\*)/g,
+  /;\s*(--|#|\/\*)/g,
   // Clear injection patterns
   /'\s*(OR|AND)\s+.*[=<>]/gi,
   /"\s*(OR|AND)\s+.*[=<>]/gi,
