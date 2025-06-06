@@ -27,7 +27,6 @@ const VocabularyAppContainer: React.FC = () => {
     currentCategory,
     nextCategory,
     displayTime,
-    debugPanelData,
     wordList
   } = useVocabularyContainerState();
 
@@ -124,6 +123,11 @@ const VocabularyAppContainer: React.FC = () => {
 
   console.log('[VOCAB-CONTAINER] Final display word:', displayWord?.word);
 
+  // Derive debug data from the word currently displayed
+  const debugData = displayWord
+    ? { word: displayWord.word, category: displayWord.category || currentCategory }
+    : null;
+
   // Word management operations
   const wordManager = displayWord ? VocabularyWordManager({
     currentWord: displayWord,
@@ -175,7 +179,7 @@ const VocabularyAppContainer: React.FC = () => {
           handleManualNext={handleManualNext}
           displayTime={displayTime}
           selectedVoice={selectedVoice}
-          debugPanelData={debugPanelData}
+          debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}
           handleSaveWord={handleSaveWord}
