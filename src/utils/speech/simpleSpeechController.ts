@@ -1,4 +1,6 @@
 
+import { unlockAudio, loadVoicesAndWait } from './core/speechEngine';
+
 /**
  * Simplified speech controller for reliable audio playback
  */
@@ -18,8 +20,12 @@ class SimpleSpeechController {
       onError?: (error: SpeechSynthesisErrorEvent) => void;
     } = {}
   ): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       try {
+        // Ensure browser audio is unlocked and voices are available
+        await unlockAudio();
+        await loadVoicesAndWait();
+
         // Stop any current speech
         this.stop();
         
