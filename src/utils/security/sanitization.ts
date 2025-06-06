@@ -35,9 +35,11 @@ export const sanitizeInput = (input: string): string => {
   });
   
   // Remove null bytes but preserve other characters that might be valid in linguistic notation
+  // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/\x00/g, '');
   
   // Only remove the most dangerous control characters, preserve others that might be linguistic
+  // eslint-disable-next-line no-control-regex
   sanitized = sanitized.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
   
   // Be much more selective about HTML entities - only remove clearly dangerous ones

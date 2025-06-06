@@ -85,6 +85,9 @@ export const speechDebugHelper = {
 
 // Make it available globally for console testing
 if (typeof window !== 'undefined') {
-  (window as any).speechDebugHelper = speechDebugHelper;
+  interface WindowWithSpeechDebug extends Window {
+    speechDebugHelper: typeof speechDebugHelper;
+  }
+  (window as WindowWithSpeechDebug).speechDebugHelper = speechDebugHelper;
   console.log('Speech debug helper available as window.speechDebugHelper');
 }

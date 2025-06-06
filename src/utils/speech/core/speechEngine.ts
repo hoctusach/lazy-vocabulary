@@ -107,7 +107,12 @@ export const unlockAudio = (): Promise<boolean> => {
       console.log('[ENGINE] Attempting to unlock audio...');
       
       // Simple approach - just create an AudioContext if available
-      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      interface WindowWithWebAudio extends Window {
+        webkitAudioContext?: typeof AudioContext;
+      }
+
+      const AudioContext =
+        window.AudioContext || (window as WindowWithWebAudio).webkitAudioContext;
       if (!AudioContext) {
         console.log('[ENGINE] AudioContext not supported, using speech directly');
         resolve(true);

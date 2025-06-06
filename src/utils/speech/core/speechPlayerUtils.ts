@@ -17,7 +17,9 @@ export function isMutedFromLocalStorage(): boolean {
       const parsedStates = JSON.parse(storedStates);
       return parsedStates.isMuted === true;
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error('Error reading mute state from localStorage:', error);
+  }
   return false;
 }
 
