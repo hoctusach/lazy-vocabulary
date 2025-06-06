@@ -108,7 +108,7 @@ export const unlockAudio = (): Promise<boolean> => {
       
       // Simple approach - just create an AudioContext if available
       interface WindowWithWebAudio extends Window {
-        webkitAudioContext?: typeof AudioContext;
+        webkitAudioContext?: typeof globalThis.AudioContext;
       }
 
       const AudioContext =
