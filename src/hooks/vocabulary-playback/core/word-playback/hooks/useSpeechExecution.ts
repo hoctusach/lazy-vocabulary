@@ -5,7 +5,7 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 
 /**
- * Simplified speech execution hook with basic error handling
+ * Enhanced speech execution hook with comprehensive error handling
  */
 export const useSpeechExecution = (
   findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
@@ -28,100 +28,177 @@ export const useSpeechExecution = (
     speechableText: string,
     setPlayInProgress: (inProgress: boolean) => void
   ) => {
-    console.log('[SPEECH-EXECUTION] Starting speech for:', currentWord.word);
-    
-    // Check permissions first
-    const hasPermission = await checkSpeechPermissions();
-    if (!hasPermission) {
-      console.log('[SPEECH-EXECUTION] Permission check failed');
+    const sessionId = Math.random().toString(36).substring(7);
+    console.log(`[SPEECH-EXECUTION-${sessionId}] === Starting Enhanced Speech Process ===`);
+    console.log(`[SPEECH-EXECUTION-${sessionId}] Word: "${currentWord.word}"`);
+    console.log(`[SPEECH-EXECUTION-${sessionId}] Text length: ${speechableText.length}`);
+    console.log(`[SPEECH-EXECUTION-${sessionId}] State:`, { paused, muted, wordTransition: wordTransitionRef.current });
+
+    // Pre-flight validation
+    if (paused || muted) {
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Skipping due to state - paused: ${paused}, muted: ${muted}`);
       setPlayInProgress(false);
-      handlePermissionError('not-allowed');
       return false;
     }
 
-    // Find appropriate voice
-    const voice = findVoice(selectedVoice.region);
-    console.log('[SPEECH-EXECUTION] Selected voice:', voice?.name || 'default');
-
-    // Use simplified speech controller
-    const success = await simpleSpeechController.speak(speechableText, {
-      voice,
-      rate: 0.8,
-      pitch: 1.0,
-      volume: 1.0,
-      onStart: () => {
-        console.log(`[SPEECH-EXECUTION] Speech started for: ${currentWord.word}`);
-        speakingRef.current = true;
-        setIsSpeaking(true);
-      },
-      onEnd: () => {
-        console.log(`[SPEECH-EXECUTION] Speech ended for: ${currentWord.word}`);
-        speakingRef.current = false;
-        setIsSpeaking(false);
-        setPlayInProgress(false);
-        resetRetryAttempts();
-        
-        // Auto-advance if not paused or muted
-        if (!paused && !muted) {
-          console.log('[SPEECH-EXECUTION] Auto-advancing to next word');
-          setTimeout(() => {
-            goToNextWord();
-          }, 1500);
-        }
-      },
-      onError: (event) => {
-        console.error(`[SPEECH-EXECUTION] Speech error for "${currentWord.word}":`, event);
-        
-        speakingRef.current = false;
-        setIsSpeaking(false);
-        setPlayInProgress(false);
-        
-        // Handle different error types
-        const errorType = event.error as string;
-        
-        switch (errorType) {
-          case 'not-allowed':
-            setHasSpeechPermission(false);
-            handlePermissionError('not-allowed');
-            break;
-          case 'network':
-            handlePermissionError('network');
-            break;
-          case 'canceled':
-            console.log('[SPEECH-EXECUTION] Speech was canceled');
-            return;
-          case 'interrupted':
-            console.log('[SPEECH-EXECUTION] Speech was interrupted, advancing without retry');
-            setTimeout(() => goToNextWord(), 1000);
-            return;
-          default:
-            console.log('[SPEECH-EXECUTION] Handling generic speech error');
-        }
-        
-        // Simple retry logic
-        if (errorType !== 'interrupted' && incrementRetryAttempts()) {
-          console.log('[SPEECH-EXECUTION] Retrying after error');
-          setTimeout(() => {
-            if (!paused && !muted && !wordTransitionRef.current) {
-              setPlayInProgress(false);
-            }
-          }, 1000);
-        } else if (errorType !== 'interrupted') {
-          console.log('[SPEECH-EXECUTION] Max retries reached, advancing');
-          setTimeout(() => goToNextWord(), 1500);
-        }
-      }
-    });
-
-    if (!success) {
-      console.warn('[SPEECH-EXECUTION] Speech failed to start');
+    if (wordTransitionRef.current) {
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Skipping due to word transition in progress`);
       setPlayInProgress(false);
-      if (!paused && !muted) {
-        setTimeout(() => goToNextWord(), 3000);
-      }
+      return false;
     }
 
-    return success;
+    try {
+      // Check permissions
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Checking speech permissions`);
+      const hasPermission = await checkSpeechPermissions();
+      if (!hasPermission) {
+        console.log(`[SPEECH-EXECUTION-${sessionId}] Permission check failed`);
+        setPlayInProgress(false);
+        handlePermissionError('not-allowed');
+        return false;
+      }
+
+      // Find and validate voice
+      const voice = findVoice(selectedVoice.region);
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Voice selection:`, {
+        requested: selectedVoice.region,
+        found: voice?.name || 'system default',
+        lang: voice?.lang || 'unknown'
+      });
+
+      // Validate speech content
+      if (!speechableText || speechableText.trim().length === 0) {
+        console.warn(`[SPEECH-EXECUTION-${sessionId}] No valid content to speak`);
+        setPlayInProgress(false);
+        setTimeout(() => goToNextWord(), 1500);
+        return false;
+      }
+
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Initiating speech with enhanced monitoring`);
+
+      // Execute speech with comprehensive error handling
+      const success = await simpleSpeechController.speak(speechableText, {
+        voice,
+        rate: 0.8,
+        pitch: 1.0,
+        volume: 1.0,
+        onStart: () => {
+          console.log(`[SPEECH-EXECUTION-${sessionId}] ✓ Speech started successfully`);
+          speakingRef.current = true;
+          setIsSpeaking(true);
+          resetRetryAttempts(); // Reset on successful start
+        },
+        onEnd: () => {
+          console.log(`[SPEECH-EXECUTION-${sessionId}] ✓ Speech completed successfully`);
+          speakingRef.current = false;
+          setIsSpeaking(false);
+          setPlayInProgress(false);
+          
+          // Auto-advance with state validation
+          if (!paused && !muted && !wordTransitionRef.current) {
+            console.log(`[SPEECH-EXECUTION-${sessionId}] Auto-advancing to next word`);
+            setTimeout(() => {
+              // Double-check state before advancing
+              if (!paused && !muted && !wordTransitionRef.current) {
+                goToNextWord();
+              } else {
+                console.log(`[SPEECH-EXECUTION-${sessionId}] State changed during delay, not advancing`);
+              }
+            }, 1500);
+          } else {
+            console.log(`[SPEECH-EXECUTION-${sessionId}] Not auto-advancing due to state`);
+          }
+        },
+        onError: (event) => {
+          const errorDetails = {
+            error: event.error,
+            type: event.type,
+            isTrusted: event.isTrusted,
+            word: currentWord.word
+          };
+          
+          console.error(`[SPEECH-EXECUTION-${sessionId}] ✗ Speech error:`, errorDetails);
+          
+          speakingRef.current = false;
+          setIsSpeaking(false);
+          setPlayInProgress(false);
+          
+          // Enhanced error handling based on error type
+          switch (event.error) {
+            case 'not-allowed':
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Permission denied`);
+              setHasSpeechPermission(false);
+              handlePermissionError('not-allowed');
+              break;
+              
+            case 'network':
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Network error`);
+              handlePermissionError('network');
+              if (!paused && !muted) {
+                setTimeout(() => goToNextWord(), 2000);
+              }
+              break;
+              
+            case 'canceled':
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Speech canceled - normal operation`);
+              // Don't advance on cancellation as it's usually intentional
+              return;
+              
+            case 'interrupted':
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Speech interrupted - advancing`);
+              if (!paused && !muted) {
+                setTimeout(() => goToNextWord(), 1000);
+              }
+              return;
+              
+            default:
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Generic error handling`);
+          }
+          
+          // Retry logic for recoverable errors
+          if (event.error !== 'canceled' && event.error !== 'interrupted') {
+            if (incrementRetryAttempts()) {
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Retrying after error`);
+              setTimeout(() => {
+                if (!paused && !muted && !wordTransitionRef.current) {
+                  setPlayInProgress(false);
+                }
+              }, 1000);
+            } else {
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Max retries reached, advancing`);
+              if (!paused && !muted) {
+                setTimeout(() => goToNextWord(), 1500);
+              }
+            }
+          }
+        }
+      });
+
+      console.log(`[SPEECH-EXECUTION-${sessionId}] Speech initiation result: ${success}`);
+
+      if (!success) {
+        console.warn(`[SPEECH-EXECUTION-${sessionId}] ✗ Speech failed to start`);
+        setPlayInProgress(false);
+        if (!paused && !muted) {
+          setTimeout(() => goToNextWord(), 3000);
+        }
+      }
+
+      return success;
+      
+    } catch (error) {
+      console.error(`[SPEECH-EXECUTION-${sessionId}] ✗ Exception in speech execution:`, error);
+      speakingRef.current = false;
+      setIsSpeaking(false);
+      setPlayInProgress(false);
+      
+      // Always advance on exception to prevent getting stuck
+      if (!paused && !muted) {
+        setTimeout(() => goToNextWord(), 2000);
+      }
+      
+      return false;
+    }
   }, [
     findVoice,
     selectedVoice,

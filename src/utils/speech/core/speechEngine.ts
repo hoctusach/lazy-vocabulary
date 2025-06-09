@@ -3,7 +3,7 @@ import { SpeechSynthesisVoice } from '@/types/speech';
 
 // Track last operation time to prevent rapid successive operations
 let lastOperationTime = 0;
-const MIN_OPERATION_INTERVAL = 200; // Minimum time between operations
+const MIN_OPERATION_INTERVAL = 100; // Reduced interval for better responsiveness
 
 const canPerformOperation = (): boolean => {
   const now = Date.now();
@@ -20,8 +20,13 @@ export const stopSpeaking = (): void => {
     return;
   }
   
-  if (window.speechSynthesis && window.speechSynthesis.speaking) {
-    console.log('[ENGINE] Stopping ongoing speech');
+  console.log('[ENGINE] Stopping speech - current state:', {
+    speaking: window.speechSynthesis?.speaking,
+    paused: window.speechSynthesis?.paused,
+    pending: window.speechSynthesis?.pending
+  });
+  
+  if (window.speechSynthesis) {
     window.speechSynthesis.cancel();
     console.log('[ENGINE] Speech stopped');
   }
@@ -59,7 +64,7 @@ export const waitForSpeechReadiness = async (): Promise<boolean> => {
     setTimeout(() => {
       console.log('[ENGINE] Speech engine ready');
       resolve(true);
-    }, 300); // Longer delay for stability
+    }, 200); // Reduced delay for better responsiveness
   });
 };
 
@@ -76,7 +81,7 @@ export const resetSpeechEngine = (): void => {
 
 export const validateCurrentSpeech = (): boolean => {
   const isSpeaking = window.speechSynthesis ? window.speechSynthesis.speaking : false;
-  console.log(`[ENGINE] Speech active: ${isSpeaking}`);
+  console.log(`[ENGINE] Speech validation - speaking: ${isSpeaking}, paused: ${window.speechSynthesis?.paused}`);
   return isSpeaking;
 };
 
@@ -86,8 +91,9 @@ export const ensureSpeechEngineReady = async (): Promise<void> => {
     
     // Only cancel if something is actually speaking
     if (window.speechSynthesis.speaking) {
+      console.log('[ENGINE] Canceling existing speech');
       window.speechSynthesis.cancel();
-      await new Promise(resolve => setTimeout(resolve, 300)); // Longer wait
+      await new Promise(resolve => setTimeout(resolve, 150)); // Reduced wait time
     }
     
     console.log('[ENGINE] Speech engine prepared');
@@ -100,21 +106,21 @@ export const isSpeechSynthesisSupported = (): boolean => {
   return isSupported;
 };
 
-// Improved unlockAudio function that doesn't create competing audio streams
+// Enhanced unlockAudio function with better error handling
 export const unlockAudio = (): Promise<boolean> => {
   return new Promise((resolve) => {
     try {
-      console.log('[ENGINE] Attempting to unlock audio...');
+      console.log('[ENGINE] Attempting to unlock audio context...');
       
-      // Simple approach - just create an AudioContext if available
       interface WindowWithWebAudio extends Window {
         webkitAudioContext?: typeof globalThis.AudioContext;
       }
 
       const AudioContext =
         window.AudioContext || (window as WindowWithWebAudio).webkitAudioContext;
+      
       if (!AudioContext) {
-        console.log('[ENGINE] AudioContext not supported, using speech directly');
+        console.log('[ENGINE] AudioContext not supported, proceeding with speech synthesis');
         resolve(true);
         return;
       }
@@ -122,17 +128,18 @@ export const unlockAudio = (): Promise<boolean> => {
       try {
         const context = new AudioContext();
         
-        // Resume the audio context if needed
+        console.log('[ENGINE] AudioContext created, state:', context.state);
+        
         if (context.state === 'suspended') {
           context.resume().then(() => {
-            console.log('[ENGINE] AudioContext resumed');
+            console.log('[ENGINE] ✓ AudioContext resumed successfully');
             resolve(true);
           }).catch(err => {
             console.warn('[ENGINE] Failed to resume AudioContext:', err);
-            resolve(true); // Still consider it unlocked
+            resolve(true); // Still allow speech synthesis to try
           });
         } else {
-          console.log('[ENGINE] AudioContext ready');
+          console.log('[ENGINE] ✓ AudioContext already ready');
           resolve(true);
         }
       } catch (e) {
@@ -146,30 +153,32 @@ export const unlockAudio = (): Promise<boolean> => {
   });
 };
 
-// Enhanced voices loading with better timing
+// Enhanced voice loading with comprehensive monitoring
 export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise((resolve) => {
     let voicesLoaded = false;
-    console.log('[ENGINE] Starting voice loading process');
+    const startTime = Date.now();
+    console.log('[ENGINE] === Voice Loading Process Started ===');
     
     // Try to get voices immediately
     let voices = window.speechSynthesis.getVoices();
     
     if (voices.length > 0) {
-      console.log('[ENGINE] Voices already loaded:', voices.length);
+      console.log('[ENGINE] ✓ Voices already available:', voices.length);
       voicesLoaded = true;
       resolve(voices);
       return;
     }
     
-    console.log('[ENGINE] Waiting for voices to load via event');
+    console.log('[ENGINE] Waiting for voices to load via event listener');
     
-    // Set up an event listener for when voices change
+    // Set up event listener for when voices change
     const voicesChangedHandler = () => {
       if (voicesLoaded) return; // Prevent multiple calls
       
       voices = window.speechSynthesis.getVoices();
-      console.log('[ENGINE] Voices loaded via event:', voices.length);
+      const elapsed = Date.now() - startTime;
+      console.log(`[ENGINE] ✓ Voices loaded via event (${elapsed}ms):`, voices.length);
       
       if (voices.length > 0) {
         voicesLoaded = true;
@@ -180,21 +189,24 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
     
     window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
     
-    // Fallback timeouts with longer delays
-    const fallbackTimeouts = [1000, 2000, 3000];
+    // Enhanced fallback with multiple checkpoints
+    const checkpoints = [500, 1000, 1500, 2000, 3000];
     
-    fallbackTimeouts.forEach((timeout, index) => {
+    checkpoints.forEach((timeout, index) => {
       setTimeout(() => {
         if (!voicesLoaded) {
           voices = window.speechSynthesis.getVoices();
-          console.log(`[ENGINE] Voices check at ${timeout}ms:`, voices.length);
+          const elapsed = Date.now() - startTime;
+          console.log(`[ENGINE] Checkpoint ${index + 1} (${elapsed}ms): ${voices.length} voices`);
           
-          // If we've found voices or this is our last attempt, resolve
-          if (voices.length > 0 || index === fallbackTimeouts.length - 1) {
-            window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
-            console.log(`[ENGINE] Voices loaded via ${voices.length > 0 ? 'check' : 'final timeout'}:`, voices.length);
-            voicesLoaded = true;
-            resolve(voices);
+          // Resolve if we found voices or this is our final attempt
+          if (voices.length > 0 || index === checkpoints.length - 1) {
+            if (!voicesLoaded) {
+              window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+              console.log(`[ENGINE] ✓ Voice loading complete (${elapsed}ms): ${voices.length} voices`);
+              voicesLoaded = true;
+              resolve(voices);
+            }
           }
         }
       }, timeout);
@@ -202,64 +214,93 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
   });
 };
 
-// Improved speech function with better error handling
+// Enhanced speech function with comprehensive monitoring
 export const speakWithRetry = async (
   utterance: SpeechSynthesisUtterance, 
-  maxRetries: number = 2 // Reduced retries
+  maxRetries: number = 2
 ): Promise<boolean> => {
-  // Unlock audio first
+  console.log('[ENGINE] === Starting Enhanced Speech Process ===');
+  
+  // Ensure audio is unlocked
   await unlockAudio();
   
   // Ensure voices are loaded
   const voices = await loadVoicesAndWait();
-  console.log(`[ENGINE] Loaded ${voices.length} voices for speech`);
+  console.log(`[ENGINE] Voice preparation complete: ${voices.length} voices available`);
   
   let attempts = 0;
   let success = false;
   
   while (attempts < maxRetries && !success) {
     attempts++;
+    const attemptId = Math.random().toString(36).substring(7);
     
     try {
+      console.log(`[ENGINE-${attemptId}] Attempt ${attempts}/${maxRetries}`);
+      
       if (attempts > 1) {
-        console.log(`[ENGINE] Retry attempt ${attempts} for speech`);
-        // Only cancel and wait if there's actually ongoing speech
+        // Clean up before retry
         if (window.speechSynthesis.speaking) {
+          console.log(`[ENGINE-${attemptId}] Canceling previous speech before retry`);
           window.speechSynthesis.cancel();
-          await new Promise(r => setTimeout(r, 500)); // Longer wait
+          await new Promise(r => setTimeout(r, 300));
         }
       }
       
+      console.log(`[ENGINE-${attemptId}] Initiating speech synthesis`);
       window.speechSynthesis.speak(utterance);
-      console.log(`[ENGINE] Speech initiated, attempt ${attempts}`);
       
-      // Check if speech actually started
-      await new Promise<void>((resolve, reject) => {
-        setTimeout(() => {
+      // Enhanced speech validation with multiple checks
+      const validationResult = await new Promise<boolean>((resolve, reject) => {
+        let checkCount = 0;
+        const maxChecks = 8;
+        
+        const validateSpeech = () => {
+          checkCount++;
+          console.log(`[ENGINE-${attemptId}] Validation check ${checkCount}/${maxChecks}`);
+          
           if (window.speechSynthesis.speaking) {
-            console.log('[ENGINE] Speech successfully started');
-            success = true;
-            resolve();
-          } else {
-            console.warn('[ENGINE] Speech did not start properly');
-            reject(new Error('Speech did not start'));
+            console.log(`[ENGINE-${attemptId}] ✓ Speech successfully validated`);
+            resolve(true);
+            return;
           }
-        }, 400); // Longer check delay
+          
+          if (checkCount >= maxChecks) {
+            console.warn(`[ENGINE-${attemptId}] ✗ Speech validation failed after ${maxChecks} checks`);
+            reject(new Error('Speech validation timeout'));
+            return;
+          }
+          
+          // Continue checking
+          setTimeout(validateSpeech, 100);
+        };
+        
+        // Start validation after initial delay
+        setTimeout(validateSpeech, 200);
       });
       
+      if (validationResult) {
+        success = true;
+        console.log(`[ENGINE-${attemptId}] ✓ Speech successfully initiated`);
+      }
+      
       break; // Exit loop on success
+      
     } catch (error) {
-      console.error(`[ENGINE] Speech attempt ${attempts} failed:`, error);
+      console.error(`[ENGINE-${attemptId}] ✗ Attempt ${attempts} failed:`, error);
       
       if (attempts >= maxRetries) {
-        console.error('[ENGINE] Max retries reached, giving up');
+        console.error(`[ENGINE] ✗ All ${maxRetries} attempts failed`);
         return false;
       }
       
-      // Wait before next attempt with longer delays
-      await new Promise(r => setTimeout(r, 500 * attempts));
+      // Wait before next attempt
+      const delay = 300 * attempts;
+      console.log(`[ENGINE-${attemptId}] Waiting ${delay}ms before retry`);
+      await new Promise(r => setTimeout(r, delay));
     }
   }
   
+  console.log(`[ENGINE] Speech process complete: ${success ? 'SUCCESS' : 'FAILED'}`);
   return success;
 };
