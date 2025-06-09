@@ -12,6 +12,10 @@ export * from './usePlaybackConditions';
 export * from './usePlaybackOrchestrator';
 export * from './useSpeechPermissionManager';
 
+// Export new modular hooks
+export * from './useCurrentWordCalculation';
+export * from './usePlaybackExecution';
+
 // Export speech execution sub-modules
 export * from './speech-execution/useSpeechValidation';
 export * from './speech-execution/useSpeechErrorHandler';
