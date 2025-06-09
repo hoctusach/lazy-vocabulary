@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
@@ -155,7 +154,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={onCycleVoice}
               className="h-7 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >
-              Voice: {selectedVoice.label}
+              {selectedVoice.label}
             </Button>
           </div>
         </div>

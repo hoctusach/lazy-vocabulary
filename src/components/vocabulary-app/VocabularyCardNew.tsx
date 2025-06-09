@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
@@ -148,14 +147,14 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
                 'Next'}
             </Button>
             
-            {/* Voice toggle button with region display */}
+            {/* Voice toggle button with simplified region display */}
             <Button
               variant="outline" 
               size="sm" 
               onClick={onCycleVoice}
               className="h-7 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >
-              Voice: {voiceRegion}
+              {voiceRegion}
             </Button>
           </div>
         </div>
