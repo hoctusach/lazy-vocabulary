@@ -7,7 +7,7 @@ import { useSimpleWordPlayback } from './useSimpleWordPlayback';
 import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 
 /**
- * Simplified vocabulary playback system with improved pause handling
+ * Simplified vocabulary playback with immediate pause response
  */
 export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const [muted, setMuted] = useState(false);
@@ -50,51 +50,52 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     console.log(`[SIMPLE-VOCABULARY] Pause state changed - paused: ${paused}, muted: ${muted}`);
     
     if (paused) {
-      console.log('[SIMPLE-VOCABULARY] Pausing speech controller immediately');
+      console.log('[SIMPLE-VOCABULARY] ✓ Pausing speech controller immediately');
       simpleSpeechController.pause();
     } else if (!muted) {
-      console.log('[SIMPLE-VOCABULARY] Resuming - first trying to resume, then playing current word');
+      console.log('[SIMPLE-VOCABULARY] ✓ Resuming from pause');
       
-      // Try to resume first
+      // Resume the controller
       simpleSpeechController.resume();
       
-      // Check if we had paused content to resume
-      const pausedContent = simpleSpeechController.getPausedContent();
-      
-      // Always play current word when unpausing to ensure consistent behavior
-      setTimeout(() => {
-        if (!paused && !muted && currentWord) {
-          console.log('[SIMPLE-VOCABULARY] Playing current word after resume');
-          playWord(currentWord);
-        }
-      }, 200);
+      // Play current word immediately after resume
+      if (currentWord) {
+        console.log('[SIMPLE-VOCABULARY] Playing current word after resume');
+        // Small delay to ensure resume is processed
+        setTimeout(() => {
+          if (!paused && !muted && currentWord) {
+            playWord(currentWord);
+          }
+        }, 100);
+      }
     }
   }, [paused, muted, currentWord, playWord]);
 
   // Handle mute state changes
   useEffect(() => {
     if (muted) {
-      console.log(`[SIMPLE-VOCABULARY] Muted - stopping speech`);
+      console.log(`[SIMPLE-VOCABULARY] ✓ Muted - stopping speech`);
       stopPlayback();
     } else if (!paused && currentWord) {
-      console.log(`[SIMPLE-VOCABULARY] Unmuted - playing current word`);
+      console.log(`[SIMPLE-VOCABULARY] ✓ Unmuted - playing current word`);
       setTimeout(() => {
         if (!muted && !paused && currentWord) {
           playWord(currentWord);
         }
-      }, 100);
+      }, 50);
     }
   }, [muted, paused, currentWord, playWord, stopPlayback]);
 
   // Control functions
   const toggleMute = useCallback(() => {
-    console.log(`[SIMPLE-VOCABULARY] Toggling mute: ${!muted}`);
-    setMuted(!muted);
+    const newMuted = !muted;
+    console.log(`[SIMPLE-VOCABULARY] ✓ Toggling mute: ${newMuted}`);
+    setMuted(newMuted);
   }, [muted]);
 
   const togglePause = useCallback(() => {
     const newPaused = !paused;
-    console.log(`[SIMPLE-VOCABULARY] Toggling pause: ${newPaused}`);
+    console.log(`[SIMPLE-VOCABULARY] ✓ Toggling pause: ${newPaused}`);
     
     // Update state immediately for responsive UI
     setPaused(newPaused);
@@ -104,15 +105,15 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
 
   const playCurrentWord = useCallback(() => {
     if (currentWord && !muted && !paused) {
-      console.log(`[SIMPLE-VOCABULARY] Manually playing current word: ${currentWord.word}`);
+      console.log(`[SIMPLE-VOCABULARY] ✓ Manually playing current word: ${currentWord.word}`);
       playWord(currentWord);
     } else {
-      console.log(`[SIMPLE-VOCABULARY] Cannot play current word - muted: ${muted}, paused: ${paused}, hasWord: ${!!currentWord}`);
+      console.log(`[SIMPLE-VOCABULARY] ✗ Cannot play current word - muted: ${muted}, paused: ${paused}, hasWord: ${!!currentWord}`);
     }
   }, [currentWord, muted, paused, playWord]);
 
   const goToNext = useCallback(() => {
-    console.log('[SIMPLE-VOCABULARY] Manual next word requested');
+    console.log('[SIMPLE-VOCABULARY] ✓ Manual next word requested');
     advanceToNext();
   }, [advanceToNext]);
 

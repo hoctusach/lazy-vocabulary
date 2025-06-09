@@ -9,7 +9,7 @@ import { SpeechStateManager } from './speechStateManager';
 import { SpeechOptions } from './types';
 
 /**
- * Handles the actual execution of speech synthesis
+ * Handles speech execution with comprehensive pause state checking
  */
 export class SpeechExecutor {
   constructor(private stateManager: SpeechStateManager) {}
@@ -20,9 +20,9 @@ export class SpeechExecutor {
         const speechId = Math.random().toString(36).substring(7);
         console.log(`[SPEECH-EXECUTOR-${speechId}] Starting speech process for text:`, text.substring(0, 50));
         
-        // Check if user has paused - if so, store for later and reject
+        // Critical pause check - reject immediately if paused
         if (this.stateManager.isPaused() && !options.allowOverride) {
-          console.log(`[SPEECH-EXECUTOR-${speechId}] Speech is paused by user, storing text for resume`);
+          console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech is paused, rejecting request immediately`);
           this.stateManager.storePausedContent(text, options);
           resolve(false);
           return;
@@ -31,7 +31,7 @@ export class SpeechExecutor {
         // Register this speech request for coordination
         const canProceed = registerSpeechRequest(speechId, text, options);
         if (!canProceed && !options.allowOverride) {
-          console.log(`[SPEECH-EXECUTOR-${speechId}] Speech request blocked by coordination`);
+          console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech request blocked by coordination`);
           resolve(false);
           return;
         }
@@ -39,6 +39,14 @@ export class SpeechExecutor {
         // Ensure browser audio is unlocked and voices are available
         await unlockAudio();
         await loadVoicesAndWait();
+
+        // Double-check pause state after async operations
+        if (this.stateManager.isPaused() && !options.allowOverride) {
+          console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Paused during setup, aborting`);
+          unregisterSpeechRequest(speechId);
+          resolve(false);
+          return;
+        }
 
         // Stop current speech if we're actually speaking
         if (this.stateManager.isCurrentlyActive() && window.speechSynthesis.speaking) {
@@ -64,9 +72,16 @@ export class SpeechExecutor {
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;
         
-        // Set up event handlers
+        // Set up event handlers with pause state checking
         utterance.onstart = () => {
-          console.log(`[SPEECH-EXECUTOR-${speechId}] Speech started successfully`);
+          // Check if we were paused while starting
+          if (this.stateManager.isPaused()) {
+            console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Paused during start, cancelling`);
+            window.speechSynthesis.cancel();
+            return;
+          }
+          
+          console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Speech started successfully`);
           this.stateManager.setSpeechProgress(true, false);
           this.stateManager.setActive(true);
           if (options.onStart) options.onStart();
@@ -87,7 +102,8 @@ export class SpeechExecutor {
             error: event.error,
             type: event.type,
             speechStarted: this.stateManager.getState().speechStarted,
-            speechEnded: this.stateManager.getState().speechEnded
+            speechEnded: this.stateManager.getState().speechEnded,
+            isPaused: this.stateManager.isPaused()
           });
           
           this.stateManager.setActive(false);
@@ -96,13 +112,12 @@ export class SpeechExecutor {
           
           if (options.onError) options.onError(event);
           
-          // Handle cancellation due to pause
-          const state = this.stateManager.getState();
+          // Handle cancellation due to pause - treat as success
           if (event.error === 'canceled' && this.stateManager.isPaused()) {
-            console.log(`[SPEECH-EXECUTOR-${speechId}] Speech canceled due to pause, treating as success`);
+            console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Speech canceled due to pause, treating as success`);
             resolve(true);
-          } else if (event.error === 'canceled' && !state.speechStarted) {
-            console.log(`[SPEECH-EXECUTOR-${speechId}] Speech was canceled before starting, treating as success`);
+          } else if (event.error === 'canceled') {
+            console.log(`[SPEECH-EXECUTOR-${speechId}] Speech was canceled, treating as success`);
             resolve(true);
           } else {
             resolve(false);
@@ -112,10 +127,18 @@ export class SpeechExecutor {
         // Store reference and start speaking
         this.stateManager.setCurrentSpeech(utterance, speechId);
         
-        console.log(`[SPEECH-EXECUTOR-${speechId}] Initiating speech synthesis`);
+        // Final pause check before speaking
+        if (this.stateManager.isPaused() && !options.allowOverride) {
+          console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Paused just before speak(), aborting`);
+          unregisterSpeechRequest(speechId);
+          resolve(false);
+          return;
+        }
+        
+        console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Initiating speech synthesis`);
         window.speechSynthesis.speak(utterance);
         
-        // Speech monitoring
+        // Speech monitoring with pause checking
         this.monitorSpeech(speechId, resolve);
         
       } catch (error) {
@@ -140,7 +163,7 @@ export class SpeechExecutor {
       
       // Check if speech was paused during monitoring
       if (this.stateManager.isPaused()) {
-        console.log(`[SPEECH-EXECUTOR-${speechId}] Speech paused during monitoring`);
+        console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech paused during monitoring, stopping`);
         return;
       }
       
@@ -152,7 +175,7 @@ export class SpeechExecutor {
       
       const state = this.stateManager.getState();
       if (state.speechStarted) {
-        console.log(`[SPEECH-EXECUTOR-${speechId}] Speech successfully started, monitoring complete`);
+        console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Speech successfully started, monitoring complete`);
         return;
       }
       
@@ -170,7 +193,7 @@ export class SpeechExecutor {
       }
       
       if (monitorAttempts >= maxMonitorAttempts) {
-        console.warn(`[SPEECH-EXECUTOR-${speechId}] Speech monitoring timeout reached`);
+        console.warn(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech monitoring timeout reached`);
         if (this.stateManager.getCurrentSpeechId() === speechId) {
           this.stateManager.setActive(false);
           this.stateManager.setCurrentSpeech(null, null);

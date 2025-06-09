@@ -1,15 +1,15 @@
-
-// Enhanced coordination module that respects pause states
+// Enhanced coordination module with immediate pause response
 let activeSpeechId: string | null = null;
 let speechQueue: Array<{ id: string; text: string; options: any }> = [];
 let isProcessingQueue = false;
+let isPausedGlobally = false;
 
 export const registerSpeechRequest = (speechId: string, text: string, options: any): boolean => {
   console.log(`[COORDINATION] Registering speech request: ${speechId}`);
   
-  // Check if speech is globally paused - if so, reject new requests
-  if (window.speechSynthesis?.paused) {
-    console.log(`[COORDINATION] Speech is paused, rejecting request ${speechId}`);
+  // Check if speech is globally paused - immediately reject
+  if (isPausedGlobally || window.speechSynthesis?.paused) {
+    console.log(`[COORDINATION] ✗ Speech is paused globally, rejecting request ${speechId}`);
     return false;
   }
   
@@ -21,7 +21,7 @@ export const registerSpeechRequest = (speechId: string, text: string, options: a
   }
   
   activeSpeechId = speechId;
-  console.log(`[COORDINATION] Speech request ${speechId} is now active`);
+  console.log(`[COORDINATION] ✓ Speech request ${speechId} is now active`);
   return true;
 };
 
@@ -30,8 +30,8 @@ export const unregisterSpeechRequest = (speechId: string): void => {
   
   if (activeSpeechId === speechId) {
     activeSpeechId = null;
-    // Don't automatically process queue if speech is paused
-    if (!window.speechSynthesis?.paused) {
+    // Only process queue if not paused
+    if (!isPausedGlobally && !window.speechSynthesis?.paused) {
       processNextInQueue();
     }
   }
@@ -52,11 +52,26 @@ export const clearAllSpeechRequests = (): void => {
   isProcessingQueue = false;
 };
 
+// New function to set global pause state
+export const setGlobalPauseState = (paused: boolean): void => {
+  console.log(`[COORDINATION] Setting global pause state: ${paused}`);
+  isPausedGlobally = paused;
+  
+  if (paused) {
+    // When pausing, clear the queue but keep active speech tracked
+    speechQueue = [];
+  }
+};
+
+export const isGloballyPaused = (): boolean => {
+  return isPausedGlobally;
+};
+
 const processNextInQueue = (): void => {
   if (isProcessingQueue || speechQueue.length === 0) return;
   
   // Don't process queue if speech is paused
-  if (window.speechSynthesis?.paused) {
+  if (isPausedGlobally || window.speechSynthesis?.paused) {
     console.log('[COORDINATION] Speech is paused, not processing queue');
     return;
   }

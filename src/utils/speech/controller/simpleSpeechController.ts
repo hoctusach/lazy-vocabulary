@@ -1,13 +1,12 @@
 
-import { clearAllSpeechRequests } from '../core/speechEngine';
+import { clearAllSpeechRequests, setGlobalPauseState } from '../core/speechEngine';
 import { SpeechStateManager } from './speechStateManager';
 import { SpeechExecutor } from './speechExecutor';
 import { PauseResumeHandler } from './pauseResumeHandler';
 import { SpeechOptions, PausedContent } from './types';
 
 /**
- * Simplified speech controller with proper pause/resume functionality
- * Refactored into smaller, focused modules
+ * Simplified speech controller with immediate pause response
  */
 class SimpleSpeechController {
   private stateManager: SpeechStateManager;
@@ -29,14 +28,27 @@ class SimpleSpeechController {
     
     this.executor.stop();
     clearAllSpeechRequests();
+    setGlobalPauseState(false); // Clear pause state when stopping
     this.stateManager.reset();
   }
 
   pause(): void {
+    console.log('[SIMPLE-CONTROLLER] Pause requested - implementing immediate response');
+    
+    // Set global pause state immediately
+    setGlobalPauseState(true);
+    
+    // Execute pause with immediate cancellation
     this.pauseHandler.pause();
   }
 
   resume(): void {
+    console.log('[SIMPLE-CONTROLLER] Resume requested');
+    
+    // Clear global pause state first
+    setGlobalPauseState(false);
+    
+    // Execute resume
     this.pauseHandler.resume();
   }
 

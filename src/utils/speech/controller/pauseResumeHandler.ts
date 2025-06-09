@@ -2,57 +2,55 @@
 import { SpeechStateManager } from './speechStateManager';
 
 /**
- * Handles pause and resume functionality for speech synthesis
+ * Handles pause and resume functionality with immediate cancellation
  */
 export class PauseResumeHandler {
   constructor(private stateManager: SpeechStateManager) {}
 
   pause(): void {
-    console.log('[PAUSE-HANDLER] Pause requested');
+    console.log('[PAUSE-HANDLER] Pause requested - implementing immediate cancellation');
+    
+    // Set pause state immediately for all components to see
     this.stateManager.setPauseState(true);
     
-    // If currently speaking, try to pause properly first
+    // If currently speaking, store content and cancel immediately
     const state = this.stateManager.getState();
     if (state.isActive && window.speechSynthesis.speaking) {
-      console.log('[PAUSE-HANDLER] Attempting to pause current speech');
+      console.log('[PAUSE-HANDLER] Speech active - storing content and cancelling immediately');
       
-      // Store current speech for potential resume
+      // Store current speech for resume
       if (state.currentUtterance) {
         this.stateManager.storePausedContent(
           state.currentUtterance.text,
-          {} // Note: We can't store the full options, but we can store basic info
+          {} // Store basic info for resume
         );
+        console.log('[PAUSE-HANDLER] Stored content for resume:', state.currentUtterance.text.substring(0, 50));
       }
       
-      // Try to pause first, then cancel if needed
-      try {
-        window.speechSynthesis.pause();
-        
-        // Check if pause worked after a short delay
-        setTimeout(() => {
-          if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-            console.log('[PAUSE-HANDLER] Pause failed, canceling speech');
-            window.speechSynthesis.cancel();
-          }
-        }, 100);
-      } catch (error) {
-        console.log('[PAUSE-HANDLER] Pause failed, canceling speech:', error);
-        window.speechSynthesis.cancel();
-      }
+      // Cancel immediately - no delay, no attempts at pause()
+      console.log('[PAUSE-HANDLER] Cancelling speech immediately');
+      window.speechSynthesis.cancel();
+      
+      // Update state to reflect cancellation
+      this.stateManager.setActive(false);
+      this.stateManager.setCurrentSpeech(null, null);
+    } else {
+      console.log('[PAUSE-HANDLER] No active speech to cancel');
     }
   }
 
   resume(): void {
     console.log('[PAUSE-HANDLER] Resume requested');
     
-    // Check if speech synthesis is paused and try to resume
+    // Clear pause state immediately
+    this.stateManager.setPauseState(false);
+    
+    // Clear any browser pause state if it exists
     if (window.speechSynthesis.paused) {
-      console.log('[PAUSE-HANDLER] Resuming paused speech');
+      console.log('[PAUSE-HANDLER] Clearing browser pause state');
       window.speechSynthesis.resume();
     }
     
-    this.stateManager.setPauseState(false);
-    
-    // If we had stored text for resume, the calling code will handle re-speaking it
+    console.log('[PAUSE-HANDLER] Resume complete - playback should restart with current word');
   }
 }

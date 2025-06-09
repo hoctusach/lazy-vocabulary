@@ -36,5 +36,7 @@ export {
   unregisterSpeechRequest,
   isActiveSpeechRequest,
   getCurrentActiveSpeech,
-  clearAllSpeechRequests
+  clearAllSpeechRequests,
+  setGlobalPauseState,
+  isGloballyPaused
 } from './modules/speechCoordination';
