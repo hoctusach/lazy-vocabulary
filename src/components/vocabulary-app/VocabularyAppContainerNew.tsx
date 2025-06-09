@@ -1,20 +1,16 @@
 
-import React, { useState } from "react";
+import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import WelcomeScreen from "@/components/WelcomeScreen";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
-import VoiceDebugPanel from "./VoiceDebugPanel";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
+import { useMobileVocabularyController } from "@/hooks/vocabulary-controller/useMobileVocabularyController";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
-import { Button } from "@/components/ui/button";
 
 const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
-  
-  const [showDebugPanel, setShowDebugPanel] = useState(false);
   
   // Get base vocabulary state (file handling, categories, etc.)
   const {
@@ -34,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller
+  // Use our new mobile-optimized vocabulary controller
   const {
     currentWord,
     currentIndex,
@@ -48,12 +44,10 @@ const VocabularyAppContainerNew: React.FC = () => {
     toggleMute,
     toggleVoice,
     playCurrentWord,
-    wordCount,
-    getVoiceDebugInfo,
-    getCurrentVoiceInfo
-  } = useVocabularyController(wordList || []);
+    wordCount
+  } = useMobileVocabularyController(wordList || []);
 
-  console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
+  console.log('[VOCAB-CONTAINER-NEW] Mobile Controller state:', {
     currentWord: currentWord?.word,
     currentIndex,
     isPaused,
@@ -61,14 +55,6 @@ const VocabularyAppContainerNew: React.FC = () => {
     voiceRegion,
     isSpeaking
   });
-
-  // Enhanced logging for voice debugging
-  React.useEffect(() => {
-    if (hasData && currentWord) {
-      const voiceInfo = getCurrentVoiceInfo();
-      console.log('[VOCAB-CONTAINER-NEW] Current voice info:', voiceInfo);
-    }
-  }, [voiceRegion, currentWord, hasData, getCurrentVoiceInfo]);
 
   // Modal state management
   const {
@@ -93,7 +79,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     }
   };
 
-  // Enhanced button handlers with user interaction tracking
+  // Enhanced button handlers for mobile
   const handleManualNext = () => {
     console.log('[VOCAB-CONTAINER-NEW] Manual next button clicked');
     goToNext();
@@ -115,36 +101,10 @@ const VocabularyAppContainerNew: React.FC = () => {
     // The actual file processing will be handled by the FileUpload component
   };
 
-  // Show debug panel if requested
-  if (showDebugPanel) {
-    return (
-      <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-        <VoiceDebugPanel 
-          currentRegion={voiceRegion}
-          onClose={() => setShowDebugPanel(false)}
-        />
-      </VocabularyLayout>
-    );
-  }
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component - fix type mismatch by converting string to boolean */}
+      {/* Error display component */}
       <ErrorDisplay jsonLoadError={!!jsonLoadError} />
-
-      {/* Debug button for mobile voice troubleshooting */}
-      {hasData && (
-        <div className="fixed top-4 right-4 z-50">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => setShowDebugPanel(true)}
-            className="bg-white/90 backdrop-blur"
-          >
-            Voice Debug
-          </Button>
-        </div>
-      )}
 
       {hasData && currentWord ? (
         <ContentWithDataNew
