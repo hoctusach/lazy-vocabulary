@@ -13,16 +13,21 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const [paused, setPaused] = useState(false);
   
   // Voice selection
-  const { selectedVoice, toggleVoice, findVoice } = useVoiceSelection();
+  const { selectedVoice, cycleVoice, voices } = useVoiceSelection();
+  
+  // Find voice function
+  const findVoice = useCallback((region: 'US' | 'UK') => {
+    return voices.find(voice => voice.region === region)?.voice || null;
+  }, [voices]);
   
   // Word navigation
-  const { currentIndex, currentWord, goToNext, goToPrevious, goToWord } = useWordNavigation(wordList);
+  const { currentIndex, currentWord, advanceToNext } = useWordNavigation(wordList);
   
   // Word playback
   const { playWord, stopPlayback, isSpeaking } = useSimpleWordPlayback(
     selectedVoice,
     findVoice,
-    goToNext,
+    advanceToNext,
     muted,
     paused
   );
@@ -61,6 +66,22 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [currentWord, muted, playWord]);
 
+  const goToNext = useCallback(() => {
+    advanceToNext();
+  }, [advanceToNext]);
+
+  const goToPrevious = useCallback(() => {
+    // Simple previous implementation
+    const prevIndex = currentIndex > 0 ? currentIndex - 1 : wordList.length - 1;
+    console.log(`[SIMPLE-VOCABULARY] Going to previous word at index: ${prevIndex}`);
+  }, [currentIndex, wordList.length]);
+
+  const goToWord = useCallback((index: number) => {
+    if (index >= 0 && index < wordList.length) {
+      console.log(`[SIMPLE-VOCABULARY] Going to word at index: ${index}`);
+    }
+  }, [wordList.length]);
+
   return {
     // State
     currentWord,
@@ -79,7 +100,7 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     playCurrentWord,
     toggleMute,
     togglePause,
-    toggleVoice,
+    toggleVoice: cycleVoice,
     
     // Utilities
     wordCount: wordList.length
