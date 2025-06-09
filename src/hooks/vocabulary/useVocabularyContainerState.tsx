@@ -1,119 +1,147 @@
 
-import { useVocabularyManager } from "@/hooks/vocabulary/useVocabularyManager";
-import { useVocabularyAudioSync } from "@/hooks/useVocabularyAudioSync";
-import { useWordModalState } from "./useWordModalState";
-import { useCategoryNavigation } from "./useCategoryNavigation";
-import { useSpeechControl } from "./useSpeechControl";
-import { useState, useEffect } from "react";
-import { vocabularyService } from "@/services/vocabularyService";
+import { useState, useEffect, useCallback } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
+import { vocabularyService } from '@/services/vocabularyService';
+import { useCategoryNavigation } from './useCategoryNavigation';
 
 export const useVocabularyContainerState = () => {
   console.log('[VOCAB-CONTAINER-STATE] === Hook Initialization ===');
-  
-  // State for the current vocabulary list
-  const [wordList, setWordList] = useState(vocabularyService.getWordList() || []);
-  
-  console.log('[VOCAB-CONTAINER-STATE] Initial word list:', {
-    length: wordList?.length || 0,
-    firstWord: wordList?.[0]?.word,
-    sample: wordList?.slice(0, 3).map(w => w.word)
-  });
-  
-  // Update word list when vocabulary changes
-  useEffect(() => {
-    const handleVocabularyChange = () => {
-      console.log('[VOCAB-CONTAINER-STATE] Vocabulary change detected');
-      const newWordList = vocabularyService.getWordList() || [];
-      console.log('[VOCAB-CONTAINER-STATE] New word list:', {
-        length: newWordList.length,
-        firstWord: newWordList[0]?.word,
-        sample: newWordList.slice(0, 3).map(w => w.word)
-      });
-      setWordList(newWordList);
-    };
-    
-    // Set up the listener
-    vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
-    
-    // Clean up
-    return () => {
-      vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
-    };
-  }, []);
-  
-  // Get modal state using the correct hook
-  const { isAddWordModalOpen, setIsAddWordModalOpen } = useWordModalState();
 
-  // Vocabulary manager for handling word navigation
-  const {
-    hasData,
-    currentWord,
-    isPaused,
-    handleFileUploaded,
-    handleTogglePause,
-    handleManualNext,
-    handleSwitchCategory,
-    setHasData,
-    jsonLoadError
-  } = useVocabularyManager();
+  // File and data loading state
+  const [hasData, setHasData] = useState(false);
+  const [jsonLoadError, setJsonLoadError] = useState<string | null>(null);
+  const [wordList, setWordList] = useState<VocabularyWord[]>([]);
 
-  console.log('[VOCAB-CONTAINER-STATE] Vocabulary manager state:', {
-    hasData,
-    currentWord: currentWord?.word,
-    isPaused
-  });
-
-  // Audio sync management
-  const {
-    isSoundPlaying,
-    setIsSoundPlaying,
-    displayTime,
-    setDisplayTime
-  } = useVocabularyAudioSync(currentWord, isPaused, false, "US");
-
-  // Get category information
+  // Category navigation
   const { currentCategory, nextCategory } = useCategoryNavigation();
 
+  // Display time for UI (can be customized later)
+  const displayTime = 5000;
+
+  // Load initial vocabulary data
+  useEffect(() => {
+    console.log('[VOCAB-CONTAINER-STATE] Loading initial vocabulary data');
+    
+    try {
+      const initialWordList = vocabularyService.getWordList();
+      console.log('[VOCAB-CONTAINER-STATE] Initial word list:', {
+        length: initialWordList.length,
+        firstWord: initialWordList[0]?.word || 'none',
+        sample: initialWordList.slice(0, 3).map(w => w.word)
+      });
+
+      setWordList(initialWordList);
+      setHasData(initialWordList.length > 0);
+      setJsonLoadError(null);
+    } catch (error) {
+      console.error('[VOCAB-CONTAINER-STATE] Error loading initial data:', error);
+      setJsonLoadError('Failed to load vocabulary data');
+      setHasData(false);
+      setWordList([]);
+    }
+  }, []);
+
+  // Subscribe to vocabulary service changes
+  useEffect(() => {
+    const unsubscribe = vocabularyService.subscribe(() => {
+      console.log('[VOCAB-CONTAINER-STATE] Vocabulary service updated');
+      
+      try {
+        const updatedWordList = vocabularyService.getWordList();
+        console.log('[VOCAB-CONTAINER-STATE] Updated word list length:', updatedWordList.length);
+        
+        setWordList(updatedWordList);
+        setHasData(updatedWordList.length > 0);
+        setJsonLoadError(null);
+      } catch (error) {
+        console.error('[VOCAB-CONTAINER-STATE] Error updating from service:', error);
+        setJsonLoadError('Failed to update vocabulary data');
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  // File upload handler
+  const handleFileUploaded = useCallback(async (file: File) => {
+    console.log('[VOCAB-CONTAINER-STATE] File uploaded:', file.name);
+    
+    try {
+      setJsonLoadError(null);
+      const success = await vocabularyService.loadFromFile(file);
+      
+      if (success) {
+        const newWordList = vocabularyService.getWordList();
+        console.log('[VOCAB-CONTAINER-STATE] File loaded successfully, words:', newWordList.length);
+        setWordList(newWordList);
+        setHasData(true);
+      } else {
+        setJsonLoadError('Failed to load vocabulary file');
+        setHasData(false);
+      }
+    } catch (error) {
+      console.error('[VOCAB-CONTAINER-STATE] File upload error:', error);
+      setJsonLoadError(error instanceof Error ? error.message : 'Unknown error occurred');
+      setHasData(false);
+    }
+  }, []);
+
+  // Category switching handler - fixed to work without parameters
+  const handleSwitchCategory = useCallback(() => {
+    console.log('[VOCAB-CONTAINER-STATE] Switching category from:', currentCategory);
+    
+    try {
+      const success = vocabularyService.switchToNextCategory();
+      
+      if (success) {
+        const newWordList = vocabularyService.getWordList();
+        const newCategory = vocabularyService.getCurrentSheetName();
+        
+        console.log('[VOCAB-CONTAINER-STATE] ✓ Category switched to:', newCategory);
+        console.log('[VOCAB-CONTAINER-STATE] New word list length:', newWordList.length);
+        
+        setWordList(newWordList);
+        setHasData(newWordList.length > 0);
+        
+        // Clear any previous errors since category switch was successful
+        setJsonLoadError(null);
+      } else {
+        console.warn('[VOCAB-CONTAINER-STATE] Category switch failed');
+        setJsonLoadError('Failed to switch category');
+      }
+    } catch (error) {
+      console.error('[VOCAB-CONTAINER-STATE] Error switching category:', error);
+      setJsonLoadError('Error switching category');
+    }
+  }, [currentCategory]);
+
+  // Get vocabulary manager state for debugging
+  const vocabularyManagerState = {
+    hasData: vocabularyService.hasData(),
+    currentWord: vocabularyService.getCurrentWord(),
+    isPaused: false // This will be managed by the controller
+  };
+
+  console.log('[VOCAB-CONTAINER-STATE] Vocabulary manager state:', vocabularyManagerState);
+
+  // Final state summary
   console.log('[VOCAB-CONTAINER-STATE] Final state summary:', {
     hasData,
-    currentWord: currentWord?.word,
-    wordListLength: wordList?.length || 0,
+    currentWord: vocabularyManagerState.currentWord?.word || 'none',
+    wordListLength: wordList.length,
     currentCategory,
-    isPaused,
-    isSoundPlaying
+    isPaused: vocabularyManagerState.isPaused,
+    isSoundPlaying: false
   });
 
-  // Combine all state and handlers
   return {
-    // Modal state
-    isAddWordModalOpen,
-    setIsAddWordModalOpen,
-    
-    // Vocabulary state
     hasData,
-    currentWord,
-    isPaused,
     handleFileUploaded,
-    handleTogglePause,
-    handleManualNext,
     jsonLoadError,
-    
-    // Category info
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    
-    // Audio playback state
-    isSoundPlaying,
     displayTime,
-    
-    // Word list for playback system
-    wordList,
-    
-    // Debug data
-    debugPanelData: currentWord ? {
-      word: currentWord.word,
-      category: currentWord.category || currentCategory
-    } : null
+    wordList
   };
 };

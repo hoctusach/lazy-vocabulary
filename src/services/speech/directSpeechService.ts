@@ -1,4 +1,6 @@
 
+import { getVoiceByRegion } from '@/utils/speech/voiceUtils';
+
 /**
  * Direct speech service with immediate cancellation and reliable state management
  */
@@ -35,13 +37,13 @@ class DirectSpeechService {
         this.currentUtterance = utterance;
         this.isActive = true;
 
-        // Find appropriate voice
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          const targetLang = options.voiceRegion === 'UK' ? 'en-GB' : 'en-US';
-          const voice = voices.find(v => v.lang.startsWith(targetLang)) || voices[0];
+        // Enhanced voice selection with the improved voice utils
+        const voice = getVoiceByRegion(options.voiceRegion || 'US', 'female');
+        if (voice) {
           utterance.voice = voice;
           console.log('[DIRECT-SPEECH] Using voice:', voice.name, voice.lang);
+        } else {
+          console.warn('[DIRECT-SPEECH] No suitable voice found, using default');
         }
 
         // Configure utterance
