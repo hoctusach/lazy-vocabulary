@@ -124,6 +124,7 @@ export const useSpeechExecution = (
           setPlayInProgress(false);
           
           // Enhanced error handling based on error type
+          // Handle the standard SpeechSynthesisErrorEvent.error types
           switch (event.error) {
             case 'not-allowed':
               console.log(`[SPEECH-EXECUTION-${sessionId}] Permission denied`);
@@ -139,26 +140,27 @@ export const useSpeechExecution = (
               }
               break;
               
-            case 'canceled':
-              console.log(`[SPEECH-EXECUTION-${sessionId}] Speech canceled - normal operation`);
-              // Don't advance on cancellation as it's usually intentional
-              return;
-              
-            case 'interrupted':
-              console.log(`[SPEECH-EXECUTION-${sessionId}] Speech interrupted - advancing`);
+            case 'synthesis-unavailable':
+            case 'synthesis-failed':
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Synthesis error - advancing`);
               if (!paused && !muted) {
                 setTimeout(() => goToNextWord(), 1000);
               }
-              return;
+              break;
               
             default:
-              console.log(`[SPEECH-EXECUTION-${sessionId}] Generic error handling`);
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Generic error handling for: ${event.error}`);
+              // For other errors, try to advance after a delay
+              if (!paused && !muted) {
+                setTimeout(() => goToNextWord(), 1500);
+              }
           }
           
           // Retry logic for recoverable errors
-          if (event.error !== 'canceled' && event.error !== 'interrupted') {
+          const recoverableErrors: SpeechSynthesisErrorCode[] = ['network', 'audio-busy', 'synthesis-failed'];
+          if (recoverableErrors.includes(event.error)) {
             if (incrementRetryAttempts()) {
-              console.log(`[SPEECH-EXECUTION-${sessionId}] Retrying after error`);
+              console.log(`[SPEECH-EXECUTION-${sessionId}] Retrying after recoverable error`);
               setTimeout(() => {
                 if (!paused && !muted && !wordTransitionRef.current) {
                   setPlayInProgress(false);
