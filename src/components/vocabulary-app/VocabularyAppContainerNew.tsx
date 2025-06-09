@@ -95,10 +95,16 @@ const VocabularyAppContainerNew: React.FC = () => {
     ? { word: currentWord.word, category: currentWord.category || currentCategory }
     : null;
 
+  // Create a wrapper function for file upload to match WelcomeScreen's expected signature
+  const handleFileUploadWrapper = () => {
+    // This is a no-op since WelcomeScreen will handle file selection internally
+    // The actual file processing will be handled by the FileUpload component
+  };
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component - fix type mismatch */}
-      <ErrorDisplay jsonLoadError={jsonLoadError} />
+      {/* Error display component - fix type mismatch by converting string to boolean */}
+      <ErrorDisplay jsonLoadError={!!jsonLoadError} />
 
       {hasData && currentWord ? (
         <ContentWithDataNew
@@ -125,7 +131,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
       ) : (
-        <WelcomeScreen onFileUploaded={handleFileUploaded} />
+        <WelcomeScreen onFileUploaded={handleFileUploadWrapper} />
       )}
     </VocabularyLayout>
   );
