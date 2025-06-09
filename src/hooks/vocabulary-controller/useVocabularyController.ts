@@ -32,6 +32,18 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     currentWord: wordList[currentIndex]?.word
   });
 
+  // Enhanced voice debugging for mobile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      const debugInfo = directSpeechService.getDebugInfo();
+      console.log('[VOCAB-CONTROLLER] Speech service debug info:', debugInfo);
+      
+      // Log current voice info for the selected region
+      const voiceInfo = directSpeechService.getCurrentVoiceInfo(voiceRegion);
+      console.log(`[VOCAB-CONTROLLER] Current ${voiceRegion} voice info:`, voiceInfo);
+    }
+  }, [voiceRegion]);
+
   // Update current word reference
   const currentWord = wordList[currentIndex] || null;
   currentWordRef.current = currentWord;
@@ -60,7 +72,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     }
   }, []);
 
-  // Enhanced play current word with region-specific settings
+  // Enhanced play current word with region-specific settings and better logging
   const playCurrentWord = useCallback(async () => {
     console.log('[VOCAB-CONTROLLER] playCurrentWord called');
     
@@ -79,6 +91,10 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     
     console.log(`[VOCAB-CONTROLLER] Playing word: ${word.word} with ${voiceRegion} voice settings`);
 
+    // Log current voice info before attempting speech
+    const voiceInfo = directSpeechService.getCurrentVoiceInfo(voiceRegion);
+    console.log(`[VOCAB-CONTROLLER] Voice info for ${voiceRegion}:`, voiceInfo);
+
     setIsSpeaking(true);
 
     try {
@@ -89,6 +105,10 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
         example: word.example,
         onStart: () => {
           console.log(`[VOCAB-CONTROLLER] Speech started for: ${word.word} (${voiceRegion})`);
+          
+          // Additional mobile debugging
+          const debugInfo = directSpeechService.getDebugInfo();
+          console.log(`[VOCAB-CONTROLLER] Speech service state:`, debugInfo);
         },
         onEnd: () => {
           console.log(`[VOCAB-CONTROLLER] Speech ended for: ${word.word} (${voiceRegion})`);
@@ -105,6 +125,10 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
         onError: (error) => {
           console.error(`[VOCAB-CONTROLLER] Speech error for ${voiceRegion}:`, error);
           setIsSpeaking(false);
+          
+          // Log additional debug info on error
+          const debugInfo = directSpeechService.getDebugInfo();
+          console.error(`[VOCAB-CONTROLLER] Debug info on error:`, debugInfo);
           
           // Still advance on error with region-specific timing
           if (!pausedRef.current && !mutedRef.current) {
@@ -228,11 +252,19 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
     const newTiming = getRegionTiming(newRegion);
     
+    console.log(`[VOCAB-CONTROLLER] Switching from ${voiceRegion} to ${newRegion}`);
+    
     setVoiceRegion(newRegion);
     
     // Stop current speech and restart with new voice and timing
     directSpeechService.stop();
     setIsSpeaking(false);
+    
+    // Log voice info for new region
+    setTimeout(() => {
+      const voiceInfo = directSpeechService.getCurrentVoiceInfo(newRegion);
+      console.log(`[VOCAB-CONTROLLER] New ${newRegion} voice info:`, voiceInfo);
+    }, 100);
     
     if (!pausedRef.current && !mutedRef.current && currentWordRef.current) {
       setTimeout(() => {
@@ -296,6 +328,10 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     playCurrentWord,
     
     // Utils
-    wordCount: wordList.length
+    wordCount: wordList.length,
+    
+    // Debug info
+    getVoiceDebugInfo: () => directSpeechService.getDebugInfo(),
+    getCurrentVoiceInfo: () => directSpeechService.getCurrentVoiceInfo(voiceRegion)
   };
 };
