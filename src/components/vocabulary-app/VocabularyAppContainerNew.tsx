@@ -6,7 +6,7 @@ import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
+import { useMobileVocabularyController } from "@/hooks/vocabulary-controller/useMobileVocabularyController";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 
 const VocabularyAppContainerNew: React.FC = () => {
@@ -30,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller
+  // Use our new mobile-optimized vocabulary controller
   const {
     currentWord,
     currentIndex,
@@ -45,9 +45,9 @@ const VocabularyAppContainerNew: React.FC = () => {
     toggleVoice,
     playCurrentWord,
     wordCount
-  } = useVocabularyController(wordList || []);
+  } = useMobileVocabularyController(wordList || []);
 
-  console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
+  console.log('[VOCAB-CONTAINER-NEW] Mobile Controller state:', {
     currentWord: currentWord?.word,
     currentIndex,
     isPaused,
@@ -79,7 +79,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     }
   };
 
-  // Enhanced button handlers with user interaction tracking
+  // Enhanced button handlers for mobile
   const handleManualNext = () => {
     console.log('[VOCAB-CONTAINER-NEW] Manual next button clicked');
     goToNext();
@@ -103,7 +103,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component - fix type mismatch by converting string to boolean */}
+      {/* Error display component */}
       <ErrorDisplay jsonLoadError={!!jsonLoadError} />
 
       {hasData && currentWord ? (
