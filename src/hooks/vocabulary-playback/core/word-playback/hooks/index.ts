@@ -16,6 +16,10 @@ export * from './useSpeechPermissionManager';
 export * from './useCurrentWordCalculation';
 export * from './usePlaybackExecution';
 
+// Export new orchestrator hooks
+export * from './useOrchestratorCore';
+export * from './usePlaybackCoordination';
+
 // Export speech execution sub-modules
 export * from './speech-execution/useSpeechValidation';
 export * from './speech-execution/useSpeechErrorHandler';

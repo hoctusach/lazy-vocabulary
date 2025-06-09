@@ -1,16 +1,12 @@
 
+import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { useOrchestratorCore } from './useOrchestratorCore';
 
 /**
- * Simplified orchestrator that delegates to the core orchestrator logic
+ * Hook for coordinating the playback execution with all the required dependencies
  */
-export const usePlaybackOrchestrator = (
-  wordList: VocabularyWord[],
-  currentIndex: number,
-  muted: boolean,
-  paused: boolean,
+export const usePlaybackCoordination = (
   findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
@@ -22,14 +18,28 @@ export const usePlaybackOrchestrator = (
   goToNextWord: () => void,
   voicesLoadedRef: React.MutableRefObject<boolean>,
   ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>
+  permissionErrorShownRef: React.MutableRefObject<boolean>,
+  paused: boolean,
+  muted: boolean
 ) => {
-  // Use the core orchestrator that handles all the complex logic
-  return useOrchestratorCore(
-    wordList,
-    currentIndex,
-    muted,
-    paused,
+  const createPlaybackContext = useCallback(() => {
+    return {
+      findVoice,
+      selectedVoice,
+      setIsSpeaking,
+      speakingRef,
+      resetRetryAttempts,
+      incrementRetryAttempts,
+      checkSpeechSupport,
+      wordTransitionRef,
+      goToNextWord,
+      voicesLoadedRef,
+      ensureVoicesLoaded,
+      permissionErrorShownRef,
+      paused,
+      muted
+    };
+  }, [
     findVoice,
     selectedVoice,
     setIsSpeaking,
@@ -41,6 +51,12 @@ export const usePlaybackOrchestrator = (
     goToNextWord,
     voicesLoadedRef,
     ensureVoicesLoaded,
-    permissionErrorShownRef
-  );
+    permissionErrorShownRef,
+    paused,
+    muted
+  ]);
+
+  return {
+    createPlaybackContext
+  };
 };
