@@ -3,7 +3,7 @@ import { VocabularyWord, SheetData } from "@/types/vocabulary";
 
 export class WordNavigation {
   private data: SheetData;
-  private currentSheetName: string = "All words";
+  private currentSheetName: string = "phrasal verbs";
   private shuffledIndices: number[] = [];
   private currentIndex: number = -1;
   private lastWordChangeTime: number = 0;
@@ -23,7 +23,13 @@ export class WordNavigation {
   }
   
   setCurrentSheetName(sheetName: string): void {
-    this.currentSheetName = sheetName;
+    // Ensure the sheet exists and is valid
+    if (this.sheetOptions.includes(sheetName)) {
+      this.currentSheetName = sheetName;
+    } else {
+      console.warn(`Invalid sheet name "${sheetName}", defaulting to "phrasal verbs"`);
+      this.currentSheetName = "phrasal verbs";
+    }
   }
   
   shuffleCurrentSheet(): void {
