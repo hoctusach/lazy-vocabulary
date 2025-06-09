@@ -3,14 +3,6 @@ import { SpeechSynthesisVoice } from '@/types/speech';
 import { getVoiceByRegion } from '../voiceUtils';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 
-interface SpeechConfig {
-  voice: SpeechSynthesisVoice | null;
-  langCode: string;
-  rate: number;
-  pitch: number;
-  volume: number;
-}
-
 export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 'US' | 'UK'): void => {
   const langCode = region === 'US' ? 'en-US' : 'en-GB';
   const voice = getVoiceByRegion(region);
@@ -38,4 +30,3 @@ export const validateSpeechSupport = (): boolean => {
   }
   return true;
 };
-

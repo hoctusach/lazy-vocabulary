@@ -1,5 +1,5 @@
 
-// Re-export all functions from the modular components
+// Main speech engine - re-exports all core functionality from focused modules
 export {
   stopSpeaking,
   pauseSpeaking,
