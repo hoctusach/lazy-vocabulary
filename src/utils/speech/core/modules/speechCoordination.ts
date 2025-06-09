@@ -1,11 +1,17 @@
 
-// Enhanced coordination module to prevent premature speech cancellation
+// Enhanced coordination module that respects pause states
 let activeSpeechId: string | null = null;
 let speechQueue: Array<{ id: string; text: string; options: any }> = [];
 let isProcessingQueue = false;
 
 export const registerSpeechRequest = (speechId: string, text: string, options: any): boolean => {
   console.log(`[COORDINATION] Registering speech request: ${speechId}`);
+  
+  // Check if speech is globally paused - if so, reject new requests
+  if (window.speechSynthesis?.paused) {
+    console.log(`[COORDINATION] Speech is paused, rejecting request ${speechId}`);
+    return false;
+  }
   
   // If there's already active speech, queue this request
   if (activeSpeechId && activeSpeechId !== speechId) {
@@ -24,7 +30,10 @@ export const unregisterSpeechRequest = (speechId: string): void => {
   
   if (activeSpeechId === speechId) {
     activeSpeechId = null;
-    processNextInQueue();
+    // Don't automatically process queue if speech is paused
+    if (!window.speechSynthesis?.paused) {
+      processNextInQueue();
+    }
   }
 };
 
@@ -45,6 +54,12 @@ export const clearAllSpeechRequests = (): void => {
 
 const processNextInQueue = (): void => {
   if (isProcessingQueue || speechQueue.length === 0) return;
+  
+  // Don't process queue if speech is paused
+  if (window.speechSynthesis?.paused) {
+    console.log('[COORDINATION] Speech is paused, not processing queue');
+    return;
+  }
   
   isProcessingQueue = true;
   const nextRequest = speechQueue.shift();

@@ -8,7 +8,7 @@ import {
 } from './core/modules/speechCoordination';
 
 /**
- * Simplified speech controller with improved coordination and pause handling
+ * Simplified speech controller with proper pause/resume functionality
  */
 class SimpleSpeechController {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
@@ -17,6 +17,8 @@ class SimpleSpeechController {
   private speechStarted = false;
   private speechEnded = false;
   private isPausedByUser = false;
+  private pausedText: string | null = null;
+  private pausedOptions: any = null;
 
   async speak(
     text: string,
@@ -36,9 +38,11 @@ class SimpleSpeechController {
         const speechId = Math.random().toString(36).substring(7);
         console.log(`[SIMPLE-CONTROLLER-${speechId}] Starting speech process for text:`, text.substring(0, 50));
         
-        // Check if user has paused
+        // Check if user has paused - if so, store for later and reject
         if (this.isPausedByUser && !options.allowOverride) {
-          console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech is paused by user, skipping`);
+          console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech is paused by user, storing text for resume`);
+          this.pausedText = text;
+          this.pausedOptions = options;
           resolve(false);
           return;
         }
@@ -55,8 +59,8 @@ class SimpleSpeechController {
         await unlockAudio();
         await loadVoicesAndWait();
 
-        // Only stop current speech if we're actually speaking and this isn't a pause override
-        if (this.isActive && window.speechSynthesis.speaking && !options.allowOverride) {
+        // Stop current speech if we're actually speaking
+        if (this.isActive && window.speechSynthesis.speaking) {
           console.log(`[SIMPLE-CONTROLLER-${speechId}] Stopping current speech before starting new one`);
           this.stop();
           await new Promise(r => setTimeout(r, 100));
@@ -66,6 +70,8 @@ class SimpleSpeechController {
         this.speechStarted = false;
         this.speechEnded = false;
         this.currentSpeechId = speechId;
+        this.pausedText = null;
+        this.pausedOptions = null;
         
         // Create new utterance
         const utterance = new SpeechSynthesisUtterance(text);
@@ -79,7 +85,7 @@ class SimpleSpeechController {
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;
         
-        // Set up event handlers with enhanced logging
+        // Set up event handlers
         utterance.onstart = () => {
           console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech started successfully`);
           this.speechStarted = true;
@@ -113,7 +119,7 @@ class SimpleSpeechController {
           
           if (options.onError) options.onError(event);
           
-          // Handle cancellation differently when paused
+          // Handle cancellation due to pause
           if (event.error === 'canceled' && this.isPausedByUser) {
             console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech canceled due to pause, treating as success`);
             resolve(true);
@@ -131,12 +137,18 @@ class SimpleSpeechController {
         console.log(`[SIMPLE-CONTROLLER-${speechId}] Initiating speech synthesis`);
         window.speechSynthesis.speak(utterance);
         
-        // Enhanced speech monitoring
+        // Speech monitoring
         let monitorAttempts = 0;
         const maxMonitorAttempts = 15;
         
         const monitorSpeech = () => {
           monitorAttempts++;
+          
+          // Check if speech was paused during monitoring
+          if (this.isPausedByUser) {
+            console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech paused during monitoring`);
+            return;
+          }
           
           // Check if this speech is still the active one
           if (!isActiveSpeechRequest(speechId)) {
@@ -151,11 +163,6 @@ class SimpleSpeechController {
           
           if (this.speechEnded) {
             console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech ended before monitoring complete`);
-            return;
-          }
-
-          if (this.isPausedByUser) {
-            console.log(`[SIMPLE-CONTROLLER-${speechId}] Speech paused by user during monitoring`);
             return;
           }
           
@@ -215,26 +222,65 @@ class SimpleSpeechController {
     this.speechStarted = false;
     this.speechEnded = false;
     this.isPausedByUser = false;
+    this.pausedText = null;
+    this.pausedOptions = null;
   }
 
   pause(): void {
     console.log('[SIMPLE-CONTROLLER] Pause requested');
     this.isPausedByUser = true;
     
-    if (window.speechSynthesis && this.isActive) {
-      window.speechSynthesis.cancel();
+    // If currently speaking, try to pause properly first
+    if (this.isActive && window.speechSynthesis.speaking) {
+      console.log('[SIMPLE-CONTROLLER] Attempting to pause current speech');
+      
+      // Store current speech for potential resume
+      if (this.currentUtterance) {
+        this.pausedText = this.currentUtterance.text;
+        // Note: We can't store the full options, but we can store basic info
+      }
+      
+      // Try to pause first, then cancel if needed
+      try {
+        window.speechSynthesis.pause();
+        
+        // Check if pause worked after a short delay
+        setTimeout(() => {
+          if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+            console.log('[SIMPLE-CONTROLLER] Pause failed, canceling speech');
+            window.speechSynthesis.cancel();
+          }
+        }, 100);
+      } catch (error) {
+        console.log('[SIMPLE-CONTROLLER] Pause failed, canceling speech:', error);
+        window.speechSynthesis.cancel();
+      }
     }
   }
 
   resume(): void {
     console.log('[SIMPLE-CONTROLLER] Resume requested');
+    
+    // Check if speech synthesis is paused and try to resume
+    if (window.speechSynthesis.paused) {
+      console.log('[SIMPLE-CONTROLLER] Resuming paused speech');
+      window.speechSynthesis.resume();
+    }
+    
     this.isPausedByUser = false;
     
-    // Note: Resume will be handled by the calling code re-initiating speech
+    // If we had stored text for resume, the calling code will handle re-speaking it
   }
 
   isPaused(): boolean {
     return this.isPausedByUser;
+  }
+
+  getPausedContent(): { text: string | null; options: any } {
+    return {
+      text: this.pausedText,
+      options: this.pausedOptions
+    };
   }
 
   getState() {
@@ -244,7 +290,8 @@ class SimpleSpeechController {
       currentUtterance: this.currentUtterance,
       speechStarted: this.speechStarted,
       speechEnded: this.speechEnded,
-      currentSpeechId: this.currentSpeechId
+      currentSpeechId: this.currentSpeechId,
+      pausedText: this.pausedText
     };
   }
 }

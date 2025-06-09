@@ -45,21 +45,29 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     }
   }, [currentWord, muted, paused, playWord]);
 
-  // Handle pause state changes
+  // Handle pause state changes with immediate effect
   useEffect(() => {
     console.log(`[SIMPLE-VOCABULARY] Pause state changed - paused: ${paused}, muted: ${muted}`);
     
     if (paused) {
-      console.log('[SIMPLE-VOCABULARY] Pausing speech controller');
+      console.log('[SIMPLE-VOCABULARY] Pausing speech controller immediately');
       simpleSpeechController.pause();
-    } else if (!muted && currentWord) {
-      console.log('[SIMPLE-VOCABULARY] Resuming - attempting to play current word');
-      // When unpausing, play the current word
+    } else if (!muted) {
+      console.log('[SIMPLE-VOCABULARY] Resuming - first trying to resume, then playing current word');
+      
+      // Try to resume first
+      simpleSpeechController.resume();
+      
+      // Check if we had paused content to resume
+      const pausedContent = simpleSpeechController.getPausedContent();
+      
+      // Always play current word when unpausing to ensure consistent behavior
       setTimeout(() => {
         if (!paused && !muted && currentWord) {
+          console.log('[SIMPLE-VOCABULARY] Playing current word after resume');
           playWord(currentWord);
         }
-      }, 100);
+      }, 200);
     }
   }, [paused, muted, currentWord, playWord]);
 
@@ -85,8 +93,13 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   }, [muted]);
 
   const togglePause = useCallback(() => {
-    console.log(`[SIMPLE-VOCABULARY] Toggling pause: ${!paused}`);
-    setPaused(!paused);
+    const newPaused = !paused;
+    console.log(`[SIMPLE-VOCABULARY] Toggling pause: ${newPaused}`);
+    
+    // Update state immediately for responsive UI
+    setPaused(newPaused);
+    
+    // The useEffect above will handle the actual pause/resume logic
   }, [paused]);
 
   const playCurrentWord = useCallback(() => {

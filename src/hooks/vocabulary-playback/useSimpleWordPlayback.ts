@@ -22,21 +22,21 @@ export const useSimpleWordPlayback = (
     const playbackId = Math.random().toString(36).substring(7);
     console.log(`[WORD-PLAYBACK-${playbackId}] Playing word: ${word.word}`);
 
-    // Check if speech controller is paused
+    // Check if speech controller is paused - this is the critical check
     if (simpleSpeechController.isPaused()) {
-      console.log(`[WORD-PLAYBACK-${playbackId}] Speech controller is paused, skipping`);
+      console.log(`[WORD-PLAYBACK-${playbackId}] Speech controller is paused, skipping playback`);
+      return;
+    }
+
+    // Check local conditions
+    if (muted || paused) {
+      console.log(`[WORD-PLAYBACK-${playbackId}] Skipping - muted: ${muted}, paused: ${paused}`);
       return;
     }
 
     // Prevent overlapping playback
     if (playingRef.current) {
       console.log(`[WORD-PLAYBACK-${playbackId}] Already playing, skipping`);
-      return;
-    }
-
-    // Check conditions
-    if (muted || paused) {
-      console.log(`[WORD-PLAYBACK-${playbackId}] Skipping - muted: ${muted}, paused: ${paused}`);
       return;
     }
 
@@ -67,7 +67,7 @@ export const useSimpleWordPlayback = (
           console.log(`[WORD-PLAYBACK-${playbackId}] Speech completed, checking auto-advance`);
           playingRef.current = false;
           
-          // Only auto-advance if not paused/muted and speech controller isn't paused
+          // Check all conditions before auto-advancing
           if (!paused && !muted && !simpleSpeechController.isPaused()) {
             console.log(`[WORD-PLAYBACK-${playbackId}] Auto-advancing to next word`);
             setTimeout(() => {
@@ -87,7 +87,7 @@ export const useSimpleWordPlayback = (
           playingRef.current = false;
           
           // Still advance on error to prevent getting stuck
-          if (!paused && !muted) {
+          if (!paused && !muted && !simpleSpeechController.isPaused()) {
             setTimeout(() => goToNextWord(), 2000);
           }
         }
@@ -96,7 +96,7 @@ export const useSimpleWordPlayback = (
       if (!success) {
         console.log(`[WORD-PLAYBACK-${playbackId}] Speech failed to start, advancing`);
         playingRef.current = false;
-        if (!paused && !muted) {
+        if (!paused && !muted && !simpleSpeechController.isPaused()) {
           setTimeout(() => goToNextWord(), 2000);
         }
       }
@@ -106,7 +106,7 @@ export const useSimpleWordPlayback = (
       playingRef.current = false;
       
       // Always advance on exception
-      if (!paused && !muted) {
+      if (!paused && !muted && !simpleSpeechController.isPaused()) {
         setTimeout(() => goToNextWord(), 2000);
       }
     }
