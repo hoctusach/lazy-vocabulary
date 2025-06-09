@@ -5,7 +5,7 @@ import { directSpeechService } from '@/services/speech/directSpeechService';
 import { toast } from 'sonner';
 
 /**
- * Unified vocabulary controller with immediate response and single source of truth
+ * Enhanced vocabulary controller with region-specific timing and improved speech management
  */
 export const useVocabularyController = (wordList: VocabularyWord[]) => {
   // Core state - single source of truth
@@ -36,6 +36,22 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   const currentWord = wordList[currentIndex] || null;
   currentWordRef.current = currentWord;
 
+  // Get region-specific timing settings
+  const getRegionTiming = useCallback((region: 'US' | 'UK') => {
+    return {
+      US: {
+        wordInterval: 4000, // Longer interval for US voices
+        errorRetryDelay: 3000,
+        resumeDelay: 200
+      },
+      UK: {
+        wordInterval: 3000,
+        errorRetryDelay: 2500,
+        resumeDelay: 150
+      }
+    }[region];
+  }, []);
+
   // Clear any pending auto-play
   const clearAutoPlay = useCallback(() => {
     if (autoPlayTimeoutRef.current) {
@@ -44,7 +60,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     }
   }, []);
 
-  // Play current word with immediate state checks
+  // Enhanced play current word with region-specific settings
   const playCurrentWord = useCallback(async () => {
     console.log('[VOCAB-CONTROLLER] playCurrentWord called');
     
@@ -59,53 +75,58 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     }
 
     const word = currentWordRef.current;
-    console.log(`[VOCAB-CONTROLLER] Playing word: ${word.word}`);
+    const timing = getRegionTiming(voiceRegion);
+    
+    console.log(`[VOCAB-CONTROLLER] Playing word: ${word.word} with ${voiceRegion} voice settings`);
 
     setIsSpeaking(true);
 
-    const speechText = `${word.word}. ${word.meaning}. ${word.example}`;
-    
     try {
-      const success = await directSpeechService.speak(speechText, {
+      const success = await directSpeechService.speak(word.word, {
         voiceRegion,
+        word: word.word,
+        meaning: word.meaning,
+        example: word.example,
         onStart: () => {
-          console.log(`[VOCAB-CONTROLLER] Speech started for: ${word.word}`);
+          console.log(`[VOCAB-CONTROLLER] Speech started for: ${word.word} (${voiceRegion})`);
         },
         onEnd: () => {
-          console.log(`[VOCAB-CONTROLLER] Speech ended for: ${word.word}`);
+          console.log(`[VOCAB-CONTROLLER] Speech ended for: ${word.word} (${voiceRegion})`);
           setIsSpeaking(false);
           
-          // Auto-advance to next word if not paused or muted
+          // Auto-advance with region-specific timing if not paused or muted
           if (!pausedRef.current && !mutedRef.current) {
+            console.log(`[VOCAB-CONTROLLER] Scheduling next word in ${timing.wordInterval}ms`);
             autoPlayTimeoutRef.current = window.setTimeout(() => {
               goToNext();
-            }, 1000);
+            }, timing.wordInterval);
           }
         },
         onError: (error) => {
-          console.error('[VOCAB-CONTROLLER] Speech error:', error);
+          console.error(`[VOCAB-CONTROLLER] Speech error for ${voiceRegion}:`, error);
           setIsSpeaking(false);
           
-          // Still advance on error if not paused/muted
+          // Still advance on error with region-specific timing
           if (!pausedRef.current && !mutedRef.current) {
+            console.log(`[VOCAB-CONTROLLER] Retrying in ${timing.errorRetryDelay}ms after error`);
             autoPlayTimeoutRef.current = window.setTimeout(() => {
               goToNext();
-            }, 2000);
+            }, timing.errorRetryDelay);
           }
         }
       });
 
       if (!success) {
-        console.warn('[VOCAB-CONTROLLER] Speech failed to start');
+        console.warn(`[VOCAB-CONTROLLER] Speech failed to start for ${voiceRegion}`);
         setIsSpeaking(false);
       }
     } catch (error) {
       console.error('[VOCAB-CONTROLLER] Error in playCurrentWord:', error);
       setIsSpeaking(false);
     }
-  }, [voiceRegion]);
+  }, [voiceRegion, getRegionTiming]);
 
-  // Navigation controls
+  // Navigation controls with enhanced state management
   const goToNext = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] goToNext called');
     
@@ -138,11 +159,12 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     });
   }, [wordList.length, clearAutoPlay]);
 
-  // Control functions with immediate response
+  // Enhanced control functions with region-aware timing
   const togglePause = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] togglePause called');
     
     const newPaused = !isPaused;
+    const timing = getRegionTiming(voiceRegion);
     
     // Update state immediately
     setIsPaused(newPaused);
@@ -156,24 +178,24 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
       setIsSpeaking(false);
       toast.info("Playback paused");
     } else {
-      // Resume
-      console.log('[VOCAB-CONTROLLER] ✓ RESUMING - will play current word');
+      // Resume with region-specific timing
+      console.log(`[VOCAB-CONTROLLER] ✓ RESUMING - will play current word in ${timing.resumeDelay}ms`);
       if (!mutedRef.current && currentWordRef.current) {
-        // Small delay to ensure state is updated
         setTimeout(() => {
           if (!pausedRef.current) {
             playCurrentWord();
           }
-        }, 100);
+        }, timing.resumeDelay);
       }
       toast.success("Playback resumed");
     }
-  }, [isPaused, clearAutoPlay, playCurrentWord]);
+  }, [isPaused, clearAutoPlay, playCurrentWord, getRegionTiming, voiceRegion]);
 
   const toggleMute = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] toggleMute called');
     
     const newMuted = !isMuted;
+    const timing = getRegionTiming(voiceRegion);
     
     // Update state immediately
     setIsMuted(newMuted);
@@ -187,60 +209,64 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
       setIsSpeaking(false);
       toast.info("Audio muted");
     } else {
-      // Unmute
-      console.log('[VOCAB-CONTROLLER] ✓ UNMUTING - will play current word');
+      // Unmute with region-specific timing
+      console.log(`[VOCAB-CONTROLLER] ✓ UNMUTING - will play current word in ${timing.resumeDelay}ms`);
       if (!pausedRef.current && currentWordRef.current) {
         setTimeout(() => {
           if (!mutedRef.current) {
             playCurrentWord();
           }
-        }, 100);
+        }, timing.resumeDelay);
       }
       toast.success("Audio unmuted");
     }
-  }, [isMuted, clearAutoPlay, playCurrentWord]);
+  }, [isMuted, clearAutoPlay, playCurrentWord, getRegionTiming, voiceRegion]);
 
   const toggleVoice = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] toggleVoice called');
     
     const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
+    const newTiming = getRegionTiming(newRegion);
+    
     setVoiceRegion(newRegion);
     
-    // Stop current speech and restart with new voice
+    // Stop current speech and restart with new voice and timing
     directSpeechService.stop();
     setIsSpeaking(false);
     
     if (!pausedRef.current && !mutedRef.current && currentWordRef.current) {
       setTimeout(() => {
         playCurrentWord();
-      }, 200);
+      }, newTiming.resumeDelay);
     }
     
     toast.success(`Voice changed to ${newRegion}`);
-  }, [voiceRegion, playCurrentWord]);
+  }, [voiceRegion, playCurrentWord, getRegionTiming]);
 
-  // Auto-play effect when word changes
+  // Enhanced auto-play effect with region-specific timing
   useEffect(() => {
     console.log('[VOCAB-CONTROLLER] Word changed effect');
     
     if (!currentWord) return;
+    
+    const timing = getRegionTiming(voiceRegion);
     
     // Clear any pending speech
     clearAutoPlay();
     directSpeechService.stop();
     setIsSpeaking(false);
     
-    // Auto-play if not paused or muted
+    // Auto-play with region-specific delay if not paused or muted
     if (!pausedRef.current && !mutedRef.current) {
       const playDelay = setTimeout(() => {
         if (!pausedRef.current && !mutedRef.current) {
           playCurrentWord();
         }
-      }, 500);
+      }, timing.resumeDelay);
       
       return () => clearTimeout(playDelay);
     }
-  }, [currentWord, playCurrentWord, clearAutoPlay]);
+  }, [currentWord, playCurrentWord, clearAutoPlay, getRegionTiming, voiceRegion]);
 
   // Cleanup on unmount
   useEffect(() => {

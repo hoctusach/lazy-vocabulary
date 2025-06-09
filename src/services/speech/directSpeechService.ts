@@ -2,22 +2,56 @@
 import { getVoiceByRegion } from '@/utils/speech/voiceUtils';
 
 /**
- * Direct speech service with immediate cancellation and reliable state management
+ * Enhanced direct speech service with region-specific settings and proper text formatting
  */
 class DirectSpeechService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isActive = false;
 
+  // Region-specific speech settings
+  private getRegionSettings(region: 'US' | 'UK') {
+    return {
+      US: {
+        rate: 0.7, // Slower for US voices
+        pitch: 1.0,
+        volume: 1.0,
+        pauseDuration: 800 // Longer pauses for US
+      },
+      UK: {
+        rate: 0.8,
+        pitch: 1.0,
+        volume: 1.0,
+        pauseDuration: 600
+      }
+    }[region];
+  }
+
+  // Format text with proper breaks between segments
+  private formatTextWithBreaks(word: string, meaning: string, example: string, region: 'US' | 'UK'): string {
+    const settings = this.getRegionSettings(region);
+    const breakDuration = Math.floor(settings.pauseDuration);
+    
+    // Use SSML-like pauses that work with speech synthesis
+    const shortBreak = '. '; // Natural pause
+    const mediumBreak = '... '; // Longer pause
+    
+    return `${word}${mediumBreak}${meaning}${mediumBreak}${example}${shortBreak}`;
+  }
+
   async speak(
     text: string, 
     options: {
       voiceRegion?: 'US' | 'UK';
+      word?: string;
+      meaning?: string;
+      example?: string;
       onStart?: () => void;
       onEnd?: () => void;
       onError?: (error: any) => void;
     } = {}
   ): Promise<boolean> {
-    console.log('[DIRECT-SPEECH] speak() called with text:', text.substring(0, 50) + '...');
+    const region = options.voiceRegion || 'US';
+    console.log(`[DIRECT-SPEECH] speak() called with region: ${region}`);
     
     // Stop any existing speech immediately
     this.stop();
@@ -32,56 +66,80 @@ class DirectSpeechService {
           return;
         }
 
+        // Format text with breaks if individual parts are provided
+        let speechText = text;
+        if (options.word && options.meaning && options.example) {
+          speechText = this.formatTextWithBreaks(
+            options.word,
+            options.meaning,
+            options.example,
+            region
+          );
+          console.log(`[DIRECT-SPEECH] Formatted text with breaks: ${speechText.substring(0, 100)}...`);
+        }
+
         // Create new utterance
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance(speechText);
         this.currentUtterance = utterance;
         this.isActive = true;
 
-        // Enhanced voice selection with the improved voice utils
-        const voice = getVoiceByRegion(options.voiceRegion || 'US', 'female');
+        // Get region-specific settings
+        const settings = this.getRegionSettings(region);
+
+        // Enhanced voice selection with region-specific preferences
+        const voice = getVoiceByRegion(region, 'female');
         if (voice) {
           utterance.voice = voice;
-          console.log('[DIRECT-SPEECH] Using voice:', voice.name, voice.lang);
+          console.log(`[DIRECT-SPEECH] Using ${region} voice: ${voice.name}, ${voice.lang}`);
         } else {
-          console.warn('[DIRECT-SPEECH] No suitable voice found, using default');
+          console.warn(`[DIRECT-SPEECH] No suitable ${region} voice found, using default`);
         }
 
-        // Configure utterance
-        utterance.rate = 0.8;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
+        // Apply region-specific settings
+        utterance.rate = settings.rate;
+        utterance.pitch = settings.pitch;
+        utterance.volume = settings.volume;
 
-        // Set up event handlers
+        console.log(`[DIRECT-SPEECH] Speech settings - Rate: ${settings.rate}, Region: ${region}`);
+
+        // Set up event handlers with enhanced timing
         utterance.onstart = () => {
-          console.log('[DIRECT-SPEECH] ✓ Speech started');
+          console.log(`[DIRECT-SPEECH] ✓ Speech started for ${region} voice`);
           options.onStart?.();
           resolve(true);
         };
 
         utterance.onend = () => {
-          console.log('[DIRECT-SPEECH] ✓ Speech ended normally');
+          console.log(`[DIRECT-SPEECH] ✓ Speech ended normally for ${region} voice`);
           this.cleanup();
-          options.onEnd?.();
+          
+          // Add region-specific delay before triggering onEnd
+          setTimeout(() => {
+            options.onEnd?.();
+          }, settings.pauseDuration);
         };
 
         utterance.onerror = (event) => {
-          console.error('[DIRECT-SPEECH] ✗ Speech error:', event.error);
+          console.error(`[DIRECT-SPEECH] ✗ Speech error for ${region} voice:`, event.error);
           this.cleanup();
           options.onError?.(event);
-          // Don't resolve false here since onstart might have already resolved true
         };
 
-        // Start speech
-        console.log('[DIRECT-SPEECH] Starting speech synthesis...');
-        window.speechSynthesis.speak(utterance);
+        // Start speech with small delay to ensure proper setup
+        console.log(`[DIRECT-SPEECH] Starting speech synthesis for ${region} voice...`);
+        setTimeout(() => {
+          if (this.currentUtterance === utterance && this.isActive) {
+            window.speechSynthesis.speak(utterance);
+          }
+        }, 100);
 
-        // Fallback timeout in case onstart never fires
+        // Fallback timeout with region-specific timing
         setTimeout(() => {
           if (this.isActive && this.currentUtterance === utterance) {
-            console.log('[DIRECT-SPEECH] Fallback - assuming speech started');
+            console.log(`[DIRECT-SPEECH] Fallback - assuming speech started for ${region}`);
             resolve(true);
           }
-        }, 1000);
+        }, 1500);
 
       } catch (error) {
         console.error('[DIRECT-SPEECH] Exception in speak():', error);
