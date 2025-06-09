@@ -56,7 +56,7 @@ export const useAutoPlay = (
       } else {
         console.log('[AUTO-PLAY] Conditions changed, skipping execution');
       }
-    }, 300); // Longer delay to prevent race conditions
+    }, 400); // Longer delay to prevent race conditions
     
     return () => {
       if (autoPlayTimeoutRef.current) {
