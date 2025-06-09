@@ -2,14 +2,13 @@
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
+import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { WordNavigation } from "./WordNavigation";
-import { VocabularyEventManager } from "./VocabularyEventManager";
-import { VocabularyFileProcessor } from "./VocabularyFileProcessor";
-import { VocabularyDataManager } from "./VocabularyDataManager";
-import { VocabularySheetManager } from "./VocabularySheetManager";
-import { VocabularyServiceCore } from "./VocabularyServiceCore";
+
+// Type for vocabulary change listeners
+type VocabularyChangeListener = () => void;
 
 export class VocabularyService {
   private data: SheetData;
@@ -18,11 +17,7 @@ export class VocabularyService {
   private dataProcessor: VocabularyDataProcessor;
   private importer: VocabularyImporter;
   private wordNavigation: WordNavigation;
-  private eventManager: VocabularyEventManager;
-  private fileProcessor: VocabularyFileProcessor;
-  private dataManager: VocabularyDataManager;
-  private sheetManagerService: VocabularySheetManager;
-  private core: VocabularyServiceCore;
+  private vocabularyChangeListeners: VocabularyChangeListener[] = [];
   
   readonly sheetOptions: string[];
   
@@ -35,38 +30,6 @@ export class VocabularyService {
     this.dataProcessor = new VocabularyDataProcessor();
     this.importer = new VocabularyImporter(this.storage);
     this.wordNavigation = new WordNavigation(this.data, this.sheetOptions);
-    this.eventManager = new VocabularyEventManager();
-    
-    // Initialize composed services
-    this.fileProcessor = new VocabularyFileProcessor(
-      this.storage,
-      this.sheetManager,
-      this.importer,
-      this.wordNavigation,
-      this.eventManager,
-      this.data
-    );
-    
-    this.dataManager = new VocabularyDataManager(
-      this.storage,
-      this.dataProcessor,
-      this.importer,
-      this.wordNavigation,
-      this.eventManager,
-      this.data,
-      this.sheetOptions
-    );
-    
-    this.sheetManagerService = new VocabularySheetManager(
-      this.wordNavigation,
-      this.eventManager
-    );
-    
-    this.core = new VocabularyServiceCore(
-      this.storage,
-      this.wordNavigation,
-      this.data
-    );
     
     // Get initial sheet name from localStorage if available
     try {
@@ -86,60 +49,192 @@ export class VocabularyService {
     console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
   
-  // Event management methods
-  addVocabularyChangeListener(listener: () => void): void {
-    this.eventManager.addVocabularyChangeListener(listener);
-  }
-  
-  removeVocabularyChangeListener(listener: () => void): void {
-    this.eventManager.removeVocabularyChangeListener(listener);
-  }
-  
-  // Core methods
+  // FIXED: Method to get complete word list for useVocabularyContainerState
   getWordList(): VocabularyWord[] {
-    return this.core.getWordList();
+    const currentSheet = this.wordNavigation.getCurrentSheetName();
+    if (this.data[currentSheet]) {
+      return [...this.data[currentSheet]];
+    }
+    return [];
   }
   
-  getCurrentWord(): VocabularyWord | null {
-    return this.core.getCurrentWord();
+  // FIXED: Method to add a vocabulary change listener
+  addVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners.push(listener);
   }
   
-  getNextWord(): VocabularyWord | null {
-    return this.core.getNextWord();
+  // FIXED: Method to remove a vocabulary change listener
+  removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
+    this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
   }
   
-  getLastWordChangeTime(): number {
-    return this.core.getLastWordChangeTime();
+  // Method to notify all listeners about vocabulary change
+  private notifyVocabularyChange(): void {
+    this.vocabularyChangeListeners.forEach(listener => listener());
   }
   
-  hasData(): boolean {
-    return this.dataManager.hasData();
+  private getTotalWordCount(): number {
+    let count = 0;
+    for (const sheetName in this.data) {
+      // Skip "All words" to avoid double counting
+      if (sheetName !== "All words") {
+        count += this.data[sheetName]?.length || 0;
+      }
+    }
+    return count;
   }
   
-  // File processing methods
   async processExcelFile(file: File): Promise<boolean> {
-    return this.fileProcessor.processExcelFile(file);
+    console.log("Processing Excel file in VocabularyService");
+    try {
+      const newData = await this.sheetManager.processExcelFile(file);
+      if (newData) {
+        // Store original data length for comparison
+        const originalWordCount = this.getTotalWordCount();
+        
+        // Merge the imported data with existing data
+        this.importer.mergeImportedData(newData, this.data);
+        
+        // Save the merged data to storage
+        const saveSuccess = this.storage.saveData(this.data);
+        if (!saveSuccess) {
+          console.error("Failed to save merged data to storage");
+          return false;
+        }
+        
+        // Update the word navigation with the new data
+        this.wordNavigation.updateData(this.data);
+        // Refresh the current sheet
+        this.wordNavigation.shuffleCurrentSheet();
+        
+        // Log results of the import
+        const newWordCount = this.getTotalWordCount();
+        console.log(`Excel import complete: ${newWordCount - originalWordCount} new words added, total ${newWordCount} words`);
+        console.log(`Current sheet "${this.wordNavigation.getCurrentSheetName()}" has ${this.data[this.wordNavigation.getCurrentSheetName()]?.length || 0} words`);
+        
+        // FIXED: Notify listeners about vocabulary change
+        this.notifyVocabularyChange();
+        
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error processing Excel file in VocabularyService:", error);
+      return false;
+    }
   }
   
-  // Data management methods
   loadDefaultVocabulary(data?: SheetData): boolean {
-    return this.dataManager.loadDefaultVocabulary(data);
+    try {
+      console.log("Loading default vocabulary data");
+      // Try to fetch the updated default vocabulary from public directory
+      fetch('/defaultVocabulary.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(fetchedData => {
+          console.log("Successfully loaded updated default vocabulary from JSON file");
+          // Process data to ensure all fields have proper types
+          this.data = this.dataProcessor.processDataTypes(fetchedData);
+          this.storage.saveData(this.data);
+          this.wordNavigation.setCurrentSheetName("All words");
+          this.wordNavigation.updateData(this.data);
+          this.wordNavigation.shuffleCurrentSheet();
+          
+          // FIXED: Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
+        })
+        .catch(error => {
+          console.warn("Failed to load from JSON file, using built-in default vocabulary:", error);
+          // Fallback to built-in default vocabulary if fetch fails
+          const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
+          this.data = this.dataProcessor.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
+          this.storage.saveData(this.data);
+          this.wordNavigation.setCurrentSheetName("All words");
+          this.wordNavigation.updateData(this.data);
+          this.wordNavigation.shuffleCurrentSheet();
+          
+          // FIXED: Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
+        });
+      
+      return true;
+    } catch (error) {
+      console.error("Failed to load default vocabulary:", error);
+      return false;
+    }
   }
   
-  mergeCustomWords(customData: SheetData): void {
-    this.dataManager.mergeCustomWords(customData);
-  }
-  
-  // Sheet management methods
   getCurrentSheetName(): string {
-    return this.sheetManagerService.getCurrentSheetName();
+    return this.wordNavigation.getCurrentSheetName();
   }
   
   switchSheet(sheetName: string): boolean {
-    return this.sheetManagerService.switchSheet(sheetName);
+    const result = this.wordNavigation.switchSheet(sheetName);
+    if (result) {
+      // FIXED: Notify listeners about vocabulary change when sheet is switched
+      this.notifyVocabularyChange();
+    }
+    return result;
   }
   
   nextSheet(): string {
-    return this.sheetManagerService.nextSheet();
+    const result = this.wordNavigation.nextSheet();
+    // FIXED: Notify listeners about vocabulary change when sheet is changed
+    this.notifyVocabularyChange();
+    return result;
+  }
+  
+  getCurrentWord(): VocabularyWord | null {
+    return this.wordNavigation.getCurrentWord();
+  }
+  
+  getNextWord(): VocabularyWord | null {
+    const word = this.wordNavigation.getNextWord();
+    
+    if (word) {
+      // Save updated data to storage after count increment
+      this.storage.saveData(this.data);
+    }
+    
+    return word;
+  }
+  
+  hasData(): boolean {
+    return Object.values(this.data).some(sheet => sheet && sheet.length > 0);
+  }
+  
+  getLastWordChangeTime(): number {
+    return this.wordNavigation.getLastWordChangeTime();
+  }
+  
+  mergeCustomWords(customData: SheetData): void {
+    console.log("Merging custom words with existing data");
+    
+    // Add each custom category to sheetOptions if it doesn't exist already
+    for (const category in customData) {
+      if (!this.sheetOptions.includes(category) && category !== "All words") {
+        (this.sheetOptions as string[]).push(category);
+        console.log(`Added new category: ${category}`);
+      }
+    }
+    
+    // Use the importer to merge words
+    this.importer.mergeImportedData(customData, this.data);
+    
+    // Update the word navigation with the new data
+    this.wordNavigation.updateData(this.data);
+    
+    // Refresh the current sheet
+    this.wordNavigation.shuffleCurrentSheet();
+    
+    // Save the updated data to storage
+    this.storage.saveData(this.data);
+    
+    // FIXED: Notify listeners about vocabulary change
+    this.notifyVocabularyChange();
   }
 }

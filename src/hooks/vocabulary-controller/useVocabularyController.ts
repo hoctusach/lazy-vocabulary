@@ -2,11 +2,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { directSpeechService } from '@/services/speech/directSpeechService';
-import { vocabularyService } from '@/services/vocabularyService';
 import { toast } from 'sonner';
 
 /**
- * Enhanced vocabulary controller with random word selection and improved speech management
+ * Enhanced vocabulary controller with region-specific timing and improved speech management
  */
 export const useVocabularyController = (wordList: VocabularyWord[]) => {
   // Core state - single source of truth
@@ -33,12 +32,9 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     currentWord: wordList[currentIndex]?.word
   });
 
-  // Get current word from vocabulary service instead of wordList[currentIndex]
-  // This ensures we get the random word from the service
-  const currentWord = vocabularyService.getCurrentWord();
+  // Update current word reference
+  const currentWord = wordList[currentIndex] || null;
   currentWordRef.current = currentWord;
-
-  console.log('[VOCAB-CONTROLLER] Current word from service:', currentWord?.word);
 
   // Get region-specific timing settings
   const getRegionTiming = useCallback((region: 'US' | 'UK') => {
@@ -130,7 +126,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     }
   }, [voiceRegion, getRegionTiming]);
 
-  // Navigation controls - use vocabulary service for random selection
+  // Navigation controls with enhanced state management
   const goToNext = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] goToNext called');
     
@@ -140,21 +136,28 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     directSpeechService.stop();
     setIsSpeaking(false);
     
-    // Get next random word from vocabulary service
-    const nextWord = vocabularyService.getNextWord();
-    if (nextWord) {
-      console.log(`[VOCAB-CONTROLLER] Moving to next random word: ${nextWord.word}`);
-      // Update the index to trigger re-renders (though we use service for actual word)
-      setCurrentIndex(prevIndex => (prevIndex + 1) % wordList.length);
-    }
+    setCurrentIndex(prevIndex => {
+      const nextIndex = (prevIndex + 1) % wordList.length;
+      console.log(`[VOCAB-CONTROLLER] Moving to index ${nextIndex}`);
+      return nextIndex;
+    });
   }, [wordList.length, clearAutoPlay]);
 
   const goToPrevious = useCallback(() => {
-    console.log('[VOCAB-CONTROLLER] goToPrevious called - not supported with random selection');
-    // Previous navigation doesn't make sense with random selection
-    // Could implement "go back to last word" functionality if needed
-    toast.info("Previous word not available with random selection");
-  }, []);
+    console.log('[VOCAB-CONTROLLER] goToPrevious called');
+    
+    if (wordList.length === 0) return;
+    
+    clearAutoPlay();
+    directSpeechService.stop();
+    setIsSpeaking(false);
+    
+    setCurrentIndex(prevIndex => {
+      const prevIndexCalc = prevIndex === 0 ? wordList.length - 1 : prevIndex - 1;
+      console.log(`[VOCAB-CONTROLLER] Moving to index ${prevIndexCalc}`);
+      return prevIndexCalc;
+    });
+  }, [wordList.length, clearAutoPlay]);
 
   // Enhanced control functions with region-aware timing
   const togglePause = useCallback(() => {

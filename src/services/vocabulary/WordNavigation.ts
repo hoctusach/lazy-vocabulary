@@ -1,32 +1,21 @@
 
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
-import { RandomWordSelector } from "./RandomWordSelector";
 
 export class WordNavigation {
   private data: SheetData;
   private currentSheetName: string = "All words";
+  private shuffledIndices: number[] = [];
+  private currentIndex: number = -1;
   private lastWordChangeTime: number = 0;
   private sheetOptions: string[];
-  private randomSelector: RandomWordSelector;
   
   constructor(data: SheetData, sheetOptions: string[]) {
     this.data = data;
     this.sheetOptions = sheetOptions;
-    this.randomSelector = new RandomWordSelector();
-    
-    // Initialize the random selector for the current sheet
-    this.initializeCurrentSheet();
-  }
-  
-  private initializeCurrentSheet(): void {
-    const currentData = this.data[this.currentSheetName] || [];
-    this.randomSelector.initializeCategory(this.currentSheetName, currentData);
   }
   
   updateData(newData: SheetData): void {
     this.data = newData;
-    // Reinitialize current sheet with new data
-    this.initializeCurrentSheet();
   }
   
   getCurrentSheetName(): string {
@@ -35,41 +24,49 @@ export class WordNavigation {
   
   setCurrentSheetName(sheetName: string): void {
     this.currentSheetName = sheetName;
-    this.initializeCurrentSheet();
   }
   
   shuffleCurrentSheet(): void {
-    console.log(`[WORD-NAVIGATION] Shuffling current sheet: ${this.currentSheetName}`);
+    console.log(`Shuffling current sheet: ${this.currentSheetName}`);
     const currentData = this.data[this.currentSheetName] || [];
     if (currentData.length === 0) {
-      console.log(`[WORD-NAVIGATION] No words in sheet "${this.currentSheetName}"`);
+      console.log(`No words in sheet "${this.currentSheetName}"`);
       return;
     }
     
-    // Initialize the random selector for this category
-    this.randomSelector.initializeCategory(this.currentSheetName, currentData);
-    console.log(`[WORD-NAVIGATION] Initialized random selection for "${this.currentSheetName}" with ${currentData.length} words`);
+    this.shuffledIndices = Array.from({ length: currentData.length }, (_, i) => i);
+    
+    // Fisher-Yates shuffle
+    for (let i = this.shuffledIndices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.shuffledIndices[i], this.shuffledIndices[j]] = [this.shuffledIndices[j], this.shuffledIndices[i]];
+    }
+    
+    // Reset to start with the first word
+    this.currentIndex = -1;
+    console.log(`Shuffled ${this.shuffledIndices.length} words in sheet "${this.currentSheetName}"`);
   }
   
   switchSheet(sheetName: string): boolean {
     // Ensure we never switch to an invalid category
     if (!sheetName || !this.sheetOptions.includes(sheetName)) {
-      console.warn(`[WORD-NAVIGATION] Invalid sheet name: ${sheetName}`);
+      console.warn(`Invalid sheet name: ${sheetName}`);
       return false;
     }
     
     // Don't do anything if we're already on this sheet
     if (this.currentSheetName === sheetName) {
-      console.log(`[WORD-NAVIGATION] Already on sheet: ${sheetName}`);
+      console.log(`Already on sheet: ${sheetName}`);
       return true;
     }
     
-    console.log(`[WORD-NAVIGATION] Switching sheet from "${this.currentSheetName}" to "${sheetName}"`);
+    console.log(`Switching sheet from "${this.currentSheetName}" to "${sheetName}"`);
     this.currentSheetName = sheetName;
     this.lastWordChangeTime = Date.now();
     
-    // Initialize the new sheet
-    this.initializeCurrentSheet();
+    // Reset index and re-shuffle the sheet
+    this.currentIndex = -1;
+    this.shuffleCurrentSheet();
     
     // Store current category in localStorage for persistence
     try {
@@ -78,7 +75,7 @@ export class WordNavigation {
       states.currentCategory = sheetName;
       localStorage.setItem('buttonStates', JSON.stringify(states));
     } catch (error) {
-      console.error("[WORD-NAVIGATION] Error saving current category to localStorage:", error);
+      console.error("Error saving current category to localStorage:", error);
     }
     
     return true;
@@ -89,12 +86,13 @@ export class WordNavigation {
     const nextIndex = (currentIndex + 1) % this.sheetOptions.length;
     const nextSheetName = this.sheetOptions[nextIndex];
     
-    console.log(`[WORD-NAVIGATION] Changing sheet from "${this.currentSheetName}" to "${nextSheetName}"`);
+    console.log(`Changing sheet from "${this.currentSheetName}" to "${nextSheetName}"`);
     this.currentSheetName = nextSheetName;
     this.lastWordChangeTime = Date.now();
     
-    // Initialize the new sheet
-    this.initializeCurrentSheet();
+    // Reset index and re-shuffle
+    this.currentIndex = -1;
+    this.shuffleCurrentSheet();
     
     // Store current category
     try {
@@ -103,7 +101,7 @@ export class WordNavigation {
       states.currentCategory = nextSheetName;
       localStorage.setItem('buttonStates', JSON.stringify(states));
     } catch (error) {
-      console.error("[WORD-NAVIGATION] Error saving current category to localStorage:", error);
+      console.error("Error saving current category to localStorage:", error);
     }
     
     return this.currentSheetName;
@@ -111,7 +109,26 @@ export class WordNavigation {
   
   getCurrentWord(): VocabularyWord | null {
     const currentData = this.data[this.currentSheetName] || [];
-    return this.randomSelector.getCurrentWord(this.currentSheetName, currentData);
+    if (currentData.length === 0 || this.shuffledIndices.length === 0) {
+      console.log(`No words available in sheet "${this.currentSheetName}"`);
+      return null;
+    }
+    
+    // If we haven't started yet, get the first word
+    if (this.currentIndex === -1) {
+      this.currentIndex = 0;
+    }
+    
+    if (this.currentIndex >= 0 && this.currentIndex < this.shuffledIndices.length) {
+      const wordIndex = this.shuffledIndices[this.currentIndex];
+      const word = currentData[wordIndex];
+      if (word) {
+        return {...word}; // Return a copy to prevent accidental modifications
+      }
+    }
+    
+    console.log("No current word set, returning null");
+    return null;
   }
   
   getNextWord(): VocabularyWord | null {
@@ -119,37 +136,38 @@ export class WordNavigation {
     this.lastWordChangeTime = Date.now();
     
     const currentData = this.data[this.currentSheetName] || [];
-    const word = this.randomSelector.getNextWord(this.currentSheetName, currentData);
-    
-    if (word) {
-      console.log(`[WORD-NAVIGATION] Advanced to next random word: "${word.word}" in category "${this.currentSheetName}"`);
+    if (currentData.length === 0 || this.shuffledIndices.length === 0) {
+      console.log(`No words available in sheet "${this.currentSheetName}"`);
+      return null;
     }
     
-    return word;
+    // Move to next word
+    this.currentIndex = (this.currentIndex + 1) % this.shuffledIndices.length;
+    const wordIndex = this.shuffledIndices[this.currentIndex];
+    
+    if (wordIndex !== undefined && currentData[wordIndex]) {
+      // Increment count and save
+      const currentValue = currentData[wordIndex].count;
+      // Convert to number, add 1, then store in the same format (string or number)
+      let newValue: string | number;
+      
+      if (typeof currentValue === 'string') {
+        newValue = String(parseInt(currentValue || '0', 10) + 1);
+      } else {
+        newValue = (currentValue || 0) + 1;
+      }
+      
+      currentData[wordIndex].count = newValue;
+      
+      console.log(`Moving to next word: "${currentData[wordIndex].word}" (index ${this.currentIndex}/${this.shuffledIndices.length-1})`);
+      return {...currentData[wordIndex]}; // Return a copy to prevent accidental modifications
+    }
+    
+    console.error("Failed to get next word - invalid index");
+    return null;
   }
   
   getLastWordChangeTime(): number {
     return this.lastWordChangeTime;
-  }
-  
-  /**
-   * Get statistics for the current category
-   */
-  getCurrentCategoryStats(): {
-    totalWords: number;
-    viewedWords: number;
-    currentPosition: number;
-    totalPositions: number;
-  } {
-    const currentData = this.data[this.currentSheetName] || [];
-    return this.randomSelector.getCategoryStats(this.currentSheetName, currentData);
-  }
-  
-  /**
-   * Reset viewed words for current category
-   */
-  resetCurrentCategoryProgress(): void {
-    this.randomSelector.resetViewedWords(this.currentSheetName);
-    this.initializeCurrentSheet();
   }
 }

@@ -12,7 +12,7 @@ import FileStatus from './file-upload/FileStatus';
 import SecurityTips from './file-upload/SecurityTips';
 
 interface FileUploadProps {
-  onFileUploaded: (file: File) => void;
+  onFileUploaded: () => void;
   onShowWordCard?: () => void;
   showBackButton?: boolean;
 }
