@@ -123,6 +123,8 @@ export const usePlaybackOrchestrator = (
       } else if (conditionCheck.reason === 'muted') {
         console.log('[PLAYBACK-ORCHESTRATOR] Speech is muted, auto-advancing after delay');
         setTimeout(() => goToNextWord(), 3000);
+      } else if (conditionCheck.reason === 'word-transition') {
+        setTimeout(playCurrentWord, 150);
       }
       return;
     }
