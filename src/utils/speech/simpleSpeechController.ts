@@ -26,8 +26,11 @@ class SimpleSpeechController {
         await unlockAudio();
         await loadVoicesAndWait();
 
-        // Stop any current speech
+        // Stop any current speech and wait briefly for the cancel
         this.stop();
+
+        // Allow the cancel operation to fully propagate
+        await new Promise(r => setTimeout(r, 50));
         
         // Create new utterance
         const utterance = new SpeechSynthesisUtterance(text);
