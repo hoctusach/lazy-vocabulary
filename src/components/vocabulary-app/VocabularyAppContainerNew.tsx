@@ -87,7 +87,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   const handleSwitchCategoryWithState = () => {
     console.log('[VOCAB-CONTAINER-NEW] Category switch button clicked');
-    handleSwitchCategory(isMuted, voiceRegion);
+    handleSwitchCategory();
   };
 
   // Debug data for the debug panel
