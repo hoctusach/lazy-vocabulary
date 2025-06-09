@@ -19,8 +19,6 @@ const VocabularyAppContainer: React.FC = () => {
   // Get base vocabulary state
   const {
     hasData,
-    currentWord: originalCurrentWord,
-    isPaused: originalIsPaused,
     handleFileUploaded,
     jsonLoadError,
     handleSwitchCategory,
@@ -32,7 +30,6 @@ const VocabularyAppContainer: React.FC = () => {
 
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData,
-    originalCurrentWord: originalCurrentWord?.word,
     wordListLength: wordList?.length || 0,
     currentCategory
   });
@@ -96,7 +93,6 @@ const VocabularyAppContainer: React.FC = () => {
   const displayWord = (() => {
     console.log('[VOCAB-CONTAINER] Determining display word:', {
       playbackCurrentWord: playbackCurrentWord?.word,
-      originalCurrentWord: originalCurrentWord?.word,
       hasData,
       wordListLength: wordList?.length || 0
     });
@@ -104,11 +100,6 @@ const VocabularyAppContainer: React.FC = () => {
     if (playbackCurrentWord) {
       console.log('[VOCAB-CONTAINER] Using playback current word:', playbackCurrentWord.word);
       return playbackCurrentWord;
-    }
-    
-    if (originalCurrentWord) {
-      console.log('[VOCAB-CONTAINER] Falling back to original current word:', originalCurrentWord.word);
-      return originalCurrentWord;
     }
     
     // Final fallback - use first word from list if available
@@ -161,7 +152,7 @@ const VocabularyAppContainer: React.FC = () => {
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component */}
+      {/* Error display component - fix type mismatch */}
       <ErrorDisplay jsonLoadError={jsonLoadError} />
 
       {hasData && displayWord ? (

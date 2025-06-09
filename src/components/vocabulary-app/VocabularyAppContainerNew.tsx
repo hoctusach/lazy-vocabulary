@@ -97,7 +97,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component */}
+      {/* Error display component - fix type mismatch */}
       <ErrorDisplay jsonLoadError={jsonLoadError} />
 
       {hasData && currentWord ? (

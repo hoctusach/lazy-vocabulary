@@ -41,9 +41,9 @@ export const useVocabularyContainerState = () => {
     }
   }, []);
 
-  // Subscribe to vocabulary service changes
+  // Subscribe to vocabulary service changes using the correct methods
   useEffect(() => {
-    const unsubscribe = vocabularyService.subscribe(() => {
+    const handleVocabularyChange = () => {
       console.log('[VOCAB-CONTAINER-STATE] Vocabulary service updated');
       
       try {
@@ -57,18 +57,24 @@ export const useVocabularyContainerState = () => {
         console.error('[VOCAB-CONTAINER-STATE] Error updating from service:', error);
         setJsonLoadError('Failed to update vocabulary data');
       }
-    });
+    };
 
-    return unsubscribe;
+    // Use the correct method name from VocabularyService
+    vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
+
+    return () => {
+      vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
+    };
   }, []);
 
-  // File upload handler
+  // File upload handler - fix signature to match expected type
   const handleFileUploaded = useCallback(async (file: File) => {
     console.log('[VOCAB-CONTAINER-STATE] File uploaded:', file.name);
     
     try {
       setJsonLoadError(null);
-      const success = await vocabularyService.loadFromFile(file);
+      // Use the correct method name from VocabularyService
+      const success = await vocabularyService.processExcelFile(file);
       
       if (success) {
         const newWordList = vocabularyService.getWordList();
@@ -86,16 +92,16 @@ export const useVocabularyContainerState = () => {
     }
   }, []);
 
-  // Category switching handler - fixed to work without parameters
+  // Category switching handler - use correct method
   const handleSwitchCategory = useCallback(() => {
     console.log('[VOCAB-CONTAINER-STATE] Switching category from:', currentCategory);
     
     try {
-      const success = vocabularyService.switchToNextCategory();
+      // Use the correct method name from VocabularyService
+      const newCategory = vocabularyService.nextSheet();
       
-      if (success) {
+      if (newCategory) {
         const newWordList = vocabularyService.getWordList();
-        const newCategory = vocabularyService.getCurrentSheetName();
         
         console.log('[VOCAB-CONTAINER-STATE] ✓ Category switched to:', newCategory);
         console.log('[VOCAB-CONTAINER-STATE] New word list length:', newWordList.length);
