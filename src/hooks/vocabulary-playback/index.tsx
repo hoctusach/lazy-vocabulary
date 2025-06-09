@@ -8,6 +8,7 @@ export const useVocabularyPlayback = (wordList: VocabularyWord[]) => {
 // Export the simplified vocabulary playback system
 export { useSimpleVocabularyPlayback } from './useSimpleVocabularyPlayback';
 export { useSimpleWordPlayback } from './useSimpleWordPlayback';
+export { useSimpleWordNavigation } from './useSimpleWordNavigation';
 
 // Keep existing exports for backward compatibility
 export * from './useVoiceSelection';

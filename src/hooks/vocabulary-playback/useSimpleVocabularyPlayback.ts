@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useVoiceSelection } from './useVoiceSelection';
-import { useWordNavigation } from './useWordNavigation';
+import { useSimpleWordNavigation } from './useSimpleWordNavigation';
 import { useSimpleWordPlayback } from './useSimpleWordPlayback';
 
 /**
@@ -20,8 +20,8 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     return voices.find(voice => voice.region === region)?.voice || null;
   }, [voices]);
   
-  // Word navigation
-  const { currentIndex, currentWord, advanceToNext } = useWordNavigation(wordList);
+  // Word navigation using the simplified hook
+  const { currentIndex, currentWord, advanceToNext, goToPrevious, goToWord } = useSimpleWordNavigation(wordList);
   
   // Word playback
   const { playWord, stopPlayback, isSpeaking } = useSimpleWordPlayback(
@@ -69,18 +69,6 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const goToNext = useCallback(() => {
     advanceToNext();
   }, [advanceToNext]);
-
-  const goToPrevious = useCallback(() => {
-    // Simple previous implementation
-    const prevIndex = currentIndex > 0 ? currentIndex - 1 : wordList.length - 1;
-    console.log(`[SIMPLE-VOCABULARY] Going to previous word at index: ${prevIndex}`);
-  }, [currentIndex, wordList.length]);
-
-  const goToWord = useCallback((index: number) => {
-    if (index >= 0 && index < wordList.length) {
-      console.log(`[SIMPLE-VOCABULARY] Going to word at index: ${index}`);
-    }
-  }, [wordList.length]);
 
   return {
     // State
