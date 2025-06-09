@@ -33,6 +33,17 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     paused
   );
 
+  // Enhanced debug logging for state synchronization
+  console.log('[SIMPLE-VOCABULARY] === Playback State Debug ===');
+  console.log('[SIMPLE-VOCABULARY] Current state:', {
+    currentIndex,
+    currentWord: currentWord?.word || 'null',
+    wordListLength: wordList?.length || 0,
+    muted,
+    paused,
+    isSpeaking
+  });
+
   // Auto-play effect - plays word when it changes (but respects pause state)
   useEffect(() => {
     console.log(`[SIMPLE-VOCABULARY] Word changed effect - word: ${currentWord?.word}, muted: ${muted}, paused: ${paused}`);
@@ -116,6 +127,18 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     console.log('[SIMPLE-VOCABULARY] ✓ Manual next word requested');
     advanceToNext();
   }, [advanceToNext]);
+
+  // Additional state synchronization logging
+  useEffect(() => {
+    console.log('[SIMPLE-VOCABULARY] === State Sync Check ===');
+    console.log('[SIMPLE-VOCABULARY] Word list changed or index changed:', {
+      wordListLength: wordList?.length || 0,
+      currentIndex,
+      computedWord: wordList?.[currentIndex]?.word || 'null',
+      currentWordFromHook: currentWord?.word || 'null',
+      isInSync: (wordList?.[currentIndex]?.word || null) === (currentWord?.word || null)
+    });
+  }, [wordList, currentIndex, currentWord]);
 
   return {
     // State

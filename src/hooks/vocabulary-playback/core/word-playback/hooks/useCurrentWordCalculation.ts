@@ -1,19 +1,16 @@
 
+import { useMemo } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 
 /**
- * Hook for calculating and debugging current word selection
+ * Hook for calculating the current word based on word list and index
+ * Enhanced with better synchronization and debugging
  */
-export const useCurrentWordCalculation = (
-  wordList: VocabularyWord[],
-  currentIndex: number
-) => {
-  // Enhanced current word calculation with comprehensive debugging
-  const currentWord = (() => {
+export const useCurrentWordCalculation = (wordList: VocabularyWord[], currentIndex: number) => {
+  const currentWord = useMemo(() => {
     console.log('[CURRENT-WORD-CALC] === Current Word Calculation Debug ===');
-    console.log('[CURRENT-WORD-CALC] Word list length:', wordList?.length || 0);
+    console.log('[CURRENT-WORD-CALC] Word list length:', wordList.length);
     console.log('[CURRENT-WORD-CALC] Current index:', currentIndex);
-    console.log('[CURRENT-WORD-CALC] Word list sample:', wordList?.slice(0, 3).map(w => w.word));
     
     if (!wordList || wordList.length === 0) {
       console.log('[CURRENT-WORD-CALC] No word list available');
@@ -21,19 +18,26 @@ export const useCurrentWordCalculation = (
     }
     
     if (currentIndex < 0 || currentIndex >= wordList.length) {
-      console.log('[CURRENT-WORD-CALC] Index out of bounds, clamping to valid range');
-      const clampedIndex = Math.max(0, Math.min(currentIndex, wordList.length - 1));
-      const word = wordList[clampedIndex];
-      console.log('[CURRENT-WORD-CALC] Clamped index:', clampedIndex, 'Word:', word?.word);
-      return word;
+      console.log('[CURRENT-WORD-CALC] Index out of bounds:', { currentIndex, wordListLength: wordList.length });
+      return null;
     }
     
     const word = wordList[currentIndex];
-    console.log('[CURRENT-WORD-CALC] Selected word at index', currentIndex, ':', word?.word);
+    console.log('[CURRENT-WORD-CALC] Calculated current word:', {
+      index: currentIndex,
+      word: word?.word,
+      wordObject: word
+    });
+    
     return word;
-  })();
+  }, [wordList, currentIndex]);
 
-  console.log('[CURRENT-WORD-CALC] Final return - currentWord:', currentWord?.word);
+  // Additional debug logging when either dependency changes
+  console.log('[CURRENT-WORD-CALC] Dependencies changed:', {
+    wordListLength: wordList?.length || 0,
+    currentIndex,
+    resultingWord: currentWord?.word || 'null'
+  });
 
   return {
     currentWord
