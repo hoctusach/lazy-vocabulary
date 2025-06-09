@@ -16,7 +16,7 @@ const WordActionButtons: React.FC<WordActionButtonsProps> = ({
   onOpenEditModal
 }) => {
   return (
-    <div className="flex items-center justify-center gap-2 my-3">
+    <div className="flex items-center justify-center gap-2 my-2">
       <EditWordButton 
         onClick={onOpenEditModal} 
         disabled={!currentWord}

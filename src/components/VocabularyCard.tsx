@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
@@ -73,8 +74,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-4">
-        <div className="space-y-3">
+      <CardContent className="p-3">
+        <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-xl font-bold text-blue-900 break-words">{mainWord}</h2>
@@ -99,18 +100,18 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             {example}
           </div>
           
-          {/* Control buttons wrapper - updated to flex-wrap */}
+          {/* Control buttons wrapper - optimized spacing */}
           <div className="flex flex-wrap gap-1 pt-1">
             <Button
               variant="outline"
               size="sm"
               onClick={onToggleMute}
               className={cn(
-                "h-7 text-xs px-2",
+                "h-6 text-xs px-2",
                 isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
               )}
             >
-              {isMuted ? <VolumeX size={14} className="mr-1" /> : <Volume2 size={14} className="mr-1" />}
+              {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
               {isMuted ? "UNMUTE" : "MUTE"}
             </Button>
             
@@ -119,11 +120,11 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               size="sm"
               onClick={onTogglePause}
               className={cn(
-                "h-7 text-xs px-2",
+                "h-6 text-xs px-2",
                 isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
               )}
             >
-              {isPaused ? <Play size={14} className="mr-1" /> : <Pause size={14} className="mr-1" />}
+              {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}
               {isPaused ? "Play" : "Pause"}
             </Button>
           
@@ -131,9 +132,9 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onNextWord}
-              className="h-7 text-xs px-2 text-indigo-700 bg-indigo-50"
+              className="h-6 text-xs px-2 text-indigo-700 bg-indigo-50"
             >
-              <SkipForward size={14} className="mr-1" />
+              <SkipForward size={12} className="mr-1" />
               Next Word
             </Button>
             
@@ -141,18 +142,20 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={onSwitchCategory}
-              className="h-7 text-xs px-2 text-green-700"
+              className="h-6 text-xs px-2 text-green-700"
             >
-              <RefreshCw size={12} className="mr-1" />
-              {safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1)}
+              <RefreshCw size={10} className="mr-1" />
+              {typeof safeNextCategory === 'string' ? 
+                safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1) : 
+                'Next'}
             </Button>
             
-            {/* New voice toggle button that cycles through all 4 voice options */}
+            {/* Single voice toggle button */}
             <Button
               variant="outline" 
               size="sm" 
               onClick={onCycleVoice}
-              className="h-7 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+              className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >
               {selectedVoice.label}
             </Button>
