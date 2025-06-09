@@ -6,11 +6,11 @@ import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
+import { useEnhancedVocabularyController } from "@/hooks/vocabulary-controller/useEnhancedVocabularyController";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 
 const VocabularyAppContainerNew: React.FC = () => {
-  console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
+  console.log('[VOCAB-CONTAINER-NEW] === Component Render with Enhanced Speech ===');
   
   // Get base vocabulary state (file handling, categories, etc.)
   const {
@@ -30,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller
+  // Use our new enhanced vocabulary controller
   const {
     currentWord,
     currentIndex,
@@ -45,9 +45,9 @@ const VocabularyAppContainerNew: React.FC = () => {
     toggleVoice,
     playCurrentWord,
     wordCount
-  } = useVocabularyController(wordList || []);
+  } = useEnhancedVocabularyController(wordList || []);
 
-  console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
+  console.log('[VOCAB-CONTAINER-NEW] Enhanced controller state:', {
     currentWord: currentWord?.word,
     currentIndex,
     isPaused,
