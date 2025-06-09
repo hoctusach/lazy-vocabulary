@@ -1,0 +1,2 @@
+
+export { directSpeechService } from './directSpeechService';

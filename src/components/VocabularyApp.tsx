@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import VocabularyAppContainer from "./vocabulary-app/VocabularyAppContainer";
+import VocabularyAppContainerNew from "./vocabulary-app/VocabularyAppContainerNew";
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 
@@ -14,7 +14,7 @@ const VocabularyApp = () => {
   return (
     <>
       <ToastProvider />
-      <VocabularyAppContainer />
+      <VocabularyAppContainerNew />
     </>
   );
 };

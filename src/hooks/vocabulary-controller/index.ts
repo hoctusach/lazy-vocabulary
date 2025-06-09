@@ -1,0 +1,2 @@
+
+export { useVocabularyController } from './useVocabularyController';
