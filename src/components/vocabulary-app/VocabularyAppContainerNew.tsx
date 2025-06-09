@@ -30,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller
+  // Use our vocabulary controller with random word selection
   const {
     currentWord,
     currentIndex,
@@ -95,12 +95,6 @@ const VocabularyAppContainerNew: React.FC = () => {
     ? { word: currentWord.word, category: currentWord.category || currentCategory }
     : null;
 
-  // Create a wrapper function for file upload to match WelcomeScreen's expected signature
-  const handleFileUploadWrapper = () => {
-    // This is a no-op since WelcomeScreen will handle file selection internally
-    // The actual file processing will be handled by the FileUpload component
-  };
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component - fix type mismatch by converting string to boolean */}
@@ -131,7 +125,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
       ) : (
-        <WelcomeScreen onFileUploaded={handleFileUploadWrapper} />
+        <WelcomeScreen onFileUploaded={handleFileUploaded} />
       )}
     </VocabularyLayout>
   );

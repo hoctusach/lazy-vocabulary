@@ -23,6 +23,7 @@ export const useVocabularyContainerState = () => {
     console.log('[VOCAB-CONTAINER-STATE] Loading initial vocabulary data');
     
     try {
+      // Ensure vocabulary service is initialized with random selection
       const initialWordList = vocabularyService.getWordList();
       console.log('[VOCAB-CONTAINER-STATE] Initial word list:', {
         length: initialWordList.length,
@@ -41,7 +42,7 @@ export const useVocabularyContainerState = () => {
     }
   }, []);
 
-  // Subscribe to vocabulary service changes using the correct methods
+  // Subscribe to vocabulary service changes
   useEffect(() => {
     const handleVocabularyChange = () => {
       console.log('[VOCAB-CONTAINER-STATE] Vocabulary service updated');
@@ -59,7 +60,6 @@ export const useVocabularyContainerState = () => {
       }
     };
 
-    // Use the correct method name from VocabularyService
     vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
 
     return () => {
@@ -67,13 +67,12 @@ export const useVocabularyContainerState = () => {
     };
   }, []);
 
-  // File upload handler - fix signature to match expected type
+  // File upload handler
   const handleFileUploaded = useCallback(async (file: File) => {
     console.log('[VOCAB-CONTAINER-STATE] File uploaded:', file.name);
     
     try {
       setJsonLoadError(null);
-      // Use the correct method name from VocabularyService
       const success = await vocabularyService.processExcelFile(file);
       
       if (success) {
@@ -92,12 +91,11 @@ export const useVocabularyContainerState = () => {
     }
   }, []);
 
-  // Category switching handler - use correct method
+  // Category switching handler
   const handleSwitchCategory = useCallback(() => {
     console.log('[VOCAB-CONTAINER-STATE] Switching category from:', currentCategory);
     
     try {
-      // Use the correct method name from VocabularyService
       const newCategory = vocabularyService.nextSheet();
       
       if (newCategory) {
@@ -108,8 +106,6 @@ export const useVocabularyContainerState = () => {
         
         setWordList(newWordList);
         setHasData(newWordList.length > 0);
-        
-        // Clear any previous errors since category switch was successful
         setJsonLoadError(null);
       } else {
         console.warn('[VOCAB-CONTAINER-STATE] Category switch failed');
