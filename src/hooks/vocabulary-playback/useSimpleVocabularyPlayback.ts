@@ -4,9 +4,10 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { useVoiceSelection } from './useVoiceSelection';
 import { useSimpleWordNavigation } from './useSimpleWordNavigation';
 import { useSimpleWordPlayback } from './useSimpleWordPlayback';
+import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 
 /**
- * Simplified vocabulary playback system
+ * Simplified vocabulary playback system with improved pause handling
  */
 export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const [muted, setMuted] = useState(false);
@@ -32,21 +33,50 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     paused
   );
 
-  // Auto-play effect - plays word when it changes
+  // Auto-play effect - plays word when it changes (but respects pause state)
   useEffect(() => {
+    console.log(`[SIMPLE-VOCABULARY] Word changed effect - word: ${currentWord?.word}, muted: ${muted}, paused: ${paused}`);
+    
     if (currentWord && !muted && !paused) {
       console.log(`[SIMPLE-VOCABULARY] Auto-playing word: ${currentWord.word}`);
       playWord(currentWord);
+    } else if (currentWord && paused) {
+      console.log(`[SIMPLE-VOCABULARY] Word ready but paused: ${currentWord.word}`);
     }
   }, [currentWord, muted, paused, playWord]);
 
-  // Stop speech when muted or paused
+  // Handle pause state changes
   useEffect(() => {
-    if (muted || paused) {
-      console.log(`[SIMPLE-VOCABULARY] Stopping speech - muted: ${muted}, paused: ${paused}`);
-      stopPlayback();
+    console.log(`[SIMPLE-VOCABULARY] Pause state changed - paused: ${paused}, muted: ${muted}`);
+    
+    if (paused) {
+      console.log('[SIMPLE-VOCABULARY] Pausing speech controller');
+      simpleSpeechController.pause();
+    } else if (!muted && currentWord) {
+      console.log('[SIMPLE-VOCABULARY] Resuming - attempting to play current word');
+      // When unpausing, play the current word
+      setTimeout(() => {
+        if (!paused && !muted && currentWord) {
+          playWord(currentWord);
+        }
+      }, 100);
     }
-  }, [muted, paused, stopPlayback]);
+  }, [paused, muted, currentWord, playWord]);
+
+  // Handle mute state changes
+  useEffect(() => {
+    if (muted) {
+      console.log(`[SIMPLE-VOCABULARY] Muted - stopping speech`);
+      stopPlayback();
+    } else if (!paused && currentWord) {
+      console.log(`[SIMPLE-VOCABULARY] Unmuted - playing current word`);
+      setTimeout(() => {
+        if (!muted && !paused && currentWord) {
+          playWord(currentWord);
+        }
+      }, 100);
+    }
+  }, [muted, paused, currentWord, playWord, stopPlayback]);
 
   // Control functions
   const toggleMute = useCallback(() => {
@@ -60,13 +90,16 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   }, [paused]);
 
   const playCurrentWord = useCallback(() => {
-    if (currentWord && !muted) {
+    if (currentWord && !muted && !paused) {
       console.log(`[SIMPLE-VOCABULARY] Manually playing current word: ${currentWord.word}`);
       playWord(currentWord);
+    } else {
+      console.log(`[SIMPLE-VOCABULARY] Cannot play current word - muted: ${muted}, paused: ${paused}, hasWord: ${!!currentWord}`);
     }
-  }, [currentWord, muted, playWord]);
+  }, [currentWord, muted, paused, playWord]);
 
   const goToNext = useCallback(() => {
+    console.log('[SIMPLE-VOCABULARY] Manual next word requested');
     advanceToNext();
   }, [advanceToNext]);
 

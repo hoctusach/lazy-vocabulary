@@ -3,9 +3,10 @@ import { useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from './useVoiceSelection';
 import { useSimpleSpeech } from '@/hooks/speech/useSimpleSpeech';
+import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 
 /**
- * Simplified word playback with clean auto-advance
+ * Simplified word playback with improved coordination and pause handling
  */
 export const useSimpleWordPlayback = (
   selectedVoice: VoiceSelection,
@@ -20,6 +21,12 @@ export const useSimpleWordPlayback = (
   const playWord = useCallback(async (word: VocabularyWord) => {
     const playbackId = Math.random().toString(36).substring(7);
     console.log(`[WORD-PLAYBACK-${playbackId}] Playing word: ${word.word}`);
+
+    // Check if speech controller is paused
+    if (simpleSpeechController.isPaused()) {
+      console.log(`[WORD-PLAYBACK-${playbackId}] Speech controller is paused, skipping`);
+      return;
+    }
 
     // Prevent overlapping playback
     if (playingRef.current) {
@@ -46,7 +53,9 @@ export const useSimpleWordPlayback = (
       if (!speechText || speechText.length === 0) {
         console.log(`[WORD-PLAYBACK-${playbackId}] No content to speak`);
         playingRef.current = false;
-        setTimeout(() => goToNextWord(), 1500);
+        setTimeout(() => {
+          if (!paused && !muted) goToNextWord();
+        }, 1500);
         return;
       }
 
@@ -55,16 +64,22 @@ export const useSimpleWordPlayback = (
       const success = await speak(speechText, {
         voice,
         onComplete: () => {
-          console.log(`[WORD-PLAYBACK-${playbackId}] Speech completed, auto-advancing`);
+          console.log(`[WORD-PLAYBACK-${playbackId}] Speech completed, checking auto-advance`);
           playingRef.current = false;
           
-          // Auto-advance with state check
-          if (!paused && !muted) {
+          // Only auto-advance if not paused/muted and speech controller isn't paused
+          if (!paused && !muted && !simpleSpeechController.isPaused()) {
+            console.log(`[WORD-PLAYBACK-${playbackId}] Auto-advancing to next word`);
             setTimeout(() => {
-              if (!paused && !muted) {
+              // Double-check state before advancing
+              if (!paused && !muted && !simpleSpeechController.isPaused()) {
                 goToNextWord();
+              } else {
+                console.log(`[WORD-PLAYBACK-${playbackId}] State changed during delay, skipping auto-advance`);
               }
             }, 1500);
+          } else {
+            console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, muted: ${muted}, controllerPaused: ${simpleSpeechController.isPaused()}`);
           }
         },
         onError: () => {

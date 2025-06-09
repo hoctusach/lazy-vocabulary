@@ -30,3 +30,11 @@ export {
 export {
   canPerformOperation
 } from './modules/speechThrottling';
+
+export {
+  registerSpeechRequest,
+  unregisterSpeechRequest,
+  isActiveSpeechRequest,
+  getCurrentActiveSpeech,
+  clearAllSpeechRequests
+} from './modules/speechCoordination';
