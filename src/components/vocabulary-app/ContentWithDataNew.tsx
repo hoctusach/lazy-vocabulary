@@ -13,6 +13,7 @@ interface ContentWithDataNewProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleCycleVoice: () => void;
+  nextVoiceLabel: string;
   handleSwitchCategory: () => void;
   currentCategory: string;
   nextCategory: string | null;
@@ -20,6 +21,7 @@ interface ContentWithDataNewProps {
   handleManualNext: () => void;
   displayTime: number;
   voiceRegion: 'US' | 'UK' | 'AU';
+  nextVoiceLabel: string;
   debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
@@ -37,6 +39,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   toggleMute,
   handleTogglePause,
   handleCycleVoice,
+  nextVoiceLabel,
   handleSwitchCategory,
   currentCategory,
   nextCategory,
@@ -44,6 +47,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleManualNext,
   displayTime,
   voiceRegion,
+  nextVoiceLabel,
   debugPanelData,
   isAddWordModalOpen,
   handleCloseModal,
@@ -70,6 +74,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         handleManualNext={handleManualNext}
         displayTime={displayTime}
         voiceRegion={voiceRegion}
+        nextVoiceLabel={nextVoiceLabel}
       />
       
       {/* Action buttons container */}

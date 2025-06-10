@@ -19,6 +19,7 @@ interface VocabularyMainProps {
   isSoundPlaying: boolean;
   displayTime: number;
   selectedVoice: VoiceSelection;
+  nextVoiceLabel: string;
 }
 
 const VocabularyMain: React.FC<VocabularyMainProps> = ({
@@ -35,6 +36,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   handleManualNext,
   displayTime,
   selectedVoice,
+  nextVoiceLabel,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -57,6 +59,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         isSpeaking={isSoundPlaying}
         category={currentWord.category || currentCategory}
         selectedVoice={selectedVoice}
+        nextVoiceLabel={nextVoiceLabel}
       />
     </div>
   );

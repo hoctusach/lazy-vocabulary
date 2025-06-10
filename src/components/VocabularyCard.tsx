@@ -24,6 +24,7 @@ interface VocabularyCardProps {
   displayTime?: number;
   category?: string;
   selectedVoice: VoiceSelection;
+  nextVoiceLabel: string;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -43,7 +44,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   isSpeaking = false,
   displayTime,
   category,
-  selectedVoice
+  selectedVoice,
+  nextVoiceLabel
 }) => {
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
@@ -152,12 +154,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             
             {/* Single voice toggle button */}
             <Button
-              variant="outline" 
-              size="sm" 
+              variant="outline"
+              size="sm"
               onClick={onCycleVoice}
               className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >
-              {selectedVoice.label}
+              {nextVoiceLabel}
             </Button>
           </div>
         </div>

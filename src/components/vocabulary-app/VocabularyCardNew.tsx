@@ -23,6 +23,7 @@ interface VocabularyCardNewProps {
   displayTime?: number;
   category?: string;
   voiceRegion: 'US' | 'UK' | 'AU';
+  nextVoiceLabel: string;
 }
 
 const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
@@ -41,7 +42,8 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   nextCategory,
   isSpeaking = false,
   category,
-  voiceRegion
+  voiceRegion,
+  nextVoiceLabel
 }) => {
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
@@ -150,12 +152,12 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             
             {/* Voice toggle button with simplified region display */}
             <Button
-              variant="outline" 
-              size="sm" 
+              variant="outline"
+              size="sm"
               onClick={onCycleVoice}
               className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >
-              {voiceRegion}
+              {nextVoiceLabel}
             </Button>
           </div>
         </div>

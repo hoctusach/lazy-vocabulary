@@ -138,11 +138,17 @@ export const useVoiceManagement = () => {
     return null;
   }, []);
   
-  // Function to cycle through voices including AU
+  // Function to cycle through voices in the desired order
   const cycleVoice = useCallback(() => {
     setVoiceIndex(prevIndex => {
-      const nextIndex = (prevIndex + 1) % allVoiceOptions.length;
-      console.log(`Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`);
+      const currentRegion = allVoiceOptions[prevIndex].region;
+      const nextRegion =
+        currentRegion === 'UK' ? 'US' : currentRegion === 'US' ? 'AU' : 'US';
+      const nextIndex = allVoiceOptions.findIndex(v => v.region === nextRegion);
+
+      console.log(
+        `Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`
+      );
       
       // Save to localStorage
       try {

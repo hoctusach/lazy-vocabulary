@@ -167,7 +167,12 @@ export const useSimpleVocabularyController = () => {
   }, [isMuted, stopSpeech]);
 
   const toggleVoice = useCallback(() => {
-    const newRegion = voiceRegion === 'US' ? 'UK' : voiceRegion === 'UK' ? 'AU' : 'US';
+    const newRegion =
+      voiceRegion === 'UK'
+        ? 'US'
+        : voiceRegion === 'US'
+        ? 'AU'
+        : 'US';
     debug('[SIMPLE-VOCAB-CONTROLLER] Toggle voice to:', newRegion);
     setVoiceRegion(newRegion);
   }, [voiceRegion]);

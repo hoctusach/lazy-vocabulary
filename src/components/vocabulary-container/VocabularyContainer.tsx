@@ -20,6 +20,12 @@ const VocabularyContainer: React.FC = () => {
 
   // Voice selection
   const { selectedVoice, cycleVoice } = useVoiceSelection();
+  const nextVoiceLabel =
+    selectedVoice.region === 'UK'
+      ? 'US'
+      : selectedVoice.region === 'US'
+      ? 'AU'
+      : 'US';
 
   // Get controller state (simplified version)
   const controllerState = useSimpleVocabularyController();
@@ -111,6 +117,7 @@ const VocabularyContainer: React.FC = () => {
         currentCategory={currentCategory}
         nextCategory={nextCategory}
         selectedVoice={selectedVoice}
+        nextVoiceLabel={nextVoiceLabel}
         category={controllerState.currentWord.category}
       />
     </div>
