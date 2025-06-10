@@ -26,7 +26,7 @@ const requestNotificationPermission = async () => {
 interface NotificationManagerProps {
   onNotificationsEnabled: () => void;
   currentWord?: VocabularyWord | null;
-  voiceRegion?: 'US' | 'UK';
+  voiceRegion?: 'US' | 'UK' | 'AU';
 }
 
 const NotificationManager: React.FC<NotificationManagerProps> = ({ 

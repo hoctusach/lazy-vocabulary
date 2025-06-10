@@ -22,7 +22,7 @@ interface VocabularyCardNewProps {
   isSpeaking?: boolean;
   displayTime?: number;
   category?: string;
-  voiceRegion: 'US' | 'UK';
+  voiceRegion: 'US' | 'UK' | 'AU';
 }
 
 const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({

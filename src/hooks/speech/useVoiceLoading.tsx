@@ -2,11 +2,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getVoiceByRegion } from '@/utils/speech';
 
-export const useVoiceLoading = (voiceRegion: 'US' | 'UK') => {
+export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
   const voicesLoadedTimeoutRef = useRef<number | null>(null);
   const currentVoiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const lastVoiceRegionRef = useRef<'US' | 'UK'>(voiceRegion);
+  const lastVoiceRegionRef = useRef<'US' | 'UK' | 'AU'>(voiceRegion);
   const pendingSpeechRef = useRef<{text: string, forceSpeak: boolean} | null>(null);
 
   // Initialize voice loading

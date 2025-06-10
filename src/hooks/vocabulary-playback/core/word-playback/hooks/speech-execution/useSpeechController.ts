@@ -8,7 +8,7 @@ import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
  * Hook for controlling speech synthesis execution
  */
 export const useSpeechController = (
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection
 ) => {
   const executeSpeechSynthesis = useCallback(async (

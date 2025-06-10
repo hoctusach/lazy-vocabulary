@@ -9,7 +9,7 @@ export const useMuteToggle = (
   isPaused: boolean,
   clearAutoAdvanceTimer: () => void,
   stopSpeech: () => void,
-  voiceRegion: 'US' | 'UK'
+  voiceRegion: 'US' | 'UK' | 'AU'
 ) => {
   const [mute, setMute] = useState(isMuted);
   

@@ -12,7 +12,7 @@ import {
 
 export const speak = (
   text: string, 
-  region: 'US' | 'UK' = 'US', 
+  region: 'US' | 'UK' | 'AU' = 'US', 
   pauseRequestedRef?: React.MutableRefObject<boolean>
 ): Promise<string> => {
   return new Promise((resolve, reject) => {

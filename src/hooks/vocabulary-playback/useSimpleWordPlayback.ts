@@ -10,7 +10,7 @@ import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
  */
 export const useSimpleWordPlayback = (
   selectedVoice: VoiceSelection,
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   goToNextWord: () => void,
   muted: boolean,
   paused: boolean

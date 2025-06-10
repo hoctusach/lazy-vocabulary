@@ -7,7 +7,7 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
  * Hook for coordinating the playback execution with all the required dependencies
  */
 export const usePlaybackCoordination = (
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,

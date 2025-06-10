@@ -14,7 +14,7 @@ export const useWordPlayback = (
   muted: boolean,
   paused: boolean,
   cancelSpeech: () => void,
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   userInteractionRef: React.MutableRefObject<boolean>,
   setIsSpeaking: (isSpeaking: boolean) => void,

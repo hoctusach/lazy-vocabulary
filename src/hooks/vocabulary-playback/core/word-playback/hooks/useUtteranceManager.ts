@@ -14,7 +14,7 @@ export const useUtteranceManager = () => {
   const createUtterance = useCallback((
     word: VocabularyWord, 
     selectedVoice: VoiceSelection,
-    findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+    findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
     onStart: () => void,
     onEnd: () => void,
     onError: (e: SpeechSynthesisErrorEvent) => void

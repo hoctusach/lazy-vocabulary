@@ -1,6 +1,6 @@
 import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
 
-// Updated voice names with better UK options
+// Updated voice names with better UK and AU options
 const US_VOICE_NAME = "Samantha"; // For US voice
 const UK_VOICE_NAMES = [
   "Google UK English Female", // Primary option
@@ -8,6 +8,12 @@ const UK_VOICE_NAMES = [
   "Kate", // Another backup
   "Susan", // Microsoft UK voice
   "Hazel" // Additional UK option
+];
+const AU_VOICE_NAMES = [
+  "Google AU English Female", // Primary option for AU
+  "Karen", // macOS AU voice
+  "Catherine", // Additional AU option
+  "Hayley" // Backup AU option
 ];
 
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
@@ -26,7 +32,7 @@ export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthes
 };
 
 // Enhanced function to get voice by region with better UK voice selection
-export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
+export const getVoiceByRegion = (region: 'US' | 'UK' | 'AU', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
   
   if (!voices || voices.length === 0) {
@@ -52,7 +58,7 @@ export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' 
       console.log(`Fallback US voice by language: ${voice.name} (${voice.lang})`);
       return voice;
     }
-  } else {
+  } else if (region === 'UK') {
     // Enhanced UK voice selection
     console.log('Searching for UK voice with enhanced selection...');
     
@@ -105,6 +111,43 @@ export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' 
         console.log(`Found UK voice by indicator "${indicator}": ${voice.name} (${voice.lang})`);
         return voice;
       }
+    }
+  }
+
+  else if (region === 'AU') {
+    console.log('Searching for AU voice...');
+
+    for (const auVoiceName of AU_VOICE_NAMES) {
+      let voice = voices.find(v => v.name === auVoiceName);
+
+      if (voice) {
+        console.log(`Found exact AU voice match: ${voice.name} (${voice.lang})`);
+        return voice;
+      }
+
+      voice = voices.find(v => v.name.includes(auVoiceName));
+
+      if (voice) {
+        console.log(`Found partial AU voice match: ${voice.name} (${voice.lang})`);
+        return voice;
+      }
+    }
+
+    let voice = voices.find(v =>
+      v.lang === 'en-AU' &&
+      (gender === 'female' ? !v.name.toLowerCase().includes('male') : v.name.toLowerCase().includes('male'))
+    );
+
+    if (voice) {
+      console.log(`Found AU voice by language and gender: ${voice.name} (${voice.lang})`);
+      return voice;
+    }
+
+    voice = voices.find(v => v.lang === 'en-AU');
+
+    if (voice) {
+      console.log(`Fallback AU voice by language: ${voice.name} (${voice.lang})`);
+      return voice;
     }
   }
   

@@ -17,7 +17,7 @@ interface VocabularyMainNewProps {
   nextCategory: string | null;
   isSoundPlaying: boolean;
   displayTime: number;
-  voiceRegion: 'US' | 'UK';
+  voiceRegion: 'US' | 'UK' | 'AU';
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({

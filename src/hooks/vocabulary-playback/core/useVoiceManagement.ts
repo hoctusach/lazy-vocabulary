@@ -74,7 +74,7 @@ export const useVoiceManagement = () => {
   }, [allVoiceOptions]);
   
   // Function to find the appropriate voice with hardcoded names
-  const findVoice = useCallback((region: 'US' | 'UK'): SpeechSynthesisVoice | null => {
+  const findVoice = useCallback((region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null => {
     console.log(`Looking for ${region} voice`);
     
     // Always get fresh voices

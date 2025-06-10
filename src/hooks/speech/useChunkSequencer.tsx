@@ -6,7 +6,7 @@ export const useChunkSequencer = () => {
   const speakChunksSequentially = useCallback(
     async (
       chunks: string[], 
-      voiceRegion: 'US' | 'UK', 
+      voiceRegion: 'US' | 'UK' | 'AU', 
       startIndex: number = 0,
       pauseRequestedRef?: React.MutableRefObject<boolean>
     ): Promise<string> => {

@@ -14,7 +14,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>('US');
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('US');
   
   // Refs to prevent unnecessary effects and manage state
   const lastWordRef = useRef<string | null>(null);
@@ -169,7 +169,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   }, [isMuted, stopSpeech, goToNext]);
 
   const toggleVoice = useCallback(() => {
-    const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
+    const newRegion = voiceRegion === 'US' ? 'UK' : voiceRegion === 'UK' ? 'AU' : 'US';
     debug('[VOCAB-CONTROLLER] Toggle voice to:', newRegion);
     setVoiceRegion(newRegion);
   }, [voiceRegion]);
