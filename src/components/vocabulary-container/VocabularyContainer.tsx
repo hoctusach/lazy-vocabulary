@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useVocabularyContainerState } from '@/hooks/vocabulary/useVocabularyContainerState';
-import { useVocabularyController } from '@/hooks/vocabulary-controller/useVocabularyController';
+import { useSimpleVocabularyController } from '@/hooks/vocabulary-controller/useSimpleVocabularyController';
 import { useVoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import VocabularyCard from '../VocabularyCard';
 import FileUpload from '../FileUpload';
@@ -14,19 +14,17 @@ const VocabularyContainer: React.FC = () => {
   const containerState = useVocabularyContainerState();
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData: containerState.hasData,
-    wordListLength: containerState.wordList?.length || 0,
     currentCategory: containerState.currentCategory
   });
 
   // Voice selection
   const { selectedVoice, cycleVoice } = useVoiceSelection();
 
-  // Get controller state (synchronized with vocabulary service)
-  const controllerState = useVocabularyController(containerState.wordList || []);
+  // Get controller state (simplified version)
+  const controllerState = useSimpleVocabularyController();
   
   console.log('[VOCAB-CONTAINER] Controller state:', {
     currentWord: controllerState.currentWord?.word || 'none',
-    currentIndex: controllerState.currentIndex,
     isPaused: controllerState.isPaused,
     isMuted: controllerState.isMuted,
     voiceRegion: controllerState.voiceRegion,
