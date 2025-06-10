@@ -31,45 +31,22 @@ export class VocabularyService {
     this.importer = new VocabularyImporter(this.storage);
     this.wordNavigation = new WordNavigation(this.data, this.sheetOptions);
     
-    // Handle localStorage migration and get initial sheet name
-    this.initializeCurrentCategory();
-    
-    this.wordNavigation.shuffleCurrentSheet();
-    console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
-  }
-  
-  private initializeCurrentCategory(): void {
+    // Get initial sheet name from localStorage if available
     try {
       const storedStates = localStorage.getItem('buttonStates');
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
-        
-        // Handle migration from "All words" to "phrasal verbs"
-        if (parsedStates.currentCategory === "All words") {
-          console.log('Migrating from "All words" to "phrasal verbs"');
-          parsedStates.currentCategory = "phrasal verbs";
-          localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
-        } else if (parsedStates.currentCategory && this.sheetOptions.includes(parsedStates.currentCategory)) {
+        if (parsedStates.currentCategory && this.sheetOptions.includes(parsedStates.currentCategory)) {
           this.wordNavigation.setCurrentSheetName(parsedStates.currentCategory);
           console.log(`Restored sheet name from localStorage: ${this.wordNavigation.getCurrentSheetName()}`);
-        } else {
-          // Invalid category, default to phrasal verbs
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
-          parsedStates.currentCategory = "phrasal verbs";
-          localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
         }
-      } else {
-        // No stored state, default to phrasal verbs
-        this.wordNavigation.setCurrentSheetName("phrasal verbs");
-        const newStates = { currentCategory: "phrasal verbs" };
-        localStorage.setItem('buttonStates', JSON.stringify(newStates));
       }
     } catch (error) {
-      console.error("Error handling localStorage migration:", error);
-      // Fallback to default
-      this.wordNavigation.setCurrentSheetName("phrasal verbs");
+      console.error("Error reading sheet name from localStorage:", error);
     }
+    
+    this.wordNavigation.shuffleCurrentSheet();
+    console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
   
   // FIXED: Method to get complete word list for useVocabularyContainerState
@@ -99,7 +76,10 @@ export class VocabularyService {
   private getTotalWordCount(): number {
     let count = 0;
     for (const sheetName in this.data) {
-      count += this.data[sheetName]?.length || 0;
+      // Skip "All words" to avoid double counting
+      if (sheetName !== "All words") {
+        count += this.data[sheetName]?.length || 0;
+      }
     }
     return count;
   }
@@ -160,7 +140,7 @@ export class VocabularyService {
           // Process data to ensure all fields have proper types
           this.data = this.dataProcessor.processDataTypes(fetchedData);
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
+          this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -173,7 +153,7 @@ export class VocabularyService {
           const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
           this.data = this.dataProcessor.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
+          this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -236,7 +216,7 @@ export class VocabularyService {
     
     // Add each custom category to sheetOptions if it doesn't exist already
     for (const category in customData) {
-      if (!this.sheetOptions.includes(category)) {
+      if (!this.sheetOptions.includes(category) && category !== "All words") {
         (this.sheetOptions as string[]).push(category);
         console.log(`Added new category: ${category}`);
       }

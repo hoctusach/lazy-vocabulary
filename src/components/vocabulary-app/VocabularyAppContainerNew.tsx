@@ -30,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller - FIXED: removed argument
+  // Use our new unified vocabulary controller
   const {
     currentWord,
     currentIndex,
@@ -45,7 +45,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     toggleVoice,
     playCurrentWord,
     wordCount
-  } = useVocabularyController();
+  } = useVocabularyController(wordList || []);
 
   console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
     currentWord: currentWord?.word,

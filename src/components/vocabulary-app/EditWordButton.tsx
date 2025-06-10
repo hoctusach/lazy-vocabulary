@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 
 interface EditWordButtonProps {
   onClick: () => void;
-  disabled?: boolean;
+  disabled: boolean;
 }
 
-const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled = false }) => {
+const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled }) => {
   return (
     <Button 
       onClick={onClick} 

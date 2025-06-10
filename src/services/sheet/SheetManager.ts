@@ -6,7 +6,7 @@ import { SheetProcessor } from "./SheetProcessor";
 import { SheetNormalizer } from "./SheetNormalizer";
 
 export class SheetManager {
-  readonly sheetOptions = ["phrasal verbs", "idioms", "advanced words"];
+  readonly sheetOptions = ["All words", "phrasal verbs", "idioms", "advanced words"];
   private sheetProcessor: SheetProcessor;
   private sheetNormalizer: SheetNormalizer;
 
@@ -58,6 +58,9 @@ export class SheetManager {
           console.log(`Sheet "${sheetName}" is empty, keeping default data`);
         }
       }
+      
+      // Add "All words" collection by combining all other sheets
+      this.sheetProcessor.generateAllWordsSheet(newData, this.sheetOptions);
       
       console.log("Excel processing complete with", 
         Object.keys(newData).map(key => `${key}: ${newData[key].length} words`).join(", "));
