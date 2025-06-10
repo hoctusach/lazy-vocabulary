@@ -4616,7 +4616,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Attentive (adjective)",
       "meaning": "Very polite and helpful, paying close attention to the needs of someone.",
-      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were. 186187",
+      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were.",
       "count": 0
     },
     {
