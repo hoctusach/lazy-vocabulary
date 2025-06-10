@@ -1,12 +1,11 @@
 
 import { SheetData } from "@/types/vocabulary";
 import * as XLSX from 'xlsx';
-import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { SheetProcessor } from "./SheetProcessor";
 import { SheetNormalizer } from "./SheetNormalizer";
 
 export class SheetManager {
-  readonly sheetOptions = ["All words", "phrasal verbs", "idioms", "advanced words"];
+  readonly sheetOptions = ["phrasal verbs", "idioms", "advanced words"];
   private sheetProcessor: SheetProcessor;
   private sheetNormalizer: SheetNormalizer;
 
@@ -22,10 +21,10 @@ export class SheetManager {
       const workbook = XLSX.read(data);
       const newData: SheetData = {};
       
-      // First, copy all sheets from default data to ensure we have all categories
+      // Initialize only the valid sheet categories (no "All words")
       for (const sheetName of this.sheetOptions) {
-        newData[sheetName] = [...(DEFAULT_VOCABULARY_DATA[sheetName] || [])];
-        console.log(`Initialized sheet "${sheetName}" with ${newData[sheetName].length} default words`);
+        newData[sheetName] = [];
+        console.log(`Initialized sheet "${sheetName}"`);
       }
       
       console.log(`Processing ${workbook.SheetNames.length} sheets from uploaded file`);
@@ -49,18 +48,15 @@ export class SheetManager {
           // Process each row from the Excel file with improved column handling
           const processedWords = this.sheetProcessor.processSheetRows(jsonData);
           
-          // Merge with existing words (don't override all defaults)
+          // Merge with existing words
           this.sheetProcessor.mergeWords(newData[normalizedSheetName], processedWords);
           
           console.log(`Processed ${processedWords.length} words from "${normalizedSheetName}" sheet`);
           console.log(`Sheet "${normalizedSheetName}" now has ${newData[normalizedSheetName].length} words total`);
         } else {
-          console.log(`Sheet "${sheetName}" is empty, keeping default data`);
+          console.log(`Sheet "${sheetName}" is empty`);
         }
       }
-      
-      // Add "All words" collection by combining all other sheets
-      this.sheetProcessor.generateAllWordsSheet(newData, this.sheetOptions);
       
       console.log("Excel processing complete with", 
         Object.keys(newData).map(key => `${key}: ${newData[key].length} words`).join(", "));

@@ -1,9 +1,8 @@
-
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 
 export class WordNavigation {
   private data: SheetData;
-  private currentSheetName: string = "All words";
+  private currentSheetName: string = "phrasal verbs"; // Changed default from "All words"
   private shuffledIndices: number[] = [];
   private currentIndex: number = -1;
   private lastWordChangeTime: number = 0;
@@ -48,8 +47,8 @@ export class WordNavigation {
   }
   
   switchSheet(sheetName: string): boolean {
-    // Ensure we never switch to an invalid category
-    if (!sheetName || !this.sheetOptions.includes(sheetName)) {
+    // Ensure we never switch to an invalid category (including "All words")
+    if (!sheetName || !this.sheetOptions.includes(sheetName) || sheetName === "All words") {
       console.warn(`Invalid sheet name: ${sheetName}`);
       return false;
     }

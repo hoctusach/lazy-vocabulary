@@ -2,22 +2,6 @@
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
-// Make this import optional since the file might not exist after revert
-let DEFAULT_VOCABULARY_DATA: SheetData = {};
-try {
-  const defaultVocab = await import("@/data/defaultVocabulary");
-  DEFAULT_VOCABULARY_DATA = defaultVocab.DEFAULT_VOCABULARY_DATA || {};
-} catch (error) {
-  console.warn("Could not import default vocabulary data, will use JSON fallback:", error);
-  // Provide a minimal fallback structure
-  DEFAULT_VOCABULARY_DATA = {
-    "All words": [],
-    "phrasal verbs": [],
-    "idioms": [],
-    "advanced words": []
-  };
-}
-
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { WordNavigation } from "./WordNavigation";
@@ -40,11 +24,16 @@ export class VocabularyService {
     this.storage = new VocabularyStorage();
     this.sheetManager = new SheetManager();
     this.data = this.storage.loadData();
-    this.sheetOptions = this.sheetManager.sheetOptions;
+    
+    // Updated sheet options without "All words"
+    this.sheetOptions = ["phrasal verbs", "idioms", "advanced words"];
     
     this.dataProcessor = new VocabularyDataProcessor();
     this.importer = new VocabularyImporter(this.storage);
     this.wordNavigation = new WordNavigation(this.data, this.sheetOptions);
+    
+    // Set default sheet to "phrasal verbs" instead of "All words"
+    let initialSheet = "phrasal verbs";
     
     // Get initial sheet name from localStorage if available
     try {
@@ -52,14 +41,15 @@ export class VocabularyService {
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
         if (parsedStates.currentCategory && this.sheetOptions.includes(parsedStates.currentCategory)) {
-          this.wordNavigation.setCurrentSheetName(parsedStates.currentCategory);
-          console.log(`Restored sheet name from localStorage: ${this.wordNavigation.getCurrentSheetName()}`);
+          initialSheet = parsedStates.currentCategory;
+          console.log(`Restored sheet name from localStorage: ${initialSheet}`);
         }
       }
     } catch (error) {
       console.error("Error reading sheet name from localStorage:", error);
     }
     
+    this.wordNavigation.setCurrentSheetName(initialSheet);
     this.wordNavigation.shuffleCurrentSheet();
     console.log(`VocabularyService initialized with sheet "${this.wordNavigation.getCurrentSheetName()}"`);
   }
@@ -91,10 +81,8 @@ export class VocabularyService {
   private getTotalWordCount(): number {
     let count = 0;
     for (const sheetName in this.data) {
-      // Skip "All words" to avoid double counting
-      if (sheetName !== "All words") {
-        count += this.data[sheetName]?.length || 0;
-      }
+      // Count all sheets since we removed "All words"
+      count += this.data[sheetName]?.length || 0;
     }
     return count;
   }
@@ -155,7 +143,7 @@ export class VocabularyService {
           // Process data to ensure all fields have proper types
           this.data = this.dataProcessor.processDataTypes(fetchedData);
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("All words");
+          this.wordNavigation.setCurrentSheetName("phrasal verbs");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -163,12 +151,16 @@ export class VocabularyService {
           this.notifyVocabularyChange();
         })
         .catch(error => {
-          console.warn("Failed to load from JSON file, using built-in default vocabulary:", error);
-          // Fallback to built-in default vocabulary if fetch fails
-          const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
-          this.data = this.dataProcessor.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
+          console.warn("Failed to load from JSON file, using minimal fallback:", error);
+          // Fallback to minimal structure without "All words"
+          const fallbackData: SheetData = {
+            "phrasal verbs": [],
+            "idioms": [],
+            "advanced words": []
+          };
+          this.data = this.dataProcessor.processDataTypes(fallbackData);
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("All words");
+          this.wordNavigation.setCurrentSheetName("phrasal verbs");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -231,7 +223,7 @@ export class VocabularyService {
     
     // Add each custom category to sheetOptions if it doesn't exist already
     for (const category in customData) {
-      if (!this.sheetOptions.includes(category) && category !== "All words") {
+      if (!this.sheetOptions.includes(category)) {
         (this.sheetOptions as string[]).push(category);
         console.log(`Added new category: ${category}`);
       }

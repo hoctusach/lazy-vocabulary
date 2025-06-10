@@ -14,6 +14,7 @@ interface WordFormFieldsProps {
   isDisabled: boolean;
 }
 
+// Updated category options without "All words"
 const CATEGORY_OPTIONS = [
   { value: "phrasal verbs", label: "Phrasal Verbs" },
   { value: "idioms", label: "Idioms" },

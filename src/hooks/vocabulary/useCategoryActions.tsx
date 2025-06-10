@@ -15,9 +15,9 @@ export const useCategoryActions = (
     // Fixed: Added debug logging to track category values
     console.log(`Switching category from "${currentCategory}" to "${nextCategory}" (types: ${typeof currentCategory}, ${typeof nextCategory})`);
     
-    // Ensure nextCategory is a string
-    if (typeof nextCategory !== 'string') {
-      console.error(`Invalid category type: ${typeof nextCategory}`, nextCategory);
+    // Ensure nextCategory is a string and not "All words"
+    if (typeof nextCategory !== 'string' || nextCategory === "All words") {
+      console.error(`Invalid category: ${nextCategory}`);
       return;
     }
     
