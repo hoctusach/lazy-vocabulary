@@ -35,9 +35,9 @@ const VocabularyContainer: React.FC = () => {
   const { currentCategory, nextCategory } = useCategoryNavigation();
 
   // Optimized file upload handler that prevents excessive processing
-  const handleOptimizedFileUpload = async (file: File) => {
+  const handleOptimizedFileUpload = (file: File) => {
     console.log('[VOCAB-CONTAINER] Optimized file upload handler called');
-    await containerState.handleFileUploaded(file);
+    containerState.handleFileUploaded(file);
   };
 
   // Optimized category switch handler

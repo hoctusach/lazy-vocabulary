@@ -14,8 +14,7 @@ export class VocabularyOperations {
   constructor(dataManager: VocabularyDataManager, sheetOperations: VocabularySheetOperations) {
     this.dataManager = dataManager;
     this.sheetOperations = sheetOperations;
-    // Pass initial data and sheet options to WordNavigation
-    this.wordNavigation = new WordNavigation(this.dataManager.getData(), this.sheetOperations.sheetOptions);
+    this.wordNavigation = new WordNavigation();
     this.lastWordChangeTime = Date.now();
     this.navigationThrottleRef = { current: 0 };
   }
@@ -41,16 +40,12 @@ export class VocabularyOperations {
         
         console.log(`Processing sheet "${sheetName}" with ${jsonData.length} rows`);
         
-        const words: VocabularyWord[] = jsonData
-          .map((row: any) => ({
-            word: String(row.Word || row.word || '').trim(),
-            meaning: String(row.Meaning || row.meaning || '').trim(),
-            example: String(row.Example || row.example || '').trim(),
-            category: sheetName,
-            // Default count to 0 if not present
-            count: row.Count ?? row.count ?? 0
-          }))
-          .filter(word => word.word && word.meaning);
+        const words: VocabularyWord[] = jsonData.map((row: any, index) => ({
+          word: String(row.Word || row.word || '').trim(),
+          meaning: String(row.Meaning || row.meaning || '').trim(),
+          example: String(row.Example || row.example || '').trim(),
+          category: sheetName
+        })).filter(word => word.word && word.meaning);
         
         if (words.length > 0) {
           importedData[sheetName] = words;
@@ -86,7 +81,7 @@ export class VocabularyOperations {
       return null;
     }
     
-    const currentWord = this.wordNavigation.getCurrentWord();
+    const currentWord = this.wordNavigation.getCurrentWord(wordList);
     console.log(`Current word from ${currentSheet}:`, currentWord?.word || 'none');
     
     return currentWord;
@@ -114,7 +109,7 @@ export class VocabularyOperations {
     
     console.log(`[VOCAB-OPS] Moving to next word in ${currentSheet} (${wordList.length} words available)`);
     
-    const nextWord = this.wordNavigation.getNextWord();
+    const nextWord = this.wordNavigation.getNextWord(wordList);
     this.lastWordChangeTime = now;
     
     console.log(`[VOCAB-OPS] Next word: ${nextWord?.word || 'none'}`);
