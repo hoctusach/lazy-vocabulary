@@ -45,7 +45,7 @@ export const useSpeechSynthesis = () => {
   
   // Function to change voice region
   const handleChangeVoice = useCallback(() => {
-    const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
+    const newRegion = voiceRegion === 'US' ? 'UK' : voiceRegion === 'UK' ? 'AU' : 'US';
     setVoiceRegion(newRegion);
     console.log(`Voice changed to ${newRegion}`);
   }, [voiceRegion, setVoiceRegion]);

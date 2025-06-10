@@ -60,7 +60,7 @@ export const useVoiceManager = () => {
     };
   }, [loadVoices]);
 
-  const selectVoiceByRegion = useCallback((voiceRegion: 'US' | 'UK'): SpeechSynthesisVoice | null => {
+  const selectVoiceByRegion = useCallback((voiceRegion: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null => {
     if (availableVoices.length === 0) {
       console.log("No voices available, cannot select by region");
       return null;
@@ -75,6 +75,14 @@ export const useVoiceManager = () => {
       
       if (!voice) {
         voice = availableVoices.find(v => v.lang === 'en-US');
+      }
+    } else if (voiceRegion === 'AU') {
+      voice = availableVoices.find(v =>
+        v.lang === 'en-AU' && (v.name.includes('Google') || v.name.includes('Microsoft'))
+      );
+
+      if (!voice) {
+        voice = availableVoices.find(v => v.lang === 'en-AU');
       }
     } else {
       // Try to find UK voice - be more specific

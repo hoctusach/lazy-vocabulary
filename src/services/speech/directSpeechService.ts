@@ -10,10 +10,16 @@ class DirectSpeechService {
   private completionTimeoutId: number | null = null;
 
   // Region-specific speech settings
-  private getRegionSettings(region: 'US' | 'UK') {
+  private getRegionSettings(region: 'US' | 'UK' | 'AU') {
     return {
       US: {
-        rate: 0.75, // Slightly slower for better comprehension
+        rate: 0.6, // Slower for lengthy text
+        pitch: 1.0,
+        volume: 1.0,
+        pauseDuration: 600
+      },
+      AU: {
+        rate: 0.6,
         pitch: 1.0,
         volume: 1.0,
         pauseDuration: 600
@@ -51,7 +57,7 @@ class DirectSpeechService {
   async speak(
     text: string, 
     options: {
-      voiceRegion?: 'US' | 'UK';
+      voiceRegion?: 'US' | 'UK' | 'AU';
       word?: string;
       meaning?: string;
       example?: string;

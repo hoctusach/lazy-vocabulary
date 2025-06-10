@@ -1,10 +1,12 @@
 
-export const getVoiceRegionFromStorage = (): 'US' | 'UK' => {
+export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
   try {
     const storedStates = localStorage.getItem('buttonStates');
     if (storedStates) {
       const parsedStates = JSON.parse(storedStates);
-      return parsedStates.voiceRegion === 'UK' ? 'UK' : 'US';
+      if (parsedStates.voiceRegion === 'UK') return 'UK';
+      if (parsedStates.voiceRegion === 'AU') return 'AU';
+      return 'US';
     }
   } catch (error) {
     console.error('Error reading voice region from localStorage:', error);
@@ -14,7 +16,7 @@ export const getVoiceRegionFromStorage = (): 'US' | 'UK' => {
 
 export const getSpeechRate = (): number => {
   const region = getVoiceRegionFromStorage();
-  return region === 'US' ? 0.8 : 1.0;
+  return region === 'UK' ? 0.8 : 0.6;
 };
 
 export const getSpeechPitch = (): number => {

@@ -2,6 +2,7 @@ import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
 
 // Updated voice names with better UK options
 const US_VOICE_NAME = "Samantha"; // For US voice
+const AU_VOICE_NAME = "Karen"; // Common AU voice
 const UK_VOICE_NAMES = [
   "Google UK English Female", // Primary option
   "Daniel", // Backup UK voice
@@ -26,7 +27,7 @@ export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthes
 };
 
 // Enhanced function to get voice by region with better UK voice selection
-export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
+export const getVoiceByRegion = (region: 'US' | 'UK' | 'AU', gender: 'male' | 'female' = 'female'): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
   
   if (!voices || voices.length === 0) {
@@ -50,6 +51,20 @@ export const getVoiceByRegion = (region: 'US' | 'UK', gender: 'male' | 'female' 
     
     if (voice) {
       console.log(`Fallback US voice by language: ${voice.name} (${voice.lang})`);
+      return voice;
+    }
+  } else if (region === 'AU') {
+    let voice = voices.find(v => v.name === AU_VOICE_NAME);
+
+    if (voice) {
+      console.log(`Found exact AU voice: ${voice.name} (${voice.lang})`);
+      return voice;
+    }
+
+    voice = voices.find(v => v.lang === 'en-AU');
+
+    if (voice) {
+      console.log(`Fallback AU voice by language: ${voice.name} (${voice.lang})`);
       return voice;
     }
   } else {

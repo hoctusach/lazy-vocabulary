@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 interface VoiceSettings {
   isMuted: boolean;
-  voiceRegion: 'US' | 'UK';
+  voiceRegion: 'US' | 'UK' | 'AU';
 }
 
 export const useVoiceSettings = () => {
@@ -20,7 +20,11 @@ export const useVoiceSettings = () => {
         
         return {
           isMuted: parsedStates.isMuted === true,
-          voiceRegion: (parsedStates.voiceRegion === 'UK' ? 'UK' : 'US') as 'US' | 'UK'
+          voiceRegion: (parsedStates.voiceRegion === 'UK'
+            ? 'UK'
+            : parsedStates.voiceRegion === 'AU'
+            ? 'AU'
+            : 'US') as 'US' | 'UK' | 'AU'
         };
       }
     } catch (error) {
@@ -31,7 +35,7 @@ export const useVoiceSettings = () => {
 
   const { isMuted: initialMuted, voiceRegion: initialVoiceRegion } = getInitialStates();
   const [isMuted, setIsMuted] = useState(initialMuted);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>(initialVoiceRegion);
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>(initialVoiceRegion);
 
   // Update mute state in localStorage when it changes
   useEffect(() => {

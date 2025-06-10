@@ -3,8 +3,8 @@ import { SpeechSynthesisVoice } from '@/types/speech';
 import { getVoiceByRegion } from '../voiceUtils';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 
-export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 'US' | 'UK'): void => {
-  const langCode = region === 'US' ? 'en-US' : 'en-GB';
+export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 'US' | 'UK' | 'AU'): void => {
+  const langCode = region === 'US' ? 'en-US' : region === 'AU' ? 'en-AU' : 'en-GB';
   const voice = getVoiceByRegion(region);
   
   if (voice) {
