@@ -10,7 +10,8 @@ export const useWordNavigationActions = (
   clearTimer: () => void,
   wordChangeInProgressRef: React.MutableRefObject<boolean>,
   lastManualActionTimeRef: React.MutableRefObject<number>,
-  isChangingWordRef: React.MutableRefObject<boolean>
+  isChangingWordRef: React.MutableRefObject<boolean>,
+  manualOverrideRef?: React.MutableRefObject<boolean>
 ) => {
   // Debounced next word handler to prevent rapid clicks
   const handleManualNext = useCallback(() => {
@@ -24,6 +25,9 @@ export const useWordNavigationActions = (
     }
 
     console.log("Manual next word requested");
+    if (manualOverrideRef) {
+      manualOverrideRef.current = true;
+    }
     lastManualActionTimeRef.current = Date.now();
     clearTimer();
     
@@ -51,7 +55,7 @@ export const useWordNavigationActions = (
         isChangingWordRef.current = false;
       }, 200);
     }
-  }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef]);
+  }, [clearTimer, setCurrentWord, wordChangeInProgressRef, lastManualActionTimeRef, isChangingWordRef, manualOverrideRef]);
 
   return {
     handleManualNext

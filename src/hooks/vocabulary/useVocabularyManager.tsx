@@ -27,6 +27,7 @@ export const useVocabularyManager = () => {
   const isSpeakingRef = useRef<boolean>(false);
   const isChangingWordRef = useRef<boolean>(false);
   const wordChangeInProgressRef = useRef(false);
+  const manualOverrideRef = useRef(false);
 
   // Error handling
   const { jsonLoadError, handleVocabularyError } = useErrorHandling(
@@ -64,7 +65,8 @@ export const useVocabularyManager = () => {
     isChangingWordRef,
     setIsPaused,
     timerRef,
-    displayNextWord
+    displayNextWord,
+    manualOverrideRef
   );
 
   // File handler
