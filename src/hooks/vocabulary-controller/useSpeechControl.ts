@@ -9,9 +9,9 @@ import { toast } from 'sonner';
 export const useSpeechControl = (
   voiceRegion: 'US' | 'UK',
   currentWordRef: React.RefObject<any>,
-  pausedRef: React.RefObject<boolean>,
-  mutedRef: React.RefObject<boolean>,
-  autoPlayTimeoutRef: React.RefObject<number | null>,
+  pausedRef: React.MutableRefObject<boolean>,
+  mutedRef: React.MutableRefObject<boolean>,
+  autoPlayTimeoutRef: React.MutableRefObject<number | null>,
   setIsSpeaking: (speaking: boolean) => void,
   goToNext: () => void
 ) => {

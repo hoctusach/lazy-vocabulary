@@ -23,12 +23,10 @@ export const useVocabularyNavigation = (
     directSpeechService.stop();
     setIsSpeaking(false);
     
-    setCurrentIndex((prevIndex) => {
-      const nextIndex = (prevIndex + 1) % wordList.length;
-      console.log(`[VOCAB-NAV] Moving to index ${nextIndex}`);
-      return nextIndex;
-    });
-  }, [wordList.length, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
+    const nextIndex = (currentIndex + 1) % wordList.length;
+    console.log(`[VOCAB-NAV] Moving to index ${nextIndex}`);
+    setCurrentIndex(nextIndex);
+  }, [wordList.length, currentIndex, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
 
   const goToPrevious = useCallback(() => {
     console.log('[VOCAB-NAV] goToPrevious called');
@@ -39,12 +37,10 @@ export const useVocabularyNavigation = (
     directSpeechService.stop();
     setIsSpeaking(false);
     
-    setCurrentIndex((prevIndex) => {
-      const prevIndexCalc = prevIndex === 0 ? wordList.length - 1 : prevIndex - 1;
-      console.log(`[VOCAB-NAV] Moving to index ${prevIndexCalc}`);
-      return prevIndexCalc;
-    });
-  }, [wordList.length, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
+    const prevIndex = currentIndex === 0 ? wordList.length - 1 : currentIndex - 1;
+    console.log(`[VOCAB-NAV] Moving to index ${prevIndex}`);
+    setCurrentIndex(prevIndex);
+  }, [wordList.length, currentIndex, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
 
   return {
     goToNext,

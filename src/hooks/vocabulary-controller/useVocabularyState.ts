@@ -15,7 +15,7 @@ export const useVocabularyState = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [hasData, setHasData] = useState(false);
 
-  // Refs for immediate state tracking
+  // Refs for immediate state tracking - using MutableRefObject for refs that need to be assigned
   const pausedRef = useRef(false);
   const mutedRef = useRef(false);
   const currentWordRef = useRef<VocabularyWord | null>(null);
