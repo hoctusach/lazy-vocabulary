@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react';
 const US_VOICE_NAME = "Samantha";
 const UK_VOICE_NAME = "Google UK English Female";
 const AU_VOICE_NAMES = [
-  "Google AU English Female",
+  "Hayley",
   "Google AU English Male",
-  "Karen"
+  "Google AU English Female",
+  "Karen",
+  "Catherine"
 ];
 
 export type VoiceOption = {

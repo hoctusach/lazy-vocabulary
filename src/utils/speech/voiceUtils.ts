@@ -10,11 +10,11 @@ const UK_VOICE_NAMES = [
   "Hazel" // Additional UK option
 ];
 const AU_VOICE_NAMES = [
-  "Google AU English Female", // Primary option for AU
-  "Google AU English Male", // New male AU option
+  "Hayley", // Energetic AU voice
+  "Google AU English Male", // Younger male AU option
+  "Google AU English Female", // Original female option
   "Karen", // macOS AU voice
-  "Catherine", // Additional AU option
-  "Hayley" // Backup AU option
+  "Catherine" // Additional AU option
 ];
 
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
