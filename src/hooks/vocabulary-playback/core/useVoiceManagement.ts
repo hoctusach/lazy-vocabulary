@@ -4,9 +4,9 @@ import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
 
 // Hard-coded voice names from previously working version
-const US_VOICE_NAME = "Samantha";
+const US_VOICE_NAME = "en-US-Standard-G";
 const UK_VOICE_NAME = "Google UK English Female";
-const AU_VOICE_NAME = "Google AU English Female";
+const AU_VOICE_NAME = "en-AU-Standard-C";
 
 /**
  * Hook for managing voice selection and finding appropriate voices

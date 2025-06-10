@@ -2,7 +2,7 @@
 import { VoiceSelection } from '../useVoiceSelection';
 
 // Hard-coded voice names based on previously working version
-const US_VOICE_NAME = "Samantha"; // For US voice
+const US_VOICE_NAME = "en-US-Standard-G"; // For US voice
 const UK_VOICE_NAME = "Google UK English Female"; // For UK voice
 
 // Backup voice names in case primary ones aren't found

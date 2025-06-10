@@ -2,10 +2,10 @@
 import { useState, useEffect } from 'react';
 
 // Hard-coded voice names from previously working version
-const US_VOICE_NAME = "Samantha";
+const US_VOICE_NAME = "en-US-Standard-G";
 const UK_VOICE_NAME = "Google UK English Female";
 const AU_VOICE_NAMES = [
-  "Hayley",
+  "en-AU-Standard-C",
   "Google AU English Male",
   "Google AU English Female",
   "Karen",
