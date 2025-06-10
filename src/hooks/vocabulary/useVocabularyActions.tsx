@@ -13,7 +13,8 @@ export const useVocabularyActions = (
   isChangingWordRef: React.MutableRefObject<boolean>,
   setIsPaused: React.Dispatch<React.SetStateAction<boolean>>,
   timerRef: React.MutableRefObject<number | null>,
-  displayNextWord: () => void
+  displayNextWord: () => void,
+  manualOverrideRef?: React.MutableRefObject<boolean>
 ) => {
   // Use the pause actions hook
   const { handleTogglePause } = usePauseActions(setIsPaused);
@@ -24,7 +25,8 @@ export const useVocabularyActions = (
     clearTimer,
     wordChangeInProgressRef,
     lastManualActionTimeRef,
-    isChangingWordRef
+    isChangingWordRef,
+    manualOverrideRef
   );
   
   // Use the category actions hook
