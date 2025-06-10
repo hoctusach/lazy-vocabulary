@@ -1,7 +1,6 @@
 
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
-import WelcomeScreen from "@/components/WelcomeScreen";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithData from "./ContentWithData";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
@@ -150,11 +149,6 @@ const VocabularyAppContainer: React.FC = () => {
     nextCategory
   });
 
-  // Create a wrapper function for file upload to match WelcomeScreen's expected signature
-  const handleFileUploadWrapper = () => {
-    // This is a no-op since WelcomeScreen will handle file selection internally
-    // The actual file processing will be handled by the FileUpload component
-  };
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
@@ -186,7 +180,7 @@ const VocabularyAppContainer: React.FC = () => {
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
       ) : (
-        <WelcomeScreen onFileUploaded={handleFileUploadWrapper} />
+        <p>Loading vocabulary…</p>
       )}
     </VocabularyLayout>
   );
