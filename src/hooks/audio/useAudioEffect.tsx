@@ -18,17 +18,23 @@ export const useAudioEffect = (
   speechAttemptsRef: React.MutableRefObject<number>,
   stopSpeaking: () => void,
   displayTime: number,
-  pauseRequestedRef?: React.MutableRefObject<boolean>
+  pauseRequestedRef?: React.MutableRefObject<boolean>,
+  manualOverrideRef?: React.MutableRefObject<boolean>
 ) => {
   // Handle playing audio when the current word changes - with debouncing
   useEffect(() => {
+    // Capture manual override state and reset it immediately
+    const manualOverride = manualOverrideRef?.current;
+    if (manualOverrideRef) {
+      manualOverrideRef.current = false;
+    }
     if (!currentWord) {
       console.log('[APP] No current word, nothing to speak');
       return;
     }
     
-    // Skip playback when muted or paused
-    if (isPaused) {
+    // Skip playback when muted or paused unless manual override is active
+    if (isPaused && !manualOverride) {
       console.log('[APP] App is paused, not speaking');
       return;
     }
@@ -144,6 +150,7 @@ export const useAudioEffect = (
     speechAttemptsRef,
     handleManualNext,
     pauseRequestedRef,
-    isSoundPlaying
+    isSoundPlaying,
+    manualOverrideRef
   ]);
 };

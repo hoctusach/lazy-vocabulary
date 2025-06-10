@@ -25,7 +25,8 @@ export const useAudioPlayback = (
   speechAttemptsRef: React.MutableRefObject<number>,
   stopSpeaking: () => void,
   displayTime: number,
-  pauseRequestedRef?: React.MutableRefObject<boolean>
+  pauseRequestedRef?: React.MutableRefObject<boolean>,
+  manualOverrideRef?: React.MutableRefObject<boolean>
 ) => {
   // Use our extracted hooks for different aspects of audio playback
   const { clearAllAudioState } = useAudioCleanup(
@@ -50,7 +51,8 @@ export const useAudioPlayback = (
     speechAttemptsRef,
     stopSpeaking,
     displayTime,
-    pauseRequestedRef
+    pauseRequestedRef,
+    manualOverrideRef
   );
   
   // Pause/unpause effect
