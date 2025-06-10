@@ -5,7 +5,6 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { useContentValidation } from './useContentValidation';
 import { usePlaybackConditions } from './usePlaybackConditions';
 import { useSpeechExecution } from './useSpeechExecution';
-import { useSpeechPermissionManager } from './useSpeechPermissionManager';
 import { toast } from 'sonner';
 
 /**
@@ -25,7 +24,6 @@ export const usePlaybackExecution = (
   paused: boolean,
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>,
   checkSpeechSupport: () => boolean,
   voicesLoadedRef: React.MutableRefObject<boolean>,
   ensureVoicesLoaded: () => Promise<boolean>
@@ -33,12 +31,7 @@ export const usePlaybackExecution = (
   const { validateAndPrepareContent } = useContentValidation();
   const { checkPlaybackConditions, handleControllerReset } = usePlaybackConditions();
   
-  // Use the permission manager for speech permissions
-  const { 
-    setHasSpeechPermission,
-    checkSpeechPermissions,
-    handlePermissionError 
-  } = useSpeechPermissionManager();
+  // Permissions are always granted in this simplified setup
   
   const { executeSpeech } = useSpeechExecution(
     findVoice,
@@ -53,11 +46,7 @@ export const usePlaybackExecution = (
     autoAdvanceTimerRef,
     paused,
     muted,
-    wordTransitionRef,
-    permissionErrorShownRef,
-    setHasSpeechPermission,
-    handlePermissionError,
-    checkSpeechPermissions
+    wordTransitionRef
   );
 
   const executePlayback = useCallback(async (
@@ -114,10 +103,7 @@ export const usePlaybackExecution = (
       
       // Ensure speech synthesis is available
       if (!checkSpeechSupport()) {
-        if (!permissionErrorShownRef.current) {
-          toast.error("Your browser doesn't support speech synthesis");
-          permissionErrorShownRef.current = true;
-        }
+        toast.error("Your browser doesn't support speech synthesis");
         scheduleAutoAdvance(3000);
         setPlayInProgress(false);
         return;
@@ -164,7 +150,6 @@ export const usePlaybackExecution = (
     voicesLoadedRef,
     ensureVoicesLoaded,
     checkSpeechSupport,
-    permissionErrorShownRef,
     validateAndPrepareContent,
     executeSpeech,
     setIsSpeaking,
