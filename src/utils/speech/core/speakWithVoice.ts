@@ -8,7 +8,7 @@ import { createSpeechMonitor, clearSpeechMonitor, SpeechMonitorRefs } from './sp
 
 interface SpeakWithVoiceParams {
   utterance: SpeechSynthesisUtterance;
-  region: 'US' | 'UK';
+  region: 'US' | 'UK' | 'AU';
   text: string;
   processedText: string;
   onComplete: () => void;
