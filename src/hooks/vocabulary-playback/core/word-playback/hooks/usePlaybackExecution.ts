@@ -18,7 +18,10 @@ export const usePlaybackExecution = (
   speakingRef: React.MutableRefObject<boolean>,
   resetRetryAttempts: () => void,
   incrementRetryAttempts: () => boolean,
-  goToNextWord: () => void,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   paused: boolean,
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
@@ -45,6 +48,9 @@ export const usePlaybackExecution = (
     resetRetryAttempts,
     incrementRetryAttempts,
     goToNextWord,
+    scheduleAutoAdvance,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef,
     paused,
     muted,
     wordTransitionRef,
@@ -88,7 +94,7 @@ export const usePlaybackExecution = (
         await handleControllerReset();
       } else if (conditionCheck.reason === 'muted') {
         console.log('[PLAYBACK-EXECUTION] Speech is muted, auto-advancing after delay');
-        setTimeout(() => goToNextWord(), 3000);
+        scheduleAutoAdvance(3000);
       } else if (conditionCheck.reason === 'word-transition') {
         setTimeout(() => executePlayback(currentWord, setPlayInProgress, isPlayInProgress, resetPlayInProgress), 150);
       }
@@ -112,7 +118,7 @@ export const usePlaybackExecution = (
           toast.error("Your browser doesn't support speech synthesis");
           permissionErrorShownRef.current = true;
         }
-        setTimeout(() => goToNextWord(), 3000);
+        scheduleAutoAdvance(3000);
         setPlayInProgress(false);
         return;
       }
@@ -130,7 +136,7 @@ export const usePlaybackExecution = (
       
       if (!hasValidContent) {
         console.log('[PLAYBACK-EXECUTION] No valid content to speak, advancing');
-        setTimeout(() => goToNextWord(), 2000);
+        scheduleAutoAdvance(2000);
         setPlayInProgress(false);
         return;
       }
@@ -147,7 +153,7 @@ export const usePlaybackExecution = (
       
       // Still auto-advance to prevent getting stuck
       if (!paused && !muted) {
-        setTimeout(() => goToNextWord(), 3000);
+        scheduleAutoAdvance(3000);
       }
     }
   }, [
@@ -164,7 +170,8 @@ export const usePlaybackExecution = (
     setIsSpeaking,
     speakingRef,
     checkPlaybackConditions,
-    handleControllerReset
+    handleControllerReset,
+    scheduleAutoAdvance
   ]);
 
   return {
