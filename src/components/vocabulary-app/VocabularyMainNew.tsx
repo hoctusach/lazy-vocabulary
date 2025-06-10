@@ -11,6 +11,7 @@ interface VocabularyMainNewProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleCycleVoice: () => void;
+  handleSetVoiceRegion: (region: 'US' | 'UK' | 'AU') => void;
   handleSwitchCategory: () => void;
   handleManualNext: () => void;
   currentCategory: string;
@@ -27,6 +28,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   toggleMute,
   handleTogglePause,
   handleCycleVoice,
+  handleSetVoiceRegion,
   handleSwitchCategory,
   currentCategory,
   nextCategory,
@@ -49,6 +51,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         onToggleMute={toggleMute}
         onTogglePause={handleTogglePause}
         onCycleVoice={handleCycleVoice}
+        onSetVoiceRegion={handleSetVoiceRegion}
         onSwitchCategory={handleSwitchCategory}
         onNextWord={handleManualNext}
         currentCategory={currentCategory}
