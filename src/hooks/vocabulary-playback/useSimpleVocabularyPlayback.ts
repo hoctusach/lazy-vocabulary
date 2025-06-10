@@ -17,7 +17,7 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const { selectedVoice, cycleVoice, voices } = useVoiceSelection();
   
   // Find voice function
-  const findVoice = useCallback((region: 'US' | 'UK') => {
+  const findVoice = useCallback((region: 'US' | 'UK' | 'AU') => {
     return voices.find(voice => voice.region === region)?.voice || null;
   }, [voices]);
   

@@ -7,7 +7,7 @@ export const useVocabularyAudioSync = (
   currentWord: VocabularyWord | null, 
   isPaused: boolean, 
   isMuted: boolean, 
-  voiceRegion: 'US' | 'UK'
+  voiceRegion: 'US' | 'UK' | 'AU'
 ) => {
   const [isSoundPlaying, setIsSoundPlaying] = useState(false);
   const autoAdvanceTimerRef = useRef<number | null>(null);

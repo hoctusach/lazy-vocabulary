@@ -9,7 +9,7 @@ import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
  */
 export const useSpeechExecution = (
   selectedVoice: VoiceSelection,
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   setIsSpeaking: (isSpeaking: boolean) => void,
   isPlayingRef: React.MutableRefObject<boolean>,
   advanceToNext: () => void,

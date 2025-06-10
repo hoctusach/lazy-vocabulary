@@ -7,7 +7,7 @@ import { VoiceSelection } from '../../useVoiceSelection';
  */
 export const useVoiceManager = (selectedVoice: VoiceSelection) => {
   // Find voice by region
-  const findVoice = useCallback((region: 'US' | 'UK') => {
+  const findVoice = useCallback((region: 'US' | 'UK' | 'AU') => {
     const voices = window.speechSynthesis?.getVoices() || [];
     const lang = region === 'US' ? 'en-US' : 'en-GB';
     return voices.find(voice => voice.lang.startsWith(lang)) || null;

@@ -1,10 +1,13 @@
 
-export const getVoiceRegionFromStorage = (): 'US' | 'UK' => {
+export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
   try {
     const storedStates = localStorage.getItem('buttonStates');
     if (storedStates) {
       const parsedStates = JSON.parse(storedStates);
-      return parsedStates.voiceRegion === 'UK' ? 'UK' : 'US';
+      if (parsedStates.voiceRegion === 'UK' || parsedStates.voiceRegion === 'AU') {
+        return parsedStates.voiceRegion;
+      }
+      return 'US';
     }
   } catch (error) {
     console.error('Error reading voice region from localStorage:', error);

@@ -11,7 +11,7 @@ import { useSpeechController } from './speech-execution/useSpeechController';
  * Refactored speech execution hook with modular components
  */
 export const useSpeechExecution = (
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,

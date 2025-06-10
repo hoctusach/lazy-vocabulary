@@ -12,7 +12,7 @@ import { toast } from 'sonner';
  * Hook for executing the playback process
  */
 export const usePlaybackExecution = (
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,

@@ -19,7 +19,7 @@ interface ContentWithDataNewProps {
   isSpeaking: boolean;
   handleManualNext: () => void;
   displayTime: number;
-  voiceRegion: 'US' | 'UK';
+  voiceRegion: 'US' | 'UK' | 'AU';
   debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;

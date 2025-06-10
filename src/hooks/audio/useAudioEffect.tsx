@@ -7,7 +7,7 @@ export const useAudioEffect = (
   currentWord: VocabularyWord | null,
   isPaused: boolean,
   mute: boolean,
-  voiceRegion: 'US' | 'UK',
+  voiceRegion: 'US' | 'UK' | 'AU',
   handleManualNext: () => void,
   isSoundPlaying: boolean,
   setIsSoundPlaying: (playing: boolean) => void,

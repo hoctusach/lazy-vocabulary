@@ -15,7 +15,7 @@ export const useOrchestratorCore = (
   currentIndex: number,
   muted: boolean,
   paused: boolean,
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: any,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,

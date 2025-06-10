@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 // Hard-coded voice names from previously working version
 const US_VOICE_NAME = "Samantha";
 const UK_VOICE_NAME = "Google UK English Female";
+const AU_VOICE_NAME = "Google AU English Female";
 
 export type VoiceOption = {
   label: string;
-  region: 'US' | 'UK';
+  region: 'US' | 'UK' | 'AU';
   gender: 'male' | 'female';
   voice: SpeechSynthesisVoice | null;
 };
@@ -15,7 +16,7 @@ export type VoiceOption = {
 // Define voice types with consistent structure
 export interface VoiceSelection {
   label: string;
-  region: 'US' | 'UK';
+  region: 'US' | 'UK' | 'AU';
   gender: 'male' | 'female';
   index: number;
 }
@@ -24,6 +25,7 @@ export interface VoiceSelection {
 const VOICE_OPTIONS: VoiceSelection[] = [
   { label: "US", region: "US", gender: "female", index: 0 },
   { label: "UK", region: "UK", gender: "female", index: 1 },
+  { label: "AU", region: "AU", gender: "female", index: 2 },
 ];
 
 const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[0];
@@ -64,9 +66,13 @@ export const useVoiceSelection = () => {
                        availableVoices.find(v => v.name.includes(US_VOICE_NAME)) ||
                        availableVoices.find(v => v.lang === 'en-US');
                        
-        const ukVoice = availableVoices.find(v => v.name === UK_VOICE_NAME) || 
+        const ukVoice = availableVoices.find(v => v.name === UK_VOICE_NAME) ||
                        availableVoices.find(v => v.name.includes(UK_VOICE_NAME)) ||
                        availableVoices.find(v => v.lang === 'en-GB');
+
+        const auVoice = availableVoices.find(v => v.name === AU_VOICE_NAME) ||
+                       availableVoices.find(v => v.name.includes(AU_VOICE_NAME)) ||
+                       availableVoices.find(v => v.lang === 'en-AU');
         
         // Create simplified voice options
         const voiceOptions: VoiceOption[] = [
@@ -81,12 +87,19 @@ export const useVoiceSelection = () => {
             region: "UK" as const,
             gender: "female" as const,
             voice: ukVoice || null
+          },
+          {
+            label: "AU",
+            region: "AU" as const,
+            gender: "female" as const,
+            voice: auVoice || null
           }
         ];
         
         console.log('Voice options created:');
         console.log(`US voice: ${voiceOptions[0].voice?.name || 'not found'}`);
         console.log(`UK voice: ${voiceOptions[1].voice?.name || 'not found'}`);
+        console.log(`AU voice: ${voiceOptions[2].voice?.name || 'not found'}`);
         
         setVoices(voiceOptions);
         
@@ -126,9 +139,9 @@ export const useVoiceSelection = () => {
     };
   }, []);
   
-  // Function to change voice selection - toggle between US and UK
+  // Function to cycle through available voices
   const cycleVoice = () => {
-    const nextIndex = voiceIndex === 0 ? 1 : 0;  // Toggle between 0 and 1
+    const nextIndex = (voiceIndex + 1) % VOICE_OPTIONS.length;
     const nextVoice = VOICE_OPTIONS[nextIndex];
     
     console.log(`Cycling voice from ${selectedVoice.label} to ${nextVoice.label}`);

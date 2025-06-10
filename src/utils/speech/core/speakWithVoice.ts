@@ -8,7 +8,7 @@ import { createSpeechMonitor, clearSpeechMonitor, SpeechMonitorRefs } from './sp
 
 interface SpeakWithVoiceParams {
   utterance: SpeechSynthesisUtterance;
-  region: 'US' | 'UK';
+  region: 'US' | 'UK' | 'AU';
   text: string;
   processedText: string;
   onComplete: () => void;
@@ -37,7 +37,7 @@ export async function speakWithVoice({
   await new Promise(resolve => setTimeout(resolve, domUpdateDelay));
   
   // Use the correct language code based on the selected region
-  const langCode = region === 'US' ? 'en-US' : 'en-GB';
+  const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
   console.log(`[VOICE] Using ${region} voice (${langCode})`);
   
   // First wait for voices to load (addressing the not-allowed error)

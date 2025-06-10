@@ -4,7 +4,7 @@ import { vocabularyService } from '@/services/vocabularyService';
 
 interface DebugPanelProps {
   isMuted: boolean;
-  voiceRegion: 'US' | 'UK';
+  voiceRegion: 'US' | 'UK' | 'AU';
   isPaused: boolean;
   currentWord?: {
     word: string;

@@ -13,7 +13,7 @@ export const useWordPlaybackLogic = (
   muted: boolean,
   paused: boolean,
   cancelSpeech: () => void,
-  findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   userInteractionRef: React.MutableRefObject<boolean>,
   setIsSpeaking: (isSpeaking: boolean) => void,
@@ -30,7 +30,7 @@ export const useWordPlaybackLogic = (
   createUtterance: (
     word: VocabularyWord, 
     selectedVoice: VoiceSelection,
-    findVoice: (region: 'US' | 'UK') => SpeechSynthesisVoice | null,
+    findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
     onStart: () => void,
     onEnd: () => void,
     onError: (e: SpeechSynthesisErrorEvent) => void
