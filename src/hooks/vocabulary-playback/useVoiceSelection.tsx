@@ -34,12 +34,12 @@ const VOICE_OPTIONS: VoiceSelection[] = [
   { label: "AU", region: "AU", gender: "female", index: 2 },
 ];
 
-const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[0];
+const DEFAULT_VOICE_OPTION: VoiceSelection = VOICE_OPTIONS[1];
 
 export const useVoiceSelection = () => {
   const [voices, setVoices] = useState<VoiceOption[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<VoiceSelection>(DEFAULT_VOICE_OPTION);
-  const [voiceIndex, setVoiceIndex] = useState<number>(0);
+  const [voiceIndex, setVoiceIndex] = useState<number>(1);
   
   // Load available voices when the component mounts
   useEffect(() => {
