@@ -16,7 +16,13 @@ export class VocabularyService {
   
   constructor() {
     // Updated sheet options without "All words"
-    this.sheetOptions = ["phrasal verbs", "idioms", "advanced words"];
+    this.sheetOptions = [
+      "phrasal verbs",
+      "idioms",
+      "advanced words",
+      "grammar",
+      "phrases, collocations"
+    ];
     
     // Initialize the components
     this.dataManager = new VocabularyDataManager();

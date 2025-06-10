@@ -5,7 +5,13 @@ import { SheetProcessor } from "./SheetProcessor";
 import { SheetNormalizer } from "./SheetNormalizer";
 
 export class SheetManager {
-  readonly sheetOptions = ["phrasal verbs", "idioms", "advanced words"];
+  readonly sheetOptions = [
+    "phrasal verbs",
+    "idioms",
+    "advanced words",
+    "grammar",
+    "phrases, collocations"
+  ];
   private sheetProcessor: SheetProcessor;
   private sheetNormalizer: SheetNormalizer;
 

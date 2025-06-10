@@ -13,6 +13,8 @@ export class SheetNormalizer {
     if (normalized.includes("phrasal") || normalized.includes("verb")) return "phrasal verbs";
     if (normalized.includes("idiom")) return "idioms";
     if (normalized.includes("advanced")) return "advanced words";
+    if (normalized.includes("grammar")) return "grammar";
+    if (normalized.includes("phrase") || normalized.includes("collocation")) return "phrases, collocations";
     
     // Default to "phrasal verbs" if no match (instead of original name)
     return "phrasal verbs";
