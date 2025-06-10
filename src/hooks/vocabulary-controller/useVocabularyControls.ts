@@ -1,10 +1,10 @@
 
 import { useCallback } from 'react';
-import { directSpeechService } from '@/services/speech/directSpeechService';
+import { unifiedSpeechService } from '@/services/speech/unifiedSpeechService';
 import { toast } from 'sonner';
 
 /**
- * Control functions for pause, mute, and voice toggling
+ * Enhanced control functions with unified speech service and better mobile support
  */
 export const useVocabularyControls = (
   isPaused: boolean,
@@ -21,7 +21,7 @@ export const useVocabularyControls = (
   playCurrentWord: () => void,
   getRegionTiming: (region: 'US' | 'UK') => any
 ) => {
-  // Enhanced control functions with region-aware timing
+  // Enhanced control functions with region-aware timing and mobile optimization
   const togglePause = useCallback(() => {
     console.log('[VOCAB-CONTROLS] togglePause called');
     
@@ -36,7 +36,7 @@ export const useVocabularyControls = (
       // Immediate pause
       console.log('[VOCAB-CONTROLS] ✓ PAUSING - stopping speech immediately');
       clearAutoPlay();
-      directSpeechService.stop();
+      unifiedSpeechService.stop();
       setIsSpeaking(false);
       toast.info("Playback paused");
     } else {
@@ -67,7 +67,7 @@ export const useVocabularyControls = (
       // Immediate mute
       console.log('[VOCAB-CONTROLS] ✓ MUTING - stopping speech immediately');
       clearAutoPlay();
-      directSpeechService.stop();
+      unifiedSpeechService.stop();
       setIsSpeaking(false);
       toast.info("Audio muted");
     } else {
@@ -93,7 +93,7 @@ export const useVocabularyControls = (
     setVoiceRegion(newRegion);
     
     // Stop current speech and restart with new voice and timing
-    directSpeechService.stop();
+    unifiedSpeechService.stop();
     setIsSpeaking(false);
     
     if (!pausedRef.current && !mutedRef.current && currentWordRef.current) {

@@ -1,6 +1,6 @@
 
 import { useEffect } from 'react';
-import { directSpeechService } from '@/services/speech/directSpeechService';
+import { unifiedSpeechService } from '@/services/speech/unifiedSpeechService';
 import { useVocabularyState } from './useVocabularyState';
 import { useSpeechControl } from './useSpeechControl';
 import { useVocabularyNavigation } from './useVocabularyNavigation';
@@ -8,8 +8,7 @@ import { useVocabularyControls } from './useVocabularyControls';
 import { useVocabularyData } from './useVocabularyData';
 
 /**
- * Primary vocabulary controller - orchestrates all vocabulary functionality
- * Refactored into smaller, focused modules for better maintainability
+ * Enhanced vocabulary controller with unified speech service and improved reliability
  */
 export const useVocabularyController = () => {
   console.log('[VOCAB-CONTROLLER] === Main Controller Render ===');
@@ -38,7 +37,7 @@ export const useVocabularyController = () => {
     wordCount
   } = useVocabularyState();
 
-  // Speech control
+  // Speech control with unified service
   const { playCurrentWord, clearAutoPlay, getRegionTiming } = useSpeechControl(
     voiceRegion,
     currentWordRef,
@@ -49,7 +48,7 @@ export const useVocabularyController = () => {
     () => {} // goToNext will be provided by navigation hook
   );
 
-  // Navigation
+  // Navigation with unified service
   const { goToNext, goToPrevious } = useVocabularyNavigation(
     wordList,
     currentIndex,
@@ -69,7 +68,7 @@ export const useVocabularyController = () => {
     goToNext
   );
 
-  // Control functions
+  // Control functions with unified service
   const { togglePause, toggleMute, toggleVoice } = useVocabularyControls(
     isPaused,
     setIsPaused,
@@ -93,7 +92,7 @@ export const useVocabularyController = () => {
     setHasData
   );
 
-  // Enhanced auto-play effect with region-specific timing
+  // Enhanced auto-play effect with region-specific timing and mobile optimization
   useEffect(() => {
     console.log('[VOCAB-CONTROLLER] Word changed effect');
     
@@ -103,7 +102,7 @@ export const useVocabularyController = () => {
     
     // Clear any pending speech
     clearAutoPlay();
-    directSpeechService.stop();
+    unifiedSpeechService.stop();
     setIsSpeaking(false);
     
     // Auto-play with region-specific delay if not paused or muted
@@ -122,7 +121,7 @@ export const useVocabularyController = () => {
   useEffect(() => {
     return () => {
       clearAutoPlay();
-      directSpeechService.stop();
+      unifiedSpeechService.stop();
     };
   }, [clearAutoPlay]);
 

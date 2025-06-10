@@ -1,10 +1,10 @@
 
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { directSpeechService } from '@/services/speech/directSpeechService';
+import { unifiedSpeechService } from '@/services/speech/unifiedSpeechService';
 
 /**
- * Navigation controls for vocabulary words
+ * Enhanced navigation controls with unified speech service
  */
 export const useVocabularyNavigation = (
   wordList: VocabularyWord[],
@@ -20,7 +20,7 @@ export const useVocabularyNavigation = (
     if (wordList.length === 0) return;
     
     clearAutoPlay();
-    directSpeechService.stop();
+    unifiedSpeechService.stop();
     setIsSpeaking(false);
     
     const nextIndex = (currentIndex + 1) % wordList.length;
@@ -34,7 +34,7 @@ export const useVocabularyNavigation = (
     if (wordList.length === 0) return;
     
     clearAutoPlay();
-    directSpeechService.stop();
+    unifiedSpeechService.stop();
     setIsSpeaking(false);
     
     const prevIndex = currentIndex === 0 ? wordList.length - 1 : currentIndex - 1;

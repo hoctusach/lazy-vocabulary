@@ -1,10 +1,10 @@
 
 import { useCallback } from 'react';
-import { directSpeechService } from '@/services/speech/directSpeechService';
+import { unifiedSpeechService } from '@/services/speech/unifiedSpeechService';
 import { toast } from 'sonner';
 
 /**
- * Speech control and voice management
+ * Enhanced speech control with unified service and improved reliability
  */
 export const useSpeechControl = (
   voiceRegion: 'US' | 'UK',
@@ -15,18 +15,20 @@ export const useSpeechControl = (
   setIsSpeaking: (speaking: boolean) => void,
   goToNext: () => void
 ) => {
-  // Get region-specific timing settings
+  // Enhanced region-specific timing settings with mobile optimization
   const getRegionTiming = useCallback((region: 'US' | 'UK') => {
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
     return {
       US: {
-        wordInterval: 4000,
-        errorRetryDelay: 3000,
-        resumeDelay: 200
+        wordInterval: isMobile ? 5000 : 4000,
+        errorRetryDelay: isMobile ? 4000 : 3000,
+        resumeDelay: isMobile ? 300 : 200
       },
       UK: {
-        wordInterval: 3000,
-        errorRetryDelay: 2500,
-        resumeDelay: 150
+        wordInterval: isMobile ? 4500 : 3500, // Fixed: longer intervals for UK voice stability
+        errorRetryDelay: isMobile ? 3500 : 2500,
+        resumeDelay: isMobile ? 250 : 200
       }
     }[region];
   }, []);
@@ -39,7 +41,7 @@ export const useSpeechControl = (
     }
   }, [autoPlayTimeoutRef]);
 
-  // Enhanced play current word with region-specific settings
+  // Enhanced play current word with unified service
   const playCurrentWord = useCallback(async () => {
     console.log('[SPEECH-CONTROL] playCurrentWord called');
     
@@ -61,7 +63,7 @@ export const useSpeechControl = (
     setIsSpeaking(true);
 
     try {
-      const success = await directSpeechService.speak(word.word, {
+      const success = await unifiedSpeechService.speak(word.word, {
         voiceRegion,
         word: word.word,
         meaning: word.meaning,
