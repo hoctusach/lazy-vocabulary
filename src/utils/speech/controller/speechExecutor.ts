@@ -1,5 +1,5 @@
 
-import { unlockAudio, loadVoicesAndWait } from '../core/speechEngine';
+import { loadVoicesAndWait } from '../core/speechEngine';
 import { 
   registerSpeechRequest, 
   unregisterSpeechRequest, 
@@ -37,8 +37,7 @@ export class SpeechExecutor {
           return;
         }
         
-        // Ensure browser audio is unlocked and voices are available
-        await unlockAudio();
+        // Ensure voices are available
         await loadVoicesAndWait();
 
         // Double-check pause state after async operations
