@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
@@ -8,6 +8,9 @@ import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyCon
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
+import { useUserInteractionHandler } from "@/hooks/vocabulary-app/useUserInteractionHandler";
+import { useAutoPlayOnDataLoad } from "@/hooks/vocabulary-app/useAutoPlayOnDataLoad";
+import { useAudioInitialization } from "@/hooks/vocabulary-app/useAudioInitialization";
 
 const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
@@ -24,6 +27,9 @@ const VocabularyAppContainerNew: React.FC = () => {
     displayTime,
     wordList
   } = useVocabularyContainerState();
+
+  // Track whether the user has interacted to enable audio playback
+  const userInteractionRef = useRef(false);
 
   console.log('[VOCAB-CONTAINER-NEW] Container state:', {
     hasData,
@@ -48,6 +54,26 @@ const VocabularyAppContainerNew: React.FC = () => {
     playCurrentWord,
     wordCount
   } = useVocabularyController(wordList || []);
+
+  // Initialize speech synthesis and user interaction handling
+  useAudioInitialization({
+    userInteractionRef,
+    playCurrentWord,
+    playbackCurrentWord: currentWord,
+  });
+
+  useUserInteractionHandler({
+    userInteractionRef,
+    playCurrentWord,
+    playbackCurrentWord: currentWord,
+  });
+
+  useAutoPlayOnDataLoad({
+    hasData,
+    wordList,
+    userInteractionRef,
+    playCurrentWord,
+  });
 
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'US';
