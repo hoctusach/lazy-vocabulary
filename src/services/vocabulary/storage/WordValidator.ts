@@ -1,5 +1,6 @@
 
-import { sanitizeInput, validateVocabularyWord, validateMeaning, validateExample } from "@/utils/security/inputValidation";
+import { validateVocabularyWord, validateMeaning, validateExample } from "@/utils/security/inputValidation";
+import { VocabularyWord } from "@/types/vocabulary";
 import { VALIDATION_LIMITS } from "./constants";
 
 /**
@@ -9,7 +10,11 @@ export class WordValidator {
   /**
    * Validates a single word object
    */
-  validateWordObject(word: any, sheetName: string, index: number): string[] {
+  validateWordObject(
+    word: Partial<Record<keyof VocabularyWord, unknown>>,
+    sheetName: string,
+    index: number
+  ): string[] {
     const errors: string[] = [];
     const prefix = `Sheet "${sheetName}", word ${index + 1}:`;
     
@@ -56,7 +61,7 @@ export class WordValidator {
   /**
    * Sanitizes count values
    */
-  sanitizeCount(count: any): number {
+  sanitizeCount(count: number | string | null | undefined): number {
     if (count === undefined || count === null) {
       return 0;
     }
