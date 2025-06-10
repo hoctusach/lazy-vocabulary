@@ -55,6 +55,10 @@ export const extractSpeechableContent = (text: string): string => {
   
   // Remove content between forward slashes (phonetic transcription)
   processedText = processedText.replace(/\/([^/]*)\//g, '');
+
+  // Remove any leading or trailing forward slash segments that might remain
+  // after earlier filtering (e.g. /ˈbjuːtɪfəl/)
+  processedText = processedText.replace(/^\s*\/[^/]*\/\s*|\s*\/[^/]*\/\s*$/g, '');
   
   // Remove standalone IPA characters but preserve words containing them
   // Only remove if the entire word consists mainly of IPA characters
