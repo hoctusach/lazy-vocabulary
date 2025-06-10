@@ -35,23 +35,40 @@ class DirectSpeechService {
     }[region];
   }
 
-  // Format text with natural breaks
-  private formatTextWithBreaks(word: string, meaning: string, example: string): string {
-    const cleanWord = word.trim();
-    const cleanMeaning = meaning.trim();
-    const cleanExample = example.trim();
-    
-    // Use natural punctuation for pauses
-    return `${cleanWord}. ${cleanMeaning}. ${cleanExample}.`;
+  // Format text into individual segments with punctuation
+  private formatTextWithBreaks(
+    word: string,
+    meaning: string,
+    example: string
+  ): string[] {
+    const addPeriod = (t: string) => {
+      const trimmed = t.trim();
+      return trimmed.endsWith('.') ? trimmed : `${trimmed}.`;
+    };
+
+    return [addPeriod(word), addPeriod(meaning), addPeriod(example)];
   }
 
   // Estimate speech duration for timeout fallback
-  private estimateSpeechDuration(text: string, rate: number): number {
+  private estimateSpeechDuration(
+    text: string | string[],
+    rate: number,
+    pauseDuration = 0
+  ): number {
+    if (Array.isArray(text)) {
+      const total = text.reduce(
+        (sum, segment) => sum + this.estimateSpeechDuration(segment, rate),
+        0
+      );
+      const pauses = pauseDuration * Math.max(0, text.length - 1);
+      return total + pauses;
+    }
+
     // Rough estimate: ~150 words per minute at normal rate, adjusted by rate
     const wordsPerMinute = 150 * rate;
     const wordCount = text.split(/\s+/).length;
     const baseSeconds = (wordCount / wordsPerMinute) * 60;
-    
+
     // Add buffer time and minimum duration
     return Math.max(baseSeconds + 2, 5) * 1000; // Convert to milliseconds
   }
@@ -86,80 +103,98 @@ class DirectSpeechService {
         }
 
         // Format text if individual parts are provided
-        let speechText = text;
+        let segments: string[] = [text];
         if (options.word && options.meaning && options.example) {
-          speechText = this.formatTextWithBreaks(
+          segments = this.formatTextWithBreaks(
             options.word,
             options.meaning,
             options.example
           );
         }
 
+        const speechText = segments.join(' ');
         console.log(`[DIRECT-SPEECH] Speech text: ${speechText.substring(0, 100)}...`);
 
-        // Create utterance
-        const utterance = new SpeechSynthesisUtterance(speechText);
-        this.currentUtterance = utterance;
         this.isActive = true;
 
         // Get settings
         const settings = this.getRegionSettings(region);
 
-        // Set voice
+        // Set voice once for all utterances
         const voice = getVoiceByRegion(region, 'female');
-        if (voice) {
-          utterance.voice = voice;
-          console.log(`[DIRECT-SPEECH] Using voice: ${voice.name} (${voice.lang})`);
-        } else {
-          console.warn(`[DIRECT-SPEECH] No ${region} voice found, using default`);
-        }
 
-        // Apply settings
-        utterance.rate = settings.rate;
-        utterance.pitch = settings.pitch;
-        utterance.volume = settings.volume;
+        const speakSegment = (index: number) => {
+          if (index >= segments.length) {
+            this.cleanup();
+            setTimeout(() => {
+              options.onEnd?.();
+            }, settings.pauseDuration);
+            return;
+          }
 
-        // Set up event handlers
-        utterance.onstart = () => {
-          console.log(`[DIRECT-SPEECH] ✓ Speech started for: ${options.word || 'text'}`);
-          options.onStart?.();
-          resolve(true);
-        };
+          const utterance = new SpeechSynthesisUtterance(segments[index]);
+          this.currentUtterance = utterance;
 
-        utterance.onend = () => {
-          console.log(`[DIRECT-SPEECH] ✓ Speech completed for: ${options.word || 'text'}`);
-          this.cleanup();
-          
-          // Small delay before triggering onEnd to ensure cleanup
-          setTimeout(() => {
-            options.onEnd?.();
-          }, settings.pauseDuration);
-        };
-
-        utterance.onerror = (event) => {
-          const manual =
-            (this.wasManuallyStopped || this.cancelledUtterance === utterance) &&
-            event.error === 'interrupted';
-          if (manual) {
-            console.log('[DIRECT-SPEECH] Ignoring interrupted error after manual stop');
+          if (voice) {
+            utterance.voice = voice;
           } else {
-            console.error(`[DIRECT-SPEECH] ✗ Speech error:`, event.error, event);
+            console.warn(`[DIRECT-SPEECH] No ${region} voice found, using default`);
           }
-          this.cleanup();
-          this.wasManuallyStopped = false;
-          this.cancelledUtterance = null;
 
-          if (!manual) {
-            options.onError?.(event);
-          }
+          utterance.rate = settings.rate;
+          utterance.pitch = settings.pitch;
+          utterance.volume = settings.volume;
+
+          utterance.onstart = () => {
+            if (index === 0) {
+              console.log(`[DIRECT-SPEECH] ✓ Speech started for: ${options.word || 'text'}`);
+              options.onStart?.();
+              resolve(true);
+            }
+          };
+
+          utterance.onend = () => {
+            if (this.wasManuallyStopped) {
+              this.cleanup();
+              return;
+            }
+
+            setTimeout(() => {
+              speakSegment(index + 1);
+            }, settings.pauseDuration);
+          };
+
+          utterance.onerror = (event) => {
+            const manual =
+              (this.wasManuallyStopped || this.cancelledUtterance === utterance) &&
+              event.error === 'interrupted';
+            if (manual) {
+              console.log('[DIRECT-SPEECH] Ignoring interrupted error after manual stop');
+            } else {
+              console.error(`[DIRECT-SPEECH] ✗ Speech error:`, event.error, event);
+            }
+            this.cleanup();
+            this.wasManuallyStopped = false;
+            this.cancelledUtterance = null;
+
+            if (!manual) {
+              options.onError?.(event);
+            }
+          };
+
+          window.speechSynthesis.speak(utterance);
         };
 
         // Set up completion timeout as fallback
-        const estimatedDuration = this.estimateSpeechDuration(speechText, settings.rate);
+        const estimatedDuration = this.estimateSpeechDuration(
+          segments,
+          settings.rate,
+          settings.pauseDuration
+        );
         console.log(`[DIRECT-SPEECH] Setting completion timeout: ${estimatedDuration}ms`);
-        
+
         this.completionTimeoutId = window.setTimeout(() => {
-          if (this.isActive && this.currentUtterance === utterance) {
+          if (this.isActive) {
             console.log('[DIRECT-SPEECH] ⏰ Completion timeout reached, assuming speech finished');
             this.cleanup();
             options.onEnd?.();
@@ -168,11 +203,11 @@ class DirectSpeechService {
 
         // Start speech
         console.log(`[DIRECT-SPEECH] Starting speech synthesis...`);
-        window.speechSynthesis.speak(utterance);
+        speakSegment(0);
 
         // Fallback timeout for start confirmation
         setTimeout(() => {
-          if (this.isActive && this.currentUtterance === utterance) {
+          if (this.isActive) {
             console.log(`[DIRECT-SPEECH] Fallback - assuming speech started`);
             resolve(true);
           }
