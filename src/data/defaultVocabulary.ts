@@ -14279,9 +14279,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     "meaning": "have/gain/provide access to (có/đạt được/cung cấp sự tiếp cận), Internet access (truy cập mạng Internet), wheelchair access (lối đi dành cho xe lăn)",
     "example": [
         "Students have access to all library materials online.",
-        "Wheelchair access is available at the entrance.",
-        "Only members can gain access to the archive."
-    ],
+        "Wheelchair access is available at the entrance. Only members can gain access to the archive.",
     "count": 0
     },
     {
