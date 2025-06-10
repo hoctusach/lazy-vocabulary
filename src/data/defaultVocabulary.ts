@@ -14297,11 +14297,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
     "word": "act /ækt/",
     "meaning": "in good/bad faith (hành vi thiện/chưa thiện), out of desperation/necessity (hành động tuyệt vọng/cần thiết), act on sb’s advice/orders/behalf (hành động dựa vào lời khuyên/mệnh lệnh/thay mặt ai), act out of (hành động vì lý do gì), act the part/role of (đóng vai), act like (cư xử như), act your age (cư xử đúng tuổi), in the act of doing (đang làm việc gì đó thì bị bắt gặp)",
-    "example": [
-        "He was caught in the act of stealing.",
-        "She acted on her lawyer’s advice.",
-        "They acted out of desperation."
-    ],
+    "example": "He was caught in the act of stealing. She acted on her lawyer’s advice. They acted out of desperation.",
     "count": 0
     },
     {
