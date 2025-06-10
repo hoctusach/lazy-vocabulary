@@ -35,6 +35,12 @@ const VocabularyContainer: React.FC = () => {
   // Category navigation
   const { currentCategory, nextCategory } = useCategoryNavigation();
 
+  // Cycle through available voices and update controller
+  const handleCycleVoice = () => {
+    cycleVoice();
+    controllerState.toggleVoice();
+  };
+
   // Optimized file upload handler that prevents excessive processing
   const handleOptimizedFileUpload = (file: File) => {
     console.log('[VOCAB-CONTAINER] Optimized file upload handler called');
@@ -99,7 +105,7 @@ const VocabularyContainer: React.FC = () => {
         isSpeaking={controllerState.isSpeaking}
         onToggleMute={controllerState.toggleMute}
         onTogglePause={controllerState.togglePause}
-        onCycleVoice={cycleVoice}
+        onCycleVoice={handleCycleVoice}
         onSwitchCategory={handleOptimizedCategorySwitch}
         onNextWord={controllerState.goToNext}
         currentCategory={currentCategory}
