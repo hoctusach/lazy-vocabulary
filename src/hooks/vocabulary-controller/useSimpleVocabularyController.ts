@@ -13,7 +13,7 @@ export const useSimpleVocabularyController = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('US');
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('UK');
   
   // Refs to track state and prevent race conditions
   const speechInProgressRef = useRef(false);
@@ -229,6 +229,7 @@ export const useSimpleVocabularyController = () => {
     togglePause,
     toggleMute,
     toggleVoice,
+    setVoiceRegion,
     playCurrentWord
   };
 };

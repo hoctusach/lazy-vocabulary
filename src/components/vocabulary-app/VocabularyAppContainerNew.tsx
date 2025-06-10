@@ -45,6 +45,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     togglePause,
     toggleMute,
     toggleVoice,
+    setVoiceRegion,
     playCurrentWord,
     wordCount
   } = useVocabularyController(wordList || []);
@@ -111,6 +112,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           toggleMute={toggleMute}
           handleTogglePause={togglePause}
           handleCycleVoice={toggleVoice}
+          handleSetVoiceRegion={setVoiceRegion}
           handleSwitchCategory={handleSwitchCategoryWithState}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
@@ -138,6 +140,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           onToggleMute={toggleMute}
           onTogglePause={togglePause}
           onCycleVoice={toggleVoice}
+          onSetVoiceRegion={setVoiceRegion}
           onSwitchCategory={handleSwitchCategoryWithState}
           onNextWord={() => {}}
           currentCategory={currentCategory}

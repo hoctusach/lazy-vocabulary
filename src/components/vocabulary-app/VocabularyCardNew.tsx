@@ -15,6 +15,7 @@ interface VocabularyCardNewProps {
   onToggleMute: () => void;
   onTogglePause: () => void;
   onCycleVoice: () => void;
+  onSetVoiceRegion: (region: 'US' | 'UK' | 'AU') => void;
   onSwitchCategory: () => void;
   onNextWord: () => void;
   currentCategory: string;
@@ -35,6 +36,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   onToggleMute,
   onTogglePause,
   onCycleVoice,
+  onSetVoiceRegion,
   onSwitchCategory,
   onNextWord,
   currentCategory,
@@ -148,10 +150,35 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
                 'Next'}
             </Button>
             
-            {/* Voice toggle button with simplified region display */}
+            {/* Voice selection buttons */}
             <Button
-              variant="outline" 
-              size="sm" 
+              variant="outline"
+              size="sm"
+              onClick={() => onSetVoiceRegion('US')}
+              className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+            >
+              US
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSetVoiceRegion('UK')}
+              className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+            >
+              UK
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSetVoiceRegion('AU')}
+              className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+            >
+              AU
+            </Button>
+            {/* Existing cycle button for convenience */}
+            <Button
+              variant="outline"
+              size="sm"
               onClick={onCycleVoice}
               className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
             >

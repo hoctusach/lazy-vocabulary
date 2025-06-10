@@ -13,6 +13,7 @@ interface ContentWithDataNewProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleCycleVoice: () => void;
+  handleSetVoiceRegion: (region: 'US' | 'UK' | 'AU') => void;
   handleSwitchCategory: () => void;
   currentCategory: string;
   nextCategory: string | null;
@@ -37,6 +38,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   toggleMute,
   handleTogglePause,
   handleCycleVoice,
+  handleSetVoiceRegion,
   handleSwitchCategory,
   currentCategory,
   nextCategory,
@@ -63,6 +65,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         toggleMute={toggleMute}
         handleTogglePause={handleTogglePause}
         handleCycleVoice={handleCycleVoice}
+        handleSetVoiceRegion={handleSetVoiceRegion}
         handleSwitchCategory={handleSwitchCategory}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
