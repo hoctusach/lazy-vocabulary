@@ -30,7 +30,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified vocabulary controller
+  // Use our unified vocabulary controller with the correct signature (only wordList)
   const {
     currentWord,
     currentIndex,

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { useVocabularyContainerState } from './useVocabularyContainerState';
+import { useVocabularyContainerState } from '@/hooks/vocabulary/useVocabularyContainerState';
 import { useVocabularyController } from '@/hooks/vocabulary-controller/useVocabularyController';
 import { useVoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import VocabularyCard from '../VocabularyCard';
-import { FileUpload } from '../FileUpload';
+import FileUpload from '../FileUpload';
 import { useCategoryNavigation } from '@/hooks/vocabulary/useCategoryNavigation';
 
 const VocabularyContainer: React.FC = () => {
@@ -22,19 +22,14 @@ const VocabularyContainer: React.FC = () => {
   const { selectedVoice, cycleVoice } = useVoiceSelection();
 
   // Get controller state (synchronized with vocabulary service)
-  const controllerState = useVocabularyController(
-    containerState.wordList,
-    selectedVoice,
-    containerState.isPaused,
-    containerState.isMuted
-  );
+  const controllerState = useVocabularyController(containerState.wordList);
   
   console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
     currentWord: controllerState.currentWord?.word || 'none',
     currentIndex: controllerState.currentIndex,
-    isPaused: containerState.isPaused,
-    isMuted: containerState.isMuted,
-    voiceRegion: selectedVoice.region,
+    isPaused: controllerState.isPaused,
+    isMuted: controllerState.isMuted,
+    voiceRegion: controllerState.voiceRegion,
     isSpeaking: controllerState.isSpeaking
   });
 
@@ -75,11 +70,11 @@ const VocabularyContainer: React.FC = () => {
         meaning={controllerState.currentWord.meaning}
         example={controllerState.currentWord.example}
         backgroundColor="#F0F8FF"
-        isMuted={containerState.isMuted}
-        isPaused={containerState.isPaused}
+        isMuted={controllerState.isMuted}
+        isPaused={controllerState.isPaused}
         isSpeaking={controllerState.isSpeaking}
-        onToggleMute={containerState.handleToggleMute}
-        onTogglePause={containerState.handleTogglePause}
+        onToggleMute={controllerState.toggleMute}
+        onTogglePause={controllerState.togglePause}
         onCycleVoice={cycleVoice}
         onSwitchCategory={containerState.handleSwitchCategory}
         onNextWord={controllerState.goToNext}

@@ -5,24 +5,22 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { directSpeechService } from '@/services/speech/directSpeechService';
 import { vocabularyService } from '@/services/vocabularyService';
 
-export const useVocabularyController = (
-  wordList: VocabularyWord[],
-  selectedVoice: VoiceSelection,
-  isPaused: boolean,
-  isMuted: boolean
-) => {
+export const useVocabularyController = (wordList: VocabularyWord[]) => {
   console.log('[VOCAB-CONTROLLER] === State Debug ===');
   
   // Get current word directly from vocabulary service instead of managing separate index
   const currentWord = vocabularyService.getCurrentWord();
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>('US');
   const retryTimeoutRef = useRef<number | null>(null);
   const lastPlayedWordRef = useRef<string | null>(null);
 
   console.log('[VOCAB-CONTROLLER] Current state:', {
     isPaused,
     isMuted,
-    voiceRegion: selectedVoice.region,
+    voiceRegion,
     isSpeaking,
     wordListLength: wordList.length,
     currentWord: currentWord?.word || 'none'
@@ -45,6 +43,27 @@ export const useVocabularyController = (
     lastPlayedWordRef.current = null;
   }, []);
 
+  const goToPrevious = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] goToPrevious called');
+    // For now, just go to next since we don't have a previous method
+    goToNext();
+  }, [goToNext]);
+
+  const togglePause = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] togglePause called');
+    setIsPaused(prev => !prev);
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] toggleMute called');
+    setIsMuted(prev => !prev);
+  }, []);
+
+  const toggleVoice = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] toggleVoice called');
+    setVoiceRegion(prev => prev === 'US' ? 'UK' : 'US');
+  }, []);
+
   const playCurrentWord = useCallback(async () => {
     console.log('[VOCAB-CONTROLLER] playCurrentWord called');
     
@@ -64,7 +83,7 @@ export const useVocabularyController = (
       return;
     }
 
-    console.log(`[VOCAB-CONTROLLER] Playing word: ${currentWord.word} with ${selectedVoice.region} voice settings`);
+    console.log(`[VOCAB-CONTROLLER] Playing word: ${currentWord.word} with ${voiceRegion} voice settings`);
     
     setIsSpeaking(true);
     lastPlayedWordRef.current = currentWord.word;
@@ -73,15 +92,15 @@ export const useVocabularyController = (
       const success = await directSpeechService.speak(
         `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}`,
         {
-          voiceRegion: selectedVoice.region,
+          voiceRegion: voiceRegion,
           word: currentWord.word,
           meaning: currentWord.meaning,
           example: currentWord.example,
           onStart: () => {
-            console.log(`[VOCAB-CONTROLLER] Speech started for: ${currentWord.word} (${selectedVoice.region})`);
+            console.log(`[VOCAB-CONTROLLER] Speech started for: ${currentWord.word} (${voiceRegion})`);
           },
           onEnd: () => {
-            console.log(`[VOCAB-CONTROLLER] Speech completed for: ${currentWord.word} (${selectedVoice.region})`);
+            console.log(`[VOCAB-CONTROLLER] Speech completed for: ${currentWord.word} (${voiceRegion})`);
             setIsSpeaking(false);
             
             // Auto-advance to next word if not paused or muted
@@ -92,7 +111,7 @@ export const useVocabularyController = (
             }
           },
           onError: (error) => {
-            console.error(`[VOCAB-CONTROLLER] Speech error for ${selectedVoice.region}:`, error);
+            console.error(`[VOCAB-CONTROLLER] Speech error for ${voiceRegion}:`, error);
             setIsSpeaking(false);
             
             // Retry after error if not paused or muted
@@ -120,7 +139,7 @@ export const useVocabularyController = (
         setTimeout(() => goToNext(), 2000);
       }
     }
-  }, [currentWord, selectedVoice.region, isMuted, isPaused, isSpeaking, goToNext]);
+  }, [currentWord, voiceRegion, isMuted, isPaused, isSpeaking, goToNext]);
 
   // Effect to play word when it changes
   useEffect(() => {
@@ -162,8 +181,16 @@ export const useVocabularyController = (
   return {
     currentWord,
     currentIndex: 0, // No longer relevant since we use vocabulary service
+    isPaused,
+    isMuted,
+    voiceRegion,
     isSpeaking,
     goToNext,
-    playCurrentWord
+    goToPrevious,
+    togglePause,
+    toggleMute,
+    toggleVoice,
+    playCurrentWord,
+    wordCount: wordList.length
   };
 };
