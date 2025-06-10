@@ -32,7 +32,7 @@ interface NotificationManagerProps {
 const NotificationManager: React.FC<NotificationManagerProps> = ({ 
   onNotificationsEnabled,
   currentWord,
-  voiceRegion = 'US'
+  voiceRegion = 'UK'
 }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [permissionState, setPermissionState] = useState<string>('default');
