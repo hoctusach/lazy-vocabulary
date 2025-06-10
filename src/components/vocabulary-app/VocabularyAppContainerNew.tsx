@@ -49,6 +49,9 @@ const VocabularyAppContainerNew: React.FC = () => {
     wordCount
   } = useVocabularyController(wordList || []);
 
+  const nextVoiceLabel =
+    voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'US';
+
   console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
     currentWord: currentWord?.word,
     currentIndex,
@@ -111,6 +114,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           toggleMute={toggleMute}
           handleTogglePause={togglePause}
           handleCycleVoice={toggleVoice}
+          nextVoiceLabel={nextVoiceLabel}
           handleSwitchCategory={handleSwitchCategoryWithState}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
@@ -118,6 +122,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleManualNext={handleManualNext}
           displayTime={displayTime}
           voiceRegion={voiceRegion}
+          nextVoiceLabel={nextVoiceLabel}
           debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}
@@ -145,6 +150,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           isSpeaking={false}
           category={currentCategory}
           voiceRegion={voiceRegion}
+          nextVoiceLabel={nextVoiceLabel}
         />
       ) : (
         <p>Loading vocabulary…</p>

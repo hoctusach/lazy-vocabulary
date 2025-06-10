@@ -53,6 +53,13 @@ const VocabularyAppContainer: React.FC = () => {
     allVoiceOptions
   } = useVocabularyPlayback(wordList || []);
 
+  const nextVoiceLabel =
+    selectedVoice.region === 'UK'
+      ? 'US'
+      : selectedVoice.region === 'US'
+      ? 'AU'
+      : 'US';
+
   console.log('[VOCAB-CONTAINER] Playback state:', {
     playbackCurrentWord: playbackCurrentWord?.word,
     muted,
@@ -166,6 +173,7 @@ const VocabularyAppContainer: React.FC = () => {
           toggleMute={handleToggleMuteWithInteraction}
           handleTogglePause={handleTogglePauseWithInteraction}
           handleCycleVoice={handleCycleVoiceWithInteraction}
+          nextVoiceLabel={nextVoiceLabel}
           handleSwitchCategory={handleCategorySwitchDirect}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
@@ -173,6 +181,7 @@ const VocabularyAppContainer: React.FC = () => {
           handleManualNext={handleManualNext}
           displayTime={displayTime}
           selectedVoice={selectedVoice}
+          nextVoiceLabel={nextVoiceLabel}
           debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}
@@ -200,6 +209,7 @@ const VocabularyAppContainer: React.FC = () => {
           isSpeaking={false}
           category={currentCategory}
           selectedVoice={selectedVoice}
+          nextVoiceLabel={nextVoiceLabel}
         />
       ) : (
         <p>Loading vocabulary…</p>

@@ -169,7 +169,12 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   }, [isMuted, stopSpeech, goToNext]);
 
   const toggleVoice = useCallback(() => {
-    const newRegion = voiceRegion === 'US' ? 'UK' : voiceRegion === 'UK' ? 'AU' : 'US';
+    const newRegion =
+      voiceRegion === 'UK'
+        ? 'US'
+        : voiceRegion === 'US'
+        ? 'AU'
+        : 'US';
     debug('[VOCAB-CONTROLLER] Toggle voice to:', newRegion);
     setVoiceRegion(newRegion);
   }, [voiceRegion]);

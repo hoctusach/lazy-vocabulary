@@ -152,22 +152,26 @@ export const useVoiceSelection = () => {
     };
   }, []);
   
-  // Function to cycle through available voices
+  // Function to cycle through available voices in the desired order
   const cycleVoice = () => {
-    const nextIndex = (voiceIndex + 1) % VOICE_OPTIONS.length;
-    const nextVoice = VOICE_OPTIONS[nextIndex];
-    
-    console.log(`Cycling voice from ${selectedVoice.label} to ${nextVoice.label}`);
-    setVoiceIndex(nextIndex);
+    const currentRegion = selectedVoice.region;
+    const nextRegion =
+      currentRegion === 'UK' ? 'US' : currentRegion === 'US' ? 'AU' : 'US';
+    const nextVoice = VOICE_OPTIONS.find(v => v.region === nextRegion)!;
+
+    console.log(
+      `Cycling voice from ${selectedVoice.label} to ${nextVoice.label}`
+    );
+    setVoiceIndex(nextVoice.index);
     setSelectedVoice(nextVoice);
-    
+
     // Save the preference
     try {
       const savedSettings = localStorage.getItem('vocabularySettings');
       const settings = savedSettings ? JSON.parse(savedSettings) : {};
       localStorage.setItem('vocabularySettings', JSON.stringify({
         ...settings,
-        voiceIndex: nextIndex
+        voiceIndex: nextVoice.index
       }));
     } catch (error) {
       console.error('Error saving voice preference:', error);

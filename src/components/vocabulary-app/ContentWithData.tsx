@@ -21,6 +21,7 @@ interface ContentWithDataProps {
   handleManualNext: () => void;
   displayTime: number;
   selectedVoice: VoiceSelection;
+  nextVoiceLabel: string;
   debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
@@ -45,6 +46,7 @@ const ContentWithData: React.FC<ContentWithDataProps> = ({
   handleManualNext,
   displayTime,
   selectedVoice,
+  nextVoiceLabel,
   debugPanelData,
   isAddWordModalOpen,
   handleCloseModal,
@@ -71,6 +73,7 @@ const ContentWithData: React.FC<ContentWithDataProps> = ({
         handleManualNext={handleManualNext}
         displayTime={displayTime}
         selectedVoice={selectedVoice}
+        nextVoiceLabel={nextVoiceLabel}
       />
       
       {/* Action buttons container */}

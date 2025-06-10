@@ -18,6 +18,7 @@ interface VocabularyMainNewProps {
   isSoundPlaying: boolean;
   displayTime: number;
   voiceRegion: 'US' | 'UK' | 'AU';
+  nextVoiceLabel: string;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -34,6 +35,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   handleManualNext,
   displayTime,
   voiceRegion,
+  nextVoiceLabel,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -56,6 +58,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         isSpeaking={isSoundPlaying}
         category={currentWord.category || currentCategory}
         voiceRegion={voiceRegion}
+        nextVoiceLabel={nextVoiceLabel}
       />
     </div>
   );
