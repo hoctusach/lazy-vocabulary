@@ -1,0 +1,53 @@
+
+import { useCallback } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
+import { directSpeechService } from '@/services/speech/directSpeechService';
+
+/**
+ * Navigation controls for vocabulary words
+ */
+export const useVocabularyNavigation = (
+  wordList: VocabularyWord[],
+  currentIndex: number,
+  setCurrentIndex: (index: number) => void,
+  setIsSpeaking: (speaking: boolean) => void,
+  clearAutoPlay: () => void
+) => {
+  // Navigation controls with enhanced state management
+  const goToNext = useCallback(() => {
+    console.log('[VOCAB-NAV] goToNext called');
+    
+    if (wordList.length === 0) return;
+    
+    clearAutoPlay();
+    directSpeechService.stop();
+    setIsSpeaking(false);
+    
+    setCurrentIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % wordList.length;
+      console.log(`[VOCAB-NAV] Moving to index ${nextIndex}`);
+      return nextIndex;
+    });
+  }, [wordList.length, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
+
+  const goToPrevious = useCallback(() => {
+    console.log('[VOCAB-NAV] goToPrevious called');
+    
+    if (wordList.length === 0) return;
+    
+    clearAutoPlay();
+    directSpeechService.stop();
+    setIsSpeaking(false);
+    
+    setCurrentIndex((prevIndex) => {
+      const prevIndexCalc = prevIndex === 0 ? wordList.length - 1 : prevIndex - 1;
+      console.log(`[VOCAB-NAV] Moving to index ${prevIndexCalc}`);
+      return prevIndexCalc;
+    });
+  }, [wordList.length, clearAutoPlay, setCurrentIndex, setIsSpeaking]);
+
+  return {
+    goToNext,
+    goToPrevious
+  };
+};
