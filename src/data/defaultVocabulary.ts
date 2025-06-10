@@ -14307,11 +14307,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
     "word": "age /eɪdʒ/",
     "meaning": "act your age (hành động đúng độ tuổi), under age (chưa đủ tuổi), old age (tuổi già), working/retirement age (độ tuổi đi làm/nghỉ hưu), age limit (độ tuổi giới hạn), age bracket/group (nhóm tuổi), in Stone/Bronze/Iron Age (Vào thời kỳ Đồ Đá/Đồ Đồng/Đồ Sắt)",
-    "example": [
-        "She retired at the age of 65.",
-        "He's not allowed in; he's under age.",
-        "We studied tools from the Bronze Age."
-    ],
+    "example": "She retired at the age of 65. He's not allowed in; he's under age. We studied tools from the Bronze Age.",
     "count": 0
     }         
   ]
