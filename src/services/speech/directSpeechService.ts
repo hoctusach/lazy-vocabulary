@@ -74,7 +74,7 @@ class DirectSpeechService {
   }
 
   async speak(
-    text: string,
+    text: string, 
     options: {
       voiceRegion?: 'US' | 'UK' | 'AU';
       word?: string;
@@ -88,13 +88,8 @@ class DirectSpeechService {
     const region = options.voiceRegion || 'US';
     console.log(`[DIRECT-SPEECH] speak() called - Region: ${region}, Word: ${options.word || 'N/A'}`);
 
-    // Ensure any existing speech has fully stopped before starting a new one
-    if (this.isActive) {
-      this.stop();
-      // Brief pause allows the speech engine to settle and prevents
-      // immediate 'interrupted' errors when starting the next utterance
-      await new Promise((r) => setTimeout(r, 150));
-    }
+    // Stop any existing speech
+    this.stop();
     this.wasManuallyStopped = false;
     
     return new Promise((resolve) => {
