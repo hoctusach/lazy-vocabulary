@@ -20,7 +20,10 @@ export const useVoiceSettings = () => {
         
         return {
           isMuted: parsedStates.isMuted === true,
-          voiceRegion: (parsedStates.voiceRegion === 'UK' ? 'UK' : 'US') as 'US' | 'UK' | 'AU'
+          voiceRegion:
+            parsedStates.voiceRegion === 'UK' || parsedStates.voiceRegion === 'AU'
+              ? parsedStates.voiceRegion
+              : 'US'
         };
       }
     } catch (error) {

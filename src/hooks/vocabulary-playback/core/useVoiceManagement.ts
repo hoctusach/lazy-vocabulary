@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 // Hard-coded voice names from previously working version
 const US_VOICE_NAME = "Samantha";
 const UK_VOICE_NAME = "Google UK English Female";
+const AU_VOICE_NAME = "Google AU English Female";
 
 /**
  * Hook for managing voice selection and finding appropriate voices
@@ -14,7 +15,8 @@ export const useVoiceManagement = () => {
   // Define voice options with consistent structure
   const allVoiceOptions: VoiceSelection[] = [
     { label: "US", region: "US", gender: "female", index: 0 },
-    { label: "UK", region: "UK", gender: "female", index: 1 }
+    { label: "UK", region: "UK", gender: "female", index: 1 },
+    { label: "AU", region: "AU", gender: "female", index: 2 }
   ];
   
   const [voiceIndex, setVoiceIndex] = useState(0);
@@ -23,7 +25,8 @@ export const useVoiceManagement = () => {
   // Create voice options array for UI - compatibility format
   const voices = [
     { label: "US", region: "US" as const, gender: "female" as const, voice: null },
-    { label: "UK", region: "UK" as const, gender: "female" as const, voice: null }
+    { label: "UK", region: "UK" as const, gender: "female" as const, voice: null },
+    { label: "AU", region: "AU" as const, gender: "female" as const, voice: null }
   ];
   
   // Load initial voice settings from localStorage
@@ -87,7 +90,8 @@ export const useVoiceManagement = () => {
     }
     
     // Use hardcoded voice names
-    const targetVoiceName = region === 'US' ? US_VOICE_NAME : UK_VOICE_NAME;
+    const targetVoiceName =
+      region === 'US' ? US_VOICE_NAME : region === 'UK' ? UK_VOICE_NAME : AU_VOICE_NAME;
     
     // Strategy 1: Find exact name match
     let voice = allVoices.find(v => v.name === targetVoiceName);
@@ -108,7 +112,8 @@ export const useVoiceManagement = () => {
     // Fallback strategies
     
     // Strategy 3: Match by language code
-    voice = allVoices.find(v => v.lang === (region === 'US' ? 'en-US' : 'en-GB'));
+    const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
+    voice = allVoices.find(v => v.lang === langCode);
     
     if (voice) {
       console.log(`Selected ${region} voice by language code: ${voice.name} (${voice.lang})`);
@@ -133,10 +138,10 @@ export const useVoiceManagement = () => {
     return null;
   }, []);
   
-  // Function to cycle through voices (simplified to just toggle between US and UK)
+  // Function to cycle through voices including AU
   const cycleVoice = useCallback(() => {
     setVoiceIndex(prevIndex => {
-      const nextIndex = prevIndex === 0 ? 1 : 0;  // Toggle between 0 (US) and 1 (UK)
+      const nextIndex = (prevIndex + 1) % allVoiceOptions.length;
       console.log(`Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`);
       
       // Save to localStorage
