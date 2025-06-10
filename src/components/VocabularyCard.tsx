@@ -3,8 +3,9 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Clock } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import { getTimingSettings } from '@/utils/speech/core/speechSettings';
 
 interface VocabularyCardProps {
   word: string;
@@ -65,6 +66,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   // Safety check for nextCategory - ensure it's a string
   const safeNextCategory = nextCategory || 'Next';
 
+  // Get timing info for current voice region
+  const voiceRegion = selectedVoice.region;
+  const timing = getTimingSettings(voiceRegion);
+
   return (
     <Card 
       className={cn(
@@ -77,17 +82,24 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       <CardContent className="p-3">
         <div className="space-y-2">
           <div className="flex justify-between items-start">
-            <div>
+            <div className="flex-1">
               <h2 className="text-xl font-bold text-blue-900 break-words">{mainWord}</h2>
               {wordType && (
                 <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
             </div>
-            {isPaused && (
-              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
-                Paused
-              </span>
-            )}
+            <div className="flex flex-col items-end gap-1">
+              {isPaused && (
+                <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+                  Paused
+                </span>
+              )}
+              {/* Show timing info */}
+              <div className="flex items-center gap-1 text-xs text-gray-600">
+                <Clock size={10} />
+                <span>{Math.round(timing.wordInterval / 1000)}s</span>
+              </div>
+            </div>
           </div>
           
           <div className="text-base text-green-800 break-words">
@@ -150,12 +162,13 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
                 'Next'}
             </Button>
             
-            {/* Single voice toggle button */}
+            {/* Enhanced voice toggle button with timing info */}
             <Button
               variant="outline" 
               size="sm" 
               onClick={onCycleVoice}
               className="h-6 text-xs px-2 text-blue-700 border-blue-300 bg-blue-50"
+              title={`${selectedVoice.label} - ${Math.round(timing.wordInterval / 1000)}s intervals`}
             >
               {selectedVoice.label}
             </Button>
