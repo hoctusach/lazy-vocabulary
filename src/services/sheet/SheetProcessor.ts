@@ -65,28 +65,4 @@ export class SheetProcessor {
     }
   }
   
-  // Generate "All words" sheet by combining all other sheets
-  generateAllWordsSheet(data: SheetData, sheetOptions: string[]): void {
-    // Start with existing "All words" data
-    const allWords = data["All words"] || [];
-    const seenWords = new Set(allWords.map(w => w.word.toLowerCase()));
-    
-    // Add words from other sheets that aren't already in "All words"
-    for (const sheetName of sheetOptions) {
-      if (sheetName === "All words") continue;
-      
-      for (const word of data[sheetName] || []) {
-        const lowercaseWord = word.word.toLowerCase();
-        
-        if (!seenWords.has(lowercaseWord)) {
-          allWords.push(word);
-          seenWords.add(lowercaseWord);
-        }
-      }
-    }
-    
-    // Update the "All words" sheet
-    data["All words"] = allWords;
-    console.log(`Updated "All words" sheet, now contains ${allWords.length} total words`);
-  }
 }
