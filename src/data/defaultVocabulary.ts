@@ -2764,7 +2764,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "get/catch sb’s drift",
-      "meaning": "understand the basic "meaning": nắm được ý chính.",
+      "meaning": "understand the basic meaning: nắm được ý chính.",
       "example": "Doreen and I have been having some problems recently, if you catch my drift.",
       "count": 0
     },
