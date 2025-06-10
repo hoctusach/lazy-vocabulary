@@ -21,7 +21,7 @@ class SpeechRecoveryController {
   private readonly RECOVERY_DELAY = 500; // Shorter recovery delay
   private readonly SUCCESS_RESET_TIME = 5000; // Reset errors after success
 
-  handleSpeechError(error: any): boolean {
+  handleSpeechError(error: unknown): boolean {
     console.log('[SPEECH-RECOVERY] Handling speech error:', error);
     
     const now = Date.now();

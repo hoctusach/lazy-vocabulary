@@ -15,8 +15,9 @@ export class SpeechExecutor {
   constructor(private stateManager: SpeechStateManager) {}
 
   async execute(text: string, options: SpeechOptions = {}): Promise<boolean> {
-    return new Promise(async (resolve) => {
-      try {
+    return new Promise((resolve) => {
+      const run = async () => {
+        try {
         const speechId = Math.random().toString(36).substring(7);
         console.log(`[SPEECH-EXECUTOR-${speechId}] Starting speech process for text:`, text.substring(0, 50));
         
@@ -151,6 +152,9 @@ export class SpeechExecutor {
         }
         resolve(false);
       }
+    };
+
+      run();
     });
   }
 
