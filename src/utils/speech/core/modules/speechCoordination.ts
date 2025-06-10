@@ -1,10 +1,16 @@
 // Enhanced coordination module with immediate pause response
 let activeSpeechId: string | null = null;
-let speechQueue: Array<{ id: string; text: string; options: any }> = [];
+import { SpeechOptions } from '../../controller/types';
+
+let speechQueue: Array<{ id: string; text: string; options: SpeechOptions }> = [];
 let isProcessingQueue = false;
 let isPausedGlobally = false;
 
-export const registerSpeechRequest = (speechId: string, text: string, options: any): boolean => {
+export const registerSpeechRequest = (
+  speechId: string,
+  text: string,
+  options: SpeechOptions
+): boolean => {
   console.log(`[COORDINATION] Registering speech request: ${speechId}`);
   
   // Check if speech is globally paused - immediately reject
