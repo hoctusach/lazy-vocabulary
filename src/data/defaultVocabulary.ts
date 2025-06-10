@@ -14404,6 +14404,138 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     "meaning": "get better (trở nên tốt hơn); better off (khấm khá hơn); better next time (lần sau sẽ tốt hơn); for better or (for worse) (dù tốt dù xấu)",
     "example": "I hope the system gets better after this update. You’ll be better off using a dedicated database. Maybe we’ll have better luck next time. For better or worse, this is the final design.",
     "count": 0
-    }               
+    },
+    {
+    "word": "big",
+    "meaning": "make a big thing out of (làm quá/ làm lớn chuyện); make it big (thành công nhanh); big of sb (đã tốt khi làm gì); big on (rất thích); big business (doanh nghiệp lớn); big-hearted (hào hiệp); big name (nhiều tiền); big game (sự kiện quan trọng)",
+    "example": "They made a big thing out of the minor mistake. She hopes to make it big in Silicon Valley. It was big of you to donate so much. He’s really big on open-source software.",
+    "count": 0
+    },
+    {
+      "word": "block",
+      "meaning": "block sb’s way (chặn đường của ai); block of flats/apartment block (tòa chung cư); high-rise block (tòa nhà cao tầng); writer’s block (rào cản tâm lý)",
+      "example": "The coach blocked their way onto the field. She lives in a new apartment block downtown. That high-rise block dominates the skyline. He suffered from writer’s block all week.",
+      "count": 0
+    },
+    {
+      "word": "book",
+      "meaning": "read sb like a book (hiểu rõ ai); (do) by the book (làm đúng chuẩn); book about/on (cuốn sách về); a closed book (câu đố bí ẩn); open book (người dễ hiểu); in my book (theo tôi); sb’s good/bad books (ai đó hài lòng/khó chịu với)",
+      "example": "I can read you like a book after all these years. She always does things by the book. He recommended a great book on algorithms. His behavior is definitely in my bad books.",
+      "count": 0
+    },
+    {
+      "word": "born",
+      "meaning": "born to do (sinh ra để làm); born on/in (sinh vào thời gian/nơi nào); born into (sinh ra trong gia đình); born and bred (sinh ra và lớn lên); born-again (tái sinh, chuyển đạo); newborn (sơ sinh)",
+      "example": "She was born to do complex data analysis. I was born in Hanoi in 1990. He was born into a family of engineers. They are proud of their born-and-bred roots.",
+      "count": 0
+    },
+    {
+      "word": "bottom",
+      "meaning": "come bottom (đứng cuối); get to the bottom of (tìm nguyên nhân); the bottom drops/falls out of (giảm sâu); bottom line (điểm mấu chốt)",
+      "example": "Our team came bottom in the hackathon. We need to get to the bottom of this bug. Suddenly the bottom fell out of the market. The bottom line is that we need more testing.",
+      "count": 0
+    },
+    {
+      "word": "brain",
+      "meaning": "pick sb’s brain(s) (hỏi để biết thông tin); rack your brain(s) (vắt óc để làm); brains behind (người chịu trách nhiệm); brainless (ngu ngốc); brainstorm (động não); brainwave (cảm hứng đột ngột)",
+      "example": "Can I pick your brains about this architecture? I’ve been racking my brain for hours. She is the brain behind our new feature. We had a productive brainstorm session yesterday.",
+      "count": 0
+    },
+    {
+      "word": "break",
+      "meaning": "break a habit (phá vỡ thói quen); break with tradition (phá bỏ truyền thống); take/have/need a break (có thời gian nghỉ); lunch/coffee break (giờ nghỉ trưa/giữa buổi)",
+      "example": "I finally broke my habit of checking email at night. They decided to break with tradition this year. Let’s take a break and grab coffee. We only have a fifteen-minute break left.",
+      "count": 0
+    },
+    {
+      "word": "brick",
+      "meaning": "bricks and mortar (cửa hàng thực sự); brick wall (bức tường gạch); bricklayer (thợ nề)",
+      "example": "They opened a bricks-and-mortar store downtown. We built a small brick wall in the courtyard. The bricklayer finished the job early.",
+      "count": 0
+    },
+    {
+      "word": "certain",
+      "meaning": "know/say for certain (biết/chắc chắn); certain to do (chắc chắn làm); make certain (chắc chắn); certain of/about (chắc chắn về); a certain (amount of sth) (một lượng nhất định)",
+      "example": "I can’t say for certain when the release will be. You’re certain to succeed with that plan. Please make certain the tests pass. We need a certain amount of RAM for this VM.",
+      "count": 0
+    },
+    {
+      "word": "chance",
+      "meaning": "take a chance (đánh liều); leave to chance (mặc kệ); by chance (tình cờ); by any chance (phải vậy không?); second chance (cơ hội thứ hai); last chance (cơ hội cuối cùng); pure chance (ngẫu nhiên thuần túy); there’s every/no chance that (rất có/không có cơ hội)",
+      "example": "I decided to take a chance and rewrite the module. Don’t leave it to chance—write unit tests. We met by chance at the conference. There’s every chance we’ll finish early.",
+      "count": 0
+    },
+    {
+      "word": "change",
+      "meaning": "change from sth to sth (đổi từ thứ gì thành); change sth into (biến thứ gì trở thành); change sth for (thay đổi cái gì đó để lấy); change for the better/worse (thay đổi tốt hơn/tệ hơn); change your mind (đổi ý); change the subject (đổi chủ đề); make a change (thay đổi); undergo a change (trải qua thay đổi)",
+      "example": "We need to change from HTTP to HTTPS. He changed his idea into a working prototype. They changed the plan for the better. After reflection, she changed her mind.",
+      "count": 0
+    },
+    {
+      "word": "charge",
+      "meaning": "charge sb with (buộc tội ai về); charge sb for (đòi tiền ai về); take charge (đảm nhiệm); put sb in charge (trao quyền); overall charge (toàn quyền lãnh đạo)",
+      "example": "They charged her with overseeing the new API. We were charged for extra storage. She took charge of the deployment. The CTO was put in charge of security.",
+      "count": 0
+    },
+    {
+      "word": "child",
+      "meaning": "as a child (khi còn nhỏ); only child (con một); child of (con của); childcare (chăm sóc trẻ); child abuse (lạm dụng trẻ em); child’s play (trò chơi trẻ con)",
+      "example": "As a child, I loved playing video games. He was an only child in his family. Childcare services are expanding. That puzzle is child’s play for us.",
+      "count": 0
+    },
+    {
+      "word": "choice",
+      "meaning": "make a choice (đưa ra lựa chọn); exercise choice (bầu chọn); have no choice (không có lựa chọn nào); choice between (lựa chọn giữa); informed choice (lựa chọn dựa trên thông tin); wide choice (nhiều lựa chọn); obvious choice (lựa chọn hiển nhiên)",
+      "example": "It’s time to make a choice about the framework. Users can exercise choice in their settings. We had no choice but to postpone. There’s a wide choice of libraries available.",
+      "count": 0
+    },
+    {
+      "word": "choose",
+      "meaning": "choose from (chọn ra từ); choose between (chọn giữa); choose sb/sth as (chọn ai/cái gì làm); choose sb/sth out of (chọn ai/cái gì trong cả nhóm); choose to do (lựa chọn làm gì); pick and choose (cân nhắc kỹ và chọn); nothing to choose between (không có gì để chọn)",
+      "example": "You can choose from several templates. We had to choose between speed and accuracy. They chose her as team lead. There was nothing to choose between the two solutions.",
+      "count": 0
+    },
+    {
+      "word": "class",
+      "meaning": "class sb/sth as (phân loại); social class (tầng lớp xã hội); working/middle/upper class (đẳng cấp lao động/trung lưu/thượng lưu); ruling class (giai cấp thống trị); class system (hệ thống giai cấp); class war (mâu thuẫn giai cấp)",
+      "example": "They classed the data points as anomalies. Discussions about social class remain relevant. He grew up in a working-class family. The ruling class resisted the reforms.",
+      "count": 0
+    },
+    {
+      "word": "clean",
+      "meaning": "give sth a (good) clean (lau dọn sạch sẽ); make a clean break (giải sạch, cắt đứt hoàn toàn); clean and tidy (sạch sẽ gọn gàng); a clean slate (một khởi đầu mới); clean sweep (dọn sạch những thứ không cần thiết)",
+      "example": "Let’s give this codebase a good clean. The team made a clean break from legacy. Keep your workspace clean and tidy. We started with a clean slate after the audit.",
+      "count": 0
+    },
+    {
+      "word": "clear",
+      "meaning": "make/get sth clear (làm rõ/chứng tỏ); make yourself clear (nói rõ ý của bạn); have a clear conscience (lương tâm trong sạch); clear in your mind (hiểu rõ); clear as a bell (rõ ràng); clear as mud (khó hiểu); clear evidence (bằng chứng); clear case of (trường hợp rõ ràng)",
+      "example": "She made her expectations perfectly clear. He has a clear conscience about the decision. The objective was clear in my mind. That explanation was clear as a bell.",
+      "count": 0
+    },
+    {
+      "word": "clock",
+      "meaning": "set a clock (đặt báo thức); watch the clock (đếm thời gian); against the clock (chạy đua với thời gian); around the clock (suốt ngày đêm); clockwise (theo chiều kim đồng hồ); clockwork (bộ máy đồng hồ)",
+      "example": "Don’t forget to set the clock before sleeping. We’re racing against the clock to finish. The server runs around the clock. The gears turned like clockwork.",
+      "count": 0
+    },
+    {
+      "word": "come",
+      "meaning": "come to a conclusion/decision (đi tới kết luận/quyết định); come to power (lên nắm quyền); come into view (hiện ra trước mắt); come as a shock (gây sốc); come true (trở thành hiện thực)",
+      "example": "We came to a conclusion after reviewing logs. The new party came to power last year. The mountain peak finally came into view. His dream to launch the app came true.",
+      "count": 0
+    },
+    {
+      "word": "common",
+      "meaning": "have sth in common (với ai) (có điểm chung); common for sb/sth to do (việc ai đó làm gì là khá phổ biến); common language (ngôn ngữ thường dùng); the common people (người dân); common practice (hành vi phổ biến)",
+      "example": "We have much in common regarding coding standards. It’s common for teams to hold daily stand-ups. English serves as a common language in tech. Code reviews are now common practice.",
+      "count": 0
+    },
+    {
+      "word": "conclusion",
+      "meaning": "bring sth to a conclusion (đưa cái gì đến kết luận); come to/reach a conclusion (đi đến kết luận); jump/leap to conclusions (nhảy cóc kết luận); in conclusion (kết lại); foregone conclusion (kết quả đương nhiên)",
+      "example": "Let’s bring this discussion to a conclusion. They reached a conclusion after testing. Don’t jump to conclusions too quickly. In conclusion, we recommend a staging environment.",
+      "count": 0
+    }
   ]
 }
