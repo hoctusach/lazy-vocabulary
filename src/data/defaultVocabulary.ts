@@ -14289,9 +14289,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     "meaning": "account for (chiếm), give an account of (kể lại/thuat lai), take into account (tính đến, cân nhắc), on account of (xem xét, chiếu cố), on account of (bởi vì), by all accounts (theo những gì thu thập được), on sb’s account (theo như ý kiến của họ)",
     "example": [
         "He gave an account of his experience to the class.",
-        "We must take weather conditions into account.",
-        "By all accounts, she’s a talented writer."
-    ],
+        "We must take weather conditions into account.By all accounts, she’s a talented writer.",
     "count": 0
     },
     {
