@@ -11,6 +11,7 @@ export const useVocabularyActions = (
   wordChangeInProgressRef: React.MutableRefObject<boolean>,
   lastManualActionTimeRef: React.MutableRefObject<number>,
   isChangingWordRef: React.MutableRefObject<boolean>,
+  pauseRequestedRef: React.MutableRefObject<boolean> | undefined,
   setIsPaused: React.Dispatch<React.SetStateAction<boolean>>,
   timerRef: React.MutableRefObject<number | null>,
   displayNextWord: () => void
@@ -24,7 +25,8 @@ export const useVocabularyActions = (
     clearTimer,
     wordChangeInProgressRef,
     lastManualActionTimeRef,
-    isChangingWordRef
+    isChangingWordRef,
+    pauseRequestedRef
   );
   
   // Use the category actions hook

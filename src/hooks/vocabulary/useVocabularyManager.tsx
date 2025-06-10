@@ -27,6 +27,7 @@ export const useVocabularyManager = () => {
   const isSpeakingRef = useRef<boolean>(false);
   const isChangingWordRef = useRef<boolean>(false);
   const wordChangeInProgressRef = useRef(false);
+  const pauseRequestedRef = useRef<boolean>(false);
 
   // Error handling
   const { jsonLoadError, handleVocabularyError } = useErrorHandling(
@@ -52,7 +53,7 @@ export const useVocabularyManager = () => {
   );
 
   // Vocabulary actions
-  const { 
+  const {
     handleTogglePause,
     handleManualNext,
     handleSwitchCategory
@@ -62,6 +63,7 @@ export const useVocabularyManager = () => {
     wordChangeInProgressRef,
     lastManualActionTimeRef,
     isChangingWordRef,
+    pauseRequestedRef,
     setIsPaused,
     timerRef,
     displayNextWord
