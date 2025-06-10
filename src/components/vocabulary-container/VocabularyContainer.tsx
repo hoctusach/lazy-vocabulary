@@ -34,6 +34,22 @@ const VocabularyContainer: React.FC = () => {
   // Category navigation
   const { currentCategory, nextCategory } = useCategoryNavigation();
 
+  // Optimized file upload handler that prevents excessive processing
+  const handleOptimizedFileUpload = (file: File) => {
+    console.log('[VOCAB-CONTAINER] Optimized file upload handler called');
+    containerState.handleFileUploaded(file);
+  };
+
+  // Optimized category switch handler
+  const handleOptimizedCategorySwitch = () => {
+    console.log('[VOCAB-CONTAINER] Optimized category switch handler called');
+    // Stop current speech before switching
+    if (controllerState.isSpeaking) {
+      console.log('[VOCAB-CONTAINER] Stopping speech before category switch');
+    }
+    containerState.handleSwitchCategory();
+  };
+
   // Show file upload if no data
   if (!containerState.hasData) {
     return (
@@ -44,7 +60,7 @@ const VocabularyContainer: React.FC = () => {
             Upload an Excel file with your vocabulary words to get started.
           </p>
         </div>
-        <FileUpload onFileUploaded={containerState.handleFileUploaded} />
+        <FileUpload onFileUploaded={handleOptimizedFileUpload} />
       </div>
     );
   }
@@ -74,7 +90,7 @@ const VocabularyContainer: React.FC = () => {
         onToggleMute={controllerState.toggleMute}
         onTogglePause={controllerState.togglePause}
         onCycleVoice={cycleVoice}
-        onSwitchCategory={containerState.handleSwitchCategory}
+        onSwitchCategory={handleOptimizedCategorySwitch}
         onNextWord={controllerState.goToNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory}

@@ -16,9 +16,9 @@ export const useSimpleVocabularyController = () => {
   
   // Refs to track state and prevent race conditions
   const speechInProgressRef = useRef(false);
-  const currentWordIdRef = useRef<string | null>(null);
   const autoAdvanceTimeoutRef = useRef<number | null>(null);
   const isInitializedRef = useRef(false);
+  const lastNavigationTimeRef = useRef(0);
 
   // Clear any pending timeouts
   const clearTimeouts = useCallback(() => {
@@ -59,15 +59,8 @@ export const useSimpleVocabularyController = () => {
       return;
     }
 
-    // Prevent duplicate speech for same word
-    if (currentWordIdRef.current === word.word) {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Same word, skipping');
-      return;
-    }
-
     console.log(`[SIMPLE-VOCAB-CONTROLLER] Starting speech for: ${word.word}`);
     speechInProgressRef.current = true;
-    currentWordIdRef.current = word.word;
     setIsSpeaking(true);
 
     try {
@@ -125,13 +118,22 @@ export const useSimpleVocabularyController = () => {
     }
   }, [currentWord, voiceRegion, isMuted, isPaused, refreshCurrentWord]);
 
-  // Navigation function
+  // Navigation function - FIXED to prevent excessive processing
   const goToNext = useCallback(() => {
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Going to next word');
-    stopSpeech();
-    currentWordIdRef.current = null;
+    const now = Date.now();
     
-    // Get next word from service
+    // Prevent rapid navigation calls
+    if (now - lastNavigationTimeRef.current < 500) {
+      console.log('[SIMPLE-VOCAB-CONTROLLER] Navigation throttled');
+      return;
+    }
+    
+    lastNavigationTimeRef.current = now;
+    console.log('[SIMPLE-VOCAB-CONTROLLER] Going to next word');
+    
+    stopSpeech();
+    
+    // Get next word from service - this should be efficient
     const nextWord = vocabularyService.getNextWord();
     console.log('[SIMPLE-VOCAB-CONTROLLER] Next word from service:', nextWord?.word || 'none');
     setCurrentWord(nextWord);
@@ -145,9 +147,6 @@ export const useSimpleVocabularyController = () => {
     
     if (newPausedState) {
       stopSpeech();
-    } else {
-      // Reset to allow word to play when unpaused
-      currentWordIdRef.current = null;
     }
   }, [isPaused, stopSpeech]);
 
@@ -158,9 +157,6 @@ export const useSimpleVocabularyController = () => {
     
     if (newMutedState) {
       stopSpeech();
-    } else {
-      // Reset to allow word to play when unmuted
-      currentWordIdRef.current = null;
     }
   }, [isMuted, stopSpeech]);
 
@@ -193,7 +189,7 @@ export const useSimpleVocabularyController = () => {
     };
   }, [refreshCurrentWord]);
 
-  // Effect to play word when conditions are right
+  // Effect to play word when conditions are right - SIMPLIFIED
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && !speechInProgressRef.current) {
       console.log('[SIMPLE-VOCAB-CONTROLLER] Scheduling play for:', currentWord.word);
@@ -203,7 +199,7 @@ export const useSimpleVocabularyController = () => {
         if (!speechInProgressRef.current) {
           playCurrentWord();
         }
-      }, 500);
+      }, 300);
       
       return () => clearTimeout(timeoutId);
     }
