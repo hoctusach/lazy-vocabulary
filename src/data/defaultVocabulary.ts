@@ -14296,6 +14296,114 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     "meaning": "act your age (hành động đúng độ tuổi), under age (chưa đủ tuổi), old age (tuổi già), working/retirement age (độ tuổi đi làm/nghỉ hưu), age limit (độ tuổi giới hạn), age bracket/group (nhóm tuổi), in Stone/Bronze/Iron Age (Vào thời kỳ Đồ Đá/Đồ Đồng/Đồ Sắt)",
     "example": "She retired at the age of 65. He's not allowed in; he's under age. We studied tools from the Bronze Age.",
     "count": 0
-    }         
+    },
+    {
+    "word": "ages",
+    "meaning": "take/spend ages (doing) (tốn nhiều thời gian làm gì); ages ago (rất lâu về trước); seems/feels like ages (có vẻ đã lâu lắm rồi kể từ khi)",
+    "example": "I spent ages trying to fix that bug before I finally gave up. They moved here ages ago and still love it. It feels like ages since we last spoke. She thinks it’s been ages since her last vacation.",
+    "count": 0
+    },
+    {
+    "word": "answer",
+    "meaning": "answer to sb (trả lời ai đó); give sb an answer (đáp lại lời); answer sb’s prayers (đáp lại lời cầu nguyện); answer the description of (rất giống với); have a lot to answer for (chịu trách nhiệm về)",
+    "example": "Could you please answer my question about the API design? He finally answered her prayers by approving the budget. His work answers the description of an ideal solution. The manager will have a lot to answer for if the project fails.",
+    "count": 0
+    },
+    {
+    "word": "argument",
+    "meaning": "argument (with sb) (cãi vã với ai); win/lose an argument (thắng/thua một cuộc tranh cãi); argument about/over (cuộc tranh luận về); argument for/against (lập luận ủng hộ/chống); without an argument (không cần bàn cãi)",
+    "example": "They had an argument about which framework to use. She won the argument by presenting clear data. There’s a strong argument for adopting microservices. We resolved the issue without an argument.",
+    "count": 0
+    },
+    {
+    "word": "arm",
+    "meaning": "arm sb with (trang bị cho ai đó); arm yourself against (trang bị cho bản thân để chống lại); take up arms (chuẩn bị chiến đấu); lay down arms (vứt bỏ vũ khí); arms control (kiểm soát vũ khí)",
+    "example": "The guide armed us with all the necessary credentials. They taught us how to arm ourselves against cyber attacks. Rebels decided to lay down arms and negotiate. An international treaty on arms control was signed.",
+    "count": 0
+    },
+    {
+    "word": "art",
+    "meaning": "art of doing (nghệ thuật/kỹ thuật làm việc gì); art deco (trang trí nghệ thuật); art gallery (phòng trưng bày nghệ thuật); art house (phim nghệ thuật)",
+    "example": "He mastered the art of debugging complex code. The building’s façade is a beautiful example of art deco. Let's visit the new art gallery this weekend. They screened an indie film at the local art house.",
+    "count": 0
+    },
+    {
+    "word": "ask",
+    "meaning": "ask yourself (tự hỏi bản thân); ask sb a favour (nhờ ai giúp đỡ); ask sb over/round (mời đến nhà chơi); ask sb in (mời ai vào nhà); asking for trouble (chắc chắn gặp rắc rối); if you ask me (theo tôi)",
+    "example": "Ask yourself what the user really needs from this feature. Could I ask you a favour and review my pull request? She asked him over for afternoon tea. If you ask me, we should refactor this module.",
+    "count": 0
+    },
+    {
+    "word": "associate",
+    "meaning": "associate sth with (liên kết cái gì với)",
+    "example": "Most people associate JavaScript with web development. He associates deadlines with unnecessary stress. Don’t associate code quality solely with performance.",
+    "count": 0
+    },
+    {
+    "word": "authority",
+    "meaning": "have the authority to do (có thẩm quyền làm việc gì); grant sb the authority to do (trao quyền cho ai làm gì); local authority (chính quyền địa phương)",
+    "example": "Only the admin has the authority to modify user roles. The board granted her the authority to approve budgets. Please consult the local authority for compliance guidelines. He assumed authority over the new deployment process.",
+    "count": 0
+    },
+    {
+    "word": "back",
+    "meaning": "back into sth (lùi vào chỗ nào đó); back onto sth (lùi xe lên trên cái gì); back out of (chống lưng/ứng hộ cho ai làm gì)",
+    "example": "He accidentally backed into the server rack. The car backed onto the loading dock. She refused to back out of her commitment. We need someone to back us up on this proposal.",
+    "count": 0
+    },
+    {
+    "word": "bad",
+    "meaning": "go bad (thiu, hỏng); bad for sb (có hại cho ai); bad at sth (kém về cái gì); bad blood (mối quan hệ xấu)",
+    "example": "Don’t eat that milk—it’s gone bad. Smoking is bad for your health. He’s bad at estimating project timelines. There’s some bad blood between those two teams.",
+    "count": 0
+    },
+    {
+    "word": "balance",
+    "meaning": "strike a balance (tìm phương án cân bằng); upset/restore the balance (phá vỡ/khôi phục cân bằng); balance between (cân bằng giữa); off balance (mất thăng bằng)",
+    "example": "We need to strike a balance between speed and quality. A sudden spike in traffic upset the balance of the system. There’s a fine balance between innovation and risk. The unexpected outage threw the team off balance.",
+    "count": 0
+    },
+    {
+    "word": "basis",
+    "meaning": "on a basis (trên cơ sở); on a daily/temporary basis (hàng ngày/tạm thời); on the basis of (dựa trên cơ sở)",
+    "example": "We review performance on a monthly basis. The feature is enabled on a temporary basis. Decisions are made on the basis of user feedback.",
+    "count": 0
+    },
+    {
+    "word": "behaviour",
+    "meaning": "behaviour towards (hành vi đối với); antisocial/violent behaviour (hành vi chống đối/bạo lực); exemplary behaviour (hành vi gương mẫu)",
+    "example": "His behaviour towards colleagues was exemplary. The test revealed some antisocial behaviour in the AI agent. Good behaviour is rewarded in our performance reviews.",
+    "count": 0
+    },
+    {
+    "word": "belief",
+    "meaning": "express belief(s) (bộc lộ niềm tin); contrary to popular belief (ngược với niềm tin chung); firm belief (niềm tin vững chắc)",
+    "example": "The CEO expressed her firm belief in the project’s success. Contrary to popular belief, code reviews improve productivity. He couldn’t hide his belief in the new framework.",
+    "count": 0
+    },
+    {
+    "word": "bend",
+    "meaning": "bend sth into (uốn cong thành gì); round the bend (quá tức giận); bend the rules (nới lỏng quy tắc)",
+    "example": "She bent the metal rod into a perfect circle. Waiting in line all day drove me round the bend. Managers sometimes bend the rules to meet deadlines.",
+    "count": 0
+    },
+    {
+    "word": "best",
+    "meaning": "make the best of (tận dụng hết khả năng); at your best (ở tình trạng tốt nhất); best of my ability (theo khả năng tốt nhất của tôi); best friend (bạn thân nhất)",
+    "example": "We need to make the best of this opportunity. He performed at his best under pressure. I’ll help you to the best of my ability. She’s been my best friend since college.",
+    "count": 0
+    },
+    {
+    "word": "bet",
+    "meaning": "bet (sth) on (đánh cuộc thứ gì đó); make a bet (đặt cược); safe bet (điều chắc chắn thành công)",
+    "example": "I’d bet on JavaScript remaining popular for years. He made a bet with his friend about the release date. Opting for thorough tests is a safe bet.",
+    "count": 0
+    },
+    {
+    "word": "better",
+    "meaning": "get better (trở nên tốt hơn); better off (khấm khá hơn); better next time (lần sau sẽ tốt hơn); for better or (for worse) (dù tốt dù xấu)",
+    "example": "I hope the system gets better after this update. You’ll be better off using a dedicated database. Maybe we’ll have better luck next time. For better or worse, this is the final design.",
+    "count": 0
+    }               
   ]
 }
