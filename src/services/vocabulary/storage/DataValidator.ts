@@ -1,5 +1,5 @@
 
-import { SheetData } from "@/types/vocabulary";
+import { SheetData, VocabularyWord } from "@/types/vocabulary";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { sanitizeInput } from "@/utils/security/inputValidation";
 import { VALIDATION_LIMITS } from "./constants";
@@ -23,7 +23,7 @@ export class DataValidator {
   /**
    * Validates and sanitizes vocabulary data for security
    */
-  validateVocabularyData(data: any): { isValid: boolean; errors: string[] } {
+  validateVocabularyData(data: unknown): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
     
     if (!data || typeof data !== 'object') {
@@ -33,19 +33,25 @@ export class DataValidator {
     
     let totalWords = 0;
     
-    for (const sheetName in data) {
+    const sheets = data as Record<string, unknown>;
+
+    for (const sheetName in sheets) {
       // Validate sheet name
       const sanitizedSheetName = sanitizeInput(sheetName);
       if (sanitizedSheetName !== sheetName) {
         errors.push(`Invalid characters in sheet name: ${sheetName}`);
       }
       
-      if (!Array.isArray(data[sheetName])) {
+      const sheet = sheets[sheetName];
+
+      if (!Array.isArray(sheet)) {
         errors.push(`Sheet "${sheetName}" is not a valid array`);
         continue;
       }
-      
-      const sheetWords = data[sheetName];
+
+      const sheetWords = sheet as Array<
+        Partial<Record<keyof VocabularyWord, unknown>>
+      >;
       
       // Check sheet size limits
       if (sheetWords.length > VALIDATION_LIMITS.MAX_WORDS_PER_SHEET) {
@@ -73,7 +79,7 @@ export class DataValidator {
   /**
    * Ensures all fields in the data have the correct types and are sanitized
    */
-  ensureDataTypes(data: any): SheetData {
+  ensureDataTypes(data: Record<string, Array<Record<string, unknown>>>): SheetData {
     return this.typeProcessor.ensureDataTypes(data);
   }
 
@@ -87,7 +93,9 @@ export class DataValidator {
   /**
    * Validates imported data before processing
    */
-  validateImportedData(data: any): { isValid: boolean; processedData?: SheetData; errors: string[] } {
+  validateImportedData(
+    data: Record<string, Array<Record<string, unknown>>>
+  ): { isValid: boolean; processedData?: SheetData; errors: string[] } {
     const validation = this.validateVocabularyData(data);
     
     if (!validation.isValid) {

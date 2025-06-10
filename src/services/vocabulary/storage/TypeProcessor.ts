@@ -3,6 +3,14 @@ import { sanitizeInput, validateVocabularyWord, validateMeaning, validateExample
 import { shouldBypassValidation, prepareTextForDisplay } from "@/utils/text/contentFilters";
 import { WordValidator } from "./WordValidator";
 
+interface RawWord {
+  word?: unknown;
+  meaning?: unknown;
+  example?: unknown;
+  count?: unknown;
+  category?: unknown;
+}
+
 /**
  * Handles type processing and sanitization for vocabulary data
  * Updated with IPA notation and Vietnamese content filtering support
@@ -14,7 +22,9 @@ export class TypeProcessor {
    * Ensures all fields in the data have the correct types and are sanitized
    * Now includes content filtering for IPA notation and Vietnamese text
    */
-  ensureDataTypes(data: any): SheetData {
+  ensureDataTypes(
+    data: Record<string, Array<Record<string, unknown>>>
+  ): SheetData {
     const processedData: SheetData = {};
     
     console.log('[TYPE-PROCESSOR] Starting comprehensive data processing with content filtering');
@@ -26,9 +36,10 @@ export class TypeProcessor {
       
       console.log(`[TYPE-PROCESSOR] Processing sheet: ${sheetName} (${data[sheetName]?.length || 0} words)`);
       
-      if (Array.isArray(data[sheetName])) {
-        for (let i = 0; i < data[sheetName].length; i++) {
-          const word = data[sheetName][i];
+      const sheet = data[sheetName];
+      if (Array.isArray(sheet)) {
+        for (let i = 0; i < sheet.length; i++) {
+          const word = sheet[i] as RawWord;
           
           // Skip invalid word objects
           if (!word || typeof word !== 'object') {
