@@ -15,7 +15,7 @@ class DirectSpeechService {
   private getRegionSettings(region: 'US' | 'UK' | 'AU') {
     return {
       US: {
-        rate: 0.7, // Slower for better comprehension
+        rate: 0.6, // Slower for better comprehension
         pitch: 1.0,
         volume: 1.0,
         pauseDuration: 600
@@ -27,7 +27,7 @@ class DirectSpeechService {
         pauseDuration: 500
       },
       AU: {
-        rate: 0.7,
+        rate: 0.6,
         pitch: 1.0,
         volume: 1.0,
         pauseDuration: 500
