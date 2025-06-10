@@ -46,14 +46,12 @@ export const extractSpeechableContent = (text: string): string => {
   
   let processedText = text;
   
-  // Remove content in square brackets (often IPA notation)
-  processedText = processedText.replace(/\[([^\]]*)\]/g, (match, content) => {
-    // If the bracketed content is short and looks like a word type, keep it
-    if (content.length < 20 && /^[a-zA-Z\s]+$/.test(content)) {
-      return `(${content})`;
-    }
-    return ''; // Remove IPA notation in brackets
-  });
+  // Remove content in square brackets (often IPA notation or word type)
+  // Always strip this content from the spoken text
+  processedText = processedText.replace(/\[[^\]]*\]/g, '');
+
+  // Remove short parenthetical word type labels like "(adj)" or "(noun)"
+  processedText = processedText.replace(/\([a-zA-Z.\s]{1,20}\)/g, '');
   
   // Remove content between forward slashes (phonetic transcription)
   processedText = processedText.replace(/\/([^/]*)\//g, '');
