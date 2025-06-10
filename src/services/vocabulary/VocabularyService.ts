@@ -76,7 +76,10 @@ export class VocabularyService {
   private getTotalWordCount(): number {
     let count = 0;
     for (const sheetName in this.data) {
-      count += this.data[sheetName]?.length || 0;
+      // Skip "All words" to avoid double counting
+      if (sheetName !== "All words") {
+        count += this.data[sheetName]?.length || 0;
+      }
     }
     return count;
   }
@@ -137,7 +140,7 @@ export class VocabularyService {
           // Process data to ensure all fields have proper types
           this.data = this.dataProcessor.processDataTypes(fetchedData);
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
+          this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -150,7 +153,7 @@ export class VocabularyService {
           const vocabularyData = data || DEFAULT_VOCABULARY_DATA;
           this.data = this.dataProcessor.processDataTypes(JSON.parse(JSON.stringify(vocabularyData)));
           this.storage.saveData(this.data);
-          this.wordNavigation.setCurrentSheetName("phrasal verbs");
+          this.wordNavigation.setCurrentSheetName("All words");
           this.wordNavigation.updateData(this.data);
           this.wordNavigation.shuffleCurrentSheet();
           
@@ -213,7 +216,7 @@ export class VocabularyService {
     
     // Add each custom category to sheetOptions if it doesn't exist already
     for (const category in customData) {
-      if (!this.sheetOptions.includes(category)) {
+      if (!this.sheetOptions.includes(category) && category !== "All words") {
         (this.sheetOptions as string[]).push(category);
         console.log(`Added new category: ${category}`);
       }

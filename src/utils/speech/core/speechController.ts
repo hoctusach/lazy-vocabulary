@@ -1,3 +1,4 @@
+
 /**
  * Centralized Speech Controller - Single source of truth for all speech operations
  * Fixed version with improved state management and throttling
@@ -320,5 +321,5 @@ class SpeechController {
   }
 }
 
-// Export as named export to match the import statements
+// Export singleton instance
 export const speechController = new SpeechController();
