@@ -25,8 +25,7 @@ export const usePlaybackFlow = (
   lastManualActionTimeRef: React.MutableRefObject<number>,
   autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   voicesLoadedRef: React.MutableRefObject<boolean>,
-  ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>
+  ensureVoicesLoaded: () => Promise<boolean>
 ) => {
   // Use the orchestrator hook that handles all the complex logic
   return usePlaybackOrchestrator(
@@ -47,7 +46,6 @@ export const usePlaybackFlow = (
     lastManualActionTimeRef,
     autoAdvanceTimerRef,
     voicesLoadedRef,
-    ensureVoicesLoaded,
-    permissionErrorShownRef
+    ensureVoicesLoaded
   );
 };

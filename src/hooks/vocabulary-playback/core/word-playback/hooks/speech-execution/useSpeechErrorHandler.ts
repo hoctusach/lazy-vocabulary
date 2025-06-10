@@ -5,8 +5,6 @@ import { useCallback } from 'react';
  * Hook for handling speech synthesis errors with appropriate recovery strategies
  */
 export const useSpeechErrorHandler = (
-  setHasSpeechPermission: (hasPermission: boolean) => void,
-  handlePermissionError: (errorType: string) => void,
   incrementRetryAttempts: () => boolean,
   goToNextWord: (fromUser?: boolean) => void,
   scheduleAutoAdvance: (delay: number) => void,
@@ -39,13 +37,13 @@ export const useSpeechErrorHandler = (
     switch (event.error) {
       case 'not-allowed':
         console.log(`[SPEECH-ERROR-${sessionId}] Permission denied`);
-        setHasSpeechPermission(false);
-        handlePermissionError('not-allowed');
+        if (!paused && !muted) {
+          scheduleAutoAdvance(2000);
+        }
         break;
         
       case 'network':
         console.log(`[SPEECH-ERROR-${sessionId}] Network error`);
-        handlePermissionError('network');
         if (!paused && !muted) {
           scheduleAutoAdvance(2000);
         }
@@ -84,8 +82,6 @@ export const useSpeechErrorHandler = (
       }
     }
   }, [
-    setHasSpeechPermission,
-    handlePermissionError,
     incrementRetryAttempts,
     goToNextWord,
     paused,

@@ -24,8 +24,7 @@ export const usePlaybackOrchestrator = (
   lastManualActionTimeRef: React.MutableRefObject<number>,
   autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   voicesLoadedRef: React.MutableRefObject<boolean>,
-  ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>
+  ensureVoicesLoaded: () => Promise<boolean>
 ) => {
   // Use the core orchestrator that handles all the complex logic
   return useOrchestratorCore(
@@ -46,7 +45,6 @@ export const usePlaybackOrchestrator = (
     lastManualActionTimeRef,
     autoAdvanceTimerRef,
     voicesLoadedRef,
-    ensureVoicesLoaded,
-    permissionErrorShownRef
+    ensureVoicesLoaded
   );
 };

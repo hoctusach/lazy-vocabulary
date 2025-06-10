@@ -28,8 +28,7 @@ export const useOrchestratorCore = (
   lastManualActionTimeRef: React.MutableRefObject<number>,
   autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   voicesLoadedRef: React.MutableRefObject<boolean>,
-  ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>
+  ensureVoicesLoaded: () => Promise<boolean>
 ) => {
   // Calculate current word using dedicated hook
   const { currentWord } = useCurrentWordCalculation(wordList, currentIndex);
@@ -58,7 +57,6 @@ export const useOrchestratorCore = (
     goToNextWord,
     voicesLoadedRef,
     ensureVoicesLoaded,
-    permissionErrorShownRef,
     paused,
     muted
   );
@@ -78,7 +76,6 @@ export const useOrchestratorCore = (
     paused,
     muted,
     wordTransitionRef,
-    permissionErrorShownRef,
     checkSpeechSupport,
     voicesLoadedRef,
     ensureVoicesLoaded

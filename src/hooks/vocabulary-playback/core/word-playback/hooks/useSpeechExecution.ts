@@ -23,18 +23,12 @@ export const useSpeechExecution = (
   autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   paused: boolean,
   muted: boolean,
-  wordTransitionRef: React.MutableRefObject<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>,
-  setHasSpeechPermission: (hasPermission: boolean) => void,
-  handlePermissionError: (errorType: string) => void,
-  checkSpeechPermissions: () => Promise<boolean>
+  wordTransitionRef: React.MutableRefObject<boolean>
 ) => {
   // Initialize modular hooks
   const { validatePreConditions, validateSpeechContent } = useSpeechValidation();
   
   const { handleSpeechError } = useSpeechErrorHandler(
-    setHasSpeechPermission,
-    handlePermissionError,
     incrementRetryAttempts,
     goToNextWord,
     paused,
@@ -73,15 +67,6 @@ export const useSpeechExecution = (
     }
 
     try {
-      // Check permissions
-      console.log(`[SPEECH-EXECUTION-${sessionId}] Checking speech permissions`);
-      const hasPermission = await checkSpeechPermissions();
-      if (!hasPermission) {
-        console.log(`[SPEECH-EXECUTION-${sessionId}] Permission check failed`);
-        setPlayInProgress(false);
-        handlePermissionError('not-allowed');
-        return false;
-      }
 
       // Validate speech content
       if (!validateSpeechContent(sessionId, speechableText, setPlayInProgress, goToNextWord)) {
@@ -129,8 +114,6 @@ export const useSpeechExecution = (
     createOnEndCallback,
     handleSpeechError,
     executeSpeechSynthesis,
-    checkSpeechPermissions,
-    handlePermissionError,
     goToNextWord,
     scheduleAutoAdvance,
     paused,

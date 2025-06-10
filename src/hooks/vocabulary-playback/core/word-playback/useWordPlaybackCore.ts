@@ -70,7 +70,6 @@ export const useWordPlaybackCore = (
     autoAdvanceTimerRef,
     voicesLoadedRef,
     ensureVoicesLoaded,
-    permissionErrorShownRef,
     utteranceRef,
     createUtterance
   );

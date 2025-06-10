@@ -18,7 +18,6 @@ export const usePlaybackCoordination = (
   goToNextWord: () => void,
   voicesLoadedRef: React.MutableRefObject<boolean>,
   ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>,
   paused: boolean,
   muted: boolean
 ) => {
@@ -35,7 +34,6 @@ export const usePlaybackCoordination = (
       goToNextWord,
       voicesLoadedRef,
       ensureVoicesLoaded,
-      permissionErrorShownRef,
       paused,
       muted
     };
@@ -51,7 +49,6 @@ export const usePlaybackCoordination = (
     goToNextWord,
     voicesLoadedRef,
     ensureVoicesLoaded,
-    permissionErrorShownRef,
     paused,
     muted
   ]);

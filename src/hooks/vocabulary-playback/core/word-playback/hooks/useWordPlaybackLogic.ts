@@ -28,7 +28,6 @@ export const useWordPlaybackLogic = (
   autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   voicesLoadedRef: React.MutableRefObject<boolean>,
   ensureVoicesLoaded: () => Promise<boolean>,
-  permissionErrorShownRef: React.MutableRefObject<boolean>,
   utteranceRef: React.MutableRefObject<SpeechSynthesisUtterance | null>,
   createUtterance: (
     word: VocabularyWord, 
@@ -58,8 +57,7 @@ export const useWordPlaybackLogic = (
     lastManualActionTimeRef,
     autoAdvanceTimerRef,
     voicesLoadedRef,
-    ensureVoicesLoaded,
-    permissionErrorShownRef
+    ensureVoicesLoaded
   );
   
   return {
