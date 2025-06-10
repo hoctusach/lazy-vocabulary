@@ -1,4 +1,3 @@
-
 import { SheetData } from "@/data/defaultVocabulary";
 
 export const DEFAULT_VOCABULARY_DATA: SheetData = {
@@ -2765,7 +2764,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     },
     {
       "word": "get/catch sb’s drift",
-      "meaning": "understand the basic meaning: nắm được ý chính.",
+      "meaning": "understand the basic "meaning": nắm được ý chính.",
       "example": "Doreen and I have been having some problems recently, if you catch my drift.",
       "count": 0
     },
@@ -4616,7 +4615,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
       "word": "Attentive (adjective)",
       "meaning": "Very polite and helpful, paying close attention to the needs of someone.",
-      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were.",
+      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were. ",
       "count": 0
     },
     {
@@ -14205,20 +14204,118 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     "count": 0
     }
   ],
-  "grammar": [
+  "grammar": [ 
     {
-      "word": "present perfect",
-      "meaning": "a tense used for actions that happened at an unspecified time",
-      "example": "I have visited France twice.",
-      "count": 0
+    "word": "Unreal time - conditional (n) /kənˈdɪʃənəl/",
+    "meaning": "a sentence that expresses a condition and its result, often used for hypothetical or unlikely situations. (câu điều kiện)",
+    "example": "If I had known, I would have taken some dollars with me.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - imagine (v) /ɪˈmædʒɪn/",
+    "meaning": "to think about something that is not real or is unlikely to happen. (tưởng tượng)",
+    "example": "Suppose you were given ten million euros, what would you spend it on?",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - suppose (v) /səˈpəʊz/",
+    "meaning": "to assume something is true for the purpose of argument or explanation. (giả sử)",
+    "example": "Suppose you had won the lottery last night. What would you have done?",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - as if (phrase)",
+    "meaning": "used to describe a situation that is not true or real. (như thể là)",
+    "example": "She acts as if she were a millionaire.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - as though (phrase)",
+    "meaning": "used in the same way as 'as if', to make unreal comparisons. (như thể là)",
+    "example": "Tony looks as if someone had just handed him a million euros.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Questions and requests (phrase)",
+    "meaning": "Used to make requests and questions sound more polite. (Cách nói lịch sự hơn khi yêu cầu hoặc đặt câu hỏi)",
+    "example": "I was wondering whether you might be able to give me some advice.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - It’s (high/about) time (phrase)",
+    "meaning": "Used to suggest that something should be done now or in the immediate future. (Đã đến lúc làm điều gì đó)",
+    "example": "It’s (high/about) time we were leaving.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Would rather/sooner (phrase)",
+    "meaning": "Used to express current, general or future preference, or past preference. (Diễn tả sự ưu tiên, mong muốn)",
+    "example": "We’d rather/sooner you hadn’t lent Kurdip the money.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Wish / if only (phrase)",
+    "meaning": "Used to express regrets or unreal desires about present or past situations. (Ước hoặc tiếc nuối về điều không có thật ở hiện tại hoặc quá khứ)",
+    "example": "If only I was earning a reasonable salary.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Other structures with wish / if only (phrase)",
+    "meaning": "Structures used to express criticism, inability, formal desires, or to wish someone success. (Các cấu trúc dùng với wish để phê phán, thể hiện ước muốn hoặc chúc ai đó)",
+    "example": "I wish I could find a job that pays well.",
+    "count": 0
     }
   ],
-  "phrases, collocations": [
+  "phrases, collocations": [     
     {
-      "word": "make up one's mind",
-      "meaning": "decide after consideration",
-      "example": "She couldn't make up her mind about the dress.",
-      "count": 0
-    }
+    "word": "about /əˈbaʊt/",
+    "meaning": "partly/mainly/all about (một phần/đa phần/toàn bộ về), do sth about (làm gì đó để xử lý), about to do (sắp làm gì)",
+    "example": [
+        "She was about to leave when the phone rang.",
+        "This book is all about courage and persistence.",
+        "What are you going to do about the issue?"
+    ],
+    "count": 0
+    },
+    {
+    "word": "access /ˈækses/",
+    "meaning": "have/gain/provide access to (có/đạt được/cung cấp sự tiếp cận), Internet access (truy cập mạng Internet), wheelchair access (lối đi dành cho xe lăn)",
+    "example": [
+        "Students have access to all library materials online.",
+        "Wheelchair access is available at the entrance.",
+        "Only members can gain access to the archive."
+    ],
+    "count": 0
+    },
+    {
+    "word": "account /əˈkaʊnt/",
+    "meaning": "account for (chiếm), give an account of (kể lại/thuat lai), take into account (tính đến, cân nhắc), on account of (xem xét, chiếu cố), on account of (bởi vì), by all accounts (theo những gì thu thập được), on sb’s account (theo như ý kiến của họ)",
+    "example": [
+        "He gave an account of his experience to the class.",
+        "We must take weather conditions into account.",
+        "By all accounts, she’s a talented writer."
+    ],
+    "count": 0
+    },
+    {
+    "word": "act /ækt/",
+    "meaning": "in good/bad faith (hành vi thiện/chưa thiện), out of desperation/necessity (hành động tuyệt vọng/cần thiết), act on sb’s advice/orders/behalf (hành động dựa vào lời khuyên/mệnh lệnh/thay mặt ai), act out of (hành động vì lý do gì), act the part/role of (đóng vai), act like (cư xử như), act your age (cư xử đúng tuổi), in the act of doing (đang làm việc gì đó thì bị bắt gặp)",
+    "example": [
+        "He was caught in the act of stealing.",
+        "She acted on her lawyer’s advice.",
+        "They acted out of desperation."
+    ],
+    "count": 0
+    },
+    {
+    "word": "age /eɪdʒ/",
+    "meaning": "act your age (hành động đúng độ tuổi), under age (chưa đủ tuổi), old age (tuổi già), working/retirement age (độ tuổi đi làm/nghỉ hưu), age limit (độ tuổi giới hạn), age bracket/group (nhóm tuổi), in Stone/Bronze/Iron Age (Vào thời kỳ Đồ Đá/Đồ Đồng/Đồ Sắt)",
+    "example": [
+        "She retired at the age of 65.",
+        "He's not allowed in; he's under age.",
+        "We studied tools from the Bronze Age."
+    ],
+    "count": 0
+    }         
   ]
 }
