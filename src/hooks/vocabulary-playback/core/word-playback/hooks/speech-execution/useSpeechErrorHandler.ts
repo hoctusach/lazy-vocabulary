@@ -8,7 +8,8 @@ export const useSpeechErrorHandler = (
   setHasSpeechPermission: (hasPermission: boolean) => void,
   handlePermissionError: (errorType: string) => void,
   incrementRetryAttempts: () => boolean,
-  goToNextWord: () => void,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void,
   paused: boolean,
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
@@ -46,7 +47,7 @@ export const useSpeechErrorHandler = (
         console.log(`[SPEECH-ERROR-${sessionId}] Network error`);
         handlePermissionError('network');
         if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 2000);
+          scheduleAutoAdvance(2000);
         }
         break;
         
@@ -54,14 +55,14 @@ export const useSpeechErrorHandler = (
       case 'synthesis-failed':
         console.log(`[SPEECH-ERROR-${sessionId}] Synthesis error - advancing`);
         if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 1000);
+          scheduleAutoAdvance(1000);
         }
         break;
         
       default:
         console.log(`[SPEECH-ERROR-${sessionId}] Generic error handling for: ${event.error}`);
         if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 1500);
+          scheduleAutoAdvance(1500);
         }
     }
     
@@ -78,7 +79,7 @@ export const useSpeechErrorHandler = (
       } else {
         console.log(`[SPEECH-ERROR-${sessionId}] Max retries reached, advancing`);
         if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 1500);
+          scheduleAutoAdvance(1500);
         }
       }
     }
@@ -90,7 +91,8 @@ export const useSpeechErrorHandler = (
     paused,
     muted,
     wordTransitionRef,
-    setPlayInProgress
+    setPlayInProgress,
+    scheduleAutoAdvance
   ]);
 
   return {
