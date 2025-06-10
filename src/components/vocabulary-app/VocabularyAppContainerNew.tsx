@@ -3,6 +3,7 @@ import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
+import VocabularyCardNew from "./VocabularyCardNew";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
@@ -126,12 +127,27 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleOpenAddWordModal={handleOpenAddWordModal}
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
+      ) : hasAnyData ? (
+        <VocabularyCardNew
+          word="No data for this category"
+          meaning=""
+          example=""
+          backgroundColor="#F0F8FF"
+          isMuted={isMuted}
+          isPaused={isPaused}
+          onToggleMute={toggleMute}
+          onTogglePause={togglePause}
+          onCycleVoice={toggleVoice}
+          onSwitchCategory={handleSwitchCategoryWithState}
+          onNextWord={() => {}}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory || 'Next'}
+          isSpeaking={false}
+          category={currentCategory}
+          voiceRegion={voiceRegion}
+        />
       ) : (
-        hasAnyData ? (
-          <p>No data for this category</p>
-        ) : (
-          <p>Loading vocabulary…</p>
-        )
+        <p>Loading vocabulary…</p>
       )}
     </VocabularyLayout>
   );
