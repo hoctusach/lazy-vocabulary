@@ -8,6 +8,8 @@ class DirectSpeechService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isActive = false;
   private completionTimeoutId: number | null = null;
+  private wasManuallyStopped = false;
+  private cancelledUtterance: SpeechSynthesisUtterance | null = null;
 
   // Region-specific speech settings
   private getRegionSettings(region: 'US' | 'UK' | 'AU') {
@@ -68,9 +70,10 @@ class DirectSpeechService {
   ): Promise<boolean> {
     const region = options.voiceRegion || 'US';
     console.log(`[DIRECT-SPEECH] speak() called - Region: ${region}, Word: ${options.word || 'N/A'}`);
-    
+
     // Stop any existing speech
     this.stop();
+    this.wasManuallyStopped = false;
     
     return new Promise((resolve) => {
       try {
@@ -134,9 +137,21 @@ class DirectSpeechService {
         };
 
         utterance.onerror = (event) => {
-          console.error(`[DIRECT-SPEECH] ✗ Speech error:`, event.error, event);
+          const manual =
+            (this.wasManuallyStopped || this.cancelledUtterance === utterance) &&
+            event.error === 'interrupted';
+          if (manual) {
+            console.log('[DIRECT-SPEECH] Ignoring interrupted error after manual stop');
+          } else {
+            console.error(`[DIRECT-SPEECH] ✗ Speech error:`, event.error, event);
+          }
           this.cleanup();
-          options.onError?.(event);
+          this.wasManuallyStopped = false;
+          this.cancelledUtterance = null;
+
+          if (!manual) {
+            options.onError?.(event);
+          }
         };
 
         // Set up completion timeout as fallback
@@ -174,6 +189,8 @@ class DirectSpeechService {
 
   stop(): void {
     console.log('[DIRECT-SPEECH] stop() called');
+    this.wasManuallyStopped = true;
+    this.cancelledUtterance = this.currentUtterance;
     
     // Clear completion timeout
     if (this.completionTimeoutId) {
