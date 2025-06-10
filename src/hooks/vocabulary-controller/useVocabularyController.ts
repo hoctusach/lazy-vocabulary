@@ -148,14 +148,20 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     const newMutedState = !isMuted;
     debug('[VOCAB-CONTROLLER] Toggle mute:', newMutedState);
     setIsMuted(newMutedState);
-    
+
     if (newMutedState) {
       stopSpeech();
+      // When muting during playback, continue auto-advance
+      autoAdvanceTimeoutRef.current = window.setTimeout(() => {
+        if (isMuted || newMutedState) {
+          goToNext();
+        }
+      }, 1500);
     } else {
       // Reset to allow word to play when unmuted
       lastWordRef.current = null;
     }
-  }, [isMuted, stopSpeech]);
+  }, [isMuted, stopSpeech, goToNext]);
 
   const toggleVoice = useCallback(() => {
     const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
@@ -167,15 +173,30 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
       debug('[VOCAB-CONTROLLER] Word effect triggered for:', currentWord.word);
-      
+
       // Small delay to ensure state is stable
       const timeoutId = setTimeout(() => {
         playCurrentWord();
       }, 300);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [currentWord?.word, isPaused, isMuted, playCurrentWord]);
+
+  // When muted, auto-advance based on a timer so words continue to cycle
+  useEffect(() => {
+    if (currentWord && isMuted && !isPaused) {
+      clearTimeouts();
+
+      autoAdvanceTimeoutRef.current = window.setTimeout(() => {
+        if (isMuted && !isPaused) {
+          goToNext();
+        }
+      }, 3000);
+
+      return () => clearTimeouts();
+    }
+  }, [currentWord?.word, isMuted, isPaused, goToNext, clearTimeouts]);
 
   // Cleanup on unmount
   useEffect(() => {
