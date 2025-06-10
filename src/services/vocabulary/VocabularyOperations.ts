@@ -14,7 +14,8 @@ export class VocabularyOperations {
   constructor(dataManager: VocabularyDataManager, sheetOperations: VocabularySheetOperations) {
     this.dataManager = dataManager;
     this.sheetOperations = sheetOperations;
-    this.wordNavigation = new WordNavigation();
+    // Reuse the WordNavigation instance managed by VocabularySheetOperations
+    this.wordNavigation = sheetOperations.getWordNavigation();
     this.lastWordChangeTime = Date.now();
     this.navigationThrottleRef = { current: 0 };
   }
@@ -81,7 +82,7 @@ export class VocabularyOperations {
       return null;
     }
     
-    const currentWord = this.wordNavigation.getCurrentWord(wordList);
+    const currentWord = this.wordNavigation.getCurrentWord();
     console.log(`Current word from ${currentSheet}:`, currentWord?.word || 'none');
     
     return currentWord;
@@ -109,7 +110,7 @@ export class VocabularyOperations {
     
     console.log(`[VOCAB-OPS] Moving to next word in ${currentSheet} (${wordList.length} words available)`);
     
-    const nextWord = this.wordNavigation.getNextWord(wordList);
+    const nextWord = this.wordNavigation.getNextWord();
     this.lastWordChangeTime = now;
     
     console.log(`[VOCAB-OPS] Next word: ${nextWord?.word || 'none'}`);
