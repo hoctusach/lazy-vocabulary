@@ -16,6 +16,9 @@ export const useUtteranceSetup = ({
   setHasSpeechPermission,
   permissionErrorShownRef,
   goToNextWord,
+  scheduleAutoAdvance,
+  lastManualActionTimeRef,
+  autoAdvanceTimerRef,
   muted,
   paused,
   incrementRetryAttempts
@@ -66,7 +69,7 @@ export const useUtteranceSetup = ({
         setIsSpeaking(false);
         
         // Auto-advance to next word after speech completes
-        setTimeout(() => goToNextWord(), 500);
+        scheduleAutoAdvance(500);
       };
       
       utterance.onerror = (event) => {
@@ -91,7 +94,7 @@ export const useUtteranceSetup = ({
             permissionErrorShownRef.current = true;
           }
           // Continue to next word even without audio
-          setTimeout(() => goToNextWord(), 2000);
+          scheduleAutoAdvance(2000);
           return;
         }
         
@@ -99,7 +102,7 @@ export const useUtteranceSetup = ({
         if (event.error === 'canceled' && (muted || paused)) {
           console.log('Speech canceled due to muting or pausing, not retrying');
           // Still auto-advance after a short delay
-          setTimeout(() => goToNextWord(), 2000);
+          scheduleAutoAdvance(2000);
           return;
         }
         
@@ -133,7 +136,7 @@ export const useUtteranceSetup = ({
         } else {
           console.log(`Max retries reached, advancing to next word`);
           // Move on after too many failures
-          setTimeout(() => goToNextWord(), 1000);
+          scheduleAutoAdvance(1000);
         }
       };
       
@@ -173,7 +176,7 @@ export const useUtteranceSetup = ({
             } else {
               // If we've tried enough times, move on
               console.log("Moving to next word after silent failures");
-              goToNextWord();
+              scheduleAutoAdvance(0);
             }
           }
         }, 200);
@@ -183,7 +186,7 @@ export const useUtteranceSetup = ({
       console.error('Error in speech playback:', error);
       setIsSpeaking(false);
       // Still try to advance to prevent getting stuck
-      setTimeout(() => goToNextWord(), 1000);
+      scheduleAutoAdvance(1000);
     }
   }, 100);
 };
