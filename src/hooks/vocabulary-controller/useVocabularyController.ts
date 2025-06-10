@@ -17,6 +17,8 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   const retryTimeoutRef = useRef<number | null>(null);
   const lastPlayedWordRef = useRef<string | null>(null);
   const isPlayingRef = useRef<boolean>(false);
+  const playbackTimeoutRef = useRef<number | null>(null);
+  const effectCleanupRef = useRef<(() => void) | null>(null);
 
   console.log('[VOCAB-CONTROLLER] Current state:', {
     isPaused,
@@ -29,19 +31,34 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     isPlaying: isPlayingRef.current
   });
 
-  const goToNext = useCallback(() => {
-    console.log('[VOCAB-CONTROLLER] goToNext called');
-    
-    // Clear any retry timeout
+  const clearAllTimeouts = useCallback(() => {
     if (retryTimeoutRef.current) {
       clearTimeout(retryTimeoutRef.current);
       retryTimeoutRef.current = null;
     }
-    
-    // Stop any current speech
+    if (playbackTimeoutRef.current) {
+      clearTimeout(playbackTimeoutRef.current);
+      playbackTimeoutRef.current = null;
+    }
+    if (effectCleanupRef.current) {
+      effectCleanupRef.current();
+      effectCleanupRef.current = null;
+    }
+  }, []);
+
+  const stopSpeechAndReset = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] Stopping speech and resetting state');
     directSpeechService.stop();
     setIsSpeaking(false);
     isPlayingRef.current = false;
+    clearAllTimeouts();
+  }, [clearAllTimeouts]);
+
+  const goToNext = useCallback(() => {
+    console.log('[VOCAB-CONTROLLER] goToNext called');
+    
+    // Stop everything cleanly
+    stopSpeechAndReset();
     
     // Use vocabulary service to get next word
     const nextWord = vocabularyService.getNextWord();
@@ -49,7 +66,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     
     // Reset last played word reference to allow new word to play
     lastPlayedWordRef.current = null;
-  }, []);
+  }, [stopSpeechAndReset]);
 
   const goToPrevious = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] goToPrevious called');
@@ -64,14 +81,12 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     
     if (newPausedState) {
       // Pausing - stop current speech
-      directSpeechService.stop();
-      setIsSpeaking(false);
-      isPlayingRef.current = false;
+      stopSpeechAndReset();
     } else {
       // Unpausing - reset to allow replay
       lastPlayedWordRef.current = null;
     }
-  }, [isPaused]);
+  }, [isPaused, stopSpeechAndReset]);
 
   const toggleMute = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] toggleMute called, current isMuted:', isMuted);
@@ -80,14 +95,12 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     
     if (newMutedState) {
       // Muting - stop current speech
-      directSpeechService.stop();
-      setIsSpeaking(false);
-      isPlayingRef.current = false;
+      stopSpeechAndReset();
     } else {
       // Unmuting - reset to allow replay
       lastPlayedWordRef.current = null;
     }
-  }, [isMuted]);
+  }, [isMuted, stopSpeechAndReset]);
 
   const toggleVoice = useCallback(() => {
     console.log('[VOCAB-CONTROLLER] toggleVoice called, current region:', voiceRegion);
@@ -115,7 +128,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
       return;
     }
 
-    // FIXED: Check if we're already playing speech instead of just the word comparison
+    // Check if we're already playing speech
     if (isPlayingRef.current || isSpeaking) {
       console.log('[VOCAB-CONTROLLER] Skipping playback - already playing:', {
         isPlaying: isPlayingRef.current,
@@ -124,7 +137,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
       return;
     }
 
-    // IMPROVED: Only prevent replay if we're actively speaking the same word
+    // Only prevent replay if we're actively speaking the same word
     if (lastPlayedWordRef.current === currentWord.word && (isSpeaking || isPlayingRef.current)) {
       console.log('[VOCAB-CONTROLLER] Skipping playback - same word already being spoken');
       return;
@@ -156,7 +169,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
             // Auto-advance to next word if not paused or muted
             if (!isPaused && !isMuted) {
               console.log('[VOCAB-CONTROLLER] Auto-advancing to next word');
-              setTimeout(() => {
+              retryTimeoutRef.current = window.setTimeout(() => {
                 goToNext();
               }, 1500);
             }
@@ -182,7 +195,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
         setIsSpeaking(false);
         isPlayingRef.current = false;
         if (!isPaused && !isMuted) {
-          setTimeout(() => goToNext(), 2000);
+          retryTimeoutRef.current = window.setTimeout(() => goToNext(), 2000);
         }
       }
     } catch (error) {
@@ -190,34 +203,43 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
       setIsSpeaking(false);
       isPlayingRef.current = false;
       if (!isPaused && !isMuted) {
-        setTimeout(() => goToNext(), 2000);
+        retryTimeoutRef.current = window.setTimeout(() => goToNext(), 2000);
       }
     }
   }, [currentWord, voiceRegion, isMuted, isPaused, isSpeaking, goToNext]);
 
-  // FIXED: Effect to play word when it changes - with proper reset
+  // Stabilized effect to play word when it changes
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted) {
       console.log('[VOCAB-CONTROLLER] ✓ Word changed effect triggered for:', currentWord.word);
       
+      // Clean up any previous effect
+      if (effectCleanupRef.current) {
+        effectCleanupRef.current();
+      }
+      
       // Stop any current speech first
-      directSpeechService.stop();
-      setIsSpeaking(false);
-      isPlayingRef.current = false;
+      stopSpeechAndReset();
       
       // Reset last played word to ensure this new word can play
       lastPlayedWordRef.current = null;
       
       // Play new word after a short delay
-      const timeoutId = setTimeout(() => {
+      playbackTimeoutRef.current = window.setTimeout(() => {
         console.log('[VOCAB-CONTROLLER] ✓ Executing delayed playback for:', currentWord.word);
         playCurrentWord();
       }, 500);
       
-      return () => {
-        console.log('[VOCAB-CONTROLLER] Cleaning up timeout for word change');
-        clearTimeout(timeoutId);
+      // Store cleanup function
+      effectCleanupRef.current = () => {
+        if (playbackTimeoutRef.current) {
+          console.log('[VOCAB-CONTROLLER] Cleaning up timeout for word change');
+          clearTimeout(playbackTimeoutRef.current);
+          playbackTimeoutRef.current = null;
+        }
       };
+      
+      return effectCleanupRef.current;
     } else {
       console.log('[VOCAB-CONTROLLER] Word change effect skipped:', {
         hasWord: !!currentWord,
@@ -225,28 +247,24 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
         isMuted
       });
     }
-  }, [currentWord?.word, isPaused, isMuted, playCurrentWord]);
+  }, [currentWord?.word, isPaused, isMuted, playCurrentWord, stopSpeechAndReset]);
 
   // Effect to handle pause/unpause
   useEffect(() => {
     if (isPaused || isMuted) {
       console.log('[VOCAB-CONTROLLER] Paused/muted state changed - stopping speech');
-      directSpeechService.stop();
-      setIsSpeaking(false);
-      isPlayingRef.current = false;
+      stopSpeechAndReset();
     }
-  }, [isPaused, isMuted]);
+  }, [isPaused, isMuted, stopSpeechAndReset]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       console.log('[VOCAB-CONTROLLER] Component unmounting - cleaning up');
       directSpeechService.stop();
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
+      clearAllTimeouts();
     };
-  }, []);
+  }, [clearAllTimeouts]);
 
   return {
     currentWord,

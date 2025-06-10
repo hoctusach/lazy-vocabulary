@@ -8,13 +8,13 @@ import FileUpload from '../FileUpload';
 import { useCategoryNavigation } from '@/hooks/vocabulary/useCategoryNavigation';
 
 const VocabularyContainer: React.FC = () => {
-  console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
+  console.log('[VOCAB-CONTAINER] === Component Render ===');
   
   // Get container state (word list, pause state, etc.)
   const containerState = useVocabularyContainerState();
-  console.log('[VOCAB-CONTAINER-NEW] Container state:', {
+  console.log('[VOCAB-CONTAINER] Container state:', {
     hasData: containerState.hasData,
-    wordListLength: containerState.wordList.length,
+    wordListLength: containerState.wordList?.length || 0,
     currentCategory: containerState.currentCategory
   });
 
@@ -22,9 +22,9 @@ const VocabularyContainer: React.FC = () => {
   const { selectedVoice, cycleVoice } = useVoiceSelection();
 
   // Get controller state (synchronized with vocabulary service)
-  const controllerState = useVocabularyController(containerState.wordList);
+  const controllerState = useVocabularyController(containerState.wordList || []);
   
-  console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
+  console.log('[VOCAB-CONTAINER] Controller state:', {
     currentWord: controllerState.currentWord?.word || 'none',
     currentIndex: controllerState.currentIndex,
     isPaused: controllerState.isPaused,
