@@ -14270,10 +14270,7 @@ export const DEFAULT_VOCABULARY_DATA: SheetData = {
     {
     "word": "about /əˈbaʊt/",
     "meaning": "partly/mainly/all about (một phần/đa phần/toàn bộ về), do sth about (làm gì đó để xử lý), about to do (sắp làm gì)",
-    "example": [
-        "She was about to leave when the phone rang.",
-        "This book is all about courage and persistence.",
-        "What are you going to do about the issue?"
+    "example": "She was about to leave when the phone rang. This book is all about courage and persistence. What are you going to do about the issue?"
     ],
     "count": 0
     },
