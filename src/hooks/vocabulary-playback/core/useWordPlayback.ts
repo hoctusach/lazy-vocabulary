@@ -21,7 +21,9 @@ export const useWordPlayback = (
   speakingRef: React.MutableRefObject<boolean>,
   resetRetryAttempts: () => void,
   incrementRetryAttempts: () => boolean,
-  checkSpeechSupport: () => boolean
+  checkSpeechSupport: () => boolean,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>
 ) => {
   // Use our refactored core implementation
   return useWordPlaybackCore(
@@ -38,6 +40,8 @@ export const useWordPlayback = (
     speakingRef,
     resetRetryAttempts,
     incrementRetryAttempts,
-    checkSpeechSupport
+    checkSpeechSupport,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef
   );
 };

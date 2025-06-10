@@ -51,6 +51,12 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
 
   // Mutable reference for the cancelSpeech function provided to other hooks
   const cancelSpeechRef = useRef<() => void>(() => {});
+
+  // Track when the user last manually advanced
+  const lastManualActionTimeRef = useRef<number>(Date.now());
+
+  // Track any scheduled auto-advance timers
+  const autoAdvanceTimerRef = useRef<number | null>(null);
   
   // Initialize playCurrentWord as an empty function that will be updated with the actual implementation
   const playCurrentWordRef = useRef<() => void>(() => {
@@ -79,7 +85,9 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     speakingRef,
     resetRetryAttempts,
     incrementRetryAttempts,
-    checkSpeechSupport
+    checkSpeechSupport,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef
   );
 
   // Obtain the cancelSpeech function now that resetPlayInProgress is available

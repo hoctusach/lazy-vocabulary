@@ -17,7 +17,10 @@ export const useSpeechExecution = (
   speakingRef: React.MutableRefObject<boolean>,
   resetRetryAttempts: () => void,
   incrementRetryAttempts: () => boolean,
-  goToNextWord: () => void,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   paused: boolean,
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
@@ -114,7 +117,7 @@ export const useSpeechExecution = (
       
       // Always advance on exception to prevent getting stuck
       if (!paused && !muted) {
-        setTimeout(() => goToNextWord(), 2000);
+        scheduleAutoAdvance(2000);
       }
       
       return false;
@@ -129,6 +132,7 @@ export const useSpeechExecution = (
     checkSpeechPermissions,
     handlePermissionError,
     goToNextWord,
+    scheduleAutoAdvance,
     paused,
     muted,
     wordTransitionRef,

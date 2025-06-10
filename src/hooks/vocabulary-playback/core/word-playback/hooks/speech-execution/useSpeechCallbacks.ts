@@ -13,7 +13,8 @@ export const useSpeechCallbacks = (
   paused: boolean,
   muted: boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
-  goToNextWord: () => void
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void
 ) => {
   const createOnStartCallback = useCallback((sessionId: string) => {
     return () => {
@@ -34,14 +35,7 @@ export const useSpeechCallbacks = (
       // Auto-advance with state validation
       if (!paused && !muted && !wordTransitionRef.current) {
         console.log(`[SPEECH-CALLBACKS-${sessionId}] Auto-advancing to next word`);
-        setTimeout(() => {
-          // Double-check state before advancing
-          if (!paused && !muted && !wordTransitionRef.current) {
-            goToNextWord();
-          } else {
-            console.log(`[SPEECH-CALLBACKS-${sessionId}] State changed during delay, not advancing`);
-          }
-        }, 1500);
+        scheduleAutoAdvance(1500);
       } else {
         console.log(`[SPEECH-CALLBACKS-${sessionId}] Not auto-advancing due to state`);
       }
@@ -53,7 +47,7 @@ export const useSpeechCallbacks = (
     paused,
     muted,
     wordTransitionRef,
-    goToNextWord
+    scheduleAutoAdvance
   ]);
 
   return {
