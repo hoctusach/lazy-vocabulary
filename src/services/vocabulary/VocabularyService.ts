@@ -2,7 +2,22 @@
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { SheetManager } from "../sheet";
-import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
+// Make this import optional since the file might not exist after revert
+let DEFAULT_VOCABULARY_DATA: SheetData = {};
+try {
+  const defaultVocab = await import("@/data/defaultVocabulary");
+  DEFAULT_VOCABULARY_DATA = defaultVocab.DEFAULT_VOCABULARY_DATA || {};
+} catch (error) {
+  console.warn("Could not import default vocabulary data, will use JSON fallback:", error);
+  // Provide a minimal fallback structure
+  DEFAULT_VOCABULARY_DATA = {
+    "All words": [],
+    "phrasal verbs": [],
+    "idioms": [],
+    "advanced words": []
+  };
+}
+
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { WordNavigation } from "./WordNavigation";
