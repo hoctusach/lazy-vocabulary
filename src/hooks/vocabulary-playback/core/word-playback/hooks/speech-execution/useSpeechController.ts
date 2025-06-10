@@ -19,7 +19,7 @@ export const useSpeechController = (
     onEnd: () => void,
     onError: (event: SpeechSynthesisErrorEvent) => void,
     setPlayInProgress: (inProgress: boolean) => void,
-    goToNextWord: () => void,
+    scheduleAutoAdvance: (delay: number) => void,
     paused: boolean,
     muted: boolean
   ): Promise<boolean> => {
@@ -51,7 +51,7 @@ export const useSpeechController = (
         console.warn(`[SPEECH-CONTROLLER-${sessionId}] ✗ Speech failed to start`);
         setPlayInProgress(false);
         if (!paused && !muted) {
-          setTimeout(() => goToNextWord(), 3000);
+          scheduleAutoAdvance(3000);
         }
       }
 
@@ -61,11 +61,11 @@ export const useSpeechController = (
       console.error(`[SPEECH-CONTROLLER-${sessionId}] ✗ Exception in speech controller:`, error);
       setPlayInProgress(false);
       if (!paused && !muted) {
-        setTimeout(() => goToNextWord(), 2000);
+        scheduleAutoAdvance(2000);
       }
       return false;
     }
-  }, [findVoice, selectedVoice]);
+  }, [findVoice, selectedVoice, scheduleAutoAdvance]);
 
   return {
     executeSpeechSynthesis

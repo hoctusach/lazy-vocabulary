@@ -9,13 +9,22 @@ export const useWordTransition = (
   wordList: VocabularyWord[],
   cancelSpeech: () => void,
   setCurrentIndex: (index: number | ((prevIndex: number) => number)) => void,
-  resetRetryAttempts: () => void
+  resetRetryAttempts: () => void,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>
 ) => {
   // Reference to track if we're currently in a word transition
   const wordTransitionRef = useRef<boolean>(false);
   
   // Function to advance to next word with full cleanup
-  const goToNextWord = useCallback(() => {
+  const goToNextWord = useCallback((fromUser: boolean = false) => {
+    if (fromUser) {
+      lastManualActionTimeRef.current = Date.now();
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    }
     if (wordList.length === 0) return;
     
     // Set the transition flag to prevent multiple word changes
@@ -38,10 +47,26 @@ export const useWordTransition = (
     setTimeout(() => {
       wordTransitionRef.current = false;
     }, 300);
-  }, [wordList, cancelSpeech, setCurrentIndex, resetRetryAttempts]);
+  }, [wordList, cancelSpeech, setCurrentIndex, resetRetryAttempts, lastManualActionTimeRef, autoAdvanceTimerRef]);
+
+  const scheduleAutoAdvance = useCallback((delay: number) => {
+    const timeSinceManual = Date.now() - lastManualActionTimeRef.current;
+    if (timeSinceManual < 1000) {
+      console.log('Skipping auto-advance due to recent manual action');
+      return;
+    }
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+    }
+    autoAdvanceTimerRef.current = window.setTimeout(() => {
+      autoAdvanceTimerRef.current = null;
+      goToNextWord();
+    }, delay);
+  }, [goToNextWord, lastManualActionTimeRef, autoAdvanceTimerRef]);
 
   return {
     wordTransitionRef,
-    goToNextWord
+    goToNextWord,
+    scheduleAutoAdvance
   };
 };

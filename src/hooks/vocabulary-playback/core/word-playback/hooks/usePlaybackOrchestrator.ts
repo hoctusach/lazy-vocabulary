@@ -19,7 +19,10 @@ export const usePlaybackOrchestrator = (
   incrementRetryAttempts: () => boolean,
   checkSpeechSupport: () => boolean,
   wordTransitionRef: React.MutableRefObject<boolean>,
-  goToNextWord: () => void,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   voicesLoadedRef: React.MutableRefObject<boolean>,
   ensureVoicesLoaded: () => Promise<boolean>,
   permissionErrorShownRef: React.MutableRefObject<boolean>
@@ -39,6 +42,9 @@ export const usePlaybackOrchestrator = (
     checkSpeechSupport,
     wordTransitionRef,
     goToNextWord,
+    scheduleAutoAdvance,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef,
     voicesLoadedRef,
     ensureVoicesLoaded,
     permissionErrorShownRef

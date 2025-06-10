@@ -29,7 +29,9 @@ export const useWordPlaybackCore = (
   speakingRef: React.MutableRefObject<boolean>,
   resetRetryAttempts: () => void,
   incrementRetryAttempts: () => boolean,
-  checkSpeechSupport: () => boolean
+  checkSpeechSupport: () => boolean,
+  lastManualActionTimeRef: React.MutableRefObject<number>,
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>
 ) => {
   // Get utterance manager functionality
   const { utteranceRef, createUtterance } = useUtteranceManager();
@@ -37,11 +39,13 @@ export const useWordPlaybackCore = (
   // Custom hooks for specific functionality
   const { voicesLoadedRef, ensureVoicesLoaded } = useVoiceLoader();
   const { permissionErrorShownRef, setHasSpeechPermission, hasSpeechPermission } = usePermissionState();
-  const { wordTransitionRef, goToNextWord } = useWordTransition(
+  const { wordTransitionRef, goToNextWord, scheduleAutoAdvance } = useWordTransition(
     wordList,
-    cancelSpeech, 
-    setCurrentIndex, 
-    resetRetryAttempts
+    cancelSpeech,
+    setCurrentIndex,
+    resetRetryAttempts,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef
   );
   
   // Core playback logic
@@ -61,6 +65,9 @@ export const useWordPlaybackCore = (
     checkSpeechSupport,
     wordTransitionRef,
     goToNextWord,
+    scheduleAutoAdvance,
+    lastManualActionTimeRef,
+    autoAdvanceTimerRef,
     voicesLoadedRef,
     ensureVoicesLoaded,
     permissionErrorShownRef,
