@@ -4,7 +4,11 @@ import { useState, useEffect } from 'react';
 // Hard-coded voice names from previously working version
 const US_VOICE_NAME = "Samantha";
 const UK_VOICE_NAME = "Google UK English Female";
-const AU_VOICE_NAME = "Google AU English Female";
+const AU_VOICE_NAMES = [
+  "Google AU English Female",
+  "Google AU English Male",
+  "Karen"
+];
 
 export type VoiceOption = {
   label: string;
@@ -70,9 +74,16 @@ export const useVoiceSelection = () => {
                        availableVoices.find(v => v.name.includes(UK_VOICE_NAME)) ||
                        availableVoices.find(v => v.lang === 'en-GB');
 
-        const auVoice = availableVoices.find(v => v.name === AU_VOICE_NAME) ||
-                       availableVoices.find(v => v.name.includes(AU_VOICE_NAME)) ||
-                       availableVoices.find(v => v.lang === 'en-AU');
+        let auVoice: SpeechSynthesisVoice | undefined;
+        for (const auName of AU_VOICE_NAMES) {
+          auVoice =
+            availableVoices.find(v => v.name === auName) ||
+            availableVoices.find(v => v.name.includes(auName));
+          if (auVoice) break;
+        }
+        if (!auVoice) {
+          auVoice = availableVoices.find(v => v.lang === 'en-AU');
+        }
         
         // Create simplified voice options
         const voiceOptions: VoiceOption[] = [

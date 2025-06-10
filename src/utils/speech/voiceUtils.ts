@@ -11,6 +11,7 @@ const UK_VOICE_NAMES = [
 ];
 const AU_VOICE_NAMES = [
   "Google AU English Female", // Primary option for AU
+  "Google AU English Male", // New male AU option
   "Karen", // macOS AU voice
   "Catherine", // Additional AU option
   "Hayley" // Backup AU option
