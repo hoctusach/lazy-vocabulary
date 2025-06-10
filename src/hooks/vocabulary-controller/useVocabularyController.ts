@@ -14,7 +14,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('US');
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('UK');
   
   // Refs to prevent unnecessary effects and manage state
   const lastWordRef = useRef<string | null>(null);

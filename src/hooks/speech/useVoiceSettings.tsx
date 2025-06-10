@@ -20,16 +20,16 @@ export const useVoiceSettings = () => {
         
         return {
           isMuted: parsedStates.isMuted === true,
-          voiceRegion:
-            parsedStates.voiceRegion === 'UK' || parsedStates.voiceRegion === 'AU'
-              ? parsedStates.voiceRegion
-              : 'US'
+            voiceRegion:
+              parsedStates.voiceRegion === 'UK' || parsedStates.voiceRegion === 'AU'
+                ? parsedStates.voiceRegion
+                : 'UK'
         };
       }
     } catch (error) {
       console.error('Error reading button states from localStorage:', error);
     }
-    return { isMuted: false, voiceRegion: 'US' };
+    return { isMuted: false, voiceRegion: 'UK' };
   };
 
   const { isMuted: initialMuted, voiceRegion: initialVoiceRegion } = getInitialStates();
