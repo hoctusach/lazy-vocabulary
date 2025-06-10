@@ -9,7 +9,7 @@ import { createSafeExternalLink } from '@/utils/security/contentSecurity';
 const uploadRateLimiter = new RateLimiter(3, 300000); // 3 uploads per 5 minutes
 
 interface UseFileUploadProps {
-  onFileUploaded: () => void;
+  onFileUploaded: (file: File) => Promise<void>;
 }
 
 export const useFileUpload = ({ onFileUploaded }: UseFileUploadProps) => {
@@ -79,7 +79,8 @@ export const useFileUpload = ({ onFileUploaded }: UseFileUploadProps) => {
           title: "File Uploaded Successfully",
           description: `Uploaded ${file.name} with security validation`,
         });
-        onFileUploaded();
+        // Call the callback with the file
+        await onFileUploaded(file);
       } else {
         setUploadError("Could not process the Excel file. Please check the format and try again.");
         toast({
