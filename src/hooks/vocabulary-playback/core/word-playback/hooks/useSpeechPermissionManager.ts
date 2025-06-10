@@ -25,17 +25,7 @@ export const useSpeechPermissionManager = () => {
       return false;
     }
 
-    // Check if user has interacted with the page
-    const hadUserInteraction = localStorage.getItem('hadUserInteraction') === 'true';
-    if (!hadUserInteraction) {
-      console.log('[PERMISSION-MANAGER] No user interaction detected');
-      if (!permissionErrorShown) {
-        toast.error("Please click anywhere on the page to enable audio playback");
-        setPermissionErrorShown(true);
-      }
-      setHasSpeechPermission(false);
-      return false;
-    }
+
 
     // Simple permission check - just try to speak
     try {

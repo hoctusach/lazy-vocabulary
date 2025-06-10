@@ -23,8 +23,6 @@ export const useUserInteractionEffect = (
         userInteractionRef.current = true;
         initializationDoneRef.current = true;
         
-        // Save interaction state
-        localStorage.setItem('hadUserInteraction', 'true');
         
         // Initialize audio context
         try {
@@ -83,13 +81,7 @@ export const useUserInteractionEffect = (
       }
     };
     
-    // Check for previous interactions
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
-      console.log('[USER-INTERACTION] Previous interaction detected from localStorage');
-      userInteractionRef.current = true;
-      initializationDoneRef.current = true;
-      return;
-    }
+    // No localStorage check required
     
     // Add event listeners for user interaction
     document.addEventListener('click', handleUserInteraction);

@@ -16,6 +16,10 @@ export const useAutoPlayOnDataLoad = ({
 }: AutoPlayProps) => {
   const [hasUserInteracted, setHasUserInteracted] = useState(userInteractionRef.current);
 
+  useEffect(() => {
+    userInteractionRef.current = true;
+  }, []);
+
   // Track changes to the ref in a state variable so effects re-run
   useEffect(() => {
     setHasUserInteracted(userInteractionRef.current);
