@@ -3,7 +3,7 @@ import { VocabularyWord, SheetData } from "@/types/vocabulary";
 
 export class WordNavigation {
   private data: SheetData;
-  private currentSheetName: string = "All words";
+  private currentSheetName: string = "phrasal verbs";
   private shuffledIndices: number[] = [];
   private currentIndex: number = -1;
   private lastWordChangeTime: number = 0;
