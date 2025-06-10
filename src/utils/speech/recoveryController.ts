@@ -14,9 +14,9 @@ class SpeechRecoveryController {
     isRecovering: false
   };
 
-  private readonly MAX_CONSECUTIVE_ERRORS = 3;
-  private readonly ERROR_RESET_TIME = 10000; // 10 seconds
-  private readonly RECOVERY_DELAY = 2000; // 2 seconds
+  private readonly MAX_CONSECUTIVE_ERRORS = 5; // Increased threshold
+  private readonly ERROR_RESET_TIME = 15000; // Longer reset time
+  private readonly RECOVERY_DELAY = 1000; // Shorter recovery delay
 
   handleSpeechError(error: any): boolean {
     console.log('[SPEECH-RECOVERY] Handling speech error:', error);
@@ -33,14 +33,14 @@ class SpeechRecoveryController {
     
     console.log(`[SPEECH-RECOVERY] Consecutive errors: ${this.state.consecutiveErrors}`);
     
-    // If too many errors, enter recovery mode
+    // Only enter recovery mode after many errors
     if (this.state.consecutiveErrors >= this.MAX_CONSECUTIVE_ERRORS) {
       console.log('[SPEECH-RECOVERY] Entering recovery mode');
       this.enterRecoveryMode();
-      return false; // Don't retry
+      return false;
     }
     
-    return true; // Allow retry
+    return true; // Allow retry for fewer errors
   }
 
   private async enterRecoveryMode() {
@@ -50,10 +50,10 @@ class SpeechRecoveryController {
     console.log('[SPEECH-RECOVERY] Starting recovery process');
     
     try {
-      // Stop all current speech
+      // Stop current speech
       directSpeechService.stop();
       
-      // Wait for recovery delay
+      // Shorter recovery delay
       await new Promise(resolve => setTimeout(resolve, this.RECOVERY_DELAY));
       
       // Reset speech synthesis
