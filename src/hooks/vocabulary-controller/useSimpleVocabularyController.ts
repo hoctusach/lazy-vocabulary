@@ -4,9 +4,10 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { directSpeechService } from '@/services/speech/directSpeechService';
 import { speechRecoveryController } from '@/utils/speech/recoveryController';
+import { debug } from '@/utils/logger';
 
 export const useSimpleVocabularyController = () => {
-  console.log('[SIMPLE-VOCAB-CONTROLLER] === Initializing ===');
+  debug('[SIMPLE-VOCAB-CONTROLLER] === Initializing ===');
   
   const [currentWord, setCurrentWord] = useState<VocabularyWord | null>(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -30,7 +31,7 @@ export const useSimpleVocabularyController = () => {
 
   // Stop speech and reset state
   const stopSpeech = useCallback(() => {
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Stopping speech');
+    debug('[SIMPLE-VOCAB-CONTROLLER] Stopping speech');
     directSpeechService.stop();
     setIsSpeaking(false);
     speechInProgressRef.current = false;
@@ -40,7 +41,7 @@ export const useSimpleVocabularyController = () => {
   // Get current word from service
   const refreshCurrentWord = useCallback(() => {
     const word = vocabularyService.getCurrentWord();
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Refreshed current word:', word?.word || 'none');
+    debug('[SIMPLE-VOCAB-CONTROLLER] Refreshed current word:', word?.word || 'none');
     setCurrentWord(word);
     return word;
   }, []);
@@ -50,7 +51,7 @@ export const useSimpleVocabularyController = () => {
     const word = currentWord || refreshCurrentWord();
     
     if (!word || isMuted || isPaused || speechInProgressRef.current) {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Cannot play:', {
+      debug('[SIMPLE-VOCAB-CONTROLLER] Cannot play:', {
         hasWord: !!word,
         isMuted,
         isPaused,
@@ -59,7 +60,7 @@ export const useSimpleVocabularyController = () => {
       return;
     }
 
-    console.log(`[SIMPLE-VOCAB-CONTROLLER] Starting speech for: ${word.word}`);
+    debug(`[SIMPLE-VOCAB-CONTROLLER] Starting speech for: ${word.word}`);
     speechInProgressRef.current = true;
     setIsSpeaking(true);
 
@@ -72,11 +73,11 @@ export const useSimpleVocabularyController = () => {
         meaning: word.meaning,
         example: word.example,
         onStart: () => {
-          console.log(`[SIMPLE-VOCAB-CONTROLLER] Speech started: ${word.word}`);
+          debug(`[SIMPLE-VOCAB-CONTROLLER] Speech started: ${word.word}`);
           speechRecoveryController.handleSpeechSuccess();
         },
         onEnd: () => {
-          console.log(`[SIMPLE-VOCAB-CONTROLLER] Speech completed: ${word.word}`);
+          debug(`[SIMPLE-VOCAB-CONTROLLER] Speech completed: ${word.word}`);
           setIsSpeaking(false);
           speechInProgressRef.current = false;
           
@@ -96,7 +97,7 @@ export const useSimpleVocabularyController = () => {
           const shouldRetry = speechRecoveryController.handleSpeechError(error);
           
           if (!shouldRetry || speechRecoveryController.isInRecoveryMode()) {
-            console.log('[SIMPLE-VOCAB-CONTROLLER] Advancing due to error/recovery');
+            debug('[SIMPLE-VOCAB-CONTROLLER] Advancing due to error/recovery');
             if (!isPaused && !isMuted) {
               autoAdvanceTimeoutRef.current = window.setTimeout(() => {
                 goToNext();
@@ -123,26 +124,26 @@ export const useSimpleVocabularyController = () => {
     const now = Date.now();
     
     // Prevent rapid navigation calls
-    if (now - lastNavigationTimeRef.current < 500) {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Navigation throttled');
+    if (now - lastNavigationTimeRef.current < 200) {
+      debug('[SIMPLE-VOCAB-CONTROLLER] Navigation throttled');
       return;
     }
     
     lastNavigationTimeRef.current = now;
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Going to next word');
+    debug('[SIMPLE-VOCAB-CONTROLLER] Going to next word');
     
     stopSpeech();
     
     // Get next word from service - this should be efficient
     const nextWord = vocabularyService.getNextWord();
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Next word from service:', nextWord?.word || 'none');
+    debug('[SIMPLE-VOCAB-CONTROLLER] Next word from service:', nextWord?.word || 'none');
     setCurrentWord(nextWord);
   }, [stopSpeech]);
 
   // Control functions
   const togglePause = useCallback(() => {
     const newPausedState = !isPaused;
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Toggle pause:', newPausedState);
+    debug('[SIMPLE-VOCAB-CONTROLLER] Toggle pause:', newPausedState);
     setIsPaused(newPausedState);
     
     if (newPausedState) {
@@ -152,7 +153,7 @@ export const useSimpleVocabularyController = () => {
 
   const toggleMute = useCallback(() => {
     const newMutedState = !isMuted;
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Toggle mute:', newMutedState);
+    debug('[SIMPLE-VOCAB-CONTROLLER] Toggle mute:', newMutedState);
     setIsMuted(newMutedState);
     
     if (newMutedState) {
@@ -162,16 +163,16 @@ export const useSimpleVocabularyController = () => {
 
   const toggleVoice = useCallback(() => {
     const newRegion = voiceRegion === 'US' ? 'UK' : 'US';
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Toggle voice to:', newRegion);
+    debug('[SIMPLE-VOCAB-CONTROLLER] Toggle voice to:', newRegion);
     setVoiceRegion(newRegion);
   }, [voiceRegion]);
 
   // Initialize and listen for vocabulary changes
   useEffect(() => {
-    console.log('[SIMPLE-VOCAB-CONTROLLER] Setting up vocabulary listener');
+    debug('[SIMPLE-VOCAB-CONTROLLER] Setting up vocabulary listener');
     
     const handleVocabularyChange = () => {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Vocabulary changed');
+      debug('[SIMPLE-VOCAB-CONTROLLER] Vocabulary changed');
       refreshCurrentWord();
     };
 
@@ -192,7 +193,7 @@ export const useSimpleVocabularyController = () => {
   // Effect to play word when conditions are right - SIMPLIFIED
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && !speechInProgressRef.current) {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Scheduling play for:', currentWord.word);
+      debug('[SIMPLE-VOCAB-CONTROLLER] Scheduling play for:', currentWord.word);
       
       // Small delay to ensure state is stable
       const timeoutId = setTimeout(() => {
@@ -208,7 +209,7 @@ export const useSimpleVocabularyController = () => {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('[SIMPLE-VOCAB-CONTROLLER] Cleaning up');
+      debug('[SIMPLE-VOCAB-CONTROLLER] Cleaning up');
       stopSpeech();
     };
   }, [stopSpeech]);
