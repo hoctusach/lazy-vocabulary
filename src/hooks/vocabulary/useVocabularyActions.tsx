@@ -1,5 +1,4 @@
 
-import { useCallback } from "react";
 import { usePauseActions } from "./usePauseActions";
 import { useWordNavigationActions } from "./useWordNavigation";
 import { useCategoryActions } from "./useCategoryActions";
