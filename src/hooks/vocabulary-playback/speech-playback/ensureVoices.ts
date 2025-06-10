@@ -1,6 +1,4 @@
 
-import { unlockAudio } from '@/utils/speech/core/speechEngine';
-
 // Maximum number of attempts to load voices
 const MAX_VOICE_LOAD_ATTEMPTS = 10;
 
@@ -8,9 +6,6 @@ const MAX_VOICE_LOAD_ATTEMPTS = 10;
 export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise(async (resolve) => {
     console.log('Ensuring voices are loaded...');
-    
-    // First try to unlock audio to ensure proper browser permissions
-    await unlockAudio();
     
     // Helper function to check if voices are available
     const checkVoices = (): SpeechSynthesisVoice[] => {

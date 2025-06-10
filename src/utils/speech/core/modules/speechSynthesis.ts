@@ -1,5 +1,4 @@
 
-import { unlockAudio } from './speechUnlock';
 import { loadVoicesAndWait } from './speechVoiceLoader';
 
 // Enhanced speech function with comprehensive monitoring
@@ -8,9 +7,6 @@ export const speakWithRetry = async (
   maxRetries: number = 2
 ): Promise<boolean> => {
   console.log('[ENGINE] === Starting Enhanced Speech Process ===');
-  
-  // Ensure audio is unlocked
-  await unlockAudio();
   
   // Ensure voices are loaded
   const voices = await loadVoicesAndWait();
