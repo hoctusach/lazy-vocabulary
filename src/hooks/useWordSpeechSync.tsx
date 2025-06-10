@@ -98,7 +98,7 @@ export const useWordSpeechSync = (
         localStorage.setItem('currentDisplayedWord', wordToSpeak.word);
       } catch {}
       const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
-      if (isPaused || isMuted) {
+      if ((isPaused && !forceSpeak) || isMuted) {
         console.log("App was paused/muted while preparing, aborting");
         isSpeakingRef.current = false;
         speechLockRef.current = false;

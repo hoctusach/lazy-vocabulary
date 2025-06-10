@@ -47,10 +47,15 @@ export const useSimpleVocabularyController = () => {
   }, []);
 
   // Play current word function
-  const playCurrentWord = useCallback(async () => {
+  const playCurrentWord = useCallback(async (allowWhenPaused = false) => {
     const word = currentWord || refreshCurrentWord();
     
-    if (!word || isMuted || isPaused || speechInProgressRef.current) {
+    if (
+      !word ||
+      isMuted ||
+      (isPaused && !allowWhenPaused) ||
+      speechInProgressRef.current
+    ) {
       debug('[SIMPLE-VOCAB-CONTROLLER] Cannot play:', {
         hasWord: !!word,
         isMuted,
