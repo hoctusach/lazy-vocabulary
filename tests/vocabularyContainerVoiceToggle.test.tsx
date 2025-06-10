@@ -13,7 +13,7 @@ const controllerState = {
   isPaused: false,
   isMuted: false,
   isSpeaking: false,
-  voiceRegion: 'US' as const,
+  voiceRegion: 'UK' as const,
   togglePause: vi.fn(),
   toggleMute: vi.fn(),
   goToNext: vi.fn(),
@@ -32,15 +32,19 @@ vi.mock('../src/hooks/vocabulary-playback/useVoiceSelection', () => {
   return {
     useVoiceSelection: () => {
       const [selectedVoice, setSelectedVoice] = React.useState({
-        label: 'US',
-        region: 'US' as const,
+        label: 'UK',
+        region: 'UK' as const,
         gender: 'female' as const,
         index: 0,
       });
 
       const cycleVoice = () => {
-        controllerState.toggleVoice();
-        const region = controllerState.voiceRegion;
+        const region =
+          selectedVoice.region === 'US'
+            ? 'UK'
+            : selectedVoice.region === 'UK'
+            ? 'AU'
+            : 'US';
         setSelectedVoice({ label: region, region, gender: 'female', index: 0 });
       };
 
@@ -72,12 +76,12 @@ describe('VocabularyContainer voice toggle', () => {
   it('keeps label and controller.voiceRegion in sync', async () => {
     render(<VocabularyContainer />);
 
-    const toggleBtn = screen.getByRole('button', { name: 'US' });
-    expect(controllerState.voiceRegion).toBe('US');
+    const toggleBtn = screen.getByRole('button', { name: 'UK' });
+    expect(controllerState.voiceRegion).toBe('UK');
 
     await userEvent.click(toggleBtn);
 
-    expect(screen.getByRole('button', { name: 'UK' })).toBeInTheDocument();
-    expect(controllerState.voiceRegion).toBe('UK');
+    expect(screen.getByRole('button', { name: 'AU' })).toBeInTheDocument();
+    expect(controllerState.voiceRegion).toBe('AU');
   });
 });
