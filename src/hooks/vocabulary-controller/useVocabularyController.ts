@@ -2,18 +2,21 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { directSpeechService } from '@/services/speech/directSpeechService';
+import { vocabularyService } from '@/services/vocabularyService';
 import { toast } from 'sonner';
 
 /**
- * Enhanced vocabulary controller with region-specific timing and improved speech management
+ * Primary vocabulary controller - single source of truth for all vocabulary state
  */
-export const useVocabularyController = (wordList: VocabularyWord[]) => {
+export const useVocabularyController = () => {
   // Core state - single source of truth
+  const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK'>('US');
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [hasData, setHasData] = useState(false);
 
   // Refs for immediate state tracking
   const pausedRef = useRef(false);
@@ -29,6 +32,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     voiceRegion,
     isSpeaking,
     wordListLength: wordList.length,
+    hasData,
     currentWord: wordList[currentIndex]?.word
   });
 
@@ -40,7 +44,7 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   const getRegionTiming = useCallback((region: 'US' | 'UK') => {
     return {
       US: {
-        wordInterval: 4000, // Longer interval for US voices
+        wordInterval: 4000,
         errorRetryDelay: 3000,
         resumeDelay: 200
       },
@@ -57,6 +61,51 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     if (autoPlayTimeoutRef.current) {
       clearTimeout(autoPlayTimeoutRef.current);
       autoPlayTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Load vocabulary data
+  const loadVocabularyData = useCallback(async () => {
+    try {
+      const data = await vocabularyService.getAllWords();
+      console.log('[VOCAB-CONTROLLER] Loaded vocabulary data:', data.length, 'words');
+      
+      setWordList(data);
+      setCurrentIndex(0);
+      setHasData(data.length > 0);
+      
+      if (data.length > 0) {
+        console.log('[VOCAB-CONTROLLER] Setting first word:', data[0].word);
+      }
+    } catch (error) {
+      console.error('[VOCAB-CONTROLLER] Error loading vocabulary:', error);
+      toast.error('Failed to load vocabulary data');
+      setWordList([]);
+      setHasData(false);
+    }
+  }, []);
+
+  // Handle file upload
+  const handleFileUploaded = useCallback(async (uploadedWords: VocabularyWord[]) => {
+    console.log('[VOCAB-CONTROLLER] Handling file upload:', uploadedWords.length, 'words');
+    
+    try {
+      // Store the words
+      await vocabularyService.storeWords(uploadedWords);
+      
+      // Update state
+      setWordList(uploadedWords);
+      setCurrentIndex(0);
+      setHasData(uploadedWords.length > 0);
+      
+      toast.success(`Successfully loaded ${uploadedWords.length} words`);
+      
+      if (uploadedWords.length > 0) {
+        console.log('[VOCAB-CONTROLLER] Setting first word after upload:', uploadedWords[0].word);
+      }
+    } catch (error) {
+      console.error('[VOCAB-CONTROLLER] Error handling file upload:', error);
+      toast.error('Failed to process uploaded file');
     }
   }, []);
 
@@ -268,6 +317,11 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     }
   }, [currentWord, playCurrentWord, clearAutoPlay, getRegionTiming, voiceRegion]);
 
+  // Initialize on mount
+  useEffect(() => {
+    loadVocabularyData();
+  }, [loadVocabularyData]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -278,12 +332,14 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
 
   return {
     // State
+    wordList,
     currentWord,
     currentIndex,
     isPaused,
     isMuted,
     voiceRegion,
     isSpeaking,
+    hasData,
     
     // Navigation
     goToNext,
@@ -294,6 +350,10 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
     toggleMute,
     toggleVoice,
     playCurrentWord,
+    
+    // Data management
+    loadVocabularyData,
+    handleFileUploaded,
     
     // Utils
     wordCount: wordList.length

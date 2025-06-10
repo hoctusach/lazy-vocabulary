@@ -6,7 +6,7 @@ import EditWordButton from './EditWordButton';
 import MobileChromeNotices from './MobileChromeNotices';
 
 interface WordActionButtonsProps {
-  currentWord: VocabularyWord;
+  currentWord: VocabularyWord | null;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
 }
@@ -20,7 +20,10 @@ const WordActionButtons: React.FC<WordActionButtonsProps> = ({
     <div className="w-full">
       {/* Action buttons container */}
       <div className="flex justify-center gap-2 mb-2">
-        <EditWordButton onClick={onOpenEditModal} />
+        <EditWordButton 
+          onClick={onOpenEditModal} 
+          disabled={!currentWord}
+        />
         <AddWordButton onClick={onOpenAddModal} />
       </div>
       
