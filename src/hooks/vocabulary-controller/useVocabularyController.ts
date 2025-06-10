@@ -50,9 +50,14 @@ export const useVocabularyController = (wordList: VocabularyWord[]) => {
   }, [clearTimeouts]);
 
   // Play current word function
-  const playCurrentWord = useCallback(async () => {
+  const playCurrentWord = useCallback(async (allowWhenPaused = false) => {
     // Prevent multiple simultaneous speech attempts
-    if (speechInProgressRef.current || !currentWord || isMuted || isPaused) {
+    if (
+      speechInProgressRef.current ||
+      !currentWord ||
+      isMuted ||
+      (isPaused && !allowWhenPaused)
+    ) {
       debug('[VOCAB-CONTROLLER] Skipping speech:', {
         speechInProgress: speechInProgressRef.current,
         hasWord: !!currentWord,
