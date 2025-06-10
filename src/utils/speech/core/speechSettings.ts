@@ -18,7 +18,7 @@ export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
 export const getSpeechRate = (): number => {
   const region = getVoiceRegionFromStorage();
   if (region === 'US' || region === 'AU') {
-    return 0.7;
+    return 0.6;
   }
   return 1.0;
 };

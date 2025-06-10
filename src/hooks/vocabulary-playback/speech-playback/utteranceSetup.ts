@@ -64,7 +64,7 @@ export const createUtterance = (
     }
     
     // Configure speech properties for much slower, clearer speech
-    utterance.rate = 0.7;   // Much slower rate for better comprehension
+    utterance.rate = 0.6;   // Much slower rate for better comprehension
     utterance.pitch = 1.0;  // Default pitch
     utterance.volume = 1.0; // Full volume
     
