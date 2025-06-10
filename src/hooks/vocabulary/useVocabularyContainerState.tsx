@@ -8,7 +8,8 @@ export const useVocabularyContainerState = () => {
   console.log('[VOCAB-CONTAINER-STATE] === Hook Initialization ===');
 
   // File and data loading state
-  const [hasData, setHasData] = useState(false);
+  const [hasData, setHasData] = useState(false); // data in current category
+  const [hasAnyData, setHasAnyData] = useState(false); // data in any category
   const [jsonLoadError, setJsonLoadError] = useState<string | null>(null);
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
 
@@ -32,11 +33,13 @@ export const useVocabularyContainerState = () => {
 
       setWordList(initialWordList);
       setHasData(initialWordList.length > 0);
+      setHasAnyData(vocabularyService.hasData());
       setJsonLoadError(null);
     } catch (error) {
       console.error('[VOCAB-CONTAINER-STATE] Error loading initial data:', error);
       setJsonLoadError('Failed to load vocabulary data');
       setHasData(false);
+      setHasAnyData(false);
       setWordList([]);
     }
   }, []);
@@ -52,6 +55,7 @@ export const useVocabularyContainerState = () => {
         
         setWordList(updatedWordList);
         setHasData(updatedWordList.length > 0);
+        setHasAnyData(vocabularyService.hasData());
         setJsonLoadError(null);
       } catch (error) {
         console.error('[VOCAB-CONTAINER-STATE] Error updating from service:', error);
@@ -81,14 +85,17 @@ export const useVocabularyContainerState = () => {
         console.log('[VOCAB-CONTAINER-STATE] File loaded successfully, words:', newWordList.length);
         setWordList(newWordList);
         setHasData(true);
+        setHasAnyData(vocabularyService.hasData());
       } else {
         setJsonLoadError('Failed to load vocabulary file');
         setHasData(false);
+        setHasAnyData(vocabularyService.hasData());
       }
     } catch (error) {
       console.error('[VOCAB-CONTAINER-STATE] File upload error:', error);
       setJsonLoadError(error instanceof Error ? error.message : 'Unknown error occurred');
       setHasData(false);
+      setHasAnyData(vocabularyService.hasData());
     }
   }, []);
 
@@ -108,16 +115,19 @@ export const useVocabularyContainerState = () => {
         
         setWordList(newWordList);
         setHasData(newWordList.length > 0);
+        setHasAnyData(vocabularyService.hasData());
         
         // Clear any previous errors since category switch was successful
         setJsonLoadError(null);
       } else {
         console.warn('[VOCAB-CONTAINER-STATE] Category switch failed');
         setJsonLoadError('Failed to switch category');
+        setHasAnyData(vocabularyService.hasData());
       }
     } catch (error) {
       console.error('[VOCAB-CONTAINER-STATE] Error switching category:', error);
       setJsonLoadError('Error switching category');
+      setHasAnyData(vocabularyService.hasData());
     }
   }, [currentCategory]);
 
@@ -142,6 +152,7 @@ export const useVocabularyContainerState = () => {
 
   return {
     hasData,
+    hasAnyData,
     handleFileUploaded,
     jsonLoadError,
     handleSwitchCategory,

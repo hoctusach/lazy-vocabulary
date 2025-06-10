@@ -98,7 +98,9 @@ export class VocabularyDataManager {
           const fallbackData: SheetData = {
             "phrasal verbs": [],
             "idioms": [],
-            "advanced words": []
+            "advanced words": [],
+            "grammar": [],
+            "phrases, collocations": []
           };
           this.data = this.dataProcessor.processDataTypes(fallbackData);
           this.storage.saveData(this.data);

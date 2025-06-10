@@ -14,6 +14,7 @@ const VocabularyContainer: React.FC = () => {
   const containerState = useVocabularyContainerState();
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData: containerState.hasData,
+    hasAnyData: containerState.hasAnyData,
     currentCategory: containerState.currentCategory
   });
 
@@ -50,8 +51,8 @@ const VocabularyContainer: React.FC = () => {
     containerState.handleSwitchCategory();
   };
 
-  // Show file upload if no data
-  if (!containerState.hasData) {
+  // Show file upload if no data at all
+  if (!containerState.hasAnyData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="text-center space-y-4">
@@ -61,6 +62,15 @@ const VocabularyContainer: React.FC = () => {
           </p>
         </div>
         <FileUpload onFileUploaded={handleOptimizedFileUpload} />
+      </div>
+    );
+  }
+
+  // Show message if category has no words
+  if (!containerState.hasData) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-gray-600">No data for this category</p>
       </div>
     );
   }

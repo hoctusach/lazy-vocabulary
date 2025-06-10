@@ -14201,5 +14201,21 @@
     "example": "She’s a consultant cardiologist.",
     "count": 0
     }
+  ],
+  "grammar": [
+    {
+      "word": "present perfect",
+      "meaning": "a tense used for actions that happened at an unspecified time",
+      "example": "I have visited France twice.",
+      "count": 0
+    }
+  ],
+  "phrases, collocations": [
+    {
+      "word": "make up one's mind",
+      "meaning": "decide after consideration",
+      "example": "She couldn't make up her mind about the dress.",
+      "count": 0
+    }
   ]
 }

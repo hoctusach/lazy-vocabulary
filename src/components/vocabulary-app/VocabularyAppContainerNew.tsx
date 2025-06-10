@@ -14,6 +14,7 @@ const VocabularyAppContainerNew: React.FC = () => {
   // Get base vocabulary state (file handling, categories, etc.)
   const {
     hasData,
+    hasAnyData,
     handleFileUploaded,
     jsonLoadError,
     handleSwitchCategory,
@@ -25,6 +26,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   console.log('[VOCAB-CONTAINER-NEW] Container state:', {
     hasData,
+    hasAnyData,
     wordListLength: wordList?.length || 0,
     currentCategory
   });
@@ -125,7 +127,11 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
       ) : (
-        <p>Loading vocabulary…</p>
+        hasAnyData ? (
+          <p>No data for this category</p>
+        ) : (
+          <p>Loading vocabulary…</p>
+        )
       )}
     </VocabularyLayout>
   );
