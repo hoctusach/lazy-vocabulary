@@ -64,10 +64,10 @@ export const useVocabularyController = () => {
     }
   }, []);
 
-  // Load vocabulary data
+  // Load vocabulary data using the correct method
   const loadVocabularyData = useCallback(async () => {
     try {
-      const data = await vocabularyService.getAllWords();
+      const data = vocabularyService.getWordList();
       console.log('[VOCAB-CONTROLLER] Loaded vocabulary data:', data.length, 'words');
       
       setWordList(data);
@@ -85,23 +85,25 @@ export const useVocabularyController = () => {
     }
   }, []);
 
-  // Handle file upload
+  // Handle file upload using existing vocabulary service methods
   const handleFileUploaded = useCallback(async (uploadedWords: VocabularyWord[]) => {
     console.log('[VOCAB-CONTROLLER] Handling file upload:', uploadedWords.length, 'words');
     
     try {
-      // Store the words
-      await vocabularyService.storeWords(uploadedWords);
+      // Create custom data structure and merge it
+      const customData = { 'Custom Words': uploadedWords };
+      vocabularyService.mergeCustomWords(customData);
       
-      // Update state
-      setWordList(uploadedWords);
+      // Get updated word list
+      const updatedData = vocabularyService.getWordList();
+      setWordList(updatedData);
       setCurrentIndex(0);
-      setHasData(uploadedWords.length > 0);
+      setHasData(updatedData.length > 0);
       
       toast.success(`Successfully loaded ${uploadedWords.length} words`);
       
-      if (uploadedWords.length > 0) {
-        console.log('[VOCAB-CONTROLLER] Setting first word after upload:', uploadedWords[0].word);
+      if (updatedData.length > 0) {
+        console.log('[VOCAB-CONTROLLER] Setting first word after upload:', updatedData[0].word);
       }
     } catch (error) {
       console.error('[VOCAB-CONTROLLER] Error handling file upload:', error);
@@ -291,6 +293,23 @@ export const useVocabularyController = () => {
     
     toast.success(`Voice changed to ${newRegion}`);
   }, [voiceRegion, playCurrentWord, getRegionTiming]);
+
+  // Listen to vocabulary service changes
+  useEffect(() => {
+    const handleVocabularyChange = () => {
+      console.log('[VOCAB-CONTROLLER] Vocabulary service updated');
+      const updatedData = vocabularyService.getWordList();
+      setWordList(updatedData);
+      setHasData(updatedData.length > 0);
+      // Reset to first word when vocabulary changes
+      setCurrentIndex(0);
+    };
+
+    vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
+    return () => {
+      vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
+    };
+  }, []);
 
   // Enhanced auto-play effect with region-specific timing
   useEffect(() => {
