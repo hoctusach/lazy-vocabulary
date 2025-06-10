@@ -39,8 +39,12 @@ vi.mock('../src/hooks/vocabulary-playback/useVoiceSelection', () => {
       });
 
       const cycleVoice = () => {
-        controllerState.toggleVoice();
-        const region = controllerState.voiceRegion;
+        const region =
+          selectedVoice.region === 'US'
+            ? 'UK'
+            : selectedVoice.region === 'UK'
+            ? 'AU'
+            : 'US';
         setSelectedVoice({ label: region, region, gender: 'female', index: 0 });
       };
 
