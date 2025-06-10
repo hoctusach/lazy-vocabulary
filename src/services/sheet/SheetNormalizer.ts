@@ -10,6 +10,7 @@ export class SheetNormalizer {
   normalizeSheetName(name: string): string {
     const normalized = name.toLowerCase().trim();
     
+    if (normalized === "all" || normalized === "all words") return "All words";
     if (normalized.includes("phrasal") || normalized.includes("verb")) return "phrasal verbs";
     if (normalized.includes("idiom")) return "idioms";
     if (normalized.includes("advanced")) return "advanced words";
