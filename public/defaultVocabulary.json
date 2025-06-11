@@ -14262,6 +14262,65 @@
     "meaning": "Structures used to express criticism, inability, formal desires, or to wish someone success. (Các cấu trúc dùng với wish để phê phán, thể hiện ước muốn hoặc chúc ai đó)",
     "example": "I wish I could find a job that pays well.",
     "count": 0
+    },
+    "word": "Reporting - Tense changes (phrase)",
+    "meaning": "When the reporting verb is in the past, we usually shift the original tense back. (Khi động từ tường thuật ở thì quá khứ, thì của câu gốc thường bị lùi lại một thì)",
+    "example": "Sam doesn’t play hockey → Fiona said that Sam didn’t play hockey.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Modal and semi-modal changes (phrase)",
+    "meaning": "When reporting speech with modals, some modal verbs change form. (Một số động từ khuyết thiếu thay đổi trong câu tường thuật)",
+    "example": "'I could swim,' she said → She said she could swim.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Modal and semi-modal change table (reference)",
+    "meaning": "Detailed list of modal/semi-modal verb changes in reported speech. (Danh sách các động từ khuyết thiếu thay đổi trong câu tường thuật)",
+    "example": "will/shall → would; can → could; must → had to / be to / should; have to → had to; don’t/doesn’t have to → didn’t have to; mustn’t → mustn’t / were not to / shouldn’t; may → might; am/is/are going to → was/were going to. Example 1: 'I will call you,' she said. → She said she would call me. Example 2: 'You must finish the work,' he said. → He said I had to finish the work.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Must and mustn’t changes (phrase)",
+    "meaning": "‘Must’ becomes ‘had to’, ‘were to’, or ‘should’ when expressing obligation. ‘Mustn’t’ becomes ‘mustn’t’, ‘were not to’, or ‘shouldn’t’. (Must → had to / should; Mustn’t → mustn’t / shouldn’t)",
+    "example": "‘You mustn’t cheat,’ said the coach. → We were told that we mustn’t / were not to / shouldn’t cheat.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Pronoun and determiner changes (phrase)",
+    "meaning": "Pronouns and determiners often change to reflect the new speaker or perspective. (Đại từ và từ xác định thường thay đổi để phản ánh người nói mới)",
+    "example": "It’s my turn. → Eddie pointed out that it was his turn.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Time and place changes (phrase)",
+    "meaning": "Time/place words are often shifted back in reported speech. (Các từ chỉ thời gian/địa điểm thường bị lùi lại)",
+    "example": "We’ll meet here tomorrow. → He said they would meet there the next day.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Reported questions (phrase)",
+    "meaning": "Questions lose question marks and follow normal word order. (Câu hỏi gián tiếp không dùng dấu hỏi và theo trật tự câu khẳng định)",
+    "example": "‘What time did the match start?’ → Jimmy asked what time the match had started.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Reported commands and requests (phrase)",
+    "meaning": "Commands use tell/order/ask + to-infinitive in reported speech. (Mệnh lệnh và yêu cầu dùng tell/order/ask + to V trong câu tường thuật)",
+    "example": "Put the cricket bats away! → Alex told me to put the cricket bats away.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Reporting verbs (phrase)",
+    "meaning": "Different reporting verbs follow different grammatical patterns. (Các động từ tường thuật khác nhau đi với các cấu trúc ngữ pháp khác nhau)",
+    "example": "Verbs include: accuse, admit, advise, agree, deny, explain, insist, suggest, tell, warn.",
+    "count": 0
+    },
+    {
+    "word": "Reporting - Modal and semi-modal change table (reference)",
+    "meaning": "Detailed list of modal/semi-modal verb changes in reported speech. (Danh sách các động từ khuyết thiếu thay đổi trong câu tường thuật)",
+    "example": "will/shall → would; can → could; must → had to / be to / should; have to → had to; don’t/doesn’t have to → didn’t have to; mustn’t → mustn’t / were not to / shouldn’t; may → might; am/is/are going to → was/were going to. Example 1: 'I will call you,' she said. → She said she would call me. Example 2: 'You must finish the work,' he said. → He said I had to finish the work.",
+    "count": 0
     }
   ],
   "phrases, collocations": [     
