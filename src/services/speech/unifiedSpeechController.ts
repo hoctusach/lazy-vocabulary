@@ -1,0 +1,274 @@
+
+import { VocabularyWord } from '@/types/vocabulary';
+
+interface SpeechState {
+  isActive: boolean;
+  isPaused: boolean;
+  isMuted: boolean;
+  currentWord: VocabularyWord | null;
+  currentUtterance: SpeechSynthesisUtterance | null;
+}
+
+type StateChangeListener = (state: SpeechState) => void;
+
+/**
+ * Unified Speech Controller - Single source of truth for all speech operations
+ * Replaces all fragmented speech controllers and ensures consistent state
+ */
+class UnifiedSpeechController {
+  private state: SpeechState = {
+    isActive: false,
+    isPaused: false,
+    isMuted: false,
+    currentWord: null,
+    currentUtterance: null
+  };
+
+  private listeners: Set<StateChangeListener> = new Set();
+  private autoAdvanceTimer: number | null = null;
+  private onWordComplete: (() => void) | null = null;
+
+  // Subscribe to state changes
+  subscribe(listener: StateChangeListener): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  // Get current state
+  getState(): SpeechState {
+    return { ...this.state };
+  }
+
+  // Set word completion callback
+  setWordCompleteCallback(callback: (() => void) | null): void {
+    this.onWordComplete = callback;
+  }
+
+  private notifyListeners(): void {
+    this.listeners.forEach(listener => listener({ ...this.state }));
+  }
+
+  // Clear any pending auto-advance
+  private clearAutoAdvance(): void {
+    if (this.autoAdvanceTimer) {
+      clearTimeout(this.autoAdvanceTimer);
+      this.autoAdvanceTimer = null;
+    }
+  }
+
+  // Schedule auto-advance with proper debouncing
+  private scheduleAutoAdvance(delay: number = 1500): void {
+    this.clearAutoAdvance();
+    
+    if (this.state.isPaused || this.state.isMuted) {
+      console.log('[UNIFIED-SPEECH] Skipping auto-advance - paused or muted');
+      return;
+    }
+
+    this.autoAdvanceTimer = window.setTimeout(() => {
+      this.autoAdvanceTimer = null;
+      if (this.onWordComplete && !this.state.isPaused && !this.state.isMuted) {
+        console.log('[UNIFIED-SPEECH] Auto-advancing to next word');
+        this.onWordComplete();
+      }
+    }, delay);
+  }
+
+  // Create formatted speech text
+  private createSpeechText(word: VocabularyWord): string {
+    const cleanText = (text: string) => text.trim().replace(/\s+/g, ' ');
+    
+    const wordText = cleanText(word.word);
+    const meaningText = cleanText(word.meaning);
+    const exampleText = cleanText(word.example);
+    
+    return `${wordText}. ${meaningText}. ${exampleText}`;
+  }
+
+  // Find voice by region
+  private findVoice(region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null {
+    const voices = window.speechSynthesis?.getVoices() || [];
+    
+    const regionMap = {
+      'US': ['en-US', 'en_US'],
+      'UK': ['en-GB', 'en_GB'], 
+      'AU': ['en-AU', 'en_AU']
+    };
+
+    const langCodes = regionMap[region];
+    return voices.find(voice => 
+      langCodes.some(code => voice.lang.includes(code))
+    ) || voices.find(voice => voice.lang.startsWith('en')) || null;
+  }
+
+  // Main speak method
+  async speak(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
+    console.log(`[UNIFIED-SPEECH] Speaking word: ${word.word}`);
+
+    // Check if we can speak
+    if (this.state.isMuted) {
+      console.log('[UNIFIED-SPEECH] Skipping - muted');
+      this.scheduleAutoAdvance(3000);
+      return false;
+    }
+
+    if (this.state.isPaused) {
+      console.log('[UNIFIED-SPEECH] Skipping - paused');
+      return false;
+    }
+
+    if (this.state.isActive) {
+      console.log('[UNIFIED-SPEECH] Already speaking, stopping current speech');
+      this.stop();
+    }
+
+    // Check browser support
+    if (!window.speechSynthesis) {
+      console.error('[UNIFIED-SPEECH] Speech synthesis not supported');
+      this.scheduleAutoAdvance(2000);
+      return false;
+    }
+
+    return new Promise((resolve) => {
+      try {
+        const speechText = this.createSpeechText(word);
+        const utterance = new SpeechSynthesisUtterance(speechText);
+        
+        // Configure utterance
+        const voice = this.findVoice(voiceRegion);
+        if (voice) utterance.voice = voice;
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // Set up event handlers
+        utterance.onstart = () => {
+          console.log(`[UNIFIED-SPEECH] ✓ Speech started for: ${word.word}`);
+          this.state.isActive = true;
+          this.state.currentWord = word;
+          this.state.currentUtterance = utterance;
+          this.notifyListeners();
+        };
+
+        utterance.onend = () => {
+          console.log(`[UNIFIED-SPEECH] ✓ Speech completed for: ${word.word}`);
+          this.state.isActive = false;
+          this.state.currentWord = null;
+          this.state.currentUtterance = null;
+          this.notifyListeners();
+          
+          // Schedule auto-advance
+          this.scheduleAutoAdvance();
+          resolve(true);
+        };
+
+        utterance.onerror = (event) => {
+          console.error(`[UNIFIED-SPEECH] ✗ Speech error:`, event.error);
+          this.state.isActive = false;
+          this.state.currentWord = null;
+          this.state.currentUtterance = null;
+          this.notifyListeners();
+          
+          // Schedule auto-advance on error
+          if (event.error !== 'canceled') {
+            this.scheduleAutoAdvance(2000);
+          }
+          resolve(false);
+        };
+
+        // Store current utterance and start speaking
+        this.state.currentUtterance = utterance;
+        window.speechSynthesis.speak(utterance);
+
+        // Fallback timeout
+        setTimeout(() => {
+          if (this.state.currentUtterance === utterance && !this.state.isActive) {
+            console.warn('[UNIFIED-SPEECH] Speech may have failed silently');
+            resolve(false);
+          }
+        }, 1000);
+
+      } catch (error) {
+        console.error('[UNIFIED-SPEECH] Error in speak method:', error);
+        this.state.isActive = false;
+        this.state.currentWord = null;
+        this.state.currentUtterance = null;
+        this.notifyListeners();
+        this.scheduleAutoAdvance(2000);
+        resolve(false);
+      }
+    });
+  }
+
+  // Stop speech
+  stop(): void {
+    console.log('[UNIFIED-SPEECH] Stopping speech');
+    
+    this.clearAutoAdvance();
+    
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+
+    // Clear utterance callbacks
+    if (this.state.currentUtterance) {
+      this.state.currentUtterance.onend = null;
+      this.state.currentUtterance.onerror = null;
+      this.state.currentUtterance.onstart = null;
+    }
+
+    this.state.isActive = false;
+    this.state.currentWord = null;
+    this.state.currentUtterance = null;
+    this.notifyListeners();
+  }
+
+  // Pause speech
+  pause(): void {
+    console.log('[UNIFIED-SPEECH] Pausing speech');
+    this.clearAutoAdvance();
+    
+    if (this.state.isActive && window.speechSynthesis?.speaking) {
+      window.speechSynthesis.pause();
+    }
+    
+    this.state.isPaused = true;
+    this.notifyListeners();
+  }
+
+  // Resume speech
+  resume(): void {
+    console.log('[UNIFIED-SPEECH] Resuming speech');
+    
+    this.state.isPaused = false;
+    this.notifyListeners();
+    
+    if (window.speechSynthesis?.paused) {
+      window.speechSynthesis.resume();
+    }
+  }
+
+  // Toggle mute
+  setMuted(muted: boolean): void {
+    console.log(`[UNIFIED-SPEECH] Setting muted: ${muted}`);
+    
+    if (muted && this.state.isActive) {
+      this.stop();
+    }
+    
+    this.state.isMuted = muted;
+    this.notifyListeners();
+    
+    if (muted) {
+      this.clearAutoAdvance();
+    }
+  }
+
+  // Check if currently active
+  isCurrentlyActive(): boolean {
+    return this.state.isActive;
+  }
+}
+
+// Export singleton instance
+export const unifiedSpeechController = new UnifiedSpeechController();

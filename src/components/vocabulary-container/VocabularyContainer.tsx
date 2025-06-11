@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useVocabularyContainerState } from '@/hooks/vocabulary/useVocabularyContainerState';
-import { useSimpleVocabularyController } from '@/hooks/vocabulary-controller/useSimpleVocabularyController';
+import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
 import { useVoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import VocabularyCard from '../VocabularyCard';
 import FileUpload from '../FileUpload';
@@ -18,53 +18,38 @@ const VocabularyContainer: React.FC = () => {
     currentCategory: containerState.currentCategory
   });
 
-  // Voice selection
-  const { selectedVoice, cycleVoice } = useVoiceSelection();
-  const nextVoiceLabel =
-    selectedVoice.region === 'UK'
-      ? 'US'
-      : selectedVoice.region === 'US'
-      ? 'AU'
-      : 'US';
-
-  // Get controller state (simplified version)
-  const controllerState = useSimpleVocabularyController();
+  // Use unified controller instead of the old fragmented one
+  const controllerState = useUnifiedVocabularyController();
   
-  console.log('[VOCAB-CONTAINER] Controller state:', {
+  console.log('[VOCAB-CONTAINER] Unified controller state:', {
     currentWord: controllerState.currentWord?.word || 'none',
     isPaused: controllerState.isPaused,
     isMuted: controllerState.isMuted,
     voiceRegion: controllerState.voiceRegion,
-    isSpeaking: controllerState.isSpeaking
+    isSpeaking: controllerState.isSpeaking,
+    hasData: controllerState.hasData
   });
+
+  // Voice selection for display purposes
+  const { selectedVoice } = useVoiceSelection();
+  const nextVoiceLabel =
+    controllerState.voiceRegion === 'UK'
+      ? 'US'
+      : controllerState.voiceRegion === 'US'
+      ? 'AU'
+      : 'UK';
 
   // Category navigation
   const { currentCategory, nextCategory } = useCategoryNavigation();
 
-  // Cycle through available voices and update controller
-  const handleCycleVoice = () => {
-    cycleVoice();
-    controllerState.toggleVoice();
-  };
-
-  // Optimized file upload handler that prevents excessive processing - now async
+  // Optimized file upload handler
   const handleOptimizedFileUpload = async (file: File) => {
     console.log('[VOCAB-CONTAINER] Optimized file upload handler called');
     await containerState.handleFileUploaded(file);
   };
 
-  // Optimized category switch handler
-  const handleOptimizedCategorySwitch = () => {
-    console.log('[VOCAB-CONTAINER] Optimized category switch handler called');
-    // Stop current speech before switching
-    if (controllerState.isSpeaking) {
-      console.log('[VOCAB-CONTAINER] Stopping speech before category switch');
-    }
-    containerState.handleSwitchCategory();
-  };
-
   // Show file upload if no data at all
-  if (!containerState.hasAnyData) {
+  if (!containerState.hasAnyData && !controllerState.hasData) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="text-center space-y-4">
@@ -79,7 +64,7 @@ const VocabularyContainer: React.FC = () => {
   }
 
   // Show message if category has no words
-  if (!containerState.hasData) {
+  if (!containerState.hasData && !controllerState.hasData) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <p className="text-gray-600">No data for this category</p>
@@ -111,8 +96,8 @@ const VocabularyContainer: React.FC = () => {
         isSpeaking={controllerState.isSpeaking}
         onToggleMute={controllerState.toggleMute}
         onTogglePause={controllerState.togglePause}
-        onCycleVoice={handleCycleVoice}
-        onSwitchCategory={handleOptimizedCategorySwitch}
+        onCycleVoice={controllerState.toggleVoice}
+        onSwitchCategory={controllerState.switchCategory}
         onNextWord={controllerState.goToNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
