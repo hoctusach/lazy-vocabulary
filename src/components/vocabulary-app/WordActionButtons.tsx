@@ -16,13 +16,18 @@ const WordActionButtons: React.FC<WordActionButtonsProps> = ({
   onOpenEditModal
 }) => {
   return (
-    <div className="flex items-center justify-center gap-2 my-2">
-      <EditWordButton 
-        onClick={onOpenEditModal} 
-        disabled={!currentWord}
-      />
-      <AddWordButton onClick={onOpenAddModal} />
-    </div>
+    <>
+      <div className="flex items-center justify-center gap-2 my-2">
+        <EditWordButton
+          onClick={onOpenEditModal}
+          disabled={!currentWord}
+        />
+        <AddWordButton onClick={onOpenAddModal} />
+      </div>
+      <p className="text-xs italic text-gray-500 text-center">
+        On Mobile, only Australia voice available (to be enhanced)
+      </p>
+    </>
   );
 };
 
