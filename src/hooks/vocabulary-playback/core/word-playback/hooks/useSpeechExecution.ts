@@ -1,5 +1,5 @@
 
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { useSpeechController } from './speech-execution/useSpeechController';
@@ -54,7 +54,8 @@ export const useSpeechExecution = (
 
   const executeSpeech = useCallback(async (
     currentWord: VocabularyWord,
-    speechText: string
+    speechText: string,
+    setPlayInProgress: (inProgress: boolean) => void
   ): Promise<boolean> => {
     const sessionId = Math.random().toString(36).substring(7);
     console.log(`[SPEECH-EXECUTION-${sessionId}] Starting execution for: "${currentWord.word}"`);

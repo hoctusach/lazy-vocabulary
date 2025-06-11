@@ -1,3 +1,4 @@
+
 import { SheetData, VocabularyWord } from "@/types/vocabulary";
 import { sanitizeInput, validateVocabularyWord, validateMeaning, validateExample } from "@/utils/security/inputValidation";
 import { shouldBypassValidation, prepareTextForDisplay } from "@/utils/text/contentFilters";
@@ -100,7 +101,7 @@ export class TypeProcessor {
               word: prepareTextForDisplay(wordValidation.sanitizedValue!),
               meaning: prepareTextForDisplay(meaningValidation.sanitizedValue!),
               example: prepareTextForDisplay(exampleValidation.sanitizedValue!),
-              count: this.wordValidator.sanitizeCount(word.count),
+              count: this.wordValidator.sanitizeCount(String(word.count || 0)),
               category: sanitizeInput(String(word.category || sanitizedSheetName))
             };
             

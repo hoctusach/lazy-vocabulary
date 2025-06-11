@@ -127,6 +127,9 @@ export const useUtteranceSetup = ({
                 setHasSpeechPermission,
                 permissionErrorShownRef,
                 goToNextWord,
+                scheduleAutoAdvance,
+                lastManualActionTimeRef,
+                autoAdvanceTimerRef,
                 muted,
                 paused,
                 incrementRetryAttempts
@@ -169,6 +172,9 @@ export const useUtteranceSetup = ({
                 setHasSpeechPermission,
                 permissionErrorShownRef,
                 goToNextWord,
+                scheduleAutoAdvance,
+                lastManualActionTimeRef,
+                autoAdvanceTimerRef,
                 muted,
                 paused,
                 incrementRetryAttempts

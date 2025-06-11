@@ -181,7 +181,6 @@ const VocabularyAppContainer: React.FC = () => {
           handleManualNext={handleManualNext}
           displayTime={displayTime}
           selectedVoice={selectedVoice}
-          nextVoiceLabel={nextVoiceLabel}
           debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}

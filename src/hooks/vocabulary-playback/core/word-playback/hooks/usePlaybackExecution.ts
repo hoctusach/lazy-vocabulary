@@ -40,13 +40,11 @@ export const usePlaybackExecution = (
     speakingRef,
     resetRetryAttempts,
     incrementRetryAttempts,
-    goToNextWord,
-    scheduleAutoAdvance,
-    lastManualActionTimeRef,
-    autoAdvanceTimerRef,
     paused,
     muted,
-    wordTransitionRef
+    wordTransitionRef,
+    goToNextWord,
+    scheduleAutoAdvance
   );
 
   const executePlayback = useCallback(async (
