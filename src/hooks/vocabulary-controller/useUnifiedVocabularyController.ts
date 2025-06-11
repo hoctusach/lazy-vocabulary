@@ -12,6 +12,7 @@ export const useUnifiedVocabularyController = () => {
   // Core vocabulary state
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const currentWord = wordList[currentIndex] || null;
   const [hasData, setHasData] = useState(false);
   
   // Control state
@@ -121,9 +122,6 @@ export const useUnifiedVocabularyController = () => {
       unifiedSpeechController.setWordCompleteCallback(null);
     };
   }, [scheduleAutoAdvance]);
-
-  // Get current word
-  const currentWord = wordList[currentIndex] || null;
 
   // Go to next word with proper timer management
   const goToNext = useCallback(() => {
