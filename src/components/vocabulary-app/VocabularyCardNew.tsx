@@ -135,7 +135,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
               className="h-6 text-xs px-2 text-indigo-700 bg-indigo-50"
             >
               <SkipForward size={12} className="mr-1" />
-              Next Word
+              Next
             </Button>
             
             <Button
