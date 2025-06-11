@@ -2,7 +2,6 @@
 import React from 'react';
 import { useVocabularyContainerState } from '@/hooks/vocabulary/useVocabularyContainerState';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
-import { useVoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import VocabularyCard from '../VocabularyCard';
 import FileUpload from '../FileUpload';
 import { useCategoryNavigation } from '@/hooks/vocabulary/useCategoryNavigation';
@@ -18,7 +17,7 @@ const VocabularyContainer: React.FC = () => {
     currentCategory: containerState.currentCategory
   });
 
-  // Use unified controller instead of the old fragmented one
+  // Use ONLY unified controller - no more dual controller architecture
   const controllerState = useUnifiedVocabularyController();
   
   console.log('[VOCAB-CONTAINER] Unified controller state:', {
@@ -30,8 +29,6 @@ const VocabularyContainer: React.FC = () => {
     hasData: controllerState.hasData
   });
 
-  // Voice selection for display purposes
-  const { selectedVoice } = useVoiceSelection();
   const nextVoiceLabel =
     controllerState.voiceRegion === 'UK'
       ? 'US'
@@ -101,7 +98,7 @@ const VocabularyContainer: React.FC = () => {
         onNextWord={controllerState.goToNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
-        selectedVoice={selectedVoice}
+        selectedVoice={{ region: controllerState.voiceRegion }}
         nextVoiceLabel={nextVoiceLabel}
         category={controllerState.currentWord.category}
       />

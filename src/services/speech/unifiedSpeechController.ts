@@ -13,7 +13,7 @@ type StateChangeListener = (state: SpeechState) => void;
 
 /**
  * Unified Speech Controller - Single source of truth for all speech operations
- * Replaces all fragmented speech controllers and ensures consistent state
+ * Fixed version with improved auto-advance timer management
  */
 class UnifiedSpeechController {
   private state: SpeechState = {
@@ -48,16 +48,18 @@ class UnifiedSpeechController {
     this.listeners.forEach(listener => listener({ ...this.state }));
   }
 
-  // Clear any pending auto-advance
+  // Clear any pending auto-advance - CRITICAL for preventing fast playback
   private clearAutoAdvance(): void {
     if (this.autoAdvanceTimer) {
       clearTimeout(this.autoAdvanceTimer);
       this.autoAdvanceTimer = null;
+      console.log('[UNIFIED-SPEECH] Auto-advance timer cleared');
     }
   }
 
   // Schedule auto-advance with proper debouncing
   private scheduleAutoAdvance(delay: number = 1500): void {
+    // ALWAYS clear existing timer first to prevent multiple timers
     this.clearAutoAdvance();
     
     if (this.state.isPaused || this.state.isMuted) {
@@ -65,6 +67,7 @@ class UnifiedSpeechController {
       return;
     }
 
+    console.log(`[UNIFIED-SPEECH] Scheduling auto-advance in ${delay}ms`);
     this.autoAdvanceTimer = window.setTimeout(() => {
       this.autoAdvanceTimer = null;
       if (this.onWordComplete && !this.state.isPaused && !this.state.isMuted) {
@@ -101,13 +104,16 @@ class UnifiedSpeechController {
     ) || voices.find(voice => voice.lang.startsWith('en')) || null;
   }
 
-  // Main speak method
+  // Main speak method with fixed timer management
   async speak(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
     console.log(`[UNIFIED-SPEECH] Speaking word: ${word.word}`);
 
+    // CRITICAL: Clear any existing auto-advance timer before starting new speech
+    this.clearAutoAdvance();
+
     // Check if we can speak
     if (this.state.isMuted) {
-      console.log('[UNIFIED-SPEECH] Skipping - muted');
+      console.log('[UNIFIED-SPEECH] Skipping - muted, scheduling auto-advance');
       this.scheduleAutoAdvance(3000);
       return false;
     }
@@ -120,6 +126,8 @@ class UnifiedSpeechController {
     if (this.state.isActive) {
       console.log('[UNIFIED-SPEECH] Already speaking, stopping current speech');
       this.stop();
+      // Wait for stop to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
     }
 
     // Check browser support
@@ -157,7 +165,7 @@ class UnifiedSpeechController {
           this.state.currentUtterance = null;
           this.notifyListeners();
           
-          // Schedule auto-advance
+          // Schedule auto-advance after speech completes
           this.scheduleAutoAdvance();
           resolve(true);
         };
@@ -169,7 +177,7 @@ class UnifiedSpeechController {
           this.state.currentUtterance = null;
           this.notifyListeners();
           
-          // Schedule auto-advance on error
+          // Schedule auto-advance on error (but not if canceled)
           if (event.error !== 'canceled') {
             this.scheduleAutoAdvance(2000);
           }
@@ -200,10 +208,11 @@ class UnifiedSpeechController {
     });
   }
 
-  // Stop speech
+  // Stop speech with proper cleanup
   stop(): void {
     console.log('[UNIFIED-SPEECH] Stopping speech');
     
+    // CRITICAL: Clear auto-advance timer when stopping
     this.clearAutoAdvance();
     
     if (window.speechSynthesis) {
@@ -226,7 +235,7 @@ class UnifiedSpeechController {
   // Pause speech
   pause(): void {
     console.log('[UNIFIED-SPEECH] Pausing speech');
-    this.clearAutoAdvance();
+    this.clearAutoAdvance(); // Clear timer when pausing
     
     if (this.state.isActive && window.speechSynthesis?.speaking) {
       window.speechSynthesis.pause();
@@ -254,19 +263,24 @@ class UnifiedSpeechController {
     
     if (muted && this.state.isActive) {
       this.stop();
+    } else if (muted) {
+      this.clearAutoAdvance(); // Clear timer when muting
     }
     
     this.state.isMuted = muted;
     this.notifyListeners();
-    
-    if (muted) {
-      this.clearAutoAdvance();
-    }
   }
 
   // Check if currently active
   isCurrentlyActive(): boolean {
     return this.state.isActive;
+  }
+
+  // Cleanup method
+  destroy(): void {
+    this.clearAutoAdvance();
+    this.stop();
+    this.listeners.clear();
   }
 }
 

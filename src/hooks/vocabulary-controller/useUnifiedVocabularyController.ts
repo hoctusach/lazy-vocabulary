@@ -6,7 +6,7 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
- * Replaces all fragmented controller hooks and ensures consistent state management
+ * Fixed version with proper auto-advance timer management to prevent fast playback
  */
 export const useUnifiedVocabularyController = () => {
   // Core vocabulary state
@@ -22,9 +22,39 @@ export const useUnifiedVocabularyController = () => {
   // Speech state from unified controller
   const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
   
-  // Prevent race conditions
+  // Prevent race conditions and manage timers
   const isTransitioningRef = useRef(false);
   const lastWordChangeRef = useRef(Date.now());
+  const autoAdvanceTimerRef = useRef<number | null>(null);
+
+  // Clear any existing auto-advance timer
+  const clearAutoAdvanceTimer = useCallback(() => {
+    if (autoAdvanceTimerRef.current) {
+      clearTimeout(autoAdvanceTimerRef.current);
+      autoAdvanceTimerRef.current = null;
+      console.log('[UNIFIED-CONTROLLER] Auto-advance timer cleared');
+    }
+  }, []);
+
+  // Schedule auto-advance with proper cleanup
+  const scheduleAutoAdvance = useCallback((delay: number = 1500) => {
+    // Always clear existing timer first
+    clearAutoAdvanceTimer();
+    
+    if (isPaused || isMuted) {
+      console.log('[UNIFIED-CONTROLLER] Skipping auto-advance - paused or muted');
+      return;
+    }
+
+    console.log(`[UNIFIED-CONTROLLER] Scheduling auto-advance in ${delay}ms`);
+    autoAdvanceTimerRef.current = window.setTimeout(() => {
+      autoAdvanceTimerRef.current = null;
+      if (!isPaused && !isMuted && !isTransitioningRef.current) {
+        console.log('[UNIFIED-CONTROLLER] Auto-advance triggered');
+        goToNext();
+      }
+    }, delay);
+  }, [isPaused, isMuted]);
 
   // Subscribe to speech controller state changes
   useEffect(() => {
@@ -58,6 +88,7 @@ export const useUnifiedVocabularyController = () => {
     // Subscribe to vocabulary changes
     const handleVocabularyChange = () => {
       console.log('[UNIFIED-CONTROLLER] Vocabulary data changed, reloading');
+      clearAutoAdvanceTimer(); // Clear timer when data changes
       loadData();
     };
 
@@ -65,18 +96,20 @@ export const useUnifiedVocabularyController = () => {
     
     return () => {
       vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
+      clearAutoAdvanceTimer(); // Clean up on unmount
     };
-  }, []);
+  }, [clearAutoAdvanceTimer]);
 
-  // Set up word completion callback
+  // Set up word completion callback with fixed auto-advance
   useEffect(() => {
     const handleWordComplete = () => {
       if (isTransitioningRef.current) {
-        console.log('[UNIFIED-CONTROLLER] Word transition in progress, skipping');
+        console.log('[UNIFIED-CONTROLLER] Word transition in progress, skipping auto-advance');
         return;
       }
       
-      goToNext();
+      console.log('[UNIFIED-CONTROLLER] Word completed, scheduling auto-advance');
+      scheduleAutoAdvance();
     };
 
     unifiedSpeechController.setWordCompleteCallback(handleWordComplete);
@@ -84,20 +117,24 @@ export const useUnifiedVocabularyController = () => {
     return () => {
       unifiedSpeechController.setWordCompleteCallback(null);
     };
-  }, []);
+  }, [scheduleAutoAdvance]);
 
   // Get current word
   const currentWord = wordList[currentIndex] || null;
 
-  // Go to next word with race condition protection
+  // Go to next word with proper timer management
   const goToNext = useCallback(() => {
     if (isTransitioningRef.current || wordList.length === 0) {
+      console.log('[UNIFIED-CONTROLLER] Cannot go to next - transitioning or no words');
       return;
     }
 
     console.log('[UNIFIED-CONTROLLER] Going to next word');
     isTransitioningRef.current = true;
     lastWordChangeRef.current = Date.now();
+
+    // CRITICAL: Clear auto-advance timer before any word transition
+    clearAutoAdvanceTimer();
 
     // Stop current speech
     unifiedSpeechController.stop();
@@ -113,7 +150,7 @@ export const useUnifiedVocabularyController = () => {
     setTimeout(() => {
       isTransitioningRef.current = false;
     }, 100);
-  }, [wordList.length]);
+  }, [wordList.length, clearAutoAdvanceTimer]);
 
   // Play current word
   const playCurrentWord = useCallback(async () => {
@@ -139,10 +176,15 @@ export const useUnifiedVocabularyController = () => {
     }
   }, [currentWord, isPaused, isMuted, speechState.isActive, playCurrentWord]);
 
-  // Control functions
+  // Control functions with proper timer management
   const togglePause = useCallback(() => {
     const newPaused = !isPaused;
     console.log(`[UNIFIED-CONTROLLER] Toggling pause: ${newPaused}`);
+    
+    // Clear auto-advance timer when pausing
+    if (newPaused) {
+      clearAutoAdvanceTimer();
+    }
     
     setIsPaused(newPaused);
     
@@ -155,11 +197,16 @@ export const useUnifiedVocabularyController = () => {
         setTimeout(() => playCurrentWord(), 100);
       }
     }
-  }, [isPaused, currentWord, isMuted, playCurrentWord]);
+  }, [isPaused, currentWord, isMuted, playCurrentWord, clearAutoAdvanceTimer]);
 
   const toggleMute = useCallback(() => {
     const newMuted = !isMuted;
     console.log(`[UNIFIED-CONTROLLER] Toggling mute: ${newMuted}`);
+    
+    // Clear auto-advance timer when muting
+    if (newMuted) {
+      clearAutoAdvanceTimer();
+    }
     
     setIsMuted(newMuted);
     unifiedSpeechController.setMuted(newMuted);
@@ -167,8 +214,11 @@ export const useUnifiedVocabularyController = () => {
     // Resume playback if unmuting
     if (!newMuted && !isPaused && currentWord) {
       setTimeout(() => playCurrentWord(), 100);
+    } else if (newMuted) {
+      // When muted, schedule auto-advance to continue cycling
+      scheduleAutoAdvance(3000);
     }
-  }, [isMuted, isPaused, currentWord, playCurrentWord]);
+  }, [isMuted, isPaused, currentWord, playCurrentWord, clearAutoAdvanceTimer, scheduleAutoAdvance]);
 
   const toggleVoice = useCallback(() => {
     const regions: ('US' | 'UK' | 'AU')[] = ['US', 'UK', 'AU'];
@@ -190,6 +240,9 @@ export const useUnifiedVocabularyController = () => {
   const switchCategory = useCallback(() => {
     console.log('[UNIFIED-CONTROLLER] Switching category');
     
+    // Clear auto-advance timer before category switch
+    clearAutoAdvanceTimer();
+    
     // Stop current speech
     unifiedSpeechController.stop();
     
@@ -198,7 +251,14 @@ export const useUnifiedVocabularyController = () => {
     console.log(`[UNIFIED-CONTROLLER] Switched to category: ${nextCategory}`);
     
     // Data will be reloaded via the vocabulary change listener
-  }, []);
+  }, [clearAutoAdvanceTimer]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      clearAutoAdvanceTimer();
+    };
+  }, [clearAutoAdvanceTimer]);
 
   return {
     // Data state

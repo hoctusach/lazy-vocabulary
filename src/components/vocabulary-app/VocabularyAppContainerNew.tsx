@@ -6,7 +6,7 @@ import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
 import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyController } from "@/hooks/vocabulary-controller/useVocabularyController";
+import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useUserInteractionHandler } from "@/hooks/vocabulary-app/useUserInteractionHandler";
 import { useAutoPlayOnDataLoad } from "@/hooks/vocabulary-app/useAutoPlayOnDataLoad";
@@ -38,22 +38,20 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory
   });
 
-  // Use our unified vocabulary controller with the correct signature (only wordList)
+  // Use ONLY the unified vocabulary controller - no more dual controller architecture
   const {
     currentWord,
-    currentIndex,
     isPaused,
     isMuted,
     voiceRegion,
     isSpeaking,
     goToNext,
-    goToPrevious,
     togglePause,
     toggleMute,
     toggleVoice,
     playCurrentWord,
-    wordCount
-  } = useVocabularyController(wordList || []);
+    hasData: controllerHasData
+  } = useUnifiedVocabularyController();
 
   // Initialize speech synthesis and user interaction handling
   useAudioInitialization({
@@ -78,13 +76,13 @@ const VocabularyAppContainerNew: React.FC = () => {
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'US';
 
-  console.log('[VOCAB-CONTAINER-NEW] Controller state:', {
+  console.log('[VOCAB-CONTAINER-NEW] Unified controller state:', {
     currentWord: currentWord?.word,
-    currentIndex,
     isPaused,
     isMuted,
     voiceRegion,
-    isSpeaking
+    isSpeaking,
+    controllerHasData
   });
 
   // Modal state management
@@ -126,10 +124,9 @@ const VocabularyAppContainerNew: React.FC = () => {
     ? { word: currentWord.word, category: currentWord.category || currentCategory }
     : null;
 
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component - fix type mismatch by converting string to boolean */}
+      {/* Error display component */}
       <ErrorDisplay jsonLoadError={!!jsonLoadError} />
 
       {hasData && currentWord ? (
