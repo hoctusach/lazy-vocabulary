@@ -13,6 +13,7 @@ export const useUnifiedVocabularyController = () => {
   // Core vocabulary state
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  // Derive the current word immediately to avoid reference errors in callbacks
   const currentWord = wordList[currentIndex] || null;
   const [hasData, setHasData] = useState(false);
   
