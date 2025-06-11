@@ -4,6 +4,24 @@
 
 **URL**: https://lovable.dev/projects/2d82c75f-fbf3-45fe-b388-9aeeec41c431
 
+## Setup
+
+This project requires **Node.js >=18**. A `.nvmrc` file is provided so you can
+quickly switch to the correct version with
+[`nvm`](https://github.com/nvm-sh/nvm#installing-and-updating):
+
+```sh
+nvm install
+nvm use
+```
+
+After cloning the repository, install dependencies before running or building
+the project:
+
+```sh
+npm install
+```
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
@@ -18,7 +36,7 @@ Changes made via Lovable will be committed automatically to this repo.
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Make sure **Node.js >=18** is installed (see the [Setup](#setup) section) and run `npm install` once after cloning to install the required dependencies.
 
 Follow these steps:
 
