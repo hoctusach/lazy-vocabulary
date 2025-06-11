@@ -37,7 +37,7 @@ export const useUserInteractionHandlers = ({
   const handleManualNext = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
-    goToNextWord(true);
+    goToNextWord();
   };
 
   // Handle toggle pause with explicit user interaction

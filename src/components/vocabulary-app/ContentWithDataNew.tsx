@@ -21,7 +21,6 @@ interface ContentWithDataNewProps {
   handleManualNext: () => void;
   displayTime: number;
   voiceRegion: 'US' | 'UK' | 'AU';
-  nextVoiceLabel: string;
   debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
@@ -47,7 +46,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleManualNext,
   displayTime,
   voiceRegion,
-  nextVoiceLabel,
   debugPanelData,
   isAddWordModalOpen,
   handleCloseModal,

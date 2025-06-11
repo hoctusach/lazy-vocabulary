@@ -1,4 +1,3 @@
-
 import { VocabularyWord } from "@/types/vocabulary";
 import { VocabularyDataManager } from "./VocabularyDataManager";
 import { VocabularySheetOperations } from "./VocabularySheetOperations";
@@ -45,7 +44,8 @@ export class VocabularyOperations {
           word: String(row.Word || row.word || '').trim(),
           meaning: String(row.Meaning || row.meaning || '').trim(),
           example: String(row.Example || row.example || '').trim(),
-          category: sheetName
+          category: sheetName,
+          count: 0 // Add the required count property
         })).filter(word => word.word && word.meaning);
         
         if (words.length > 0) {

@@ -9,7 +9,8 @@ import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
  */
 export const useSpeechController = (
   findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
-  selectedVoice: VoiceSelection
+  selectedVoice: VoiceSelection,
+  scheduleAutoAdvance: (delay: number) => void
 ) => {
   const executeSpeechSynthesis = useCallback(async (
     sessionId: string,
@@ -19,7 +20,6 @@ export const useSpeechController = (
     onEnd: () => void,
     onError: (event: SpeechSynthesisErrorEvent) => void,
     setPlayInProgress: (inProgress: boolean) => void,
-    scheduleAutoAdvance: (delay: number) => void,
     paused: boolean,
     muted: boolean
   ): Promise<boolean> => {

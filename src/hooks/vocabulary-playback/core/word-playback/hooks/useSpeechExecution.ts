@@ -2,13 +2,12 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { useSpeechValidation } from './speech-execution/useSpeechValidation';
-import { useSpeechErrorHandler } from './speech-execution/useSpeechErrorHandler';
-import { useSpeechCallbacks } from './speech-execution/useSpeechCallbacks';
 import { useSpeechController } from './speech-execution/useSpeechController';
+import { useSpeechCallbacks } from './speech-execution/useSpeechCallbacks';
+import { useSpeechErrorHandler } from './speech-execution/useSpeechErrorHandler';
 
 /**
- * Refactored speech execution hook with modular components
+ * Hook for executing speech synthesis with proper error handling and auto-advance
  */
 export const useSpeechExecution = (
   findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
@@ -17,90 +16,75 @@ export const useSpeechExecution = (
   speakingRef: React.MutableRefObject<boolean>,
   resetRetryAttempts: () => void,
   incrementRetryAttempts: () => boolean,
-  goToNextWord: (fromUser?: boolean) => void,
-  scheduleAutoAdvance: (delay: number) => void,
-  lastManualActionTimeRef: React.MutableRefObject<number>,
-  autoAdvanceTimerRef: React.MutableRefObject<number | null>,
   paused: boolean,
   muted: boolean,
-  wordTransitionRef: React.MutableRefObject<boolean>
+  wordTransitionRef: React.MutableRefObject<boolean>,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void
 ) => {
-  // Initialize modular hooks
-  const { validatePreConditions, validateSpeechContent } = useSpeechValidation();
-  
-  const { handleSpeechError } = useSpeechErrorHandler(
-    incrementRetryAttempts,
-    goToNextWord,
-    paused,
-    muted,
-    wordTransitionRef,
-    (inProgress: boolean) => {} // setPlayInProgress placeholder
+  const [setPlayInProgress] = useState(false);
+
+  const { executeSpeechSynthesis } = useSpeechController(
+    findVoice,
+    selectedVoice,
+    scheduleAutoAdvance
   );
-  
+
   const { createOnStartCallback, createOnEndCallback } = useSpeechCallbacks(
     speakingRef,
     setIsSpeaking,
     resetRetryAttempts,
-    (inProgress: boolean) => {}, // setPlayInProgress placeholder
+    setPlayInProgress,
     paused,
     muted,
     wordTransitionRef,
-    goToNextWord
+    goToNextWord,
+    scheduleAutoAdvance
   );
-  
-  const { executeSpeechSynthesis } = useSpeechController(findVoice, selectedVoice);
+
+  const { handleSpeechError } = useSpeechErrorHandler(
+    incrementRetryAttempts,
+    goToNextWord,
+    scheduleAutoAdvance,
+    paused,
+    muted,
+    wordTransitionRef,
+    setPlayInProgress
+  );
 
   const executeSpeech = useCallback(async (
     currentWord: VocabularyWord,
-    speechableText: string,
-    setPlayInProgress: (inProgress: boolean) => void
-  ) => {
+    speechText: string
+  ): Promise<boolean> => {
     const sessionId = Math.random().toString(36).substring(7);
-    console.log(`[SPEECH-EXECUTION-${sessionId}] === Starting Modular Speech Process ===`);
-    console.log(`[SPEECH-EXECUTION-${sessionId}] Word: "${currentWord.word}"`);
-    console.log(`[SPEECH-EXECUTION-${sessionId}] Text length: ${speechableText.length}`);
+    console.log(`[SPEECH-EXECUTION-${sessionId}] Starting execution for: "${currentWord.word}"`);
 
-    // Pre-flight validation
-    if (!validatePreConditions(sessionId, currentWord, paused, muted, wordTransitionRef)) {
-      setPlayInProgress(false);
-      return false;
-    }
+    // Create callbacks
+    const onStart = createOnStartCallback(sessionId);
+    const onEnd = createOnEndCallback(sessionId);
+    const onError = (event: SpeechSynthesisErrorEvent) => {
+      handleSpeechError(sessionId, event, currentWord, speakingRef, setIsSpeaking);
+    };
 
     try {
-
-      // Validate speech content
-      if (!validateSpeechContent(sessionId, speechableText, setPlayInProgress, goToNextWord)) {
-        return false;
-      }
-
-      // Create callbacks
-      const onStart = createOnStartCallback(sessionId);
-      const onEnd = createOnEndCallback(sessionId);
-      const onError = (event: SpeechSynthesisErrorEvent) => {
-        handleSpeechError(sessionId, event, currentWord, speakingRef, setIsSpeaking);
-      };
-
-      // Execute speech synthesis
-      return await executeSpeechSynthesis(
+      const success = await executeSpeechSynthesis(
         sessionId,
         currentWord,
-        speechableText,
+        speechText,
         onStart,
         onEnd,
         onError,
         setPlayInProgress,
-        goToNextWord,
         paused,
         muted
       );
-      
+
+      return success;
     } catch (error) {
-      console.error(`[SPEECH-EXECUTION-${sessionId}] ✗ Exception in speech execution:`, error);
-      speakingRef.current = false;
+      console.error(`[SPEECH-EXECUTION-${sessionId}] Exception:`, error);
       setIsSpeaking(false);
       setPlayInProgress(false);
       
-      // Always advance on exception to prevent getting stuck
       if (!paused && !muted) {
         scheduleAutoAdvance(2000);
       }
@@ -108,19 +92,17 @@ export const useSpeechExecution = (
       return false;
     }
   }, [
-    validatePreConditions,
-    validateSpeechContent,
+    selectedVoice,
+    findVoice,
+    executeSpeechSynthesis,
     createOnStartCallback,
     createOnEndCallback,
     handleSpeechError,
-    executeSpeechSynthesis,
-    goToNextWord,
-    scheduleAutoAdvance,
+    speakingRef,
+    setIsSpeaking,
     paused,
     muted,
-    wordTransitionRef,
-    speakingRef,
-    setIsSpeaking
+    scheduleAutoAdvance
   ]);
 
   return {
