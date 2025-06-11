@@ -79,12 +79,10 @@ export const useUserInteractionHandler = ({
       document.removeEventListener('keydown', enableAudioPlayback);
     };
     
-    // Check if we've had interaction before
+    // Check if we've had interaction before, but still attach listeners to
+    // ensure audio is unlocked with a fresh user gesture
     if (localStorage.getItem('hadUserInteraction') === 'true') {
       console.log('Previous interaction detected from localStorage');
-      userInteractionRef.current = true;
-      initializedRef.current = true;
-      return; // Don't add event listeners if already initialized
     }
     
     // Add event listeners for various user interaction types
