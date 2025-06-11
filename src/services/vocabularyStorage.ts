@@ -60,8 +60,20 @@ export class VocabularyStorage {
    */
   saveData(data: SheetData): boolean {
     try {
+      // Convert SheetData to the format expected by ensureDataTypes
+      const convertedData: Record<string, Array<Record<string, unknown>>> = {};
+      for (const [sheetName, words] of Object.entries(data)) {
+        convertedData[sheetName] = words.map(word => ({
+          word: word.word,
+          meaning: word.meaning,
+          example: word.example,
+          count: word.count,
+          category: word.category
+        }));
+      }
+      
       // Ensure correct types before saving
-      const processedData = this.validator.ensureDataTypes(data);
+      const processedData = this.validator.ensureDataTypes(convertedData);
       const dataString = JSON.stringify(processedData);
       
       if (!this.validator.validateDataSize(dataString, this.config.MAX_STORAGE_SIZE)) {

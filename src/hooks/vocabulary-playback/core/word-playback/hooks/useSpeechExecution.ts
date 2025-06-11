@@ -22,8 +22,6 @@ export const useSpeechExecution = (
   goToNextWord: (fromUser?: boolean) => void,
   scheduleAutoAdvance: (delay: number) => void
 ) => {
-  const [setPlayInProgress] = useState(false);
-
   const { executeSpeechSynthesis } = useSpeechController(
     findVoice,
     selectedVoice,
@@ -34,7 +32,7 @@ export const useSpeechExecution = (
     speakingRef,
     setIsSpeaking,
     resetRetryAttempts,
-    setPlayInProgress,
+    () => {}, // setPlayInProgress placeholder - will be passed from caller
     paused,
     muted,
     wordTransitionRef,
@@ -49,7 +47,7 @@ export const useSpeechExecution = (
     paused,
     muted,
     wordTransitionRef,
-    setPlayInProgress
+    () => {} // setPlayInProgress placeholder - will be passed from caller
   );
 
   const executeSpeech = useCallback(async (

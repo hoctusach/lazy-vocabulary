@@ -47,10 +47,10 @@ const VocabularyContainer: React.FC = () => {
     controllerState.toggleVoice();
   };
 
-  // Optimized file upload handler that prevents excessive processing
-  const handleOptimizedFileUpload = (file: File) => {
+  // Optimized file upload handler that prevents excessive processing - now async
+  const handleOptimizedFileUpload = async (file: File) => {
     console.log('[VOCAB-CONTAINER] Optimized file upload handler called');
-    containerState.handleFileUploaded(file);
+    await containerState.handleFileUploaded(file);
   };
 
   // Optimized category switch handler
