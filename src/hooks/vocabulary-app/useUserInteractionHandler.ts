@@ -44,13 +44,7 @@ export const useUserInteractionHandler = ({
           
           utterance.onend = () => {
             console.log('Speech system initialized successfully');
-            // Only try to play current word if we have one and after a delay
-            if (playbackCurrentWord) {
-              setTimeout(() => {
-                if (!userInteractionRef.current) return; // Double-check
-                playCurrentWord();
-              }, 500);
-            }
+            // Playback will be triggered by the auto-play hook when appropriate
           };
           
           utterance.onerror = (err) => {
