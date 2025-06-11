@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getVoiceRegionFromStorage } from '@/utils/speech/core/speechSettings';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -13,8 +13,8 @@ export const useUnifiedVocabularyController = () => {
   // Core vocabulary state
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Derive the current word via useMemo to ensure stable reference
-  const currentWord = useMemo(() => wordList[currentIndex] || null, [wordList, currentIndex]);
+  // Track the current word explicitly instead of deriving via useMemo
+  const [currentWord, setCurrentWord] = useState<VocabularyWord | null>(null);
   const [hasData, setHasData] = useState(false);
   
   // Control state
@@ -37,6 +37,11 @@ export const useUnifiedVocabularyController = () => {
   
   // Speech state from unified controller
   const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
+
+  // Keep currentWord in sync with the word list and index
+  useEffect(() => {
+    setCurrentWord(wordList[currentIndex] ?? null);
+  }, [wordList, currentIndex]);
   
   // Prevent race conditions and manage timers
   const isTransitioningRef = useRef(false);
