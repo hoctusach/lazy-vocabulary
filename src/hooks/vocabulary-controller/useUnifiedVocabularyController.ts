@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { getVoiceRegionFromStorage } from '@/utils/speech/core/speechSettings';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -13,8 +13,8 @@ export const useUnifiedVocabularyController = () => {
   // Core vocabulary state
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Derive the current word immediately to avoid reference errors in callbacks
-  const currentWord = wordList[currentIndex] || null;
+  // Derive the current word via useMemo to ensure stable reference
+  const currentWord = useMemo(() => wordList[currentIndex] || null, [wordList, currentIndex]);
   const [hasData, setHasData] = useState(false);
   
   // Control state
