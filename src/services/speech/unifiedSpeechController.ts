@@ -171,16 +171,27 @@ class UnifiedSpeechController {
         };
 
         utterance.onerror = (event) => {
-          console.error(`[UNIFIED-SPEECH] ✗ Speech error:`, event.error);
+          console.error(`[UNIFIED-SPEECH] \u2717 Speech error:`, event.error);
           this.state.isActive = false;
           this.state.currentWord = null;
           this.state.currentUtterance = null;
           this.notifyListeners();
-          
-          // Schedule auto-advance on error (but not if canceled)
-          if (event.error !== 'canceled') {
-            this.scheduleAutoAdvance(2000);
+
+          // ensure timers don't continue running
+          this.clearAutoAdvance();
+
+          if (event.error === 'canceled') {
+            console.log('[UNIFIED-SPEECH] Speech was canceled');
+            return resolve(false);
           }
+
+          try {
+            window.speechSynthesis.cancel();
+          } catch (e) {
+            console.warn('[UNIFIED-SPEECH] Failed to reset speech synthesis', e);
+          }
+
+          this.scheduleAutoAdvance(2000);
           resolve(false);
         };
 
