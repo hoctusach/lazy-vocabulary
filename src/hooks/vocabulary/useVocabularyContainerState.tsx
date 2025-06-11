@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { useCategoryNavigation } from './useCategoryNavigation';
 
@@ -11,7 +10,6 @@ export const useVocabularyContainerState = () => {
   const [hasData, setHasData] = useState(false); // data in current category
   const [hasAnyData, setHasAnyData] = useState(false); // data in any category
   const [jsonLoadError, setJsonLoadError] = useState<string | null>(null);
-  const [wordList, setWordList] = useState<VocabularyWord[]>([]);
 
   // Category navigation
   const { currentCategory, nextCategory } = useCategoryNavigation();
@@ -19,20 +17,14 @@ export const useVocabularyContainerState = () => {
   // Display time for UI (can be customized later)
   const displayTime = 5000;
 
-  // Load initial vocabulary data
+  // Load initial vocabulary info
   useEffect(() => {
-    console.log('[VOCAB-CONTAINER-STATE] Loading initial vocabulary data');
-    
-    try {
-      const initialWordList = vocabularyService.getWordList();
-      console.log('[VOCAB-CONTAINER-STATE] Initial word list:', {
-        length: initialWordList.length,
-        firstWord: initialWordList[0]?.word || 'none',
-        sample: initialWordList.slice(0, 3).map(w => w.word)
-      });
+    console.log('[VOCAB-CONTAINER-STATE] Loading initial vocabulary info');
 
-      setWordList(initialWordList);
-      setHasData(initialWordList.length > 0);
+    try {
+      const list = vocabularyService.getWordList();
+      console.log('[VOCAB-CONTAINER-STATE] Initial word count:', list.length);
+      setHasData(list.length > 0);
       setHasAnyData(vocabularyService.hasData());
       setJsonLoadError(null);
     } catch (error) {
@@ -40,21 +32,19 @@ export const useVocabularyContainerState = () => {
       setJsonLoadError('Failed to load vocabulary data');
       setHasData(false);
       setHasAnyData(false);
-      setWordList([]);
     }
   }, []);
 
-  // Subscribe to vocabulary service changes using the correct methods
+  // Subscribe to vocabulary service changes
   useEffect(() => {
     const handleVocabularyChange = () => {
       console.log('[VOCAB-CONTAINER-STATE] Vocabulary service updated');
-      
+
       try {
-        const updatedWordList = vocabularyService.getWordList();
-        console.log('[VOCAB-CONTAINER-STATE] Updated word list length:', updatedWordList.length);
-        
-        setWordList(updatedWordList);
-        setHasData(updatedWordList.length > 0);
+        const list = vocabularyService.getWordList();
+        console.log('[VOCAB-CONTAINER-STATE] Updated word count:', list.length);
+
+        setHasData(list.length > 0);
         setHasAnyData(vocabularyService.hasData());
         setJsonLoadError(null);
       } catch (error) {
@@ -81,10 +71,9 @@ export const useVocabularyContainerState = () => {
       const success = await vocabularyService.processExcelFile(file);
       
       if (success) {
-        const newWordList = vocabularyService.getWordList();
-        console.log('[VOCAB-CONTAINER-STATE] File loaded successfully, words:', newWordList.length);
-        setWordList(newWordList);
-        setHasData(true);
+        const list = vocabularyService.getWordList();
+        console.log('[VOCAB-CONTAINER-STATE] File loaded successfully, words:', list.length);
+        setHasData(list.length > 0);
         setHasAnyData(vocabularyService.hasData());
       } else {
         setJsonLoadError('Failed to load vocabulary file');
@@ -108,13 +97,12 @@ export const useVocabularyContainerState = () => {
       const newCategory = vocabularyService.nextSheet();
       
       if (newCategory) {
-        const newWordList = vocabularyService.getWordList();
-        
+        const list = vocabularyService.getWordList();
+
         console.log('[VOCAB-CONTAINER-STATE] ✓ Category switched to:', newCategory);
-        console.log('[VOCAB-CONTAINER-STATE] New word list length:', newWordList.length);
-        
-        setWordList(newWordList);
-        setHasData(newWordList.length > 0);
+        console.log('[VOCAB-CONTAINER-STATE] New word count:', list.length);
+
+        setHasData(list.length > 0);
         setHasAnyData(vocabularyService.hasData());
         
         // Clear any previous errors since category switch was successful
@@ -144,7 +132,6 @@ export const useVocabularyContainerState = () => {
   console.log('[VOCAB-CONTAINER-STATE] Final state summary:', {
     hasData,
     currentWord: vocabularyManagerState.currentWord?.word || 'none',
-    wordListLength: wordList.length,
     currentCategory,
     isPaused: vocabularyManagerState.isPaused,
     isSoundPlaying: false
@@ -158,7 +145,6 @@ export const useVocabularyContainerState = () => {
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    displayTime,
-    wordList
+    displayTime
   };
 };

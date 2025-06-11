@@ -68,7 +68,6 @@ vi.mock('../src/hooks/vocabulary/useVocabularyContainerState', () => ({
     currentCategory: 'general',
     nextCategory: 'next',
     displayTime: 5000,
-    wordList: [controllerState.currentWord],
   }),
 }));
 

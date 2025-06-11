@@ -25,9 +25,10 @@ const VocabularyAppContainer: React.FC = () => {
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    displayTime,
-    wordList
+    displayTime
   } = useVocabularyContainerState();
+
+  const wordList = vocabularyService.getWordList();
 
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData,
@@ -82,7 +83,7 @@ const VocabularyAppContainer: React.FC = () => {
   
   useAutoPlayOnDataLoad({
     hasData,
-    wordList,
+    currentWord: playbackCurrentWord,
     userInteractionRef,
     playCurrentWord
   });

@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 
 interface AutoPlayProps {
   hasData: boolean;
-  wordList: any[] | null;
+  currentWord: any | null;
   userInteractionRef: React.MutableRefObject<boolean>;
   playCurrentWord: () => void;
 }
 
 export const useAutoPlayOnDataLoad = ({
   hasData,
-  wordList,
+  currentWord,
   userInteractionRef,
   playCurrentWord,
 }: AutoPlayProps) => {
@@ -23,7 +23,7 @@ export const useAutoPlayOnDataLoad = ({
 
   // Force audio to play when data becomes available
   useEffect(() => {
-    if (hasData && wordList && wordList.length > 0 && hasUserInteracted) {
+    if (hasData && currentWord && hasUserInteracted) {
       console.log('Data loaded and user has interacted, triggering playback');
       // Small delay to ensure rendering completes
       const timerId = setTimeout(() => {
@@ -31,5 +31,5 @@ export const useAutoPlayOnDataLoad = ({
       }, 500);
       return () => clearTimeout(timerId);
     }
-  }, [hasData, wordList, hasUserInteracted, playCurrentWord]);
+  }, [hasData, currentWord, hasUserInteracted, playCurrentWord]);
 };
