@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AutoPlayProps {
   hasData: boolean;
@@ -15,6 +15,7 @@ export const useAutoPlayOnDataLoad = ({
   playCurrentWord,
 }: AutoPlayProps) => {
   const [hasUserInteracted, setHasUserInteracted] = useState(userInteractionRef.current);
+  const hasAutoPlayedRef = useRef(false);
 
   // Track changes to the ref in a state variable so effects re-run
   useEffect(() => {
@@ -23,13 +24,19 @@ export const useAutoPlayOnDataLoad = ({
 
   // Force audio to play when data becomes available
   useEffect(() => {
-    if (hasData && currentWord && hasUserInteracted) {
+    if (hasData && currentWord && hasUserInteracted && !hasAutoPlayedRef.current) {
       console.log('Data loaded and user has interacted, triggering playback');
+      hasAutoPlayedRef.current = true;
       // Small delay to ensure rendering completes
       const timerId = setTimeout(() => {
         playCurrentWord();
       }, 500);
       return () => clearTimeout(timerId);
+    }
+
+    // Reset flag if data becomes unavailable
+    if (!hasData || !currentWord) {
+      hasAutoPlayedRef.current = false;
     }
   }, [hasData, currentWord, hasUserInteracted, playCurrentWord]);
 };
