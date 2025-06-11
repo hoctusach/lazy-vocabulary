@@ -4613,7 +4613,7 @@
     {
       "word": "Attentive (adjective)",
       "meaning": "Very polite and helpful, paying close attention to the needs of someone.",
-      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were.",
+      "example": "One of the best things about that trip was how friendly and attentive all the staff in the hotel were. ",
       "count": 0
     },
     {
@@ -14202,19 +14202,337 @@
     "count": 0
     }
   ],
-  "grammar": [
+  "grammar": [ 
     {
-      "word": "present perfect",
-      "meaning": "a tense used for actions that happened at an unspecified time",
-      "example": "I have visited France twice.",
-      "count": 0
+    "word": "Unreal time - conditional (n) /kənˈdɪʃənəl/",
+    "meaning": "a sentence that expresses a condition and its result, often used for hypothetical or unlikely situations. (câu điều kiện)",
+    "example": "If I had known, I would have taken some dollars with me.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - imagine (v) /ɪˈmædʒɪn/",
+    "meaning": "to think about something that is not real or is unlikely to happen. (tưởng tượng)",
+    "example": "Suppose you were given ten million euros, what would you spend it on?",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - suppose (v) /səˈpəʊz/",
+    "meaning": "to assume something is true for the purpose of argument or explanation. (giả sử)",
+    "example": "Suppose you had won the lottery last night. What would you have done?",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - as if (phrase)",
+    "meaning": "used to describe a situation that is not true or real. (như thể là)",
+    "example": "She acts as if she were a millionaire.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - as though (phrase)",
+    "meaning": "used in the same way as 'as if', to make unreal comparisons. (như thể là)",
+    "example": "Tony looks as if someone had just handed him a million euros.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Questions and requests (phrase)",
+    "meaning": "Used to make requests and questions sound more polite. (Cách nói lịch sự hơn khi yêu cầu hoặc đặt câu hỏi)",
+    "example": "I was wondering whether you might be able to give me some advice.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - It’s (high/about) time (phrase)",
+    "meaning": "Used to suggest that something should be done now or in the immediate future. (Đã đến lúc làm điều gì đó)",
+    "example": "It’s (high/about) time we were leaving.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Would rather/sooner (phrase)",
+    "meaning": "Used to express current, general or future preference, or past preference. (Diễn tả sự ưu tiên, mong muốn)",
+    "example": "We’d rather/sooner you hadn’t lent Kurdip the money.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Wish / if only (phrase)",
+    "meaning": "Used to express regrets or unreal desires about present or past situations. (Ước hoặc tiếc nuối về điều không có thật ở hiện tại hoặc quá khứ)",
+    "example": "If only I was earning a reasonable salary.",
+    "count": 0
+    },
+    {
+    "word": "Unreal time - Other structures with wish / if only (phrase)",
+    "meaning": "Structures used to express criticism, inability, formal desires, or to wish someone success. (Các cấu trúc dùng với wish để phê phán, thể hiện ước muốn hoặc chúc ai đó)",
+    "example": "I wish I could find a job that pays well.",
+    "count": 0
     }
   ],
-  "phrases, collocations": [
+  "phrases, collocations": [     
     {
-      "word": "make up one's mind",
-      "meaning": "decide after consideration",
-      "example": "She couldn't make up her mind about the dress.",
+    "word": "about /əˈbaʊt/",
+    "meaning": "partly/mainly/all about (một phần/đa phần/toàn bộ về), do sth about (làm gì đó để xử lý), about to do (sắp làm gì)",
+    "example": "She was about to leave when the phone rang. This book is all about courage and persistence. What are you going to do about the issue?",
+    "count": 0
+    },
+    {
+    "word": "access /ˈækses/",
+    "meaning": "have/gain/provide access to (có/đạt được/cung cấp sự tiếp cận), Internet access (truy cập mạng Internet), wheelchair access (lối đi dành cho xe lăn)",
+    "example": "Students have access to all library materials online. Wheelchair access is available at the entrance. Only members can gain access to the archive.",
+    "count": 0
+    },
+    {
+    "word": "account /əˈkaʊnt/",
+    "meaning": "account for (chiếm), give an account of (kể lại/thuat lai), take into account (tính đến, cân nhắc), on account of (xem xét, chiếu cố), on account of (bởi vì), by all accounts (theo những gì thu thập được), on sb’s account (theo như ý kiến của họ)",
+    "example": "He gave an account of his experience to the class. We must take weather conditions into account.By all accounts, she’s a talented writer.",
+    "count": 0
+    },
+    {
+    "word": "act /ækt/",
+    "meaning": "in good/bad faith (hành vi thiện/chưa thiện), out of desperation/necessity (hành động tuyệt vọng/cần thiết), act on sb’s advice/orders/behalf (hành động dựa vào lời khuyên/mệnh lệnh/thay mặt ai), act out of (hành động vì lý do gì), act the part/role of (đóng vai), act like (cư xử như), act your age (cư xử đúng tuổi), in the act of doing (đang làm việc gì đó thì bị bắt gặp)",
+    "example": "He was caught in the act of stealing. She acted on her lawyer’s advice. They acted out of desperation.",
+    "count": 0
+    },
+    {
+    "word": "age /eɪdʒ/",
+    "meaning": "act your age (hành động đúng độ tuổi), under age (chưa đủ tuổi), old age (tuổi già), working/retirement age (độ tuổi đi làm/nghỉ hưu), age limit (độ tuổi giới hạn), age bracket/group (nhóm tuổi), in Stone/Bronze/Iron Age (Vào thời kỳ Đồ Đá/Đồ Đồng/Đồ Sắt)",
+    "example": "She retired at the age of 65. He's not allowed in; he's under age. We studied tools from the Bronze Age.",
+    "count": 0
+    },
+    {
+    "word": "ages",
+    "meaning": "take/spend ages (doing) (tốn nhiều thời gian làm gì); ages ago (rất lâu về trước); seems/feels like ages (có vẻ đã lâu lắm rồi kể từ khi)",
+    "example": "I spent ages trying to fix that bug before I finally gave up. They moved here ages ago and still love it. It feels like ages since we last spoke. She thinks it’s been ages since her last vacation.",
+    "count": 0
+    },
+    {
+    "word": "answer",
+    "meaning": "answer to sb (trả lời ai đó); give sb an answer (đáp lại lời); answer sb’s prayers (đáp lại lời cầu nguyện); answer the description of (rất giống với); have a lot to answer for (chịu trách nhiệm về)",
+    "example": "Could you please answer my question about the API design? He finally answered her prayers by approving the budget. His work answers the description of an ideal solution. The manager will have a lot to answer for if the project fails.",
+    "count": 0
+    },
+    {
+    "word": "argument",
+    "meaning": "argument (with sb) (cãi vã với ai); win/lose an argument (thắng/thua một cuộc tranh cãi); argument about/over (cuộc tranh luận về); argument for/against (lập luận ủng hộ/chống); without an argument (không cần bàn cãi)",
+    "example": "They had an argument about which framework to use. She won the argument by presenting clear data. There’s a strong argument for adopting microservices. We resolved the issue without an argument.",
+    "count": 0
+    },
+    {
+    "word": "arm",
+    "meaning": "arm sb with (trang bị cho ai đó); arm yourself against (trang bị cho bản thân để chống lại); take up arms (chuẩn bị chiến đấu); lay down arms (vứt bỏ vũ khí); arms control (kiểm soát vũ khí)",
+    "example": "The guide armed us with all the necessary credentials. They taught us how to arm ourselves against cyber attacks. Rebels decided to lay down arms and negotiate. An international treaty on arms control was signed.",
+    "count": 0
+    },
+    {
+    "word": "art",
+    "meaning": "art of doing (nghệ thuật/kỹ thuật làm việc gì); art deco (trang trí nghệ thuật); art gallery (phòng trưng bày nghệ thuật); art house (phim nghệ thuật)",
+    "example": "He mastered the art of debugging complex code. The building’s façade is a beautiful example of art deco. Let's visit the new art gallery this weekend. They screened an indie film at the local art house.",
+    "count": 0
+    },
+    {
+    "word": "ask",
+    "meaning": "ask yourself (tự hỏi bản thân); ask sb a favour (nhờ ai giúp đỡ); ask sb over/round (mời đến nhà chơi); ask sb in (mời ai vào nhà); asking for trouble (chắc chắn gặp rắc rối); if you ask me (theo tôi)",
+    "example": "Ask yourself what the user really needs from this feature. Could I ask you a favour and review my pull request? She asked him over for afternoon tea. If you ask me, we should refactor this module.",
+    "count": 0
+    },
+    {
+    "word": "associate",
+    "meaning": "associate sth with (liên kết cái gì với)",
+    "example": "Most people associate JavaScript with web development. He associates deadlines with unnecessary stress. Don’t associate code quality solely with performance.",
+    "count": 0
+    },
+    {
+    "word": "authority",
+    "meaning": "have the authority to do (có thẩm quyền làm việc gì); grant sb the authority to do (trao quyền cho ai làm gì); local authority (chính quyền địa phương)",
+    "example": "Only the admin has the authority to modify user roles. The board granted her the authority to approve budgets. Please consult the local authority for compliance guidelines. He assumed authority over the new deployment process.",
+    "count": 0
+    },
+    {
+    "word": "back",
+    "meaning": "back into sth (lùi vào chỗ nào đó); back onto sth (lùi xe lên trên cái gì); back out of (chống lưng/ứng hộ cho ai làm gì)",
+    "example": "He accidentally backed into the server rack. The car backed onto the loading dock. She refused to back out of her commitment. We need someone to back us up on this proposal.",
+    "count": 0
+    },
+    {
+    "word": "bad",
+    "meaning": "go bad (thiu, hỏng); bad for sb (có hại cho ai); bad at sth (kém về cái gì); bad blood (mối quan hệ xấu)",
+    "example": "Don’t eat that milk—it’s gone bad. Smoking is bad for your health. He’s bad at estimating project timelines. There’s some bad blood between those two teams.",
+    "count": 0
+    },
+    {
+    "word": "balance",
+    "meaning": "strike a balance (tìm phương án cân bằng); upset/restore the balance (phá vỡ/khôi phục cân bằng); balance between (cân bằng giữa); off balance (mất thăng bằng)",
+    "example": "We need to strike a balance between speed and quality. A sudden spike in traffic upset the balance of the system. There’s a fine balance between innovation and risk. The unexpected outage threw the team off balance.",
+    "count": 0
+    },
+    {
+    "word": "basis",
+    "meaning": "on a basis (trên cơ sở); on a daily/temporary basis (hàng ngày/tạm thời); on the basis of (dựa trên cơ sở)",
+    "example": "We review performance on a monthly basis. The feature is enabled on a temporary basis. Decisions are made on the basis of user feedback.",
+    "count": 0
+    },
+    {
+    "word": "behaviour",
+    "meaning": "behaviour towards (hành vi đối với); antisocial/violent behaviour (hành vi chống đối/bạo lực); exemplary behaviour (hành vi gương mẫu)",
+    "example": "His behaviour towards colleagues was exemplary. The test revealed some antisocial behaviour in the AI agent. Good behaviour is rewarded in our performance reviews.",
+    "count": 0
+    },
+    {
+    "word": "belief",
+    "meaning": "express belief(s) (bộc lộ niềm tin); contrary to popular belief (ngược với niềm tin chung); firm belief (niềm tin vững chắc)",
+    "example": "The CEO expressed her firm belief in the project’s success. Contrary to popular belief, code reviews improve productivity. He couldn’t hide his belief in the new framework.",
+    "count": 0
+    },
+    {
+    "word": "bend",
+    "meaning": "bend sth into (uốn cong thành gì); round the bend (quá tức giận); bend the rules (nới lỏng quy tắc)",
+    "example": "She bent the metal rod into a perfect circle. Waiting in line all day drove me round the bend. Managers sometimes bend the rules to meet deadlines.",
+    "count": 0
+    },
+    {
+    "word": "best",
+    "meaning": "make the best of (tận dụng hết khả năng); at your best (ở tình trạng tốt nhất); best of my ability (theo khả năng tốt nhất của tôi); best friend (bạn thân nhất)",
+    "example": "We need to make the best of this opportunity. He performed at his best under pressure. I’ll help you to the best of my ability. She’s been my best friend since college.",
+    "count": 0
+    },
+    {
+    "word": "bet",
+    "meaning": "bet (sth) on (đánh cuộc thứ gì đó); make a bet (đặt cược); safe bet (điều chắc chắn thành công)",
+    "example": "I’d bet on JavaScript remaining popular for years. He made a bet with his friend about the release date. Opting for thorough tests is a safe bet.",
+    "count": 0
+    },
+    {
+    "word": "better",
+    "meaning": "get better (trở nên tốt hơn); better off (khấm khá hơn); better next time (lần sau sẽ tốt hơn); for better or (for worse) (dù tốt dù xấu)",
+    "example": "I hope the system gets better after this update. You’ll be better off using a dedicated database. Maybe we’ll have better luck next time. For better or worse, this is the final design.",
+    "count": 0
+    },
+    {
+    "word": "big",
+    "meaning": "make a big thing out of (làm quá/ làm lớn chuyện); make it big (thành công nhanh); big of sb (đã tốt khi làm gì); big on (rất thích); big business (doanh nghiệp lớn); big-hearted (hào hiệp); big name (nhiều tiền); big game (sự kiện quan trọng)",
+    "example": "They made a big thing out of the minor mistake. She hopes to make it big in Silicon Valley. It was big of you to donate so much. He’s really big on open-source software.",
+    "count": 0
+    },
+    {
+      "word": "block",
+      "meaning": "block sb’s way (chặn đường của ai); block of flats/apartment block (tòa chung cư); high-rise block (tòa nhà cao tầng); writer’s block (rào cản tâm lý)",
+      "example": "The coach blocked their way onto the field. She lives in a new apartment block downtown. That high-rise block dominates the skyline. He suffered from writer’s block all week.",
+      "count": 0
+    },
+    {
+      "word": "book",
+      "meaning": "read sb like a book (hiểu rõ ai); (do) by the book (làm đúng chuẩn); book about/on (cuốn sách về); a closed book (câu đố bí ẩn); open book (người dễ hiểu); in my book (theo tôi); sb’s good/bad books (ai đó hài lòng/khó chịu với)",
+      "example": "I can read you like a book after all these years. She always does things by the book. He recommended a great book on algorithms. His behavior is definitely in my bad books.",
+      "count": 0
+    },
+    {
+      "word": "born",
+      "meaning": "born to do (sinh ra để làm); born on/in (sinh vào thời gian/nơi nào); born into (sinh ra trong gia đình); born and bred (sinh ra và lớn lên); born-again (tái sinh, chuyển đạo); newborn (sơ sinh)",
+      "example": "She was born to do complex data analysis. I was born in Hanoi in 1990. He was born into a family of engineers. They are proud of their born-and-bred roots.",
+      "count": 0
+    },
+    {
+      "word": "bottom",
+      "meaning": "come bottom (đứng cuối); get to the bottom of (tìm nguyên nhân); the bottom drops/falls out of (giảm sâu); bottom line (điểm mấu chốt)",
+      "example": "Our team came bottom in the hackathon. We need to get to the bottom of this bug. Suddenly the bottom fell out of the market. The bottom line is that we need more testing.",
+      "count": 0
+    },
+    {
+      "word": "brain",
+      "meaning": "pick sb’s brain(s) (hỏi để biết thông tin); rack your brain(s) (vắt óc để làm); brains behind (người chịu trách nhiệm); brainless (ngu ngốc); brainstorm (động não); brainwave (cảm hứng đột ngột)",
+      "example": "Can I pick your brains about this architecture? I’ve been racking my brain for hours. She is the brain behind our new feature. We had a productive brainstorm session yesterday.",
+      "count": 0
+    },
+    {
+      "word": "break",
+      "meaning": "break a habit (phá vỡ thói quen); break with tradition (phá bỏ truyền thống); take/have/need a break (có thời gian nghỉ); lunch/coffee break (giờ nghỉ trưa/giữa buổi)",
+      "example": "I finally broke my habit of checking email at night. They decided to break with tradition this year. Let’s take a break and grab coffee. We only have a fifteen-minute break left.",
+      "count": 0
+    },
+    {
+      "word": "brick",
+      "meaning": "bricks and mortar (cửa hàng thực sự); brick wall (bức tường gạch); bricklayer (thợ nề)",
+      "example": "They opened a bricks-and-mortar store downtown. We built a small brick wall in the courtyard. The bricklayer finished the job early.",
+      "count": 0
+    },
+    {
+      "word": "certain",
+      "meaning": "know/say for certain (biết/chắc chắn); certain to do (chắc chắn làm); make certain (chắc chắn); certain of/about (chắc chắn về); a certain (amount of sth) (một lượng nhất định)",
+      "example": "I can’t say for certain when the release will be. You’re certain to succeed with that plan. Please make certain the tests pass. We need a certain amount of RAM for this VM.",
+      "count": 0
+    },
+    {
+      "word": "chance",
+      "meaning": "take a chance (đánh liều); leave to chance (mặc kệ); by chance (tình cờ); by any chance (phải vậy không?); second chance (cơ hội thứ hai); last chance (cơ hội cuối cùng); pure chance (ngẫu nhiên thuần túy); there’s every/no chance that (rất có/không có cơ hội)",
+      "example": "I decided to take a chance and rewrite the module. Don’t leave it to chance—write unit tests. We met by chance at the conference. There’s every chance we’ll finish early.",
+      "count": 0
+    },
+    {
+      "word": "change",
+      "meaning": "change from sth to sth (đổi từ thứ gì thành); change sth into (biến thứ gì trở thành); change sth for (thay đổi cái gì đó để lấy); change for the better/worse (thay đổi tốt hơn/tệ hơn); change your mind (đổi ý); change the subject (đổi chủ đề); make a change (thay đổi); undergo a change (trải qua thay đổi)",
+      "example": "We need to change from HTTP to HTTPS. He changed his idea into a working prototype. They changed the plan for the better. After reflection, she changed her mind.",
+      "count": 0
+    },
+    {
+      "word": "charge",
+      "meaning": "charge sb with (buộc tội ai về); charge sb for (đòi tiền ai về); take charge (đảm nhiệm); put sb in charge (trao quyền); overall charge (toàn quyền lãnh đạo)",
+      "example": "They charged her with overseeing the new API. We were charged for extra storage. She took charge of the deployment. The CTO was put in charge of security.",
+      "count": 0
+    },
+    {
+      "word": "child",
+      "meaning": "as a child (khi còn nhỏ); only child (con một); child of (con của); childcare (chăm sóc trẻ); child abuse (lạm dụng trẻ em); child’s play (trò chơi trẻ con)",
+      "example": "As a child, I loved playing video games. He was an only child in his family. Childcare services are expanding. That puzzle is child’s play for us.",
+      "count": 0
+    },
+    {
+      "word": "choice",
+      "meaning": "make a choice (đưa ra lựa chọn); exercise choice (bầu chọn); have no choice (không có lựa chọn nào); choice between (lựa chọn giữa); informed choice (lựa chọn dựa trên thông tin); wide choice (nhiều lựa chọn); obvious choice (lựa chọn hiển nhiên)",
+      "example": "It’s time to make a choice about the framework. Users can exercise choice in their settings. We had no choice but to postpone. There’s a wide choice of libraries available.",
+      "count": 0
+    },
+    {
+      "word": "choose",
+      "meaning": "choose from (chọn ra từ); choose between (chọn giữa); choose sb/sth as (chọn ai/cái gì làm); choose sb/sth out of (chọn ai/cái gì trong cả nhóm); choose to do (lựa chọn làm gì); pick and choose (cân nhắc kỹ và chọn); nothing to choose between (không có gì để chọn)",
+      "example": "You can choose from several templates. We had to choose between speed and accuracy. They chose her as team lead. There was nothing to choose between the two solutions.",
+      "count": 0
+    },
+    {
+      "word": "class",
+      "meaning": "class sb/sth as (phân loại); social class (tầng lớp xã hội); working/middle/upper class (đẳng cấp lao động/trung lưu/thượng lưu); ruling class (giai cấp thống trị); class system (hệ thống giai cấp); class war (mâu thuẫn giai cấp)",
+      "example": "They classed the data points as anomalies. Discussions about social class remain relevant. He grew up in a working-class family. The ruling class resisted the reforms.",
+      "count": 0
+    },
+    {
+      "word": "clean",
+      "meaning": "give sth a (good) clean (lau dọn sạch sẽ); make a clean break (giải sạch, cắt đứt hoàn toàn); clean and tidy (sạch sẽ gọn gàng); a clean slate (một khởi đầu mới); clean sweep (dọn sạch những thứ không cần thiết)",
+      "example": "Let’s give this codebase a good clean. The team made a clean break from legacy. Keep your workspace clean and tidy. We started with a clean slate after the audit.",
+      "count": 0
+    },
+    {
+      "word": "clear",
+      "meaning": "make/get sth clear (làm rõ/chứng tỏ); make yourself clear (nói rõ ý của bạn); have a clear conscience (lương tâm trong sạch); clear in your mind (hiểu rõ); clear as a bell (rõ ràng); clear as mud (khó hiểu); clear evidence (bằng chứng); clear case of (trường hợp rõ ràng)",
+      "example": "She made her expectations perfectly clear. He has a clear conscience about the decision. The objective was clear in my mind. That explanation was clear as a bell.",
+      "count": 0
+    },
+    {
+      "word": "clock",
+      "meaning": "set a clock (đặt báo thức); watch the clock (đếm thời gian); against the clock (chạy đua với thời gian); around the clock (suốt ngày đêm); clockwise (theo chiều kim đồng hồ); clockwork (bộ máy đồng hồ)",
+      "example": "Don’t forget to set the clock before sleeping. We’re racing against the clock to finish. The server runs around the clock. The gears turned like clockwork.",
+      "count": 0
+    },
+    {
+      "word": "come",
+      "meaning": "come to a conclusion/decision (đi tới kết luận/quyết định); come to power (lên nắm quyền); come into view (hiện ra trước mắt); come as a shock (gây sốc); come true (trở thành hiện thực)",
+      "example": "We came to a conclusion after reviewing logs. The new party came to power last year. The mountain peak finally came into view. His dream to launch the app came true.",
+      "count": 0
+    },
+    {
+      "word": "common",
+      "meaning": "have sth in common (với ai) (có điểm chung); common for sb/sth to do (việc ai đó làm gì là khá phổ biến); common language (ngôn ngữ thường dùng); the common people (người dân); common practice (hành vi phổ biến)",
+      "example": "We have much in common regarding coding standards. It’s common for teams to hold daily stand-ups. English serves as a common language in tech. Code reviews are now common practice.",
+      "count": 0
+    },
+    {
+      "word": "conclusion",
+      "meaning": "bring sth to a conclusion (đưa cái gì đến kết luận); come to/reach a conclusion (đi đến kết luận); jump/leap to conclusions (nhảy cóc kết luận); in conclusion (kết lại); foregone conclusion (kết quả đương nhiên)",
+      "example": "Let’s bring this discussion to a conclusion. They reached a conclusion after testing. Don’t jump to conclusions too quickly. In conclusion, we recommend a staging environment.",
       "count": 0
     }
   ]
