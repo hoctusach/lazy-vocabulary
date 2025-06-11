@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { getVoiceRegionFromStorage } from '@/utils/speech/core/speechSettings';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
@@ -17,7 +18,20 @@ export const useUnifiedVocabularyController = () => {
   // Control state
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('US');
+  const initialRegion = getVoiceRegionFromStorage();
+  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>(initialRegion);
+
+  // Persist voice region whenever it changes
+  useEffect(() => {
+    try {
+      const storedStates = localStorage.getItem('buttonStates');
+      const states = storedStates ? JSON.parse(storedStates) : {};
+      states.voiceRegion = voiceRegion;
+      localStorage.setItem('buttonStates', JSON.stringify(states));
+    } catch (error) {
+      console.error('Error saving voice region to localStorage:', error);
+    }
+  }, [voiceRegion]);
   
   // Speech state from unified controller
   const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
@@ -46,10 +60,7 @@ export const useUnifiedVocabularyController = () => {
       return;
     }
 
-    console.log(`[UNIFIED-CONTROLLER] Scheduling auto-advance in ${delay}ms`, {
-      word: currentWord?.word,
-      index: currentIndex
-    });
+    console.log(`[UNIFIED-CONTROLLER] Scheduling auto-advance in ${delay}ms`);
     autoAdvanceTimerRef.current = window.setTimeout(() => {
       autoAdvanceTimerRef.current = null;
       if (!isPaused && !isMuted && !isTransitioningRef.current) {
@@ -57,7 +68,7 @@ export const useUnifiedVocabularyController = () => {
         goToNext();
       }
     }, delay);
-  }, [isPaused, isMuted, currentWord, currentIndex]);
+  }, [isPaused, isMuted]);
 
   // Subscribe to speech controller state changes
   useEffect(() => {

@@ -10,30 +10,36 @@ import VocabularyContainer from '../src/components/vocabulary-container/Vocabula
 
 const controllerState = {
   currentWord: { word: 'water', meaning: 'H2O', example: 'Drink water', category: 'general' },
-  isPaused: false,
-  isMuted: false,
-  isSpeaking: false,
   voiceRegion: 'UK' as const,
-  togglePause: vi.fn(),
-  toggleMute: vi.fn(),
-  goToNext: vi.fn(),
-  toggleVoice: vi.fn(() => {
-    controllerState.voiceRegion =
-      controllerState.voiceRegion === 'UK'
-        ? 'US'
-        : controllerState.voiceRegion === 'US'
-        ? 'AU'
-        : 'US';
-  }),
-  playCurrentWord: vi.fn(),
 };
 
-vi.mock('../src/hooks/vocabulary-controller/useSimpleVocabularyController', () => ({
-  useSimpleVocabularyController: () => controllerState,
-}));
+vi.mock('../src/hooks/vocabulary-controller/useUnifiedVocabularyController', () => {
+  return {
+    useUnifiedVocabularyController: () => {
+      const [voiceRegion, setVoiceRegion] = React.useState<'US' | 'UK' | 'AU'>(controllerState.voiceRegion);
+      React.useEffect(() => {
+        controllerState.voiceRegion = voiceRegion;
+      }, [voiceRegion]);
+      return {
+        currentWord: controllerState.currentWord,
+        isPaused: false,
+        isMuted: false,
+        isSpeaking: false,
+        voiceRegion,
+        togglePause: vi.fn(),
+        toggleMute: vi.fn(),
+        goToNext: vi.fn(),
+        toggleVoice: vi.fn(() => setVoiceRegion(r => (r === 'UK' ? 'US' : r === 'US' ? 'AU' : 'US'))),
+        playCurrentWord: vi.fn(),
+        hasData: true,
+        currentCategory: 'general',
+        switchCategory: vi.fn(),
+      };
+    },
+  };
+});
 
 vi.mock('../src/hooks/vocabulary-playback/useVoiceSelection', () => {
-  const React = require('react');
   return {
     useVoiceSelection: () => {
       const [selectedVoice, setSelectedVoice] = React.useState({
