@@ -19,7 +19,7 @@ export class VocabularyService {
     this.sheetOptions = [
       "phrasal verbs",
       "idioms",
-      "advanced words",
+      "topic vocab",
       "grammar",
       "phrases, collocations"
     ];

@@ -8,7 +8,7 @@ export class SheetManager {
   readonly sheetOptions = [
     "phrasal verbs",
     "idioms",
-    "advanced words",
+    "topic vocab",
     "grammar",
     "phrases, collocations"
   ];

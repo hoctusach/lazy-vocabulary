@@ -18,7 +18,7 @@ interface WordFormFieldsProps {
 const CATEGORY_OPTIONS = [
   { value: "phrasal verbs", label: "Phrasal Verbs" },
   { value: "idioms", label: "Idioms" },
-  { value: "advanced words", label: "Advanced Words" },
+  { value: "topic vocab", label: "Topic Vocab" },
   { value: "grammar", label: "Grammar" },
   { value: "phrases, collocations", label: "Phrases & Collocations" }
 ];
