@@ -5,6 +5,7 @@ import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/us
 import VocabularyCard from '../VocabularyCard';
 import FileUpload from '../FileUpload';
 import { useCategoryNavigation } from '@/hooks/vocabulary/useCategoryNavigation';
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
 const VocabularyContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
@@ -28,6 +29,18 @@ const VocabularyContainer: React.FC = () => {
     isSpeaking: controllerState.isSpeaking,
     hasData: controllerState.hasData
   });
+
+  // Create proper VoiceSelection object based on current voice region
+  const createVoiceSelection = (region: 'US' | 'UK' | 'AU'): VoiceSelection => {
+    const voiceMap = {
+      'US': { label: 'US', region: 'US' as const, gender: 'female' as const, index: 0 },
+      'UK': { label: 'UK', region: 'UK' as const, gender: 'female' as const, index: 1 },
+      'AU': { label: 'AU', region: 'AU' as const, gender: 'female' as const, index: 2 }
+    };
+    return voiceMap[region];
+  };
+
+  const selectedVoice = createVoiceSelection(controllerState.voiceRegion);
 
   const nextVoiceLabel =
     controllerState.voiceRegion === 'UK'
@@ -98,7 +111,7 @@ const VocabularyContainer: React.FC = () => {
         onNextWord={controllerState.goToNext}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
-        selectedVoice={{ region: controllerState.voiceRegion }}
+        selectedVoice={selectedVoice}
         nextVoiceLabel={nextVoiceLabel}
         category={controllerState.currentWord.category}
       />
