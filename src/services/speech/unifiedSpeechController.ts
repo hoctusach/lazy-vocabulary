@@ -27,6 +27,8 @@ class UnifiedSpeechController {
   private listeners: Set<StateChangeListener> = new Set();
   private autoAdvanceTimer: number | null = null;
   private onWordComplete: (() => void) | null = null;
+  private isStopping = false;
+  private cancelledUtterance: SpeechSynthesisUtterance | null = null;
 
   // Subscribe to state changes
   subscribe(listener: StateChangeListener): () => void {
@@ -123,10 +125,10 @@ class UnifiedSpeechController {
       return false;
     }
 
-    if (this.state.isActive) {
-      console.log('[UNIFIED-SPEECH] Already speaking, stopping current speech');
+    if (this.state.isActive || this.state.currentUtterance) {
+      console.log('[UNIFIED-SPEECH] Cancelling existing utterance before speaking');
       this.stop();
-      // Wait for stop to complete
+      // Wait briefly for cancellation to propagate
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
@@ -163,6 +165,8 @@ class UnifiedSpeechController {
           this.state.isActive = false;
           this.state.currentWord = null;
           this.state.currentUtterance = null;
+          this.isStopping = false;
+          this.cancelledUtterance = null;
           this.notifyListeners();
           
           // Schedule auto-advance after speech completes
@@ -180,8 +184,22 @@ class UnifiedSpeechController {
           // ensure timers don't continue running
           this.clearAutoAdvance();
 
+          const wasManual =
+            (this.isStopping || this.cancelledUtterance === utterance) &&
+            event.error === 'canceled';
+
+          if (wasManual) {
+            console.log('[UNIFIED-SPEECH] Speech was canceled manually');
+            this.isStopping = false;
+            this.cancelledUtterance = null;
+            return resolve(false);
+          }
+
           if (event.error === 'canceled') {
-            console.log('[UNIFIED-SPEECH] Speech was canceled');
+            console.log('[UNIFIED-SPEECH] Speech was canceled unexpectedly, advancing');
+            this.scheduleAutoAdvance(1500);
+            this.isStopping = false;
+            this.cancelledUtterance = null;
             return resolve(false);
           }
 
@@ -192,11 +210,15 @@ class UnifiedSpeechController {
           }
 
           this.scheduleAutoAdvance(2000);
+          this.isStopping = false;
+          this.cancelledUtterance = null;
           resolve(false);
         };
 
         // Store current utterance and start speaking
         this.state.currentUtterance = utterance;
+        this.isStopping = false;
+        this.cancelledUtterance = null;
         window.speechSynthesis.speak(utterance);
 
         // Fallback timeout
@@ -222,10 +244,13 @@ class UnifiedSpeechController {
   // Stop speech with proper cleanup
   stop(): void {
     console.log('[UNIFIED-SPEECH] Stopping speech');
-    
+
     // CRITICAL: Clear auto-advance timer when stopping
     this.clearAutoAdvance();
-    
+
+    this.isStopping = true;
+    this.cancelledUtterance = this.state.currentUtterance;
+
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
     }
@@ -241,6 +266,7 @@ class UnifiedSpeechController {
     this.state.currentWord = null;
     this.state.currentUtterance = null;
     this.notifyListeners();
+
   }
 
   // Pause speech
