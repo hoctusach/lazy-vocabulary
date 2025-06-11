@@ -24,8 +24,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    displayTime,
-    wordList
+    displayTime
   } = useVocabularyContainerState();
 
   // Track whether the user has interacted to enable audio playback
@@ -34,7 +33,6 @@ const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] Container state:', {
     hasData,
     hasAnyData,
-    wordListLength: wordList?.length || 0,
     currentCategory
   });
 
@@ -68,7 +66,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   useAutoPlayOnDataLoad({
     hasData,
-    wordList,
+    currentWord,
     userInteractionRef,
     playCurrentWord,
   });

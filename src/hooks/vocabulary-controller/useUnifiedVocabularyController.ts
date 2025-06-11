@@ -46,7 +46,10 @@ export const useUnifiedVocabularyController = () => {
       return;
     }
 
-    console.log(`[UNIFIED-CONTROLLER] Scheduling auto-advance in ${delay}ms`);
+    console.log(`[UNIFIED-CONTROLLER] Scheduling auto-advance in ${delay}ms`, {
+      word: currentWord?.word,
+      index: currentIndex
+    });
     autoAdvanceTimerRef.current = window.setTimeout(() => {
       autoAdvanceTimerRef.current = null;
       if (!isPaused && !isMuted && !isTransitioningRef.current) {
@@ -54,7 +57,7 @@ export const useUnifiedVocabularyController = () => {
         goToNext();
       }
     }, delay);
-  }, [isPaused, isMuted]);
+  }, [isPaused, isMuted, currentWord, currentIndex]);
 
   // Subscribe to speech controller state changes
   useEffect(() => {
@@ -129,7 +132,11 @@ export const useUnifiedVocabularyController = () => {
       return;
     }
 
-    console.log('[UNIFIED-CONTROLLER] Going to next word');
+    console.log('[UNIFIED-CONTROLLER] Going to next word', {
+      from: currentWord?.word,
+      index: currentIndex,
+      total: wordList.length
+    });
     isTransitioningRef.current = true;
     lastWordChangeRef.current = Date.now();
 
