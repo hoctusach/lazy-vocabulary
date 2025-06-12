@@ -16292,6 +16292,241 @@
   ],
   "grammar": [ 
     {
+    "word": "Adjectives n Adverbs - Position of adjectives",
+    "meaning": "Adjectives usually appear before a noun, or after verbs such as appear, become, feel, get, grow, look, seem, smell, sound, taste, and turn. (Tính từ thường đứng trước danh từ hoặc sau một số động từ chỉ trạng thái)",
+    "example": "I love your new house. / The material this dress is made out of feels rough. / She looked angrily at the man behind the counter. / There was an asleep boy in the street. ✗ There was an-asleep boy in the street.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Position of multiple adjectives",
+    "meaning": "When more than one adjective is used before a noun, they appear in the order: opinion, size, age, shape, colour, origin, material, purpose. (Thứ tự tính từ khi có nhiều tính từ đi trước danh từ)",
+    "example": "We've got a lovely little wooden cabin in the mountains. / You love your long, red, Chinese, silk curtains. / What you need for your living room is a large oak dining table.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Adjectives used as nouns",
+    "meaning": "Adjectives can function as nouns to refer to social groups, specific groups, or nationalities. (Tính từ có thể dùng như danh từ để chỉ nhóm người hoặc quốc tịch)",
+    "example": "We need to provide better housing for the poor. / When the building collapsed, the injured were rushed to hospital. / The French have introduced new housing regulations in Paris.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Position of adverbs",
+    "meaning": "Adverbs can appear at the beginning, middle, or end of a clause. Their position varies by type. (Trạng từ có thể đứng đầu, giữa hoặc cuối mệnh đề tùy loại)",
+    "example": "They built the house very quickly. / Our house will probably have been decorated by the time you get there. / I'm rarely in the city centre. / I rarely go to the city centre. / We bought it as an investment; then, all the property prices in the area fell.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Comparisons",
+    "meaning": "Comparatives and superlatives are used to compare people or things. (Dùng để so sánh các người hoặc vật)",
+    "example": "Your flat is much bigger and more comfortable than ours. / Mexico City is probably my least favourite city. / I think my home town is the best place in the world.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Comparative and superlative modifiers",
+    "meaning": "Modifiers such as quite, far, much, easily, etc., can strengthen comparatives and superlatives. (Các từ bổ nghĩa dùng để nhấn mạnh tính từ so sánh)",
+    "example": "This area has become considerably more crowded and far noisier in the last ten years. / If you ask me, Ladybridge is easily the nicest area of town to live in.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Structures used to make comparisons",
+    "meaning": "We can use structures like 'as ... as', 'not nearly as ... as', 'the ... the ...', etc. to express comparisons. (Các cấu trúc so sánh phức như the more ... the more ... hoặc not nearly as ...)",
+    "example": "Platinum is about twice as expensive as gold. / Iron is not nearly as hard as diamond. / Iron is nothing like as hard as diamond. / The taller the building, the greater the fire risk.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Gradable and ungradable adjectives",
+    "meaning": "Gradable adjectives can vary in degree and take modifiers like 'very'; ungradable adjectives express extremes and take words like 'absolutely'. (Tính từ chia làm loại có mức độ và loại tuyệt đối)",
+    "example": "Pete was a bit tired after working on the building site all day, but it wasn’t too bad. / After working on the building site all day, Tim was absolutely exhausted. / The balconies are quite splendid.",
+    "count": 0
+    },
+    {
+    "word": "Adjectives n Adverbs - Confusing cases",
+    "meaning": "Some words have forms that look like both adjectives and adverbs (e.g., fast, hard, late), or take -ly with different meanings. (Một số từ có thể là cả tính từ và trạng từ, đôi khi nghĩa khác nhau)",
+    "example": "Sandstone is not a very hard material. ✓ Hit it too hard and you’ll break it. ✗ Hit-it-too-hardly-and-you’ll-break-it. / I could hardly hear the music. / She looked at me in a very friendly way.",
+    "count": 0
+    },      
+    {
+    "word": "Clauses - Relative pronouns in relative clauses",
+    "meaning": "Relative pronouns are used to link a relative clause to a noun. (Đại từ quan hệ dùng để nối mệnh đề quan hệ với danh từ chính) Includes: who, which, whom, that, when, where, why, whose, what.",
+    "example": "There are a lot of people who hate having injections. / This is the prescription which the doctor gave me. / That’s the consultant with whom I spoke. / This is the prescription that the doctor gave me. / I’ll never forget the day when I broke my finger. / Harley Street, where she was born, is famous for its clinics. / That’s the reason why I wanted to become a vet. / There are several kids in my class whose parents are doctors. / What I don’t understand is why she didn’t take her pills.",
+    "count": 0
+    },      
+    {
+    "word": "Clauses - Defining and non-defining relative clauses",
+    "meaning": "Defining clauses identify which person/thing is meant; non-defining add extra information. (Mệnh đề quan hệ xác định và không xác định)",
+    "example": "Defining: The doctor who did Karen’s operation. / I’ll never forget the day when I broke my arm. Non-defining: Dr Lake, who has been working here for over ten years, is a very experienced surgeon. / Harley Street, where she was born, is famous for its clinics.",
+    "count": 0
+    },
+    {
+    "word": "Clauses - Participle clauses",
+    "meaning": "Used to replace relative clauses or add information using -ing, past participle, or having + V3. (Mệnh đề rút gọn dùng phân từ hiện tại/quá khứ)",
+    "example": "After giving blood, I went home. / Being frightened of needles, Tony was not looking forward to the injection. / Given the chance, I’d definitely study pharmacology.",
+    "count": 0
+    },
+    {
+    "word": "Clauses - Infinitive clauses",
+    "meaning": "Infinitive clauses can express purpose or follow certain verbs like 'be'. (Mệnh đề với động từ nguyên mẫu dùng để thể hiện mục đích hoặc theo sau một số động từ nhất định)",
+    "example": "To be a successful surgeon is the dream of many young children. / My job was to give the patients their lunch.",
+    "count": 0
+    },
+    {
+    "word": "Clauses - Concession clauses",
+    "meaning": "Concession clauses express contrast or unexpected results. (Mệnh đề nhượng bộ dùng để diễn tả sự trái ngược hoặc bất ngờ) Common phrases: although, even though, in spite of, despite, while, however, much as, etc.",
+    "example": "Even though she’d put on sun cream, Tamsin got burnt. / In spite of the fact that she put on sun cream, Tamsin still got burnt. / However hard he tried, he couldn’t put up with the pain.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Time",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: in an hour, in a second; Definite article: in the 1840s, in the winter, in the afternoon; Zero article: in 2010, in winter, in December, on Tuesday, at night",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For People and Work",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: have a job, work as a teacher, I met a very nice American last night; Definite article: the King, the Principal, the President, the British; Zero article: Russians, become President, go to work, be at work, have work to do",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Places",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: Is there a beach near here?; Definite article: the Himalayas, the Pacific Ocean, the Seine, the Earth, the Antarctic, the USA, the UK, the Scilly Isles; Zero article: Mount Everest, Berlin, America, Antarctica, Jupiter, Fleet Street, Lake Michigan, Mykonos",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Public Buildings",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: Is there a bank near here?; Definite article: the bank, the post office, go to the hospital/prison/school (as a visitor); Zero article: go to school/hospital/prison (as a student/patient/prisoner)",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Entertainment and Sport",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: Play us a song!, I’ve got a tennis ball; Definite article: play the guitar, the media, on the radio, go to the cinema, watch the TV; Zero article: play tennis, play guitar, listen to music, on television, watch TV",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Organisations",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: Does Switzerland have an army?; Definite article: the BBC, the police, the emergency services, the United Nations; Zero article: NATO",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Education",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: have a lesson, take an exam; Definite article: be in the first year; Zero article: geography, be in class/year/form 5",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Travel",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: take a taxi, catch a bus/train; Definite article: in the car/taxi, on the bus/plane; Zero article: on foot, go home, go by car/plane",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Articles by category and set phrases (usage) - For Health",
+    "meaning": "Certain categories have typical article usage. (Một số danh từ theo nhóm có quy tắc dùng mạo từ đặc trưng)",
+    "example": "Indefinite article: have a cold/cough/headache/toothache/stomach ache; Definite article: have the flu/measles; Zero article: have flu/measles/toothache/stomach ache",
+    "count": 0
+    },      
+    {
+        "word": "Noun phrase - Countable nouns (structure)",
+        "meaning": "Countable nouns have both singular and plural forms, and can be used with a/an or numbers. (Danh từ đếm được có dạng số ít và số nhiều, dùng với a/an hoặc số đếm) Examples: painting, paintings, idea, books. Some have irregular plurals (e.g. people, mice, men).",
+        "example": "That painting is amazing. / Those paintings are dreadful. / The sheep are in the field. / The government is/are not doing anything to help the arts.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Singular uncountable nouns (structure)",
+        "meaning": "These nouns only have a singular form and take singular verbs. (Danh từ không đếm được chỉ có dạng số ít và đi với động từ số ít) Includes: advice, blood, bread, furniture, hair, information, jewellery, knowledge, luggage, money, news, permission, respect, water.",
+        "example": "Is the information reliable? / The table is made of wood. / It's a picture of a local wood.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Plural uncountable nouns (structure)",
+        "meaning": "These uncountable nouns have a plural form and take plural verbs. (Một số danh từ không đếm được có dạng số nhiều và đi với động từ số nhiều) Includes: arms, binoculars, clothes, congratulations, earnings, glasses, goods, groceries, jeans, pajamas, scales, surroundings, scissors, trousers, etc.",
+        "example": "The scissors aren't on the table. / A pair of binoculars is on the desk.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Quantifiers for countable and uncountable nouns (usage)",
+        "meaning": "Some quantifiers are used only with countable nouns, others with uncountable, and some with both. (Một số từ chỉ định lượng chỉ dùng với danh từ đếm được, không đếm được, hoặc cả hai)",
+        "example": "A few friends (countable) / A little milk (uncountable) / A lot of people (all nouns) / Only a few of them came. / Only a little of it was useful.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Indefinite articles: a/an (usage)",
+        "meaning": "Used with singular countable nouns to refer to something not specific or mentioned for the first time. (Dùng với danh từ đếm được số ít, để nói về một vật chưa xác định hoặc mới nhắc đến lần đầu)",
+        "example": "I'd like to go to a concert tonight. / I've had a great idea! / A poet sees the world differently.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Definite article: the (usage)",
+        "meaning": "Used to refer to specific things or when both speaker and listener know what is being talked about. (Dùng để nói về điều đã biết hoặc xác định được)",
+        "example": "Is that the band you were talking about? / The scales are balanced to symbolise equality. / The young often rebel against the old.",
+        "count": 0
+      },
+      {
+        "word": "Noun phrase - Zero article: no article at all (usage)",
+        "meaning": "Used with plural or uncountable nouns when talking generally or in idiomatic expressions. (Không dùng mạo từ khi nói chung hoặc trong các cụm thành ngữ)",
+        "example": "Don't let your young child use scissors unsupervised. / An artist always needs inspiration.",
+        "count": 0
+      },
+
+    {
+    "word": "Verbal complements - Verb + -ing form (structure)",
+    "meaning": "Certain verbs are followed by the -ing form. (Một số động từ đi với dạng V-ing) Verbs include: admit, adore, advocate, appreciate, avoid, can't help, carry on, compare, consider, contemplate, delay, deny, detest, discuss, dislike, endure, enjoy, escape, face, fancy, feel like, finish, foresee, give up, include, involve, justify, keep (on), mention, mind, miss, postpone, practise, put off, recommend, resent, resist, risk, suggest, take up.",
+    "example": "Sue admitted feeling rather upset. / Damien insisted on going to the party. / I'm looking forward to meeting your brother.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb + object + -ing form (structure)",
+    "meaning": "Some verbs take an object followed by an -ing form. (Một số động từ đi với tân ngữ + V-ing) Verbs include: catch, find, glimpse, hear, notice, observe, overhear, see, smell, watch.",
+    "example": "They caught him taking money from the till.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb + full infinitive (structure)",
+    "meaning": "Many verbs are followed by the full infinitive (to + V). (Nhiều động từ đi với to + V nguyên mẫu) Verbs include: afford, agree, aim, appear, apply, arrange, aspire, attempt, beg, cease, choose, claim, come, dare, decide, demand, deserve, desire, expect, fail, happen, help, hesitate, hope, learn, manage, need, neglect, offer, plan, prepare, pretend, promise, refuse, resolve, rush, seek, seem, strive, tend, undertake, volunteer, vote, wait, want, wish, would like, yearn.",
+    "example": "Can you afford to buy that car? / I hope to pass the exam. / They promised to call later.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb + object + full infinitive (structure)",
+    "meaning": "Some verbs require both an object and a full infinitive. (Một số động từ cần cả tân ngữ và to + V) Verbs include: advise, allow, ask, assist, authorise, beg, cause, challenge, choose, command, compel, convince, dare, decide, defy, desire, employ, enable, empower, encourage, expect, force, free, help, hire, inspire, instruct, intend, invite, lead, motivate, move, need, nominate, order, permit, persuade, pick, prepare, prompt, qualify, raise, recommend, recruit, request, require, select, send, signal, teach, tell, tempt, trust, want, warn.",
+    "example": "My sister advised me to tell Jim the truth.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb + object + bare infinitive (structure)",
+    "meaning": "Verbs like let, make, help are followed by object + bare infinitive (V without to). (Một số động từ theo sau là tân ngữ + V không 'to') Verbs include: help, let, make, feel, hear, notice, overhear, see, watch.",
+    "example": "The teacher let the class leave early.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb (+ object) + infinitive or -ing form with little or no change in meaning (structure)",
+    "meaning": "Some verbs can be followed by either an infinitive or -ing form without significant change in meaning. (Một số động từ đi với to V hoặc V-ing mà không thay đổi nghĩa nhiều) Verbs include: begin, bother, can't bear/stand, continue, hate, intend, like, love, prefer, start.",
+    "example": "I love to read. / I love reading. / They continued to work. / They continued working.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Verb (+ object) + infinitive or -ing form with a change in meaning (structure)",
+    "meaning": "Some verbs change meaning depending on whether they are followed by an infinitive or -ing. (Một số động từ thay đổi nghĩa tùy thuộc vào to V hay V-ing theo sau) Verbs include: consider, forget, go on, hear, imagine, like, mean, regret, remember, see, stop, try.",
+    "example": "I forgot to ask Brian. / I’ll never forget asking Helen. / I stopped to think. / Please stop telling me what to do. / Try to not forget her birthday. / You could try buying her some flowers.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Preparatory it (structure)",
+    "meaning": "Some verbs like find, think, and consider can use 'it' as preparatory subject. (Dùng 'it' như chủ ngữ giả với các động từ như find, think, consider) Common verbs: find, think, consider, make, believe, feel.",
+    "example": "I consider it incredible that James and Alice are still together.",
+    "count": 0
+    },
+    {
+    "word": "Verbal complements - Subjunctive (structure)",
+    "meaning": "Used in that-clauses after verbs suggesting necessity or importance; uses base form of verb (no -s in 3rd person). (Câu giả định dùng để diễn tả điều cần thiết, quan trọng hoặc mong muốn, dùng động từ nguyên mẫu) Typical verbs: suggest, recommend, insist, demand, ask, require, propose, important that..., essential that..., vital that..., necessary that....",
+    "example": "The doctor suggested that Sam take some time off work. / It’s very important that Greg not know about this. / It’s absolutely essential that I be informed.",
+    "count": 0
+    },      
+    {
     "word": "Unreal time - conditional (n) /kənˈdɪʃənəl/",
     "meaning": "a sentence that expresses a condition and its result, often used for hypothetical or unlikely situations. (câu điều kiện)",
     "example": "If I had known, I would have taken some dollars with me.",
@@ -16479,7 +16714,67 @@
     }
             
   ],
-  "phrases, collocations": [     
+  "phrases, collocations": [    
+    {
+    "word": "consequence /ˈkɒnsɪkwəns/",
+    "meaning": "accept/face the consequences (chấp nhận/hứng chịu hậu quả), serious/disastrous/negative consequences (hậu quả nghiêm trọng), direct consequence of (hậu quả trực tiếp), in consequence of (vì lý do), of no/little consequence (không/không quá quan trọng)",
+    "example": "You must face the consequences of your actions. The accident was a direct consequence of poor planning. His opinion is of no consequence to me.",
+    "count": 0
+    },
+    {
+    "word": "consideration /kənˌsɪdəˈreɪʃn/",
+    "meaning": "take into consideration (cân nhắc), give consideration to (xem xét), show consideration for (quan tâm tới), under consideration (được xem xét), for consideration (để cân nhắc), out of consideration for (vì cân nhắc tới ai)",
+    "example": "We must take all factors into consideration before deciding. She always shows consideration for others. Your suggestion is under consideration.",
+    "count": 0
+    },
+    {
+    "word": "course /kɔːs/",
+    "meaning": "in the course of (trong suốt quá trình), course of action/events (diễn biến hành động/sự kiện)",
+    "example": "In the course of the investigation, new evidence came to light. We must decide the best course of action.",
+    "count": 0
+    },
+    {
+    "word": "crime /kraɪm/",
+    "meaning": "commit/permit/witness/solve a crime (thực hiện/cho phép/chứng kiến/giải quyết một tội ác), fight/combat crime (chống tội phạm), crime rate (tỉ lệ tội phạm), organised crime (tội phạm có tổ chức)",
+    "example": "He committed a serious crime last year. The government is taking steps to combat organised crime. The city’s crime rate has dropped.",
+    "count": 0
+    },
+    {
+    "word": "cry /kraɪ/",
+    "meaning": "cry with pain/happiness/laughter (khóc vì...), cry over/about (khóc vì), cry for help (kêu cứu), cry your eyes/heart out (khóc nhiều), have a good cry (khóc thỏa thích), burst into tears (bật khóc)",
+    "example": "She burst into tears at the news. He cried for help when he fell. I needed to have a good cry after the breakup.",
+    "count": 0
+    },
+    {
+    "word": "date /deɪt/",
+    "meaning": "date from (bắt đầu xuất hiện từ), date back to (có từ khi), keep sth up to date (cập nhật), set/fix a date (chọn ngày), go on/make a date with sb (hẹn hò), at a later/future date (một ngày nào đó trong tương lai), to date (đến nay)",
+    "example": "The building dates back to the 18th century. Please keep your records up to date. We haven’t set a date for the wedding yet.",
+    "count": 0
+    },
+    {
+    "word": "day /deɪ/",
+    "meaning": "make sb’s day (khiến ai đó hạnh phúc), by day (ban ngày), any day now (sắp tới, bất cứ lúc nào), from day to day (từng ngày), day by day (ngày qua ngày), day off (ngày nghỉ), day trip (chuyến đi trong ngày)",
+    "example": "The kind words really made my day. He works by day and studies by night. We're planning a day trip to the countryside.",
+    "count": 0
+    },
+    {
+    "word": "dead /ded/",
+    "meaning": "go dead (tắt, ngừng hoạt động), drop dead (đột nhiên lăn ra chết), dead silence (sự im lặng tuyệt đối), dead tired (mệt lả), dead and gone (biến mất, không còn nữa), dead ahead (ngay phía trước mặt)",
+    "example": "The phone line suddenly went dead. I was dead tired after the hike. There was dead silence in the room.",
+    "count": 0
+    },
+    {
+    "word": "deal /diːl/",
+    "meaning": "deal in (buôn bán), deal with (giải quyết), deal a blow to (giáng một đòn vào), get a good deal on (mua được giá tốt), give sb a good deal (cho ai đó thỏa thuận tốt), great deal of sth (rất nhiều)",
+    "example": "She deals in antiques. We need to deal with this problem quickly. He got a good deal on his new car.",
+    "count": 0
+    },
+    {
+    "word": "decide /dɪˈsaɪd/",
+    "meaning": "decide on sb/sth (quyết định chọn), decide against (quyết định không), decide in favour of (quyết định ủng hộ), decide for yourself (tự quyết định), decision to do (quyết định làm gì)",
+    "example": "They decided against buying the house. You need to decide for yourself. We made the decision to expand the business.",
+    "count": 0
+    }, 
     {
     "word": "about /əˈbaʊt/",
     "meaning": "partly/mainly/all about (một phần/đa phần/toàn bộ về), do sth about (làm gì đó để xử lý), about to do (sắp làm gì)",
@@ -16752,6 +17047,126 @@
     }
   ],    
   "word formation": [
+    {
+    "word": "avoid",
+    "meaning": "avoidance, /əˈvɔɪdəns/: sự tránh. (un)avoidable, /əˈvɔɪdəbl/: (không thể) tránh khỏi. (un)avoidably, /ˌʌnəˈvɔɪdəbli/: (một cách không thể) tránh khỏi.",
+    "example": "His avoidance of the issue was clear. The damage was unavoidable. The crash was unavoidably caused by the fog.",
+    "count": 0
+    },
+    {
+    "word": "awe",
+    "meaning": "awfulness, /ˈɔːflnəs/: sự khủng khiếp. awesomeness, /ˈɔːsəmnəs/: sự tuyệt vời. awestruck, /ˈɔːstrʌk/: kinh ngạc. awfully(ly), /ˈɔːf(ə)li/: (một cách) kinh khủng. awesome(ly), /ˈɔːs(ə)mli/: (một cách) tuyệt vời.",
+    "example": "The awfulness of the event shocked everyone. Her awesomeness was undeniable. He was awestruck by the view. It was awfully noisy. She danced awesomely.",
+    "count": 0
+    },
+    {
+    "word": "believe",
+    "meaning": "disbelieve, /ˌdɪsbɪˈliːv/: không tin. belief, /bɪˈliːf/: niềm tin. believer, /bɪˈliːvər/: người tin tưởng. (un)believable, /ˌʌnbɪˈliːvəbl/: (không) thể tin được. disbelieving(ly), /ˌdɪsbɪˈliːvɪŋ(li)/: (một cách) không tin.",
+    "example": "I disbelieve that rumor. He has a strong belief in honesty. She’s a true believer. That’s unbelievable! He looked at me disbelievingly.",
+    "count": 0
+    },
+    {
+    "word": "benefit",
+    "meaning": "beneficiary, /ˌbenɪˈfɪʃəri/: người hưởng lợi. beneficial(ly), /ˌbenɪˈfɪʃəl(li)/: (một cách) có lợi.",
+    "example": "She’s the main beneficiary of the will. The program worked beneficially for all.",
+    "count": 0
+    },
+    {
+    "word": "brief",
+    "meaning": "(de)briefing, /ˈbriːfɪŋ/: cuộc phỏng vấn, thẩm vấn. brevity, /ˈbrevəti/: sự ngắn gọn. briefs, /briːfs/: quần lót nam. briefly, /ˈbriːfli/: một cách vắn tắt.",
+    "example": "The debriefing took an hour. The letter was praised for its brevity. He packed several briefs. She explained briefly.",
+    "count": 0
+    },
+    {
+    "word": "brilliant",
+    "meaning": "brilliance, /ˈbrɪljəns/: sự tài giỏi. brilliantly, /ˈbrɪljəntli/: một cách giỏi giang.",
+    "example": "Her brilliance impressed everyone. He played brilliantly.",
+    "count": 0
+    },
+    {
+    "word": "broad",
+    "meaning": "broaden, /ˈbrɔːdn/: mở rộng. breadth, /bredθ/: chiều rộng. broadly, /ˈbrɔːdli/: một cách rộng rãi.",
+    "example": "Travel broadens the mind. The table has a great breadth. He smiled broadly.",
+    "count": 0
+    },
+    {
+    "word": "capable",
+    "meaning": "capability, /ˌkeɪpəˈbɪləti/: khả năng. incapable, /ɪnˈkeɪpəbl/: không có khả năng.",
+    "example": "She has great capability. He is incapable of lying.",
+    "count": 0
+    },
+    {
+    "word": "cause",
+    "meaning": "causation, /kɔːˈzeɪʃn/: nguyên nhân. causal, /ˈkɔːzl/: thuộc quan hệ nhân quả. causative, /ˈkɔːzətɪv/: là nguyên nhân gây ra.",
+    "example": "The causation of the accident is unclear. There is a causal link between stress and illness. Smoking is a causative factor of cancer.",
+    "count": 0
+    },
+    {
+    "word": "change",
+    "meaning": "exchange, /ɪksˈtʃeɪndʒ/: trao đổi. changeover, /ˈtʃeɪndʒəʊvə(r)/: chuyển biến. (un)changing, /ˌʌnˈtʃeɪndʒɪŋ/: (không) thay đổi. (un)changeable, /ˌʌnˈtʃeɪndʒəbl/: (không) dễ thay đổi. interchangeable, /ˌɪntəˈtʃeɪndʒəbl/: có tính thay thế lẫn nhau.",
+    "example": "They discussed a cultural exchange. The changeover was seamless. His mood is unchanging. The weather is changeable. These parts are interchangeable.",
+    "count": 0
+    },      
+    {
+    "word": "approve",
+    "meaning": "disapprove, /ˌdɪsəˈpruːv/: không ủng hộ, không thông qua. (dis)approval, /ˌdɪsəˈpruːvəl/: sự (không) ủng hộ, thông qua. (dis)approved, /ˌdɪsəˈpruːvd/: (không) được thông qua. (dis)approving(ly), /ˌdɪsəˈpruːvɪŋ(li)/: (một cách) (không) tán thành.",
+    "example": "She disapproved of his decision. The plan received official approval. The application was disapproved. He looked at them disapprovingly.",
+    "count": 0
+    },
+    {
+    "word": "architect",
+    "meaning": "architecture, /ˈɑːkɪtektʃə(r)/: kiến trúc. architectural(ly), /ˌɑːkɪˈtek.tʃər(ə)li/: (thuộc) kiến trúc.",
+    "example": "The building is famous for its modern architecture. The city is architecturally diverse.",
+    "count": 0
+    },
+    {
+    "word": "argue",
+    "meaning": "argument, /ˈɑːɡjumənt/: lập luận, lý lẽ. argumentative(ly), /ˌɑːɡjumənˈtetɪv(li)/: (một cách) thích tranh luận. (un)arguable, /ˈɑːɡjuəbl/: (không thể) bàn cãi. arguably, /ˈɑːɡjuəbli/: có thể cho là.",
+    "example": "They had a strong argument. He answered argumentatively. That’s an unarguable fact. Arguably, she’s the best in the team.",
+    "count": 0
+    },
+    {
+    "word": "arrange",
+    "meaning": "rearrange, /ˌriːəˈreɪndʒ/: sắp xếp lại. (re)arrangement, /ˌ(riː)əˈreɪndʒmənt/: sự sắp xếp (lại). arranged, /əˈreɪndʒd/: được sắp xếp.",
+    "example": "Let’s rearrange the meeting. The rearrangement was necessary. Everything was neatly arranged.",
+    "count": 0
+    },
+    {
+    "word": "art",
+    "meaning": "arts, /ɑːts/: nghệ thuật. artfulness, /ˈɑːtfəlnəs/: sự tinh ranh, khéo léo. artificiality, /ˌɑːtɪˌfɪʃiˈæləti/: tính nhân tạo, giả tạo. artist, /ˈɑːtɪst/: nghệ sĩ. artistic(ally), /ɑːˈtɪstɪk(li)/: (một cách) nghệ thuật. artificial(ly), /ˌɑːtɪˈfɪʃl(i)/: (một cách) giả tạo. artful(ly), /ˈɑːtfəl(i)/: (một cách) tinh vi. artless(ly), /ˈɑːtləs(li)/: (một cách) chân thật.",
+    "example": "She studied the arts. His artfulness was impressive. The flower looked artificial. The artist displayed new work. She decorated the room artistically. It was artificially sweetened. He answered artfully. She sang artlessly.",
+    "count": 0
+    },
+    {
+    "word": "assess",
+    "meaning": "reassess, /ˌriːəˈses/: đánh giá lại. (re)assessment, /ˌ(riː)əˈsesmənt/: đánh giá (lại). assessor, /əˈsesər/: người đánh giá. assessed, /əˈsest/: bị đánh thuế.",
+    "example": "We need to reassess our priorities. The assessment was thorough. The assessor arrived on time. Property was assessed last year.",
+    "count": 0
+    },
+    {
+    "word": "associate",
+    "meaning": "dissociate, /dɪˈsəʊʃieɪt/: phân tách. association, /əˌsəʊsiˈeɪʃn/: sự liên kết. associate, /əˈsəʊʃiət/: người cộng tác. associated, /əˈsəʊsieɪtɪd/: có liên hệ.",
+    "example": "He tried to dissociate himself from the scandal. The event is organized by a student association. She’s a business associate. The risks are associated with smoking.",
+    "count": 0
+    },
+    {
+    "word": "assume",
+    "meaning": "assumption, /əˈsʌmpʃn/: giả định. assuming, /əˈsjuːmɪŋ/: giả sử. unassuming, /ˌʌnəˈsjuːmɪŋ/: khiêm tốn. assumed, /əˈsjuːmd/: giả, sai sự thật.",
+    "example": "That’s a risky assumption. Assuming he’s right, we’ll win. He is very unassuming. She used an assumed name.",
+    "count": 0
+    },
+    {
+    "word": "attach",
+    "meaning": "reattach, /ˌriːəˈtætʃ/: đính kèm lại. attachment, /əˈtætʃmənt/: sự đính kèm. (un)attached, /ʌnəˈtætʃt/: (không) đính kèm.",
+    "example": "Please reattach the document. The email had an attachment. He arrived unattached.",
+    "count": 0
+    },
+    {
+    "word": "available",
+    "meaning": "(un)availability, /əˌveɪləˈbɪləti/: sự (không) sẵn sàng.",
+    "example": "Check the availability of the room. Internet unavailability affected our work.",
+    "count": 0
+    },      
     {      
     "word": "access",
     "meaning": "accessibility, /ˌæk.ses.əˈbɪl.ə.ti/: khả năng tiếp cận. (in)accessible, /ˌɪn.əkˈses.ə.bəl/: (không) có thể tiếp cận được.",
