@@ -5,6 +5,7 @@ import { AutoAdvanceTimer } from './AutoAdvanceTimer';
 import { VoiceManager } from './VoiceManager';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
+import { toast } from 'sonner';
 
 /**
  * Handles the actual speech synthesis execution
@@ -109,12 +110,14 @@ export class SpeechExecutor {
         this.stateManager.setCurrentUtterance(utterance);
         this.isStopping = false;
         this.cancelledUtterance = null;
+        console.log('[SPEECH-EXECUTOR] -> invoking window.speechSynthesis.speak');
         window.speechSynthesis.speak(utterance);
 
         // Fallback timeout
         setTimeout(() => {
           if (this.stateManager.getState().currentUtterance === utterance && !this.stateManager.getState().isActive) {
             console.warn('[SPEECH-EXECUTOR] Speech may have failed silently');
+            toast.error('Audio blocked—click anywhere to enable sound.');
             resolve(false);
           }
         }, 1000);
