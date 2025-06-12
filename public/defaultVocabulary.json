@@ -3299,9 +3299,117 @@
       "meaning": "continue doing something in a determined way: quyết tâm tiến hành.",
       "example": "Don't worry, your dad's going to pull through.",
       "count": 0
-    }
+    }   
   ],
   "idioms": [
+    {
+    "word": "keep a straight face",
+    "meaning": "remain serious and not laugh (giữ vẻ mặt nghiêm túc)",
+    "example": "I couldn't keep a straight face when I saw Mike’s new haircut.",
+    "count": 0
+    },
+    {
+    "word": "keep sb posted",
+    "meaning": "regularly give someone information about something they are interested in (thường xuyên cập nhật thông tin)",
+    "example": "Do please keep me posted about any developments.",
+    "count": 0
+    },
+    {
+    "word": "keep sth under your hat",
+    "meaning": "keep something secret (giữ bí mật)",
+    "example": "Keep it under your hat, but we’re thinking of buying a new house.",
+    "count": 0
+    },
+    {
+    "word": "keep up with the Joneses",
+    "meaning": "try to be as rich, successful, etc. as your neighbours (đu đòi)",
+    "example": "I don’t need a new car, and I’m really not interested in keeping up with the Joneses.",
+    "count": 0
+    },
+    {
+    "word": "keep your hair on",
+    "meaning": "used for telling someone not to get angry or upset (bình tĩnh nào)",
+    "example": "Keep your hair on! There’s no need to get annoyed.",
+    "count": 0
+    },
+    {
+    "word": "kick yourself",
+    "meaning": "be very annoyed because you made a mistake or missed an opportunity (dằn vặt bản thân)",
+    "example": "I could have kicked myself when I realised I’d left my wallet in the restaurant.",
+    "count": 0
+    },
+    {
+    "word": "knee-high to a grasshopper",
+    "meaning": "very small, because you were very young (lúc còn nhỏ xíu)",
+    "example": "When I was knee-high to a grasshopper, I used to believe that a monster lived under my bed.",
+    "count": 0
+    },
+    {
+    "word": "know sth inside out",
+    "meaning": "be very familiar with; know everything about (biết tường tận)",
+    "example": "Maria’s been in the business for years and she knows advertising inside out.",
+    "count": 0
+    },
+    {
+    "word": "know what’s what",
+    "meaning": "know the important facts about a situation (hiểu rõ cái gì ra cái gì)",
+    "example": "Ask Tony about the proposed changes. He knows what’s what.",
+    "count": 0
+    },
+    {
+    "word": "last word in sth",
+    "meaning": "the newest and best type of something (kiểu mới nhất, thành tựu mới nhất)",
+    "example": "The ZD-2000 is the last word in mobile phones.",
+    "count": 0
+    },
+    {
+    "word": "lay/put your cards on the table",
+    "meaning": "tell people exactly what you are thinking or what you intend to do (thẳng thắn nói hết ra)",
+    "example": "I’m going to lay my cards on the table and offer you an extra £1,000. But that’s my final offer!",
+    "count": 0
+    },
+    {
+    "word": "let nature take its course",
+    "meaning": "allow something to develop without trying to influence it (hãy cứ để tự nhiên đi)",
+    "example": "I’m sure sales will improve if we just let nature take its course.",
+    "count": 0
+    },
+    {
+    "word": "let off steam",
+    "meaning": "shout or do something that allows you to get rid of anger (xả hơi, xả giận)",
+    "example": "I was so annoyed I had to go for a long walk to let off steam.",
+    "count": 0
+    },
+    {
+    "word": "let sleeping dogs lie",
+    "meaning": "leave a person or situation alone if it might cause you trouble (chuyện đã qua hãy để cho qua đi)",
+    "example": "I know you think your parents are being unfair, but it’s probably best to let sleeping dogs lie and not make it worse by arguing.",
+    "count": 0
+    },
+    {
+    "word": "let your hair down",
+    "meaning": "relax and enjoy yourself in a comfortable environment (xõa đi)",
+    "example": "It’s good to let your hair down after a hard week at work.",
+    "count": 0
+    },
+    {
+    "word": "life and soul of the party",
+    "meaning": "someone who is very lively at social events (linh hồn của bữa tiệc)",
+    "example": "Harry’s so much fun and everyone says he’s the life and soul of the party.",
+    "count": 0
+    },
+    {
+    "word": "like two peas in a pod",
+    "meaning": "used for saying that two people look or think exactly the same (giống như hai giọt nước)",
+    "example": "Irene and her sister are like two peas in a pod.",
+    "count": 0
+    },
+    {
+    "word": "line your pocket(s)",
+    "meaning": "obtain money, especially dishonestly (vì tiền mà bất chấp, mờ mắt vì tiền)",
+    "example": "He’d been lining his pockets for years before he was finally caught.",
+    "count": 0
+    },      
     {
       "word": "Your Guess is as Good as Mine",
       "meaning": "To have no idea about anything",
@@ -4895,6 +5003,768 @@
 
   ],
   "topic vocab": [
+    {
+    "word": "yearn (v) /jɜːn/",
+    "meaning": "to want something a lot, especially something difficult to get (ao ước)",
+    "example": "Many people yearn to retire to the country, but not everyone manages it.",
+    "count": 0
+    },
+    {
+    "word": "absorbing (adj) /əbˈzɔːbɪŋ/",
+    "meaning": "so entertaining that you give it all your attention (hấp dẫn)",
+    "example": "The film was so absorbing that time simply flew by.",
+    "count": 0
+    },
+    {
+    "word": "casual (adj) /ˈkæʒuəl/",
+    "meaning": "relaxed and informal (tự nhiên, không trịnh trọng)",
+    "example": "The party is quite casual, so don’t dress too formally.",
+    "count": 0
+    },
+    {
+    "word": "exhilarating (adj) /ɪɡˈzɪləreɪtɪŋ/",
+    "meaning": "making you feel happy, excited and full of energy (gây hứng khởi, hồi hộp)",
+    "example": "The funfair was really exhilarating.",
+    "count": 0
+    },
+    {
+    "word": "fatigue (n) /fəˈtiːɡ/",
+    "meaning": "a feeling of being very tired (mệt nhọc)",
+    "example": "Fatigue can lead to mistakes.",
+    "count": 0
+    },
+    {
+    "word": "idle (adj) /ˈaɪdl/",
+    "meaning": "not doing anything when you should be (lười biếng, vô công rồi nghề)",
+    "example": "Don’t just sit there being idle — there’s housework to be done.",
+    "count": 0
+    },
+    {
+    "word": "idle (adj) /ˈaɪdl/",
+    "meaning": "not working or not being used (ăn không ngồi rồi)",
+    "example": "The company is losing money all the time the workers are idle.",
+    "count": 0
+    },
+    {
+    "word": "indulge (v) /ɪnˈdʌldʒ/",
+    "meaning": "to allow yourself to have or do something enjoyable (nuông chiều, thỏa mãn)",
+    "example": "I decided to indulge myself and had a holiday in the Bahamas.",
+    "count": 0
+    },
+    {
+    "word": "lifestyle (n) /ˈlaɪfstaɪl/",
+    "meaning": "the way in which a person lives (lối sống)",
+    "example": "This product is ideal for today’s busy lifestyles.",
+    "count": 0
+    },
+    {
+    "word": "leave (n) /liːv/",
+    "meaning": "a period of time away from your job or the armed forces (thời gian nghỉ phép)",
+    "example": "My brother comes out of the army on leave next week.",
+    "count": 0
+    },
+    {
+    "word": "outing (n) /ˈaʊtɪŋ/",
+    "meaning": "a short journey taken for enjoyment (cuộc đi chơi ngắn)",
+    "example": "Let’s have an outing to the beach this weekend.",
+    "count": 0
+    },
+    {
+    "word": "pastime (n) /ˈpɑːstaɪm/",
+    "meaning": "an activity that you do for fun in your free time (trò tiêu khiển)",
+    "example": "I need to find a pastime that doesn’t demand a lot of money.",
+    "count": 0
+    },
+    {
+    "word": "pursue (v) /pəˈsjuː/",
+    "meaning": "to follow or try to achieve something (theo đuổi)",
+    "example": "I’m thinking of pursuing a career in medicine.",
+    "count": 0
+    },
+    {
+    "word": "recreation (n) /ˌrekriˈeɪʃn/",
+    "meaning": "activities done for enjoyment (sự giải trí, tiêu khiển)",
+    "example": "Sport can be a very social form of recreation.",
+    "count": 0
+    },
+    {
+    "word": "respite (n) /ˈrespaɪt/",
+    "meaning": "a short break from something difficult or unpleasant (thời gian nghỉ ngơi)",
+    "example": "We had a few days of respite from the hot weather, but it soon got warmer again.",
+    "count": 0
+    },
+    {
+    "word": "sedentary (adj) /ˈsedntri/",
+    "meaning": "involving little physical activity (tĩnh tại, ít vận động)",
+    "example": "I’ve got quite a sedentary job, so I like to go to the gym once a week.",
+    "count": 0
+    },
+    {
+    "word": "socialise (v) /ˈsəʊʃəlaɪz/",
+    "meaning": "to spend time with others in a friendly way (giao tiếp xã hội)",
+    "example": "We seem to have done a lot of socialising this month.",
+    "count": 0
+    },
+    {
+    "word": "solitude (n) /ˈsɒlɪtjuːd/",
+    "meaning": "the state of being alone in a pleasant way (trạng thái cô độc dễ chịu)",
+    "example": "There’s nothing like the peace and solitude you get when you’re fishing.",
+    "count": 0
+    },
+    {
+    "word": "tedious (adj) /ˈtiːdiəs/",
+    "meaning": "boring and lasting a long time (chán ngắt)",
+    "example": "I couldn’t believe how tedious that meeting was!",
+    "count": 0
+    },
+    {
+    "word": "trivial (adj) /ˈtrɪviəl/",
+    "meaning": "not important or serious (tầm thường, vụn vặt)",
+    "example": "Fran always seems to think that her problems are important, while yours are quite trivial.",
+    "count": 0
+    },
+    {
+    "word": "unwind (v) /ʌnˈwaɪnd/",
+    "meaning": "to relax after working or being nervous (thư giãn)",
+    "example": "I like to unwind with a good book in the evenings.",
+    "count": 0
+    },
+    {
+    "word": "venue (n) /ˈvenjuː/",
+    "meaning": "a place where an event happens (địa điểm)",
+    "example": "Have they chosen a venue for the wedding yet?",
+    "count": 0
+    },      
+    {
+    "word": "decline (v) /dɪˈklaɪn/",
+    "meaning": "to become less or worse (giảm, suy tàn)",
+    "example": "The service in this hotel has really declined over the last couple of years.",
+    "count": 0
+    },
+    {
+    "word": "dedicated (adj) /ˈdedɪkeɪtɪd/",
+    "meaning": "spending all your time and effort on something (tận tâm)",
+    "example": "Kelly’s very dedicated to her job and should go far.",
+    "count": 0
+    },
+    {
+    "word": "delight (v) /dɪˈlaɪt/",
+    "meaning": "to give someone a lot of enjoyment or pleasure (làm vui sướng)",
+    "example": "I was delighted by the decision.",
+    "count": 0
+    },
+    {
+    "word": "desire (v) /dɪˈzaɪə(r)/",
+    "meaning": "to want something (ao ước, khát khao)",
+    "example": "It’s quite common for people to desire what they can’t have.",
+    "count": 0
+    },
+    {
+    "word": "desire (n) /dɪˈzaɪə(r)/",
+    "meaning": "a strong feeling of wanting to have or do something (niềm mơ ước, khao khát)",
+    "example": "She had a strong desire to work in the media.",
+    "count": 0
+    },
+    {
+    "word": "devote (v) /dɪˈvəʊt/",
+    "meaning": "to spend a lot of time or effort doing something (cống hiến)",
+    "example": "Gordon’s absolutely devoted to his kids.",
+    "count": 0
+    },
+    {
+    "word": "devote (v) /dɪˈvəʊt/",
+    "meaning": "to use something such as money for a particular purpose (dành cho việc gì)",
+    "example": "The government has devoted £10 million to the museum.",
+    "count": 0
+    },
+    {
+    "word": "differentiate (v) /ˌdɪfəˈrenʃieɪt/",
+    "meaning": "to see or show the difference between things (phân biệt)",
+    "example": "I’m colour blind, so I have problems differentiating between red and green.",
+    "count": 0
+    },
+    {
+    "word": "envy (v) /ˈenvi/",
+    "meaning": "to have the unhappy feeling of wanting to be like someone else (ghen tị)",
+    "example": "Carla’s brother never showed envy at her success.",
+    "count": 0
+    },
+    {
+    "word": "envy (n) /ˈenvi/",
+    "meaning": "the unhappy feeling of wanting what someone else has (sự ghen tị)",
+    "example": "Envy can destroy a relationship.",
+    "count": 0
+    },
+    {
+    "word": "fancy (v) /ˈfænsi/",
+    "meaning": "to want to have or do something (thích, muốn)",
+    "example": "Do you fancy going out tonight?",
+    "count": 0
+    },
+    {
+    "word": "fascination (n) /ˌfæsɪˈneɪʃn/",
+    "meaning": "state of being extremely interested in something (sự quyến rũ, hấp dẫn)",
+    "example": "Carol’s always had a fascination with insects.",
+    "count": 0
+    },
+    {
+    "word": "favour (n) /ˈfeɪvə(r)/",
+    "meaning": "to support or agree with one thing more than another (sự ủng hộ)",
+    "example": "I favour the first suggestion.",
+    "count": 0
+    },
+    {
+    "word": "favour (v) /ˈfeɪvə(r)/",
+    "meaning": "to help or give advantage to someone (thiên vị)",
+    "example": "It’s not fair to favour one student over another.",
+    "count": 0
+    },
+    {
+    "word": "favour (v) /ˈfeɪvə(r)/",
+    "meaning": "to do something for someone as an act of kindness (sự giúp đỡ)",
+    "example": "I don’t suppose you could do me a favour, could you?",
+    "count": 0
+    },
+    {
+    "word": "greedy (adj) /ˈɡriːdi/",
+    "meaning": "wanting more money, things or power than needed (tham lam)",
+    "example": "Maybe being sick will teach you not to be so greedy next time.",
+    "count": 0
+    },
+    {
+    "word": "impulse (n) /ˈɪmpʌls/",
+    "meaning": "a sudden strong desire to do something (sự thôi thúc)",
+    "example": "I couldn’t resist the impulse to kiss her.",
+    "count": 0
+    },
+    {
+    "word": "inclined (adj) /ɪnˈklaɪnd/",
+    "meaning": "feeling that you want to do something (có khuynh hướng)",
+    "example": "I’m inclined to agree with you.",
+    "count": 0
+    },
+    {
+    "word": "liking (n) /ˈlaɪkɪŋ/",
+    "meaning": "an enjoyment or fondness for something (sự ưa thích)",
+    "example": "I developed a liking for Chinese food when I lived there.",
+    "count": 0
+    },
+    {
+    "word": "mediocre (adj) /ˌmiːdiˈəʊkə(r)/",
+    "meaning": "average or below average in quality (tầm thường)",
+    "example": "The food was only mediocre.",
+    "count": 0
+    },
+    {
+    "word": "motive (n) /ˈməʊtɪv/",
+    "meaning": "the reason why someone does something (động cơ)",
+    "example": "What was the murderer’s motive?",
+    "count": 0
+    },
+    {
+    "word": "mundane (adj) /mʌnˈdeɪn/",
+    "meaning": "ordinary and not interesting or exciting (tẻ nhạt)",
+    "example": "I’m thinking of changing jobs. This one’s become quite mundane.",
+    "count": 0
+    },
+    {
+    "word": "obsessed (adj) /əbˈsest/",
+    "meaning": "thinking or worrying about something all the time (bị ám ảnh)",
+    "example": "Oliver’s totally obsessed with football.",
+    "count": 0
+    },
+    {
+    "word": "optional (adj) /ˈɒpʃənl/",
+    "meaning": "not required, you can choose to do it (tùy chọn)",
+    "example": "The course includes some optional language classes.",
+    "count": 0
+    },
+    {
+    "word": "passion (n) /ˈpæʃn/",
+    "meaning": "a strong enthusiasm for something (niềm đam mê)",
+    "example": "Alice had a passion for cooking.",
+    "count": 0
+    },
+    {
+    "word": "praise (v) /preɪz/",
+    "meaning": "to express admiration or approval (khen ngợi)",
+    "example": "The teacher praised the students for their efforts.",
+    "count": 0
+    },
+    {
+    "word": "praise (n) /preɪz/",
+    "meaning": "expression of approval or admiration (lời khen)",
+    "example": "Praise usually works far better than criticism.",
+    "count": 0
+    },
+    {
+    "word": "resolve (v) /rɪˈzɒlv/",
+    "meaning": "to make a firm decision to do something (quyết tâm)",
+    "example": "We resolved to leave early and avoid traffic.",
+    "count": 0
+    },
+    {
+    "word": "sacrifice (v) /ˈsækrɪfaɪs/",
+    "meaning": "to give up something for the sake of others (hy sinh)",
+    "example": "We had to sacrifice a lot to get here.",
+    "count": 0
+    },
+    {
+    "word": "sacrifice (n) /ˈsækrɪfaɪs/",
+    "meaning": "the act of giving up something valuable (sự hy sinh)",
+    "example": "She made many sacrifices for her family.",
+    "count": 0
+    },
+    {
+    "word": "strive (v) /straɪv/",
+    "meaning": "to make a great effort to achieve something (phấn đấu)",
+    "example": "You won’t achieve your goals unless you strive towards them.",
+    "count": 0
+    },
+    {
+    "word": "taste (n) /teɪst/",
+    "meaning": "ability to judge if something is good or bad (gu, khiếu thẩm mỹ)",
+    "example": "He really has no taste in clothes.",
+    "count": 0
+    },
+    {
+    "word": "tempting (adj) /ˈtemptɪŋ/",
+    "meaning": "appealing, making you want it (đầy cám dỗ)",
+    "example": "It was a tempting offer, but I had to refuse.",
+    "count": 0
+    },
+    {
+    "word": "urge (v) /ɜːdʒ/",
+    "meaning": "to advise strongly about what action to take (thúc giục)",
+    "example": "I would urge you to speak to a lawyer.",
+    "count": 0
+    },
+    {
+    "word": "urge (n) /ɜːdʒ/",
+    "meaning": "a strong feeling of wanting to do something (sự thôi thúc)",
+    "example": "I suddenly felt an urge to run from the room.",
+    "count": 0
+    },
+    {
+    "word": "welcome (v) /ˈwelkəm/",
+    "meaning": "to say that you accept or support something (hoan nghênh)",
+    "example": "We welcome your feedback and suggestions.",
+    "count": 0
+    },
+    {
+    "word": "welcome (adj) /ˈwelkəm/",
+    "meaning": "pleased to be accepted or included (được chào đón)",
+    "example": "We were made to feel very welcome.",
+    "count": 0
+    },
+    {
+    "word": "worthwhile (adj) /ˌwɜːθˈwaɪl/",
+    "meaning": "worth the time, effort, or money (đáng giá)",
+    "example": "Why don’t you watch less TV and do something more worthwhile?",
+    "count": 0
+    },      
+    {
+    "word": "adopt (v) /əˈdɒpt/",
+    "meaning": "to decide to start using a particular idea, plan, or method (thực hiện)",
+    "example": "I adopted the method the coach showed me and played far better.",
+    "count": 0
+    },
+    {
+    "word": "adopt (v) /əˈdɒpt/",
+    "meaning": "to take someone else’s child into your family and legally make them your own (nhận nuôi)",
+    "example": "We’re hoping to adopt a young boy.",
+    "count": 0
+    },
+    {
+    "word": "ancestor (n) /ˈænsestə(r)/",
+    "meaning": "someone in your family who lived a long time ago (tổ tiên)",
+    "example": "My ancestors all came from the same part of China.",
+    "count": 0
+    },
+    {
+    "word": "citizen (n) /ˈsɪtɪzn/",
+    "meaning": "someone who has the right to live in a particular country (công dân)",
+    "example": "He was an American citizen.",
+    "count": 0
+    },
+    {
+    "word": "companion (n) /kəmˈpænjən/",
+    "meaning": "someone you spend a lot of time with (người đồng hành)",
+    "example": "This prize is a holiday for you and your companion.",
+    "count": 0
+    },
+    {
+    "word": "dependant (n) /dɪˈpendənt/",
+    "meaning": "a child or other relative you care for financially (người sống phụ thuộc)",
+    "example": "I couldn’t believe how many dependants he’s got!",
+    "count": 0
+    },
+    {
+    "word": "descendant (n) /dɪˈsendənt/",
+    "meaning": "a relative of someone from the past (hậu duệ)",
+    "example": "I’m a descendant of Lord Byron.",
+    "count": 0
+    },
+    {
+    "word": "empathetic (adj) /ˌempəˈθetɪk/",
+    "meaning": "able to understand how someone feels (thấu cảm)",
+    "example": "I’ve had a similar experience, so I can empathise.",
+    "count": 0
+    },
+    {
+    "word": "extrovert (n) /ˈekstrəvɜːt/",
+    "meaning": "someone confident and outgoing (người hướng ngoại)",
+    "example": "She’s such an extrovert and loves meeting new people.",
+    "count": 0
+    },
+    {
+    "word": "foster (v) /ˈfɒstə(r)/",
+    "meaning": "to take care of a child temporarily (nuôi dưỡng tạm thời)",
+    "example": "Parents have fostered lots of children over the years.",
+    "count": 0
+    },
+    {
+    "word": "guardian (n) /ˈɡɑːdiən/",
+    "meaning": "someone legally responsible for a child (người giám hộ)",
+    "example": "You need to get the form signed by a parent or guardian.",
+    "count": 0
+    },
+    {
+    "word": "introvert (n) /ˈɪntrəvɜːt/",
+    "meaning": "someone who prefers being alone or quiet (người hướng nội)",
+    "example": "I’m more of an introvert and prefer to spend time on my own.",
+    "count": 0
+    },
+    {
+    "word": "partner (n) /ˈpɑːtnə(r)/",
+    "meaning": "someone you do a particular activity with (đối tác)",
+    "example": "Nadine and I are partners at tennis.",
+    "count": 0
+    },
+    {
+    "word": "partner (n) /ˈpɑːtnə(r)/",
+    "meaning": "someone you live with and have a relationship with (bạn đời)",
+    "example": "The invitation is for me and my partner.",
+    "count": 0
+    },
+    {
+    "word": "peer (n) /pɪə(r)/",
+    "meaning": "someone who is the same age or level as you (người đồng lứa)",
+    "example": "What your peers think of you can be very important.",
+    "count": 0
+    },
+    {
+    "word": "predecessor (n) /ˈpriːdəsesə(r)/",
+    "meaning": "someone who had the job before you (người tiền nhiệm)",
+    "example": "I hope to avoid making my predecessor’s mistakes.",
+    "count": 0
+    },
+    {
+    "word": "sibling (n) /ˈsɪblɪŋ/",
+    "meaning": "your brothers and sisters (anh/chị/em ruột)",
+    "example": "The elder sibling is often more successful in his or her career.",
+    "count": 0
+    },
+    {
+    "word": "spouse (n) /spaʊs/",
+    "meaning": "a husband or wife (vợ hoặc chồng)",
+    "example": "Each spouse is responsible for paying their own income tax.",
+    "count": 0
+    },
+    {
+    "word": "stepmother/son/etc (n) /ˈstepˌmʌðə(r)/",
+    "meaning": "someone’s step-relative from a second marriage (mẹ kế, con riêng...)",
+    "example": "I didn’t really get on with my stepmother.",
+    "count": 0
+    },
+    {
+    "word": "successor (n) /səkˈsesə(r)/",
+    "meaning": "someone who takes a job after someone else (người kế nhiệm)",
+    "example": "I hope my successor enjoys the job as much as I have.",
+    "count": 0
+    },
+    {
+    "word": "sympathise (v) /ˈsɪmpəθaɪz/",
+    "meaning": "to show that you understand and care about someone’s problems (đồng cảm)",
+    "example": "Why do you always sympathise with people instead of blaming them?",
+    "count": 0
+    },
+    {
+    "word": "addiction (n) /əˈdɪkʃn/",
+    "meaning": "a strong need to regularly have or do something (nghiện)",
+    "example": "I developed an addiction to video games.",
+    "count": 0
+    },
+    {
+    "word": "adore (v) /əˈdɔː(r)/",
+    "meaning": "to love someone or something very much (rất yêu thích)",
+    "example": "I absolutely adore Indian food!",
+    "count": 0
+    },
+    {
+    "word": "appeal (n) /əˈpiːl/",
+    "meaning": "a feeling of excitement about something new (sự hấp dẫn)",
+    "example": "I waited for the appeal of something new.",
+    "count": 0
+    },
+    {
+    "word": "appeal (n) /əˈpiːl/",
+    "meaning": "a quality that makes something attractive (tính hấp dẫn)",
+    "example": "It’s difficult to explain the appeal of this place.",
+    "count": 0
+    },
+    {
+    "word": "appeal (n) /əˈpiːl/",
+    "meaning": "a request to change a decision (lời kháng cáo)",
+    "example": "He made an appeal for witnesses to come forward.",
+    "count": 0
+    },
+    {
+    "word": "arbitrary (adj) /ˈɑːbɪtrəri/",
+    "meaning": "not based on any particular plan or reason (tùy tiện)",
+    "example": "The wedding was just arbitrary.",
+    "count": 0
+    },
+    {
+    "word": "aspiration (n) /ˌæspəˈreɪʃn/",
+    "meaning": "a strong desire to achieve something (khát vọng)",
+    "example": "One of my aspirations is to become fluent in French.",
+    "count": 0
+    },
+    {
+    "word": "bear (v) /beə(r)/",
+    "meaning": "to accept or tolerate something difficult (chịu đựng)",
+    "example": "I can’t bear waiting in queues.",
+    "count": 0
+    },
+    {
+    "word": "compulsory (adj) /kəmˈpʌlsəri/",
+    "meaning": "required by rule or law (bắt buộc)",
+    "example": "This course is compulsory for all students.",
+    "count": 0
+    },
+    {
+    "word": "content (adj) /kənˈtent/",
+    "meaning": "happy and satisfied (hài lòng)",
+    "example": "I’m quite content working here.",
+    "count": 0
+    },
+    {
+    "word": "craving (n) /ˈkreɪvɪŋ/",
+    "meaning": "a very strong desire for something (sự thèm muốn)",
+    "example": "I had a sudden craving for chocolate ice cream.",
+    "count": 0
+    },
+    {
+    "word": "decline (v) /dɪˈklaɪn/",
+    "meaning": "to say politely that you will not accept something (từ chối)",
+    "example": "The Prime Minister declined to answer questions.",
+    "count": 0
+    },      
+    {
+    "word": "dispute (n) /dɪˈspjuːt/",
+    "meaning": "a serious disagreement, especially one between groups that lasts a long time (tranh chấp)",
+    "example": "The dispute seems likely to continue.",
+    "count": 0
+    },
+    {
+    "word": "distinguish (v) /dɪˈstɪŋɡwɪʃ/",
+    "meaning": "to recognize the difference between two things (phân biệt)",
+    "example": "It’s not always easy to distinguish between expensive coffee and the cheap brand.",
+    "count": 0
+    },
+    {
+    "word": "diverse (adj) /daɪˈvɜːs/",
+    "meaning": "very different from each other (đa dạng)",
+    "example": "The school has students from quite a diverse range of backgrounds.",
+    "count": 0
+    },
+    {
+    "word": "divorce (v) /dɪˈvɔːs/",
+    "meaning": "to take legal action to end your marriage (ly hôn)",
+    "example": "She and her husband divorced ten years ago.",
+    "count": 0
+    },
+    {
+    "word": "divorce (n) /dɪˈvɔːs/",
+    "meaning": "the legal ending of a marriage (ly hôn)",
+    "example": "I’ve been meaning to tell you for some time now… I’d like a divorce.",
+    "count": 0
+    },
+    {
+    "word": "equivalent (n) /ɪˈkwɪvələnt/",
+    "meaning": "something that has the same size, value, importance or meaning (vật tương đương)",
+    "example": "There’s no equivalent word in English.",
+    "count": 0
+    },
+    {
+    "word": "equivalent (adj) /ɪˈkwɪvələnt/",
+    "meaning": "of the same size, value, or meaning as something else (tương đương)",
+    "example": "We can exchange it for one of equivalent value.",
+    "count": 0
+    },
+    {
+    "word": "exclude (v) /ɪkˈskluːd/",
+    "meaning": "to deliberately not include something (loại trừ)",
+    "example": "Excluding ourselves, we’re 18 people on the trip.",
+    "count": 0
+    },
+    {
+    "word": "external (adj) /ɪkˈstɜːnl/",
+    "meaning": "coming from outside a place or organisation (bên ngoài)",
+    "example": "You’ll be interviewed by an external examiner.",
+    "count": 0
+    },
+    {
+    "word": "external (adj) /ɪkˈstɜːnl/",
+    "meaning": "on or from the outside of something like a building or body (ở bên ngoài)",
+    "example": "This cream is for external use only.",
+    "count": 0
+    },
+    {
+    "word": "identify (v) /aɪˈdentɪfaɪ/",
+    "meaning": "to recognize someone and be able to say who they are (xác nhận, nhận diện)",
+    "example": "The witness wasn’t able to identify the man.",
+    "count": 0
+    },
+    {
+    "word": "identify with (v) /aɪˈdentɪfaɪ wɪð/",
+    "meaning": "to feel that you understand and share someone’s feelings (thấu hiểu)",
+    "example": "I could really identify with the character of Melissa in the film.",
+    "count": 0
+    },
+    {
+    "word": "integral (adj) /ˈɪntɪɡrəl/",
+    "meaning": "essential or necessary to make something complete (cần thiết, không thể thiếu)",
+    "example": "Learning to forgive is an integral part of growing up.",
+    "count": 0
+    },
+    {
+    "word": "integrate (v) /ˈɪntɪɡreɪt/",
+    "meaning": "to make someone become a full member of society or group (hòa nhập)",
+    "example": "I think people who come to this country should make an effort to integrate.",
+    "count": 0
+    },
+    {
+    "word": "interfere (v) /ˌɪntəˈfɪə(r)/",
+    "meaning": "to become involved in a situation and try to influence it without being wanted (xen vào, quấy rầy)",
+    "example": "Stop interfering in my relationship with Jane!",
+    "count": 0
+    },
+    {
+    "word": "intermediate (adj) /ˌɪntəˈmiːdiət/",
+    "meaning": "in between two stages or levels (trung gian)",
+    "example": "You can’t become a pilot without going through a lot of intermediate steps.",
+    "count": 0
+    },
+    {
+    "word": "intermediate (adj) /ˌɪntəˈmiːdiət/",
+    "meaning": "at a level of education higher than beginner but lower than advanced (trung cấp)",
+    "example": "This course is aimed at intermediate learners.",
+    "count": 0
+    },
+    {
+    "word": "internal (adj) /ɪnˈtɜːnl/",
+    "meaning": "existing or happening inside a building, body, or organisation (bên trong)",
+    "example": "We decided to knock down one of the internal walls.",
+    "count": 0
+    },
+    {
+    "word": "intervene (v) /ˌɪntəˈviːn/",
+    "meaning": "to become involved in a situation in order to improve or change it (can thiệp)",
+    "example": "The fight could have got ugly if the teacher hadn’t intervened.",
+    "count": 0
+    },
+    {
+    "word": "intimate (adj) /ˈɪntɪmət/",
+    "meaning": "describes a very close and personal relationship (thân mật)",
+    "example": "Martin seems to have problems forming intimate relationships.",
+    "count": 0
+    },
+    {
+    "word": "intimate (adj) /ˈɪntɪmət/",
+    "meaning": "relating to very private or personal things (riêng tư)",
+    "example": "Try not to ask too many intimate questions.",
+    "count": 0
+    },
+    {
+    "word": "involve (v) /ɪnˈvɒlv/",
+    "meaning": "to include as a necessary part or result (bao gồm)",
+    "example": "Getting your degree is going to involve a lot of hard work.",
+    "count": 0
+    },
+    {
+    "word": "involve (v) /ɪnˈvɒlv/",
+    "meaning": "to include someone in an activity (bao gồm ai đó tham gia)",
+    "example": "You need to involve your team in decision-making.",
+    "count": 0
+    },
+    {
+    "word": "joint (adj) /dʒɔɪnt/",
+    "meaning": "involving two or more people (chung, cùng nhau)",
+    "example": "We decided to open a joint bank account.",
+    "count": 0
+    },
+    {
+    "word": "liken (v) /ˈlaɪkən/",
+    "meaning": "to say that someone or something is similar to someone or something else (so sánh với)",
+    "example": "She likened her experience to being on a roller coaster.",
+    "count": 0
+    },
+    {
+    "word": "link (v) /lɪŋk/",
+    "meaning": "to connect or relate two or more things (liên kết)",
+    "example": "The robbery is linked to the one that took place last week.",
+    "count": 0
+    },
+    {
+    "word": "link (n) /lɪŋk/",
+    "meaning": "a connection or relationship between two or more things (mối liên hệ)",
+    "example": "There’s a strong link between diet and health.",
+    "count": 0
+    },
+    {
+    "word": "merge (v) /mɜːdʒ/",
+    "meaning": "to combine two or more things into one (sáp nhập)",
+    "example": "I might lose my job when the two businesses merge.",
+    "count": 0
+    },
+    {
+    "word": "mutual (adj) /ˈmjuːtʃuəl/",
+    "meaning": "shared equally by two or more people (lẫn nhau, chung)",
+    "example": "John doesn’t respect mutual feelings of trust.",
+    "count": 0
+    },
+    {
+    "word": "negotiate (v) /nɪˈɡəʊʃieɪt/",
+    "meaning": "to try to reach an agreement by discussion (đàm phán)",
+    "example": "We managed to negotiate through traffic and arrive on time.",
+    "count": 0
+    },
+    {
+    "word": "related (adj) /rɪˈleɪtɪd/",
+    "meaning": "connected in some way (liên quan)",
+    "example": "The stress you are under is related to your workload.",
+    "count": 0
+    },
+    {
+    "word": "relative (adj) /ˈrelətɪv/",
+    "meaning": "considered in comparison with something else (tương đối)",
+    "example": "After the failure of other schemes, the last one was a relative success.",
+    "count": 0
+    },
+    {
+    "word": "resemblance (n) /rɪˈzembləns/",
+    "meaning": "similarity in appearance or nature (sự tương đồng)",
+    "example": "Can you see the resemblance between me and my father?",
+    "count": 0
+    },
+    {
+    "word": "acquaintance (n) /əˈkweɪntəns/",
+    "meaning": "someone you know a little, but who is not a close friend (người quen)",
+    "example": "He’s not really a friend, more of an acquaintance.",
+    "count": 0
+    },      
     {
     "word": "installation (n) /ˌɪnstəˈleɪʃn/",
     "meaning": "a piece of art that consists of several different objects or images arranged to produce a particular effect (tác phẩm trưng bày)",
@@ -15879,8 +16749,6 @@
       "meaning": "bring sth to a conclusion (đưa cái gì đến kết luận); come to/reach a conclusion (đi đến kết luận); jump/leap to conclusions (nhảy cóc kết luận); in conclusion (kết lại); foregone conclusion (kết quả đương nhiên)",
       "example": "Let’s bring this discussion to a conclusion. They reached a conclusion after testing. Don’t jump to conclusions too quickly. In conclusion, we recommend a staging environment.",
       "count": 0
-    }      
-                  
-      
+    }          
   ]
 }
