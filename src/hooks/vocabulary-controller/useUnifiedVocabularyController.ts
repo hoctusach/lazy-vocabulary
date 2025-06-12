@@ -7,14 +7,12 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
- * Fixed version with proper auto-advance timer management to prevent fast playback
+ * Fixed version with proper initialization order to prevent circular dependencies
  */
 export const useUnifiedVocabularyController = () => {
-  // Core vocabulary state
+  // Core vocabulary state - initialize with safe defaults
   const [wordList, setWordList] = useState<VocabularyWord[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  // Track the current word explicitly instead of deriving via useMemo
-  const [currentWord, setCurrentWord] = useState<VocabularyWord | null>(null);
   const [hasData, setHasData] = useState(false);
   
   // Control state
@@ -22,6 +20,12 @@ export const useUnifiedVocabularyController = () => {
   const [isMuted, setIsMuted] = useState(false);
   const initialRegion = getVoiceRegionFromStorage();
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>(initialRegion);
+
+  // Speech state from unified controller
+  const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
+
+  // Derived state - calculate currentWord safely
+  const currentWord = wordList[currentIndex] ?? null;
 
   // Persist voice region whenever it changes
   useEffect(() => {
@@ -34,14 +38,6 @@ export const useUnifiedVocabularyController = () => {
       console.error('Error saving voice region to localStorage:', error);
     }
   }, [voiceRegion]);
-  
-  // Speech state from unified controller
-  const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
-
-  // Keep currentWord in sync with the word list and index
-  useEffect(() => {
-    setCurrentWord(wordList[currentIndex] ?? null);
-  }, [wordList, currentIndex]);
   
   // Prevent race conditions and manage timers
   const isTransitioningRef = useRef(false);
@@ -75,7 +71,41 @@ export const useUnifiedVocabularyController = () => {
         goToNext();
       }
     }, delay);
-  }, [isPaused, isMuted]);
+  }, [isPaused, isMuted]); // Remove circular dependency
+
+  // Go to next word with proper timer management
+  const goToNext = useCallback(() => {
+    if (isTransitioningRef.current || wordList.length === 0) {
+      console.log('[UNIFIED-CONTROLLER] Cannot go to next - transitioning or no words');
+      return;
+    }
+
+    console.log('[UNIFIED-CONTROLLER] Going to next word', {
+      from: currentWord?.word,
+      index: currentIndex,
+      total: wordList.length
+    });
+    isTransitioningRef.current = true;
+    lastWordChangeRef.current = Date.now();
+
+    // CRITICAL: Clear auto-advance timer before any word transition
+    clearAutoAdvanceTimer();
+
+    // Stop current speech
+    unifiedSpeechController.stop();
+
+    // Move to next word
+    setCurrentIndex(prevIndex => {
+      const nextIndex = (prevIndex + 1) % wordList.length;
+      console.log(`[UNIFIED-CONTROLLER] Moving from word ${prevIndex} to ${nextIndex}`);
+      return nextIndex;
+    });
+
+    // Clear transition flag after brief delay
+    setTimeout(() => {
+      isTransitioningRef.current = false;
+    }, 100);
+  }, [wordList.length, currentWord?.word, currentIndex, clearAutoAdvanceTimer]);
 
   // Subscribe to speech controller state changes
   useEffect(() => {
@@ -121,6 +151,16 @@ export const useUnifiedVocabularyController = () => {
     };
   }, [clearAutoAdvanceTimer]);
 
+  // Play current word
+  const playCurrentWord = useCallback(async () => {
+    if (!currentWord || speechState.isActive || isTransitioningRef.current) {
+      return;
+    }
+
+    console.log(`[UNIFIED-CONTROLLER] Playing word: ${currentWord.word}`);
+    await unifiedSpeechController.speak(currentWord, voiceRegion);
+  }, [currentWord, speechState.isActive, voiceRegion]);
+
   // Set up word completion callback with fixed auto-advance
   useEffect(() => {
     const handleWordComplete = () => {
@@ -139,50 +179,6 @@ export const useUnifiedVocabularyController = () => {
       unifiedSpeechController.setWordCompleteCallback(null);
     };
   }, [scheduleAutoAdvance]);
-
-  // Go to next word with proper timer management
-  const goToNext = useCallback(() => {
-    if (isTransitioningRef.current || wordList.length === 0) {
-      console.log('[UNIFIED-CONTROLLER] Cannot go to next - transitioning or no words');
-      return;
-    }
-
-    console.log('[UNIFIED-CONTROLLER] Going to next word', {
-      from: currentWord?.word,
-      index: currentIndex,
-      total: wordList.length
-    });
-    isTransitioningRef.current = true;
-    lastWordChangeRef.current = Date.now();
-
-    // CRITICAL: Clear auto-advance timer before any word transition
-    clearAutoAdvanceTimer();
-
-    // Stop current speech
-    unifiedSpeechController.stop();
-
-    // Move to next word
-    setCurrentIndex(prevIndex => {
-      const nextIndex = (prevIndex + 1) % wordList.length;
-      console.log(`[UNIFIED-CONTROLLER] Moving from word ${prevIndex} to ${nextIndex}`);
-      return nextIndex;
-    });
-
-    // Clear transition flag after brief delay
-    setTimeout(() => {
-      isTransitioningRef.current = false;
-    }, 100);
-  }, [wordList.length, clearAutoAdvanceTimer]);
-
-  // Play current word
-  const playCurrentWord = useCallback(async () => {
-    if (!currentWord || speechState.isActive || isTransitioningRef.current) {
-      return;
-    }
-
-    console.log(`[UNIFIED-CONTROLLER] Playing word: ${currentWord.word}`);
-    await unifiedSpeechController.speak(currentWord, voiceRegion);
-  }, [currentWord, speechState.isActive, voiceRegion]);
 
   // Auto-play effect when word changes
   useEffect(() => {
