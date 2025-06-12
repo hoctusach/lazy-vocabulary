@@ -25,7 +25,7 @@ const WordActionButtons: React.FC<WordActionButtonsProps> = ({
         <AddWordButton onClick={onOpenAddModal} />
       </div>
       <p className="text-xs italic text-gray-500 text-center">
-        On mobile: the Australian voice may be the sole option, and if audio fails, tap any button to grant speech permissions.
+        On Mobile: Australian voice is only option, and if audio fails, tap any button to grant speech permissions.
       </p>
     </>
   );
