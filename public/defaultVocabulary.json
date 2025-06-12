@@ -4896,6 +4896,228 @@
   ],
   "topic vocab": [
     {
+    "word": "installation (n) /ˌɪnstəˈleɪʃn/",
+    "meaning": "a piece of art that consists of several different objects or images arranged to produce a particular effect (tác phẩm trưng bày)",
+    "example": "There’s an interesting installation at the Tate Gallery next month. The artist created a powerful light installation. Visitors admired the outdoor sound installation. The museum hosts interactive installations annually.",
+    "count": 0
+    },
+    {
+    "word": "lines (n pl) /laɪnz/",
+    "meaning": "the words that an actor says in a performance (lời thoại)",
+    "example": "He forgot his lines. She memorized her lines overnight. The actor practiced his lines before rehearsal. His delivery of the final lines was perfect.",
+    "count": 0
+    },
+    {
+    "word": "lyrics (n pl) /ˈlɪrɪks/",
+    "meaning": "the words of a song (lời bài hát)",
+    "example": "I’ve written the music but not the lyrics. She always mishears the lyrics. He studies song lyrics for inspiration. These lyrics are beautifully poetic.",
+    "count": 0
+    },
+    {
+    "word": "masterpiece (n) /ˈmɑːstəpiːs/",
+    "meaning": "an excellent work of art, book, piece of music, etc. (kiệt tác)",
+    "example": "The film widely regarded as Hitchcock’s masterpiece. This novel is her literary masterpiece. The painting was declared a masterpiece. That sculpture is considered a modern masterpiece.",
+    "count": 0
+    },
+    {
+    "word": "paperback (n) /ˈpeɪəbæk/",
+    "meaning": "a book with a soft cover (sách bìa mềm)",
+    "example": "His collection of rare books is now out in paperback. She prefers to travel with paperbacks. I found an old paperback edition. The book was released in paperback this spring.",
+    "count": 0
+    },
+    {
+    "word": "period (adj) /ˈpɪəriəd/",
+    "meaning": "typical of a particular historical time (thuộc về thời kỳ nào đó)",
+    "example": "Will you be wearing period costumes in the play? The film used period furniture. She collects period jewelry. A period drama aired last night.",
+    "count": 0
+    },
+    {
+    "word": "period (n) /ˈpɪəriəd/",
+    "meaning": "a particular time in history (thời kỳ)",
+    "example": "Her collection is solely related to the Roman period. It was a difficult period in his life. We studied the Baroque period in class. The medieval period was very harsh.",
+    "count": 0
+    },
+    {
+    "word": "priceless (adj) /ˈpraɪsləs/",
+    "meaning": "very valuable and impossible to replace (vô giá)",
+    "example": "These are priceless jewels. That vase is absolutely priceless. The moment we shared was priceless. Her advice turned out to be priceless.",
+    "count": 0
+    },
+    {
+    "word": "ritual (n) /ˈrɪtʃuəl/",
+    "meaning": "a set of fixed actions performed regularly (nghi lễ, nghi thức)",
+    "example": "Are you coming to the piano recital ritual tonight? He follows a strict morning ritual. The ritual lasted for two hours. Candle lighting was part of the ritual.",
+    "count": 0
+    },
+    {
+    "word": "retrospective (adj) /ˌretrəˈspektɪv/",
+    "meaning": "relating to things that happened in the past (hồi tưởng)",
+    "example": "The show includes a retrospective look at the 1970s. It was a retrospective exhibition of her work. His writing had a retrospective tone. The museum held a retrospective series.",
+    "count": 0
+    },
+    {
+    "word": "retrospective (n) /ˌretrəˈspektɪv/",
+    "meaning": "an exhibition showing the work of an artist over a long period (triển lãm hồi cố)",
+    "example": "I really want to get to the Tim Burton retrospective. They opened a retrospective of Picasso. The gallery hosted a Van Gogh retrospective. The retrospective drew large crowds.",
+    "count": 0
+    },
+    {
+    "word": "score (n) /skɔːr/",
+    "meaning": "the music written for a film, play, etc. (nhạc phim)",
+    "example": "Who wrote the musical score for Star Wars? The score enhanced the scene’s emotion. That composer won awards for his score. The film’s score is unforgettable.",
+    "count": 0
+    },
+    {
+    "word": "sketch (n) /sketʃ/",
+    "meaning": "a drawing made quickly that does not have many details (bức phác thảo)",
+    "example": "Draw a rough sketch of the dog. She shared her travel sketches. His sketch captured the skyline beautifully. The museum displayed several artist sketches.",
+    "count": 0
+    },
+    {
+    "word": "sketch (v) /sketʃ/",
+    "meaning": "to make a quick drawing (phác thảo)",
+    "example": "She sketched the outline of the landscape. He sketched a portrait from memory. I just sketch and go with the flow. We sat by the lake and sketched birds.",
+    "count": 0
+    },
+    {
+    "word": "sketch (v) /sketʃ/",
+    "meaning": "to describe something briefly (mô tả sơ lược)",
+    "example": "I’ll just sketch out a few ideas. She sketched the plan to the team. He sketched the situation before we entered. They asked him to sketch the event quickly.",
+    "count": 0
+    },
+    {
+    "word": "work of art (n phr) /ˌwɜːk əv ˈɑːt/",
+    "meaning": "something that is made or done in a skilful or attractive way (công trình nghệ thuật)",
+    "example": "Her house is a real work of art. The dress was a work of art. The garden is a living work of art. That mural is a true work of art.",
+    "count": 0
+    },
+    {
+    "word": "worthless (adj) /ˈwɜːθləs/",
+    "meaning": "not having any value or good qualities (vô giá trị)",
+    "example": "The country’s currency is nearly worthless. That promise turned out worthless. This broken device is worthless now. The coins looked old but were worthless.",
+    "count": 0
+    },
+    {
+    "word": "adjacent (adj) /əˈdʒeɪsnt/",
+    "meaning": "next to or near something else (ở sát cạnh)",
+    "example": "The theatre is adjacent to the library. Our room was adjacent to the pool. The adjacent street was blocked. We sat in adjacent seats.",
+    "count": 0
+    },
+    {
+    "word": "attach (v) /əˈtætʃ/",
+    "meaning": "to join or fasten something (gắn liền, đính)",
+    "example": "You need to attach these two parts. The form is attached to the letter. She attached her name to the application. Please attach a recent photo.",
+    "count": 0
+    },
+    {
+    "word": "bond (v) /bɒnd/",
+    "meaning": "to fix things firmly together with glue, or to form a close connection (gắn kết)",
+    "example": "It’s not easy to bond plastic and metal. They bonded quickly during the trip. Heat helps bond the materials. They bonded over shared experiences.",
+    "count": 0
+    },
+    {
+    "word": "bond (n) /bɒnd/",
+    "meaning": "a close connection joining two or more people (mối liên kết)",
+    "example": "We shared a strong bond from the start. Their bond grew stronger over time. Family bonds can last a lifetime. There’s a bond of trust between us.",
+    "count": 0
+    },
+    {
+    "word": "coexist (v) /ˌkəʊɪɡˈzɪst/",
+    "meaning": "to live or exist together (cùng tồn tại)",
+    "example": "Can art and commerce coexist? These traditions coexist peacefully. Humans and animals coexist in harmony. Two different views can coexist.",
+    "count": 0
+    },
+    {
+    "word": "coherent (adj) /kəʊˈhɪərənt/",
+    "meaning": "logical and well-organized (mạch lạc)",
+    "example": "Your argument is not coherent. He gave a coherent explanation. Her writing is clear and coherent. The plan must be coherent and realistic.",
+    "count": 0
+    },
+    {
+    "word": "compatible (adj) /kəmˈpætəbl/",
+    "meaning": "able to exist or work together (tương thích, hòa hợp)",
+    "example": "Lisa and Jim are very compatible. The software isn’t compatible with my phone. Their goals aren’t compatible. The charger is compatible with all models.",
+    "count": 0
+    },
+    {
+    "word": "compromise (n) /ˈkɒmprəmaɪz/",
+    "meaning": "a way of solving a problem in which people agree to accept less (sự thỏa hiệp)",
+    "example": "They reached a compromise after long talks. Compromise is vital in any relationship. We made a compromise on budget. The solution was a fair compromise.",
+    "count": 0
+    },
+    {
+    "word": "compromise (v) /ˈkɒmprəmaɪz/",
+    "meaning": "to settle a disagreement by each side accepting less (thỏa hiệp)",
+    "example": "They agreed to compromise on the schedule. You must compromise to move forward. We compromised after hours of debate. Don’t compromise your values easily.",
+    "count": 0
+    },
+    {
+    "word": "conflict (n) /ˈkɒnflɪkt/",
+    "meaning": "a serious disagreement (xung đột)",
+    "example": "Many people have died in the conflict. There’s a conflict between two departments. Family conflict affects children deeply. Conflict over pay led to the strike.",
+    "count": 0
+    },
+    {
+    "word": "confront (v) /kənˈfrʌnt/",
+    "meaning": "to go close to someone in a threatening way (đối mặt)",
+    "example": "A man in a suit confronted me. She was afraid to confront her boss. He confronted the thief in the act. They confronted protesters at the gate.",
+    "count": 0
+    },
+    {
+    "word": "confront (v) /kənˈfrʌnt/",
+    "meaning": "to deal with a difficult situation (đương đầu)",
+    "example": "Just confront the problem head on. He confronted his past mistakes. She decided to confront the issue. They must confront their fears together.",
+    "count": 0
+    },
+    {
+    "word": "consistent (adj) /kənˈsɪstənt/",
+    "meaning": "not changing in behaviour, attitudes or qualities (nhất quán)",
+    "example": "He is consistent but not quick. Her results are always consistent. The policy must be consistent. They demand consistent performance.",
+    "count": 0
+    },
+    {
+    "word": "contradict (v) /ˌkɒntrəˈdɪkt/",
+    "meaning": "to say the opposite of what someone else has said (mâu thuẫn, phủ nhận)",
+    "example": "The witness contradicted the evidence. Don’t contradict your teacher. His story contradicts the facts. You shouldn’t contradict me all the time.",
+    "count": 0
+    },
+    {
+    "word": "contradict (v) /ˌkɒntrəˈdɪkt/",
+    "meaning": "to show that something is wrong or false (bác bỏ)",
+    "example": "The second witness contradicted the alibi. Your statement contradicts the timeline. Facts contradict what you claim. His later words contradicted the original promise.",
+    "count": 0
+    },
+    {
+    "word": "contrasting (adj) /kənˈtrɑːstɪŋ/",
+    "meaning": "very different from each other (đối lập)",
+    "example": "They wore contrasting styles. The essay compared two contrasting views. Their personalities are contrasting. We studied contrasting colors in design.",
+    "count": 0
+    },
+    {
+    "word": "cooperate (v) /kəʊˈɒpəreɪt/",
+    "meaning": "to work with other people to achieve something (hợp tác)",
+    "example": "We can achieve more if we cooperate. Countries must cooperate to fight climate change. He refused to cooperate with the police. Let’s cooperate on the project.",
+    "count": 0
+    },
+    {
+    "word": "correspond (v) /ˌkɒrəˈspɒnd/",
+    "meaning": "to be the same as or very much like something (tương ứng, khớp)",
+    "example": "The two accounts did not correspond. Your idea corresponds with mine. The evidence corresponds to the theory. Results must correspond to the expectations.",
+    "count": 0
+    },
+    {
+    "word": "dispute (v) /dɪˈspjuːt/",
+    "meaning": "to say something is incorrect or false (tranh cãi, phản bác)",
+    "example": "I’m not disputing the facts. She disputed the charges. We disputed the decision. He always disputes authority.",
+    "count": 0
+    },
+    {
+    "word": "dispute (n) /ˈdɪspjuːt/",
+    "meaning": "a serious argument (cuộc tranh cãi)",
+    "example": "The dispute was finally resolved. There’s a long-standing dispute over the land. That caused a bitter dispute. The contract ended in legal dispute.",
+    "count": 0
+    },      
+    {
     "word": "ideal (adj) /aɪˈdɪəl/",
     "meaning": "the best or most suitable type (lý tưởng, tốt nhất)",
     "example": "The fair provides an ideal opportunity for job seekers and employers to meet.",
