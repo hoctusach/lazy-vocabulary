@@ -4894,7 +4894,565 @@
     }
 
   ],
-  "advanced words": [
+  "topic vocab": [
+    {
+    "word": "aggression (n)",
+    "meaning": "an angry feeling that makes you want to attack or defeat someone else (sự hung hăng)",
+    "example": "He struggled to control his aggression during the heated debate. Road rage is a common form of aggression on busy highways. The coach warned that unchecked aggression could lead to penalties. She learned techniques to manage her aggression in stressful situations.",
+    "count": 0
+    },
+    {
+    "word": "authority (n)",
+    "meaning": "the power to make decisions for or tell people what to do (quyền hạn)",
+    "example": "Only the principal has the authority to approve changes to the curriculum. The manager’s authority was challenged by some team members. We need to escalate this issue to someone with proper authority. He questioned the authority of the new policy.",
+    "count": 0
+    },
+    {
+    "word": "benign (adj)",
+    "meaning": "kind and easygoing; not harmful (nhân từ, lành tính)",
+    "example": "Her benign smile put everyone at ease. The lump turned out to be benign, not cancerous. He has a benign demeanor that makes him well liked. The doctor said the growth was benign and required no treatment.",
+    "count": 0
+    },
+    {
+    "word": "bully (v)",
+    "meaning": "to frighten or hurt someone who is smaller or weaker (bắt nạt)",
+    "example": "He refused to bully his classmates into doing his homework. Online platforms must do more to stop users from bullying others. Don’t let anyone bully you into backing down. She stood up when she saw him bully a younger student.",
+    "count": 0
+    },
+    {
+    "word": "bully (n)",
+    "meaning": "someone who frightens or hurts someone smaller or weaker (kẻ bắt nạt)",
+    "example": "The playground bully was finally reprimanded by the teacher. No one should have to tolerate a bully at work. He used to be a bully in high school but has changed. Parents worried the new student would become a target for the bully.",
+    "count": 0
+    },
+    {
+    "word": "command (v)",
+    "meaning": "to officially order someone to do something (mệnh lệnh)",
+    "example": "The general commanded his troops to hold their position. She commanded the team to stop all work immediately. The director can command resources for any urgent project. He commanded respect from his subordinates.",
+    "count": 0
+    },
+    {
+    "word": "command (n)",
+    "meaning": "an official order (mệnh lệnh)",
+    "example": "He carried out every command from his superior. The rescue team acted on the commander’s commands. You must follow the safety commands in the manual. Failure to obey that command could be dangerous.",
+    "count": 0
+    },
+    {
+    "word": "conquer (v)",
+    "meaning": "to take control of land or people using soldiers (chinh phục)",
+    "example": "The empire set out to conquer neighboring territories. Alexander the Great conquered vast regions before age 30. They attempted to conquer the rugged mountain passes. Napoleon famously tried to conquer all of Europe.",
+    "count": 0
+    },
+    {
+    "word": "conquer (v)",
+    "meaning": "to gain control of a situation or emotion by making a great effort (chinh phục)",
+    "example": "She trained hard to conquer her fear of public speaking. He finally conquered the challenges of learning a new language. They worked together to conquer every obstacle. It took years to conquer his self-doubt.",
+    "count": 0
+    },
+    {
+    "word": "consent (v)",
+    "meaning": "to give approval for something (đồng ý)",
+    "example": "You cannot proceed without the patient’s consent. She consented to share her data for the study. He consented to the new terms and conditions. They asked for parental consent before the trip.",
+    "count": 0
+    },
+    {
+    "word": "consent (n)",
+    "meaning": "permission to do something (sự đồng ý)",
+    "example": "The project needed consent from all stakeholders. They obtained consent before accessing private records. He signed the form to indicate his consent. Consent is required by law for any data collection.",
+    "count": 0
+    },
+    {
+    "word": "controversy (n)",
+    "meaning": "a public disagreement about a policy or moral issue (tranh cãi)",
+    "example": "The new law sparked controversy across the country. There was controversy over the CEO’s high salary. The film’s ending caused heated controversy among fans. Scientists faced controversy when they published their findings.",
+    "count": 0
+    },
+    {
+    "word": "dictator (n)",
+    "meaning": "someone who uses force to take and keep power in a country (nhà độc tài)",
+    "example": "The dictator ruled the nation with an iron fist. Citizens lived in fear under the oppressive dictator. He escaped the country to flee the dictator’s regime. Historians study how dictators maintain control.",
+    "count": 0
+    },
+    {
+    "word": "dominate (v)",
+    "meaning": "to control something or someone, often negatively, because you have more power (áp đảo)",
+    "example": "Large corporations often dominate smaller competitors. His presence can dominate any room he enters. Social media platforms dominate our daily interactions. The team’s star player dominated the game.",
+    "count": 0
+    },
+    {
+    "word": "eliminate (v)",
+    "meaning": "to get rid of something unwanted or unnecessary (loại bỏ)",
+    "example": "We need to eliminate all bugs before release. The new process eliminates redundant steps. He aimed to eliminate waste from the workflow. That diet plan promises to eliminate unhealthy fats.",
+    "count": 0
+    },
+    {
+    "word": "enforce (v)",
+    "meaning": "to make sure that a law or rule is obeyed (thực thi)",
+    "example": "Police work to enforce traffic regulations. The company enforces a strict code of conduct. Judges enforce court orders without exception. It’s challenging to enforce remote-work policies.",
+    "count": 0
+    },
+    {
+    "word": "entitled (adj)",
+    "meaning": "having the right to something (được quyền)",
+    "example": "Students are entitled to free access to the library. He was entitled to compensation after the delay. Full-time employees are entitled to health benefits. She felt entitled to a refund after poor service.",
+    "count": 0
+    },
+    {
+    "word": "exempt (adj)",
+    "meaning": "allowed to ignore a rule, obligation, or payment (được miễn)",
+    "example": "Nonprofits are exempt from certain taxes. Volunteers may be exempt from registration fees. Some countries exempt students from military service. Members with seniority are exempt from jury duty.",
+    "count": 0
+    },
+    {
+    "word": "former (adj)",
+    "meaning": "used for describing someone or something that had a particular job, title, or status in the past, but not now (trước đó)",
+    "example": "The former CEO now runs a startup. She met her former teacher at the event. Their former office was downtown. The Prime Minister of India is visiting the UK.",
+    "count": 0
+    },
+    {
+    "word": "impose (v)",
+    "meaning": "to introduce something such as a law or new system, and force people to accept it (áp đặt)",
+    "example": "The government imposed a new tax on imports. The school imposed stricter rules for late arrivals. Curfews were imposed after the unrest. New fees are being imposed without anyone’s opinion.",
+    "count": 0
+    },
+    {
+    "word": "inferior (adj)",
+    "meaning": "not as good as something else (kém hơn)",
+    "example": "Street markets often sell inferior quality goods. Their design felt inferior to the original version. The copy was clearly inferior in build. He never considered himself inferior to others.",
+    "count": 0
+    },
+    {
+    "word": "intimidate (v)",
+    "meaning": "to deliberately make someone feel frightened, especially so that they will do what you want (hăm dọa)",
+    "example": "The bully tried to intimidate the new student. The manager’s tone intimidated everyone in the room. He uses threats to intimidate people. Richard often tries to intimidate people.",
+    "count": 0
+    },
+    {
+    "word": "label (v)",
+    "meaning": "to use a word or phrase to describe someone or something, especially one that is not completely fair (gán mác)",
+    "example": "Don’t label all young people as lazy. He was unfairly labeled a troublemaker. They labeled her without understanding her background. I wish people wouldn’t try to put a label on me.",
+    "count": 0
+    },
+    {
+    "word": "label (n)",
+    "meaning": "a piece of paper or material fastened to an object that gives information about it (nhãn, nhãn hiệu)",
+    "example": "Check the label before washing the shirt. The nutrition label lists all ingredients. I don’t recognize the brand’s label. Each product has a barcode label attached.",
+    "count": 0
+    },
+    {
+    "word": "liberate (v)",
+    "meaning": "to give someone the freedom to do something by taking away their restrictions (giải phóng)",
+    "example": "Leaving the job liberated her from stress. They worked to liberate the city from occupation. He felt liberated after speaking his mind. Technology can liberate us from manual tasks.",
+    "count": 0
+    },
+    {
+    "word": "mainstream (n)",
+    "meaning": "ideas, attitudes, or activities that are considered ordinary and accepted by most people (xu hướng chính)",
+    "example": "Most mainstream politicians dismissed the idea. He struggles to fit into the mainstream. The film never achieved mainstream popularity. Life can be difficult if you're not part of the mainstream.",
+    "count": 0
+    },
+    {
+    "word": "mainstream (adj)",
+    "meaning": "considered ordinary or normal and accepted by most people (chính thống)",
+    "example": "Mainstream media didn’t cover the story. His views differ from mainstream science. She made the issue part of mainstream culture. That style isn’t considered mainstream anymore.",
+    "count": 0
+    },
+    {
+    "word": "master (v)",
+    "meaning": "to learn something thoroughly so that you know how to do it very well (nắm vững, tinh thông)",
+    "example": "It took her years to master graphic design. He mastered the technique through practice. I’m trying to master Spanish before my trip. She finally mastered the software tools.",
+    "count": 0
+    },
+    {
+    "word": "master (n)",
+    "meaning": "a man who has control over servants or other people (chủ, thầy)",
+    "example": "The servant bowed to his master. He was the master of the estate. Servants should show respect to their master at all times. The master expected complete obedience.",
+    "count": 0
+    },
+    {
+    "word": "minister (n)",
+    "meaning": "an official in charge of a government department (bộ trưởng)",
+    "example": "The Minister of Health announced new policies. He was appointed as the Education Minister. The Minister responsible for defense resigned. A new Minister was sworn in last week.",
+    "count": 0
+    },
+    {
+    "word": "monarch (n)",
+    "meaning": "a king or queen (vua, chúa)",
+    "example": "The monarch represents the country abroad. Britain still has a monarch as head of state. The monarch addressed the nation live. The monarch’s role today is mostly symbolic.",
+    "count": 0
+    },
+    {
+    "word": "prohibit (v)",
+    "meaning": "to officially stop something from being done, especially by making it illegal (cấm)",
+    "example": "Smoking is prohibited in public buildings. The school prohibits mobile phones during exams. They passed a law to prohibit animal testing. The sale of lottery tickets is prohibited.",
+    "count": 0
+    },
+    {
+    "word": "reign (v)",
+    "meaning": "if a king or queen reigns, they officially rule a country (trị vì)",
+    "example": "Queen Elizabeth II reigned for decades. The king reigned during a time of great change. She reigned with fairness and grace. Monarchs traditionally reign until death.",
+    "count": 0
+    },
+    {
+    "word": "reign (n)",
+    "meaning": "the period of time during which a king or queen rules a country (triều đại)",
+    "example": "The long reign of the monarch brought stability. His reign was marked by peace and reform. What was the longest reign of any king or queen? The reign ended with revolution.",
+    "count": 0
+    },
+    {
+    "word": "reinforce (v)",
+    "meaning": "to make an idea, belief or feeling stronger (củng cố)",
+    "example": "The speech reinforced their confidence. Media often reinforces stereotypes. His actions reinforced the team's trust in him. The teacher reinforced the idea with real-life examples.",
+    "count": 0
+    },
+    {
+    "word": "reluctant (adj)",
+    "meaning": "not willing to do something (chần chừ, miễn cưỡng)",
+    "example": "He was reluctant to share his ideas at the meeting. She felt reluctant to accept the promotion. I’m reluctant to travel during the storm. Many employees were reluctant to adopt the new system.",
+    "count": 0
+    },
+    {
+    "word": "resist (v)",
+    "meaning": "to oppose or fight against something or someone (chống cự, kháng cự)",
+    "example": "They resisted the new regulations. She couldn't resist laughing at the joke. The people resisted the invaders bravely. The Prime Minister resisted a lot of pressure to change his mind.",
+    "count": 0
+    },
+    {
+    "word": "resist (v)",
+    "meaning": "to stop yourself from doing something that you want to do (cưỡng lại, kìm chế)",
+    "example": "I can’t resist chocolate. He resisted the urge to speak. They couldn’t resist checking their phones. She tried to resist buying the dress.",
+    "count": 0
+    },
+    {
+    "word": "restrict (v)",
+    "meaning": "to keep something within strict limits (hạn chế)",
+    "example": "Parents restrict the number of hours children watch TV. Access is restricted to authorized personnel. The policy restricts movement during lockdowns. They restricted the budget for travel expenses.",
+    "count": 0
+    },
+    {
+    "word": "society (n)",
+    "meaning": "people in general living together in organized communities, with laws and traditions (xã hội)",
+    "example": "Education plays a big role in modern society. Society expects everyone to follow the rules. We live in a diverse and evolving society. People have more freedom in today’s society.",
+    "count": 0
+    },
+    {
+    "word": "subject (v)",
+    "meaning": "to make someone experience something unpleasant (bắt phải chịu)",
+    "example": "They were subjected to harsh criticism. The soldier was subjected to intense training. She was subjected to unfair treatment. They subjected the poor prisoner to torture.",
+    "count": 0
+    },
+    {
+    "word": "subject (n)",
+    "meaning": "an idea, problem, situation, etc. that you discuss or think about (chủ đề, đề tài)",
+    "example": "Math is my favorite subject. That subject came up often during meetings. Have you chosen your subject for the essay? It’s a complex subject that needs research.",
+    "count": 0
+    },
+    {
+    "word": "subject (n)",
+    "meaning": "a citizen of a country ruled by a monarch (thần dân)",
+    "example": "He is proud to be a British subject. The Queen’s subjects attended the ceremony. All subjects must obey royal laws. She lived as a subject under the empire.",
+    "count": 0
+    },
+    {
+    "word": "subjective (adj)",
+    "meaning": "based on your own feelings and ideas and not on facts (chủ quan)",
+    "example": "Her review was highly subjective. Opinions on art are often subjective. That’s just your subjective view. We tried to avoid being subjective in the report.",
+    "count": 0
+    },
+    {
+    "word": "submit (v)",
+    "meaning": "to accept that someone has defeated you and you must obey them (phục tùng, đầu hàng)",
+    "example": "They refused to submit to the enemy. The country would never submit to foreign rule. He finally submitted after hours of questioning. They submitted without a fight.",
+    "count": 0
+    },
+    {
+    "word": "submit (v)",
+    "meaning": "to formally give something to someone in authority (nộp)",
+    "example": "You must submit your application by Friday. She submitted the report late. They stopped listening when he submitted. He was asked to submit the design proposal.",
+    "count": 0
+    },
+    {
+    "word": "summon (v)",
+    "meaning": "to officially order someone to come to a place, especially a court of law (triệu tập)",
+    "example": "The witness was summoned to court. He was summoned for questioning. The king summoned his advisors. I was suddenly summoned to the boss’s office.",
+    "count": 0
+    },
+    {
+    "word": "superior (adj)",
+    "meaning": "better than someone or something else in quality or skill (vượt trội)",
+    "example": "His work is vastly superior to mine. This version is technically superior. She thinks her cooking is superior. The latest model is superior in design.",
+    "count": 0
+    },
+    {
+    "word": "undermine (v)",
+    "meaning": "to make something become gradually less effective or successful (làm suy yếu)",
+    "example": "His actions undermined the team’s trust. Criticism can undermine your confidence. The scandal undermined the leader’s credibility. This unfortunate event undermined morale.",
+    "count": 0
+    },
+    {
+    "word": "unrest (n)",
+    "meaning": "angry or violent behavior by people who are protesting (tình trạng bất ổn)",
+    "example": "The policy led to civil unrest. Political unrest spread quickly. There’s growing unrest among workers. The protest ended in unrest across the city.",
+    "count": 0
+    },
+    {
+    "word": "victimise (v)",
+    "meaning": "to treat someone in a deliberately unfair way (ngược đãi)",
+    "example": "It’s not right to victimise someone at work. He was victimised for his beliefs. Many were victimised under the regime. She felt victimised by the teacher’s comments.",
+    "count": 0
+    },
+    {
+    "word": "vulnerable (adj)",
+    "meaning": "weak or easy to hurt physically or mentally (dễ bị tổn thương)",
+    "example": "Children are vulnerable to online abuse. The elderly feel vulnerable living alone. She became emotionally vulnerable after the breakup. I felt vulnerable walking home late at night.",
+    "count": 0
+    },
+    {
+    "word": "abolish (v)",
+    "meaning": "to officially get rid of a law, system, or practice (bãi bỏ)",
+    "example": "Slavery was abolished in the 19th century. They voted to abolish the tax. The law was officially abolished in 1963. Activists fought to abolish unfair policies.",
+    "count": 0
+    },
+    {
+    "word": "advocate (v)",
+    "meaning": "to publicly support a particular policy or action (ủng hộ công khai)",
+    "example": "He advocates equal pay for all employees. The article advocates reform in education. Many advocate for stronger climate action. Do you advocate capital punishment in schools?",
+    "count": 0
+    },
+    {
+    "word": "alleviate (v)",
+    "meaning": "to make something less painful, severe, or serious (giảm bớt)",
+    "example": "The new policy aims to alleviate poverty. Painkillers help alleviate headaches. These measures are designed to alleviate suffering. The medicine alleviates symptoms quickly.",
+    "count": 0
+    },
+    {
+    "word": "aggravate (v)",
+    "meaning": "to make something bad become worse, especially a situation or a medical condition (làm trầm trọng thêm)",
+    "example": "His rude comments only aggravated the situation. The dust aggravated her asthma. Loud noises can aggravate my headache. His headache was aggravated by stress.",
+    "count": 0
+    },
+    {
+    "word": "better (v)",
+    "meaning": "to achieve a better result than someone or something (vượt qua, vượt trội)",
+    "example": "She bettered her previous exam score. The new team bettered last year's record. He hopes to better his personal best. Bradman’s average of 96 has never been bettered.",
+    "count": 0
+    },
+    {
+    "word": "better (adj)",
+    "meaning": "to improve something (cải thiện)",
+    "example": "We must better our communication process. It’s an important step towards bettering relations. The city bettered its public transportation system. Efforts are being made to better the lives of workers.",
+    "count": 0
+    },
+    {
+    "word": "blemish (n)",
+    "meaning": "a mark or spot that spoils the appearance of something (vết nhơ, vết xấu)",
+    "example": "The mirror had a small blemish on its surface. The report was almost perfect except for one blemish. The painting was spoiled by a tiny blemish. His record has only one blemish: a late submission.",
+    "count": 0
+    },
+    {
+    "word": "chaos (n)",
+    "meaning": "a situation in which everything is confused and in a mess (hỗn loạn)",
+    "example": "There was chaos during the blackout. Chaos broke out after the announcement. The office was in chaos during the audit. His desk is always in a state of chaos.",
+    "count": 0
+    },
+    {
+    "word": "cheapen (v)",
+    "meaning": "to make someone or something seem less valuable or respected (làm mất giá trị)",
+    "example": "The scandal cheapened his reputation. These types of ads cheapen the brand. Don’t cheapen your work by rushing. This type of advertising cheapens the image of the brand.",
+    "count": 0
+    },
+    {
+    "word": "contaminate (v)",
+    "meaning": "to make a place or substance dirty or harmful by adding something unwanted (làm ô nhiễm)",
+    "example": "The lake was contaminated by chemicals. Don’t contaminate the samples. One drop of bleach can contaminate the entire solution. Infection can contaminate the wound.",
+    "count": 0
+    },
+    {
+    "word": "decay (v)",
+    "meaning": "to be gradually destroyed as a result of natural process or lack of care (mục nát, suy tàn)",
+    "example": "The wood began to decay after months of rain. Morals can decay without strong values. The abandoned house was slowly decaying. Without sunlight, your teeth may decay.",
+    "count": 0
+    },
+    {
+    "word": "decay (n)",
+    "meaning": "the gradual destruction of something as a result of natural process (sự mục nát, suy tàn)",
+    "example": "Tooth decay can be prevented with proper hygiene. Urban decay affects many old cities. There’s been a moral decay in leadership. The paint showed signs of decay.",
+    "count": 0
+    },
+    {
+    "word": "decline (v)",
+    "meaning": "to become lower in amount or less in quality (giảm sút)",
+    "example": "Sales declined in the third quarter. Attendance continues to decline. His health declined rapidly. The number of people attending has declined.",
+    "count": 0
+    },
+    {
+    "word": "defective (adj)",
+    "meaning": "not working correctly or not made correctly (lỗi, bị lỗi)",
+    "example": "The car was recalled due to defective brakes. The batch had several defective units. A defective product can be dangerous. They refunded me for the defective item.",
+    "count": 0
+    },
+    {
+    "word": "detrimental (adj)",
+    "meaning": "harmful or damaging (có hại, bất lợi)",
+    "example": "Too much screen time is detrimental to your eyes. Oversleeping may be detrimental to health. Pollution is detrimental to marine life. Sunlight can have a detrimental effect on skin.",
+    "count": 0
+    },
+    {
+    "word": "devastate (v)",
+    "meaning": "to seriously damage or completely destroy something (tàn phá, phá hủy)",
+    "example": "The earthquake devastated entire villages. War can devastate communities. Western India was devastated by a huge storm. The flood devastated local businesses.",
+    "count": 0
+    },
+    {
+    "word": "devastate (v)",
+    "meaning": "to make someone feel very shocked and upset (tàn phá về tinh thần)",
+    "example": "The news devastated her. She was devastated by her dog’s disappearance. His sudden death devastated the team. The breakup devastated him emotionally.",
+    "count": 0
+    },
+    {
+    "word": "enhance (v)",
+    "meaning": "to improve something, or make it more attractive or valuable (nâng cao, cải thiện)",
+    "example": "They want to enhance the user experience. The new lighting enhances the mood. The course is designed to enhance your skills. The measures should enhance quality of life.",
+    "count": 0
+    },
+    {
+    "word": "evaluate (v)",
+    "meaning": "to think carefully about something before making a judgment (đánh giá)",
+    "example": "We need to evaluate the risks before launching. She evaluated the pros and cons. The company evaluates performance every quarter. The performance of each employee is evaluated once a year.",
+    "count": 0
+    },
+    {
+    "word": "exacerbate (v)",
+    "meaning": "to make a problem become worse (làm trầm trọng thêm)",
+    "example": "The fire was exacerbated by the wind. His complaints only exacerbate the tension. Bad weather exacerbated the delay. Complaining will only exacerbate an already difficult situation.",
+    "count": 0
+    },
+    {
+    "word": "exquisite (adj)",
+    "meaning": "extremely beautiful and delicate (tinh xảo)",
+    "example": "She wore an exquisite silk dress. The artist created an exquisite sculpture. That’s an exquisite piece of jewelry. It was an exquisite hand-painted vase from China.",
+    "count": 0
+    },
+    {
+    "word": "first-rate (adj)",
+    "meaning": "of the highest quality (hàng đầu, xuất sắc)",
+    "example": "The hotel service was first-rate. She’s a first-rate designer. This is a first-rate opportunity for growth. The service is first-rate.",
+    "count": 0
+    },
+    {
+    "word": "flaw (n)",
+    "meaning": "a mistake or fault in something that makes it useless, less effective or beautiful (lỗi, khuyết điểm)",
+    "example": "There’s a flaw in the software design. Her logic had a major flaw. The mirror had no visible flaw. There are serious flaws in the way we train our teachers.",
+    "count": 0
+    },
+    {
+    "word": "bureaucracy (n)",
+    "meaning": "a complicated and annoying system of rules and processes (quan liêu)",
+    "example": "I tried to start my own business but there was too much bureaucracy. The new policy created additional bureaucracy. Bureaucracy slows down decision-making. He's frustrated by the school bureaucracy.",
+    "count": 0
+    },
+    {
+    "word": "charity (n)",
+    "meaning": "an organisation to which you give money so it can help people in need (tổ chức từ thiện)",
+    "example": "She donates to local charities every year. The charity supports homeless children. They set up a charity for disaster relief. There are one or two charities that I make regular donations to.",
+    "count": 0
+    },
+    {
+    "word": "class (n)",
+    "meaning": "a group into which people in a society are divided based on family background, income, or education (giai cấp, tầng lớp)",
+    "example": "My family are very middle class in a lot of ways. There’s a big gap between the rich and the working class. He moved up from the lower class. Education often reflects social class.",
+    "count": 0
+    },
+    {
+    "word": "community (n)",
+    "meaning": "the people who live in an area (cộng đồng)",
+    "example": "Politics should begin in the local community. She volunteers in her immigrant community. The school is central to the rural community. We need stronger ties in our online community.",
+    "count": 0
+    },
+    {
+    "word": "convict (v)",
+    "meaning": "to prove in court that someone is guilty of a crime (kết tội)",
+    "example": "He was convicted of arson. The jury convicted her quickly. They were convicted despite weak evidence. A court must convict someone beyond doubt.",
+    "count": 0
+    },
+    {
+    "word": "convict (n)",
+    "meaning": "someone who is in prison because they committed a crime (tù nhân)",
+    "example": "Two convicts have escaped from the local prison. The convict was transferred to maximum security. Former convicts often struggle to find work. The convict was granted parole.",
+    "count": 0
+    },
+    {
+    "word": "corruption (n)",
+    "meaning": "dishonest or illegal behaviour by officials or people in power (sự tham nhũng)",
+    "example": "They’ve started an investigation into corruption. Corruption in the police force was exposed. The government vowed to end corruption. Bribery is a common form of corruption.",
+    "count": 0
+    },
+    {
+    "word": "deterrent (n)",
+    "meaning": "something that makes people decide not to do something by making them realise that something unpleasant could happen to them (răn đe)",
+    "example": "I think capital punishment serves as a deterrent. Alarm systems are a good deterrent to thieves. Fear of fines is a deterrent. Cameras act as a strong deterrent.",
+    "count": 0
+    },
+    {
+    "word": "heritage (n)",
+    "meaning": "the art, buildings, and traditions that are important to a society’s culture and history (di sản)",
+    "example": "It’s important that we preserve our national heritage. UNESCO protects world heritage sites. The museum showcases cultural heritage. We must protect our architectural heritage.",
+    "count": 0
+    },
+    {
+    "word": "immigration (n)",
+    "meaning": "the process of people entering a country to live permanently (sự nhập cư)",
+    "example": "Is the level of immigration actually rising, or is it falling? Immigration laws are often debated. Canada supports skilled immigration. Immigration affects the economy and housing.",
+    "count": 0
+    },
+    {
+    "word": "industrial action (n phr)",
+    "meaning": "a protest in which workers disagree with employer policy, often by striking (trừng phạt lao động)",
+    "example": "Unless something changes, we’ll be taking industrial action. Teachers are threatening industrial action. The union voted for industrial action. Train workers announced new industrial action.",
+    "count": 0
+    },
+    {
+    "word": "institution (n)",
+    "meaning": "a large organisation like a bank, hospital, or prison (cơ quan, tổ chức)",
+    "example": "It’s hard spending all your life inside an institution like a children’s home. The university is a respected institution. Mental health institutions need more funding. Banks are financial institutions.",
+    "count": 0
+    },
+    {
+    "word": "legislation (n)",
+    "meaning": "a law or set of laws (pháp luật)",
+    "example": "There is already legislation to prevent that. New legislation was passed yesterday. The minister proposed new legislation. Environmental legislation is now stricter.",
+    "count": 0
+    },
+    {
+    "word": "prejudice (n)",
+    "meaning": "an unreasonable opinion or feeling, especially dislike for people in a particular group (định kiến)",
+    "example": "Many women have had to deal with prejudice in the workplace. We must fight racial prejudice. He was a victim of religious prejudice. Prejudice often stems from ignorance.",
+    "count": 0
+    },
+    {
+    "word": "prison reform (n phr)",
+    "meaning": "changes to make the prison system fairer or more effective (cải cách nhà tù)",
+    "example": "I’m a great believer in prison reform. The minister proposed prison reform. Prison reform aims to reduce repeat offenses. Activists are calling for urgent prison reform.",
+    "count": 0
+    },
+    {
+    "word": "privileged (adj)",
+    "meaning": "having advantages and opportunities that other people do not have (được ưu tiên)",
+    "example": "I suppose I come from quite a privileged background. He grew up in a privileged family. Privileged students get better access. She's aware of her privileged position.",
+    "count": 0
+    },
+    {
+    "word": "prosecute (v)",
+    "meaning": "to officially accuse someone of a crime in court (khởi tố)",
+    "example": "The police decided not to prosecute and let him off with a warning. They prosecuted him for fraud. Few corporations are prosecuted for pollution. She was prosecuted for tax evasion.",
+    "count": 0
+    },
+    {
+    "word": "state (n)",
+    "meaning": "the government of a country (nhà nước); also, a condition something is in (tình trạng)",
+    "example": "The health system is the state’s responsibility. The building was in a poor state. He works for a state agency. Her mental state was concerning.",
+    "count": 0
+    },
     {
       "word": "leverage",
       "meaning": "the mechanical advantage gained by being in a position to use a lever strategic advantage; power to act effectively investing with borrowed money as a way to amplify potential gains (at the risk of greater losses) supplement with leverage provide with leverage",
@@ -4983,6 +5541,12 @@
       "word": "In order to achieve a very high band in the IELTS speaking test, you need to show that you can use some ‘less common’ vocabulary, including idioms and less common collocations. Let’s look at how you can say common sentences in a ‘less common’",
       "meaning": "Note on using idioms. Do not try to ‘show off’ to the examiner by using an idiom in every single sentence. Idioms should be used appropriately. Think of them like spices in a cooking recipe.",
       "example": "People in my country think that they are good singers, so they enjoy karaoke. People in my country regard themselves as being talented singers, so they enjoy karaoke. I was very happy when I got my exam results. I was over the moon when I got my exam results. We should try to produce fewer greenhouse gas emissions. We should try to reduce our carbon footprint. Some people in my country are very very poor. Some people in my country live below the breadline.",
+      "count": 0
+    },
+    {
+      "word": "He would- he'd - He'd like to see you now. why have - Why've. Why've you come? I will - I'll - I'll think about it. where did - Where'd - Where'd you get that? they are - they're - They're already here",
+      "meaning": "Less common words/expressions",
+      "example": ".",
       "count": 0
     },
     {
@@ -14316,7 +14880,74 @@
     "meaning": "Detailed list of modal/semi-modal verb changes in reported speech. (Danh sách các động từ khuyết thiếu thay đổi trong câu tường thuật)",
     "example": "will/shall → would; can → could; must → had to / be to / should; have to → had to; don’t/doesn’t have to → didn’t have to; mustn’t → mustn’t / were not to / shouldn’t; may → might; am/is/are going to → was/were going to. Example 1: 'I will call you,' she said. → She said she would call me. Example 2: 'You must finish the work,' he said. → He said I had to finish the work.",
     "count": 0
-    }      
+    },
+    {
+    "word": "Complex sentence - Cleft sentences (structure)",
+    "meaning": "Used to emphasize a particular part of a sentence by placing it at the beginning. (Dùng để nhấn mạnh một phần nào đó trong câu)",
+    "example": "All that Keith wanted was to get his money back. / The person who stole the money was Thomas. / The day when this government came to power was 2006.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - It is/was ... who/which/that (structure)",
+    "meaning": "Used for emphasizing a person or thing responsible for an action. (Nhấn mạnh người hoặc vật thực hiện hành động)",
+    "example": "It was Carol who called the police. / It was the year in which this government came to power. / It was me that stole the money.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - So / Such / Too / Enough (adverbial structure)",
+    "meaning": "Used to express degree or intensity, often followed by a result clause. (Dùng để diễn tả mức độ và kết quả)",
+    "example": "There is so much crime around here that I’m thinking of moving. / It was such a terrible crime that the judge sentenced him to life in prison. / The police didn’t respond quickly enough to catch the burglar.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - So (adverb)",
+    "meaning": "Used to express intensity and result. (Dùng để nhấn mạnh mức độ dẫn đến kết quả)",
+    "example": "It all happened so quickly that I didn’t have time to see the man’s face. / This problem has gone on for so long that I don’t think they’ll ever find a solution.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Such (determiner)",
+    "meaning": "Used before nouns to emphasize extreme characteristics. (Dùng trước danh từ để nhấn mạnh)",
+    "example": "It was such a terrible crime that the judge sentenced him to life in prison. / There is such a lot of crime around here that I’m thinking of moving.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Too (adverb)",
+    "meaning": "Used to indicate more than what is wanted or needed. (Dùng để chỉ mức độ vượt quá)",
+    "example": "I had too little time to get a good look at his face. / The police responded too slowly to have any chance of catching the burglar.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Enough (adverb/determiner)",
+    "meaning": "Used to show a sufficient degree or amount. (Dùng để chỉ mức độ hoặc số lượng đủ)",
+    "example": "There just aren’t enough police officers on the streets. / The police weren’t quick enough to catch the burglar.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Inversions with negative adverbials (structure)",
+    "meaning": "Used for emphasis, these begin with negative adverbs and require subject-verb inversion. (Cấu trúc đảo ngữ với trạng từ phủ định để nhấn mạnh)",
+    "example": "Hardly had the new law been introduced when the mistake was realised. / Barely had we solved one problem when another one arose. / Never had I heard such a ridiculous suggestion.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Not until / Only when / Only after (inversion)",
+    "meaning": "Inversion is used after time clauses with ‘not until’, ‘only when’, or ‘only after’. (Dùng đảo ngữ sau các cụm thời gian để nhấn mạnh)",
+    "example": "Not until the next election will we know how the public feel about this news. / Only when we agree what measures are needed will we be able to solve the problem.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Inversions with place expressions (+ verb of movement) (structure)",
+    "meaning": "Used when place expressions begin the sentence, followed by inversion. (Đảo ngữ khi câu bắt đầu bằng cụm chỉ nơi chốn và động từ di chuyển)",
+    "example": "Here comes the Minister now. / At the top of society are the aristocracy. / Running down the road was a young man with a woman’s handbag under his arm.",
+    "count": 0
+    },
+    {
+    "word": "Complex sentence - Other inversions (structure)",
+    "meaning": "Used in short answers and with phrases like ‘neither/nor’, ‘so’, ‘such’, etc. (Các kiểu đảo ngữ khác với so/such/neither/nor)",
+    "example": "‘Did you?’ – So did I. / ‘I don’t believe a word this government says.’ – ‘No, neither do I.’ / So rare is burglary here that many people don’t lock their doors.",
+    "count": 0
+    }
+            
   ],
   "phrases, collocations": [     
     {
@@ -14588,115 +15219,6 @@
       "meaning": "bring sth to a conclusion (đưa cái gì đến kết luận); come to/reach a conclusion (đi đến kết luận); jump/leap to conclusions (nhảy cóc kết luận); in conclusion (kết lại); foregone conclusion (kết quả đương nhiên)",
       "example": "Let’s bring this discussion to a conclusion. They reached a conclusion after testing. Don’t jump to conclusions too quickly. In conclusion, we recommend a staging environment.",
       "count": 0
-    },
-    {
-    "word": "aggression (n)",
-    "meaning": "an angry feeling that makes you want to attack or defeat someone else (sự hung hăng)",
-    "example": "He struggled to control his aggression during the heated debate. Road rage is a common form of aggression on busy highways. The coach warned that unchecked aggression could lead to penalties. She learned techniques to manage her aggression in stressful situations.",
-    "count": 0
-    },
-    {
-    "word": "authority (n)",
-    "meaning": "the power to make decisions for or tell people what to do (quyền hạn)",
-    "example": "Only the principal has the authority to approve changes to the curriculum. The manager’s authority was challenged by some team members. We need to escalate this issue to someone with proper authority. He questioned the authority of the new policy.",
-    "count": 0
-    },
-    {
-    "word": "benign (adj)",
-    "meaning": "kind and easygoing; not harmful (nhân từ, lành tính)",
-    "example": "Her benign smile put everyone at ease. The lump turned out to be benign, not cancerous. He has a benign demeanor that makes him well liked. The doctor said the growth was benign and required no treatment.",
-    "count": 0
-    },
-    {
-    "word": "bully (v)",
-    "meaning": "to frighten or hurt someone who is smaller or weaker (bắt nạt)",
-    "example": "He refused to bully his classmates into doing his homework. Online platforms must do more to stop users from bullying others. Don’t let anyone bully you into backing down. She stood up when she saw him bully a younger student.",
-    "count": 0
-    },
-    {
-    "word": "bully (n)",
-    "meaning": "someone who frightens or hurts someone smaller or weaker (kẻ bắt nạt)",
-    "example": "The playground bully was finally reprimanded by the teacher. No one should have to tolerate a bully at work. He used to be a bully in high school but has changed. Parents worried the new student would become a target for the bully.",
-    "count": 0
-    },
-    {
-    "word": "command (v)",
-    "meaning": "to officially order someone to do something (mệnh lệnh)",
-    "example": "The general commanded his troops to hold their position. She commanded the team to stop all work immediately. The director can command resources for any urgent project. He commanded respect from his subordinates.",
-    "count": 0
-    },
-    {
-    "word": "command (n)",
-    "meaning": "an official order (mệnh lệnh)",
-    "example": "He carried out every command from his superior. The rescue team acted on the commander’s commands. You must follow the safety commands in the manual. Failure to obey that command could be dangerous.",
-    "count": 0
-    },
-    {
-    "word": "conquer (v)",
-    "meaning": "to take control of land or people using soldiers (chinh phục)",
-    "example": "The empire set out to conquer neighboring territories. Alexander the Great conquered vast regions before age 30. They attempted to conquer the rugged mountain passes. Napoleon famously tried to conquer all of Europe.",
-    "count": 0
-    },
-    {
-    "word": "conquer (v)",
-    "meaning": "to gain control of a situation or emotion by making a great effort (chinh phục)",
-    "example": "She trained hard to conquer her fear of public speaking. He finally conquered the challenges of learning a new language. They worked together to conquer every obstacle. It took years to conquer his self-doubt.",
-    "count": 0
-    },
-    {
-    "word": "consent (v)",
-    "meaning": "to give approval for something (đồng ý)",
-    "example": "You cannot proceed without the patient’s consent. She consented to share her data for the study. He consented to the new terms and conditions. They asked for parental consent before the trip.",
-    "count": 0
-    },
-    {
-    "word": "consent (n)",
-    "meaning": "permission to do something (sự đồng ý)",
-    "example": "The project needed consent from all stakeholders. They obtained consent before accessing private records. He signed the form to indicate his consent. Consent is required by law for any data collection.",
-    "count": 0
-    },
-    {
-    "word": "controversy (n)",
-    "meaning": "a public disagreement about a policy or moral issue (tranh cãi)",
-    "example": "The new law sparked controversy across the country. There was controversy over the CEO’s high salary. The film’s ending caused heated controversy among fans. Scientists faced controversy when they published their findings.",
-    "count": 0
-    },
-    {
-    "word": "dictator (n)",
-    "meaning": "someone who uses force to take and keep power in a country (nhà độc tài)",
-    "example": "The dictator ruled the nation with an iron fist. Citizens lived in fear under the oppressive dictator. He escaped the country to flee the dictator’s regime. Historians study how dictators maintain control.",
-    "count": 0
-    },
-    {
-    "word": "dominate (v)",
-    "meaning": "to control something or someone, often negatively, because you have more power (áp đảo)",
-    "example": "Large corporations often dominate smaller competitors. His presence can dominate any room he enters. Social media platforms dominate our daily interactions. The team’s star player dominated the game.",
-    "count": 0
-    },
-    {
-    "word": "eliminate (v)",
-    "meaning": "to get rid of something unwanted or unnecessary (loại bỏ)",
-    "example": "We need to eliminate all bugs before release. The new process eliminates redundant steps. He aimed to eliminate waste from the workflow. That diet plan promises to eliminate unhealthy fats.",
-    "count": 0
-    },
-    {
-    "word": "enforce (v)",
-    "meaning": "to make sure that a law or rule is obeyed (thực thi)",
-    "example": "Police work to enforce traffic regulations. The company enforces a strict code of conduct. Judges enforce court orders without exception. It’s challenging to enforce remote-work policies.",
-    "count": 0
-    },
-    {
-    "word": "entitled (adj)",
-    "meaning": "having the right to something (được quyền)",
-    "example": "Students are entitled to free access to the library. He was entitled to compensation after the delay. Full-time employees are entitled to health benefits. She felt entitled to a refund after poor service.",
-    "count": 0
-    },
-    {
-    "word": "exempt (adj)",
-    "meaning": "allowed to ignore a rule, obligation, or payment (được miễn)",
-    "example": "Nonprofits are exempt from certain taxes. Volunteers may be exempt from registration fees. Some countries exempt students from military service. Members with seniority are exempt from jury duty.",
-    "count": 0
-    }
-      
+    }          
   ]
 }
