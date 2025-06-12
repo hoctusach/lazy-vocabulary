@@ -113,14 +113,7 @@ export class SpeechExecutor {
         console.log('[SPEECH-EXECUTOR] -> invoking window.speechSynthesis.speak');
         window.speechSynthesis.speak(utterance);
 
-        // Fallback timeout
-        setTimeout(() => {
-          if (this.stateManager.getState().currentUtterance === utterance && !this.stateManager.getState().isActive) {
-            console.warn('[SPEECH-EXECUTOR] Speech may have failed silently');
-            toast.error('Audio blocked—click anywhere to enable sound.');
-            resolve(false);
-          }
-        }, 1000);
+        // Removed fallback timeout which previously handled blocked audio
 
       } catch (error) {
         console.error('[SPEECH-EXECUTOR] Error in speak method:', error);
