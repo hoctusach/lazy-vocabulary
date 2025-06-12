@@ -121,7 +121,7 @@ const VocabularyAppContainer: React.FC = () => {
         hasData={hasData}
         hasAnyData={hasAnyData}
         displayWord={displayWord}
-        jsonLoadError={jsonLoadError}
+        jsonLoadError={!!jsonLoadError}
         muted={muted}
         paused={paused}
         isSpeaking={isSpeaking}
