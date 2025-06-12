@@ -33,7 +33,8 @@ const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] Container state:', {
     hasData,
     hasAnyData,
-    currentCategory
+    currentCategory,
+    jsonLoadError
   });
 
   // Use ONLY the unified vocabulary controller - no more dual controller architecture
@@ -122,6 +123,19 @@ const VocabularyAppContainerNew: React.FC = () => {
     ? { word: currentWord.word, category: currentWord.category || currentCategory }
     : null;
 
+  // Enhanced loading state logic
+  const isActuallyLoading = !hasData && !hasAnyData && !jsonLoadError;
+  const showNoDataMessage = !hasData && hasAnyData && !jsonLoadError;
+  
+  console.log('[VOCAB-CONTAINER-NEW] Loading state analysis:', {
+    hasData,
+    hasAnyData,
+    jsonLoadError: !!jsonLoadError,
+    isActuallyLoading,
+    showNoDataMessage,
+    currentWord: currentWord?.word || 'none'
+  });
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       {/* Error display component */}
@@ -152,10 +166,10 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleOpenAddWordModal={handleOpenAddWordModal}
           handleOpenEditWordModal={handleOpenEditWordModal}
         />
-      ) : hasAnyData ? (
+      ) : showNoDataMessage ? (
         <VocabularyCardNew
-          word="No data for this category"
-          meaning=""
+          word={`No words in "${currentCategory}" category`}
+          meaning="Try switching to another category or upload a vocabulary file"
           example=""
           backgroundColor="#F0F8FF"
           isMuted={isMuted}
@@ -172,8 +186,46 @@ const VocabularyAppContainerNew: React.FC = () => {
           voiceRegion={voiceRegion}
           nextVoiceLabel={nextVoiceLabel}
         />
+      ) : isActuallyLoading ? (
+        <VocabularyCardNew
+          word="Loading vocabulary..."
+          meaning="Please wait while we load your vocabulary data"
+          example=""
+          backgroundColor="#F0F8FF"
+          isMuted={isMuted}
+          isPaused={isPaused}
+          onToggleMute={toggleMute}
+          onTogglePause={togglePause}
+          onCycleVoice={toggleVoice}
+          onSwitchCategory={handleSwitchCategoryWithState}
+          onNextWord={() => {}}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory || 'Next'}
+          isSpeaking={false}
+          category="Loading"
+          voiceRegion={voiceRegion}
+          nextVoiceLabel={nextVoiceLabel}
+        />
       ) : (
-        <p>Loading vocabulary…</p>
+        <VocabularyCardNew
+          word="Vocabulary Ready"
+          meaning="Your vocabulary is loaded and ready to use"
+          example="Click the controls to start learning"
+          backgroundColor="#F0F8FF"
+          isMuted={isMuted}
+          isPaused={isPaused}
+          onToggleMute={toggleMute}
+          onTogglePause={togglePause}
+          onCycleVoice={toggleVoice}
+          onSwitchCategory={handleSwitchCategoryWithState}
+          onNextWord={() => {}}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory || 'Next'}
+          isSpeaking={false}
+          category="Ready"
+          voiceRegion={voiceRegion}
+          nextVoiceLabel={nextVoiceLabel}
+        />
       )}
     </VocabularyLayout>
   );

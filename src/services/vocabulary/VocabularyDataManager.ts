@@ -3,6 +3,7 @@ import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
+import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 
 // Type for vocabulary change listeners
 type VocabularyChangeListener = () => void;
@@ -75,6 +76,7 @@ export class VocabularyDataManager {
   loadDefaultVocabulary(): boolean {
     try {
       console.log("Loading default vocabulary data");
+      
       // Try to fetch the updated default vocabulary from public directory
       fetch('/defaultVocabulary.json')
         .then(response => {
@@ -84,7 +86,11 @@ export class VocabularyDataManager {
           return response.json();
         })
         .then(fetchedData => {
-          console.log("Successfully loaded updated default vocabulary from JSON file");
+          console.log("Successfully loaded default vocabulary from JSON file");
+          console.log("Fetched data preview:", Object.keys(fetchedData).map(key => 
+            `${key}: ${fetchedData[key]?.length || 0} words`
+          ));
+          
           // Process data to ensure all fields have proper types
           this.data = this.dataProcessor.processDataTypes(fetchedData);
           this.storage.saveData(this.data);
@@ -93,17 +99,16 @@ export class VocabularyDataManager {
           this.notifyVocabularyChange();
         })
         .catch(error => {
-          console.warn("Failed to load from JSON file, using minimal fallback:", error);
-          // Fallback to minimal structure without "All words"
-          const fallbackData: SheetData = {
-            "phrasal verbs": [],
-            "idioms": [],
-            "topic vocab": [],
-            "grammar": [],
-            "phrases, collocations": []
-          };
-          this.data = this.dataProcessor.processDataTypes(fallbackData);
+          console.warn("Failed to load from JSON file, using embedded default data:", error);
+          
+          // Use the embedded default data as fallback
+          console.log("Using embedded default vocabulary data");
+          this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
           this.storage.saveData(this.data);
+          
+          console.log("Embedded data loaded:", Object.keys(this.data).map(key => 
+            `${key}: ${this.data[key]?.length || 0} words`
+          ));
           
           // Notify listeners about vocabulary change
           this.notifyVocabularyChange();
@@ -112,7 +117,17 @@ export class VocabularyDataManager {
       return true;
     } catch (error) {
       console.error("Failed to load default vocabulary:", error);
-      return false;
+      
+      // Last resort fallback - use embedded data synchronously
+      try {
+        this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
+        this.storage.saveData(this.data);
+        this.notifyVocabularyChange();
+        return true;
+      } catch (fallbackError) {
+        console.error("Critical error: Failed to load any vocabulary data:", fallbackError);
+        return false;
+      }
     }
   }
   
