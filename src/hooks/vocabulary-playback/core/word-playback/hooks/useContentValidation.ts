@@ -1,18 +1,14 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import {
-  extractSpeechableContent,
-  hasValidSpeechableContent,
-  getPreserveSpecialFromStorage
-} from '@/utils/text/contentFilters';
-import { toast } from 'sonner';
+import { prepareTextForSpeech } from '@/utils/speech';
+
 
 /**
  * Hook for handling content validation and filtering for speech
  */
 export const useContentValidation = () => {
   const validateAndPrepareContent = (currentWord: VocabularyWord) => {
-    // Construct text to speak with content filtering
+    // Construct text to speak
     let rawTextToSpeak = currentWord.word;
     if (currentWord.meaning) {
       rawTextToSpeak += `. ${currentWord.meaning}`;
@@ -21,10 +17,9 @@ export const useContentValidation = () => {
       rawTextToSpeak += `. ${currentWord.example}`;
     }
 
-    const preserveSpecial = getPreserveSpecialFromStorage();
+    // Prepare text for speech (whitespace cleanup only)
+    const speechableText = prepareTextForSpeech(rawTextToSpeak);
 
-    // Apply content filtering to extract speechable content
-    const speechableText = extractSpeechableContent(rawTextToSpeak, preserveSpecial);
     
     console.log('[CONTENT-VALIDATION] Original text length:', rawTextToSpeak.length);
     console.log('[CONTENT-VALIDATION] Speechable text length:', speechableText.length);

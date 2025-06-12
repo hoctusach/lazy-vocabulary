@@ -109,7 +109,7 @@ export class TypeProcessor {
             console.log(`[TYPE-PROCESSOR] ✅ Successfully processed: "${processedWord.word}"`);
             
             if (containsSpecialContent) {
-              console.log(`[TYPE-PROCESSOR] 🔤 Word contains IPA/Vietnamese content and will be filtered during speech`);
+              console.log(`[TYPE-PROCESSOR] 🔤 Word contains IPA/Vietnamese content; speech will include it as-is`);
             }
           } else {
             // Provide detailed information about why the word was rejected
