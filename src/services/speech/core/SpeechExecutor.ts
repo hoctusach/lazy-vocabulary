@@ -3,6 +3,8 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { SpeechStateManager } from './SpeechStateManager';
 import { AutoAdvanceTimer } from './AutoAdvanceTimer';
 import { VoiceManager } from './VoiceManager';
+import { isMobileDevice } from '@/utils/device';
+import { directSpeechService } from '../directSpeechService';
 
 /**
  * Handles the actual speech synthesis execution
@@ -58,6 +60,38 @@ export class SpeechExecutor {
   private async executeSpeech(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU'): Promise<boolean> {
     return new Promise((resolve) => {
       try {
+        // On mobile devices, use the direct speech service which speaks each
+        // part separately. This avoids issues where only the first word is
+        // spoken on some mobile browsers.
+        if (isMobileDevice()) {
+          directSpeechService.speak('', {
+            voiceRegion,
+            word: word.word,
+            meaning: word.meaning,
+            example: word.example,
+            onStart: () => {
+              this.stateManager.updateState({
+                isActive: true,
+                currentWord: word,
+                currentUtterance: null
+              });
+            },
+            onEnd: () => {
+              this.resetState();
+              const state = this.stateManager.getState();
+              this.autoAdvanceTimer.schedule(1500, state.isPaused, state.isMuted);
+              resolve(true);
+            },
+            onError: () => {
+              this.resetState();
+              const state = this.stateManager.getState();
+              this.autoAdvanceTimer.schedule(2000, state.isPaused, state.isMuted);
+              resolve(false);
+            }
+          });
+          return;
+        }
+
         const speechText = this.voiceManager.createSpeechText(word);
         const utterance = new SpeechSynthesisUtterance(speechText);
         
