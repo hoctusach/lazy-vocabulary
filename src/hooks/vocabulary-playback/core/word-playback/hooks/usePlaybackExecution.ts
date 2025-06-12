@@ -110,15 +110,14 @@ export const usePlaybackExecution = (
       console.log(`[PLAYBACK-EXECUTION] Processing word for speech: ${currentWord.word}`);
 
       // Validate and prepare content with enhanced logging
-      const { speechableText, hasValidContent } = validateAndPrepareContent(currentWord);
-      
+      const { speechableText } = validateAndPrepareContent(currentWord);
+
       console.log('[PLAYBACK-EXECUTION] Content validation result:', {
-        hasValidContent,
         speechableTextLength: speechableText.length,
         speechableTextPreview: speechableText.substring(0, 100) + '...'
       });
-      
-      if (!hasValidContent) {
+
+      if (speechableText.trim().length === 0) {
         console.log('[PLAYBACK-EXECUTION] No valid content to speak, advancing');
         scheduleAutoAdvance(2000);
         setPlayInProgress(false);
