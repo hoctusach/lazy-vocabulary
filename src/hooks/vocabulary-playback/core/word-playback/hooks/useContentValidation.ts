@@ -1,6 +1,10 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { extractSpeechableContent, hasValidSpeechableContent } from '@/utils/text/contentFilters';
+import {
+  extractSpeechableContent,
+  hasValidSpeechableContent,
+  getPreserveSpecialFromStorage
+} from '@/utils/text/contentFilters';
 import { toast } from 'sonner';
 
 /**
@@ -17,15 +21,17 @@ export const useContentValidation = () => {
       rawTextToSpeak += `. ${currentWord.example}`;
     }
 
+    const preserveSpecial = getPreserveSpecialFromStorage();
+
     // Apply content filtering to extract speechable content
-    const speechableText = extractSpeechableContent(rawTextToSpeak);
+    const speechableText = extractSpeechableContent(rawTextToSpeak, preserveSpecial);
     
     console.log('[CONTENT-VALIDATION] Original text length:', rawTextToSpeak.length);
     console.log('[CONTENT-VALIDATION] Speechable text length:', speechableText.length);
     console.log('[CONTENT-VALIDATION] Text to speak:', speechableText.substring(0, 100) + '...');
 
     // Check if we have any content to speak after filtering
-    const hasValidContent = hasValidSpeechableContent(rawTextToSpeak);
+    const hasValidContent = hasValidSpeechableContent(rawTextToSpeak, preserveSpecial);
     
     if (!hasValidContent) {
       console.log('[CONTENT-VALIDATION] No speechable content after filtering');
