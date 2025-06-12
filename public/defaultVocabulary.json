@@ -4896,6 +4896,234 @@
   ],
   "topic vocab": [
     {
+    "word": "ideal (adj) /aɪˈdɪəl/",
+    "meaning": "the best or most suitable type (lý tưởng, tốt nhất)",
+    "example": "The fair provides an ideal opportunity for job seekers and employers to meet.",
+    "count": 0
+    },
+    {
+    "word": "ideal (n) /aɪˈdɪəl/",
+    "meaning": "an idea or standard that seems perfect and worth aiming for (lý tưởng)",
+    "example": "In an ideal world there would be no poverty or war.",
+    "count": 0
+    },
+    {
+    "word": "inadequate (adj) /ɪnˈædɪkwət/",
+    "meaning": "not good enough or not sufficient for a particular purpose (không đủ, không tương xứng)",
+    "example": "We are suffering because of inadequate resources.",
+    "count": 0
+    },
+    {
+    "word": "invaluable (adj) /ɪnˈvæljuəbl/",
+    "meaning": "extremely useful (vô giá)",
+    "example": "The Internet is an invaluable resource for students.",
+    "count": 0
+    },
+    {
+    "word": "optimum (adj) /ˈɒptɪməm/",
+    "meaning": "most suitable within a range of possibilities (tối ưu)",
+    "example": "The warm water provides the optimum conditions for breeding.",
+    "count": 0
+    },
+    {
+    "word": "optimum (n) /ˈɒptɪməm/",
+    "meaning": "the best or most suitable situation, level or amount (mức tối ưu)",
+    "example": "The optimum we should be producing is 100 units per hour.",
+    "count": 0
+    },
+    {
+    "word": "outclass (v) /ˌaʊtˈklɑːs/",
+    "meaning": "to be much better than someone or something else (vượt trội)",
+    "example": "The team was completely outclassed by the opposition.",
+    "count": 0
+    },
+    {
+    "word": "prime (adj) /praɪm/",
+    "meaning": "most important, most suitable or of the highest quality (chính, chủ yếu, ưu tú)",
+    "example": "Our prime concern was the safety of the children.",
+    "count": 0
+    },
+    {
+    "word": "redeeming feature (n phr) /rɪˈdiːmɪŋ ˈfiːtʃə/",
+    "meaning": "a quality that improves something that is not very good (điểm bù trừ)",
+    "example": "Smith’s only redeeming feature is his sense of humor.",
+    "count": 0
+    },
+    {
+    "word": "refurbish (v) /ˌriːˈfɜːbɪʃ/",
+    "meaning": "to improve a room or building by cleaning and decorating it (tân trang, cải tạo)",
+    "example": "They’re planning to refurbish the teachers’ room.",
+    "count": 0
+    },
+    {
+    "word": "reinforce (v) /ˌriːɪnˈfɔːs/",
+    "meaning": "to make a building, structure or object stronger (gia cố)",
+    "example": "Crews started work today to reinforce the seriously damaged bridge.",
+    "count": 0
+    },
+    {
+    "word": "renovate (v) /ˈrenəveɪt/",
+    "meaning": "to make something old look new again by repairing and improving it (nâng cấp, cải tạo)",
+    "example": "They plan to renovate the fire station.",
+    "count": 0
+    },
+    {
+    "word": "rotten (adj) /ˈrɒtn/",
+    "meaning": "something that is decayed or bad (thối, hỏng)",
+    "example": "There was a horrible smell of rotten eggs.",
+    "count": 0
+    },
+    {
+    "word": "rotten (adj) /ˈrɒtn/",
+    "meaning": "of low quality, standard or behavior (tệ hại)",
+    "example": "She’s a rotten singer.",
+    "count": 0
+    },
+    {
+    "word": "rusty (adj) /ˈrʌsti/",
+    "meaning": "a rusty metal object is covered in rust (bị gỉ sét)",
+    "example": "I don’t know why you bought that rusty old car.",
+    "count": 0
+    },
+    {
+    "word": "satisfactory (adj) /ˌsætɪsˈfæktəri/",
+    "meaning": "good enough to be accepted in a particular situation (đủ dùng)",
+    "example": "I have still not received a satisfactory answer to my question.",
+    "count": 0
+    },
+    {
+    "word": "satisfactory (adj) /ˌsætɪsˈfæktəri/",
+    "meaning": "enjoyable and pleasing (hài lòng)",
+    "example": "This new arrangement proved highly satisfactory to us all.",
+    "count": 0
+    },
+    {
+    "word": "shambles (n) /ˈʃæmbəlz/",
+    "meaning": "a situation that is very badly organised and does not operate effectively (rối ren, hỗn loạn)",
+    "example": "Government corruption has left the economy in a shambles.",
+    "count": 0
+    },
+    {
+    "word": "shoddy (adj) /ˈʃɒdi/",
+    "meaning": "shoddy work, services or products are of very low standard (chất lượng kém)",
+    "example": "The work they did on the new road was very shoddy in places.",
+    "count": 0
+    },
+    {
+    "word": "sound (adj) /saʊnd/",
+    "meaning": "involving good judgment or reliable methods (hợp lý, đúng đắn)",
+    "example": "You’ll need a sound understanding of basic teaching skills before you start.",
+    "count": 0
+    },
+    {
+    "word": "sound (adj) /saʊnd/",
+    "meaning": "thorough or solid (toàn diện, vững chắc)",
+    "example": "Wrap the bread in foil to keep it sound.",
+    "count": 0
+    },
+    {
+    "word": "stale (adj) /steɪl/",
+    "meaning": "food that is stale is old and no longer fresh (ôi, thiu)",
+    "example": "This bread is stale. Throw it away.",
+    "count": 0
+    },
+    {
+    "word": "streamline (v) /ˈstriːmlaɪn/",
+    "meaning": "to improve a business, organisation, process etc by making it more modern and efficient (tinh gọn)",
+    "example": "We need to streamline the whole process.",
+    "count": 0
+    },
+    {
+    "word": "strengthen (v) /ˈstreŋθn/",
+    "meaning": "to make something stronger (gia cố, củng cố)",
+    "example": "The bridge strengthens the connection between the two cities.",
+    "count": 0
+    },
+    {
+    "word": "surpass (v) /səˈpɑːs/",
+    "meaning": "to be better or greater than something else (vượt qua)",
+    "example": "Winning the gold medal surpassed our expectations.",
+    "count": 0
+    },
+    {
+    "word": "ultimate (adj) /ˈʌltɪmət/",
+    "meaning": "happening at the end of a process or activity (cuối cùng)",
+    "example": "The incident affected the outcome of the ultimate decision.",
+    "count": 0
+    },
+    {
+    "word": "ultimate (adj) /ˈʌltɪmət/",
+    "meaning": "as good or as bad as possible (tối thượng, tốt nhất)",
+    "example": "The course offers the ultimate test of skill.",
+    "count": 0
+    },
+    {
+    "word": "worsen (v) /ˈwɜːsn/",
+    "meaning": "to become worse, or to make something worse (làm trầm trọng hơn)",
+    "example": "Temperatures fell and the weather worsened.",
+    "count": 0
+    },
+    {
+    "word": "wreck (n) /rek/",
+    "meaning": "something that has been badly damaged (đống đổ nát)",
+    "example": "The car was a wreck after the accident.",
+    "count": 0
+    },
+    {
+    "word": "wreck (v) /rek/",
+    "meaning": "to severely damage (phá hủy)",
+    "example": "The town was wrecked by the bombing.",
+    "count": 0
+    },
+    {
+    "word": "abstract (adj) /ˈæbstrækt/",
+    "meaning": "abstract art shows ideas rather than actual objects (trừu tượng)",
+    "example": "I’m not very keen on abstract paintings.",
+    "count": 0
+    },
+    {
+    "word": "abstract (n) /ˈæbstrækt/",
+    "meaning": "an abstract painting or design (tác phẩm trừu tượng)",
+    "example": "You’re not supposed to understand what an abstract is.",
+    "count": 0
+    },
+    {
+    "word": "auction (n) /ˈɔːkʃn/",
+    "meaning": "a public occasion when things are sold to the person who offers the most money (buổi đấu giá)",
+    "example": "They bought the paintings at auction in 1989.",
+    "count": 0
+    },
+    {
+    "word": "audition (n) /ɔːˈdɪʃn/",
+    "meaning": "a short performance to decide if someone is good enough (buổi thử vai)",
+    "example": "I’ve got an audition for the school play tomorrow.",
+    "count": 0
+    },
+    {
+    "word": "bestseller (n) /ˌbestˈselə/",
+    "meaning": "a book that many people buy (sách bán chạy)",
+    "example": "His first novel was a bestseller.",
+    "count": 0
+    },
+    {
+    "word": "collector’s item (n phr) /kəˈlektəz ˈaɪtəm/",
+    "meaning": "a rare or valuable object that collectors want (đồ hiếm)",
+    "example": "Do you think this watch is a collector’s item?",
+    "count": 0
+    },
+    {
+    "word": "curator (n) /kjʊˈreɪtə/",
+    "meaning": "someone whose job is to look after the objects in a museum or art gallery (bảo tàng viên)",
+    "example": "He’ll be able to tell you more about it – he’s the curator.",
+    "count": 0
+    },
+    {
+    "word": "fine art (n phr) /ˌfaɪn ˈɑːt/",
+    "meaning": "art forms like painting, drawing, or sculpture (mỹ thuật)",
+    "example": "I’m thinking of studying fine art at university.",
+    "count": 0
+    },      
+    {
     "word": "diagnosis (n)",
     "meaning": "a statement about what disease someone has, based on examining them (chẩn đoán); a diagnosis of appendicitis (chẩn đoán viêm ruột thừa)",
     "example": "The doctor’s diagnosis was pneumonia. Early diagnosis of diabetes can save lives. She awaited the final diagnosis with anxiety. His diagnosis of appendicitis was confirmed by blood tests.",
