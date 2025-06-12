@@ -1,4 +1,3 @@
-
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
@@ -12,6 +11,7 @@ import { useAudioInitialization } from "@/hooks/vocabulary-app/useAudioInitializ
 import { useUserInteractionHandler } from "@/hooks/vocabulary-app/useUserInteractionHandler";
 import { useAutoPlayOnDataLoad } from "@/hooks/vocabulary-app/useAutoPlayOnDataLoad";
 import { useUserInteractionHandlers } from "./interactive/UserInteractionHandlers";
+import { vocabularyService } from "@/services/vocabularyService";
 
 const VocabularyAppContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
