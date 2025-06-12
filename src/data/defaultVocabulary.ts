@@ -1,5 +1,9 @@
-import { SheetData } from "@/data/defaultVocabulary";
+
+import { SheetData } from "@/types/vocabulary";
+
 export const DEFAULT_VOCABULARY_DATA: SheetData = 
+//import { SheetData } from "@/data/defaultVocabulary";
+//export const DEFAULT_VOCABULARY_DATA: SheetData = 
 {
   "phrasal verbs": [
     {
@@ -4985,6 +4989,12 @@ export const DEFAULT_VOCABULARY_DATA: SheetData =
       "word": "In order to achieve a very high band in the IELTS speaking test, you need to show that you can use some ‘less common’ vocabulary, including idioms and less common collocations. Let’s look at how you can say common sentences in a ‘less common’",
       "meaning": "Note on using idioms. Do not try to ‘show off’ to the examiner by using an idiom in every single sentence. Idioms should be used appropriately. Think of them like spices in a cooking recipe.",
       "example": "People in my country think that they are good singers, so they enjoy karaoke. People in my country regard themselves as being talented singers, so they enjoy karaoke. I was very happy when I got my exam results. I was over the moon when I got my exam results. We should try to produce fewer greenhouse gas emissions. We should try to reduce our carbon footprint. Some people in my country are very very poor. Some people in my country live below the breadline.",
+      "count": 0
+    },
+    {
+      "word": "He would- he'd - He'd like to see you now. why have - Why've. Why've you come? I will - I'll - I'll think about it. where did - Where'd - Where'd you get that? they are - they're - They're already here",
+      "meaning": "Less common words/expressions",
+      "example": ".",
       "count": 0
     },
     {
