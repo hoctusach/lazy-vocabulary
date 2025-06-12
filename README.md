@@ -83,6 +83,13 @@ npm test       # execute unit tests with vitest
 npm run lint   # check code style with ESLint
 ```
 
+## Enabling speech playback
+
+Modern browsers block audio playback until the user interacts with the page.
+To hear the vocabulary pronunciations, click anywhere on the page (or press any
+key) before using the play controls. The first interaction unlocks the speech
+synthesis engine so that audio can be played normally.
+
 ## What technologies are used for this project?
 
 This project is built with:
