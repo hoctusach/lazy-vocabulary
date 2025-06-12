@@ -1,4 +1,4 @@
-import { SheetData } from "@/data/defaultVocabulary";
+import { SheetData } from "@/types/vocabulary";
 export const DEFAULT_VOCABULARY_DATA: SheetData = 
 {
   "phrasal verbs": [
