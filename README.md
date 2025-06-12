@@ -90,6 +90,18 @@ To hear the vocabulary pronunciations, click anywhere on the page (or press any
 key) before using the play controls. The first interaction unlocks the speech
 synthesis engine so that audio can be played normally.
 
+## Controlling content filtering
+
+The app strips IPA notation and Vietnamese diacritics from speech output by default.
+If you prefer to keep them, set a `preserveSpecial` flag in local storage:
+
+```js
+localStorage.setItem('buttonStates', JSON.stringify({ preserveSpecial: true }));
+```
+
+When `preserveSpecial` is `true`, `extractSpeechableContent` will leave those
+characters intact when preparing text for speech.
+
 ## What technologies are used for this project?
 
 This project is built with:

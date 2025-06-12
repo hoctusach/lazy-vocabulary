@@ -25,6 +25,20 @@ const BYPASS_PATTERNS = [
   /\/.*?\//g  // Content between forward slashes (often phonetic)
 ];
 
+export const getPreserveSpecialFromStorage = (): boolean => {
+  try {
+    if (typeof localStorage === 'undefined') return false;
+    const stored = localStorage.getItem('buttonStates');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return parsed.preserveSpecial === true;
+    }
+  } catch (error) {
+    console.error('Error reading preserveSpecial flag from localStorage:', error);
+  }
+  return false;
+};
+
 /**
  * Check if text contains IPA notation or Vietnamese characters that should bypass validation
  */
@@ -38,7 +52,7 @@ export const shouldBypassValidation = (text: string): boolean => {
  * Extract content that can be spoken by speech synthesis
  * More conservative filtering - only removes obvious problematic content
  */
-export const extractSpeechableContent = (text: string): string => {
+export const extractSpeechableContent = (text: string, preserveSpecial = false): string => {
   if (!text || typeof text !== 'string') return '';
   
   console.log('[CONTENT-FILTER] Processing text for speech:', text.substring(0, 100) + '...');
@@ -56,16 +70,18 @@ export const extractSpeechableContent = (text: string): string => {
   // Remove content between forward slashes (phonetic transcription)
   processedText = processedText.replace(/\/([^/]*)\//g, '');
   
-  // Remove standalone IPA characters but preserve words containing them
-  // Only remove if the entire word consists mainly of IPA characters
-  processedText = processedText.replace(/\b\w*[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]\w*\b/g, (match) => {
-    // Only remove if more than 50% of the word is IPA characters
-    const ipaCount = (match.match(/[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]/g) || []).length;
-    if (ipaCount / match.length > 0.5) {
-      return '';
-    }
-    return match;
-  });
+  if (!preserveSpecial) {
+    // Remove standalone IPA characters but preserve words containing them
+    // Only remove if the entire word consists mainly of IPA characters
+    processedText = processedText.replace(/\b\w*[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]\w*\b/g, (match) => {
+      // Only remove if more than 50% of the word is IPA characters
+      const ipaCount = (match.match(/[ɑɒæɓʙβɕçɗɖðʤʣeɛɘəɚɜɝɞɟʄɡɠɢʛɦɧħɥʜɨɪʝɭɬɫɮʟɱɯɰŋɳɲɴøɵɸœɶʘɹɺɾɻʀʁɽʂʃʈθʧʉʊʋⱱʌɣɤʍχʎʏʑʐʒʔʡʢˈˌˑ]/g) || []).length;
+      if (ipaCount / match.length > 0.5) {
+        return '';
+      }
+      return match;
+    });
+  }
   
   // Clean up extra whitespace
   processedText = processedText.replace(/\s+/g, ' ').trim();
@@ -79,8 +95,11 @@ export const extractSpeechableContent = (text: string): string => {
 /**
  * Check if text has valid content for speech after filtering
  */
-export const hasValidSpeechableContent = (text: string): boolean => {
-  const filtered = extractSpeechableContent(text);
+export const hasValidSpeechableContent = (
+  text: string,
+  preserveSpecial = false
+): boolean => {
+  const filtered = extractSpeechableContent(text, preserveSpecial);
   
   // Check if we have meaningful content (not just punctuation and spaces)
   const meaningfulContent = filtered.replace(/[^\w]/g, '');
