@@ -35,6 +35,8 @@ export const useVocabularyAppState = () => {
     playCurrentWord,
     currentWord: playbackCurrentWord,
     userInteractionRef,
+    hasUserInteracted,
+    onUserInteraction,
     isSpeaking,
     allVoiceOptions
   } = useVocabularyPlayback(wordList || []);
@@ -73,6 +75,8 @@ export const useVocabularyAppState = () => {
     playCurrentWord,
     playbackCurrentWord,
     userInteractionRef,
+    hasUserInteracted,
+    onUserInteraction,
     isSpeaking,
     allVoiceOptions,
     

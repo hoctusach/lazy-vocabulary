@@ -3,11 +3,12 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useWordNavigation = (
-  wordList: VocabularyWord[], 
+  wordList: VocabularyWord[],
   cancelSpeech: () => void,
   muted: boolean,
   paused: boolean,
-  playWord: (word: VocabularyWord) => void
+  playWord: (word: VocabularyWord) => void,
+  onUserInteraction?: () => void
 ) => {
   // Navigation state
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,6 +28,7 @@ export const useWordNavigation = (
   const advanceToNext = useCallback(() => {
     // Mark that we've had user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     
     // Cancel any ongoing speech
     cancelSpeech();

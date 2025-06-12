@@ -10,6 +10,7 @@ interface UserInteractionHandlersProps {
   handleSwitchCategory: (current: string, next: string) => void;
   currentCategory: string;
   nextCategory: string | null;
+  onUserInteraction?: () => void;
 }
 
 export const useUserInteractionHandlers = ({
@@ -20,12 +21,14 @@ export const useUserInteractionHandlers = ({
   toggleMute,
   handleSwitchCategory,
   currentCategory,
-  nextCategory
+  nextCategory,
+  onUserInteraction
 }: UserInteractionHandlersProps) => {
   // Handle category switch with explicit user interaction tracking
   const handleCategorySwitchDirect = () => {
     // Mark that we've had user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     
     if (typeof nextCategory === 'string') {
       console.log(`Switching directly to category: ${nextCategory}`);
@@ -37,6 +40,7 @@ export const useUserInteractionHandlers = ({
   const handleManualNext = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     goToNextWord();
   };
 
@@ -44,6 +48,7 @@ export const useUserInteractionHandlers = ({
   const handleTogglePauseWithInteraction = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     togglePause();
   };
 
@@ -51,6 +56,7 @@ export const useUserInteractionHandlers = ({
   const handleCycleVoiceWithInteraction = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     cycleVoice();
   };
 
@@ -58,6 +64,7 @@ export const useUserInteractionHandlers = ({
   const handleToggleMuteWithInteraction = () => {
     // This is definitely user interaction
     userInteractionRef.current = true;
+    onUserInteraction?.();
     toggleMute();
   };
 

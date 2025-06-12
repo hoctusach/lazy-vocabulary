@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 /**
  * Hook for managing user interaction detection
  */
-export const useUserInteraction = () => {
+export const useUserInteraction = (onUserInteraction?: () => void) => {
   // Track if user has interacted with the page
   const userInteractionRef = useRef<boolean>(false);
   
@@ -14,6 +14,7 @@ export const useUserInteraction = () => {
     if (localStorage.getItem('hadUserInteraction') === 'true') {
       console.log('User interaction detected from localStorage');
       userInteractionRef.current = true;
+      onUserInteraction?.();
     }
     
     // Function to handle user interaction
@@ -21,6 +22,7 @@ export const useUserInteraction = () => {
       if (!userInteractionRef.current) {
         console.log('User interaction detected');
         userInteractionRef.current = true;
+        onUserInteraction?.();
         localStorage.setItem('hadUserInteraction', 'true');
         
         // Try to initialize speech synthesis

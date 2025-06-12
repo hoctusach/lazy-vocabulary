@@ -35,6 +35,8 @@ const VocabularyAppContainer: React.FC = () => {
     playCurrentWord,
     playbackCurrentWord,
     userInteractionRef,
+    hasUserInteracted,
+    onUserInteraction,
     isSpeaking,
     isAddWordModalOpen,
     isEditMode,
@@ -74,13 +76,14 @@ const VocabularyAppContainer: React.FC = () => {
   useUserInteractionHandler({
     userInteractionRef,
     playCurrentWord,
-    playbackCurrentWord
+    playbackCurrentWord,
+    onUserInteraction
   });
   
   useAutoPlayOnDataLoad({
     hasData,
     currentWord: playbackCurrentWord,
-    userInteractionRef,
+    hasUserInteracted,
     playCurrentWord
   });
 
@@ -112,7 +115,8 @@ const VocabularyAppContainer: React.FC = () => {
     toggleMute,
     handleSwitchCategory,
     currentCategory,
-    nextCategory
+    nextCategory,
+    onUserInteraction
   });
 
   return (

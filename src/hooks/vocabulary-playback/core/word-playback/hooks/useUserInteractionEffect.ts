@@ -11,7 +11,8 @@ export const useUserInteractionEffect = (
   userInteractionRef: React.MutableRefObject<boolean>,
   currentWord: VocabularyWord | null,
   playCurrentWord: () => void,
-  ensureVoicesLoaded: () => Promise<boolean>
+  ensureVoicesLoaded: () => Promise<boolean>,
+  onUserInteraction?: () => void
 ) => {
   const initializationDoneRef = useRef(false);
 
@@ -22,6 +23,7 @@ export const useUserInteractionEffect = (
         console.log('[USER-INTERACTION] First user interaction detected');
         userInteractionRef.current = true;
         initializationDoneRef.current = true;
+        onUserInteraction?.();
         
         // Save interaction state
         localStorage.setItem('hadUserInteraction', 'true');
@@ -88,6 +90,7 @@ export const useUserInteractionEffect = (
       console.log('[USER-INTERACTION] Previous interaction detected from localStorage');
       userInteractionRef.current = true;
       initializationDoneRef.current = true;
+      onUserInteraction?.();
       return;
     }
     
@@ -101,5 +104,5 @@ export const useUserInteractionEffect = (
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
     };
-  }, [userInteractionRef, currentWord, playCurrentWord, ensureVoicesLoaded]);
+  }, [userInteractionRef, currentWord, playCurrentWord, ensureVoicesLoaded, onUserInteraction]);
 };
