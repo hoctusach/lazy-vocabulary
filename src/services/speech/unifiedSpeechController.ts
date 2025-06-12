@@ -44,6 +44,7 @@ class UnifiedSpeechController {
 
   // Main speak method
   async speak(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
+    console.log(`[UNIFIED-SPEECH] speak() called for: ${word.word}`);
     return this.speechExecutor.speak(word, voiceRegion);
   }
 
