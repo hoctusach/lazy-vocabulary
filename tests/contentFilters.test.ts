@@ -7,4 +7,10 @@ describe('extractSpeechableContent', () => {
     const result = extractSpeechableContent(input);
     expect(result).toBe('quick (adj) [kwiːk]');
   });
+
+  it('preserves IPA characters when preserveSpecial is true', () => {
+    const input = 'ʃʊd';
+    const result = extractSpeechableContent(input, true);
+    expect(result).toBe('ʃʊd');
+  });
 });
