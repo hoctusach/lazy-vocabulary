@@ -4896,6 +4896,216 @@
   ],
   "topic vocab": [
     {
+    "word": "diagnosis (n)",
+    "meaning": "a statement about what disease someone has, based on examining them (chẩn đoán); a diagnosis of appendicitis (chẩn đoán viêm ruột thừa)",
+    "example": "The doctor’s diagnosis was pneumonia. Early diagnosis of diabetes can save lives. She awaited the final diagnosis with anxiety. His diagnosis of appendicitis was confirmed by blood tests.",
+    "count": 0
+    },
+    {
+    "word": "inoculate (v)",
+    "meaning": "to protect someone against a particular disease by injecting a small amount of it so that their body becomes immune (tiêm phòng); to inoculate someone against diphtheria",
+    "example": "The hospital inoculated all staff against influenza. They plan to inoculate children before flu season. She was inoculated against measles at birth. The clinic offers to inoculate travelers for free.",
+    "count": 0
+    },
+    {
+    "word": "irritation (n)",
+    "meaning": "a painful feeling in a part of the body, often with red skin or swelling (kích ứng); stomach irritation (đau dạ dày)",
+    "example": "The cream reduced skin irritation quickly. Spicy food can cause throat irritation. He experienced eye irritation from the smoke. The patch may cause mild irritation initially.",
+    "count": 0
+    },
+    {
+    "word": "numb (adj)",
+    "meaning": "a part of your body that is numb has no feeling (tê liệt); After hours of sitting on the floor, her legs had gone numb",
+    "example": "Her fingers went numb in the cold. He felt numb after hearing the shocking news. The dentist gave her an injection to make her gums numb. He sat so long that his foot went completely numb.",
+    "count": 0
+    },
+    {
+    "word": "numb (v)",
+    "meaning": "not able to react or to show your emotions, often because of an extreme shock (làm tê liệt); I was numb with fear",
+    "example": "He was numb with disbelief after the accident. She sat there, numb from the news. The pain numned her senses. He felt numb and could not cry.",
+    "count": 0
+    },
+    {
+    "word": "nursing home (n phr)",
+    "meaning": "an institution where old or ill people live when they are too old or ill to look after themselves without help (viện dưỡng lão)",
+    "example": "My grandmother is moving into a nursing home next week. The nursing home provides 24-hour care. Their grandfather lives in a private nursing home. She visits the nursing home every Sunday.",
+    "count": 0
+    },
+    {
+    "word": "paralysis (n)",
+    "meaning": "the loss of the ability to move your body or a part of it, usually because of an injury or illness (liệt); uỷ liệt; The syndrome can lead to sudden paralysis",
+    "example": "He recovered slowly from the paralysis. The accident caused partial paralysis in his arm. Early treatment can prevent permanent paralysis. She fears paralysis if the injury worsens.",
+    "count": 0
+    },
+    {
+    "word": "plaster (v)",
+    "meaning": "to cover a cut or broken bone with a band of plaster (băng dán vết thương); I’ve cut my finger. Have you got a plaster?",
+    "example": "The nurse plastered his arm after the fall. She plastered the wound to prevent infection. He asked for a plaster for his cut. They plastered her leg until it healed.",
+    "count": 0
+    },
+    {
+    "word": "plaster (n)",
+    "meaning": "if a part of someone’s body is in plaster, it has a hard cover around it to protect a broken bone (thạch cao); One man had his leg in plaster, having broken it in an accident",
+    "example": "She had her arm in plaster for six weeks. His plaster was removed yesterday. The child played despite having a plaster on his knee. He accidentally cracked his plaster doing sports.",
+    "count": 0
+    },
+    {
+    "word": "prescribe (v)",
+    "meaning": "if a doctor prescribes a drug or treatment, they say you should have it (kê đơn); The drug should not be taken unless prescribed by a doctor",
+    "example": "The physician prescribed antibiotics for the infection. He was prescribed rest and fluids. The doctor prescribed a new treatment plan. She prescribes only what’s necessary.",
+    "count": 0
+    },
+    {
+    "word": "preventative medicine (n phr)",
+    "meaning": "medical examinations, treatments, advice, etc. intended to prevent illness or discover it before it becomes serious (y tế dự phòng)",
+    "example": "The government should invest more in preventative medicine. Preventative medicine reduces healthcare costs. She studies preventative medicine at university. Vaccination is a key part of preventative medicine.",
+    "count": 0
+    },
+    {
+    "word": "prognosis (n)",
+    "meaning": "a doctor’s opinion about the way in which a disease or illness is likely to develop (tiên lượng); What’s the prognosis, doctor?",
+    "example": "The prognosis for full recovery is good. He asked the doctor about his prognosis. Early diagnosis improved her prognosis. The specialist gave a grim prognosis.",
+    "count": 0
+    },
+    {
+    "word": "sick leave (n phr)",
+    "meaning": "a period of time during which you do not work because you are ill (nghỉ ốm); Mr Jenkins is away on sick leave today",
+    "example": "She took two weeks of sick leave after surgery. He filed for sick leave last Monday. The company offers paid sick leave. He returned from sick leave refreshed.",
+    "count": 0
+    },
+    {
+    "word": "side effect (n phr)",
+    "meaning": "an effect of a medicine that is not intended and could be unpleasant (tác dụng phụ); The treatment has no significant side effects",
+    "example": "Nausea is a common side effect of this drug. She experienced severe side effects. The doctor warned him about side effects. He stopped the medication due to side effects.",
+    "count": 0
+    },
+    {
+    "word": "syringe (n)",
+    "meaning": "a needle fitted to a plastic tube, used for taking blood from your body or for putting medicine or drugs into it (ống tiêm)",
+    "example": "The nurse filled the syringe with vaccine. He handled the syringe carefully. She taught me how to use a syringe. The syringe needs to be sterilized.",
+    "count": 0
+    },
+    {
+    "word": "vaccine (n)",
+    "meaning": "a substance put into the body, usually by injection, in order to provide protection against a disease (vắc xin); Is there an effective vaccine for meningitis?",
+    "example": "Scientists developed a new vaccine for malaria. The clinic offers free vaccines. He opted to receive the flu vaccine. A vaccine can prevent many illnesses.",
+    "count": 0
+    },
+    {
+    "word": "ward (n)",
+    "meaning": "a large room in a hospital with beds for people to stay in; phòng bệnh, khu bệnh; Jo is a staff nurse working on the maternity ward",
+    "example": "She visited her grandmother in the ward. The ward was full of healthy babies. He volunteered to work in the children’s ward. The ward staff were very attentive.",
+    "count": 0
+    },
+    {
+    "word": "aggression (n)",
+    "meaning": "an angry feeling that makes you want to attack or defeat someone else (sự hung hăng)",
+    "example": "He struggled to control his aggression during the heated debate. Road rage is a common form of aggression on busy highways. The coach warned that unchecked aggression could lead to penalties. She learned techniques to manage her aggression in stressful situations.",
+    "count": 0
+    },
+    {
+    "word": "authority (n)",
+    "meaning": "the power to make decisions for or tell people what to do (quyền hạn)",
+    "example": "Only the principal has the authority to approve changes to the curriculum. The manager’s authority was challenged by some team members. We need to escalate this issue to someone with proper authority. He questioned the authority of the new policy.",
+    "count": 0
+    },
+    {
+    "word": "benign (adj)",
+    "meaning": "kind and easygoing; not harmful (nhân từ, lành tính)",
+    "example": "Her benign smile put everyone at ease. The lump turned out to be benign, not cancerous. He has a benign demeanor that makes him well liked. The doctor said the growth was benign and required no treatment.",
+    "count": 0
+    },
+    {
+    "word": "bully (v)",
+    "meaning": "to frighten or hurt someone who is smaller or weaker (bắt nạt)",
+    "example": "He refused to bully his classmates into doing his homework. Online platforms must do more to stop users from bullying others. Don’t let anyone bully you into backing down. She stood up when she saw him bully a younger student.",
+    "count": 0
+    },
+    {
+    "word": "bully (n)",
+    "meaning": "someone who frightens or hurts someone smaller or weaker (kẻ bắt nạt)",
+    "example": "The playground bully was finally reprimanded by the teacher. No one should have to tolerate a bully at work. He used to be a bully in high school but has changed. Parents worried the new student would become a target for the bully.",
+    "count": 0
+    },
+    {
+    "word": "command (v)",
+    "meaning": "to officially order someone to do something (mệnh lệnh)",
+    "example": "The general commanded his troops to hold their position. She commanded the team to stop all work immediately. The director can command resources for any urgent project. He commanded respect from his subordinates.",
+    "count": 0
+    },
+    {
+    "word": "command (n)",
+    "meaning": "an official order (mệnh lệnh)",
+    "example": "He carried out every command from his superior. The rescue team acted on the commander’s commands. You must follow the safety commands in the manual. Failure to obey that command could be dangerous.",
+    "count": 0
+    },
+    {
+    "word": "conquer (v)",
+    "meaning": "to take control of land or people using soldiers (chinh phục)",
+    "example": "The empire set out to conquer neighboring territories. Alexander the Great conquered vast regions before age 30. They attempted to conquer the rugged mountain passes. Napoleon famously tried to conquer all of Europe.",
+    "count": 0
+    },
+    {
+    "word": "conquer (v)",
+    "meaning": "to gain control of a situation or emotion by making a great effort (chinh phục)",
+    "example": "She trained hard to conquer her fear of public speaking. He finally conquered the challenges of learning a new language. They worked together to conquer every obstacle. It took years to conquer his self-doubt.",
+    "count": 0
+    },
+    {
+    "word": "consent (v)",
+    "meaning": "to give approval for something (đồng ý)",
+    "example": "You cannot proceed without the patient’s consent. She consented to share her data for the study. He consented to the new terms and conditions. They asked for parental consent before the trip.",
+    "count": 0
+    },
+    {
+    "word": "consent (n)",
+    "meaning": "permission to do something (sự đồng ý)",
+    "example": "The project needed consent from all stakeholders. They obtained consent before accessing private records. He signed the form to indicate his consent. Consent is required by law for any data collection.",
+    "count": 0
+    },
+    {
+    "word": "controversy (n)",
+    "meaning": "a public disagreement about a policy or moral issue (tranh cãi)",
+    "example": "The new law sparked controversy across the country. There was controversy over the CEO’s high salary. The film’s ending caused heated controversy among fans. Scientists faced controversy when they published their findings.",
+    "count": 0
+    },
+    {
+    "word": "dictator (n)",
+    "meaning": "someone who uses force to take and keep power in a country (nhà độc tài)",
+    "example": "The dictator ruled the nation with an iron fist. Citizens lived in fear under the oppressive dictator. He escaped the country to flee the dictator’s regime. Historians study how dictators maintain control.",
+    "count": 0
+    },
+    {
+    "word": "dominate (v)",
+    "meaning": "to control something or someone, often negatively, because you have more power (áp đảo)",
+    "example": "Large corporations often dominate smaller competitors. His presence can dominate any room he enters. Social media platforms dominate our daily interactions. The team’s star player dominated the game.",
+    "count": 0
+    },
+    {
+    "word": "eliminate (v)",
+    "meaning": "to get rid of something unwanted or unnecessary (loại bỏ)",
+    "example": "We need to eliminate all bugs before release. The new process eliminates redundant steps. He aimed to eliminate waste from the workflow. That diet plan promises to eliminate unhealthy fats.",
+    "count": 0
+    },
+    {
+    "word": "enforce (v)",
+    "meaning": "to make sure that a law or rule is obeyed (thực thi)",
+    "example": "Police work to enforce traffic regulations. The company enforces a strict code of conduct. Judges enforce court orders without exception. It’s challenging to enforce remote-work policies.",
+    "count": 0
+    },
+    {
+    "word": "entitled (adj)",
+    "meaning": "having the right to something (được quyền)",
+    "example": "Students are entitled to free access to the library. He was entitled to compensation after the delay. Full-time employees are entitled to health benefits. She felt entitled to a refund after poor service.",
+    "count": 0
+    },
+    {
+    "word": "exempt (adj)",
+    "meaning": "allowed to ignore a rule, obligation, or payment (được miễn)",
+    "example": "Nonprofits are exempt from certain taxes. Volunteers may be exempt from registration fees. Some countries exempt students from military service. Members with seniority are exempt from jury duty.",
+    "count": 0
+    },      
+    {
     "word": "aggression (n)",
     "meaning": "an angry feeling that makes you want to attack or defeat someone else (sự hung hăng)",
     "example": "He struggled to control his aggression during the heated debate. Road rage is a common form of aggression on busy highways. The coach warned that unchecked aggression could lead to penalties. She learned techniques to manage her aggression in stressful situations.",
@@ -15219,6 +15429,8 @@
       "meaning": "bring sth to a conclusion (đưa cái gì đến kết luận); come to/reach a conclusion (đi đến kết luận); jump/leap to conclusions (nhảy cóc kết luận); in conclusion (kết lại); foregone conclusion (kết quả đương nhiên)",
       "example": "Let’s bring this discussion to a conclusion. They reached a conclusion after testing. Don’t jump to conclusions too quickly. In conclusion, we recommend a staging environment.",
       "count": 0
-    }          
+    }      
+                  
+      
   ]
 }
