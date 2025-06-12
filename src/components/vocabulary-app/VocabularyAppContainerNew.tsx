@@ -29,6 +29,13 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   // Track whether the user has interacted to enable audio playback
   const userInteractionRef = useRef(false);
+  const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
+
+  React.useEffect(() => {
+    if (localStorage.getItem('hadUserInteraction') === 'true') {
+      setHasUserInteracted(true);
+    }
+  }, []);
 
   console.log('[VOCAB-CONTAINER-NEW] Container state:', {
     hasData,
@@ -63,12 +70,13 @@ const VocabularyAppContainerNew: React.FC = () => {
     userInteractionRef,
     playCurrentWord,
     playbackCurrentWord: currentWord,
+    onUserInteraction: () => setHasUserInteracted(true),
   });
 
   useAutoPlayOnDataLoad({
     hasData,
     currentWord,
-    userInteractionRef,
+    hasUserInteracted,
     playCurrentWord,
   });
 

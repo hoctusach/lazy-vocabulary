@@ -6,12 +6,14 @@ interface UserInteractionProps {
   userInteractionRef: React.MutableRefObject<boolean>;
   playCurrentWord: () => void;
   playbackCurrentWord: any;
+  onUserInteraction?: () => void;
 }
 
 export const useUserInteractionHandler = ({
   userInteractionRef,
   playCurrentWord,
-  playbackCurrentWord
+  playbackCurrentWord,
+  onUserInteraction
 }: UserInteractionProps) => {
   // Track if we've already initialized to prevent duplicate initialization
   const initializedRef = useRef(false);
@@ -30,6 +32,7 @@ export const useUserInteractionHandler = ({
       // Mark that we've had user interaction
       userInteractionRef.current = true;
       initializedRef.current = true;
+      onUserInteraction?.();
       
       try {
         // Store this fact in localStorage to persist across page reloads
@@ -83,6 +86,7 @@ export const useUserInteractionHandler = ({
     // ensure audio is unlocked with a fresh user gesture
     if (localStorage.getItem('hadUserInteraction') === 'true') {
       console.log('Previous interaction detected from localStorage');
+      onUserInteraction?.();
     }
     
     // Add event listeners for various user interaction types
@@ -96,5 +100,5 @@ export const useUserInteractionHandler = ({
       document.removeEventListener('touchstart', enableAudioPlayback);
       document.removeEventListener('keydown', enableAudioPlayback);
     };
-  }, [userInteractionRef, playCurrentWord, playbackCurrentWord]);
+  }, [userInteractionRef, playCurrentWord, playbackCurrentWord, onUserInteraction]);
 };

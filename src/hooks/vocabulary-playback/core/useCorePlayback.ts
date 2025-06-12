@@ -5,7 +5,7 @@ import { toast } from "sonner";
 /**
  * Core playback state and utility functions
  */
-export const useCorePlayback = () => {
+export const useCorePlayback = (onUserInteraction?: () => void) => {
   // Basic state for playback
   const [isSpeaking, setIsSpeaking] = useState(false);
   const speakingRef = useRef(false);
@@ -21,6 +21,7 @@ export const useCorePlayback = () => {
       if (!userInteractionRef.current) {
         console.log('User interaction detected in useCorePlayback');
         userInteractionRef.current = true;
+        onUserInteraction?.();
         
         // Initialize speech synthesis after user interaction
         if (!speechInitializedRef.current) {

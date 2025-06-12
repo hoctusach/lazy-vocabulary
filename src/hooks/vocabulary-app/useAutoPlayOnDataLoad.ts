@@ -1,26 +1,20 @@
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface AutoPlayProps {
   hasData: boolean;
   currentWord: any | null;
-  userInteractionRef: React.MutableRefObject<boolean>;
+  hasUserInteracted: boolean;
   playCurrentWord: () => void;
 }
 
 export const useAutoPlayOnDataLoad = ({
   hasData,
   currentWord,
-  userInteractionRef,
+  hasUserInteracted,
   playCurrentWord,
 }: AutoPlayProps) => {
-  const [hasUserInteracted, setHasUserInteracted] = useState(userInteractionRef.current);
   const hasAutoPlayedRef = useRef(false);
-
-  // Track changes to the ref in a state variable so effects re-run
-  useEffect(() => {
-    setHasUserInteracted(userInteractionRef.current);
-  }, [userInteractionRef.current]);
 
   // Force audio to play when data becomes available
   useEffect(() => {

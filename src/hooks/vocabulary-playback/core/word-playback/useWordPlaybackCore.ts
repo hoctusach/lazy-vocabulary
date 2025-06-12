@@ -31,7 +31,8 @@ export const useWordPlaybackCore = (
   incrementRetryAttempts: () => boolean,
   checkSpeechSupport: () => boolean,
   lastManualActionTimeRef: React.MutableRefObject<number>,
-  autoAdvanceTimerRef: React.MutableRefObject<number | null>
+  autoAdvanceTimerRef: React.MutableRefObject<number | null>,
+  onUserInteraction?: () => void
 ) => {
   // Get utterance manager functionality
   const { utteranceRef, createUtterance } = useUtteranceManager();
@@ -79,10 +80,11 @@ export const useWordPlaybackCore = (
   
   // Setup user interaction effect
   useUserInteractionEffect(
-    userInteractionRef, 
-    currentWord, 
-    playCurrentWord, 
-    ensureVoicesLoaded
+    userInteractionRef,
+    currentWord,
+    playCurrentWord,
+    ensureVoicesLoaded,
+    onUserInteraction
   );
   
   return {

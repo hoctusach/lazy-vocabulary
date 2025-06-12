@@ -1,5 +1,5 @@
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { 
   useCorePlayback, 
@@ -20,16 +20,28 @@ import { useSafariSupport } from './core/ios-support';
  */
 export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
   // Get core playback functionality
-  const { 
-    isSpeaking, 
-    setIsSpeaking, 
+  const {
+    isSpeaking,
+    setIsSpeaking,
     speakingRef,
-    retryAttemptsRef, 
+    retryAttemptsRef,
     userInteractionRef,
     resetRetryAttempts,
     incrementRetryAttempts,
     checkSpeechSupport
-  } = useCorePlayback();
+  } = useCorePlayback(() => setHasUserInteracted(true));
+
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('hadUserInteraction') === 'true') {
+        setHasUserInteracted(true);
+      }
+    } catch (e) {
+      console.error('Failed to read interaction state:', e);
+    }
+  }, []);
   
   // Get voice management functionality
   const { 
@@ -87,7 +99,8 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     incrementRetryAttempts,
     checkSpeechSupport,
     lastManualActionTimeRef,
-    autoAdvanceTimerRef
+    autoAdvanceTimerRef,
+    () => setHasUserInteracted(true)
   );
 
   // Obtain the cancelSpeech function now that resetPlayInProgress is available
@@ -140,6 +153,8 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     togglePause,
     cycleVoice,
     userInteractionRef,
+    hasUserInteracted,
+    onUserInteraction: () => setHasUserInteracted(true),
     isSpeaking,
     hasSpeechPermission,
     allVoiceOptions
