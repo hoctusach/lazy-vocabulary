@@ -1,7 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { extractSpeechableContent, hasValidSpeechableContent } from '@/utils/text/contentFilters';
-import { toast } from 'sonner';
+import { extractSpeechableContent } from '@/utils/text/contentFilters';
 
 /**
  * Hook for handling content validation and filtering for speech
@@ -24,16 +23,7 @@ export const useContentValidation = () => {
     console.log('[CONTENT-VALIDATION] Speechable text length:', speechableText.length);
     console.log('[CONTENT-VALIDATION] Text to speak:', speechableText.substring(0, 100) + '...');
 
-    // Check if we have any content to speak after filtering
-    const hasValidContent = hasValidSpeechableContent(rawTextToSpeak);
-    
-    if (!hasValidContent) {
-      console.log('[CONTENT-VALIDATION] No speechable content after filtering');
-      toast.info("This word contains only IPA notation or Vietnamese text - skipping speech");
-      return { speechableText: '', hasValidContent: false };
-    }
-
-    return { speechableText, hasValidContent: true };
+    return { speechableText };
   };
 
   return {
