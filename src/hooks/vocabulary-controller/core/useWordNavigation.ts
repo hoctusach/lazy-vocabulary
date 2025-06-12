@@ -37,7 +37,7 @@ export const useWordNavigation = (
     unifiedSpeechController.stop();
 
     // Move to next word
-    setCurrentIndex(prevIndex => {
+    setCurrentIndex((prevIndex: number) => {
       const nextIndex = (prevIndex + 1) % wordList.length;
       console.log(`[WORD-NAVIGATION] Moving from word ${prevIndex} to ${nextIndex}`);
       return nextIndex;
