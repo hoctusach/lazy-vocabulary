@@ -44,7 +44,7 @@ export const useSpeechIntegration = (
 
       return () => clearTimeout(timeout);
     }
-  }, [currentWord, isPaused, isMuted, speechState.isActive, playCurrentWord]);
+  }, [currentWord, isPaused, isMuted, playCurrentWord]);
 
   return {
     speechState,
