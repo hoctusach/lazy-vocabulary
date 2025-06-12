@@ -1,22 +1,20 @@
+
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
-import ErrorDisplay from "./ErrorDisplay";
-import ContentWithData from "./ContentWithData";
-import VocabularyCard from "./VocabularyCard";
-import { useVocabularyContainerState } from "@/hooks/vocabulary/useVocabularyContainerState";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
-import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useVocabularyPlayback } from "@/hooks/vocabulary-playback";
 import { useAudioInitialization } from "@/hooks/vocabulary-app/useAudioInitialization";
 import { useUserInteractionHandler } from "@/hooks/vocabulary-app/useUserInteractionHandler";
 import { useAutoPlayOnDataLoad } from "@/hooks/vocabulary-app/useAutoPlayOnDataLoad";
 import { useUserInteractionHandlers } from "./interactive/UserInteractionHandlers";
-import { vocabularyService } from "@/services/vocabularyService";
+import { useVocabularyAppState } from "./hooks/useVocabularyAppState";
+import { useDisplayWord } from "./hooks/useDisplayWord";
+import { useVoiceLabels } from "./hooks/useVoiceLabels";
+import VocabularyAppContent from "./components/VocabularyAppContent";
 
 const VocabularyAppContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
   
-  // Get base vocabulary state
+  // Get all app state
   const {
     hasData,
     hasAnyData,
@@ -25,10 +23,26 @@ const VocabularyAppContainer: React.FC = () => {
     handleSwitchCategory,
     currentCategory,
     nextCategory,
-    displayTime
-  } = useVocabularyContainerState();
-
-  const wordList = vocabularyService.getWordList();
+    displayTime,
+    wordList,
+    muted,
+    paused,
+    selectedVoice,
+    toggleMute,
+    togglePause,
+    goToNextWord,
+    cycleVoice,
+    playCurrentWord,
+    playbackCurrentWord,
+    userInteractionRef,
+    isSpeaking,
+    isAddWordModalOpen,
+    isEditMode,
+    wordToEdit,
+    handleOpenAddWordModal,
+    handleOpenEditWordModal,
+    handleCloseModal
+  } = useVocabularyAppState();
 
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData,
@@ -37,36 +51,18 @@ const VocabularyAppContainer: React.FC = () => {
     currentCategory
   });
 
-  // Use our new unified playback hook for all speech functionality
-  const {
-    muted,
-    paused,
-    voices,
-    selectedVoice,
-    toggleMute,
-    togglePause,
-    goToNextWord,
-    cycleVoice,
-    playCurrentWord,
-    currentWord: playbackCurrentWord,
-    userInteractionRef,
-    isSpeaking,
-    allVoiceOptions
-  } = useVocabularyPlayback(wordList || []);
-
-  const nextVoiceLabel =
-    selectedVoice.region === 'UK'
-      ? 'US'
-      : selectedVoice.region === 'US'
-      ? 'AU'
-      : 'US';
-
   console.log('[VOCAB-CONTAINER] Playback state:', {
     playbackCurrentWord: playbackCurrentWord?.word,
     muted,
     paused,
     isSpeaking
   });
+
+  // Determine display word with fallback logic
+  const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
+
+  // Get voice labels
+  const { nextVoiceLabel } = useVoiceLabels(selectedVoice);
 
   // Use our extracted hooks for audio initialization and interaction handling
   useAudioInitialization({
@@ -87,47 +83,6 @@ const VocabularyAppContainer: React.FC = () => {
     userInteractionRef,
     playCurrentWord
   });
-
-  // Modal state management
-  const {
-    isAddWordModalOpen,
-    isEditMode,
-    wordToEdit,
-    handleOpenAddWordModal,
-    handleOpenEditWordModal,
-    handleCloseModal
-  } = useWordModalState();
-
-  // Use the current word from playback system as single source of truth
-  // But add fallback logic for better reliability
-  const displayWord = (() => {
-    console.log('[VOCAB-CONTAINER] Determining display word:', {
-      playbackCurrentWord: playbackCurrentWord?.word,
-      hasData,
-      wordListLength: wordList?.length || 0
-    });
-    
-    if (playbackCurrentWord) {
-      console.log('[VOCAB-CONTAINER] Using playback current word:', playbackCurrentWord.word);
-      return playbackCurrentWord;
-    }
-    
-    // Final fallback - use first word from list if available
-    if (wordList && wordList.length > 0) {
-      console.log('[VOCAB-CONTAINER] Using first word from list as fallback:', wordList[0].word);
-      return wordList[0];
-    }
-    
-    console.log('[VOCAB-CONTAINER] No display word available');
-    return null;
-  })();
-
-  console.log('[VOCAB-CONTAINER] Final display word:', displayWord?.word);
-
-  // Derive debug data from the word currently displayed
-  const debugData = displayWord
-    ? { word: displayWord.word, category: displayWord.category || currentCategory }
-    : null;
 
   // Word management operations
   const wordManager = displayWord ? VocabularyWordManager({
@@ -160,60 +115,35 @@ const VocabularyAppContainer: React.FC = () => {
     nextCategory
   });
 
-
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      {/* Error display component - fix type mismatch by converting string to boolean */}
-      <ErrorDisplay jsonLoadError={!!jsonLoadError} />
-
-      {hasData && displayWord ? (
-        <ContentWithData
-          displayWord={displayWord}
-          muted={muted}
-          paused={paused}
-          toggleMute={handleToggleMuteWithInteraction}
-          handleTogglePause={handleTogglePauseWithInteraction}
-          handleCycleVoice={handleCycleVoiceWithInteraction}
-          nextVoiceLabel={nextVoiceLabel}
-          handleSwitchCategory={handleCategorySwitchDirect}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
-          isSpeaking={isSpeaking}
-          handleManualNext={handleManualNext}
-          displayTime={displayTime}
-          selectedVoice={selectedVoice}
-          debugPanelData={debugData}
-          isAddWordModalOpen={isAddWordModalOpen}
-          handleCloseModal={handleCloseModal}
-          handleSaveWord={handleSaveWord}
-          isEditMode={isEditMode}
-          wordToEdit={wordToEdit}
-          handleOpenAddWordModal={handleOpenAddWordModal}
-          handleOpenEditWordModal={handleOpenEditWordModal}
-        />
-      ) : hasAnyData ? (
-        <VocabularyCard
-          word="No data for this category"
-          meaning=""
-          example=""
-          backgroundColor="#F0F8FF"
-          isMuted={muted}
-          isPaused={paused}
-          onToggleMute={handleToggleMuteWithInteraction}
-          onTogglePause={handleTogglePauseWithInteraction}
-          onCycleVoice={handleCycleVoiceWithInteraction}
-          onSwitchCategory={handleCategorySwitchDirect}
-          onNextWord={() => {}}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory || 'Next'}
-          isSpeaking={false}
-          category={currentCategory}
-          selectedVoice={selectedVoice}
-          nextVoiceLabel={nextVoiceLabel}
-        />
-      ) : (
-        <p>Loading vocabulary…</p>
-      )}
+      <VocabularyAppContent
+        hasData={hasData}
+        hasAnyData={hasAnyData}
+        displayWord={displayWord}
+        jsonLoadError={jsonLoadError}
+        muted={muted}
+        paused={paused}
+        isSpeaking={isSpeaking}
+        selectedVoice={selectedVoice}
+        nextVoiceLabel={nextVoiceLabel}
+        currentCategory={currentCategory}
+        nextCategory={nextCategory}
+        displayTime={displayTime}
+        debugData={debugData}
+        isAddWordModalOpen={isAddWordModalOpen}
+        isEditMode={isEditMode}
+        wordToEdit={wordToEdit}
+        handleToggleMuteWithInteraction={handleToggleMuteWithInteraction}
+        handleTogglePauseWithInteraction={handleTogglePauseWithInteraction}
+        handleCycleVoiceWithInteraction={handleCycleVoiceWithInteraction}
+        handleCategorySwitchDirect={handleCategorySwitchDirect}
+        handleManualNext={handleManualNext}
+        handleCloseModal={handleCloseModal}
+        handleSaveWord={handleSaveWord}
+        handleOpenAddWordModal={handleOpenAddWordModal}
+        handleOpenEditWordModal={handleOpenEditWordModal}
+      />
     </VocabularyLayout>
   );
 };

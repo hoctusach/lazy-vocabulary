@@ -9,7 +9,7 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
 export const useWordNavigation = (
   wordList: VocabularyWord[],
   currentIndex: number,
-  setCurrentIndex: React.Dispatch<React.SetStateAction<number>>,
+  setCurrentIndex: (value: number | ((prevIndex: number) => number)) => void,
   currentWord: VocabularyWord | null,
   isTransitioningRef: React.MutableRefObject<boolean>,
   lastWordChangeRef: React.MutableRefObject<number>,
