@@ -1,6 +1,5 @@
 
 import { useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
 interface UserInteractionProps {
   userInteractionRef: React.MutableRefObject<boolean>;
@@ -34,30 +33,36 @@ export const useUserInteractionHandler = ({
       try {
         // Store this fact in localStorage to persist across page reloads
         localStorage.setItem('hadUserInteraction', 'true');
-        
-        // Simple speech synthesis initialization without competing audio elements
+
+        // Resume audio context if needed
         try {
-          // Just initialize speech synthesis with a minimal approach
-          const utterance = new SpeechSynthesisUtterance('');
-          utterance.volume = 0; // Completely silent
+          const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+          if (AudioCtx) {
+            const ctx = new AudioCtx();
+            if (ctx.state === 'suspended') {
+              ctx.resume();
+            }
+          }
+        } catch (err) {
+          console.warn('AudioContext resume failed:', err);
+        }
+
+        // Initialize speech synthesis with a silent utterance (required on iOS)
+        try {
+          const utterance = new SpeechSynthesisUtterance(' ');
+          utterance.volume = 0;
           utterance.rate = 1;
-          
+
           utterance.onend = () => {
             console.log('Speech system initialized successfully');
-            // Playback will be triggered by the auto-play hook when appropriate
           };
-          
-          utterance.onerror = (err) => {
-            console.log('Speech initialization completed with error (this is normal):', err.error);
-            // Don't show error toast for initialization - this is expected
+
+          utterance.onerror = () => {
             initializedRef.current = true;
           };
-          
-          // Clear any pending speech first
+
           if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
-            
-            // Wait for cancellation before initializing
             setTimeout(() => {
               window.speechSynthesis.speak(utterance);
             }, 200);
