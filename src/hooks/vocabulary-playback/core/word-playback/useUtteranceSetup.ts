@@ -48,26 +48,35 @@ export const useUtteranceSetup = ({
       } else {
         console.log('No matching voice found, using system default');
       }
-      
+      let fallbackTimer: number | null = null;
+
       // Set speech parameters for better clarity
       utterance.rate = 0.95; // Slightly slower for better comprehension
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
-      
+
       // Set up event handlers BEFORE calling speak()
       utterance.onstart = () => {
         console.log(`Speech started for: ${currentWord.word}`);
+        if (fallbackTimer) {
+          clearTimeout(fallbackTimer);
+          fallbackTimer = null;
+        }
         speakingRef.current = true;
         setIsSpeaking(true);
         setHasSpeechPermission(true);
         permissionErrorShownRef.current = false;
       };
-      
+
       utterance.onend = () => {
         console.log(`Speech ended successfully for: ${currentWord.word}`);
+        if (fallbackTimer) {
+          clearTimeout(fallbackTimer);
+          fallbackTimer = null;
+        }
         speakingRef.current = false;
         setIsSpeaking(false);
-        
+
         // Auto-advance to next word after speech completes
         scheduleAutoAdvance(500);
       };
@@ -147,11 +156,17 @@ export const useUtteranceSetup = ({
       setTimeout(() => {
         // Cancel any existing speech just before speaking
         window.speechSynthesis.cancel();
-        
+
         // Actually start speaking
         window.speechSynthesis.speak(utterance);
         console.log('Speaking with voice:', utterance.voice ? utterance.voice.name : 'default system voice');
-        
+
+        // Start fallback timer in case no speech events fire
+        fallbackTimer = window.setTimeout(() => {
+          console.warn('Fallback timer triggered - advancing to next word');
+          scheduleAutoAdvance(0);
+        }, 3000);
+
         // Verify speech is working after a short delay
         setTimeout(() => {
           if (!window.speechSynthesis.speaking && !paused && !muted && !wordTransitionRef.current) {
