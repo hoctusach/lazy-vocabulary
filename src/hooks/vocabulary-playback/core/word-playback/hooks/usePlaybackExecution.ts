@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { useContentValidation } from './useContentValidation';
-import { usePlaybackConditions } from './usePlaybackConditions';
+import { useUnifiedValidation } from './useUnifiedValidation';
 import { useSpeechExecution } from './useSpeechExecution';
 import { toast } from 'sonner';
 
@@ -29,7 +29,7 @@ export const usePlaybackExecution = (
   ensureVoicesLoaded: () => Promise<boolean>
 ) => {
   const { validateAndPrepareContent } = useContentValidation();
-  const { checkPlaybackConditions, handleControllerReset } = usePlaybackConditions();
+  const { checkAll } = useUnifiedValidation();
   
   // Permissions are always granted in this simplified setup
   
@@ -66,8 +66,8 @@ export const usePlaybackExecution = (
     
     console.log('[PLAYBACK-EXECUTION] Current conditions:', debugState);
 
-    // Check playback conditions
-    const conditionCheck = checkPlaybackConditions(
+    // Unified validation step
+    const conditionCheck = checkAll(
       currentWord,
       muted,
       paused,
@@ -77,9 +77,7 @@ export const usePlaybackExecution = (
     );
 
     if (!conditionCheck.canPlay) {
-      if (conditionCheck.reason === 'controller-reset-needed') {
-        await handleControllerReset();
-      } else if (conditionCheck.reason === 'muted') {
+      if (conditionCheck.reason === 'muted') {
         console.log('[PLAYBACK-EXECUTION] Speech is muted, auto-advancing after delay');
         scheduleAutoAdvance(3000);
       } else if (conditionCheck.reason === 'word-transition') {
@@ -151,8 +149,7 @@ export const usePlaybackExecution = (
     executeSpeech,
     setIsSpeaking,
     speakingRef,
-    checkPlaybackConditions,
-    handleControllerReset,
+    checkAll,
     scheduleAutoAdvance
   ]);
 

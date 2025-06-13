@@ -1,12 +1,13 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { SpeechState, StateChangeListener } from './SpeechState';
+import { SpeechState, StateChangeListener, SpeechPhase } from './SpeechState';
 
 /**
  * Manages speech state and notifies listeners of changes
  */
 export class SpeechStateManager {
   private state: SpeechState = {
+    phase: 'idle',
     isActive: false,
     isPaused: false,
     isMuted: false,
@@ -44,6 +45,10 @@ export class SpeechStateManager {
 
   setMuted(isMuted: boolean): void {
     this.updateState({ isMuted });
+  }
+
+  setPhase(phase: SpeechPhase): void {
+    this.updateState({ phase });
   }
 
   setCurrentWord(currentWord: VocabularyWord | null): void {

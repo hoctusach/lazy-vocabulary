@@ -3,6 +3,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { SpeechStateManager } from './SpeechStateManager';
 import { AutoAdvanceTimer } from './AutoAdvanceTimer';
 import { VoiceManager } from './VoiceManager';
+import { SpeechGuard } from './SpeechGuard';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
 import { mobileAudioManager } from '@/utils/audio/mobileAudioManager';
@@ -22,12 +23,15 @@ export class SpeechExecutor {
   private readonly MAX_RETRIES = 1; // Reduced to prevent delay loops
   private currentSpeechPromise: Promise<boolean> | null = null;
   private isExecuting = false;
+  private guard: SpeechGuard;
 
   constructor(
     private stateManager: SpeechStateManager,
     private autoAdvanceTimer: AutoAdvanceTimer,
     private voiceManager: VoiceManager
-  ) {}
+  ) {
+    this.guard = new SpeechGuard(this.stateManager);
+  }
 
   // Main speak method with conflict prevention
   async speak(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
@@ -58,6 +62,15 @@ export class SpeechExecutor {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
 
+    const guardCheck = this.guard.canPlay();
+    if (!guardCheck.canPlay) {
+      console.log(`[SPEECH-EXECUTOR] Skipping - ${guardCheck.reason}`);
+      return false;
+    }
+
+    // Update phase to preparing
+    this.stateManager.setPhase('preparing');
+
     this.isExecuting = true;
     console.log(`[SPEECH-EXECUTOR] Speaking word: ${word.word} (attempt ${this.retryCount + 1})`);
 
@@ -65,20 +78,6 @@ export class SpeechExecutor {
     this.autoAdvanceTimer.clear();
 
     const state = this.stateManager.getState();
-
-    // Check if we can speak
-    if (state.isMuted) {
-      console.log('[SPEECH-EXECUTOR] Skipping - muted, scheduling auto-advance');
-      this.isExecuting = false;
-      this.autoAdvanceTimer.schedule(3000, state.isPaused, state.isMuted);
-      return false;
-    }
-
-    if (state.isPaused) {
-      console.log('[SPEECH-EXECUTOR] Skipping - paused');
-      this.isExecuting = false;
-      return false;
-    }
 
     // Stop any existing speech with proper cleanup and timing
     if (state.isActive || state.currentUtterance) {
@@ -129,6 +128,7 @@ export class SpeechExecutor {
             onStart: () => {
               console.log('[SPEECH-EXECUTOR] ✓ Mobile speech started');
               this.stateManager.updateState({
+                phase: 'speaking',
                 isActive: true,
                 currentWord: word,
                 currentUtterance: null
@@ -138,6 +138,7 @@ export class SpeechExecutor {
             onEnd: () => {
               console.log('[SPEECH-EXECUTOR] ✓ Mobile speech completed');
               this.resetState();
+              this.stateManager.setPhase('finished');
               const state = this.stateManager.getState();
               this.autoAdvanceTimer.schedule(1500, state.isPaused, state.isMuted);
               resolve(true);
@@ -204,9 +205,10 @@ export class SpeechExecutor {
         console.log('[SPEECH-EXECUTOR] Speech was cancelled before start event');
         return;
       }
-      
+
       console.log(`[SPEECH-EXECUTOR] ✓ Speech started for: ${word.word}`);
       this.stateManager.updateState({
+        phase: 'speaking',
         isActive: true,
         currentWord: word,
         currentUtterance: utterance
@@ -220,10 +222,12 @@ export class SpeechExecutor {
         console.log('[SPEECH-EXECUTOR] Speech end was due to manual cancellation');
         return;
       }
-      
+
       console.log(`[SPEECH-EXECUTOR] ✓ Speech completed for: ${word.word}`);
       this.resetState();
-      
+
+      this.stateManager.setPhase('finished');
+
       // Schedule auto-advance after successful completion
       const state = this.stateManager.getState();
       this.autoAdvanceTimer.schedule(1500, state.isPaused, state.isMuted);
@@ -263,6 +267,7 @@ export class SpeechExecutor {
     // For any error, just advance without retry to prevent delays
     console.log('[SPEECH-EXECUTOR] Handling speech error, advancing immediately');
     this.resetState();
+    this.stateManager.setPhase('finished');
     this.retryCount = 0;
     
     try {
@@ -280,6 +285,7 @@ export class SpeechExecutor {
     // No retries for mobile to prevent delays
     console.log('[SPEECH-EXECUTOR] Mobile speech error - advancing immediately');
     this.resetState();
+    this.stateManager.setPhase('finished');
     this.retryCount = 0;
     const state = this.stateManager.getState();
     this.autoAdvanceTimer.schedule(1000, state.isPaused, state.isMuted); // Reduced delay
@@ -290,6 +296,7 @@ export class SpeechExecutor {
     // No retries on timeout to prevent delays
     console.log('[SPEECH-EXECUTOR] Speech timeout - advancing immediately');
     this.resetState();
+    this.stateManager.setPhase('finished');
     this.retryCount = 0;
     this.autoAdvanceTimer.schedule(1000, this.stateManager.getState().isPaused, this.stateManager.getState().isMuted);
     resolve(false);
@@ -297,6 +304,7 @@ export class SpeechExecutor {
 
   private handleSpeechError(resolve: (value: boolean) => void): void {
     this.resetState();
+    this.stateManager.setPhase('finished');
     this.retryCount = 0;
     this.autoAdvanceTimer.schedule(1000, this.stateManager.getState().isPaused, this.stateManager.getState().isMuted);
     resolve(false);
@@ -335,6 +343,7 @@ export class SpeechExecutor {
     }
 
     this.resetState();
+    this.stateManager.setPhase('idle');
   }
 
   // Pause speech
@@ -375,6 +384,7 @@ export class SpeechExecutor {
 
   private resetState(): void {
     this.stateManager.updateState({
+      phase: 'idle',
       isActive: false,
       currentWord: null,
       currentUtterance: null

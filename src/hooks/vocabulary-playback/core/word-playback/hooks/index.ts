@@ -9,6 +9,7 @@ export * from './useSpeechExecution';
 export * from './usePlaybackFlow';
 export * from './usePlaybackState';
 export * from './usePlaybackConditions';
+export * from './useUnifiedValidation';
 export * from './usePlaybackOrchestrator';
 export * from './useSpeechPermissionManager';
 
