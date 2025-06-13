@@ -16290,11 +16290,241 @@
     "count": 0
     }
   ],
-  "grammar": [ 
+  "grammar": [    
+    {
+    "word": "Passives n Causations - The passive",
+    "meaning": "The passive is used when the doer is unknown, obvious, unimportant, or to create a formal tone. (Câu bị động dùng khi không rõ, không quan trọng hoặc không muốn nhắc tới chủ thể hành động)",
+    "example": "The car was stolen at approximately 1.30 am. / The XL500 was designed with young families in mind. / This type of submarine was developed during WWII. / We were surprised by the number of people trying to leave the city. / All passengers are required to present their ticket.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Impersonal passive",
+    "meaning": "Used to express general beliefs, expectations, or assumptions. Often starts with 'It is thought...', 'Tourism is expected to...', etc. (Dùng bị động vô danh để nói về suy nghĩ/quan điểm chung)",
+    "example": "Tourism is expected to become a major part of the country’s economy. / It is thought that the new railway will provide employment opportunities. / There are reported to have been a record number of accidents.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Direct and indirect object",
+    "meaning": "Some verbs allow two objects (person + thing). In passive, either object can become subject. (Dùng bị động với câu có 2 tân ngữ — trực tiếp và gián tiếp)",
+    "example": "Michael gave the plane tickets to Jill. / Jill was given the plane tickets (by Michael). / The plane tickets were given to Jill (by Michael). / How to drive the train was explained to me.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Avoiding the passive",
+    "meaning": "Used when passive is awkward or not natural in continuous/perfect tenses. We use prepositional phrases instead. (Tránh dùng bị động bằng cách dùng cụm giới từ phù hợp hơn)",
+    "example": "Preparations for the flight will be in progress as the President arrives. / At the end of this year, I will have been in training as a pilot for four years. / Vintage cars have been on display in the town centre. / The problem had been under consideration. / The railway station has been under construction for two years now.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get/have something done",
+    "meaning": "Used when someone arranges for someone else to do something for them. (Cấu trúc nhờ ai đó làm gì cho mình)",
+    "example": "Did you finally get your bike fixed? / I heard that Susie had her motorbike stolen. / I’d like those cars washed by this evening. / We’ll set off as soon as I’ve got the car fixed.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get sb to do / have sb do",
+    "meaning": "Used to say someone persuades or arranges for someone else to do something. (Dùng khi khiến ai đó làm việc gì)",
+    "example": "Did you get Alex to drive you all the way to London? / I had my assistant book the tickets.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get/have sb doing",
+    "meaning": "Used to say someone starts someone else doing something. (Dùng khi khiến ai đó bắt đầu làm gì đó)",
+    "example": "Don’t worry. We’ll soon have your car running like new. / That film got me thinking about my childhood.",
+    "count": 0
+    },      
+    {
+    "word": "Passives n Causations - The passive",
+    "meaning": "The passive is used when the doer is unknown, obvious, unimportant, or to create a formal tone. (Câu bị động dùng khi không rõ, không quan trọng hoặc không muốn nhắc tới chủ thể hành động)",
+    "example": "The car was stolen at approximately 1.30 am. / The XL500 was designed with young families in mind. / This type of submarine was developed during WWII. / We were surprised by the number of people trying to leave the city. / All passengers are required to present their ticket.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Impersonal passive",
+    "meaning": "Used to express general beliefs, expectations, or assumptions. Often starts with 'It is thought...', 'Tourism is expected to...', etc. (Dùng bị động vô danh để nói về suy nghĩ/quan điểm chung)",
+    "example": "Tourism is expected to become a major part of the country’s economy. / It is thought that the new railway will provide employment opportunities. / There are reported to have been a record number of accidents.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Direct and indirect object",
+    "meaning": "Some verbs allow two objects (person + thing). In passive, either object can become subject. (Dùng bị động với câu có 2 tân ngữ — trực tiếp và gián tiếp)",
+    "example": "Michael gave the plane tickets to Jill. / Jill was given the plane tickets (by Michael). / The plane tickets were given to Jill (by Michael). / How to drive the train was explained to me.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Avoiding the passive",
+    "meaning": "Used when passive is awkward or not natural in continuous/perfect tenses. We use prepositional phrases instead. (Tránh dùng bị động bằng cách dùng cụm giới từ phù hợp hơn)",
+    "example": "Preparations for the flight will be in progress as the President arrives. / At the end of this year, I will have been in training as a pilot for four years. / Vintage cars have been on display in the town centre. / The problem had been under consideration. / The railway station has been under construction for two years now.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get/have something done",
+    "meaning": "Used when someone arranges for someone else to do something for them. (Cấu trúc nhờ ai đó làm gì cho mình)",
+    "example": "Did you finally get your bike fixed? / I heard that Susie had her motorbike stolen. / I’d like those cars washed by this evening. / We’ll set off as soon as I’ve got the car fixed.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get sb to do / have sb do",
+    "meaning": "Used to say someone persuades or arranges for someone else to do something. (Dùng khi khiến ai đó làm việc gì)",
+    "example": "Did you get Alex to drive you all the way to London? / I had my assistant book the tickets.",
+    "count": 0
+    },
+    {
+    "word": "Passives n Causations - Causative: get/have sb doing",
+    "meaning": "Used to say someone starts someone else doing something. (Dùng khi khiến ai đó bắt đầu làm gì đó)",
+    "example": "Don’t worry. We’ll soon have your car running like new. / That film got me thinking about my childhood.",
+    "count": 0
+    },      
+
+    {
+    "word": "Modals n semi-modals - Overview and structure",
+    "meaning": "Modals (will, would, can, could, may, might, shall, should, must) have only one form and are followed by bare infinitives. Semi-modals (need to, ought to, had better, have to) behave similarly but may vary in structure. (Tổng quan về động từ khiếm khuyết và bán khiếm khuyết, cấu trúc theo sau là động từ nguyên mẫu)",
+    "example": "Modals: could + do, be doing, have done, have been doing. / Passive: could + be done, have been done. / Semi-modals: need to, ought to, had better, have (got) to.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Criticising past behaviour",
+    "meaning": "Used to express disapproval of something that happened in the past. (Dùng để chỉ trích hành vi đã xảy ra trong quá khứ) Modals: should have, shouldn’t have, ought to have, oughtn’t to have.",
+    "example": "You shouldn’t have spoken to Mrs Todd like that.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Expressing annoyance at past behaviour",
+    "meaning": "Used to express irritation or frustration about something that happened. (Dùng để thể hiện sự khó chịu với hành vi trong quá khứ) Modals: could have, might have.",
+    "example": "You could/might have told me you were going to be late!",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Criticising general behaviour",
+    "meaning": "Used to describe repeated or habitual negative behaviour. (Chỉ trích hành vi lặp lại hoặc quen thuộc) Modal: will.",
+    "example": "He will slam the door every time he goes out.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Criticising a specific example of someone's general behaviour",
+    "meaning": "Used to highlight a particular instance of a known habit or behaviour. (Dùng để chỉ trích một ví dụ cụ thể về hành vi quen thuộc) Modal: would.",
+    "example": "You would take the car just when I wanted to go out.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Suggesting criticism with might as well",
+    "meaning": "Might as well can be used sarcastically to suggest someone doesn’t care. (Might as well có thể dùng mang hàm ý phê phán hoặc chua chát)",
+    "example": "I might as well be dead for all you care.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Current or general obligation",
+    "meaning": "Used to describe what is necessary or required in general. (Dùng để chỉ nghĩa vụ hoặc yêu cầu chung) Modals: must, mustn’t, have (got) to, need (to).",
+    "example": "You have to be a good communicator to be a press spokesperson.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Lack of current or general obligation",
+    "meaning": "Used to say something is not necessary or required. (Dùng để nói điều gì đó không bắt buộc) Modals: don’t have to, haven’t got to, needn’t, don’t need (to).",
+    "example": "You don’t always need to have a degree to become a journalist.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Future obligation",
+    "meaning": "Used to talk about something that must be done in the future. (Dùng để nói về nghĩa vụ trong tương lai) Modals: will have to, must, mustn’t, have (got) to, will need (to).",
+    "example": "You’ll have to do quite a lot of research before you write this report.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Lack of future obligation",
+    "meaning": "Used to talk about things that will not be necessary. (Dùng để nói về điều không bắt buộc trong tương lai) Modals: don’t/won’t have to, haven’t got to, needn’t, won’t need (to).",
+    "example": "I’m glad we won’t have to write any more essays on this course.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Past obligation",
+    "meaning": "Used to describe something that had to be done in the past. (Dùng để nói về nghĩa vụ trong quá khứ) Modals: had to, needed (to).",
+    "example": "We had to come up with three questions each.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Lack of past obligation",
+    "meaning": "Used to say that something wasn’t necessary in the past. (Dùng để nói rằng điều gì đó đã không bắt buộc trong quá khứ) Modals: didn’t have to, didn’t need (to), needn’t have.",
+    "example": "In the past, politicians didn’t have to deal with being in a 24-hour media spotlight.",
+    "count": 0
+    },            
+    {
+    "word": "Modals n semi-modals - Ability",
+    "meaning": "Modals like can, could, be able to express current, past, future, or hypothetical ability. (Dùng để diễn tả khả năng hiện tại, quá khứ, tương lai hoặc giả định)",
+    "example": "You can’t really speak seven languages fluently, can you? / There’s no way you could read when you were two! / One day, maybe, all adults will be able to read and write. / I couldn’t go on a quiz show – I’d be too nervous. / They could have asked the Prime Minister much more searching questions.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Permission",
+    "meaning": "Modals such as can, could, may, might are used to ask for or give/refuse permission. (Dùng để xin hoặc cho phép làm điều gì đó)",
+    "example": "Can I finish watching this before I go to bed? / No, you can’t. / Mum said we could buy one comic each. / We were allowed to buy one comic each.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Advice",
+    "meaning": "Modals like should, ought to, had better are used to give advice or make suggestions. (Dùng để đưa ra lời khuyên hoặc gợi ý)",
+    "example": "You should try to get that poem published. / Hadn’t you better check these facts are actually true? / We may as well watch this as there’s nothing else on.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Criticism",
+    "meaning": "Modals are used to criticize past actions or express annoyance. (Dùng để chỉ trích hành động trong quá khứ hoặc thể hiện sự khó chịu)",
+    "example": "You shouldn’t have spoken to Mrs Todd like that. / You could/might have told me you were going to be late! / He will slam the door every time he goes out. / You would take the car just when I wanted to go out. / I might as well be dead for all you care.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Obligation",
+    "meaning": "Modals such as must, have to, need to are used to express present, future or past obligation. (Dùng để nói về nghĩa vụ ở hiện tại, tương lai hoặc quá khứ)",
+    "example": "You have to be a good communicator. / You don’t always need to have a degree. / You’ll have to do quite a lot of research. / I’m glad we won’t have to write essays. / We had to come up with three questions each. / In the past, politicians didn’t have to deal with 24-hour media.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Certainty about now, the future or generally",
+    "meaning": "Used to express strong certainty or near-certainty about something now or in the future. (Dùng để diễn tả điều gần như chắc chắn ở hiện tại hoặc tương lai) Modals: will, would, must, can, can’t, could, couldn’t.",
+    "example": "There’s someone at the door. / That’ll be the postman. / It can’t be. He’s already been.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Certainty about the past",
+    "meaning": "Used to express strong certainty or deduction about a past event. (Dùng để suy luận chắc chắn điều gì đã xảy ra trong quá khứ) Modals: will have, won’t have, would have, wouldn’t have, must have, can’t have, couldn’t have.",
+    "example": "They won’t have heard the news, will they? / They must have heard by now, surely.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Probability about now, the future or generally",
+    "meaning": "Used to express something likely to happen or probably true now or in the future. (Dùng để nói điều có khả năng xảy ra hoặc đúng ở hiện tại/tương lai) Modals: should, shouldn’t, ought to, may/might well, could well, might easily.",
+    "example": "The weather should be good tomorrow, shouldn’t it? / Actually, the forecast said it may well rain.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Probability about the past",
+    "meaning": "Used to say what was probably true or likely in the past. (Dùng để diễn tả điều có lẽ đúng trong quá khứ) Modals: should have, shouldn’t have, ought to have, oughtn’t to have, may/might well have, might easily have.",
+    "example": "Jan should have finished writing her article by now, shouldn’t she? / She may well have done, but I haven’t seen it yet.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Possibility about now, the future or generally",
+    "meaning": "Used to express a possible situation in the present or future. (Dùng để nói về một khả năng có thể xảy ra ở hiện tại hoặc tương lai) Modals: could, may, might, may/might/could just.",
+    "example": "I might (just) have time to get to the library before it closes.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Possibility about the real past",
+    "meaning": "Used to express a real past possibility that might or might not have happened. (Dùng để nói về khả năng thực tế trong quá khứ) Modals: could have, may have, might have.",
+    "example": "Jim might not have checked his email yet.",
+    "count": 0
+    },
+    {
+    "word": "Modals n semi-modals - Overview and structure",
+    "meaning": "Modals (will, would, can, could, may, might, shall, should, must) have only one form and are followed by bare infinitives. Semi-modals (need to, ought to, had better, have to) behave similarly but may vary in structure. (Tổng quan về động từ khiếm khuyết và bán khiếm khuyết, cấu trúc theo sau là động từ nguyên mẫu)",
+    "example": "Modals: could + do, be doing, have done, have been doing. / Passive: could + be done, have been done. / Semi-modals: need to, ought to, had better, have (got) to.",
+    "count": 0
+    }
+        
     {
     "word": "Adjectives n Adverbs - Position of adjectives",
     "meaning": "Adjectives usually appear before a noun, or after verbs such as appear, become, feel, get, grow, look, seem, smell, sound, taste, and turn. (Tính từ thường đứng trước danh từ hoặc sau một số động từ chỉ trạng thái)",
-    "example": "I love your new house. / The material this dress is made out of feels rough. / She looked angrily at the man behind the counter. / There was an asleep boy in the street. ✗ There was an-asleep boy in the street.",
+    "example": "I love your new house. / The material this dress is made out of feels rough. / She looked angrily at the man behind the counter.",
     "count": 0
     },
     {
@@ -16430,47 +16660,47 @@
     "count": 0
     },      
     {
-        "word": "Noun phrase - Countable nouns (structure)",
-        "meaning": "Countable nouns have both singular and plural forms, and can be used with a/an or numbers. (Danh từ đếm được có dạng số ít và số nhiều, dùng với a/an hoặc số đếm) Examples: painting, paintings, idea, books. Some have irregular plurals (e.g. people, mice, men).",
-        "example": "That painting is amazing. / Those paintings are dreadful. / The sheep are in the field. / The government is/are not doing anything to help the arts.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Singular uncountable nouns (structure)",
-        "meaning": "These nouns only have a singular form and take singular verbs. (Danh từ không đếm được chỉ có dạng số ít và đi với động từ số ít) Includes: advice, blood, bread, furniture, hair, information, jewellery, knowledge, luggage, money, news, permission, respect, water.",
-        "example": "Is the information reliable? / The table is made of wood. / It's a picture of a local wood.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Plural uncountable nouns (structure)",
-        "meaning": "These uncountable nouns have a plural form and take plural verbs. (Một số danh từ không đếm được có dạng số nhiều và đi với động từ số nhiều) Includes: arms, binoculars, clothes, congratulations, earnings, glasses, goods, groceries, jeans, pajamas, scales, surroundings, scissors, trousers, etc.",
-        "example": "The scissors aren't on the table. / A pair of binoculars is on the desk.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Quantifiers for countable and uncountable nouns (usage)",
-        "meaning": "Some quantifiers are used only with countable nouns, others with uncountable, and some with both. (Một số từ chỉ định lượng chỉ dùng với danh từ đếm được, không đếm được, hoặc cả hai)",
-        "example": "A few friends (countable) / A little milk (uncountable) / A lot of people (all nouns) / Only a few of them came. / Only a little of it was useful.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Indefinite articles: a/an (usage)",
-        "meaning": "Used with singular countable nouns to refer to something not specific or mentioned for the first time. (Dùng với danh từ đếm được số ít, để nói về một vật chưa xác định hoặc mới nhắc đến lần đầu)",
-        "example": "I'd like to go to a concert tonight. / I've had a great idea! / A poet sees the world differently.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Definite article: the (usage)",
-        "meaning": "Used to refer to specific things or when both speaker and listener know what is being talked about. (Dùng để nói về điều đã biết hoặc xác định được)",
-        "example": "Is that the band you were talking about? / The scales are balanced to symbolise equality. / The young often rebel against the old.",
-        "count": 0
-      },
-      {
-        "word": "Noun phrase - Zero article: no article at all (usage)",
-        "meaning": "Used with plural or uncountable nouns when talking generally or in idiomatic expressions. (Không dùng mạo từ khi nói chung hoặc trong các cụm thành ngữ)",
-        "example": "Don't let your young child use scissors unsupervised. / An artist always needs inspiration.",
-        "count": 0
-      },
+    "word": "Noun phrase - Countable nouns (structure)",
+    "meaning": "Countable nouns have both singular and plural forms, and can be used with a/an or numbers. (Danh từ đếm được có dạng số ít và số nhiều, dùng với a/an hoặc số đếm) Examples: painting, paintings, idea, books. Some have irregular plurals (e.g. people, mice, men).",
+    "example": "That painting is amazing. / Those paintings are dreadful. / The sheep are in the field. / The government is/are not doing anything to help the arts.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Singular uncountable nouns (structure)",
+    "meaning": "These nouns only have a singular form and take singular verbs. (Danh từ không đếm được chỉ có dạng số ít và đi với động từ số ít) Includes: advice, blood, bread, furniture, hair, information, jewellery, knowledge, luggage, money, news, permission, respect, water.",
+    "example": "Is the information reliable? / The table is made of wood. / It's a picture of a local wood.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Plural uncountable nouns (structure)",
+    "meaning": "These uncountable nouns have a plural form and take plural verbs. (Một số danh từ không đếm được có dạng số nhiều và đi với động từ số nhiều) Includes: arms, binoculars, clothes, congratulations, earnings, glasses, goods, groceries, jeans, pajamas, scales, surroundings, scissors, trousers, etc.",
+    "example": "The scissors aren't on the table. / A pair of binoculars is on the desk.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Quantifiers for countable and uncountable nouns (usage)",
+    "meaning": "Some quantifiers are used only with countable nouns, others with uncountable, and some with both. (Một số từ chỉ định lượng chỉ dùng với danh từ đếm được, không đếm được, hoặc cả hai)",
+    "example": "A few friends (countable) / A little milk (uncountable) / A lot of people (all nouns) / Only a few of them came. / Only a little of it was useful.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Indefinite articles: a/an (usage)",
+    "meaning": "Used with singular countable nouns to refer to something not specific or mentioned for the first time. (Dùng với danh từ đếm được số ít, để nói về một vật chưa xác định hoặc mới nhắc đến lần đầu)",
+    "example": "I'd like to go to a concert tonight. / I've had a great idea! / A poet sees the world differently.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Definite article: the (usage)",
+    "meaning": "Used to refer to specific things or when both speaker and listener know what is being talked about. (Dùng để nói về điều đã biết hoặc xác định được)",
+    "example": "Is that the band you were talking about? / The scales are balanced to symbolise equality. / The young often rebel against the old.",
+    "count": 0
+    },
+    {
+    "word": "Noun phrase - Zero article: no article at all (usage)",
+    "meaning": "Used with plural or uncountable nouns when talking generally or in idiomatic expressions. (Không dùng mạo từ khi nói chung hoặc trong các cụm thành ngữ)",
+    "example": "Don't let your young child use scissors unsupervised. / An artist always needs inspiration.",
+    "count": 0
+    },
 
     {
     "word": "Verbal complements - Verb + -ing form (structure)",
@@ -16711,7 +16941,163 @@
     "meaning": "Used in short answers and with phrases like ‘neither/nor’, ‘so’, ‘such’, etc. (Các kiểu đảo ngữ khác với so/such/neither/nor)",
     "example": "‘Did you?’ – So did I. / ‘I don’t believe a word this government says.’ – ‘No, neither do I.’ / So rare is burglary here that many people don’t lock their doors.",
     "count": 0
-    }
+    },
+    {
+    "word": "Future Time - will",
+    "meaning": "Used for predictions, future facts, decisions made at the moment, promises, offers, and requests. (Dùng cho dự đoán, sự thật tương lai, quyết định tức thì, hứa hẹn, đề nghị, và yêu cầu). Will is generally more formal than going to.",
+    "example": "It looks as if Jake will lose his job. / The factory will open in July. / I’ll ask for a pay rise tomorrow. / I’ll help you with the advertising campaign. / I promise you won’t lose your job. / Will you give a presentation on the sales figures? / No, I won’t give a presentation on the sales figures.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - be going to",
+    "meaning": "Used to express predictions based on present evidence and intentions already formed. (Dùng để dự đoán có cơ sở hiện tại và diễn đạt ý định đã có sẵn). Less formal than 'will'.",
+    "example": "Look at that wall. It looks as if it’s going to fall down. / I’m going to get my degree, then get a well-paid job.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Present continuous",
+    "meaning": "Used to describe definite arrangements and scheduled events in the near future. (Dùng cho các kế hoạch cụ thể sắp diễn ra). Often used with a time reference (e.g. tomorrow, on Friday).",
+    "example": "I’m meeting Fiona on Friday to discuss the advertising campaign. / I’m asking for a pay rise tomorrow.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Present simple",
+    "meaning": "Used for fixed future events such as timetables and schedules. (Dùng để nói về lịch trình hoặc sự kiện cố định trong tương lai). Often used in official contexts.",
+    "example": "The shop closes at 3 pm next Saturday. / The bus departs at 8:00 AM sharp.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Future perfect simple",
+    "meaning": "Describes actions that will be completed before a specific time in the future or situations continuing up to that point. (Dùng cho hành động hoàn tất hoặc tiếp diễn đến một thời điểm xác định trong tương lai).",
+    "example": "It looks as if Jake will have lost his job by the end of the week. / This time next month, I’ll have worked at the company for exactly 25 years.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Future perfect continuous",
+    "meaning": "Focuses on the duration of actions continuing up to a point in the future. (Nhấn mạnh khoảng thời gian của hành động kéo dài đến tương lai).",
+    "example": "This time next month, I’ll have been working at the company for exactly 25 years.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Future continuous",
+    "meaning": "Used for actions in progress at a specific future time, or regular events that are expected in the future. (Dùng cho hành động đang diễn ra hoặc thói quen dự kiến ở tương lai).",
+    "example": "This time next week I’ll be travelling round Russia on business. / The company Chairperson will be arriving on Thursday. / More people will be commuting to work by plane in the future.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Time clauses",
+    "meaning": "Used after time expressions (when, as soon as, until, before, after, once, etc.) to describe conditions for future actions. (Dùng mệnh đề thời gian để mô tả điều kiện cho hành động tương lai).",
+    "example": "I’ll give you a pay rise when you start working harder. / I’ll give you a pay rise once you’ve proved you’re a hard worker. / I’ll give you a pay rise as soon as you’ve brought in three new customers. / I won’t give you a pay rise until you’ve been working here for three years.",
+    "count": 0
+    },
+    {
+    "word": "Future Time - Other ways to express the future",
+    "meaning": "Additional future expressions using phrases like 'be about to', 'be due to', and modal verbs. These convey plans, near-future actions, formality, obligations, or probability. (Các cấu trúc diễn tả tương lai gần, kế hoạch, nghĩa vụ, hoặc khả năng xảy ra).",
+    "example": "• I'm just about to ask for my pay rise. / She's about to leave for the airport. \n• I'm just on the point/verge of asking for my pay rise. / He was on the verge of quitting. \n• I'm due to meet my boss at eleven o’clock. / The train is due to arrive in ten minutes. \n• You're to get those reports written before Friday! / The Prime Minister is to visit Japan next week. \n• I might ask for a pay rise tomorrow. / They may announce the results tonight. / The conference could be postponed due to weather.",
+    "count": 0
+    },      
+    {
+    "word": "Future Time - Future in the past",
+    "meaning": "Used when describing past thoughts or statements about the future. (Dùng khi nói về điều trong quá khứ được xem là tương lai). Will becomes would, and present tenses shift to past tenses.",
+    "example": "Then: I think the factory will open in September. → Now: I thought the factory would open in September. / Then: I’m in a rush because the train leaves at 4. → Now: I was in a rush because the train left at 4.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past simple",
+    "meaning": "Used for completed actions, habits, general truths, permanent situations, or background in stories. (Dùng cho hành động hoàn tất, thói quen, sự thật, tình huống cố định trong quá khứ)",
+    "example": "Sony and Philips invented the CD in the early 1980s. / We moved house a lot when I was a kid. / Early clocks were usually very unreliable. / Frank turned on the TV and sat on the sofa. / I’d rather Michael didn’t waste so much time playing video games.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Emphatic past simple",
+    "meaning": "Used to stress or emphasise actions or contrast with other past situations. (Dùng để nhấn mạnh hoặc đối lập hành động quá khứ)",
+    "example": "Perhaps our grandparents didn’t have e-mail, but they did have the telephone. / I did enjoy our visit to the Science Museum last summer.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past simple vs Present perfect simple",
+    "meaning": "Past simple is for finished time periods; present perfect is for recent actions or time periods that continue. (So sánh giữa hành động đã hoàn tất và hành động liên quan đến hiện tại)",
+    "example": "I sent my first e-mail six months ago. / Have you ever sent an e-mail before? / There have been many technological advances in recent years. / Did the ancient Egyptians have more advanced technology?",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past continuous",
+    "meaning": "Used for actions in progress at a time in the past, background events, temporary actions, and repeated actions. (Dùng cho hành động đang diễn ra hoặc lặp lại trong quá khứ)",
+    "example": "Were you chatting to Matt online at midnight last night? / I was working for a large software company. / She was always taking things apart to see how they worked. / It was raining outside and people were making their way home. / While I was playing a computer game, my brother was doing his homework.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past continuous vs Past simple",
+    "meaning": "Past continuous describes background in progress; past simple describes main events. (Dùng past continuous cho bối cảnh, past simple cho hành động chính)",
+    "example": "We were talking about MP3s when Andrea mentioned her new music website. / When I was a child, I visited my grandmother every week.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past continuous vs Present perfect continuous",
+    "meaning": "Past continuous is used for past progress; present perfect continuous links past to present. (So sánh hành động quá khứ đang diễn ra và hành động kéo dài đến hiện tại)",
+    "example": "We were working on my computer for four hours yesterday. / We have been working on my computer for four hours so far.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past perfect simple",
+    "meaning": "Describes actions completed before another point in the past. (Dùng cho hành động hoàn tất trước một hành động khác trong quá khứ)",
+    "example": "Had you had your computer long before it broke down? / When Dimitra called, I had managed to fix her computer. / By the time of his death, Thomas Edison had invented a number of things. / I beat Jason because I’d played a lot with my brother.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - Past perfect continuous",
+    "meaning": "Describes actions or states continuing up to a point in the past. (Dùng cho hành động kéo dài đến một thời điểm trong quá khứ)",
+    "example": "She’d been writing computer games for over ten years before she had a hit.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - would (past habit)",
+    "meaning": "Used to describe repeated actions in the distant past. (Dùng để diễn tả thói quen đã xảy ra trong quá khứ)",
+    "example": "The ancient Greeks would rely on the power of slaves. / Whenever I went to James’s house, he would usually be playing on his computer.",
+    "count": 0
+    },
+    {
+    "word": "Past Time - used to",
+    "meaning": "Used to describe past habits or states that are no longer true. (Dùng cho hành động hoặc trạng thái đã từng xảy ra trong quá khứ)",
+    "example": "It used to seem strange to be able to communicate over long distances. / At first, people found it strange sending messages by mobile, but now everyone’s used to it. / We got used to travelling by train quickly.",
+    "count": 0
+    },   
+    {
+    "word": "Present Time - Present simple",
+    "meaning": "Used for general truths, habits, permanent states, live commentary, instructions, newspaper headlines, reviews, and scheduled events. (Thì hiện tại đơn dùng cho sự thật, thói quen, tình trạng cố định, tiêu đề, lịch trình)",
+    "example": "The left-hand side of the brain controls the right-hand side of the body. / I don’t always go to lectures that are early in the morning. / Angie teaches French at a local adult education centre. / So, a man goes to see his psychiatrist. / HAWWKING WINS NOBEL PRIZE. / The film ends with us not knowing the result. / Tom turns left at the end of the road. / Term ends on 21st December. / I’ll be so relieved when I finish this crossword.",
+    "count": 0
+    },
+    {
+    "word": "Present Time - Emphatic present simple",
+    "meaning": "Used to express strong emotion or to contrast with another idea. (Dùng để nhấn mạnh cảm xúc hoặc sự tương phản)",
+    "example": "Adam doesn’t know much about psychiatry but he does know quite a lot about psychology. / I do like playing word games!",
+    "count": 0
+    },
+    {
+    "word": "Present Time - Present continuous",
+    "meaning": "Used for actions happening now, changing situations, temporary states, fixed future plans, and habits with always. (Dùng cho hành động đang xảy ra, tình huống thay đổi, sắp xếp tương lai, hoặc thói quen gây phiền)",
+    "example": "The boys are doing their homework right now. / What book are you doing in English? / We aren’t having any exams while the lecturers are on strike. / More and more people are recognising the advantages of learning a foreign language. / Dan’s always coming up with the craziest ideas! / He’s carrying a bag full of honey. / When are you taking your driving test? / I’ll probably be a bit scared when I’m waiting outside for the exam.",
+    "count": 0
+    },
+    {
+    "word": "Present Time - Present perfect simple",
+    "meaning": "Used for actions/states from past to present, recent actions, experiences, and present results. (Dùng cho hành động từ quá khứ kéo dài tới hiện tại, hoặc ảnh hưởng tới hiện tại)",
+    "example": "I’ve been a member of MENSA for over five years. / She’s done a BA, an MA and a PhD. / Have you ever read any books by Edward De Bono? / She’s been awarded a scholarship to Harvard. / I’ve just received my exam results. / Tell me when you’ve finished the report. / US: I already found the answer. UK: Have you found the answer yet?",
+    "count": 0
+    },
+    {
+    "word": "Present Time - Present perfect continuous",
+    "meaning": "Used for actions in progress from the past up to now, especially to emphasize duration. (Dùng cho hành động đang diễn ra từ quá khứ và nhấn mạnh thời lượng)",
+    "example": "We’ve all been wondering what to get Tony for his birthday. / I won’t take my driving test until I’ve been having lessons for at least two months. / I’ve worked here for five years. / I’ve been working here for five years.",
+    "count": 0
+    },
+    {
+    "word": "Present Time - Stative and non-stative verb uses",
+    "meaning": "Stative verbs (describe states, not actions) are usually not used in continuous tenses. (Động từ chỉ trạng thái thường không dùng ở thì tiếp diễn)",
+    "example": "I think it’s important to know how to use a computer. (state: think = believe) / I’m thinking about going on a computer course. (action: think = consider)",
+    "count": 0
+    }      
             
   ],
   "phrases, collocations": [    
