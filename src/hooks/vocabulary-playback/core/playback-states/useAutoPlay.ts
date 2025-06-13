@@ -14,7 +14,25 @@ export const useAutoPlay = (
   playCurrentWord: () => void
 ) => {
   const lastWordRef = useRef<string | null>(null);
+  const prevMutedRef = useRef(muted);
+  const prevPausedRef = useRef(paused);
   const autoPlayTimeoutRef = useRef<number | null>(null);
+
+  // Reset lastWordRef when unmuting
+  useEffect(() => {
+    if (prevMutedRef.current && !muted) {
+      lastWordRef.current = null;
+    }
+    prevMutedRef.current = muted;
+  }, [muted]);
+
+  // Reset lastWordRef when unpausing
+  useEffect(() => {
+    if (prevPausedRef.current && !paused) {
+      lastWordRef.current = null;
+    }
+    prevPausedRef.current = paused;
+  }, [paused]);
 
   // Auto-play effect with proper coordination
   useEffect(() => {
