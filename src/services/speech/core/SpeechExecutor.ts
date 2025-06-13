@@ -170,6 +170,10 @@ export class SpeechExecutor {
         this.cancelledUtterance = null;
         
         console.log('[SPEECH-EXECUTOR] -> invoking window.speechSynthesis.speak');
+        // Cancel any ongoing speech before starting a new one to avoid
+        // triggering "canceled" errors when a previous utterance is still
+        // pending or speaking.
+        window.speechSynthesis.cancel();
         window.speechSynthesis.speak(utterance);
 
         // Enhanced fallback timeout with reduced time to prevent delays
