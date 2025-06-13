@@ -230,16 +230,6 @@ export class SpeechExecutor {
       console.error(`[SPEECH-EXECUTOR] ✗ Speech error: ${event.error} for word: ${word.word}`);
       this.handleUtteranceError(event, utterance, resolve);
     };
-
-    utterance.onpause = () => {
-      console.log('[SPEECH-EXECUTOR] Speech paused');
-      this.stateManager.setPaused(true);
-    };
-
-    utterance.onresume = () => {
-      console.log('[SPEECH-EXECUTOR] Speech resumed');
-      this.stateManager.setPaused(false);
-    };
   }
 
   private handleUtteranceError(
