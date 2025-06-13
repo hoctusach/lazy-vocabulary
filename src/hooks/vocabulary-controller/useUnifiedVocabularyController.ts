@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { useVocabularyState } from './core/useVocabularyState';
@@ -11,10 +11,10 @@ import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
- * Now properly integrated with speech system to prevent dual controller conflicts
+ * Fixed to prevent re-initialization and improve stability
  */
 export const useUnifiedVocabularyController = () => {
-  console.log('[UNIFIED-CONTROLLER] Initializing unified controller');
+  console.log('[UNIFIED-CONTROLLER] Using stable controller instance');
 
   // Core state management
   const {
@@ -35,19 +35,19 @@ export const useUnifiedVocabularyController = () => {
     lastWordChangeRef
   } = useVocabularyState();
 
-  // Timer management
+  // Timer management with debouncing
   const {
     clearAutoAdvanceTimer,
     scheduleAutoAdvance
   } = useTimerManagement(isPaused, isMuted);
 
-  // Speech integration
+  // Speech integration with error recovery
   const {
     speechState,
     playCurrentWord
   } = useSpeechIntegration(currentWord, voiceRegion, isPaused, isMuted, isTransitioningRef);
 
-  // Word navigation
+  // Word navigation with proper state management
   const {
     goToNext
   } = useWordNavigation(
@@ -60,7 +60,7 @@ export const useUnifiedVocabularyController = () => {
     clearAutoAdvanceTimer
   );
 
-  // Control actions
+  // Control actions with proper audio management
   const {
     togglePause,
     toggleMute,
@@ -89,9 +89,9 @@ export const useUnifiedVocabularyController = () => {
     clearAutoAdvanceTimer
   );
 
-  // Set up word completion callback with auto-advance
-  useEffect(() => {
-    const handleWordComplete = () => {
+  // Set up word completion callback with auto-advance - memoized to prevent re-creation
+  const handleWordComplete = useMemo(() => {
+    return () => {
       if (isTransitioningRef.current) {
         console.log('[UNIFIED-CONTROLLER] Word transition in progress, skipping auto-advance');
         return;
@@ -105,36 +105,45 @@ export const useUnifiedVocabularyController = () => {
       console.log('[UNIFIED-CONTROLLER] Word completed, scheduling auto-advance');
       scheduleAutoAdvance(1500, goToNext);
     };
+  }, [scheduleAutoAdvance, goToNext, isTransitioningRef, isPaused, isMuted]);
 
+  useEffect(() => {
     unifiedSpeechController.setWordCompleteCallback(handleWordComplete);
     
     return () => {
       unifiedSpeechController.setWordCompleteCallback(null);
     };
-  }, [scheduleAutoAdvance, goToNext, isTransitioningRef, isPaused, isMuted]);
+  }, [handleWordComplete]);
 
-  // Pause/resume speech when state changes
+  // Pause/resume speech when state changes - with debouncing
   useEffect(() => {
-    if (isPaused) {
-      console.log('[UNIFIED-CONTROLLER] Pausing speech due to state change');
-      unifiedSpeechController.pause();
-    } else {
-      console.log('[UNIFIED-CONTROLLER] Resuming speech due to state change');
-      unifiedSpeechController.resume();
-    }
+    const timeoutId = setTimeout(() => {
+      if (isPaused) {
+        console.log('[UNIFIED-CONTROLLER] Pausing speech due to state change');
+        unifiedSpeechController.pause();
+      } else {
+        console.log('[UNIFIED-CONTROLLER] Resuming speech due to state change');
+        unifiedSpeechController.resume();
+      }
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
   }, [isPaused]);
 
-  // Mute/unmute speech when state changes
+  // Mute/unmute speech when state changes - with debouncing
   useEffect(() => {
-    console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
-    unifiedSpeechController.setMuted(isMuted);
+    const timeoutId = setTimeout(() => {
+      console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
+      unifiedSpeechController.setMuted(isMuted);
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
   }, [isMuted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearAutoAdvanceTimer();
-      unifiedSpeechController.destroy();
     };
   }, [clearAutoAdvanceTimer]);
 
