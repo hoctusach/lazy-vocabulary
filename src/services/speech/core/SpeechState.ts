@@ -1,7 +1,10 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 
+export type SpeechPhase = 'idle' | 'preparing' | 'speaking' | 'finished';
+
 export interface SpeechState {
+  phase: SpeechPhase;
   isActive: boolean;
   isPaused: boolean;
   isMuted: boolean;

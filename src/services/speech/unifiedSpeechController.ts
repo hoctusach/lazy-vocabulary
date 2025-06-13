@@ -5,6 +5,7 @@ import { SpeechStateManager } from './core/SpeechStateManager';
 import { AutoAdvanceTimer } from './core/AutoAdvanceTimer';
 import { VoiceManager } from './core/VoiceManager';
 import { SpeechExecutor } from './core/SpeechExecutor';
+import { SpeechGuard } from './core/SpeechGuard';
 
 /**
  * Unified Speech Controller - Single source of truth for all speech operations
@@ -15,6 +16,7 @@ class UnifiedSpeechController {
   private autoAdvanceTimer: AutoAdvanceTimer;
   private voiceManager: VoiceManager;
   private speechExecutor: SpeechExecutor;
+  private guard: SpeechGuard;
 
   constructor() {
     this.stateManager = new SpeechStateManager();
@@ -25,6 +27,12 @@ class UnifiedSpeechController {
       this.autoAdvanceTimer,
       this.voiceManager
     );
+    this.guard = new SpeechGuard(this.stateManager);
+  }
+
+  // Legacy compatibility helpers
+  isPaused(): boolean {
+    return this.stateManager.getState().isPaused;
   }
 
   // Subscribe to state changes
@@ -46,6 +54,10 @@ class UnifiedSpeechController {
   async speak(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
     console.log(`[UNIFIED-SPEECH] speak() called for: ${word.word}`);
     return this.speechExecutor.speak(word, voiceRegion);
+  }
+
+  canSpeak() {
+    return this.guard.canPlay();
   }
 
   // Stop speech
