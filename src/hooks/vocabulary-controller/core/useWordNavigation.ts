@@ -45,10 +45,7 @@ export const useWordNavigation = (
     });
 
     try {
-      // Update vocabulary service first
-      vocabularyService.moveToNextWord();
-      
-      // Then update local state
+      // Update local state - move to next index
       const nextIndex = (currentIndex + 1) % wordList.length;
       console.log('[WORD-NAVIGATION] Moving from word', currentIndex, 'to', nextIndex);
       setCurrentIndex(nextIndex);

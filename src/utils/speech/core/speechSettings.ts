@@ -15,6 +15,27 @@ export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
   return 'UK'; // Default to UK if not found or error
 };
 
+export const saveVoiceRegionToStorage = (region: 'US' | 'UK' | 'AU'): void => {
+  try {
+    const existingStates = localStorage.getItem('buttonStates');
+    let buttonStates = {};
+    
+    if (existingStates) {
+      buttonStates = JSON.parse(existingStates);
+    }
+    
+    const updatedStates = {
+      ...buttonStates,
+      voiceRegion: region
+    };
+    
+    localStorage.setItem('buttonStates', JSON.stringify(updatedStates));
+    console.log(`Voice region saved to storage: ${region}`);
+  } catch (error) {
+    console.error('Error saving voice region to localStorage:', error);
+  }
+};
+
 export const getSpeechRate = (): number => {
   const region = getVoiceRegionFromStorage();
   if (region === 'US' || region === 'AU') {

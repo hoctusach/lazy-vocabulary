@@ -1,13 +1,17 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 import { prepareTextForSpeech } from '@/utils/speech';
-
+import { hasValidSpeechableContent, getPreserveSpecialFromStorage } from '@/utils/text/contentFilters';
+import { toast } from '@/components/ui/use-toast';
 
 /**
  * Hook for handling content validation and filtering for speech
  */
 export const useContentValidation = () => {
   const validateAndPrepareContent = (currentWord: VocabularyWord) => {
+    // Get preserve special setting
+    const preserveSpecial = getPreserveSpecialFromStorage();
+    
     // Construct text to speak
     let rawTextToSpeak = currentWord.word;
     if (currentWord.meaning) {
@@ -30,7 +34,10 @@ export const useContentValidation = () => {
     
     if (!hasValidContent) {
       console.log('[CONTENT-VALIDATION] No speechable content after filtering');
-      toast.info("This word contains only IPA notation or Vietnamese text - skipping speech");
+      toast({
+        title: "Content Notice",
+        description: "This word contains only IPA notation or Vietnamese text - skipping speech"
+      });
       return { speechableText: '', hasValidContent: false };
     }
 

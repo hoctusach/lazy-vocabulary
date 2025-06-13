@@ -48,6 +48,11 @@ export class VocabularyService {
     this.dataManager.removeVocabularyChangeListener(listener);
   }
   
+  // NEW: Method to get all available sheet names
+  getAllSheetNames(): string[] {
+    return this.sheetOptions;
+  }
+  
   async processExcelFile(file: File): Promise<boolean> {
     return this.vocabularyOperations.processExcelFile(file);
   }
