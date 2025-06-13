@@ -16520,7 +16520,6 @@
     "example": "Modals: could + do, be doing, have done, have been doing. / Passive: could + be done, have been done. / Semi-modals: need to, ought to, had better, have (got) to.",
     "count": 0
     },
-        
     {
     "word": "Adjectives n Adverbs - Position of adjectives",
     "meaning": "Adjectives usually appear before a noun, or after verbs such as appear, become, feel, get, grow, look, seem, smell, sound, taste, and turn. (Tính từ thường đứng trước danh từ hoặc sau một số động từ chỉ trạng thái)",
@@ -17100,7 +17099,1003 @@
     }      
             
   ],
-  "phrases, collocations": [    
+  "phrases, collocations": [   
+    {
+    "word": "pay /peɪ/",
+    "meaning": "pay dearly for, pay sb a compliment, pay your way, pay your respects, pay the price, pay rise",
+    "example": "He paid dearly for his mistake. She paid me a compliment on my work. I always pay my way when dining out. We went to pay our respects at the memorial. He paid the price for ignoring the warning. He asked for a pay rise.",
+    "count": 0
+    },
+    {
+    "word": "peer /pɪə(r)/",
+    "meaning": "peer group, peer pressure",
+    "example": "Teenagers are easily influenced by their peer group. He started smoking due to peer pressure.",
+    "count": 0
+    },
+    {
+    "word": "pen /pen/",
+    "meaning": "put pen to paper, the pen is mightier than the sword, pen-pusher",
+    "example": "She finally put pen to paper and wrote the letter. The pen is mightier than the sword. He’s just another pen-pusher in the office.",
+    "count": 0
+    },
+    {
+    "word": "person /ˈpɜːsn/",
+    "meaning": "do sth in person, meet sb in person",
+    "example": "You’ll need to apply in person. I’d love to meet the author in person someday.",
+    "count": 0
+    },
+    {
+    "word": "perspective /pəˈspektɪv/",
+    "meaning": "put into perspective, from the perspective of, a sense of perspective",
+    "example": "The tragedy really put things into perspective. From the perspective of a teacher, the system needs reform. Losing gave me a better sense of perspective.",
+    "count": 0
+    },
+    {
+    "word": "place /pleɪs/",
+    "meaning": "change/swap places with, take the place of, take sb’s place, put in place, in place of, out of place, place of work/residence/birth",
+    "example": "I wouldn’t change places with him for anything. Machines have taken the place of many workers. Can you take my place at the meeting? The new rules are now in place. Use vinegar in place of lemon juice. He looked out of place at the party. Please write your place of residence.",
+    "count": 0
+    },
+    {
+    "word": "play /pleɪ/",
+    "meaning": "play against/for, play a part/role in, play the fool, play along, play by the rules, play fair",
+    "example": "They played against Brazil in the finals. He played a key role in negotiations. He was just playing the fool to avoid blame. I decided to play along with the prank. In business, we play by the rules. Let’s play fair and square.",
+    "count": 0
+    },
+    {
+    "word": "point /pɔɪnt/",
+    "meaning": "point at/to/towards, get to the point, make a point of doing sth, beside the point, up to a point, make your point, see/take sb’s point, there’s no point in",
+    "example": "She pointed towards the building. Let’s get to the point. He made a point of checking everything twice. That’s beside the point. I agree with you up to a point. You’ve made your point clear. I take your point, but I disagree. There’s no point in arguing further.",
+    "count": 0
+    },
+    {
+    "word": "polite /pəˈlaɪt/",
+    "meaning": "polite to sb, polite of sb to do, just/only being polite, polite conversation/society",
+    "example": "Please be polite to the guests. It was polite of her to say thank you. He was only being polite. They had some polite conversation over dinner. He’s not used to polite society.",
+    "count": 0
+    },
+    {
+    "word": "poor /pɔː(r)/",
+    "meaning": "come a poor second, poor loser, poor girl/boy/etc, poor relation, poor health, the rich and the poor",
+    "example": "He came a poor second in the race. Don’t be a poor loser. The poor boy had no shoes. The charity is a poor relation of bigger ones. She has suffered from poor health. The gap between the rich and the poor is widening.",
+    "count": 0
+    },
+    {
+    "word": "power /ˈpaʊə(r)/",
+    "meaning": "take/seize/hold/exercise/exert/wield/abuse power, power to do, power over, beyond sb’s power, the powers that be, power structure/base",
+    "example": "The army seized power overnight. He exercised his power wisely. She has the power to make that decision. He holds power over the region. It’s beyond my power to change it. The powers that be decided to cancel the project. The power structure is too rigid.",
+    "count": 0
+    },
+    {
+    "word": "praise /preɪz/",
+    "meaning": "praise sb for doing, win/receive/earn praise, full of praise for, in praise of",
+    "example": "She praised him for helping. The project received a lot of praise. Everyone was full of praise for her speech. The painting was created in praise of freedom.",
+    "count": 0
+    },
+    {
+    "word": "prefer /prɪˈfɜː(r)/",
+    "meaning": "prefer sb to do, prefer sth to, prefer doing, would prefer",
+    "example": "I’d prefer him to call later. I prefer coffee to tea. She prefers working alone. I would prefer to stay home tonight.",
+    "count": 0
+    },
+    {
+    "word": "principle /ˈprɪnsəpl/",
+    "meaning": "have principles, against sb’s principles, principle of sth, a matter/issue of principle",
+    "example": "He’s a man of strong principles. It’s against my principles to lie. The principle of gravity is universal. I can’t agree, it’s a matter of principle.",
+    "count": 0
+    },
+    {
+    "word": "print /prɪnt/",
+    "meaning": "print sth out/off, in print, out of print",
+    "example": "Please print out the tickets. The book is still in print. That novel is out of print now.",
+    "count": 0
+    },
+    {
+    "word": "prison /ˈprɪzn/",
+    "meaning": "go to prison, serve a sentence, prison term, prison reform, prison officer",
+    "example": "He went to prison for theft. He’s serving a ten-year sentence. It was a long prison term. The law aims at prison reform. The prison officer escorted the inmate.",
+    "count": 0
+    },
+    {
+    "word": "process /ˈprəʊses/",
+    "meaning": "in the process of doing, peace/election/judicial/legal process, due process",
+    "example": "We’re in the process of hiring. The peace process has stalled. The election process is underway. He didn’t receive due process.",
+    "count": 0
+    },
+    {
+    "word": "provoke /prəˈvəʊk/",
+    "meaning": "provoke sb into doing, provoke a reaction/protest/outcry",
+    "example": "His insult provoked her into quitting. The speech provoked a strong reaction. It provoked widespread protest.",
+    "count": 0
+    },
+    {
+    "word": "purpose /ˈpɜːpəs/",
+    "meaning": "serve a purpose, purpose of doing, on purpose, for the purpose of, escape sb’s purpose",
+    "example": "This feature serves no purpose. The purpose of doing this is safety. I did it on purpose. He was hired for the purpose of expanding the team. Her point escaped my purpose.",
+    "count": 0
+    },
+    {
+    "word": "quality /ˈkwɒləti/",
+    "meaning": "high/good/top quality, poor/bad/low quality, personal/professional qualities, quality of life/time",
+    "example": "They produce high-quality goods. The video was poor quality. His honesty is one of his best qualities. We want to improve quality of life. I enjoy spending quality time with my kids.",
+    "count": 0
+    },
+    {
+    "word": "question /ˈkwestʃən/",
+    "meaning": "beg the question, a/no question of, in question, out of the question, without question, beyond question, some question over/as to/about, awkward question",
+    "example": "This begs the question—why now? There’s no question of him resigning. His future is in question. It’s out of the question to cancel now. He’s guilty without question. Her loyalty is beyond question. There’s some question over the deal. That was an awkward question.",
+    "count": 0
+    },
+    {
+    "word": "rain /reɪn/",
+    "meaning": "rain hard/heavily, pour with rain, heavy/light rain, get caught in the rain",
+    "example": "It rained heavily last night. It’s pouring with rain today. We had light rain this morning. I got caught in the rain on the way home.",
+    "count": 0
+    },      
+    {
+    "word": "raise /reɪz/",
+    "meaning": "raise your hand, raise sth with sb, raise an objection, raise your voice/eyebrows, raise a child/family, raise sb’s hopes/expectations, raise awareness, raise money",
+    "example": "Please raise your hand to speak. She raised the issue with her manager. I’d like to raise an objection. He raised his voice in anger. They raised four children. That comment raised everyone’s hopes. The ad campaign raised awareness about the issue. We raised money for the shelter.",
+    "count": 0
+    },
+    {
+    "word": "react /riˈækt/",
+    "meaning": "react by doing, react accordingly/inappropriately, react to sth, react against",
+    "example": "He reacted by slamming the door. They reacted accordingly to the new rules. She reacted strongly to the news. The crowd reacted against the unfair policy.",
+    "count": 0
+    },
+    {
+    "word": "reaction /riˈækʃn/",
+    "meaning": "cause/produce/provoke/trigger a reaction, reaction against, reaction to",
+    "example": "The announcement triggered a strong reaction. The book is a reaction against modern trends. Her reaction to the surprise was priceless.",
+    "count": 0
+    },
+    {
+    "word": "read /riːd/",
+    "meaning": "read sb’s mind, read sb like a book, read between the lines, read out loud, read from cover to cover",
+    "example": "She can read your mind. I can read him like a book. You need to read between the lines here. Please read this paragraph out loud. I read the novel from cover to cover.",
+    "count": 0
+    },
+    {
+    "word": "reality /riˈæləti/",
+    "meaning": "escape from reality, face reality, in reality, reality TV",
+    "example": "Some people drink to escape from reality. You must face reality at some point. In reality, the plan was flawed. She appears on a reality TV show.",
+    "count": 0
+    },
+    {
+    "word": "record /ˈrekɔːd/",
+    "meaning": "keep/maintain/copy a record of, set/break a record, on record, off the record",
+    "example": "We keep a record of all payments. She broke the world record in 100m. The hottest year on record was 2016. He spoke off the record.",
+    "count": 0
+    },
+    {
+    "word": "relative /ˈrelətɪv/",
+    "meaning": "a relative of yours, distant/close relative, a relative newcomer/unknown, relative clause/pronoun",
+    "example": "She’s a close relative of mine. That man is a distant relative. He’s a relative newcomer to politics. The sentence contains a relative clause.",
+    "count": 0
+    },
+    {
+    "word": "respect /rɪˈspekt/",
+    "meaning": "respect sb for sth, lose/win sb’s respect, have/show respect for, in this/that respect, with respect to",
+    "example": "I respect her for her honesty. He lost everyone’s respect after the scandal. We should show respect for elders. In this respect, I agree. With respect to your concerns, we’re working on it.",
+    "count": 0
+    },
+    {
+    "word": "response /rɪˈspɒns/",
+    "meaning": "response to sth, in response to, no response",
+    "example": "His response to the news was calm. In response to your request, we will issue a refund. There was no response after we called.",
+    "count": 0
+    },
+    {
+    "word": "rest /rest/",
+    "meaning": "rest on/against, rest assured that, take/have a rest, come to rest",
+    "example": "He rested his head on her shoulder. Rest assured that we will deliver on time. I need to take a rest after that hike. The car came to rest in a ditch.",
+    "count": 0
+    },
+    {
+    "word": "rich /rɪtʃ/",
+    "meaning": "rich in, filthy/stinking rich, rich and famous, the rich and the poor",
+    "example": "Avocados are rich in healthy fats. They became stinking rich overnight. She dreams of becoming rich and famous. The film contrasts the lives of the rich and the poor.",
+    "count": 0
+    },
+    {
+    "word": "right /raɪt/",
+    "meaning": "have a/the/no/every right to do, give sb the right to do, right and wrong, right in doing, right of sb to do, human/animal rights",
+    "example": "You have every right to speak up. The law gives us the right to vote. Kids must learn right and wrong. He was right in refusing the offer. It’s not right of you to blame her. They campaign for human rights.",
+    "count": 0
+    },
+    {
+    "word": "risk /rɪsk/",
+    "meaning": "run the risk of doing, risk sth on, pose a risk to, at the risk of doing, put sth at risk, take a risk, at risk",
+    "example": "He ran the risk of losing his job. She risked everything on one bet. Smoking poses a risk to your health. At the risk of sounding rude, I disagree. You put our plans at risk. We took a risk investing early. The species is at risk.",
+    "count": 0
+    },
+    {
+    "word": "rule /ruːl/",
+    "meaning": "break/follow/bend the rules, against the rules, rule of law, rule book, rule out the possibility, rule of thumb",
+    "example": "You must follow the rules. It’s against the rules to cheat. Democracy relies on the rule of law. He lives by the rule book. They ruled out the possibility of fraud. As a rule of thumb, don’t spend more than you earn.",
+    "count": 0
+    },
+    {
+    "word": "run /rʌn/",
+    "meaning": "run a business/campaign, run wild, run riot, run sb a bath, run on, run through sth, run the risk of doing, run into trouble",
+    "example": "She runs her own business. The children ran wild at the park. Emotions ran riot after the game. He ran me a warm bath. The meeting ran on for hours. Let’s run through the plan. You run the risk of failure. We ran into trouble halfway.",
+    "count": 0
+    },
+    {
+    "word": "rush /rʌʃ/",
+    "meaning": "rush to do, rush sb into, in a rush, rush hour, do sth in a rush",
+    "example": "Don’t rush to conclusions. Don’t rush me into a decision. I’m in a rush, sorry! Traffic’s bad during rush hour. I packed everything in a rush.",
+    "count": 0
+    },
+    {
+    "word": "say /seɪ/",
+    "meaning": "have your say, say the word, say for certain, say your piece, nothing to say",
+    "example": "Everyone will have their say. Just say the word and I’ll help. I can’t say for certain. She said her piece and left. I have nothing to say about that.",
+    "count": 0
+    },
+    {
+    "word": "second /ˈsekənd/",
+    "meaning": "give/take a second to do, a split second, second hand, second best",
+    "example": "Give me a second to think. It happened in a split second. He bought a second-hand bike. I don’t want to settle for second best.",
+    "count": 0
+    },
+    {
+    "word": "sense /sens/",
+    "meaning": "make sense of, see sense, have the sense to do, common sense",
+    "example": "I can’t make sense of these instructions. I hope he’ll see sense and apologize. She had the sense to leave early. Use your common sense in emergencies.",
+    "count": 0
+    },
+    {
+    "word": "sentence /ˈsentəns/",
+    "meaning": "pass sentence on, serve a sentence, prison/jail sentence, death/life sentence",
+    "example": "The judge passed sentence on the thief. He served a five-year sentence. The crime led to a jail sentence. She received a life sentence.",
+    "count": 0
+    },
+    {
+    "word": "shape /ʃeɪp/",
+    "meaning": "get/stay in shape, take shape, out of shape, in the shape of",
+    "example": "I exercise to stay in shape. Plans are starting to take shape. I’m so out of shape lately. The island is in the shape of a star.",
+    "count": 0
+    },
+    {
+    "word": "share /ʃeə(r)/",
+    "meaning": "share with/between/among, shareholder, share index, share option",
+    "example": "He shared the cake with his friends. The shareholders met yesterday. The share index rose sharply. She received share options at her job.",
+    "count": 0
+    },
+    {
+    "word": "sharp /ʃɑːp/",
+    "meaning": "keep a sharp eye on, sharp rise/drop/increase, sharp criticism",
+    "example": "Keep a sharp eye on your belongings. There was a sharp rise in prices. His speech drew sharp criticism.",
+    "count": 0
+    },
+    {
+    "word": "short /ʃɔːt/",
+    "meaning": "run short, short-term/notice/while/period/spell, be short of sth, short-list",
+    "example": "We’re running short on time. It’s a short-term fix. She was hired on short notice. Stay for a short while. I’m short of cash right now. They short-listed five candidates.",
+    "count": 0
+    },      
+    {
+    "word": "law /lɔː/",
+    "meaning": "become law, break/follow/uphold the law, pass/amend/repeal a law, lay down the law, law and order, against the law, under the law, follow the law",
+    "example": "The bill became law last year. He broke the law and was fined. Police must uphold the law. Parliament passed a new traffic law. The law was amended last session. Parents can't just lay down the law. The protest was against the law. Everyone is equal under the law. You must follow the law.",
+    "count": 0
+    },
+    {
+    "word": "lead /liːd/",
+    "meaning": "lead sb into, lead the way, lead the world in, lead sb to believe, take/hold the lead, follow sb’s lead, in the lead",
+    "example": "He led us into a dangerous area. She will lead the way on climate reform. This firm leads the world in biotech. He led me to believe we had a deal. She took the lead early in the race. We followed his lead and stopped arguing. Our team is currently in the lead.",
+    "count": 0
+    },
+    {
+    "word": "leisure /ˈleʒə(r)/",
+    "meaning": "have the leisure to do, at your leisure, leisure centre, leisure time/pursuits",
+    "example": "She doesn’t have the leisure to read these days. Please complete this at your leisure. We joined the local leisure centre. Watching movies is my favourite leisure pursuit.",
+    "count": 0
+    },
+    {
+    "word": "length /leŋkθ/",
+    "meaning": "go to great lengths, run the length of, in length, of (un)equal length, length of time",
+    "example": "He went to great lengths to impress her. The pipe runs the length of the building. The documentary was 45 minutes in length. These tables are of equal length. It took a long length of time to finish.",
+    "count": 0
+    },
+    {
+    "word": "letter /ˈletə(r)/",
+    "meaning": "get/receive a letter from, write/send sb a letter, letter bomb",
+    "example": "I got a letter from my cousin. I wrote a letter to the council. Police intercepted a letter bomb at the embassy.",
+    "count": 0
+    },
+    {
+    "word": "life /laɪf/",
+    "meaning": "put sb’s life at risk, bring sth to life, come to life, save sb’s life, take sb’s life, lose a life, quality of life",
+    "example": "Speeding puts lives at risk. The story was brought to life on stage. The city centre came to life at night. The doctor saved his life. The suspect took his own life. The crash claimed three lives. They enjoy a high quality of life.",
+    "count": 0
+    },
+    {
+    "word": "lightning /ˈlaɪtnɪŋ/",
+    "meaning": "lightning bolt/flash, struck by lightning, lightning speed",
+    "example": "A bolt of lightning hit the tree. He was struck by lightning during the storm. She responded with lightning speed.",
+    "count": 0
+    },
+    {
+    "word": "like /laɪk/",
+    "meaning": "like doing/to do, anything/nothing like, alike/in like manner, just like, be like sb to do",
+    "example": "I like playing guitar in my free time. There’s nothing like a warm bath. They look alike. She sings just like her mother. It’s like him to show up late.",
+    "count": 0
+    },
+    {
+    "word": "link /lɪŋk/",
+    "meaning": "link to/with, find/prove/establish a link, click/follow a link",
+    "example": "This disease is linked to poor diet. They found a link between stress and heart disease. Click this link to join the call.",
+    "count": 0
+    },
+    {
+    "word": "live /lɪv/",
+    "meaning": "live a life of crime/luxury, live to do, live and let live, live in hope/fear, live to tell the tale",
+    "example": "He lived a life of crime before reform. She lives to help others. I say live and let live. We live in hope that things improve. He survived the crash and lived to tell the tale.",
+    "count": 0
+    },
+    {
+    "word": "load /ləʊd/",
+    "meaning": "load sth with/into, take a load off, a (whole) load of, loads of, a heavy load to bear/carry",
+    "example": "She loaded the cart with groceries. Sit down and take a load off your feet. We had a whole load of laundry. He’s got loads of work today. Caring for his family is a heavy load to carry.",
+    "count": 0
+    },
+    {
+    "word": "lock /lɒk/",
+    "meaning": "lock sth in/behind/under, lock horns with, locksmith",
+    "example": "He locked the files in a drawer. They locked horns during the debate. Call a locksmith if you're locked out.",
+    "count": 0
+    },
+    {
+    "word": "long /lɒŋ/",
+    "meaning": "last long, take a long time, all day long, long way, long distance, at long last, long and hard, long time ago",
+    "example": "The meeting didn’t last long. It took a long time to recover. They talked all day long. He walked a long way home. They maintained a long-distance relationship. At long last, they found peace. She thought long and hard about it. That happened a long time ago.",
+    "count": 0
+    },
+    {
+    "word": "lot /lɒt/",
+    "meaning": "a lot of, lots of, a lot on, a lot to do with, the lot",
+    "example": "There are a lot of options. We have lots of time. He’s got a lot on his mind. Her mood has a lot to do with stress. They ate the lot in one sitting.",
+    "count": 0
+    },
+    {
+    "word": "love /lʌv/",
+    "meaning": "love doing/to do, fall in love with, be in love, love affair, love for",
+    "example": "She loves baking cakes. He fell in love with Paris. They are still in love after 20 years. Their romance started as a love affair. She has a deep love for animals.",
+    "count": 0
+    },
+    {
+    "word": "luck /lʌk/",
+    "meaning": "push your luck, be in luck, lucky charm, bring/leave luck, wish sb luck",
+    "example": "Don’t push your luck asking for more. You’re in luck—we have one left. This ring is my lucky charm. That cat brings bad luck. I wished her luck before the test.",
+    "count": 0
+    },
+    {
+    "word": "mark /mɑːk/",
+    "meaning": "mark sb/sth on, leave a mark, mark the occasion, make a mark on, be quick/slow off the mark, hit the mark",
+    "example": "The teacher marked us on clarity. The war left a mark on him. We planted a tree to mark the occasion. He made his mark on politics. She’s always quick off the mark. Her speech really hit the mark.",
+    "count": 0
+    },
+    {
+    "word": "marriage /ˈmærɪdʒ/",
+    "meaning": "related by marriage, marriage guidance, marriage vows",
+    "example": "They are related by marriage. They sought marriage guidance. They exchanged heartfelt marriage vows.",
+    "count": 0
+    },
+    {
+    "word": "material /məˈtɪəriəl/",
+    "meaning": "material goods/possessions, material wealth, material resources, raw materials",
+    "example": "He owns few material possessions. They pursued material wealth above all. The region has limited material resources. The factory imports raw materials from abroad.",
+    "count": 0
+    },
+    {
+    "word": "matter /ˈmætə(r)/",
+    "meaning": "a matter of, in a matter of (days/etc), to make matters worse, to no matter, no matter what/how/etc, no laughing matter, a matter of opinion, a matter of urgency",
+    "example": "It’s a matter of principle. In a matter of days, everything changed. To make matters worse, it rained. It’s over—no matter. No matter what happens, I’ll stay. This is no laughing matter. Whether it's art is a matter of opinion. This is a matter of urgency.",
+    "count": 0
+    },
+    {
+    "word": "medicine /ˈmedsn/",
+    "meaning": "take medicine, alternative/complementary medicine, herbal medicine",
+    "example": "She took the medicine after lunch. He practices alternative medicine. I use herbal medicine for colds.",
+    "count": 0
+    },
+    {
+    "word": "mental /ˈmentl/",
+    "meaning": "make a mental note, mental arithmetic, mental illness/health",
+    "example": "I made a mental note to call her. He’s good at mental arithmetic. She’s recovering from a mental illness.",
+    "count": 0
+    },
+    {
+    "word": "metal /ˈmetl/",
+    "meaning": "precious metal, metal detector",
+    "example": "Gold is a precious metal. The metal detector beeped at the airport.",
+    "count": 0
+    },      
+    {
+    "word": "sick /sɪk/",
+    "meaning": "call in sick, feel sick, make sb sick, sick as a parrot, sick and tired of, sick with fear/worry/etc, sick at heart, sick bag",
+    "example": "He had to call in sick today. I feel sick after that ride. That movie made me sick. She was sick as a parrot when she lost. I'm sick and tired of cleaning up after them. She’s sick with worry about her exam. He was sick at heart after the news. Please use a sick bag during turbulence.",
+    "count": 0
+    },
+    {
+    "word": "side /saɪd/",
+    "meaning": "side with sb, take sides, see both sides of an argument, the other side, on either side, on the plus/minus side, side by side",
+    "example": "She always sides with her brother. Don’t take sides in their argument. Try to see both sides of the argument. I’ll be waiting on the other side. Houses stood on either side of the street. On the plus side, it’s cheaper. They walked side by side in silence.",
+    "count": 0
+    },
+    {
+    "word": "size /saɪz/",
+    "meaning": "that’s about the size of it, cut sth to size, in size, of a certain size, increase/reduce in size",
+    "example": "So we lost the contract? That’s about the size of it. Cut the wood to size. The fish was large in size. We need envelopes of a certain size. The company reduced in size last year.",
+    "count": 0
+    },
+    {
+    "word": "small /smɔːl/",
+    "meaning": "feel small, in a small way, it’s a small world, small talk, small change, small number/amount/etc, small business",
+    "example": "His insult made me feel small. She contributed in a small way. We ran into each other – it’s a small world! We had some small talk before the meeting. I paid with small change. Only a small number of people attended. He runs a small business in town.",
+    "count": 0
+    },
+    {
+    "word": "smooth /smuːð/",
+    "meaning": "smooth the way for, smooth-talking, smooth sailing",
+    "example": "The manager helped smooth the way for my promotion. He’s a smooth-talking salesman. After the repairs, it was smooth sailing.",
+    "count": 0
+    },
+    {
+    "word": "social /ˈsəʊʃl/",
+    "meaning": "social conditions, social contact, social security, social services, social call, social worker",
+    "example": "Poor social conditions can lead to unrest. He avoids all social contact. Many retirees depend on social security. She works in social services. He dropped by on a social call. The social worker helped the family with housing.",
+    "count": 0
+    },
+    {
+    "word": "speaking /ˈspiːkɪŋ/",
+    "meaning": "speak well/highly/badly/ill of, speak your mind, speak out, speak the same language, so to speak",
+    "example": "Everyone spoke highly of her work. I decided to speak my mind about the changes. He spoke out against injustice. We speak the same language on this topic. We are partners, so to speak.",
+    "count": 0
+    },
+    {
+    "word": "start /stɑːt/",
+    "meaning": "make a good/bad/etc start, get off to a good/flying/head/etc start, head start, start from scratch, for a start, right from the start, from the start of",
+    "example": "She made a good start on the project. We got off to a flying start. That gave me a head start. I had to start from scratch. For a start, we’ll need more staff. He was honest right from the start. It was clear from the start of the lesson.",
+    "count": 0
+    },
+    {
+    "word": "steady /ˈstedi/",
+    "meaning": "steady yourself, steady your nerves, hold sth steady, steady relationship, steady growth, steady look, steady pace",
+    "example": "She steadied herself before going on stage. He tried to steady his nerves. Hold the ladder steady. They’re in a steady relationship. The company has shown steady growth. He gave her a steady look. They walked at a steady pace.",
+    "count": 0
+    },
+    {
+    "word": "straight /streɪt/",
+    "meaning": "set/put sb straight, get sth straight, think/see straight, straight talking, straight answer",
+    "example": "Let me set you straight about the rules. I want to get this straight. I was so tired I couldn’t think straight. I like his style of straight talking. Just give me a straight answer.",
+    "count": 0
+    },
+    {
+    "word": "style /staɪl/",
+    "meaning": "style sth/yourself as, in style, style of, out of style, with style",
+    "example": "He styled himself as a reformer. She always arrives in style. That’s not my style of writing. Bell-bottoms are out of style now. She completed the performance with style.",
+    "count": 0
+    },
+    {
+    "word": "subject /ˈsʌbdʒɪkt/",
+    "meaning": "subject to, bring up a subject, get onto a subject, drop a subject, subject sb to, the subject of, British subject",
+    "example": "Prices are subject to change. She brought up the subject of bonuses. Let’s get onto the next subject. Let’s drop the subject. The manager subjected us to a long lecture. The subject of today’s meeting is safety. He is a British subject by birth.",
+    "count": 0
+    },
+    {
+    "word": "sun /sʌn/",
+    "meaning": "sun yourself, in the sun, in the shade/sunlight/sunshine, sunset",
+    "example": "He lay on the beach to sun himself. We sat in the sun all day. They stayed in the shade. The room was full of sunlight. They watched the beautiful sunset together.",
+    "count": 0
+    },
+    {
+    "word": "support /səˈpɔːt/",
+    "meaning": "support doing sth, support sb, support sth, support sb financially/emotionally/etc, support a team",
+    "example": "I support limiting emissions. Her family supported her throughout. I fully support the plan. He supports his parents financially. I support the national team.",
+    "count": 0
+    },
+    {
+    "word": "surface /ˈsɜːfɪs/",
+    "meaning": "on the surface, beneath/under the surface, surface area, kitchen surface, smooth surface",
+    "example": "On the surface it seemed fine. Beneath the surface, tensions grew. The paint covers a large surface area. Wipe down the kitchen surface. The floor had a smooth surface.",
+    "count": 0
+    },
+    {
+    "word": "table /ˈteɪbl/",
+    "meaning": "set/clear/lay the table, table a proposal, table manners, on the table, under the table",
+    "example": "She set the table for dinner. They tabled a proposal for discussion. His table manners are excellent. That offer is still on the table. They paid under the table.",
+    "count": 0
+    },
+    {
+    "word": "talk /tɔːk/",
+    "meaning": "talk sb into/out of doing, talk sense, talk the same language, talk is cheap, talk your way into/out of",
+    "example": "She talked me into applying. You’re finally talking sense. We talk the same language about values. Talk is cheap—actions matter more. He talked his way out of trouble.",
+    "count": 0
+    },
+    {
+    "word": "taste /teɪst/",
+    "meaning": "develop/have/acquire a taste for, in good/bad taste, sense of taste",
+    "example": "He developed a taste for jazz. That joke was in bad taste. I lost my sense of taste when I was sick.",
+    "count": 0
+    },
+    {
+    "word": "tell /tel/",
+    "meaning": "tell the truth/a lie, tell yourself, tell the difference, tell sb to do sth, tell sb what, be told, tell that, tell on",
+    "example": "Please tell the truth. I told myself it was okay. Can you tell the difference between them? He told me to wait. She told him what happened. I was told to leave. I can tell that she’s lying. His lies will tell on him eventually.",
+    "count": 0
+    },
+    {
+    "word": "term /tɜːm/",
+    "meaning": "in the long/short term, term of/in office, prison/jail term, fixed term, term time, long/short-term",
+    "example": "In the short term, sales may fall. He served a term in office. He was sentenced to a long prison term. The job has a fixed term of 2 years. During term time, the library is busy. It’s a short-term fix.",
+    "count": 0
+    },
+    {
+    "word": "thin /θɪn/",
+    "meaning": "have thin skin, thin on top, thin on the ground, out of thin air, into thin air",
+    "example": "She has thin skin and gets offended easily. He’s a bit thin on top these days. Volunteers were thin on the ground. He appeared out of thin air. The documents vanished into thin air.",
+    "count": 0
+    },
+    {
+    "word": "threat /θret/",
+    "meaning": "pose a threat to, under threat, threat of, bomb/death threat",
+    "example": "Pollution poses a threat to wildlife. The species is under threat. There’s a threat of war. She received a death threat online.",
+    "count": 0
+    },
+    {
+    "word": "time /taɪm/",
+    "meaning": "pass the time, spend time doing, make time, find time, take time, in time, on time, time limit",
+    "example": "We played cards to pass the time. I spent time reading. Try to make time for your hobbies. Can you find time for lunch? Take your time with the project. I arrived just in time. The train was on time. There’s a time limit for submissions.",
+    "count": 0
+    },      
+    {
+    "word": "want /wɒnt/",
+    "meaning": "want (sb) to do, want sth done, for want of",
+    "example": "I want you to help me move this. I want this report finished by Friday. The plan failed for want of support.",
+    "count": 0
+    },
+    {
+    "word": "way /weɪ/",
+    "meaning": "get in sb’s way, know the way, lose your way, get sth out of the way, in the way, on the/your/their way, in this way, way of doing",
+    "example": "Try not to get in his way. Do you know the way to the beach? We lost our way in the forest. Let’s get this task out of the way. The chair is in the way. I met her on the way to work. We solve problems in this way. This is her way of teaching grammar.",
+    "count": 0
+    },
+    {
+    "word": "weak /wiːk/",
+    "meaning": "weak at the knees, weak on, weak argument, weak point/spot, weak-willed",
+    "example": "She felt weak at the knees when he smiled. I’m a bit weak on statistics. That’s a weak argument. Patience is my weak spot. He’s too weak-willed to stand up for himself.",
+    "count": 0
+    },
+    {
+    "word": "weather /ˈweðə(r)/",
+    "meaning": "good/bad/etc weather, freak weather, in all weathers, under the weather, weather forecast, weatherproof",
+    "example": "We had such good weather for the trip. A freak weather event damaged the town. He works outside in all weathers. I feel a bit under the weather today. Did you hear the weather forecast? This jacket is completely weatherproof.",
+    "count": 0
+    },
+    {
+    "word": "web /web/",
+    "meaning": "surf the Web, on the Web, website, webcam, World Wide Web, web page",
+    "example": "She spent hours surfing the Web. I found this on the Web. The website was down for maintenance. Turn on your webcam, please. He teaches about the World Wide Web. This web page isn’t loading correctly.",
+    "count": 0
+    },
+    {
+    "word": "wedding /ˈwedɪŋ/",
+    "meaning": "wedding anniversary, wedding cake, wedding ceremony, wedding dress, wedding invitation, wedding present",
+    "example": "Today is our wedding anniversary. The wedding cake was beautiful. The wedding ceremony took place in a garden. She wore a traditional wedding dress. We got a lovely wedding invitation. They bought them a wedding present.",
+    "count": 0
+    },
+    {
+    "word": "wheel /wiːl/",
+    "meaning": "take the wheel, behind the wheel, wheel of fortune",
+    "example": "She asked me to take the wheel. He was behind the wheel during the crash. Winning the lottery felt like spinning the wheel of fortune.",
+    "count": 0
+    },
+    {
+    "word": "wind /wɪnd/",
+    "meaning": "high/strong wind, light wind, against the wind, in the wind, out of the wind, wind blows, gust of wind, the winds of change",
+    "example": "High wind caused delays at the airport. A light wind cooled the afternoon. We cycled against the wind. Leaves floated in the wind. Sit out of the wind to stay warm. The wind blows hard in winter. A gust of wind slammed the door. The winds of change are coming.",
+    "count": 0
+    },
+    {
+    "word": "window /ˈwɪndəʊ/",
+    "meaning": "window-shopping, window display, window dresser, out the window, a window on/onto/into",
+    "example": "We went window-shopping downtown. The window display featured summer clothes. She works as a window dresser. His good mood went out the window. The novel offers a window into ancient life.",
+    "count": 0
+    },
+    {
+    "word": "word /wɜːd/",
+    "meaning": "put in a (good) word for, have a word with, spread the word, from the word go, in other words",
+    "example": "Can you put in a good word for me? I need to have a word with you. We’re spreading the word about the event. I knew from the word go it was trouble. In other words, it’s time to leave.",
+    "count": 0
+    },
+    {
+    "word": "work /wɜːk/",
+    "meaning": "work on/in/with/as/at/for, work like magic/a charm, work both ways, work a treat, work wonders, work your way up/to/through",
+    "example": "She works in finance. That remedy worked like a charm. Respect works both ways. The new design works a treat. This medicine works wonders. He worked his way up from clerk to manager.",
+    "count": 0
+    },
+    {
+    "word": "worse /wɜːs/",
+    "meaning": "get worse, make matters/things worse, worse for wear, for the worse, if (the) worst comes to (the) worst",
+    "example": "My headache is getting worse. He made matters worse by shouting. The sofa looks worse for wear. His health has changed for the worse. If the worst comes to the worst, we’ll call for help.",
+    "count": 0
+    },
+    {
+    "word": "worst /wɜːst/",
+    "meaning": "do your worst, fear the worst, be your own worst enemy, if the worst comes to the worst, at worst",
+    "example": "Go ahead—do your worst! I feared the worst when he didn’t call. She’s her own worst enemy. If the worst comes to the worst, we’ll cancel. At worst, we’ll have to wait another day.",
+    "count": 0
+    },
+    {
+    "word": "write /raɪt/",
+    "meaning": "write for a magazine/etc, have sth be written all over your face, write about, write of, write on, write sb/sth off, writer’s block",
+    "example": "He writes for a travel magazine. Guilt was written all over her face. I’m writing about AI ethics. She wrote of her childhood. He’s writing on climate change. They wrote the car off as a loss. She’s struggling with writer’s block.",
+    "count": 0
+    },
+    {
+    "word": "year /jɪə(r)/",
+    "meaning": "years of age, year on year, for years, year after year, never in a million years, year (noun)",
+    "example": "She’s 10 years of age. Profits increased year on year. We’ve lived here for years. He wins that race year after year. Never in a million years did I expect this. It was a year full of challenges.",
+    "count": 0
+    },       
+    {
+    "word": "tool /tuːl/",
+    "meaning": "a tool for (doing), a tool of (vũ khí, công cụ), toolbar (thanh công cụ), tool kit (bộ dụng cụ), power tool (dụng cụ điện)",
+    "example": "This wrench is a tool for fixing bikes. Language is a powerful tool of communication. Click the icon in the toolbar to proceed. He opened the tool kit to find a screwdriver. Power tools can be dangerous if misused.",
+    "count": 0
+    },
+    {
+    "word": "top /tɒp/",
+    "meaning": "come out on top, get on top of sth, be on top of, on top (of), off the top of your head, from the top, at the top (of), top of the world, top priority, top secret",
+    "example": "She came out on top in the final round. I need to get on top of these emails. He’s really on top of his job. There was a vase on top of the table. Off the top of my head, I’d say ten. Start from the top and work your way down. They live at the top of the hill. After the win, he felt on top of the world. Health is our top priority. This information is top secret.",
+    "count": 0
+    },
+    {
+    "word": "tough /tʌf/",
+    "meaning": "get tough with, tough on, tough luck, tough love, tough guy",
+    "example": "The manager decided to get tough with underperformers. The law is tough on repeat offenders. It’s tough luck we missed the train. His parents used tough love to guide him. He acts like a tough guy but is kind inside.",
+    "count": 0
+    },
+    {
+    "word": "town /taʊn/",
+    "meaning": "town planning, the town of, in town, the outskirts/edge of town, town centre",
+    "example": "She studied town planning at university. The town of Hoi An is famous for its lanterns. Are you in town this weekend? They live on the outskirts of town. Let’s meet in the town centre.",
+    "count": 0
+    },
+    {
+    "word": "track /træk/",
+    "meaning": "keep track of, lose track of, on track, track sb/sth, off the beaten track",
+    "example": "I keep track of my expenses using an app. I lost track of time while reading. We’re on track to meet the deadline. The police are tracking the suspect. We camped somewhere off the beaten track.",
+    "count": 0
+    },
+    {
+    "word": "treat /triːt/",
+    "meaning": "treat cruelly/badly/fairly/unjustly, treat sb for (bệnh), treat sb to (chiêu đãi), treat sb with, treat sb like/as, treat a disease/illness/injury/patient",
+    "example": "They treated him unfairly. The doctor treated her for the flu. I’ll treat you to lunch today. Treat animals with respect. He treated her like a child. This hospital treats cancer patients.",
+    "count": 0
+    },
+    {
+    "word": "turn /tɜːn/",
+    "meaning": "turn to sb/sth, turn a gun/etc on sb, turn to sb for help/advice, turn cold/nasty/etc, turn 40/etc",
+    "example": "She turned to her best friend for advice. He turned a gun on himself. I turned to my mentor for help. The weather turned cold overnight. He turned 40 last week.",
+    "count": 0
+    },
+    {
+    "word": "understanding /ˌʌndəˈstændɪŋ/",
+    "meaning": "come to/reach an understanding, have an understanding with, an understanding of",
+    "example": "We came to an understanding after the meeting. I have an understanding with my boss about working hours. He has a deep understanding of physics.",
+    "count": 0
+    },
+    {
+    "word": "use /juːz/",
+    "meaning": "use sth for doing, use sth to do, use sth properly, have many uses, in use, of (no) use, it's no/little/some use doing, what's the use of doing",
+    "example": "We use knives for cutting vegetables. I used my phone to take the photo. Make sure you use this properly. This tool has many uses. Is the printer still in use? That method is of no use here. It’s no use crying over spilt milk. What’s the use of worrying now?",
+    "count": 0
+    },
+    {
+    "word": "view /vjuː/",
+    "meaning": "take the view that, have a dim/poor view of, come into view, in view of, view on/about, take a view, in sb’s view, view from sth, viewpoint",
+    "example": "I take the view that honesty is best. I have a poor view of that policy. The mountains came into view. In view of the situation, we canceled the event. What’s your view on this issue? I’d like to take a longer view. In her view, we acted rightly. The view from here is amazing. His viewpoint is always interesting.",
+    "count": 0
+    },      
+    {
+    "word": "mind /maɪnd/",
+    "meaning": "make up your mind (quyết định), cross/slip your mind (quên), bear/keep in mind (nhớ trong đầu), have a one-track mind (luôn nghĩ về một thứ), in two minds about (phân vân), on your mind (bận tâm), take your mind off (nghĩ sang chuyện khác), bring to mind (gợi nhớ), never mind (đừng bận tâm), narrow/broad/open/absent-minded (đầu óc hẹp hòi/rộng mở/lơ đãng)",
+    "example": "I haven’t made up my mind yet. That name brings to mind a funny memory. Never mind the mess — come in!",
+    "count": 0
+    },
+    {
+    "word": "misapprehension /ˌmɪsæprɪˈhenʃn/",
+    "meaning": "under the misapprehension that (hiểu sai rằng)",
+    "example": "She was under the misapprehension that I lived alone.",
+    "count": 0
+    },
+    {
+    "word": "moment /ˈməʊmənt/",
+    "meaning": "take/be a moment (mất chút thời gian), just/wait a moment (chờ một chút), at the moment (hiện tại), at this/that moment in time (ngay lúc này), in a moment (trong giây lát), the moment of truth (thời khắc quyết định), for (the) moment (tạm thời)",
+    "example": "Wait a moment while I check. At the moment, we’re not hiring. This is the moment of truth.",
+    "count": 0
+    },
+    {
+    "word": "money /ˈmʌni/",
+    "meaning": "make/earn/spend/cost/get money (kiếm/tiêu tiền), save/have money (tiết kiệm/có tiền), do sth for money (làm vì tiền), put your money where your mouth is (làm thay vì nói), get your money’s worth (xứng đáng), pay good money for (trả nhiều tiền)",
+    "example": "He makes good money selling cars. I just want to get my money’s worth. She paid good money for that dress.",
+    "count": 0
+    },
+    {
+    "word": "mother /ˈmʌðə(r)/",
+    "meaning": "mother of (mẹ của), single/working mother (mẹ đơn thân/làm việc), mother-to-be (mẹ tương lai), mother figure (người mẹ tinh thần), mother country/tongue (mẫu quốc/tiếng mẹ đẻ), in-law (mẹ chồng), Mother Nature (Mẹ Thiên nhiên)",
+    "example": "She’s a single mother with two children. Vietnamese is my mother tongue.",
+    "count": 0
+    },
+    {
+    "word": "move /muːv/",
+    "meaning": "move to (chuyển đến), get a move on (nhanh lên), follow sb's every move (theo dõi), make a move (hành động), on the move (đang di chuyển/tiến triển)",
+    "example": "We decided to move to Da Nang. Let’s get a move on or we’ll be late. This company is constantly on the move.",
+    "count": 0
+    },
+    {
+    "word": "national /ˈnæʃnəl/",
+    "meaning": "national anthem (quốc ca), national costume (trang phục truyền thống), national debt (nợ quốc gia), national holiday (ngày lễ toàn quốc)",
+    "example": "Everyone stood for the national anthem. Tet is a national holiday in Vietnam.",
+    "count": 0
+    },
+    {
+    "word": "native /ˈneɪtɪv/",
+    "meaning": "native to (bản địa), a native of (người bản địa), native speaker (người nói bản ngữ), non-native (không bản địa), native land/tongue (quê hương/tiếng mẹ đẻ), native species (loài sinh vật bản địa)",
+    "example": "The panda is native to China. He’s a native speaker of English. That bird is a native species of Vietnam.",
+    "count": 0
+    },
+    {
+    "word": "natural /ˈnætʃrəl/",
+    "meaning": "natural causes (nguyên nhân tự nhiên), natural ability (năng lực bẩm sinh), natural resource (tài nguyên thiên nhiên), natural selection (chọn lọc tự nhiên)",
+    "example": "She has a natural ability for music. The country is rich in natural resources.",
+    "count": 0
+    },
+    {
+    "word": "nature /ˈneɪtʃə(r)/",
+    "meaning": "the nature of sth (bản chất của...), in nature (về bản chất), Nature (Mẹ Thiên nhiên), human nature (bản chất con người), second nature (trở thành thói quen tự nhiên)",
+    "example": "The nature of the problem is complex. Spending time outdoors helps you reconnect with nature.",
+    "count": 0
+    },
+    {
+    "word": "near /nɪə(r)/",
+    "meaning": "near to doing sth (sắp làm gì), the near future (tương lai gần), from near and far (từ khắp nơi), near thing (việc suýt thất bại), the nearest thing to (gần giống nhất với), nearest and dearest (người thân cận)",
+    "example": "He came near to quitting. We’ll see each other in the near future. They traveled from near and far to attend.",
+    "count": 0
+    },
+    {
+    "word": "need /niːd/",
+    "meaning": "need (sb) to do (cần ai làm gì), need doing (cần được làm), meet a need (đáp ứng nhu cầu), have no need of (không cần), in need (đang cần)",
+    "example": "We need to fix the roof. The plan needs reviewing. She helped a family in need.",
+    "count": 0
+    },
+    {
+    "word": "never /ˈnevə(r)/",
+    "meaning": "you never know (ai mà biết được), never again (không bao giờ nữa), never mind (đừng bận tâm), never-ending (không có hồi kết)",
+    "example": "Never again will I trust him. This winter feels never-ending. You never know who’s watching.",
+    "count": 0
+    },
+    {
+    "word": "new /njuː/",
+    "meaning": "new to (chưa quen), brand new (mới toanh), whole new (hoàn toàn mới), good as new (như mới), new to sb (ai đó mới với cái gì), new look (diện mạo mới), new age/music/etc (phong cách hiện đại)",
+    "example": "I’m new to this job. The phone looks as good as new. He’s into new age music.",
+    "count": 0
+    },
+    {
+    "word": "nice /naɪs/",
+    "meaning": "nice to sb (tốt với ai), nice of sb to do (ai đó tốt khi làm gì), nice for sb to do (ai đó tốt khi làm gì), nice to meet/hear/see/sb (rất vui gặp/nghe/thấy ai), nice and clean/safe/warm/etc (rất sạch/safe/ấm...)",
+    "example": "It was nice of you to help. This blanket is nice and warm. Nice to meet you!",
+    "count": 0
+    },
+    {
+    "word": "notice /ˈnəʊtɪs/",
+    "meaning": "notice sb doing/do sth (để ý thấy ai làm gì), bring sth to sb’s notice (nhắc nhở ai điều gì), come to sb’s notice (ai đó chú ý), escape sb’s notice (ai đó không để ý), take notice of (chú ý đến), at short notice (gấp), until further notice (cho đến khi có thông báo tiếp theo)",
+    "example": "She didn’t notice him come in. It came to my notice that she was late. We canceled the meeting at short notice.",
+    "count": 0
+    },
+    {
+    "word": "now /naʊ/",
+    "meaning": "now is the time to do (lúc để làm gì), from now on (từ giờ trở đi), for now (hiện tại), now that (bởi vì giờ đây), just now (mới đây), any day/moment now (bất cứ lúc nào)",
+    "example": "Now is the time to act. From now on, I’ll be more careful. She’ll be here any moment now.",
+    "count": 0
+    },
+    {
+    "word": "odds /ɒdz/",
+    "meaning": "odds are (that) (rất có khả năng là), the odds of doing (khả năng xảy ra), the odds are in favor/against (khả năng ủng hộ/chống lại), against all odds (bất chấp mọi khó khăn), take a chance/chances/guess (đoán/bắt lấy cơ hội)",
+    "example": "The odds are he’ll arrive late. She succeeded against all odds.",
+    "count": 0
+    },
+    {
+    "word": "off /ɒf/",
+    "meaning": "have/take/be given the day off (nghỉ làm), off work/college/etc (nghỉ làm), off duty (hết ca trực), off the top of your head (ngay lập tức), off and on/on and off (lúc có lúc không), off balance (mất thăng bằng), off limits (cấm vào)",
+    "example": "I’m off duty now. He’s off work due to illness. This room is off limits.",
+    "count": 0
+    },
+    {
+    "word": "office /ˈɒfɪs/",
+    "meaning": "take office (nhậm chức), run for office (tranh cử), hold office (giữ chức), head office (trụ sở chính), office holder (người nắm giữ chức vụ), office job (công việc văn phòng), office hours (giờ làm việc)",
+    "example": "He took office last year. She’s running for public office.",
+    "count": 0
+    },
+    {
+    "word": "old /əʊld/",
+    "meaning": "get/grow old (trở nên già), old age (tuổi già), old folks (người già), old hand (người dày dạn), old-fashioned (cổ hủ), old money (gia đình giàu lâu đời), old flame (tình cũ), old-fashioned ideas (tư tưởng cổ hủ)",
+    "example": "He’s getting old but still strong. She’s an old hand at negotiation.",
+    "count": 0
+    },
+    {
+    "word": "on /ɒn/",
+    "meaning": "on purpose (cố tình), on your own (tự mình), on and on (dài dòng mãi), on the one/other hand (một mặt/mặt khác), on top (trên đầu), on time (đúng giờ), on demand (khi cần), on loan (cho mượn)",
+    "example": "I didn’t do it on purpose. She arrived on time. This book is on loan from the library.",
+    "count": 0
+    },
+    {
+    "word": "opt /ɒpt/",
+    "meaning": "opt for (chọn thứ gì), opt to do (chọn làm gì)",
+    "example": "She opted for the vegetarian dish. I opted to stay at home.",
+    "count": 0
+    },
+    {
+    "word": "option /ˈɒpʃn/",
+    "meaning": "have no option (but to) (không còn lựa chọn nào), consider your options (cân nhắc lựa chọn), keep/leave your options open (giữ lựa chọn), the option of doing (lựa chọn làm việc gì), the option to do (lựa chọn để làm gì)",
+    "example": "We had no option but to leave. I’m keeping my options open for now.",
+    "count": 0
+    },
+    {
+    "word": "paper /ˈpeɪpə(r)/",
+    "meaning": "piece/sheet of paper (mảnh/giấy), present/write/set a paper on (trình bày/viết đề tài), paper round (nghề phát báo), paper qualifications (bằng cấp giấy), paperwork (công việc giấy tờ)",
+    "example": "Please fill out this sheet of paper. He gave a paper on renewable energy.",
+    "count": 0
+    },      
+    {
+    "word": "end /end/",
+    "meaning": "come to an end (kết thúc), bring sth to an end (kết thúc việc gì), put an end to sth (chấm dứt), at an end (đã kết thúc), (for) hours/weeks/etc on end (liên tục hàng giờ/ngày/tuần...)",
+    "example": "The meeting finally came to an end. We must put an end to this behavior. She studied for hours on end.",
+    "count": 0
+    },
+    {
+    "word": "energy /ˈenədʒi/",
+    "meaning": "have/lack the energy to do (có/thiếu năng lượng làm gì), put/energy into (dồn năng lượng vào), source of energy (nguồn năng lượng), nuclear/alternative/renewable energy (năng lượng hạt nhân/thay thế/tái tạo)",
+    "example": "I didn’t have the energy to cook. He puts a lot of energy into his work. Solar power is a renewable energy source.",
+    "count": 0
+    },
+    {
+    "word": "equal /ˈiːkwəl/",
+    "meaning": "call for/equal/same quality/value (có chất lượng/tương đương), equal in size/etc (bằng kích thước...), roughly equal to (tương đương với), of equal size/quality/value (có cùng kích thước/chất lượng)",
+    "example": "Both tasks are equal in difficulty. His salary is roughly equal to mine. These shoes are of equal size.",
+    "count": 0
+    },
+    {
+    "word": "erect /ɪˈrekt/",
+    "meaning": "erect (a statue/monument/etc) (dựng tượng), erect posture (tư thế thẳng)",
+    "example": "They erected a statue in her honor. He stood with an erect posture during the ceremony.",
+    "count": 0
+    },
+    {
+    "word": "ever /ˈevə(r)/",
+    "meaning": "hardly ever (hầu như không bao giờ), if ever (nếu có thì cũng hiếm), first/only/last time ever (lần đầu/duy nhất/cuối cùng), bigger/better/etc than ever (lớn hơn/tốt hơn bao giờ hết), as ever (như thường lệ)",
+    "example": "I hardly ever go to the gym. It was the first time ever I met him. She's as friendly as ever.",
+    "count": 0
+    },
+    {
+    "word": "example /ɪɡˈzɑːmpl/",
+    "meaning": "an example of (một ví dụ về), follow an example (làm gương), set an example (làm gương), classic/prime example (ví dụ điển hình/điển hình nhất)",
+    "example": "He set a good example for his peers. This is a classic example of poor planning.",
+    "count": 0
+    },
+    {
+    "word": "fall /fɔːl/",
+    "meaning": "fall ill (ngã bệnh), fall in love (yêu), fall into a category (thuộc loại), fall short (thiếu hụt), fall asleep (ngủ gật), fall to pieces (sụp đổ)",
+    "example": "She fell in love while traveling. He fell asleep during the movie. The plan fell to pieces at the last moment.",
+    "count": 0
+    },
+    {
+    "word": "family /ˈfæməli/",
+    "meaning": "start a family (bắt đầu một gia đình), nuclear/extended family (gia đình hạt nhân/mở rộng), close/near/distant relative (họ hàng gần/xa), family friend (bạn của gia đình), family name (họ), family tree (cây gia phả)",
+    "example": "They plan to start a family next year. She drew her family tree. He’s a close family friend.",
+    "count": 0
+    },
+    {
+    "word": "fat /fæt/",
+    "meaning": "get/grow fat (trở nên giàu có/mập), fat chance (khó có thể xảy ra), a fat lot of good (không hề hữu ích)",
+    "example": "Fat chance he’ll agree to it! That expensive car did a fat lot of good stuck in traffic.",
+    "count": 0
+    },
+    {
+    "word": "feature /ˈfiːtʃə(r)/",
+    "meaning": "feature in sth (nổi bật trong), a feature of (đặc điểm của), distinguishing feature (đặc điểm nổi bật), safety feature (tính năng an toàn), feature writer (tác giả bài nổi bật)",
+    "example": "The curved roof is a feature of this design. She works as a feature writer for the magazine.",
+    "count": 0
+    },
+    {
+    "word": "feel /fiːl/",
+    "meaning": "feel like doing (cảm thấy muốn làm), feel as if/though (cảm giác như), feel strongly about (cảm thấy mạnh mẽ về), feel the effects/benefits (cảm nhận ảnh hưởng/lợi ích), feel guilty/nervous/etc (cảm thấy tội lỗi...), feel at home (cảm thấy tự nhiên)",
+    "example": "I feel like taking a nap. I feel as if I’ve forgotten something. She felt the benefits of the new workout.",
+    "count": 0
+    },
+    {
+    "word": "find /faɪnd/",
+    "meaning": "find yourself doing (tự dưng làm gì), find sb doing sth (bắt gặp ai đó), find it difficult to do (gặp khó khăn khi làm), find your way (tìm đường/giải pháp)",
+    "example": "I found myself staring at the stars. She found him sleeping on the sofa. I can’t find my way in this city.",
+    "count": 0
+    },
+    {
+    "word": "fine /faɪn/",
+    "meaning": "cut it fine (xoay sở làm vừa kịp), fine sb for sth (phạt vì...), a heavy/small fine (mức phạt nặng/nhẹ)",
+    "example": "He was fined for speeding. They cut it fine but still made the train.",
+    "count": 0
+    },
+    {
+    "word": "floor /flɔː(r)/",
+    "meaning": "take the floor (lên phát biểu), floor show (buổi biểu diễn trên sàn), ground/first/etc floor (tầng trệt/thứ nhất...), floor plan (sơ đồ tầng)",
+    "example": "He took the floor to address the issue. The apartment is on the second floor.",
+    "count": 0
+    },
+    {
+    "word": "fly /flaɪ/",
+    "meaning": "fly a flag/kite (treo cờ/thả diều), fly at sb (tấn công ai), fly open (mở toang), fly by (trôi qua nhanh chóng)",
+    "example": "The kite flew high in the sky. Time flew by during the holidays.",
+    "count": 0
+    },
+    {
+    "word": "focus /ˈfəʊkəs/",
+    "meaning": "focus on (tập trung vào), the focus of (tiêu điểm của...), in focus/out of focus (rõ/mờ), focus group (nhóm thảo luận)",
+    "example": "Let’s focus on the task at hand. The main focus of the meeting was safety.",
+    "count": 0
+    },
+    {
+    "word": "fold /fəʊld/",
+    "meaning": "fold sth in half/two (gấp đôi), fold sth neatly/carefully (gấp gọn/gấp cẩn thận), fold flat (gấp phẳng)",
+    "example": "Fold the paper in half. Please fold your clothes neatly.",
+    "count": 0
+    },
+    {
+    "word": "follow /ˈfɒləʊ/",
+    "meaning": "follow sb's advice (nghe lời ai), follow sb's argument (hiểu luận điểm), follow sb's lead (theo sau), follow sb's example (noi gương), as follows (như sau), follow suit (làm theo)",
+    "example": "He followed her advice and succeeded. The team followed suit after the leader’s move.",
+    "count": 0
+    },
+    {
+    "word": "form /fɔːm/",
+    "meaning": "form an impression of (hình thành ấn tượng), take/assume the form of (có hình dạng...), in the form of (dưới dạng...), application form (mẫu đơn), good/bad form (cách hành xử tốt/xấu)",
+    "example": "I formed a good impression of her. Please complete this application form.",
+    "count": 0
+    },
+    {
+    "word": "foundation /faʊnˈdeɪʃn/",
+    "meaning": "lay the foundations (đặt nền móng), foundation course (khóa học cơ sở), foundation stone (viên đá nền tảng)",
+    "example": "They laid the foundations for future success. I’m taking a foundation course in art.",
+    "count": 0
+    },
+    {
+    "word": "free /friː/",
+    "meaning": "set sb free (thả ai đó tự do), let sb go free (thả ai), walk free (tự do đi lại), free sb from sth (giải thoát), free to do (tự do làm gì), free and easy (thoải mái), feel free (cứ tự nhiên)",
+    "example": "They were finally set free. Feel free to contact us anytime.",
+    "count": 0
+    },
+    {
+    "word": "fresh /freʃ/",
+    "meaning": "fresh air (không khí trong lành), fresh-faced (tươi tắn), fresh start (khởi đầu mới), fresh from (vừa mới từ), fresh out of (vừa hết), fresh water (nước ngọt)",
+    "example": "Let’s go outside for some fresh air. She’s fresh from university.",
+    "count": 0
+    },
+    {
+    "word": "friend /frend/",
+    "meaning": "be/friend sb (kết bạn), close/good/great friend (bạn thân), mutual friend (bạn chung), circle of friends (vòng bạn bè), friends with sb (là bạn với ai)",
+    "example": "He’s a close friend of mine. We met through a mutual friend.",
+    "count": 0
+    },
+    {
+    "word": "generation /ˌdʒenəˈreɪʃn/",
+    "meaning": "the older/younger generation (thế hệ già/trẻ), generation gap (khoảng cách thế hệ), generation X (thế hệ X), future generations (những thế hệ tương lai)",
+    "example": "There’s a clear generation gap in values. We must protect the environment for future generations.",
+    "count": 0
+    },      
     {
     "word": "consequence /ˈkɒnsɪkwəns/",
     "meaning": "accept/face the consequences (chấp nhận/hứng chịu hậu quả), serious/disastrous/negative consequences (hậu quả nghiêm trọng), direct consequence of (hậu quả trực tiếp), in consequence of (vì lý do), of no/little consequence (không/không quá quan trọng)",
@@ -17434,6 +18429,378 @@
   ],    
   "word formation": [
     {
+    "word": "relate",
+    "meaning": "relation, /rɪˈleɪʃn/: mối tương quan. relationship, /rɪˈleɪʃnʃɪp/: mối quan hệ. (un)related, /(ʌn)ˈreɪtɪd/: (không) có liên quan. relative(ly), /ˈrelətɪv(li)/: (một cách) tương đối.",
+    "example": "They have a close relationship. Those events are unrelated. The change is relatively minor.",
+    "count": 0
+    },
+    {
+    "word": "relax",
+    "meaning": "relaxation, /ˌriːlækˈseɪʃn/: sự thư giãn. relaxing, /rɪˈlæksɪŋ/: có tính thư giãn.",
+    "example": "Take time for relaxation. The music is very relaxing.",
+    "count": 0
+    },
+    {
+    "word": "repair",
+    "meaning": "repairman/men, /rɪˈpeəmən/: thợ sửa máy móc. repairer, /rɪˈpeərə/: người sửa chữa. reparation, /ˌrepəˈreɪʃn/: sự sửa chữa. repair, /rɪˈpeə/: việc sửa chữa. irreparable, /ɪˈrepərəbl/: không thể sửa chữa. irreparably, /ɪˈrepərəbli/: một cách không thể sửa.",
+    "example": "The repairman fixed the leak. She is a skilled repairer. The damages required reparation. This repair was costly. The loss is irreparable. The damage was irreparably done.",
+    "count": 0
+    },
+    {
+    "word": "reside",
+    "meaning": "residence, /ˈrezɪdns/: nhà ở. resident, /ˈrezɪdənt/: cư dân. residing, /rɪˈzaɪdɪŋ/: cư trú. residential(ly), /ˌrezɪˈdenʃl(i)/: thuộc về, ở tại.",
+    "example": "His residence is near the park. The residents complained. He is currently residing in Tokyo. It's a residential area.",
+    "count": 0
+    },
+    {
+    "word": "resolve",
+    "meaning": "(ir)resolution, /(ˌɪr)ˌrezəˈluːʃn/: (sự) (thiếu) kiên quyết. (un)resolved, /(ˌʌn)rɪˈzɒlvd/: (chưa) được giải quyết. (ir)resolute(ly), /(ˌɪr)ˈrezəluːt(li)/: (một cách) (thiếu) kiên quyết.",
+    "example": "The resolution was unanimous. The conflict remains unresolved. She spoke resolutely.",
+    "count": 0
+    },
+    {
+    "word": "respond",
+    "meaning": "response, /rɪˈspɒns/: phản hồi. respondent, /rɪˈspɒndənt/: người trả lời. (un)responsive(ly), /(ˌʌn)rɪˈspɒnsɪv(li)/: (thiếu) nhiệt tình, phản hồi.",
+    "example": "His response was quick. The respondent answered all questions. The system is unresponsive. She responded responsively.",
+    "count": 0
+    },
+    {
+    "word": "rest",
+    "meaning": "restlessness, /ˈrestləsnəs/: sự bồn chồn. unrest, /ʌnˈrest/: tình trạng không yên. restive, /ˈrestɪv/: bồn chồn, ngang bướng. restful(ly), /ˈrestfl(i)/: (một cách) yên tĩnh. restless(ly), /ˈrestləsli/: (một cách) không yên.",
+    "example": "He felt restlessness before the exam. Political unrest spread. The child was restive. The lake was restful. She slept restlessly.",
+    "count": 0
+    },
+    {
+    "word": "result",
+    "meaning": "resultant, /rɪˈzʌltənt/: như kết quả. resulting, /rɪˈzʌltɪŋ/: như kết quả của cái gì.",
+    "example": "The resultant damage was severe. The traffic jam was resulting from the accident.",
+    "count": 0
+    },
+    {
+    "word": "revolt",
+    "meaning": "revolutionise, /ˌrevəˈluːʃənaɪz/: cách mạng hóa. revolution, /ˌrevəˈluːʃn/: cuộc cách mạng. revolutionary, /ˌrevəˈluːʃənəri/: có tính cách mạng. revolting, /rɪˈvəʊltɪŋ/: gây phản cảm.",
+    "example": "Technology revolutionised our lives. The revolution changed history. He’s a revolutionary leader. The dish looked revolting.",
+    "count": 0
+    },
+    {
+    "word": "rhythm",
+    "meaning": "rhythmic(al)(ly), /ˈrɪðmɪk(ə)li/: nhịp nhàng, một cách nhịp nhàng.",
+    "example": "The song has a rhythmic beat. She danced rhythmically.",
+    "count": 0
+    },
+    {
+    "word": "rigid",
+    "meaning": "rigidity, /rɪˈdʒɪdəti/: sự cứng, sự khắt khe. rigidly, /ˈrɪdʒɪdli/: một cách cứng nhắc.",
+    "example": "The rigidity of the structure is impressive. He rigidly followed the rules.",
+    "count": 0
+    },
+    {
+    "word": "risk",
+    "meaning": "risky, /ˈrɪski/: mạo hiểm.",
+    "example": "That's a risky investment.",
+    "count": 0
+    },
+    {
+    "word": "surround",
+    "meaning": "surroundings, /səˈraʊndɪŋz/: vùng xung quanh. roundabout, /ˈraʊndəbaʊt/: vòng tròn. surrounding, /səˈraʊndɪŋ/: bao quanh. roundly, /ˈraʊndli/: thẳng thắn, tròn trịa.",
+    "example": "She was unfamiliar with her surroundings. Take the next roundabout. The mountain was surrounded by fog. He was roundly criticized.",
+    "count": 0
+    },
+    {
+    "word": "sane",
+    "meaning": "(in)sanity, /(ɪn)ˈsænəti/: (mất) trạng thái tỉnh táo. insane(ly), /ɪnˈseɪn(li)/: (một cách) điên rồ.",
+    "example": "He questioned her sanity. The idea is insanely expensive.",
+    "count": 0
+    },
+    {
+    "word": "satisfy",
+    "meaning": "(un)satisfactory, /(ʌn)ˌsætɪsˈfæktəri/: (không) hài lòng. (dis)satisfied, /(ˌdɪs)ˈsætɪsfaɪd/: (không) hài lòng. (un)satisfying(ly), /(ʌn)ˈsætɪsfaɪɪŋli/: (một cách) (không) thỏa mãn. satisfaction, /ˌsætɪsˈfækʃn/: sự hài lòng.",
+    "example": "The result was unsatisfactory. She felt dissatisfied with the service. He smiled satisfyingly. Her satisfaction was evident.",
+    "count": 0
+    },
+    {
+    "word": "say",
+    "meaning": "gainsay, /ˌɡeɪnˈseɪ/: chối cãi. saying, /ˈseɪɪŋ/: ngạn ngữ. unsaid, /ʌnˈsed/: không nói ra.",
+    "example": "No one dared to gainsay him. That’s a wise saying. Some things are better left unsaid.",
+    "count": 0
+    },
+    {
+    "word": "seem",
+    "meaning": "seeming(ly), /ˈsiːmɪŋ(li)/: (có vẻ) như, có vẻ.",
+    "example": "She was seemingly unaware of the danger.",
+    "count": 0
+    },
+    {
+    "word": "select",
+    "meaning": "deselect, /ˌdiːsɪˈlekt/: bỏ chọn. selection, /sɪˈlekʃn/: sự lựa chọn. selective(ly), /sɪˈlektɪv(li)/: (một cách) chọn lọc.",
+    "example": "You can deselect the item. The selection process was rigorous. She listened selectively.",
+    "count": 0
+    },
+    {
+    "word": "self",
+    "meaning": "(un)selfishness, /ʌnˈselfɪʃnəs/: (sự) (không) ích kỷ. (un)selfishly, /ʌnˈselfɪʃli/: (một cách) (không) ích kỷ. selfless(ly), /ˈselfləsli/: (một cách) vị tha.",
+    "example": "Her unselfishness was inspiring. He acted unselfishly. They worked selflessly.",
+    "count": 0
+    },
+    {
+    "word": "sense (2)",
+    "meaning": "(de)sensitise, /ˈdesəntaɪz/: làm (mất) nhạy cảm. (in)sensitivity, /ˌɪnsensəˈtɪvəti/: (thiếu) nhạy cảm. hypersensitivity, /ˌhaɪpəsensəˈtɪvəti/: sự quá nhạy cảm. sensibility, /ˌsensəˈbɪləti/: trí giác, sự nhạy cảm. sense(less)(ness), /ˈsensləs(nəs)/: (sự) bất tỉnh, vô nghĩa. sensuality, /ˌsenʃuˈæləti/: ham muốn nhục dục. sensuousness, /ˈsenʃuəsnəs/: ham muốn nhục dục. sensor, /ˈsensər/: cảm biến. hypersensitive, /ˌhaɪpəˈsensətɪv/: quá nhạy cảm. oversensitive, /ˌəʊvəsensətɪv/: quá nhạy cảm. nonsense, /ˈnɒnsens/: vô nghĩa. sensory, /ˈsensəri/: (thuộc) cảm giác, xúc giác.",
+    "example": "The drug desensitised his pain. Her insensitivity upset him. He suffers from hypersensitivity. Her sensibility makes her a great artist. The joke was senseless. His sensuality was obvious. The poem had deep sensuousness. The sensor detected movement. She’s hypersensitive to criticism. Don’t be oversensitive. That’s complete nonsense. The painting evoked a strong sensory response.",
+    "count": 0
+    },
+    {
+    "word": "sense",
+    "meaning": "sensible, /ˈsensəbl/: nhạy bén, khôn ngoan. nonsensical(ly), /ˌnɒnˈsensɪkl(i)/: vô lý. sensibly, /ˈsensəbli/: một cách hợp lý. (in)sensitive(ly), /(ɪn)ˈsensətɪv(li)/: (một cách) (không) nhạy cảm. (in)sensational(ly), /(ɪn)senˈseɪʃənl(i)/: (một cách) (không) gây xúc động. sensual(ly), /ˈsenʃuəl(i)/: (một cách) nhục dục. sensuous(ly), /ˈsenʃuəsli/: (một cách) đầy kích thích giác quan.",
+    "example": "She made a sensible decision. That idea is nonsensical. He acted sensibly. He responded insensitively. The news was sensationally exaggerated. The perfume was described sensually. The music played sensuously.",
+    "count": 0
+    },
+    {
+    "word": "separate",
+    "meaning": "separation, /ˌsepəˈreɪʃn/: sự ngăn cách, chia cắt. (in)separable, /(ɪn)ˈseprəbl/: (không) thể tách rời. separated, /ˈsepəreɪtɪd/: ly thân. separately, /ˈseprətli/: một cách tách biệt.",
+    "example": "The separation lasted months. The twins are inseparable. They are now separated. The items were packed separately.",
+    "count": 0
+    },
+    {
+    "word": "shelf",
+    "meaning": "shelve, /ʃelv/: xếp vào ngăn. shelves, /ʃelvz/: giá sách. shelving, /ˈʃelvɪŋ/: vật liệu làm kệ.",
+    "example": "Please shelve the books alphabetically. The shelves were full. We need new shelving for the pantry.",
+    "count": 0
+    },
+    {
+    "word": "signify",
+    "meaning": "(in)significance, /(ɪn)ˌsɪɡnɪˈfɪkəns/: (sự) (không) quan trọng. (in)significantly, /(ɪn)sɪɡˈnɪfɪkəntli/: (một cách) (không) đáng kể.",
+    "example": "The discovery has great significance. The price increased significantly. His role is insignificant in the project. That error didn’t significantly affect results.",
+    "count": 0
+    },
+    {
+    "word": "slip",
+    "meaning": "slippage, /ˈslɪpɪdʒ/: sự trượt giá. slippery, /ˈslɪpəri/: trơn trượt.",
+    "example": "There was a slippage in profits. The road is slippery when wet.",
+    "count": 0
+    },
+    {
+    "word": "soft",
+    "meaning": "soften, /ˈsɒfn/: làm dịu. softener, /ˈsɒfənər/: chất làm mềm. softly, /ˈsɒftli/: một cách dịu dàng.",
+    "example": "Let the butter soften. Add fabric softener. She spoke softly.",
+    "count": 0
+    },
+    {
+    "word": "solid",
+    "meaning": "solidify, /səˈlɪdɪfaɪ/: làm cứng. solidity, /səˈlɪdəti/: sự vững chắc.",
+    "example": "Let the mixture solidify overnight. The wall has great solidity.",
+    "count": 0
+    },
+    {
+    "word": "space",
+    "meaning": "spacing, /ˈspeɪsɪŋ/: sự giãn cách. spaciousness, /ˈspeɪʃəsnəs/: tính rộng rãi. spacious(ly), /ˈspeɪʃəsli/: (một cách) rộng rãi.",
+    "example": "Check the line spacing. I admire the spaciousness of the house. The room is spaciously designed.",
+    "count": 0
+    },
+    {
+    "word": "speak",
+    "meaning": "spoke, /spəʊk/: nói (quá khứ). speech, /spiːtʃ/: bài diễn văn. speaker, /ˈspiːkər/: người nói. spokesmen, /ˈspəʊksmən/: phát ngôn viên (nam). spokeswoman, /ˈspəʊkswʊmən/: phát ngôn viên (nữ). spokeswomen, /ˈspəʊkswɪmɪn/: phát ngôn viên (nữ, số nhiều). spokesperson, /ˈspəʊkspɜːsn/: người phát ngôn.",
+    "example": "He spoke at the event. Her speech was inspiring. The speaker took questions. The company’s spokesman issued a statement. The spokeswoman denied the claims. Two spokeswomen were present. The spokesperson addressed the press.",
+    "count": 0
+    },
+    {
+    "word": "speak (2)",
+    "meaning": "spokespeople, /ˈspəʊksˌpiːpl/: những phát ngôn viên. outspokenness, /ˌaʊtˈspəʊkənnəs/: thẳng thắn. (un)spoken, /ˌʌnˈspəʊkən/: (không) được nói ra. speechless, /ˈspiːtʃləs/: cạn lời. unspeakable, /ʌnˈspiːkəbl/: không thể diễn tả. unspeakably, /ʌnˈspiːkəbli/: cực kỳ. outspoken(ly), /ˌaʊtˈspəʊkən(li)/: (một cách) thẳng thắn.",
+    "example": "The spokespeople met the press. His outspokenness was admirable. The pain was unspoken. She was speechless with joy. That crime was unspeakable. He was unspeakably rude. She criticized them outspokenly.",
+    "count": 0
+    },
+    {
+    "word": "speed",
+    "meaning": "sped, /sped/: sự chạy tốc độ. speeding, /ˈspiːdɪŋ/: lái xe quá tốc độ. speedy, /ˈspiːdi/: nhanh chóng. speedily, /ˈspiːdɪli/: một cách nhanh chóng.",
+    "example": "He sped down the highway. She was fined for speeding. We need a speedy solution. The issue was resolved speedily.",
+    "count": 0
+    },
+    {
+    "word": "sport",
+    "meaning": "sportsman, /ˈspɔːtsmən/: vận động viên (nam). sportswoman, /ˈspɔːtsˌwʊmən/: vận động viên (nữ). sportsperson, /ˈspɔːtspɜːsn/: vận động viên. sportsmanship, /ˈspɔːtsmənʃɪp/: tinh thần thể thao. sports, /spɔːts/: các môn thể thao. sporting, /ˈspɔːtɪŋ/: (có) tính thể thao. sporty, /ˈspɔːti/: thích thể thao.",
+    "example": "He is a talented sportsman. She’s a famous sportswoman. That sportsperson won gold. They showed great sportsmanship. I enjoy watching sports. He took a sporting chance. She wears sporty outfits.",
+    "count": 0
+    },
+    {
+    "word": "stable",
+    "meaning": "(de)stabilise, /ˈsteɪbəlaɪz/: làm (mất) ổn định. (in)stability, /(ɪn)stəˈbɪləti/: (không) ổn định. stabiliser, /ˈsteɪbəlaɪzə(r)/: thiết bị ổn định. (de)stabilising, /ˈsteɪbəlaɪzɪŋ/: có tính (mất) ổn định.",
+    "example": "The government aims to stabilise prices. There’s political instability in the region. The stabiliser kept the ship balanced. Those events were destabilising.",
+    "count": 0
+    },
+    {
+    "word": "stand",
+    "meaning": "withstand, /wɪðˈstænd/: chịu đựng. withstood, /wɪðˈstʊd/: đã chịu đựng. standing, /ˈstændɪŋ/: tư thế đứng, địa vị. upstanding, /ʌpˈstændɪŋ/: thẳng thắn, đáng kính. outstanding, /aʊtˈstændɪŋ/: nổi bật. notwithstanding, /ˌnɒtwɪðˈstændɪŋ/: tuy nhiên.",
+    "example": "These materials can withstand heat. She withstood all criticism. He has long-standing respect. He is an upstanding citizen. Her work is outstanding. Notwithstanding the delay, the work continued.",
+    "count": 0
+    },
+    {
+    "word": "state",
+    "meaning": "restate, /ˌriːˈsteɪt/: nhấn mạnh lại. overstate, /ˌəʊvəˈsteɪt/: phóng đại. understate, /ˌʌndəˈsteɪt/: nói giảm. statement, /ˈsteɪtmənt/: bản tuyên bố. understatement, /ˌʌndəˈsteɪtmənt/: nói nhẹ. overstated, /ˌəʊvəˈsteɪtɪd/: bị phóng đại. understated, /ˌʌndəˈsteɪtɪd/: bị giảm bớt.",
+    "example": "She restated her position clearly. He overstated the facts. She tends to understate problems. The statement was official. Saying it's cold is an understatement. The importance was overstated. The issue was understated in the report.",
+    "count": 0
+    },            
+    {
+    "word": "steady",
+    "meaning": "unsteady, /ʌnˈstedi/: không ổn định, bất ổn. (un)steadily, /(ʌn)ˈstedəli/: một cách (không) ổn định, đều đặn.",
+    "example": "The ladder is unsteady. He walked unsteadily after the fall.",
+    "count": 0
+    },
+    {
+    "word": "stimulate",
+    "meaning": "stimulation, /ˌstɪmjʊˈleɪʃn/: sự kích thích. stimulant, /ˈstɪmjələnt/: chất kích thích. stimulus, /ˈstɪmjələs/: sự kích thích. stimuli, /ˈstɪmjʊlaɪ/: các tác nhân kích thích. stimulating, /ˈstɪmjəleɪtɪŋ/: kích thích, thú vị. stimulated, /ˈstɪmjəleɪtɪd/: bị kích thích.",
+    "example": "Mental stimulation helps keep your brain sharp. Coffee is a common stimulant. Music acts as a stimulus. These lights are visual stimuli. The lecture was very stimulating. Her curiosity was stimulated by the mystery.",
+    "count": 0
+    },
+    {
+    "word": "strong",
+    "meaning": "strengthen, /ˈstreŋθn/: gia cố, làm mạnh lên. strength, /streŋθ/: sức mạnh. stronghold, /ˈstrɒŋhəʊld/: thành trì. strongly, /ˈstrɒŋli/: một cách mạnh mẽ.",
+    "example": "They aim to strengthen the economy. She showed great strength. The castle was a stronghold of the rebels. I strongly disagree with that view.",
+    "count": 0
+    },
+    {
+    "word": "structure",
+    "meaning": "infrastructure, /ˈɪnfrəstrʌktʃə/: cơ sở hạ tầng. structural(ly), /ˈstrʌktʃər(ə)li/: (về) cấu trúc. (un)structured, /(ˌʌn)ˈstrʌktʃərd/: (không) có bố cục, cấu trúc rõ.",
+    "example": "The country needs better infrastructure. The problem is structural. The meeting was unstructured and confusing.",
+    "count": 0
+    },
+    {
+    "word": "substance",
+    "meaning": "substantiation, /səbˌstænʃiˈeɪʃn/: sự chứng minh. substantiate, /səbˈstænʃieɪt/: chứng minh. (in)substantial(ly), /(ˌɪn)səbˈstænʃl(i)/: (một cách) (không) đáng kể.",
+    "example": "The theory lacked substantiation. Can you substantiate your claim? The cost is insubstantial.",
+    "count": 0
+    },
+    {
+    "word": "suggest",
+    "meaning": "suggestion, /səˈdʒestʃn/: sự đề nghị. suggested, /səˈdʒestɪd/: được đề xuất. suggestive(ly), /səˈdʒestɪv(li)/: (một cách) mang tính đề nghị. suggestible, /səˈdʒestəbl/: dễ bị ảnh hưởng.",
+    "example": "She made a helpful suggestion. The solution suggested by the teacher was effective. He nodded suggestively. Children are highly suggestible.",
+    "count": 0
+    },
+    {
+    "word": "sympathy",
+    "meaning": "sympathise, /ˈsɪmpəθaɪz/: thông cảm. sympathiser, /ˈsɪmpəθaɪzər/: người ủng hộ. (un)sympathetic, /ˌʌnsɪmpəˈθetɪk/: (không) đồng cảm. (un)sympathetically, /(ʌn)sɪmpəˈθetɪkli/: một cách (không) cảm thông.",
+    "example": "I sympathise with your loss. She’s a known political sympathiser. The teacher was unsympathetic. He listened sympathetically.",
+    "count": 0
+    },
+    {
+    "word": "talk",
+    "meaning": "talker, /ˈtɔːkər/: người nói. talkie, /ˈtɔːki/: phim nói. talkback, /ˈtɔːkbæk/: ý kiến đóng góp. talkative, /ˈtɔːkətɪv/: nói nhiều.",
+    "example": "He’s a good talker. They watched an old black-and-white talkie. The show features a talkback segment. She’s very talkative.",
+    "count": 0
+    },
+    {
+    "word": "tend",
+    "meaning": "tendency, /ˈtendənsi/: xu hướng.",
+    "example": "There’s a growing tendency to work from home.",
+    "count": 0
+    },
+    {
+    "word": "terror",
+    "meaning": "terrorise, /ˈterəraɪz/: khủng bố. terrify, /ˈterəfaɪ/: làm kinh hãi. terrorist, /ˈterərɪst/: kẻ khủng bố. terrorism, /ˈterərɪzəm/: chủ nghĩa khủng bố. terror, /ˈterər/: kinh hoàng. terrible, /ˈterəbl/: kinh khủng. terrific, /təˈrɪfɪk/: xuất sắc. terrifying, /ˈterəfaɪɪŋ/: kinh hoàng. terrified, /ˈterəfaɪd/: sợ hãi. terribly, /ˈterəbli/: rất, cực kỳ.",
+    "example": "They tried to terrorise the public. The loud noise terrified the child. The terrorist was caught. The country faces terrorism threats. She felt pure terror. That movie was terrible. His performance was terrific. It was a terrifying experience. I’m terrified of spiders. He was terribly late.",
+    "count": 0
+    },
+    {
+    "word": "think",
+    "meaning": "thought, /θɔːt/: suy nghĩ, tư duy. thinker, /ˈθɪŋkər/: nhà tư tưởng. thinking, /ˈθɪŋkɪŋ/: tư duy. thoughtfulness, /ˈθɔːtfəlnəs/: sự chu đáo. thoughtlessness, /ˈθɔːtləsnəs/: sự vô tâm. (un)thinkable, /ʌnˈθɪŋkəbl/: (không) thể tưởng tượng. thoughtful(ly), /ˈθɔːtfl(i)/: (một cách) chu đáo. thoughtless(ly), /ˈθɔːtləsli/: (một cách) vô tâm.",
+    "example": "He paused in thought. She’s a deep thinker. Creative thinking is valuable. Her thoughtfulness was appreciated. His thoughtlessness hurt her. That’s unthinkable! She acted thoughtfully. He spoke thoughtlessly.",
+    "count": 0
+    },
+    {
+    "word": "threat",
+    "meaning": "threaten, /ˈθretn/: đe dọa. threatened, /ˈθretənd/: bị đe dọa. threatening(ly), /ˈθretnɪŋli/: (một cách) đe dọa.",
+    "example": "He threatened to leave. The animals are threatened by extinction. She glared at him threateningly.",
+    "count": 0
+    },
+    {
+    "word": "time",
+    "meaning": "mistime, /ˌmɪsˈtaɪm/: định thời gian không đúng lúc. timer, /ˈtaɪmər/: bộ hẹn giờ. timing, /ˈtaɪmɪŋ/: sự tính toán thời gian. overtime, /ˈəʊvətaɪm/: làm thêm giờ. timetable, /ˈtaɪmteɪbl/: thời gian biểu. timeless(ness), /ˈtaɪmləs(nəs)/: (sự) vượt thời gian. (un)timely, /ˈtaɪmli/: (không) đúng lúc. timeless(ly), /ˈtaɪmləsli/: một cách vượt thời gian.",
+    "example": "He mistimed the pass. Set the timer for 10 minutes. Her timing was perfect. I worked overtime last week. Check the class timetable. Her beauty is timeless. The rescue was timely. The book is timelessly relevant.",
+    "count": 0
+    },
+    {
+    "word": "transit",
+    "meaning": "transition, /trænˈzɪʃn/: sự chuyển đổi. transitory, /ˈtrænzətri/: tạm thời. transitional, /trænˈzɪʃənl/: mang tính chuyển tiếp. transitionally, /trænˈzɪʃnəli/: quá độ, chuyển tiếp.",
+    "example": "The country is in a political transition. These feelings are transitory. A transitional period is expected. Things changed transitionally over time.",
+    "count": 0
+    },
+    {
+    "word": "type",
+    "meaning": "typeset, /ˈtaɪpset/: sắp chữ. typecast, /ˈtaɪpkɑːst/: đóng khung. typify, /ˈtɪpɪfaɪ/: điển hình. typist, /ˈtaɪpɪst/: người đánh máy. typewriter, /ˈtaɪpraɪtər/: máy đánh chữ. typeface, /ˈtaɪpfeɪs/: kiểu chữ. typesetting, /ˈtaɪpsetɪŋ/: sự sắp chữ. typesetter, /ˈtaɪpsetər/: thợ xếp chữ. typewritten, /ˈtaɪprɪtn/: được đánh máy. typical(ly), /ˈtɪpɪkl(i)/: (một cách) điển hình.",
+    "example": "He learned to typeset pages. She was typecast as the villain. That style typifies the 80s. The typist finished quickly. I used a typewriter in school. This font uses a modern typeface. Typesetting takes skill. The typesetter adjusted the layout. The document was typewritten. She answered typically sarcastically.",
+    "count": 0
+    },
+    {
+    "word": "up",
+    "meaning": "uppermost, /ˈʌpəməʊst/: cao nhất. upright, /ˈʌpraɪt/: thẳng đứng, ngay ngắn. upward(s), /ˈʌpwəd(z)/: hướng lên trên. upwardly, /ˈʌpwədli/: hướng lên trên.",
+    "example": "That was the uppermost shelf. Stand upright for posture. Look upward. Prices moved upwardly this quarter.",
+    "count": 0
+    },
+    {
+    "word": "use",
+    "meaning": "abuse, /əˈbjuːz/: lạm dụng. misuse, /ˌmɪsˈjuːz/: sử dụng sai, lạm dụng. reuse, /ˌriːˈjuːz/: tái sử dụng. overuse, /ˌəʊvəˈjuːz/: sử dụng quá mức. (ab)user, /ə(b)ˈjuːzər/: (người) sử dụng. usefulness, /ˈjuːsfəlnəs/: tính hữu dụng. usage, /ˈjuːsɪdʒ/: cách sử dụng. uselessness, /ˈjuːsləsnəs/: sự vô dụng. (un)used, /ˌʌnˈjuːzd/: (chưa) được sử dụng. (un)usable, /ˈjuːzəbl/: (không) thể sử dụng. reusable, /ˌriːˈjuːzəbl/: có thể tái sử dụng. abused, /əˈbjuːzd/: bị lạm dụng. abusive(ly), /əˈbjuːsɪv(li)/: (một cách) lạm dụng. usefully, /ˈjuːsfəli/: một cách hữu dụng.",
+    "example": "He abused the system for personal gain. Misuse of funds led to legal action. We should reuse old containers. The overuse of antibiotics is dangerous. The app tracks each user’s time. This knife is known for its usefulness. Usage instructions are included. The tool’s uselessness made it obsolete. This coupon is unused. The material is unusable. These bags are reusable. The child was abused. He spoke abusively. She reacted usefully in the situation.",
+    "count": 0
+    },
+    {
+    "word": "value",
+    "meaning": "revalue, /ˌriːˈvæljuː/: đánh giá lại, nâng giá. overvalue, /ˌəʊvəˈvæljuː/: đánh giá quá cao. evaluate, /ɪˈvæljueɪt/: đánh giá. (re)evaluation, /ˌ(riː)ɪˌvæljuˈeɪʃn/: sự (tái) đánh giá. evaluation, /ˌɪvæljuˈeɪʃn/: sự đánh giá. overvaluation, /ˌəʊvərˌvæljuˈeɪʃn/: sự định giá quá cao. valuer, /ˈvæljuər/: người định giá. valuables, /ˈvæljəblz/: vật quý giá. (in)valuable, /ˌɪnˈvæljuəbl/: (vô) giá trị. valueless, /ˈvæljuləs/: không có tác dụng.",
+    "example": "The currency was revalued. He tends to overvalue his input. They evaluate the project yearly. A reevaluation is needed. The evaluation took two days. That’s an overvaluation of the house. The valuer arrived late. Keep your valuables in a safe. Her advice was invaluable. That item is valueless now.",
+    "count": 0
+    },
+    {
+    "word": "weigh",
+    "meaning": "weight, /weɪt/: cân nặng. weightlifter, /ˈweɪtlɪftər/: vận động viên cử tạ. weightlifting, /ˈweɪtlɪftɪŋ/: môn cử tạ. weightiness, /ˈweɪtinəs/: tính quan trọng. overweight, /ˌəʊvəˈweɪt/: béo phì. underweight, /ˌʌndəˈweɪt/: nhẹ cân. (un)weighted, /ˈweɪtɪd/: (không) được cân. weightless(ness), /ˈweɪtləs(nəs)/: (sự) không trọng lượng. weighty, /ˈweɪti/: nặng, nghiêm trọng.",
+    "example": "He gained a lot of weight. The weightlifter won gold. Weightlifting is his passion. Her words had great weightiness. He became overweight after the holidays. She is slightly underweight. The dice are weighted. The astronaut floated in weightlessness. That’s a weighty matter.",
+    "count": 0
+    },
+    {
+    "word": "wild",
+    "meaning": "wilderness, /ˈwɪldənəs/: vùng hoang dã. wildlife, /ˈwaɪldlaɪf/: động vật hoang dã. wildness, /ˈwaɪldnəs/: tính chất hoang dã. wildly, /ˈwaɪldli/: điên dại, hoang dã.",
+    "example": "They explored the wilderness. The park protects wildlife. The wildness of the storm was shocking. He danced wildly.",
+    "count": 0
+    },
+    {
+    "word": "wise",
+    "meaning": "wisdom, /ˈwɪzdəm/: trí khôn, sự thông thái. (un)wise(ly), /ˈ(wɪz)(li)/: (một cách) (không) khôn ngoan.",
+    "example": "He is full of wisdom. She acted unwisely in that situation.",
+    "count": 0
+    },
+    {
+    "word": "reword",
+    "meaning": "reword, /ˌriːˈwɜːd/: diễn đạt lại, soạn lại. (re)wording, /ˌriːˈwɜːdɪŋ/: cách dùng từ (soạn lại từ). wordplay, /ˈwɜːdpleɪ/: chơi chữ. wordy, /ˈwɜːdi/: dài dòng. (re)worded, /ˌriːˈwɜːdɪd/: được diễn đạt (lại). wordless(ly), /ˈwɜːdləs(li)/: (một cách) không thể diễn tả bằng lời.",
+    "example": "She reworded the sentence for clarity. The legal document needs careful rewording. The comedian is known for clever wordplay. His explanation was too wordy. The statement was reworded formally. He stared wordlessly at the scene.",
+    "count": 0
+    },
+    {
+    "word": "work",
+    "meaning": "rework, /ˌriːˈwɜːk/: làm lại. overwork, /ˌəʊvəˈwɜːk/: làm việc quá sức. worker, /ˈwɜːkər/: công nhân. works, /wɜːks/: tác phẩm. workplace, /ˈwɜːkpleɪs/: nơi làm việc. working, /ˈwɜːkɪŋ/: (thuộc) công việc. (un)workable, /ʌnˈwɜːkəbl/: (không) thể thực hiện.",
+    "example": "We need to rework the design. She often overworks herself. The workers went on strike. His collected works are famous. Safety is important in the workplace. They discussed the working hours. That plan is unworkable.",
+    "count": 0
+    },
+    {
+    "word": "worth",
+    "meaning": "worthlessness, /ˈwɜːθləsnəs/: sự vô dụng. worthy, /ˈwɜːði/: xứng đáng. worthless, /ˈwɜːθləs/: vô giá trị. worthwhile, /ˌwɜːθˈwaɪl/: đáng giá.",
+    "example": "She felt a deep sense of worthlessness. He is a worthy opponent. That item is worthless now. Helping others is always worthwhile.",
+    "count": 0
+    },
+    {
+    "word": "write",
+    "meaning": "rewrite, /ˌriːˈraɪt/: viết lại. (re)wrote, /ˌ(riː)ˈrəʊt/: (đã) viết lại. (re)written, /ˌ(riː)ˈrɪtn/: (đã) được viết lại. writing(s), /ˈraɪtɪŋ(z)/: sự viết/bài viết. writer, /ˈraɪtər/: tác giả, nhà văn. unwritten, /ʌnˈrɪtn/: bất thành văn.",
+    "example": "He had to rewrite the essay. She rewrote the ending. The script was rewritten for clarity. His writings are inspiring. She is a well-known writer. It’s an unwritten rule.",
+    "count": 0
+    },
+    {
+    "word": "young",
+    "meaning": "youngster, /ˈjʌŋstər/: đứa con, người trẻ. youth, /juːθ/: thanh xuân, tuổi trẻ. youthful, /ˈjuːθfl/: trẻ trung.",
+    "example": "The youngster was eager to learn. She remembered her youth fondly. He has a youthful spirit.",
+    "count": 0
+    },
+    {
+    "word": "zeal",
+    "meaning": "zealot, /ˈzelət/: người cuồng tín, người quá khích. zealous(ly), /ˈzeləs(li)/: (một cách) sốt sắng, đầy nhiệt huyết.",
+    "example": "The zealot refused to compromise. She supported the cause zealously.",
+    "count": 0
+    },            
+    {
     "word": "avoid",
     "meaning": "avoidance, /əˈvɔɪdəns/: sự tránh. (un)avoidable, /əˈvɔɪdəbl/: (không thể) tránh khỏi. (un)avoidably, /ˌʌnəˈvɔɪdəbli/: (một cách không thể) tránh khỏi.",
     "example": "His avoidance of the issue was clear. The damage was unavoidable. The crash was unavoidably caused by the fog.",
@@ -17636,7 +19003,6 @@
     "meaning": "appreciation, /əˌpriːʃiˈeɪʃn/: sự cảm kích. appreciable, /əˈpriːʃəbl/: đáng kể. appreciably, /əˈpriːʃəbli/: một cách đáng kể. (un)appreciative(ly), /ʌnəˈpriːʃətɪv(li)/: (một cách không) biết ơn.",
     "example": "He showed deep appreciation. The cost is appreciable. Profits increased appreciably. She nodded appreciatively.",
     "count": 0
-    }
-                 
+    }             
   ]
 }
