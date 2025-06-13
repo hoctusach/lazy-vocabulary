@@ -26,7 +26,7 @@ export const useSpeechIntegration = (
 
   // Play current word with conflict prevention
   const playCurrentWord = useCallback(async () => {
-    if (!currentWord || speechState.isActive || isTransitioningRef.current || isPlayingRef.current) {
+    if (!currentWord || isTransitioningRef.current || isPlayingRef.current) {
       console.log('[SPEECH-INTEGRATION] Skipping play - conditions not met:', {
         hasWord: !!currentWord,
         isActive: speechState.isActive,
@@ -34,6 +34,12 @@ export const useSpeechIntegration = (
         isPlaying: isPlayingRef.current
       });
       return;
+    }
+
+    // If speech is currently active, stop it before starting the new word
+    if (speechState.isActive) {
+      unifiedSpeechController.stop();
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
 
     // Prevent duplicate plays of the same word

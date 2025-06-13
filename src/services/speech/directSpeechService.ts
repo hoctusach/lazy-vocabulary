@@ -1,5 +1,6 @@
 
 import { getVoiceByRegion } from '@/utils/speech/voiceUtils';
+import { mobileAudioManager } from '@/utils/audio/mobileAudioManager';
 
 /**
  * Enhanced direct speech service with improved completion detection and error handling
@@ -74,7 +75,7 @@ class DirectSpeechService {
   }
 
   async speak(
-    text: string, 
+    text: string,
     options: {
       voiceRegion?: 'US' | 'UK' | 'AU';
       word?: string;
@@ -91,6 +92,14 @@ class DirectSpeechService {
     // Stop any existing speech
     this.stop();
     this.wasManuallyStopped = false;
+
+    // Ensure mobile audio context is ready
+    try {
+      await mobileAudioManager.initialize();
+      await mobileAudioManager.resume();
+    } catch (e) {
+      console.warn('[DIRECT-SPEECH] Failed to init mobile audio manager:', e);
+    }
     
     return new Promise((resolve) => {
       try {

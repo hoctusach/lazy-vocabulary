@@ -4,6 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { saveVoiceRegionToStorage } from '@/utils/speech/core/speechSettings';
 import { SpeechState } from '@/services/speech/core/SpeechState';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Vocabulary control actions
@@ -79,9 +80,10 @@ export const useVocabularyControls = (
   // Switch category with mobile-friendly handling
   const switchCategory = useCallback(() => {
     console.log('[VOCABULARY-CONTROLS] Switching category');
-    
-    // Clear timers during category switch
+
+    // Clear timers and stop current speech during category switch
     clearAutoAdvanceTimer();
+    unifiedSpeechController.stop();
     
     try {
       const newCategory = vocabularyService.nextSheet();
@@ -101,7 +103,7 @@ export const useVocabularyControls = (
     } catch (error) {
       console.error('[VOCABULARY-CONTROLS] Error switching category:', error);
     }
-  }, [clearAutoAdvanceTimer, isPaused, isMuted, playCurrentWord]);
+  }, [clearAutoAdvanceTimer, isPaused, isMuted, playCurrentWord, unifiedSpeechController]);
 
   return {
     togglePause,

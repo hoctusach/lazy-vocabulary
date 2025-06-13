@@ -5,6 +5,7 @@ import { AutoAdvanceTimer } from './AutoAdvanceTimer';
 import { VoiceManager } from './VoiceManager';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
+import { mobileAudioManager } from '@/utils/audio/mobileAudioManager';
 
 /**
  * Enhanced Speech Executor with improved cancellation handling and mobile support
@@ -94,19 +95,13 @@ export class SpeechExecutor {
       return false;
     }
 
-    // Initialize mobile audio context if needed
+    // Initialize/resume mobile audio context if needed
     if (isMobileDevice()) {
       try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioContext) {
-          const audioContext = new AudioContext();
-          if (audioContext.state === 'suspended') {
-            console.log('[SPEECH-EXECUTOR] Resuming mobile audio context');
-            await audioContext.resume();
-          }
-        }
+        await mobileAudioManager.initialize();
+        await mobileAudioManager.resume();
       } catch (error) {
-        console.warn('[SPEECH-EXECUTOR] Mobile audio context initialization failed:', error);
+        console.warn('[SPEECH-EXECUTOR] Mobile audio manager init failed:', error);
       }
     }
 
