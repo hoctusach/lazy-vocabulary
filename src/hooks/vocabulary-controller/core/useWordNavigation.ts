@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Word navigation logic
@@ -35,8 +36,9 @@ export const useWordNavigation = (
     lastWordChangeRef.current = now;
     isTransitioningRef.current = true;
 
-    // Clear any auto-advance timers
+    // Clear any auto-advance timers and stop current speech
     clearAutoAdvanceTimer();
+    unifiedSpeechController.stop();
 
     console.log('[WORD-NAVIGATION] Going to next word', {
       from: currentWord?.word || 'none',
