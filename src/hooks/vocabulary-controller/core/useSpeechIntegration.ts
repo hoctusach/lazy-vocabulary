@@ -15,7 +15,6 @@ export const useSpeechIntegration = (
 ) => {
   // Speech state from unified controller
   const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
-  const lastPlayedWordRef = useRef<string | null>(null);
   const isPlayingRef = useRef(false);
 
   // Subscribe to speech controller state changes
@@ -42,14 +41,7 @@ export const useSpeechIntegration = (
       await new Promise(resolve => setTimeout(resolve, 50));
     }
 
-    // Prevent duplicate plays of the same word
-    if (lastPlayedWordRef.current === currentWord.word) {
-      console.log('[SPEECH-INTEGRATION] Skipping - same word already played');
-      return;
-    }
-
     isPlayingRef.current = true;
-    lastPlayedWordRef.current = currentWord.word;
 
     console.log(`[SPEECH-INTEGRATION] Playing word: ${currentWord.word}`);
     
@@ -65,29 +57,19 @@ export const useSpeechIntegration = (
   // Auto-play effect when word changes (with stricter conditions)
   useEffect(() => {
     if (currentWord && !isPaused && !isMuted && !speechState.isActive && !isPlayingRef.current) {
-      // Only play if this is a new word
-      if (lastPlayedWordRef.current !== currentWord.word) {
-        console.log(`[SPEECH-INTEGRATION] New word detected: ${currentWord.word}, scheduling play`);
-        
-        // Small delay to ensure clean transitions, but shorter to reduce lag
-        const timeout = setTimeout(() => {
-          if (!isTransitioningRef.current && !isPlayingRef.current) {
-            playCurrentWord();
-          }
-        }, 100); // Reduced from 200ms
+      console.log(`[SPEECH-INTEGRATION] Scheduling play for word: ${currentWord.word}`);
 
-        return () => clearTimeout(timeout);
-      }
+      // Small delay to ensure clean transitions, but shorter to reduce lag
+      const timeout = setTimeout(() => {
+        if (!isTransitioningRef.current && !isPlayingRef.current) {
+          playCurrentWord();
+        }
+      }, 100); // Reduced from 200ms
+
+      return () => clearTimeout(timeout);
     }
   }, [currentWord, isPaused, isMuted, playCurrentWord]);
 
-  // Reset last played word when word changes
-  useEffect(() => {
-    if (currentWord && lastPlayedWordRef.current !== currentWord.word) {
-      console.log(`[SPEECH-INTEGRATION] Word changed from ${lastPlayedWordRef.current} to ${currentWord.word}`);
-      // Don't update lastPlayedWordRef here - let playCurrentWord do it
-    }
-  }, [currentWord]);
 
   return {
     speechState,

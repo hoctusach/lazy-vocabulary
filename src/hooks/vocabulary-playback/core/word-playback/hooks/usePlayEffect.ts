@@ -11,7 +11,6 @@ export const usePlayEffect = (
   currentWord: VocabularyWord | null,
   playCurrentWord: () => void
 ) => {
-  const lastPlayedWordRef = useRef<string | null>(null);
   const playTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -26,12 +25,6 @@ export const usePlayEffect = (
     }
 
     const currentWordId = currentWord.word;
-    
-    // Only play if this is a genuinely new word
-    if (lastPlayedWordRef.current === currentWordId) {
-      console.log('[PLAY-EFFECT] Same word as last played, skipping');
-      return;
-    }
 
     // Check if speech is already active
     if (speechController.isActive()) {
@@ -39,8 +32,7 @@ export const usePlayEffect = (
       return;
     }
 
-    console.log(`[PLAY-EFFECT] Scheduling play for new word: ${currentWord.word}`);
-    lastPlayedWordRef.current = currentWordId;
+    console.log(`[PLAY-EFFECT] Scheduling play for word: ${currentWord.word}`);
     
     // Schedule play with delay to ensure everything is ready
     playTimeoutRef.current = window.setTimeout(() => {
