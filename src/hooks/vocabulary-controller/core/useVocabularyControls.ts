@@ -1,11 +1,13 @@
 
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { vocabularyService } from '@/services/vocabularyService';
+import { saveVoiceRegionToStorage } from '@/utils/speech/core/speechSettings';
+import { SpeechState } from '@/services/speech/core/SpeechState';
 
 /**
- * Control actions (pause, mute, voice, category)
+ * Vocabulary control actions
+ * Enhanced for mobile responsiveness
  */
 export const useVocabularyControls = (
   isPaused: boolean,
@@ -15,86 +17,91 @@ export const useVocabularyControls = (
   voiceRegion: 'US' | 'UK' | 'AU',
   setVoiceRegion: (region: 'US' | 'UK' | 'AU') => void,
   currentWord: VocabularyWord | null,
-  speechState: any,
-  playCurrentWord: () => void,
+  speechState: SpeechState,
+  playCurrentWord: () => Promise<void>,
   clearAutoAdvanceTimer: () => void,
-  scheduleAutoAdvance: (delay: number) => void
+  scheduleAutoAdvance: (delay: number, onAdvance?: () => void) => void
 ) => {
+  // Toggle pause with immediate feedback for mobile
   const togglePause = useCallback(() => {
-    const newPaused = !isPaused;
-    console.log(`[VOCABULARY-CONTROLS] Toggling pause: ${newPaused}`);
+    const newPausedState = !isPaused;
+    console.log(`[VOCABULARY-CONTROLS] Toggle pause: ${isPaused} -> ${newPausedState}`);
     
-    // Clear auto-advance timer when pausing
-    if (newPaused) {
+    // Update state immediately for responsive UI
+    setIsPaused(newPausedState);
+    
+    // Clear timers when pausing
+    if (newPausedState) {
       clearAutoAdvanceTimer();
-    }
-    
-    setIsPaused(newPaused);
-    
-    if (newPaused) {
-      unifiedSpeechController.pause();
     } else {
-      unifiedSpeechController.resume();
-      // Resume playback if needed
-      if (currentWord && !isMuted) {
-        setTimeout(() => playCurrentWord(), 100);
+      // When resuming, try to play current word if not speaking
+      if (currentWord && !speechState.isActive && !isMuted) {
+        setTimeout(() => {
+          playCurrentWord();
+        }, 100);
       }
     }
-  }, [isPaused, currentWord, isMuted, playCurrentWord, clearAutoAdvanceTimer, setIsPaused]);
+  }, [isPaused, setIsPaused, clearAutoAdvanceTimer, currentWord, speechState.isActive, isMuted, playCurrentWord]);
 
+  // Toggle mute with immediate feedback
   const toggleMute = useCallback(() => {
-    const newMuted = !isMuted;
-    console.log(`[VOCABULARY-CONTROLS] Toggling mute: ${newMuted}`);
+    const newMutedState = !isMuted;
+    console.log(`[VOCABULARY-CONTROLS] Toggle mute: ${isMuted} -> ${newMutedState}`);
     
-    // Clear auto-advance timer when muting
-    if (newMuted) {
+    // Update state immediately for responsive UI
+    setIsMuted(newMutedState);
+    
+    // Clear timers when muting
+    if (newMutedState) {
       clearAutoAdvanceTimer();
-    }
-    
-    setIsMuted(newMuted);
-    unifiedSpeechController.setMuted(newMuted);
-    
-    // Resume playback if unmuting
-    if (!newMuted && !isPaused && currentWord) {
-      setTimeout(() => playCurrentWord(), 100);
-    } else if (newMuted) {
-      // When muted, schedule auto-advance to continue cycling
-      scheduleAutoAdvance(3000);
-    }
-  }, [isMuted, isPaused, currentWord, playCurrentWord, clearAutoAdvanceTimer, scheduleAutoAdvance, setIsMuted]);
-
-  const toggleVoice = useCallback(() => {
-    const regions: ('US' | 'UK' | 'AU')[] = ['US', 'UK', 'AU'];
-    const currentRegionIndex = regions.indexOf(voiceRegion);
-    const nextRegion = regions[(currentRegionIndex + 1) % regions.length];
-    
-    console.log(`[VOCABULARY-CONTROLS] Changing voice from ${voiceRegion} to ${nextRegion}`);
-    setVoiceRegion(nextRegion);
-    
-    // Stop current speech and restart with new voice
-    if (speechState.isActive) {
-      unifiedSpeechController.stop();
-      if (currentWord && !isPaused && !isMuted) {
-        setTimeout(() => playCurrentWord(), 200);
+    } else {
+      // When unmuting, try to play current word if not paused and not speaking
+      if (currentWord && !isPaused && !speechState.isActive) {
+        setTimeout(() => {
+          playCurrentWord();
+        }, 100);
       }
     }
-  }, [voiceRegion, speechState.isActive, currentWord, isPaused, isMuted, playCurrentWord, setVoiceRegion]);
+  }, [isMuted, setIsMuted, clearAutoAdvanceTimer, currentWord, isPaused, speechState.isActive, playCurrentWord]);
 
+  // Toggle voice region
+  const toggleVoice = useCallback(() => {
+    const voiceOrder: ('US' | 'UK' | 'AU')[] = ['US', 'UK', 'AU'];
+    const currentIndex = voiceOrder.indexOf(voiceRegion);
+    const nextIndex = (currentIndex + 1) % voiceOrder.length;
+    const nextRegion = voiceOrder[nextIndex];
+    
+    console.log(`[VOCABULARY-CONTROLS] Toggle voice: ${voiceRegion} -> ${nextRegion}`);
+    setVoiceRegion(nextRegion);
+    saveVoiceRegionToStorage(nextRegion);
+  }, [voiceRegion, setVoiceRegion]);
+
+  // Switch category with mobile-friendly handling
   const switchCategory = useCallback(() => {
     console.log('[VOCABULARY-CONTROLS] Switching category');
     
-    // Clear auto-advance timer before category switch
+    // Clear timers during category switch
     clearAutoAdvanceTimer();
     
-    // Stop current speech
-    unifiedSpeechController.stop();
-    
-    // Switch to next category
-    const nextCategory = vocabularyService.nextSheet();
-    console.log(`[VOCABULARY-CONTROLS] Switched to category: ${nextCategory}`);
-    
-    // Data will be reloaded via the vocabulary change listener
-  }, [clearAutoAdvanceTimer]);
+    try {
+      const newCategory = vocabularyService.nextSheet();
+      console.log('[VOCABULARY-CONTROLS] Switched to category:', newCategory);
+      
+      // Give time for the new category to load
+      setTimeout(() => {
+        if (!isPaused && !isMuted) {
+          // Try to play the first word of the new category
+          const newWord = vocabularyService.getCurrentWord();
+          if (newWord) {
+            playCurrentWord();
+          }
+        }
+      }, 300);
+      
+    } catch (error) {
+      console.error('[VOCABULARY-CONTROLS] Error switching category:', error);
+    }
+  }, [clearAutoAdvanceTimer, isPaused, isMuted, playCurrentWord]);
 
   return {
     togglePause,

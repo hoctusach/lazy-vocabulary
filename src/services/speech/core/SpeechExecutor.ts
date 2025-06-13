@@ -5,14 +5,16 @@ import { AutoAdvanceTimer } from './AutoAdvanceTimer';
 import { VoiceManager } from './VoiceManager';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
-import { toast } from 'sonner';
 
 /**
  * Handles the actual speech synthesis execution
+ * Fixed version that prevents cancellation loops and improves mobile support
  */
 export class SpeechExecutor {
   private isStopping = false;
   private cancelledUtterance: SpeechSynthesisUtterance | null = null;
+  private lastStopTime = 0;
+  private readonly MIN_STOP_INTERVAL = 100; // Prevent rapid stop calls
 
   constructor(
     private stateManager: SpeechStateManager,
@@ -42,10 +44,10 @@ export class SpeechExecutor {
     }
 
     if (state.isActive || state.currentUtterance) {
-      console.log('[SPEECH-EXECUTOR] Cancelling existing utterance before speaking');
+      console.log('[SPEECH-EXECUTOR] Stopping existing utterance before speaking');
       this.stop();
-      // Wait briefly for cancellation to propagate
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for cancellation to propagate
+      await new Promise(resolve => setTimeout(resolve, 150));
     }
 
     // Check browser support
@@ -61,16 +63,16 @@ export class SpeechExecutor {
   private async executeSpeech(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU'): Promise<boolean> {
     return new Promise((resolve) => {
       try {
-        // On mobile devices, use the direct speech service which speaks each
-        // part separately. This avoids issues where only the first word is
-        // spoken on some mobile browsers.
+        // On mobile devices, use the direct speech service
         if (isMobileDevice()) {
+          console.log('[SPEECH-EXECUTOR] Using mobile direct speech service');
           directSpeechService.speak('', {
             voiceRegion,
             word: word.word,
             meaning: word.meaning,
             example: word.example,
             onStart: () => {
+              console.log('[SPEECH-EXECUTOR] Mobile speech started');
               this.stateManager.updateState({
                 isActive: true,
                 currentWord: word,
@@ -78,12 +80,14 @@ export class SpeechExecutor {
               });
             },
             onEnd: () => {
+              console.log('[SPEECH-EXECUTOR] Mobile speech ended');
               this.resetState();
               const state = this.stateManager.getState();
               this.autoAdvanceTimer.schedule(1500, state.isPaused, state.isMuted);
               resolve(true);
             },
-            onError: () => {
+            onError: (error) => {
+              console.error('[SPEECH-EXECUTOR] Mobile speech error:', error);
               this.resetState();
               const state = this.stateManager.getState();
               this.autoAdvanceTimer.schedule(2000, state.isPaused, state.isMuted);
@@ -93,6 +97,7 @@ export class SpeechExecutor {
           return;
         }
 
+        // Desktop speech synthesis
         const speechText = this.voiceManager.createSpeechText(word);
         const utterance = new SpeechSynthesisUtterance(speechText);
         
@@ -110,10 +115,21 @@ export class SpeechExecutor {
         this.stateManager.setCurrentUtterance(utterance);
         this.isStopping = false;
         this.cancelledUtterance = null;
+        
         console.log('[SPEECH-EXECUTOR] -> invoking window.speechSynthesis.speak');
         window.speechSynthesis.speak(utterance);
 
-        // Removed fallback timeout which previously handled blocked audio
+        // Fallback timeout for stuck speech
+        setTimeout(() => {
+          if (this.stateManager.getState().currentUtterance === utterance && 
+              !window.speechSynthesis.speaking && 
+              !this.stateManager.getState().isActive) {
+            console.warn('[SPEECH-EXECUTOR] Speech appears stuck, cleaning up');
+            this.resetState();
+            this.autoAdvanceTimer.schedule(2000, this.stateManager.getState().isPaused, this.stateManager.getState().isMuted);
+            resolve(false);
+          }
+        }, 3000);
 
       } catch (error) {
         console.error('[SPEECH-EXECUTOR] Error in speak method:', error);
@@ -130,6 +146,12 @@ export class SpeechExecutor {
     resolve: (value: boolean) => void
   ): void {
     utterance.onstart = () => {
+      // Double-check we haven't been cancelled in the meantime
+      if (this.isStopping || this.cancelledUtterance === utterance) {
+        console.log('[SPEECH-EXECUTOR] Speech was cancelled before start event');
+        return;
+      }
+      
       console.log(`[SPEECH-EXECUTOR] ✓ Speech started for: ${word.word}`);
       this.stateManager.updateState({
         isActive: true,
@@ -139,6 +161,12 @@ export class SpeechExecutor {
     };
 
     utterance.onend = () => {
+      // Check if this was a manual cancellation
+      if (this.isStopping || this.cancelledUtterance === utterance) {
+        console.log('[SPEECH-EXECUTOR] Speech end was due to manual cancellation');
+        return;
+      }
+      
       console.log(`[SPEECH-EXECUTOR] ✓ Speech completed for: ${word.word}`);
       this.resetState();
       
@@ -180,6 +208,7 @@ export class SpeechExecutor {
       return resolve(false);
     }
 
+    // For other errors, try to reset and continue
     try {
       window.speechSynthesis.cancel();
     } catch (e) {
@@ -193,8 +222,15 @@ export class SpeechExecutor {
     resolve(false);
   }
 
-  // Stop speech with proper cleanup
+  // Stop speech with proper cleanup and debouncing
   stop(): void {
+    const now = Date.now();
+    if (now - this.lastStopTime < this.MIN_STOP_INTERVAL) {
+      console.log('[SPEECH-EXECUTOR] Stop call debounced to prevent loops');
+      return;
+    }
+    this.lastStopTime = now;
+
     console.log('[SPEECH-EXECUTOR] Stopping speech');
 
     this.autoAdvanceTimer.clear();
@@ -205,7 +241,7 @@ export class SpeechExecutor {
       window.speechSynthesis.cancel();
     }
 
-    // Clear utterance callbacks
+    // Clear utterance callbacks to prevent further events
     const currentUtterance = this.stateManager.getState().currentUtterance;
     if (currentUtterance) {
       currentUtterance.onend = null;

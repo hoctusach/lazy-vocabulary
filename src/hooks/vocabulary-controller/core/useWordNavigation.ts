@@ -1,53 +1,75 @@
 
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { vocabularyService } from '@/services/vocabularyService';
 
 /**
- * Word navigation functionality
+ * Word navigation logic
+ * Fixed to work properly on mobile devices
  */
 export const useWordNavigation = (
   wordList: VocabularyWord[],
   currentIndex: number,
-  setCurrentIndex: (value: number | ((prevIndex: number) => number)) => void,
+  setCurrentIndex: (index: number) => void,
   currentWord: VocabularyWord | null,
   isTransitioningRef: React.MutableRefObject<boolean>,
   lastWordChangeRef: React.MutableRefObject<number>,
   clearAutoAdvanceTimer: () => void
 ) => {
-  // Go to next word with proper timer management
+  // Go to next word with proper mobile handling
   const goToNext = useCallback(() => {
-    if (isTransitioningRef.current || wordList.length === 0) {
-      console.log('[WORD-NAVIGATION] Cannot go to next - transitioning or no words');
+    const now = Date.now();
+    
+    // Prevent rapid transitions
+    if (isTransitioningRef.current) {
+      console.log('[WORD-NAVIGATION] Transition in progress, ignoring');
       return;
     }
 
+    // Debounce rapid calls (especially on mobile)
+    if (now - lastWordChangeRef.current < 300) {
+      console.log('[WORD-NAVIGATION] Navigation debounced');
+      return;
+    }
+
+    lastWordChangeRef.current = now;
+    isTransitioningRef.current = true;
+
+    // Clear any auto-advance timers
+    clearAutoAdvanceTimer();
+
     console.log('[WORD-NAVIGATION] Going to next word', {
-      from: currentWord?.word,
+      from: currentWord?.word || 'none',
       index: currentIndex,
       total: wordList.length
     });
-    isTransitioningRef.current = true;
-    lastWordChangeRef.current = Date.now();
 
-    // CRITICAL: Clear auto-advance timer before any word transition
-    clearAutoAdvanceTimer();
+    try {
+      // Update vocabulary service first
+      vocabularyService.moveToNextWord();
+      
+      // Then update local state
+      const nextIndex = (currentIndex + 1) % wordList.length;
+      console.log('[WORD-NAVIGATION] Moving from word', currentIndex, 'to', nextIndex);
+      setCurrentIndex(nextIndex);
 
-    // Stop current speech
-    unifiedSpeechController.stop();
-
-    // Move to next word
-    setCurrentIndex((prevIndex: number) => {
-      const nextIndex = (prevIndex + 1) % wordList.length;
-      console.log(`[WORD-NAVIGATION] Moving from word ${prevIndex} to ${nextIndex}`);
-      return nextIndex;
-    });
-
-    // Clear transition flag after brief delay
-    setTimeout(() => {
-      isTransitioningRef.current = false;
-    }, 100);
-  }, [wordList.length, currentWord?.word, currentIndex, clearAutoAdvanceTimer, setCurrentIndex, isTransitioningRef, lastWordChangeRef]);
+    } catch (error) {
+      console.error('[WORD-NAVIGATION] Error navigating to next word:', error);
+    } finally {
+      // Always clear transition flag after a delay
+      setTimeout(() => {
+        isTransitioningRef.current = false;
+      }, 200);
+    }
+  }, [
+    currentIndex,
+    currentWord,
+    wordList.length,
+    setCurrentIndex,
+    isTransitioningRef,
+    lastWordChangeRef,
+    clearAutoAdvanceTimer
+  ]);
 
   return {
     goToNext

@@ -11,9 +11,11 @@ import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
- * Refactored version with modular architecture
+ * Now properly integrated with speech system to prevent dual controller conflicts
  */
 export const useUnifiedVocabularyController = () => {
+  console.log('[UNIFIED-CONTROLLER] Initializing unified controller');
+
   // Core state management
   const {
     wordList,
@@ -95,6 +97,11 @@ export const useUnifiedVocabularyController = () => {
         return;
       }
       
+      if (isPaused || isMuted) {
+        console.log('[UNIFIED-CONTROLLER] Paused or muted, skipping auto-advance');
+        return;
+      }
+      
       console.log('[UNIFIED-CONTROLLER] Word completed, scheduling auto-advance');
       scheduleAutoAdvance(1500, goToNext);
     };
@@ -104,12 +111,30 @@ export const useUnifiedVocabularyController = () => {
     return () => {
       unifiedSpeechController.setWordCompleteCallback(null);
     };
-  }, [scheduleAutoAdvance, goToNext, isTransitioningRef]);
+  }, [scheduleAutoAdvance, goToNext, isTransitioningRef, isPaused, isMuted]);
+
+  // Pause/resume speech when state changes
+  useEffect(() => {
+    if (isPaused) {
+      console.log('[UNIFIED-CONTROLLER] Pausing speech due to state change');
+      unifiedSpeechController.pause();
+    } else {
+      console.log('[UNIFIED-CONTROLLER] Resuming speech due to state change');
+      unifiedSpeechController.resume();
+    }
+  }, [isPaused]);
+
+  // Mute/unmute speech when state changes
+  useEffect(() => {
+    console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
+    unifiedSpeechController.setMuted(isMuted);
+  }, [isMuted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearAutoAdvanceTimer();
+      unifiedSpeechController.destroy();
     };
   }, [clearAutoAdvanceTimer]);
 
