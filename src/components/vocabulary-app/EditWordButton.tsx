@@ -12,7 +12,7 @@ const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled }) =>
   return (
     <Button
       onClick={onClick}
-      className="flex items-center justify-center gap-2 py-0.5 px-1.5 text-xs"
+      className="flex items-center justify-center gap-1 py-0.5 px-1 text-xs"
       variant="outline"
       size="sm"
       disabled={disabled}

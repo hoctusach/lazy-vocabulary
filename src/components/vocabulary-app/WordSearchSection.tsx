@@ -40,14 +40,14 @@ const WordSearchSection: React.FC<WordSearchSectionProps> = ({
             maxLength={100}
           />
           {!editMode && (
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               onClick={onSearch}
               disabled={isSearching || !word.trim()}
               aria-busy={isSearching}
-              className="shrink-0"
+              className="shrink-0 px-1.5"
             >
-              {isSearching ? <Loader className="h-4 w-4 animate-spin mr-1" /> : 'Search'}
+              {isSearching ? <Loader className="h-4 w-4 animate-spin mr-1" /> : 'Go'}
             </Button>
           )}
         </div>
