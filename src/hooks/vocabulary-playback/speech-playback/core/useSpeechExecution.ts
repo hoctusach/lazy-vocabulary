@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../../useVoiceSelection';
-import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
+import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
 
 /**
  * Enhanced speech execution hook with robust error handling and retry logic
@@ -22,7 +22,6 @@ export const useSpeechExecution = (
   ): Promise<boolean> => {
     const executionId = Math.random().toString(36).substring(7);
     console.log(`[SPEECH-EXECUTION-${executionId}] Starting execution for: "${wordToPlay.word}"`);
-    console.log(`[SPEECH-EXECUTION-${executionId}] Speech text length: ${speechText.length}`);
     console.log(`[SPEECH-EXECUTION-${executionId}] Current state:`, {
       muted,
       paused,
@@ -43,22 +42,7 @@ export const useSpeechExecution = (
     }
     
     try {
-      // Find the appropriate voice
-      const voice = findVoice(selectedVoice.region);
-      console.log(`[SPEECH-EXECUTION-${executionId}] Selected voice:`, voice?.name || 'system default');
-      
-      // Validate text content
-      if (!speechText || speechText.trim().length === 0) {
-        console.warn(`[SPEECH-EXECUTION-${executionId}] No valid text to speak`);
-        isPlayingRef.current = false;
-        if (!paused && !muted) {
-          setTimeout(() => advanceToNext(), 1000);
-        }
-        return false;
-      }
-      
-      // Attempt speech with the correct signature
-      console.log(`[SPEECH-EXECUTION-${executionId}] Initiating speech synthesis`);
+      console.log(`[SPEECH-EXECUTION-${executionId}] Initiating speech synthesis with simple controller`);
       
       const success = await simpleSpeechController.speak(wordToPlay, selectedVoice.region);
       
@@ -68,7 +52,8 @@ export const useSpeechExecution = (
         console.log(`[SPEECH-EXECUTION-${executionId}] ✓ Speech started successfully for: "${wordToPlay.word}"`);
         setIsSpeaking(true);
         
-        // Schedule completion callback
+        // Schedule completion callback with dynamic duration
+        const estimatedDuration = Math.max(2000, speechText.length * 40);
         setTimeout(() => {
           console.log(`[SPEECH-EXECUTION-${executionId}] ✓ Speech completed for: "${wordToPlay.word}"`);
           setIsSpeaking(false);
@@ -84,11 +69,11 @@ export const useSpeechExecution = (
               } else {
                 console.log(`[SPEECH-EXECUTION-${executionId}] State changed, skipping auto-advance`);
               }
-            }, 1500);
+            }, 1000);
           } else {
             console.log(`[SPEECH-EXECUTION-${executionId}] Not auto-advancing - paused: ${paused}, muted: ${muted}`);
           }
-        }, 2000);
+        }, estimatedDuration);
       } else {
         console.warn(`[SPEECH-EXECUTION-${executionId}] ✗ Speech failed to start`);
         setIsSpeaking(false);
@@ -116,7 +101,7 @@ export const useSpeechExecution = (
       
       return false;
     }
-  }, [selectedVoice, findVoice, setIsSpeaking, isPlayingRef, advanceToNext, muted, paused]);
+  }, [selectedVoice, setIsSpeaking, isPlayingRef, advanceToNext, muted, paused]);
 
   return {
     executeSpeech

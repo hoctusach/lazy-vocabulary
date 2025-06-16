@@ -4,6 +4,7 @@ import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
+import AudioStatusIndicator from "./AudioStatusIndicator";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
 import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
@@ -60,11 +61,11 @@ const VocabularyAppContainerNew: React.FC = () => {
     if (hasData && currentWord && hasInitialized && !isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
       console.log('[AUTO-PLAY] ✓ All conditions met - scheduling word playback');
       const timeoutId = setTimeout(() => {
-        if (!isPaused && !isMuted && !isSpeaking) {
+        if (!isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
           console.log('[AUTO-PLAY] Executing delayed word playback');
           playCurrentWord();
         }
-      }, 600);
+      }, 800);
 
       return () => clearTimeout(timeoutId);
     } else {
@@ -125,25 +126,32 @@ const VocabularyAppContainerNew: React.FC = () => {
   if (!hasData && !vocabularyService.hasData()) {
     return (
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-        <VocabularyCardNew
-          word="No vocabulary data"
-          meaning="Please upload a vocabulary file to get started"
-          example=""
-          backgroundColor="#F0F8FF"
-          isMuted={isMuted}
-          isPaused={isPaused}
-          onToggleMute={toggleMute}
-          onTogglePause={togglePause}
-          onCycleVoice={toggleVoice}
-          onSwitchCategory={switchCategory}
-          onNextWord={goToNext}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
-          isSpeaking={false}
-          category="No Data"
-          voiceRegion={voiceRegion}
-          nextVoiceLabel={nextVoiceLabel}
-        />
+        <div className="space-y-4">
+          <AudioStatusIndicator 
+            isAudioUnlocked={isAudioUnlocked}
+            hasInitialized={hasInitialized}
+            interactionCount={interactionCount}
+          />
+          <VocabularyCardNew
+            word="No vocabulary data"
+            meaning="Please upload a vocabulary file to get started"
+            example=""
+            backgroundColor="#F0F8FF"
+            isMuted={isMuted}
+            isPaused={isPaused}
+            onToggleMute={toggleMute}
+            onTogglePause={togglePause}
+            onCycleVoice={toggleVoice}
+            onSwitchCategory={switchCategory}
+            onNextWord={goToNext}
+            currentCategory={currentCategory}
+            nextCategory={nextCategory}
+            isSpeaking={false}
+            category="No Data"
+            voiceRegion={voiceRegion}
+            nextVoiceLabel={nextVoiceLabel}
+          />
+        </div>
       </VocabularyLayout>
     );
   }
@@ -151,25 +159,32 @@ const VocabularyAppContainerNew: React.FC = () => {
   if (!hasData) {
     return (
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-        <VocabularyCardNew
-          word={`No words in "${currentCategory}" category`}
-          meaning="Try switching to another category"
-          example=""
-          backgroundColor="#F0F8FF"
-          isMuted={isMuted}
-          isPaused={isPaused}
-          onToggleMute={toggleMute}
-          onTogglePause={togglePause}
-          onCycleVoice={toggleVoice}
-          onSwitchCategory={switchCategory}
-          onNextWord={goToNext}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
-          isSpeaking={false}
-          category={currentCategory}
-          voiceRegion={voiceRegion}
-          nextVoiceLabel={nextVoiceLabel}
-        />
+        <div className="space-y-4">
+          <AudioStatusIndicator 
+            isAudioUnlocked={isAudioUnlocked}
+            hasInitialized={hasInitialized}
+            interactionCount={interactionCount}
+          />
+          <VocabularyCardNew
+            word={`No words in "${currentCategory}" category`}
+            meaning="Try switching to another category"
+            example=""
+            backgroundColor="#F0F8FF"
+            isMuted={isMuted}
+            isPaused={isPaused}
+            onToggleMute={toggleMute}
+            onTogglePause={togglePause}
+            onCycleVoice={toggleVoice}
+            onSwitchCategory={switchCategory}
+            onNextWord={goToNext}
+            currentCategory={currentCategory}
+            nextCategory={nextCategory}
+            isSpeaking={false}
+            category={currentCategory}
+            voiceRegion={voiceRegion}
+            nextVoiceLabel={nextVoiceLabel}
+          />
+        </div>
       </VocabularyLayout>
     );
   }
@@ -177,57 +192,72 @@ const VocabularyAppContainerNew: React.FC = () => {
   if (!currentWord) {
     return (
       <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
-        <VocabularyCardNew
-          word="Loading vocabulary..."
-          meaning="Please wait while we load your vocabulary data"
-          example=""
-          backgroundColor="#F0F8FF"
-          isMuted={isMuted}
-          isPaused={isPaused}
-          onToggleMute={toggleMute}
-          onTogglePause={togglePause}
-          onCycleVoice={toggleVoice}
-          onSwitchCategory={switchCategory}
-          onNextWord={goToNext}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
-          isSpeaking={false}
-          category="Loading"
-          voiceRegion={voiceRegion}
-          nextVoiceLabel={nextVoiceLabel}
-        />
+        <div className="space-y-4">
+          <AudioStatusIndicator 
+            isAudioUnlocked={isAudioUnlocked}
+            hasInitialized={hasInitialized}
+            interactionCount={interactionCount}
+          />
+          <VocabularyCardNew
+            word="Loading vocabulary..."
+            meaning="Please wait while we load your vocabulary data"
+            example=""
+            backgroundColor="#F0F8FF"
+            isMuted={isMuted}
+            isPaused={isPaused}
+            onToggleMute={toggleMute}
+            onTogglePause={togglePause}
+            onCycleVoice={toggleVoice}
+            onSwitchCategory={switchCategory}
+            onNextWord={goToNext}
+            currentCategory={currentCategory}
+            nextCategory={nextCategory}
+            isSpeaking={false}
+            category="Loading"
+            voiceRegion={voiceRegion}
+            nextVoiceLabel={nextVoiceLabel}
+          />
+        </div>
       </VocabularyLayout>
     );
   }
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      <ErrorDisplay jsonLoadError={false} />
-      
-      <ContentWithDataNew
-        displayWord={currentWord}
-        muted={isMuted}
-        paused={isPaused}
-        toggleMute={toggleMute}
-        handleTogglePause={togglePause}
-        handleCycleVoice={toggleVoice}
-        nextVoiceLabel={nextVoiceLabel}
-        handleSwitchCategory={switchCategory}
-        currentCategory={currentCategory}
-        nextCategory={nextCategory}
-        isSpeaking={isSpeaking}
-        handleManualNext={goToNext}
-        displayTime={5000}
-        voiceRegion={voiceRegion}
-        debugPanelData={debugData}
-        isAddWordModalOpen={isAddWordModalOpen}
-        handleCloseModal={handleCloseModal}
-        handleSaveWord={handleSaveWord}
-        isEditMode={isEditMode}
-        wordToEdit={wordToEdit}
-        handleOpenAddWordModal={handleOpenAddWordModal}
-        handleOpenEditWordModal={handleOpenEditWordModal}
-      />
+      <div className="space-y-4">
+        <AudioStatusIndicator 
+          isAudioUnlocked={isAudioUnlocked}
+          hasInitialized={hasInitialized}
+          interactionCount={interactionCount}
+        />
+        
+        <ErrorDisplay jsonLoadError={false} />
+        
+        <ContentWithDataNew
+          displayWord={currentWord}
+          muted={isMuted}
+          paused={isPaused}
+          toggleMute={toggleMute}
+          handleTogglePause={togglePause}
+          handleCycleVoice={toggleVoice}
+          nextVoiceLabel={nextVoiceLabel}
+          handleSwitchCategory={switchCategory}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory}
+          isSpeaking={isSpeaking}
+          handleManualNext={goToNext}
+          displayTime={5000}
+          voiceRegion={voiceRegion}
+          debugPanelData={debugData}
+          isAddWordModalOpen={isAddWordModalOpen}
+          handleCloseModal={handleCloseModal}
+          handleSaveWord={handleSaveWord}
+          isEditMode={isEditMode}
+          wordToEdit={wordToEdit}
+          handleOpenAddWordModal={handleOpenAddWordModal}
+          handleOpenEditWordModal={handleOpenEditWordModal}
+        />
+      </div>
     </VocabularyLayout>
   );
 };

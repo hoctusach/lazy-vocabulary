@@ -1,5 +1,5 @@
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { audioUnlockService } from '@/services/audio/AudioUnlockService';
 
 interface EnhancedUserInteractionProps {
@@ -19,7 +19,8 @@ export const useEnhancedUserInteraction = ({
   const hasInitialized = useRef(false);
   const lastInteractionTime = useRef(0);
   const interactionCount = useRef(0);
-  const debounceDelay = 500; // Prevent rapid interaction detection
+  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
+  const debounceDelay = 300; // Reduced debounce delay
 
   const handleUserInteraction = useCallback(async (interactionType: string) => {
     const now = Date.now();
@@ -37,15 +38,16 @@ export const useEnhancedUserInteraction = ({
     // Mark user gesture for audio unlock service
     audioUnlockService.markUserGesture();
 
-    // Only initialize once
-    if (!hasInitialized.current) {
-      hasInitialized.current = true;
-      console.log('[USER-INTERACTION] ✓ First meaningful interaction - initializing audio systems');
+    try {
+      // Always attempt to unlock audio on user interaction
+      const unlocked = await audioUnlockService.unlock();
+      console.log('[USER-INTERACTION] Audio unlock result:', unlocked);
+      setIsAudioUnlocked(unlocked);
       
-      try {
-        // Attempt comprehensive audio unlock
-        const unlocked = await audioUnlockService.unlock();
-        console.log('[USER-INTERACTION] Audio unlock result:', unlocked);
+      // Only initialize once
+      if (!hasInitialized.current) {
+        hasInitialized.current = true;
+        console.log('[USER-INTERACTION] ✓ First meaningful interaction - audio systems initialized');
         
         // Store interaction state
         localStorage.setItem('hadUserInteraction', 'true');
@@ -60,25 +62,29 @@ export const useEnhancedUserInteraction = ({
             playCurrentWord();
           }, 500);
         }
-        
-      } catch (error) {
-        console.error('[USER-INTERACTION] Error during audio initialization:', error);
+      } else if (unlocked && currentWord && playCurrentWord) {
+        // For subsequent interactions, try to play if audio is working
+        console.log('[USER-INTERACTION] Subsequent interaction - attempting word playback');
+        setTimeout(() => {
+          playCurrentWord();
+        }, 200);
       }
-    } else {
-      // For subsequent interactions, just resume audio context
-      try {
-        await audioUnlockService.unlock();
-      } catch (error) {
-        console.warn('[USER-INTERACTION] Error resuming audio:', error);
-      }
+      
+    } catch (error) {
+      console.error('[USER-INTERACTION] Error during audio initialization:', error);
+      setIsAudioUnlocked(false);
     }
   }, [onUserInteraction, currentWord, playCurrentWord]);
 
   useEffect(() => {
-    // Check for previous interactions
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
-      console.log('[USER-INTERACTION] Previous interaction detected from localStorage');
+    // Check for previous interactions and current audio state
+    const hadPreviousInteraction = localStorage.getItem('hadUserInteraction') === 'true';
+    const audioAlreadyUnlocked = audioUnlockService.isAudioUnlocked();
+    
+    if (hadPreviousInteraction || audioAlreadyUnlocked) {
+      console.log('[USER-INTERACTION] Previous interaction or audio already unlocked');
       hasInitialized.current = true;
+      setIsAudioUnlocked(audioAlreadyUnlocked);
       audioUnlockService.markUserGesture();
       onUserInteraction?.();
       return;
@@ -91,7 +97,7 @@ export const useEnhancedUserInteraction = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       // Only handle meaningful key presses
-      if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'Escape'].includes(e.key)) {
         handleUserInteraction('keydown');
       }
     };
@@ -102,8 +108,10 @@ export const useEnhancedUserInteraction = ({
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && hasInitialized.current) {
-        console.log('[USER-INTERACTION] Page became visible - resuming audio');
-        audioUnlockService.unlock().catch(console.warn);
+        console.log('[USER-INTERACTION] Page became visible - attempting audio resume');
+        audioUnlockService.unlock().then(unlocked => {
+          setIsAudioUnlocked(unlocked);
+        }).catch(console.warn);
       }
     };
 
@@ -121,9 +129,22 @@ export const useEnhancedUserInteraction = ({
     };
   }, [handleUserInteraction]);
 
+  // Update audio unlock status periodically
+  useEffect(() => {
+    const checkAudioStatus = () => {
+      const currentStatus = audioUnlockService.isAudioUnlocked();
+      if (currentStatus !== isAudioUnlocked) {
+        setIsAudioUnlocked(currentStatus);
+      }
+    };
+
+    const interval = setInterval(checkAudioStatus, 1000);
+    return () => clearInterval(interval);
+  }, [isAudioUnlocked]);
+
   return {
     hasInitialized: hasInitialized.current,
     interactionCount: interactionCount.current,
-    isAudioUnlocked: audioUnlockService.isAudioUnlocked()
+    isAudioUnlocked
   };
 };

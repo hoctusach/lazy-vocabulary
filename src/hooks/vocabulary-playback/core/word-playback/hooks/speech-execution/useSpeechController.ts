@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
+import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
 
 /**
  * Hook for controlling speech synthesis execution
@@ -24,17 +24,18 @@ export const useSpeechController = (
     muted: boolean
   ): Promise<boolean> => {
     try {
-      // Find and validate voice
-      const voice = findVoice(selectedVoice.region);
-      console.log(`[SPEECH-CONTROLLER-${sessionId}] Voice selection:`, {
-        requested: selectedVoice.region,
-        found: voice?.name || 'system default',
-        lang: voice?.lang || 'unknown'
-      });
+      console.log(`[SPEECH-CONTROLLER-${sessionId}] Initiating speech with enhanced audio unlock`);
 
-      console.log(`[SPEECH-CONTROLLER-${sessionId}] Initiating speech with enhanced monitoring`);
+      if (muted || paused) {
+        console.log(`[SPEECH-CONTROLLER-${sessionId}] Skipping - muted: ${muted}, paused: ${paused}`);
+        setPlayInProgress(false);
+        if (!paused && !muted) {
+          scheduleAutoAdvance(1000);
+        }
+        return false;
+      }
 
-      // Execute speech with the correct signature
+      // Use the simple speech controller
       const success = await simpleSpeechController.speak(currentWord, selectedVoice.region);
 
       console.log(`[SPEECH-CONTROLLER-${sessionId}] Speech initiation result: ${success}`);
@@ -44,12 +45,12 @@ export const useSpeechController = (
         // Schedule end callback after estimated duration
         setTimeout(() => {
           onEnd();
-        }, 2000);
+        }, Math.max(2000, speechableText.length * 50)); // Dynamic duration based on text length
       } else {
         console.warn(`[SPEECH-CONTROLLER-${sessionId}] ✗ Speech failed to start`);
         setPlayInProgress(false);
         if (!paused && !muted) {
-          scheduleAutoAdvance(3000);
+          scheduleAutoAdvance(2000);
         }
       }
 
@@ -63,7 +64,7 @@ export const useSpeechController = (
       }
       return false;
     }
-  }, [findVoice, selectedVoice, scheduleAutoAdvance]);
+  }, [selectedVoice, scheduleAutoAdvance]);
 
   return {
     executeSpeechSynthesis
