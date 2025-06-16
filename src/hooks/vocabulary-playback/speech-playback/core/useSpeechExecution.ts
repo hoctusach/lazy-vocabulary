@@ -57,19 +57,19 @@ export const useSpeechExecution = (
         return false;
       }
       
-      // Attempt speech with enhanced monitoring
+      // Attempt speech with the correct signature
       console.log(`[SPEECH-EXECUTION-${executionId}] Initiating speech synthesis`);
       
-      const success = await simpleSpeechController.speak(wordToPlay, selectedVoice.region, {
-        voice,
-        rate: 0.8,
-        pitch: 1.0,
-        volume: 1.0,
-        onStart: () => {
-          console.log(`[SPEECH-EXECUTION-${executionId}] ✓ Speech started successfully for: "${wordToPlay.word}"`);
-          setIsSpeaking(true);
-        },
-        onEnd: () => {
+      const success = await simpleSpeechController.speak(wordToPlay, selectedVoice.region);
+      
+      console.log(`[SPEECH-EXECUTION-${executionId}] Speech initiation result:`, success);
+      
+      if (success) {
+        console.log(`[SPEECH-EXECUTION-${executionId}] ✓ Speech started successfully for: "${wordToPlay.word}"`);
+        setIsSpeaking(true);
+        
+        // Schedule completion callback
+        setTimeout(() => {
           console.log(`[SPEECH-EXECUTION-${executionId}] ✓ Speech completed for: "${wordToPlay.word}"`);
           setIsSpeaking(false);
           isPlayingRef.current = false;
@@ -88,58 +88,8 @@ export const useSpeechExecution = (
           } else {
             console.log(`[SPEECH-EXECUTION-${executionId}] Not auto-advancing - paused: ${paused}, muted: ${muted}`);
           }
-        },
-        onError: (event) => {
-          console.error(`[SPEECH-EXECUTION-${executionId}] ✗ Speech error:`, {
-            error: event.error,
-            type: event.type,
-            word: wordToPlay.word,
-            textLength: speechText.length
-          });
-          
-          setIsSpeaking(false);
-          isPlayingRef.current = false;
-          
-          // Handle different error types with specific recovery strategies
-          switch (event.error) {
-            case 'canceled':
-              console.log(`[SPEECH-EXECUTION-${executionId}] Speech was canceled - normal operation`);
-              // Don't auto-advance for cancellation
-              break;
-              
-            case 'interrupted':
-              console.log(`[SPEECH-EXECUTION-${executionId}] Speech was interrupted - advancing`);
-              if (!paused && !muted) {
-                setTimeout(() => advanceToNext(), 1000);
-              }
-              break;
-              
-            case 'network':
-              console.log(`[SPEECH-EXECUTION-${executionId}] Network error - advancing after delay`);
-              if (!paused && !muted) {
-                setTimeout(() => advanceToNext(), 2000);
-              }
-              break;
-              
-            case 'not-allowed':
-              console.log(`[SPEECH-EXECUTION-${executionId}] Permission error - advancing after delay`);
-              if (!paused && !muted) {
-                setTimeout(() => advanceToNext(), 2000);
-              }
-              break;
-              
-            default:
-              console.log(`[SPEECH-EXECUTION-${executionId}] Generic error (${event.error}) - advancing after delay`);
-              if (!paused && !muted) {
-                setTimeout(() => advanceToNext(), 2000);
-              }
-          }
-        }
-      });
-      
-      console.log(`[SPEECH-EXECUTION-${executionId}] Speech initiation result:`, success);
-      
-      if (!success) {
+        }, 2000);
+      } else {
         console.warn(`[SPEECH-EXECUTION-${executionId}] ✗ Speech failed to start`);
         setIsSpeaking(false);
         isPlayingRef.current = false;

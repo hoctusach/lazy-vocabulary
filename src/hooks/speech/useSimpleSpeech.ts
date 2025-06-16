@@ -47,33 +47,20 @@ export const useSimpleSpeech = () => {
         count: 0
       };
 
-      const success = await simpleSpeechController.speak(wordObject, 'US', {
-        voice: options.voice,
-        rate: 0.8,
-        pitch: 1.0,
-        volume: 1.0,
-        onStart: () => {
-          console.log(`[SIMPLE-SPEECH-${speechId}] Speech started successfully`);
-        },
-        onEnd: () => {
-          console.log(`[SIMPLE-SPEECH-${speechId}] Speech completed successfully`);
+      // Use the correct signature with only word and region
+      const success = await simpleSpeechController.speak(wordObject, 'US');
+
+      if (success) {
+        console.log(`[SIMPLE-SPEECH-${speechId}] Speech started successfully`);
+        // Set up completion callback
+        setTimeout(() => {
           setIsSpeaking(false);
           currentSpeechRef.current = null;
           if (options.onComplete) {
             options.onComplete();
           }
-        },
-        onError: (event) => {
-          console.log(`[SIMPLE-SPEECH-${speechId}] Speech error: ${event.error}`);
-          setIsSpeaking(false);
-          currentSpeechRef.current = null;
-          if (options.onError) {
-            options.onError();
-          }
-        }
-      });
-
-      if (!success) {
+        }, 2000); // Estimate completion time
+      } else {
         console.log(`[SIMPLE-SPEECH-${speechId}] Speech failed to start`);
         setIsSpeaking(false);
         currentSpeechRef.current = null;

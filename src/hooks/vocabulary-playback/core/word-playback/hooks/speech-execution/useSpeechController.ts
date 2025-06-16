@@ -34,20 +34,18 @@ export const useSpeechController = (
 
       console.log(`[SPEECH-CONTROLLER-${sessionId}] Initiating speech with enhanced monitoring`);
 
-      // Execute speech with comprehensive error handling
-      const success = await simpleSpeechController.speak(currentWord, selectedVoice.region, {
-        voice,
-        rate: 0.8,
-        pitch: 1.0,
-        volume: 1.0,
-        onStart,
-        onEnd,
-        onError
-      });
+      // Execute speech with the correct signature
+      const success = await simpleSpeechController.speak(currentWord, selectedVoice.region);
 
       console.log(`[SPEECH-CONTROLLER-${sessionId}] Speech initiation result: ${success}`);
 
-      if (!success) {
+      if (success) {
+        onStart();
+        // Schedule end callback after estimated duration
+        setTimeout(() => {
+          onEnd();
+        }, 2000);
+      } else {
         console.warn(`[SPEECH-CONTROLLER-${sessionId}] ✗ Speech failed to start`);
         setPlayInProgress(false);
         if (!paused && !muted) {
