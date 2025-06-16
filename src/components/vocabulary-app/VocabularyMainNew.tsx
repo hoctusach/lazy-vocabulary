@@ -3,6 +3,7 @@ import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyCardNew from './VocabularyCardNew';
 import { useBackgroundColor } from './useBackgroundColor';
+import VocabularyControlsColumn from './VocabularyControlsColumn';
 
 interface VocabularyMainNewProps {
   currentWord: VocabularyWord;
@@ -19,6 +20,8 @@ interface VocabularyMainNewProps {
   displayTime: number;
   voiceRegion: 'US' | 'UK' | 'AU';
   nextVoiceLabel: string;
+  onOpenAddModal: () => void;
+  onOpenEditModal: () => void;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -36,12 +39,14 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   displayTime,
   voiceRegion,
   nextVoiceLabel,
+  onOpenAddModal,
+  onOpenEditModal,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
   return (
-    <div className="space-y-6">
-      <VocabularyCardNew 
+    <div className="flex flex-col sm:flex-row items-start gap-4">
+      <VocabularyCardNew
         word={currentWord.word}
         meaning={currentWord.meaning}
         example={currentWord.example}
@@ -59,6 +64,20 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         category={currentWord.category || currentCategory}
         voiceRegion={voiceRegion}
         nextVoiceLabel={nextVoiceLabel}
+      />
+      <VocabularyControlsColumn
+        isMuted={mute}
+        isPaused={isPaused}
+        onToggleMute={toggleMute}
+        onTogglePause={handleTogglePause}
+        onNextWord={handleManualNext}
+        onSwitchCategory={handleSwitchCategory}
+        onCycleVoice={handleCycleVoice}
+        nextCategory={nextCategory || 'Next'}
+        nextVoiceLabel={nextVoiceLabel}
+        currentWord={currentWord}
+        onOpenAddModal={onOpenAddModal}
+        onOpenEditModal={onOpenEditModal}
       />
     </div>
   );
