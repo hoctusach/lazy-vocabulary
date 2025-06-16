@@ -45,8 +45,9 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   const { backgroundColor } = useBackgroundColor();
 
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-4">
-      <VocabularyCardNew
+    <div className="flex flex-row flex-nowrap items-start gap-4 w-full">
+      <div className="flex-1 min-w-0">
+        <VocabularyCardNew
         word={currentWord.word}
         meaning={currentWord.meaning}
         example={currentWord.example}
@@ -64,8 +65,10 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         category={currentWord.category || currentCategory}
         voiceRegion={voiceRegion}
         nextVoiceLabel={nextVoiceLabel}
-      />
-      <VocabularyControlsColumn
+        />
+      </div>
+      <div className="flex-none w-28">
+        <VocabularyControlsColumn
         isMuted={mute}
         isPaused={isPaused}
         onToggleMute={toggleMute}
@@ -78,7 +81,8 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         currentWord={currentWord}
         onOpenAddModal={onOpenAddModal}
         onOpenEditModal={onOpenEditModal}
-      />
+        />
+      </div>
     </div>
   );
 };
