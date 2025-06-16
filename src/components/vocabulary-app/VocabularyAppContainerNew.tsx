@@ -10,6 +10,7 @@ import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/us
 import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
+import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
 
 const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
@@ -42,7 +43,7 @@ const VocabularyAppContainerNew: React.FC = () => {
   });
 
   // Enhanced user interaction handling with proper audio unlock
-  const { hasInitialized, interactionCount, isAudioUnlocked } = useEnhancedUserInteraction({
+  const { hasInitialized, interactionCount, isAudioUnlocked, forceAudioUnlock } = useEnhancedUserInteraction({
     onUserInteraction: () => {
       console.log('[VOCAB-CONTAINER-NEW] User interaction callback triggered');
     },
@@ -56,30 +57,60 @@ const VocabularyAppContainerNew: React.FC = () => {
     isAudioUnlocked
   });
 
-  // Auto-play when conditions are met (simplified logic)
+  // [FIX-APPLIED] Enhanced auto-play with proper state monitoring
   useEffect(() => {
+    const speechState = simpleSpeechController.getState();
+    
+    const autoPlayConditions = {
+      hasData,
+      hasCurrentWord: !!currentWord,
+      hasInitialized,
+      isPaused,
+      isMuted,
+      isSpeaking,
+      isAudioUnlocked,
+      speechControllerActive: speechState.isActive,
+      audioUnlockedFromController: speechState.audioUnlocked
+    };
+
+    console.log('[AUTO-PLAY] Condition check:', autoPlayConditions);
+
     if (hasData && currentWord && hasInitialized && !isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
       console.log('[AUTO-PLAY] ✓ All conditions met - scheduling word playback');
+      console.log('[FIX-APPLIED] Auto-play triggered with enhanced conditions');
+      
       const timeoutId = setTimeout(() => {
-        if (!isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
-          console.log('[AUTO-PLAY] Executing delayed word playback');
+        // Double-check conditions before executing
+        const finalCheck = {
+          isPaused,
+          isMuted,
+          isSpeaking,
+          isAudioUnlocked,
+          stillHasWord: !!currentWord
+        };
+        
+        console.log('[AUTO-PLAY] Final condition check before execution:', finalCheck);
+        
+        if (!isPaused && !isMuted && !isSpeaking && isAudioUnlocked && currentWord) {
+          console.log('[AUTO-PLAY] ✓ Executing delayed word playback');
+          console.log('[FIX-APPLIED] Auto-play execution with verified conditions');
           playCurrentWord();
+        } else {
+          console.log('[AUTO-PLAY] ✗ Conditions changed, skipping playback');
         }
       }, 800);
 
       return () => clearTimeout(timeoutId);
     } else {
-      console.log('[AUTO-PLAY] Conditions not met:', {
-        hasData,
-        hasCurrentWord: !!currentWord,
-        hasInitialized,
-        isPaused,
-        isMuted,
-        isSpeaking,
-        isAudioUnlocked
-      });
+      console.log('[AUTO-PLAY] Conditions not met for auto-play');
     }
   }, [hasData, currentWord, hasInitialized, isPaused, isMuted, isSpeaking, isAudioUnlocked, playCurrentWord]);
+
+  // [FIX-APPLIED] Audio unlock button for manual unlock if needed
+  const handleManualAudioUnlock = async () => {
+    console.log('[FIX-APPLIED] Manual audio unlock requested');
+    await forceAudioUnlock();
+  };
 
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
@@ -132,6 +163,14 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
+          {!isAudioUnlocked && hasInitialized && (
+            <button 
+              onClick={handleManualAudioUnlock}
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              [FIX-APPLIED] Unlock Audio
+            </button>
+          )}
           <VocabularyCardNew
             word="No vocabulary data"
             meaning="Please upload a vocabulary file to get started"
@@ -165,6 +204,14 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
+          {!isAudioUnlocked && hasInitialized && (
+            <button 
+              onClick={handleManualAudioUnlock}
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              [FIX-APPLIED] Unlock Audio
+            </button>
+          )}
           <VocabularyCardNew
             word={`No words in "${currentCategory}" category`}
             meaning="Try switching to another category"
@@ -198,6 +245,14 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
+          {!isAudioUnlocked && hasInitialized && (
+            <button 
+              onClick={handleManualAudioUnlock}
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              [FIX-APPLIED] Unlock Audio
+            </button>
+          )}
           <VocabularyCardNew
             word="Loading vocabulary..."
             meaning="Please wait while we load your vocabulary data"
@@ -230,6 +285,15 @@ const VocabularyAppContainerNew: React.FC = () => {
           hasInitialized={hasInitialized}
           interactionCount={interactionCount}
         />
+        
+        {!isAudioUnlocked && hasInitialized && (
+          <button 
+            onClick={handleManualAudioUnlock}
+            className="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600"
+          >
+            [FIX-APPLIED] Unlock Audio for Speech
+          </button>
+        )}
         
         <ErrorDisplay jsonLoadError={false} />
         

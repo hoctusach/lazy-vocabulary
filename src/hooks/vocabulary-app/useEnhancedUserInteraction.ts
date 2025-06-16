@@ -1,150 +1,120 @@
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
 import { audioUnlockService } from '@/services/audio/AudioUnlockService';
 
-interface EnhancedUserInteractionProps {
+interface UseEnhancedUserInteractionProps {
   onUserInteraction?: () => void;
-  currentWord?: any;
+  currentWord?: VocabularyWord | null;
   playCurrentWord?: () => void;
 }
 
 /**
- * Enhanced user interaction handler with proper debouncing and audio unlock
+ * Enhanced user interaction hook with improved audio unlock detection
  */
-export const useEnhancedUserInteraction = ({ 
-  onUserInteraction, 
-  currentWord, 
-  playCurrentWord 
-}: EnhancedUserInteractionProps) => {
-  const hasInitialized = useRef(false);
-  const lastInteractionTime = useRef(0);
-  const interactionCount = useRef(0);
+export const useEnhancedUserInteraction = ({
+  onUserInteraction,
+  currentWord,
+  playCurrentWord
+}: UseEnhancedUserInteractionProps) => {
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [interactionCount, setInteractionCount] = useState(0);
   const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
-  const debounceDelay = 300; // Reduced debounce delay
+  const unlockAttemptRef = useRef(false);
 
-  const handleUserInteraction = useCallback(async (interactionType: string) => {
-    const now = Date.now();
-    interactionCount.current++;
+  // Check audio unlock status
+  const checkAudioStatus = useCallback(async () => {
+    const unlocked = audioUnlockService.isUnlocked();
+    const hasGesture = audioUnlockService.hasValidUserGesture();
     
-    // Debounce rapid interactions
-    if (now - lastInteractionTime.current < debounceDelay) {
-      console.log(`[USER-INTERACTION] Debounced ${interactionType} interaction #${interactionCount.current}`);
-      return;
-    }
+    console.log('[USER-INTERACTION] Audio status check:', {
+      unlocked,
+      hasGesture,
+      hasInitialized
+    });
     
-    lastInteractionTime.current = now;
-    console.log(`[USER-INTERACTION] Processing ${interactionType} interaction #${interactionCount.current}`);
+    setIsAudioUnlocked(unlocked);
+    return unlocked;
+  }, [hasInitialized]);
 
-    // Mark user gesture for audio unlock service
-    audioUnlockService.markUserGesture();
-
-    try {
-      // Always attempt to unlock audio on user interaction
-      const unlocked = await audioUnlockService.unlock();
-      console.log('[USER-INTERACTION] Audio unlock result:', unlocked);
-      setIsAudioUnlocked(unlocked);
+  // Handle user interaction with immediate audio unlock attempt
+  const handleUserInteraction = useCallback(async () => {
+    console.log('[USER-INTERACTION] ✓ User interaction detected');
+    
+    const newCount = interactionCount + 1;
+    setInteractionCount(newCount);
+    setHasInitialized(true);
+    
+    // Trigger callback
+    onUserInteraction?.();
+    
+    // Attempt to unlock audio immediately
+    if (!unlockAttemptRef.current) {
+      unlockAttemptRef.current = true;
       
-      // Only initialize once
-      if (!hasInitialized.current) {
-        hasInitialized.current = true;
-        console.log('[USER-INTERACTION] ✓ First meaningful interaction - audio systems initialized');
+      console.log('[USER-INTERACTION] Attempting audio unlock...');
+      try {
+        const unlocked = await audioUnlockService.unlock();
+        console.log(`[USER-INTERACTION] Audio unlock result: ${unlocked}`);
+        setIsAudioUnlocked(unlocked);
         
-        // Store interaction state
-        localStorage.setItem('hadUserInteraction', 'true');
-        
-        // Notify parent component
-        onUserInteraction?.();
-        
-        // Auto-play current word if available and conditions are met
-        if (currentWord && playCurrentWord && unlocked) {
-          console.log('[USER-INTERACTION] Auto-playing current word after unlock');
+        // If we have a word and audio is unlocked, try to play it
+        if (unlocked && currentWord && playCurrentWord) {
+          console.log('[USER-INTERACTION] ✓ Triggering speech after unlock');
           setTimeout(() => {
             playCurrentWord();
-          }, 500);
+          }, 200);
         }
-      } else if (unlocked && currentWord && playCurrentWord) {
-        // For subsequent interactions, try to play if audio is working
-        console.log('[USER-INTERACTION] Subsequent interaction - attempting word playback');
-        setTimeout(() => {
-          playCurrentWord();
-        }, 200);
+      } catch (error) {
+        console.error('[USER-INTERACTION] ✗ Audio unlock error:', error);
+      } finally {
+        unlockAttemptRef.current = false;
       }
-      
-    } catch (error) {
-      console.error('[USER-INTERACTION] Error during audio initialization:', error);
-      setIsAudioUnlocked(false);
     }
-  }, [onUserInteraction, currentWord, playCurrentWord]);
+  }, [interactionCount, onUserInteraction, currentWord, playCurrentWord]);
 
+  // Set up interaction listeners
   useEffect(() => {
-    // Check for previous interactions and current audio state
-    const hadPreviousInteraction = localStorage.getItem('hadUserInteraction') === 'true';
-    const audioAlreadyUnlocked = audioUnlockService.isAudioUnlocked();
-    
-    if (hadPreviousInteraction || audioAlreadyUnlocked) {
+    // Check if we already had interaction
+    const hadPreviousInteraction = audioUnlockService.hasValidUserGesture();
+    if (hadPreviousInteraction) {
       console.log('[USER-INTERACTION] Previous interaction or audio already unlocked');
-      hasInitialized.current = true;
-      setIsAudioUnlocked(audioAlreadyUnlocked);
-      audioUnlockService.markUserGesture();
+      setHasInitialized(true);
       onUserInteraction?.();
-      return;
+      checkAudioStatus();
     }
 
-    // Event handlers with debouncing
-    const handleClick = (e: MouseEvent) => {
-      handleUserInteraction('click');
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle meaningful key presses
-      if ([' ', 'Enter', 'ArrowRight', 'ArrowLeft', 'Escape'].includes(e.key)) {
-        handleUserInteraction('keydown');
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      handleUserInteraction('touchstart');
-    };
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && hasInitialized.current) {
-        console.log('[USER-INTERACTION] Page became visible - attempting audio resume');
-        audioUnlockService.unlock().then(unlocked => {
-          setIsAudioUnlocked(unlocked);
-        }).catch(console.warn);
-      }
-    };
-
-    // Add event listeners
-    document.addEventListener('click', handleClick, { passive: true });
-    document.addEventListener('keydown', handleKeyDown, { passive: true });
-    document.addEventListener('touchstart', handleTouchStart, { passive: true });
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    // Add event listeners for various interaction types
+    const events = ['click', 'touchstart', 'keydown', 'pointerdown', 'mousedown'];
+    events.forEach(event => {
+      document.addEventListener(event, handleUserInteraction, { passive: true });
+    });
 
     return () => {
-      document.removeEventListener('click', handleClick);
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      events.forEach(event => {
+        document.removeEventListener(event, handleUserInteraction);
+      });
     };
-  }, [handleUserInteraction]);
+  }, [handleUserInteraction, onUserInteraction, checkAudioStatus]);
 
-  // Update audio unlock status periodically
+  // Periodic audio status check
   useEffect(() => {
-    const checkAudioStatus = () => {
-      const currentStatus = audioUnlockService.isAudioUnlocked();
-      if (currentStatus !== isAudioUnlocked) {
-        setIsAudioUnlocked(currentStatus);
-      }
-    };
+    const interval = setInterval(() => {
+      checkAudioStatus();
+    }, 2000);
 
-    const interval = setInterval(checkAudioStatus, 1000);
     return () => clearInterval(interval);
-  }, [isAudioUnlocked]);
+  }, [checkAudioStatus]);
+
+  // Initial audio status check
+  useEffect(() => {
+    checkAudioStatus();
+  }, [checkAudioStatus]);
 
   return {
-    hasInitialized: hasInitialized.current,
-    interactionCount: interactionCount.current,
-    isAudioUnlocked
+    hasInitialized,
+    interactionCount,
+    isAudioUnlocked,
+    forceAudioUnlock: handleUserInteraction
   };
 };
