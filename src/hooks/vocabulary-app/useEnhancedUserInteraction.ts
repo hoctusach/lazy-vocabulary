@@ -114,7 +114,6 @@ export const useEnhancedUserInteraction = ({
   return {
     hasInitialized,
     interactionCount,
-    isAudioUnlocked,
-    forceAudioUnlock: handleUserInteraction
+    isAudioUnlocked
   };
 };

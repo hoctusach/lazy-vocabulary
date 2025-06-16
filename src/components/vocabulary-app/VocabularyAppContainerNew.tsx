@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
@@ -43,7 +43,7 @@ const VocabularyAppContainerNew: React.FC = () => {
   });
 
   // Enhanced user interaction handling with proper audio unlock
-  const { hasInitialized, interactionCount, isAudioUnlocked, forceAudioUnlock } = useEnhancedUserInteraction({
+  const { hasInitialized, interactionCount, isAudioUnlocked } = useEnhancedUserInteraction({
     onUserInteraction: () => {
       console.log('[VOCAB-CONTAINER-NEW] User interaction callback triggered');
     },
@@ -106,11 +106,6 @@ const VocabularyAppContainerNew: React.FC = () => {
     }
   }, [hasData, currentWord, hasInitialized, isPaused, isMuted, isSpeaking, isAudioUnlocked, playCurrentWord]);
 
-  // [FIX-APPLIED] Audio unlock button for manual unlock if needed
-  const handleManualAudioUnlock = async () => {
-    console.log('[FIX-APPLIED] Manual audio unlock requested');
-    await forceAudioUnlock();
-  };
 
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
@@ -163,14 +158,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
-          {!isAudioUnlocked && hasInitialized && (
-            <button
-              onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
-            >
-              [FIX-APPLIED] Unlock Audio
-            </button>
-          )}
           <VocabularyCardNew
             word="No vocabulary data"
             meaning="Please upload a vocabulary file to get started"
@@ -204,14 +191,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
-          {!isAudioUnlocked && hasInitialized && (
-            <button
-              onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
-            >
-              [FIX-APPLIED] Unlock Audio
-            </button>
-          )}
           <VocabularyCardNew
             word={`No words in "${currentCategory}" category`}
             meaning="Try switching to another category"
@@ -245,14 +224,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             hasInitialized={hasInitialized}
             interactionCount={interactionCount}
           />
-          {!isAudioUnlocked && hasInitialized && (
-            <button
-              onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
-            >
-              [FIX-APPLIED] Unlock Audio
-            </button>
-          )}
           <VocabularyCardNew
             word="Loading vocabulary..."
             meaning="Please wait while we load your vocabulary data"
@@ -285,15 +256,6 @@ const VocabularyAppContainerNew: React.FC = () => {
           hasInitialized={hasInitialized}
           interactionCount={interactionCount}
         />
-        
-        {!isAudioUnlocked && hasInitialized && (
-          <button
-            onClick={handleManualAudioUnlock}
-            className="w-full bg-amber-500 text-white text-xs px-3 py-1 rounded hover:bg-amber-600"
-          >
-            [FIX-APPLIED] Unlock Audio for Speech
-          </button>
-        )}
         
         <ErrorDisplay jsonLoadError={false} />
         
