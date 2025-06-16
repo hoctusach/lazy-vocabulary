@@ -1,8 +1,6 @@
-
 import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
-import WordActionButtons from './WordActionButtons';
 import DebugPanel from '@/components/DebugPanel';
 import AddWordModal from './AddWordModal';
 
@@ -73,14 +71,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         displayTime={displayTime}
         voiceRegion={voiceRegion}
         nextVoiceLabel={nextVoiceLabel}
-      />
-      
-      {/* Action buttons container */}
-      <WordActionButtons 
-        currentWord={displayWord}
         onOpenAddModal={handleOpenAddWordModal}
         onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       />
+      
       
       {/* Debug Panel */}
       <DebugPanel 
