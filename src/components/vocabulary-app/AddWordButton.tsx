@@ -11,7 +11,7 @@ const AddWordButton: React.FC<AddWordButtonProps> = ({ onClick }) => {
   return (
     <Button
       onClick={onClick}
-      className="flex items-center justify-center gap-1 py-0.5 px-1 text-xs"
+      className="flex items-center justify-center gap-1 py-0.5 px-1 text-[10px] w-fit"
       variant="outline"
       size="sm"
     >

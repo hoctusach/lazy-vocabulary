@@ -67,7 +67,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         nextVoiceLabel={nextVoiceLabel}
         />
       </div>
-      <div className="flex-none w-28">
+      <div className="flex-none w-24">
         <VocabularyControlsColumn
         isMuted={mute}
         isPaused={isPaused}
