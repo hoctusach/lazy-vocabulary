@@ -60,7 +60,7 @@ export const useSpeechExecution = (
       // Attempt speech with enhanced monitoring
       console.log(`[SPEECH-EXECUTION-${executionId}] Initiating speech synthesis`);
       
-      const success = await simpleSpeechController.speak(speechText, {
+      const success = await simpleSpeechController.speak(wordToPlay, selectedVoice.region, {
         voice,
         rate: 0.8,
         pitch: 1.0,

@@ -35,7 +35,7 @@ export const useSpeechController = (
       console.log(`[SPEECH-CONTROLLER-${sessionId}] Initiating speech with enhanced monitoring`);
 
       // Execute speech with comprehensive error handling
-      const success = await simpleSpeechController.speak(speechableText, {
+      const success = await simpleSpeechController.speak(currentWord, selectedVoice.region, {
         voice,
         rate: 0.8,
         pitch: 1.0,

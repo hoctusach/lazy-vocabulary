@@ -1,5 +1,6 @@
 
 import { useCallback, useRef, useState } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
 import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
 
 /**
@@ -38,7 +39,15 @@ export const useSimpleSpeech = () => {
     setIsSpeaking(true);
 
     try {
-      const success = await simpleSpeechController.speak(text, {
+      // Create a minimal VocabularyWord object from the text
+      const wordObject: VocabularyWord = {
+        word: text,
+        meaning: '',
+        example: '',
+        count: 0
+      };
+
+      const success = await simpleSpeechController.speak(wordObject, 'US', {
         voice: options.voice,
         rate: 0.8,
         pitch: 1.0,
