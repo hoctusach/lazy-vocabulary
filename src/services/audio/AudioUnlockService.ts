@@ -78,21 +78,30 @@ class AudioUnlockService {
     this.unlockAttempts++;
 
     try {
+
       // Test with Web Audio API
       if (typeof AudioContext !== 'undefined' || typeof (window as any).webkitAudioContext !== 'undefined') {
         const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext;
         const audioContext = new AudioCtx();
-        
+
         if (audioContext.state === 'suspended') {
           console.log('[AUDIO-UNLOCK] Resuming suspended audio context');
           await audioContext.resume();
         }
-        
+
         if (audioContext.state === 'running') {
           console.log('[AUDIO-UNLOCK] ✓ Audio context is running');
         }
-        
+
         audioContext.close();
+      }
+
+      // Fallback for environments without speech synthesis support
+      if (!window.speechSynthesis) {
+        console.warn('[AUDIO-UNLOCK] speechSynthesis not available - assuming unlocked');
+        this.isAudioUnlocked = true;
+        localStorage.setItem('audioUnlocked', 'true');
+        return true;
       }
 
       // Test with speech synthesis
