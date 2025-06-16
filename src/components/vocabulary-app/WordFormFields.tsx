@@ -16,11 +16,11 @@ interface WordFormFieldsProps {
 
 // Updated category options without "All words"
 const CATEGORY_OPTIONS = [
-  { value: "phrasal verbs", label: "Phrasal Verbs" },
+  { value: "phrasal verbs", label: "Phrasal V" },
   { value: "idioms", label: "Idioms" },
-  { value: "topic vocab", label: "Topic Vocab" },
+  { value: "topic vocab", label: "Topic" },
   { value: "grammar", label: "Grammar" },
-  { value: "phrases, collocations", label: "Phrases & Collocations" }
+  { value: "phrases, collocations", label: "Phrasals" }
 ];
 
 const WordFormFields: React.FC<WordFormFieldsProps> = ({
@@ -70,7 +70,7 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
         </Label>
         <div className="col-span-3">
           <Select value={category} onValueChange={onCategoryChange} disabled={isDisabled}>
-            <SelectTrigger>
+            <SelectTrigger className="w-28">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
