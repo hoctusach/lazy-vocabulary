@@ -90,6 +90,10 @@ export class SpeechExecutor {
     this.stateManager.setPhase('preparing');
     this.isExecuting = true;
 
+    // Ensure the unlock process has fully completed before speaking
+    console.log(`[SPEECH-EXECUTOR-${speechId}] Waiting for audio unlock completion`);
+    await audioUnlockService.unlock();
+
     try {
       this.currentSpeechPromise = this.executeSpeech(word, voiceRegion, speechId);
       const result = await this.currentSpeechPromise;

@@ -8,6 +8,8 @@ class AudioUnlockService {
   private unlockAttempts = 0;
   private readonly MAX_UNLOCK_ATTEMPTS = 3;
   private silentTestUtterance: SpeechSynthesisUtterance | null = null;
+  private unlockInProgress = false;
+  private unlockPromise: Promise<boolean> | null = null;
 
   constructor() {
     this.setupUserGestureDetection();
@@ -62,6 +64,12 @@ class AudioUnlockService {
       return true;
     }
 
+    if (this.unlockInProgress && this.unlockPromise) {
+      console.log('[AUDIO-UNLOCK] Unlock already in progress - waiting');
+      await this.unlockPromise;
+      return this.isAudioUnlocked;
+    }
+
     if (this.unlockAttempts >= this.MAX_UNLOCK_ATTEMPTS) {
       console.log('[AUDIO-UNLOCK] ✗ Max unlock attempts reached');
       return false;
@@ -91,22 +99,28 @@ class AudioUnlockService {
       if (window.speechSynthesis) {
         // Cancel any existing speech first
         window.speechSynthesis.cancel();
-        
+
         // Wait a bit for cancellation to complete
         await new Promise(resolve => setTimeout(resolve, 100));
-        
+
         // Create a silent test utterance
         this.silentTestUtterance = new SpeechSynthesisUtterance(' ');
         this.silentTestUtterance.volume = 0.01; // Nearly silent
         this.silentTestUtterance.rate = 10; // Very fast
         this.silentTestUtterance.pitch = 0.1; // Very low
-        
-        const unlockPromise = new Promise<boolean>((resolve) => {
+
+        this.unlockInProgress = true;
+        console.log('[AUDIO-UNLOCK] Unlock attempt started');
+
+        this.unlockPromise = new Promise<boolean>((resolve) => {
           let resolved = false;
-          
+
           const resolveOnce = (success: boolean) => {
             if (!resolved) {
               resolved = true;
+              this.unlockInProgress = false;
+              window.speechSynthesis.cancel();
+              console.log('[AUDIO-UNLOCK] Unlock attempt completed', { success });
               resolve(success);
             }
           };
@@ -116,14 +130,11 @@ class AudioUnlockService {
               console.log('[AUDIO-UNLOCK] ✓ Silent utterance started - audio unlocked');
               this.isAudioUnlocked = true;
               localStorage.setItem('audioUnlocked', 'true');
-              resolveOnce(true);
             };
 
             this.silentTestUtterance.onend = () => {
               console.log('[AUDIO-UNLOCK] Silent utterance ended');
-              if (!this.isAudioUnlocked) {
-                resolveOnce(false);
-              }
+              resolveOnce(this.isAudioUnlocked);
             };
 
             this.silentTestUtterance.onerror = (event) => {
@@ -146,7 +157,8 @@ class AudioUnlockService {
           }, 1000);
         });
 
-        const result = await unlockPromise;
+        const result = await this.unlockPromise;
+        this.unlockPromise = null;
         
         if (result) {
           console.log('[AUDIO-UNLOCK] ✓ Audio successfully unlocked');
@@ -159,6 +171,8 @@ class AudioUnlockService {
 
     } catch (error) {
       console.error('[AUDIO-UNLOCK] ✗ Error during unlock:', error);
+      this.unlockInProgress = false;
+      this.unlockPromise = null;
       return false;
     }
   }
@@ -168,6 +182,8 @@ class AudioUnlockService {
     this.isAudioUnlocked = false;
     this.hasUserGesture = false;
     this.unlockAttempts = 0;
+    this.unlockInProgress = false;
+    this.unlockPromise = null;
     localStorage.removeItem('hasUserGesture');
     localStorage.removeItem('audioUnlocked');
     
