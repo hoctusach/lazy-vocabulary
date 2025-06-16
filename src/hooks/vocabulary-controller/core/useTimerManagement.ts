@@ -1,83 +1,65 @@
 
-import { useRef, useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 /**
- * Enhanced timer management with aggressive debouncing to prevent 1-second delays
+ * Enhanced timer management with improved debouncing and coordination
  */
 export const useTimerManagement = (isPaused: boolean, isMuted: boolean) => {
   const autoAdvanceTimerRef = useRef<number | null>(null);
-  const lastScheduleTimeRef = useRef(0);
-  const isSchedulingRef = useRef(false);
-  const MIN_SCHEDULE_INTERVAL = 250; // Increased to prevent rapid scheduling
-  const lastClearTimeRef = useRef(0);
+  const lastClearTime = useRef(0);
+  const isScheduling = useRef(false);
 
   const clearAutoAdvanceTimer = useCallback(() => {
-    const now = Date.now();
-    
-    // Prevent rapid clear/schedule cycles
-    if (now - lastClearTimeRef.current < 100) {
-      console.log('[TIMER-MANAGER] Clear call debounced to prevent cycles');
-      return;
-    }
-    lastClearTimeRef.current = now;
-
     if (autoAdvanceTimerRef.current !== null) {
       console.log('[TIMER-MANAGER] Clearing auto-advance timer');
-      window.clearTimeout(autoAdvanceTimerRef.current);
+      clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
+      lastClearTime.current = Date.now();
     }
-    isSchedulingRef.current = false;
+    isScheduling.current = false;
   }, []);
 
-  const scheduleAutoAdvance = useCallback((delay: number, onAdvance?: () => void) => {
+  const scheduleAutoAdvance = useCallback((delay: number, callback: () => void) => {
     const now = Date.now();
     
-    // More aggressive debouncing to prevent rapid scheduling
-    if (now - lastScheduleTimeRef.current < MIN_SCHEDULE_INTERVAL) {
-      console.log('[TIMER-MANAGER] Schedule call debounced - preventing rapid scheduling');
+    // Prevent scheduling if already in progress
+    if (isScheduling.current) {
+      console.log('[TIMER-MANAGER] Already scheduling, skipping');
       return;
     }
 
-    // Prevent overlapping schedules more strictly
-    if (isSchedulingRef.current) {
-      console.log('[TIMER-MANAGER] Schedule already in progress - rejecting new request');
+    // Enhanced minimum interval check - allow scheduling but with extra delay if too soon
+    if (now - lastClearTime.current < 100) {
+      console.log('[TIMER-MANAGER] Scheduling too soon after clear, adding delay');
+      setTimeout(() => scheduleAutoAdvance(delay, callback), 200);
       return;
     }
 
-    lastScheduleTimeRef.current = now;
-
-    // Clear any existing timer first
-    clearAutoAdvanceTimer();
-
-    // Don't schedule if paused or muted
     if (isPaused || isMuted) {
-      console.log('[TIMER-MANAGER] Not scheduling due to paused/muted state');
+      console.log('[TIMER-MANAGER] Not scheduling - paused or muted');
       return;
     }
 
-    // Prevent scheduling if too soon after last clear
-    if (now - lastClearTimeRef.current < 100) {
-      console.log('[TIMER-MANAGER] Not scheduling - too soon after clear');
-      return;
-    }
-
-    isSchedulingRef.current = true;
+    isScheduling.current = true;
+    clearAutoAdvanceTimer();
 
     console.log(`[TIMER-MANAGER] Scheduling auto-advance in ${delay}ms`);
     
     autoAdvanceTimerRef.current = window.setTimeout(() => {
-      console.log('[TIMER-MANAGER] Auto-advance triggered');
-      
-      // Double-check state before advancing
-      if (!isPaused && !isMuted) {
-        onAdvance?.();
-      } else {
-        console.log('[TIMER-MANAGER] Auto-advance skipped due to state change');
-      }
-      
-      // Clean up
+      console.log('[TIMER-MANAGER] Executing auto-advance');
       autoAdvanceTimerRef.current = null;
-      isSchedulingRef.current = false;
+      isScheduling.current = false;
+      
+      // Double-check conditions before executing
+      if (!isPaused && !isMuted) {
+        try {
+          callback();
+        } catch (error) {
+          console.error('[TIMER-MANAGER] Error in auto-advance callback:', error);
+        }
+      } else {
+        console.log('[TIMER-MANAGER] Skipping auto-advance - conditions changed');
+      }
     }, delay);
   }, [isPaused, isMuted, clearAutoAdvanceTimer]);
 

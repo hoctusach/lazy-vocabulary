@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
@@ -5,27 +6,13 @@ import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
-import { useMobileInteractionHandler } from '@/hooks/vocabulary-app/useMobileInteractionHandler';
+import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
-import { mobileAudioManager } from '@/utils/audio/mobileAudioManager';
 
 const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
   
-  // Track whether the user has interacted to enable audio playback
-  const userInteractionRef = useRef(false);
-  const [hasUserInteracted, setHasUserInteracted] = React.useState(false);
-  const interactionCountRef = useRef(0);
-
-  React.useEffect(() => {
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
-      setHasUserInteracted(true);
-      userInteractionRef.current = true;
-      console.log('[VOCAB-CONTAINER-NEW] ✓ Previous user interaction detected from localStorage');
-    }
-  }, []);
-
   // Use ONLY the unified vocabulary controller - single source of truth
   const {
     currentWord,
@@ -53,118 +40,45 @@ const VocabularyAppContainerNew: React.FC = () => {
     isSpeaking
   });
 
-  // Enhanced user interaction handler with comprehensive audio setup
-  const handleUserInteraction = React.useCallback(async () => {
-    interactionCountRef.current++;
-    console.log(`[USER-INTERACTION] Interaction #${interactionCountRef.current} detected`);
+  // Enhanced user interaction handling with proper audio unlock
+  const { hasInitialized, interactionCount, isAudioUnlocked } = useEnhancedUserInteraction({
+    onUserInteraction: () => {
+      console.log('[VOCAB-CONTAINER-NEW] User interaction callback triggered');
+    },
+    currentWord,
+    playCurrentWord
+  });
 
-    if (!userInteractionRef.current) {
-      console.log('[USER-INTERACTION] ✓ First user interaction - initializing audio systems');
-      userInteractionRef.current = true;
-      setHasUserInteracted(true);
-      localStorage.setItem('hadUserInteraction', 'true');
-      
-      // Initialize mobile audio manager
-      const audioInitialized = await mobileAudioManager.initialize();
-      console.log('[USER-INTERACTION] Mobile audio manager initialized:', audioInitialized);
-      
-      // Initialize audio context with comprehensive fallbacks
-      try {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-        if (AudioContext) {
-          const audioContext = new AudioContext();
-          console.log('[USER-INTERACTION] AudioContext state:', audioContext.state);
-          
-          if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-            console.log('[USER-INTERACTION] ✓ AudioContext resumed');
-          }
-        }
-      } catch (e) {
-        console.warn('[USER-INTERACTION] ⚠ Audio context initialization failed:', e);
-      }
-      
-      // Play current word if available and conditions are met
-      if (currentWord && !isPaused && !isMuted) {
-        console.log('[USER-INTERACTION] Starting initial audio playback');
-        setTimeout(() => {
+  console.log('[VOCAB-CONTAINER-NEW] User interaction state:', {
+    hasInitialized,
+    interactionCount,
+    isAudioUnlocked
+  });
+
+  // Auto-play when conditions are met (simplified logic)
+  useEffect(() => {
+    if (hasData && currentWord && hasInitialized && !isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
+      console.log('[AUTO-PLAY] ✓ All conditions met - scheduling word playback');
+      const timeoutId = setTimeout(() => {
+        if (!isPaused && !isMuted && !isSpeaking) {
+          console.log('[AUTO-PLAY] Executing delayed word playback');
           playCurrentWord();
-        }, 300);
-      } else {
-        console.log('[USER-INTERACTION] Not starting audio:', {
-          hasCurrentWord: !!currentWord,
-          isPaused,
-          isMuted
-        });
-      }
-    } else {
-      // Resume audio context on subsequent interactions
-      try {
-        await mobileAudioManager.resume();
-        console.log(`[USER-INTERACTION] Interaction #${interactionCountRef.current} - audio context resumed`);
-      } catch (e) {
-        console.warn('[USER-INTERACTION] Failed to resume audio:', e);
-      }
-    }
-  }, [currentWord, isPaused, isMuted, playCurrentWord]);
+        }
+      }, 600);
 
-  // Desktop interaction handler with logging
-  useEffect(() => {
-    const handleClick = (e: Event) => {
-      console.log('[USER-INTERACTION] Click event detected on:', e.target);
-      handleUserInteraction();
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      console.log('[USER-INTERACTION] Keydown event detected:', e.key);
-      handleUserInteraction();
-    };
-
-    // Add event listeners for user interaction
-    document.addEventListener('click', handleClick);
-    document.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      document.removeEventListener('click', handleClick);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleUserInteraction]);
-
-  // Enhanced mobile interaction handler
-  const mobileHandler = useMobileInteractionHandler(handleUserInteraction);
-  console.log('[VOCAB-CONTAINER-NEW] Mobile interaction state:', mobileHandler);
-
-  // Auto-play when data loads and user has interacted
-  useEffect(() => {
-    if (hasData && currentWord && hasUserInteracted && !isPaused && !isMuted && !isSpeaking) {
-      console.log('[AUTO-PLAY] ✓ All conditions met - playing word on data load');
-      setTimeout(() => {
-        playCurrentWord();
-      }, 500);
+      return () => clearTimeout(timeoutId);
     } else {
       console.log('[AUTO-PLAY] Conditions not met:', {
         hasData,
         hasCurrentWord: !!currentWord,
-        hasUserInteracted,
+        hasInitialized,
         isPaused,
         isMuted,
-        isSpeaking
+        isSpeaking,
+        isAudioUnlocked
       });
     }
-  }, [hasData, currentWord, hasUserInteracted, isPaused, isMuted, isSpeaking, playCurrentWord]);
-
-  // Log state changes for debugging
-  useEffect(() => {
-    console.log('[VOCAB-CONTAINER-NEW] State change - isPaused:', isPaused);
-  }, [isPaused]);
-
-  useEffect(() => {
-    console.log('[VOCAB-CONTAINER-NEW] State change - isMuted:', isMuted);
-  }, [isMuted]);
-
-  useEffect(() => {
-    console.log('[VOCAB-CONTAINER-NEW] State change - isSpeaking:', isSpeaking);
-  }, [isSpeaking]);
+  }, [hasData, currentWord, hasInitialized, isPaused, isMuted, isSpeaking, isAudioUnlocked, playCurrentWord]);
 
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
