@@ -164,9 +164,9 @@ const VocabularyAppContainerNew: React.FC = () => {
             interactionCount={interactionCount}
           />
           {!isAudioUnlocked && hasInitialized && (
-            <button 
+            <button
               onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
             >
               [FIX-APPLIED] Unlock Audio
             </button>
@@ -205,9 +205,9 @@ const VocabularyAppContainerNew: React.FC = () => {
             interactionCount={interactionCount}
           />
           {!isAudioUnlocked && hasInitialized && (
-            <button 
+            <button
               onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
             >
               [FIX-APPLIED] Unlock Audio
             </button>
@@ -246,9 +246,9 @@ const VocabularyAppContainerNew: React.FC = () => {
             interactionCount={interactionCount}
           />
           {!isAudioUnlocked && hasInitialized && (
-            <button 
+            <button
               onClick={handleManualAudioUnlock}
-              className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="w-full bg-blue-500 text-white text-xs px-3 py-1 rounded hover:bg-blue-600"
             >
               [FIX-APPLIED] Unlock Audio
             </button>
@@ -287,9 +287,9 @@ const VocabularyAppContainerNew: React.FC = () => {
         />
         
         {!isAudioUnlocked && hasInitialized && (
-          <button 
+          <button
             onClick={handleManualAudioUnlock}
-            className="w-full bg-amber-500 text-white px-4 py-2 rounded hover:bg-amber-600"
+            className="w-full bg-amber-500 text-white text-xs px-3 py-1 rounded hover:bg-amber-600"
           >
             [FIX-APPLIED] Unlock Audio for Speech
           </button>
