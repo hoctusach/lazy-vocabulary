@@ -44,8 +44,12 @@ export const getPreserveSpecialFromStorage = (): boolean => {
  */
 export const shouldBypassValidation = (text: string): boolean => {
   if (!text || typeof text !== 'string') return false;
-  
-  return BYPASS_PATTERNS.some(pattern => pattern.test(text));
+
+  return BYPASS_PATTERNS.some(pattern => {
+    // Reset lastIndex in case the regex has the global flag
+    pattern.lastIndex = 0;
+    return pattern.test(text);
+  });
 };
 
 /**
