@@ -40,13 +40,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
 
   return (
-    <div className="flex flex-col gap-2 items-stretch">
+    <div className="flex flex-col gap-2 items-end">
       <Button
         variant="outline"
         size="sm"
         onClick={onToggleMute}
         className={cn(
-          'h-6 text-xs px-1.5',
+          'h-6 text-[10px] px-1 w-fit',
           isMuted ? 'text-purple-700 border-purple-300 bg-purple-50' : 'text-gray-700'
         )}
       >
@@ -59,7 +59,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={onTogglePause}
         className={cn(
-          'h-6 text-xs px-1.5',
+          'h-6 text-[10px] px-1 w-fit',
           isPaused ? 'text-orange-500 border-orange-300 bg-orange-50' : 'text-gray-700'
         )}
       >
@@ -71,7 +71,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={onNextWord}
-        className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
+        className="h-6 text-[10px] px-1 w-fit text-indigo-700 bg-indigo-50"
       >
         <SkipForward size={12} className="mr-1" />
         Next
@@ -81,7 +81,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={onSwitchCategory}
-        className="h-6 text-xs px-1.5 text-green-700"
+        className="h-6 text-[10px] px-1 w-fit text-green-700"
       >
         <RefreshCw size={10} className="mr-1" />
         {nextCategoryLabel}
@@ -91,7 +91,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={onCycleVoice}
-        className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
+        className="h-6 text-[10px] px-1 w-fit text-blue-700 border-blue-300 bg-blue-50"
       >
         {nextVoiceLabel}
       </Button>
