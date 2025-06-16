@@ -3,11 +3,12 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { audioUnlockService } from '@/services/audio/AudioUnlockService';
 
 /**
- * Simple Speech Controller with proper audio unlock integration
+ * Simple Speech Controller with proper audio unlock integration and pause/resume support
  */
 class SimpleSpeechController {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isActive = false;
+  private isPausedState = false;
 
   async speak(word: VocabularyWord, region: 'US' | 'UK' | 'AU' = 'US'): Promise<boolean> {
     const speechId = Math.random().toString(36).substring(7);
@@ -49,12 +50,14 @@ class SimpleSpeechController {
         utterance.onstart = () => {
           console.log(`[SIMPLE-SPEECH-${speechId}] ✓ Speech started`);
           this.isActive = true;
+          this.isPausedState = false;
         };
 
         utterance.onend = () => {
           console.log(`[SIMPLE-SPEECH-${speechId}] ✓ Speech completed`);
           this.isActive = false;
           this.currentUtterance = null;
+          this.isPausedState = false;
           resolve(true);
         };
 
@@ -62,6 +65,7 @@ class SimpleSpeechController {
           console.error(`[SIMPLE-SPEECH-${speechId}] ✗ Speech error:`, event.error);
           this.isActive = false;
           this.currentUtterance = null;
+          this.isPausedState = false;
           resolve(false);
         };
 
@@ -90,10 +94,31 @@ class SimpleSpeechController {
     }
     this.currentUtterance = null;
     this.isActive = false;
+    this.isPausedState = false;
+  }
+
+  pause(): void {
+    console.log('[SIMPLE-SPEECH] Pausing speech');
+    if (this.isActive && window.speechSynthesis.speaking) {
+      window.speechSynthesis.pause();
+      this.isPausedState = true;
+    }
+  }
+
+  resume(): void {
+    console.log('[SIMPLE-SPEECH] Resuming speech');
+    if (this.isPausedState && window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      this.isPausedState = false;
+    }
   }
 
   isSpeaking(): boolean {
     return this.isActive;
+  }
+
+  isPaused(): boolean {
+    return this.isPausedState;
   }
 
   private async ensureVoicesLoaded(): Promise<void> {
