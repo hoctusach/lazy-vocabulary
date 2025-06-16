@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
+import { getCategoryLabel } from '@/utils/categoryLabels';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
 interface VocabularyCardProps {
@@ -65,6 +66,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
 
   // Safety check for nextCategory - ensure it's a string
   const safeNextCategory = nextCategory || 'Next';
+  const nextCategoryLabel = getCategoryLabel(safeNextCategory);
 
   return (
     <Card 
@@ -146,9 +148,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               className="h-6 text-xs px-2 text-green-700"
             >
               <RefreshCw size={10} className="mr-1" />
-              {typeof safeNextCategory === 'string' ? 
-                safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1) : 
-                'Next'}
+              {nextCategoryLabel}
             </Button>
             
             {/* Single voice toggle button */}

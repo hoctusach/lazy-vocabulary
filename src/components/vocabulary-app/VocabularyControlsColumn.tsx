@@ -5,6 +5,7 @@ import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
+import { getCategoryLabel } from '@/utils/categoryLabels';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -36,6 +37,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenEditModal,
 }) => {
   const safeNextCategory = nextCategory || 'Next';
+  const nextCategoryLabel = getCategoryLabel(safeNextCategory);
 
   return (
     <div className="flex flex-col gap-2 items-stretch">
@@ -82,9 +84,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         className="h-6 text-xs px-2 text-green-700"
       >
         <RefreshCw size={10} className="mr-1" />
-        {typeof safeNextCategory === 'string'
-          ? safeNextCategory.charAt(0).toUpperCase() + safeNextCategory.slice(1)
-          : 'Next'}
+        {nextCategoryLabel}
       </Button>
 
       <Button
