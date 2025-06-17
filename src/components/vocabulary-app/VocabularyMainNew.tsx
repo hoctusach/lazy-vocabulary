@@ -45,7 +45,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   const { backgroundColor } = useBackgroundColor();
 
   return (
-    <div className="flex flex-row items-start gap-4 w-full max-w-5xl mx-auto">
+    <div className="flex flex-row items-start gap-1 w-full max-w-5xl mx-auto">
       {/* Main card - takes most of the space */}
       <div className="flex-1 min-w-0">
         <VocabularyCardNew
@@ -70,7 +70,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
       </div>
       
       {/* Controls column - positioned on the right side */}
-      <div className="flex-none w-20 flex flex-col justify-start">
+      <div className="flex-none w-20 flex flex-col justify-start items-end">
         <VocabularyControlsColumn
         isMuted={mute}
         isPaused={isPaused}
