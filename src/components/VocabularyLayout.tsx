@@ -17,7 +17,7 @@ const VocabularyLayout: React.FC<VocabularyLayoutProps> = ({
   children
 }) => {
   return (
-    <div className="flex flex-col gap-3 w-full max-w-xl mx-auto p-2">
+    <div className="flex flex-col gap-3 w-full max-w-6xl mx-auto p-2 sm:p-4">
       {children}
     </div>
   );

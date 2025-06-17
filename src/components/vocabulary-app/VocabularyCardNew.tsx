@@ -63,34 +63,34 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   return (
     <Card 
       className={cn(
-        "w-[600px] mx-auto transition-colors duration-300",
+        "w-full max-w-2xl mx-auto transition-colors duration-300",
         "border-0 shadow-lg",
         isSpeaking ? "ring-2 ring-blue-400" : ""
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6 lg:p-8">
         <div className="space-y-4">
           <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900 break-words">{mainWord}</h2>
               {wordType && (
-                <p className="text-base text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
+                <p className="text-sm sm:text-base lg:text-lg text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
             </div>
             {isPaused && (
-              <span className="text-sm bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-medium">
+              <span className="text-xs sm:text-sm bg-amber-100 text-amber-800 px-2 sm:px-3 py-1 rounded-full font-medium ml-2 flex-none">
                 Paused
               </span>
             )}
           </div>
           
-          <div className="text-lg text-green-800 break-words">
+          <div className="text-base sm:text-lg lg:text-xl text-green-800 break-words">
             <span className="font-medium">* </span>
             {meaning}
           </div>
           
-          <div className="text-lg italic text-red-800 break-words">
+          <div className="text-base sm:text-lg lg:text-xl italic text-red-800 break-words">
             <span className="font-medium">* </span>
             {example}
           </div>
