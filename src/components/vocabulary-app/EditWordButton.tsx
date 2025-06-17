@@ -12,13 +12,13 @@ const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled }) =>
   return (
     <Button
       onClick={onClick}
-      className="flex items-center justify-center gap-1 py-0.5 px-1 text-[10px] w-fit"
+      className="h-8 w-8 p-0"
       variant="outline"
       size="sm"
       disabled={disabled}
+      title="Edit Word"
     >
-      <Edit className="h-4 w-4" />
-      <span>Edit</span>
+      <Edit size={16} />
     </Button>
   );
 };

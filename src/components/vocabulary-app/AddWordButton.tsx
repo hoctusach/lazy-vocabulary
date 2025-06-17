@@ -11,12 +11,12 @@ const AddWordButton: React.FC<AddWordButtonProps> = ({ onClick }) => {
   return (
     <Button
       onClick={onClick}
-      className="flex items-center justify-center gap-1 py-0.5 px-1 text-[10px] w-fit"
+      className="h-8 w-8 p-0"
       variant="outline"
       size="sm"
+      title="Add Word"
     >
-      <Plus className="h-4 w-4" />
-      <span>Add</span>
+      <Plus size={16} />
     </Button>
   );
 };
