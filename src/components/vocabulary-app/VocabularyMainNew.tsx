@@ -45,7 +45,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   const { backgroundColor } = useBackgroundColor();
 
   return (
-    <div className="flex flex-row items-start gap-1 w-full max-w-5xl mx-auto">
+    <div className="flex flex-row items-start gap-2 sm:gap-4 w-full max-w-5xl mx-auto">
       {/* Main card - takes most of the space */}
       <div className="flex-1 min-w-0">
         <VocabularyCardNew
