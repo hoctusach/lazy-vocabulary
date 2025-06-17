@@ -67,7 +67,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   return (
-    <div className="flex flex-row lg:flex-col gap-2 justify-center lg:items-end">
+    <div className="flex flex-col gap-2 items-center">
       <Button
         variant="outline"
         size="sm"
