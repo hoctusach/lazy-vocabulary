@@ -70,7 +70,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
       </div>
       
       {/* Controls column - positioned on the right side */}
-      <div className="flex-none w-20 flex flex-col justify-start items-end">
+      <div className="flex-none flex flex-col justify-start items-end">
         <VocabularyControlsColumn
         isMuted={mute}
         isPaused={isPaused}
