@@ -46,7 +46,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   const { backgroundColor } = useBackgroundColor();
 
   return (
-    <div className="flex flex-col sm:flex-row items-start gap-1">
+    <div className="flex flex-col sm:flex-row items-start gap-2 sm:gap-4">
       <VocabularyCard
         word={currentWord.word}
         meaning={currentWord.meaning}
