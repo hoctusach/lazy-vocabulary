@@ -103,7 +103,9 @@ The app strips IPA notation and Vietnamese diacritics from speech output by defa
 If you prefer to keep them, set a `preserveSpecial` flag in local storage:
 
 ```js
-localStorage.setItem('buttonStates', JSON.stringify({ preserveSpecial: true }));
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+
+localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify({ preserveSpecial: true }));
 ```
 
 When `preserveSpecial` is `true`, `extractSpeechableContent` will leave those

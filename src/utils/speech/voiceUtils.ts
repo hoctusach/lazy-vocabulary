@@ -5,6 +5,7 @@ import {
   AU_VOICE_NAMES
 } from '@/utils/speech/voiceNames';
 
+
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
   if (!voices || voices.length === 0) {
     return null;

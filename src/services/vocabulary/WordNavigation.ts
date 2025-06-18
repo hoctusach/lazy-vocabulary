@@ -1,4 +1,5 @@
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 export class WordNavigation {
   private data: SheetData;
@@ -69,10 +70,10 @@ export class WordNavigation {
     
     // Store current category in localStorage for persistence
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const states = storedStates ? JSON.parse(storedStates) : {};
       states.currentCategory = sheetName;
-      localStorage.setItem('buttonStates', JSON.stringify(states));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
     } catch (error) {
       console.error("Error saving current category to localStorage:", error);
     }
@@ -95,10 +96,10 @@ export class WordNavigation {
     
     // Store current category
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const states = storedStates ? JSON.parse(storedStates) : {};
       states.currentCategory = nextSheetName;
-      localStorage.setItem('buttonStates', JSON.stringify(states));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
     } catch (error) {
       console.error("Error saving current category to localStorage:", error);
     }

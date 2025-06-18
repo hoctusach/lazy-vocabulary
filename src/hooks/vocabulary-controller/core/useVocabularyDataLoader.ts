@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 /**
  * Data loading and persistence
@@ -16,10 +17,10 @@ export const useVocabularyDataLoader = (
   // Persist voice region whenever it changes
   useEffect(() => {
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const states = storedStates ? JSON.parse(storedStates) : {};
       states.voiceRegion = voiceRegion;
-      localStorage.setItem('buttonStates', JSON.stringify(states));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
     } catch (error) {
       console.error('Error saving voice region to localStorage:', error);
     }

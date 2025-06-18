@@ -1,3 +1,5 @@
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+
 /**
  * Enhanced content filtering for speech synthesis
  * Improved to preserve more speechable content while filtering out problematic elements
@@ -28,7 +30,7 @@ const BYPASS_PATTERNS = [
 export const getPreserveSpecialFromStorage = (): boolean => {
   try {
     if (typeof localStorage === 'undefined') return false;
-    const stored = localStorage.getItem('buttonStates');
+    const stored = localStorage.getItem(BUTTON_STATES_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
       return parsed.preserveSpecial === true;

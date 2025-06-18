@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 export const usePauseState = () => {
   const getInitialPausedState = () => {
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
         return parsedStates.isPaused === true;
@@ -19,10 +20,10 @@ export const usePauseState = () => {
 
   useEffect(() => {
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const parsedStates = storedStates ? JSON.parse(storedStates) : {};
       parsedStates.isPaused = isPaused;
-      localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(parsedStates));
     } catch (error) {
       console.error('Error saving pause state to localStorage:', error);
     }

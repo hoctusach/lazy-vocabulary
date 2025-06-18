@@ -1,5 +1,4 @@
 export const US_VOICE_NAME = "en-US-Standard-G";
-
 export const UK_VOICE_NAME = "Google UK English Female";
 export const UK_VOICE_NAMES = [
   UK_VOICE_NAME,
@@ -17,3 +16,4 @@ export const AU_VOICE_NAMES = [
   "Karen",
   "Catherine"
 ] as const;
+

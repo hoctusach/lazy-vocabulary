@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 interface VoiceSettings {
   isMuted: boolean;
@@ -9,7 +10,7 @@ interface VoiceSettings {
 export const useVoiceSettings = () => {
   const getInitialStates = (): VoiceSettings => {
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
         
@@ -39,10 +40,10 @@ export const useVoiceSettings = () => {
   // Update mute state in localStorage when it changes
   useEffect(() => {
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const parsedStates = storedStates ? JSON.parse(storedStates) : {};
       parsedStates.isMuted = isMuted;
-      localStorage.setItem('buttonStates', JSON.stringify(parsedStates));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(parsedStates));
     } catch (error) {
       console.error('Error saving mute state to localStorage:', error);
     }

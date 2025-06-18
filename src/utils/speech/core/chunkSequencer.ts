@@ -1,5 +1,4 @@
 
-import { SpeechSynthesisVoice } from '@/types/speech';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 
 type ChunkResult = { success: boolean, error?: string };

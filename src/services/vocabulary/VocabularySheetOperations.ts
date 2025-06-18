@@ -1,6 +1,7 @@
 
 import { WordNavigation } from "./WordNavigation";
 import { VocabularyDataManager } from "./VocabularyDataManager";
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 export class VocabularySheetOperations {
   private wordNavigation: WordNavigation;
@@ -17,7 +18,7 @@ export class VocabularySheetOperations {
     
     // Get initial sheet name from localStorage if available
     try {
-      const storedStates = localStorage.getItem('buttonStates');
+      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
         if (parsedStates.currentCategory && this.sheetOptions.includes(parsedStates.currentCategory)) {
