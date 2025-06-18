@@ -1,5 +1,4 @@
 
-import { SpeechSynthesisVoice } from '@/types/speech';
 import { getVoiceByRegion } from '../voiceUtils';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 

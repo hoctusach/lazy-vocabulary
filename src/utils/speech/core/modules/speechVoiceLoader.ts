@@ -1,5 +1,4 @@
 
-import { SpeechSynthesisVoice } from '@/types/speech';
 
 // Enhanced voice loading with comprehensive monitoring
 export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
