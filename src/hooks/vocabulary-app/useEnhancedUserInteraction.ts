@@ -111,6 +111,15 @@ export const useEnhancedUserInteraction = ({
     checkAudioStatus();
   }, [checkAudioStatus]);
 
+  // Auto-play when audio becomes unlocked for the first time
+  const hasPlayedRef = useRef(false);
+  useEffect(() => {
+    if (!hasPlayedRef.current && hasInitialized && isAudioUnlocked && currentWord && playCurrentWord) {
+      hasPlayedRef.current = true;
+      playCurrentWord();
+    }
+  }, [isAudioUnlocked, hasInitialized, currentWord, playCurrentWord]);
+
   return {
     hasInitialized,
     interactionCount,
