@@ -83,12 +83,6 @@ npm test       # execute unit tests with vitest
 npm run lint   # check code style with ESLint
 ```
 
-## Vocabulary limits
-
-Meanings longer than 500 characters will be rejected during validation. The limit
-is defined as `MAX_MEANING_LENGTH` in
-`src/services/vocabulary/storage/constants.ts`. If you import custom lists,
-shorten or split very long definitions so they stay under this threshold.
 
 ## Enabling speech playback
 
