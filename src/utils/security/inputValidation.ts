@@ -29,5 +29,3 @@ export { validateFileUpload } from './fileValidation';
 // Export rate limiter
 export { RateLimiter } from './rateLimiter';
 
-// Export test utilities (for debugging)
-export { testValidationPatterns } from './validationTest';
