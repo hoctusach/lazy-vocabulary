@@ -1,21 +1,9 @@
-import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
-
-// Updated voice names with better UK and AU options
-const US_VOICE_NAME = "en-US-Standard-G"; // For US voice
-const UK_VOICE_NAMES = [
-  "Google UK English Female", // Primary option
-  "Daniel", // Backup UK voice
-  "Kate", // Another backup
-  "Susan", // Microsoft UK voice
-  "Hazel" // Additional UK option
-];
-const AU_VOICE_NAMES = [
-  "en-AU-Standard-C", // Energetic AU voice
-  "Google AU English Male", // Younger male AU option
-  "Google AU English Female", // Original female option
-  "Karen", // macOS AU voice
-  "Catherine" // Additional AU option
-];
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import {
+  US_VOICE_NAME,
+  UK_VOICE_NAMES,
+  AU_VOICE_NAMES
+} from '@/utils/speech/voiceNames';
 
 export const findFallbackVoice = (voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null => {
   if (!voices || voices.length === 0) {

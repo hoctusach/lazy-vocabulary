@@ -1,16 +1,10 @@
 
 import { useState, useEffect } from 'react';
-
-// Hard-coded voice names from previously working version
-const US_VOICE_NAME = "en-US-Standard-G";
-const UK_VOICE_NAME = "Google UK English Female";
-const AU_VOICE_NAMES = [
-  "en-AU-Standard-C",
-  "Google AU English Male",
-  "Google AU English Female",
-  "Karen",
-  "Catherine"
-];
+import {
+  US_VOICE_NAME,
+  UK_VOICE_NAME,
+  AU_VOICE_NAMES
+} from '@/utils/speech/voiceNames';
 
 export type VoiceOption = {
   label: string;
