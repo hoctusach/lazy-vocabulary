@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Silent speech controller hook
@@ -32,8 +32,8 @@ export const useSpeechController = (
         return false;
       }
 
-      // Use the silent speech controller
-      const success = await simpleSpeechController.speak(currentWord, selectedVoice.region);
+      // Use the unified speech controller
+      const success = await unifiedSpeechController.speak(currentWord, selectedVoice.region);
 
       if (success) {
         onStart();

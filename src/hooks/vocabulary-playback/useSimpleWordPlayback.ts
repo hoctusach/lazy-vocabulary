@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from './useVoiceSelection';
 import { useSimpleSpeech } from '@/hooks/speech/useSimpleSpeech';
-import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Simplified word playback with improved coordination and pause handling
@@ -23,7 +23,7 @@ export const useSimpleWordPlayback = (
     console.log(`[WORD-PLAYBACK-${playbackId}] Playing word: ${word.word}`);
 
     // Check if speech controller is paused - this is the critical check
-    if (simpleSpeechController.isPaused()) {
+    if (unifiedSpeechController.isPaused()) {
       console.log(`[WORD-PLAYBACK-${playbackId}] Speech controller is paused, skipping playback`);
       return;
     }
@@ -68,18 +68,18 @@ export const useSimpleWordPlayback = (
           playingRef.current = false;
           
           // Check all conditions before auto-advancing
-          if (!paused && !muted && !simpleSpeechController.isPaused()) {
+          if (!paused && !muted && !unifiedSpeechController.isPaused()) {
             console.log(`[WORD-PLAYBACK-${playbackId}] Auto-advancing to next word`);
             setTimeout(() => {
               // Double-check state before advancing
-              if (!paused && !muted && !simpleSpeechController.isPaused()) {
+              if (!paused && !muted && !unifiedSpeechController.isPaused()) {
                 goToNextWord();
               } else {
                 console.log(`[WORD-PLAYBACK-${playbackId}] State changed during delay, skipping auto-advance`);
               }
             }, 1500);
           } else {
-            console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, muted: ${muted}, controllerPaused: ${simpleSpeechController.isPaused()}`);
+            console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, muted: ${muted}, controllerPaused: ${unifiedSpeechController.isPaused()}`);
           }
         },
         onError: () => {
@@ -87,7 +87,7 @@ export const useSimpleWordPlayback = (
           playingRef.current = false;
           
           // Still advance on error to prevent getting stuck
-          if (!paused && !muted && !simpleSpeechController.isPaused()) {
+          if (!paused && !muted && !unifiedSpeechController.isPaused()) {
             setTimeout(() => goToNextWord(), 2000);
           }
         }
@@ -96,7 +96,7 @@ export const useSimpleWordPlayback = (
       if (!success) {
         console.log(`[WORD-PLAYBACK-${playbackId}] Speech failed to start, advancing`);
         playingRef.current = false;
-        if (!paused && !muted && !simpleSpeechController.isPaused()) {
+        if (!paused && !muted && !unifiedSpeechController.isPaused()) {
           setTimeout(() => goToNextWord(), 2000);
         }
       }
@@ -106,7 +106,7 @@ export const useSimpleWordPlayback = (
       playingRef.current = false;
       
       // Always advance on exception
-      if (!paused && !muted && !simpleSpeechController.isPaused()) {
+      if (!paused && !muted && !unifiedSpeechController.isPaused()) {
         setTimeout(() => goToNextWord(), 2000);
       }
     }

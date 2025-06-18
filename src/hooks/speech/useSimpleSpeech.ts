@@ -1,7 +1,7 @@
 
 import { useCallback, useRef, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Simplified speech hook with minimal complexity and maximum reliability
@@ -30,7 +30,7 @@ export const useSimpleSpeech = () => {
     // Stop any current speech
     if (isSpeaking) {
       console.log(`[SIMPLE-SPEECH-${speechId}] Stopping current speech before starting new one`);
-      simpleSpeechController.stop();
+      unifiedSpeechController.stop();
       setIsSpeaking(false);
       await new Promise(r => setTimeout(r, 100));
     }
@@ -48,7 +48,7 @@ export const useSimpleSpeech = () => {
       };
 
       // Use the correct signature with only word and region
-      const success = await simpleSpeechController.speak(wordObject, 'US');
+      const success = await unifiedSpeechController.speak(wordObject, 'US');
 
       if (success) {
         console.log(`[SIMPLE-SPEECH-${speechId}] Speech started successfully`);
@@ -83,7 +83,7 @@ export const useSimpleSpeech = () => {
 
   const stop = useCallback(() => {
     console.log('[SIMPLE-SPEECH] Stopping speech');
-    simpleSpeechController.stop();
+    unifiedSpeechController.stop();
     setIsSpeaking(false);
     currentSpeechRef.current = null;
   }, []);

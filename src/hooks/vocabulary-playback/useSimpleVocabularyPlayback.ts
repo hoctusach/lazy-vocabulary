@@ -4,7 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { useVoiceSelection } from './useVoiceSelection';
 import { useSimpleWordNavigation } from './useSimpleWordNavigation';
 import { useSimpleWordPlayback } from './useSimpleWordPlayback';
-import { simpleSpeechController } from '@/utils/speech/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Simplified vocabulary playback with immediate pause response
@@ -62,12 +62,12 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     
     if (paused) {
       console.log('[SIMPLE-VOCABULARY] ✓ Pausing speech controller immediately');
-      simpleSpeechController.pause();
+      unifiedSpeechController.pause();
     } else if (!muted) {
       console.log('[SIMPLE-VOCABULARY] ✓ Resuming from pause');
       
       // Resume the controller
-      simpleSpeechController.resume();
+      unifiedSpeechController.resume();
       
       // Play current word immediately after resume
       if (currentWord) {
