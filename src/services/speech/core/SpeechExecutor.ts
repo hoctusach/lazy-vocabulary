@@ -7,7 +7,6 @@ import { SpeechGuard } from './SpeechGuard';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
 import { mobileAudioManager } from '@/utils/audio/mobileAudioManager';
-import { audioUnlockService } from '@/services/audio/AudioUnlockService';
 
 /**
  * Enhanced Speech Executor with improved cancellation handling and mobile support
@@ -54,20 +53,7 @@ export class SpeechExecutor {
     }
     this.lastSpeakTime = now;
 
-    // Ensure audio is unlocked before proceeding
-    if (!audioUnlockService.hasValidUserGesture()) {
-      console.log(`[SPEECH-EXECUTOR-${speechId}] No user gesture detected yet`);
-      return false;
-    }
-
-    // Try to unlock audio if not already done
-    const audioUnlocked = await audioUnlockService.unlock();
-    if (!audioUnlocked) {
-      console.warn(`[SPEECH-EXECUTOR-${speechId}] Audio unlock failed`);
-      // Schedule retry instead of immediate failure
-      this.autoAdvanceTimer.schedule(2000, false, false);
-      return false;
-    }
+    // Audio unlocking is no longer required
 
     // Wait for any existing speech to complete
     if (this.currentSpeechPromise) {
@@ -90,9 +76,7 @@ export class SpeechExecutor {
     this.stateManager.setPhase('preparing');
     this.isExecuting = true;
 
-    // Ensure the unlock process has fully completed before speaking
-    console.log(`[SPEECH-EXECUTOR-${speechId}] Waiting for audio unlock completion`);
-    await audioUnlockService.unlock();
+    // Proceed directly to speech execution
 
     try {
       this.currentSpeechPromise = this.executeSpeech(word, voiceRegion, speechId);
