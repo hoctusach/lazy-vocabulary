@@ -73,9 +73,9 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
         <div className="space-y-4">
           <div className="flex justify-between items-start">
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-900 break-words">{mainWord}</h2>
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
               {wordType && (
-                <p className="text-sm sm:text-base lg:text-lg text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
+                <p className="text-xs sm:text-sm lg:text-base text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
             </div>
             {isPaused && (
@@ -85,12 +85,12 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             )}
           </div>
           
-          <div className="text-base sm:text-lg lg:text-xl text-green-800 break-words">
+          <div className="text-sm sm:text-base lg:text-lg text-green-800 break-words">
             <span className="font-medium">* </span>
             {meaning}
           </div>
-          
-          <div className="text-base sm:text-lg lg:text-xl italic text-red-800 break-words">
+
+          <div className="text-sm sm:text-base lg:text-lg italic text-red-800 break-words">
             <span className="font-medium">* </span>
             {example}
           </div>
