@@ -53,7 +53,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleNextWord = () => {
     onNextWord();
-    toast('Next word');
   };
 
   const handleSwitchCategory = () => {
