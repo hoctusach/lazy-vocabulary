@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Volume2, VolumeX, Loader2 } from 'lucide-react';
+import { VolumeX } from 'lucide-react';
 
 interface AudioStatusIndicatorProps {
   isAudioUnlocked: boolean;
@@ -22,22 +22,9 @@ const AudioStatusIndicator: React.FC<AudioStatusIndicatorProps> = ({
     );
   }
 
-  if (hasInitialized && !isAudioUnlocked) {
-    return (
-      <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm">Initializing audio...</span>
-      </div>
-    );
-  }
-
-  if (isAudioUnlocked) {
-    return (
-      <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg border border-green-200">
-        <Volume2 className="h-4 w-4" />
-        <span className="text-sm">Audio ready</span>
-      </div>
-    );
+  // Hide the indicator once initialization has started or audio is unlocked
+  if (hasInitialized || isAudioUnlocked) {
+    return null;
   }
 
   return null;
