@@ -1,11 +1,14 @@
 
 import { useState, useEffect } from 'react';
+import {
+  US_VOICE_NAME,
+  UK_VOICE_NAME,
+  AU_VOICE_NAME
+} from '@/utils/speech/voiceNames';
 
-// Hard-coded voice names from previously working version
-const US_VOICE_NAME = "en-US-Standard-G";
-const UK_VOICE_NAME = "Google UK English Female";
+// Additional AU voice options beyond the primary one
 const AU_VOICE_NAMES = [
-  "en-AU-Standard-C",
+  AU_VOICE_NAME,
   "Google AU English Male",
   "Google AU English Female",
   "Karen",
