@@ -120,6 +120,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleCycleVoice}
         className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50"
         title={`Change to ${nextVoiceLabel}`}
+        aria-label={nextVoiceLabel}
       >
         <Speaker size={16} />
       </Button>
