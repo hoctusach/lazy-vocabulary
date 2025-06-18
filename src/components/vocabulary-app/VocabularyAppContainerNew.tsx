@@ -9,7 +9,7 @@ import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/us
 import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
-import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 const VocabularyAppContainerNew: React.FC = () => {
   console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
@@ -58,7 +58,7 @@ const VocabularyAppContainerNew: React.FC = () => {
 
   // Enhanced auto-play with proper state monitoring
   useEffect(() => {
-    const speechState = simpleSpeechController.getState();
+    const speechState = unifiedSpeechController.getState();
     
     const autoPlayConditions = {
       hasData,

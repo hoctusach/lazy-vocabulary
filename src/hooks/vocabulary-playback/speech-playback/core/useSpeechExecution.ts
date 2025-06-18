@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../../useVoiceSelection';
-import { simpleSpeechController } from '@/utils/speech/controller/simpleSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Silent speech execution hook
@@ -32,7 +32,7 @@ export const useSpeechExecution = (
     }
     
     try {
-      const success = await simpleSpeechController.speak(wordToPlay, selectedVoice.region);
+      const success = await unifiedSpeechController.speak(wordToPlay, selectedVoice.region);
       
       if (success) {
         setIsSpeaking(true);
