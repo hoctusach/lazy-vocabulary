@@ -2,7 +2,6 @@
 import { VoiceSelection } from '../useVoiceSelection';
 import { US_VOICE_NAME, UK_VOICE_NAME } from '@/utils/speech/voiceNames';
 
-// Hard-coded voice names based on previously working version
 
 // Backup voice names in case primary ones aren't found
 const BACKUP_US_VOICES = ["Google US English", "Microsoft David", "Alex"];

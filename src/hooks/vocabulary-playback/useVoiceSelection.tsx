@@ -3,17 +3,9 @@ import { useState, useEffect } from 'react';
 import {
   US_VOICE_NAME,
   UK_VOICE_NAME,
-  AU_VOICE_NAME
+  AU_VOICE_NAMES
 } from '@/utils/speech/voiceNames';
 
-// Additional AU voice options beyond the primary one
-const AU_VOICE_NAMES = [
-  AU_VOICE_NAME,
-  "Google AU English Male",
-  "Google AU English Female",
-  "Karen",
-  "Catherine"
-];
 
 export type VoiceOption = {
   label: string;
