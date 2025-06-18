@@ -1,16 +1,20 @@
 import { VoiceSelection } from "@/hooks/vocabulary-playback/useVoiceSelection";
+import {
+  US_VOICE_NAME,
+  UK_VOICE_NAME,
+  AU_VOICE_NAME
+} from "@/utils/speech/voiceNames";
 
 // Updated voice names with better UK and AU options
-const US_VOICE_NAME = "en-US-Standard-G"; // For US voice
 const UK_VOICE_NAMES = [
-  "Google UK English Female", // Primary option
+  UK_VOICE_NAME, // Primary option
   "Daniel", // Backup UK voice
   "Kate", // Another backup
   "Susan", // Microsoft UK voice
   "Hazel" // Additional UK option
 ];
 const AU_VOICE_NAMES = [
-  "en-AU-Standard-C", // Energetic AU voice
+  AU_VOICE_NAME, // Energetic AU voice
   "Google AU English Male", // Younger male AU option
   "Google AU English Female", // Original female option
   "Karen", // macOS AU voice
