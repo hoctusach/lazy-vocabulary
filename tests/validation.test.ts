@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateVocabularyWord, validateMeaning, validateExample } from '../src/utils/security/validation';
+import { VALIDATION_LIMITS } from '../src/services/vocabulary/storage/constants';
 
 // Representative tests for vocabulary validation utilities
 
@@ -35,6 +36,12 @@ describe('validateMeaning', () => {
     const result = validateMeaning('SELECT * FROM users');
     expect(result.isValid).toBe(true);
     expect(result.sanitizedValue).toBe('users');
+  });
+
+  it('rejects meanings that exceed the configured length', () => {
+    const longMeaning = 'x'.repeat(VALIDATION_LIMITS.MAX_MEANING_LENGTH + 1);
+    const result = validateMeaning(longMeaning);
+    expect(result.isValid).toBe(false);
   });
 });
 
