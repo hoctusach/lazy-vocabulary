@@ -7,7 +7,7 @@ import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
-import { getCategoryLabel } from '@/utils/categoryLabels';
+import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -40,6 +40,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 }) => {
   const safeNextCategory = nextCategory || 'Next';
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
+  const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
 
   const handleToggleMute = () => {
     onToggleMute();
@@ -53,12 +54,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleNextWord = () => {
     onNextWord();
-    toast('Next word');
   };
 
   const handleSwitchCategory = () => {
     onSwitchCategory();
-    toast(`Switched to ${nextCategoryLabel}`);
+    toast(`Switched to ${nextCategoryMessageLabel}`);
   };
 
   const handleCycleVoice = () => {
@@ -120,6 +120,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleCycleVoice}
         className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50"
         title={`Change to ${nextVoiceLabel}`}
+        aria-label={nextVoiceLabel}
       >
         <Speaker size={16} />
       </Button>

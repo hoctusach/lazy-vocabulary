@@ -18,8 +18,8 @@ export const useEnhancedUserInteraction = ({
   useEffect(() => {
     onUserInteraction?.();
   }, [onUserInteraction]);
+ // Without user interaction gating, audio is always unlocked
 
-  // Without user interaction gating, audio is always unlocked
   return {
     hasInitialized: true,
     interactionCount: 0,
