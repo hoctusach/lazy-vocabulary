@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 
 /**
- * Hook for handling speech synthesis errors with appropriate recovery strategies
+ * Silent speech error handler hook
  */
 export const useSpeechErrorHandler = (
   incrementRetryAttempts: () => boolean,
@@ -20,62 +20,25 @@ export const useSpeechErrorHandler = (
     speakingRef: React.MutableRefObject<boolean>,
     setIsSpeaking: (isSpeaking: boolean) => void
   ) => {
-    const errorDetails = {
-      error: event.error,
-      type: event.type,
-      isTrusted: event.isTrusted,
-      word: currentWord.word
-    };
-    
-    console.error(`[SPEECH-ERROR-${sessionId}] ✗ Speech error:`, errorDetails);
-    
     speakingRef.current = false;
     setIsSpeaking(false);
     setPlayInProgress(false);
     
-    // Enhanced error handling based on error type
-    switch (event.error) {
-      case 'not-allowed':
-        console.log(`[SPEECH-ERROR-${sessionId}] Permission denied`);
-        if (!paused && !muted) {
-          scheduleAutoAdvance(2000);
-        }
-        break;
-        
-      case 'network':
-        console.log(`[SPEECH-ERROR-${sessionId}] Network error`);
-        if (!paused && !muted) {
-          scheduleAutoAdvance(2000);
-        }
-        break;
-        
-      case 'synthesis-unavailable':
-      case 'synthesis-failed':
-        console.log(`[SPEECH-ERROR-${sessionId}] Synthesis error - advancing`);
-        if (!paused && !muted) {
-          scheduleAutoAdvance(1000);
-        }
-        break;
-        
-      default:
-        console.log(`[SPEECH-ERROR-${sessionId}] Generic error handling for: ${event.error}`);
-        if (!paused && !muted) {
-          scheduleAutoAdvance(1500);
-        }
+    // Silent error handling with auto-advance
+    if (!paused && !muted) {
+      scheduleAutoAdvance(1500);
     }
     
     // Retry logic for recoverable errors
     const recoverableErrors: SpeechSynthesisErrorCode[] = ['network', 'audio-busy', 'synthesis-failed'];
     if (recoverableErrors.includes(event.error)) {
       if (incrementRetryAttempts()) {
-        console.log(`[SPEECH-ERROR-${sessionId}] Retrying after recoverable error`);
         setTimeout(() => {
           if (!paused && !muted && !wordTransitionRef.current) {
             setPlayInProgress(false);
           }
         }, 1000);
       } else {
-        console.log(`[SPEECH-ERROR-${sessionId}] Max retries reached, advancing`);
         if (!paused && !muted) {
           scheduleAutoAdvance(1500);
         }

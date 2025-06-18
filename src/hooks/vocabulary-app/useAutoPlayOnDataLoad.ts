@@ -1,6 +1,5 @@
 
 import { useEffect, useRef } from 'react';
-import { unlockAudio } from '@/utils/speech/core/modules/speechUnlock';
 
 interface AutoPlayProps {
   hasData: boolean;
@@ -17,14 +16,12 @@ export const useAutoPlayOnDataLoad = ({
 }: AutoPlayProps) => {
   const hasAutoPlayedRef = useRef(false);
 
-  // Force audio to play when data becomes available
+  // Trigger playback when data becomes available
   useEffect(() => {
     if (hasData && currentWord && hasUserInteracted && !hasAutoPlayedRef.current) {
-      console.log('Data loaded and user has interacted, triggering playback');
       hasAutoPlayedRef.current = true;
 
-      const timerId = setTimeout(async () => {
-        await unlockAudio();
+      const timerId = setTimeout(() => {
         playCurrentWord();
       }, 500);
       return () => clearTimeout(timerId);

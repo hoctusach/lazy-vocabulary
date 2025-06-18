@@ -33,24 +33,20 @@ export const useSpeechPlaybackCore = (
   const playWord = useCallback(async (wordToPlay: VocabularyWord | null) => {
     // Prevent overlapping speech
     if (isPlayingRef.current) {
-      console.log('[SPEECH-PLAYBACK] Speech already in progress, skipping');
       return;
     }
 
     // Basic checks
     if (!wordToPlay || muted || paused) {
-      console.log(`[SPEECH-PLAYBACK] Cannot play word: ${!wordToPlay ? 'No word' : muted ? 'Muted' : 'Paused'}`);
       return;
     }
     
-    console.log(`[SPEECH-PLAYBACK] Playing word: ${wordToPlay.word}`);
     isPlayingRef.current = true;
     
     try {
       const speechText = createSpeechText(wordToPlay);
       await executeSpeech(wordToPlay, speechText);
     } catch (error) {
-      console.error("[SPEECH-PLAYBACK] Error in playWord function:", error);
       setIsSpeaking(false);
       isPlayingRef.current = false;
       if (!paused && !muted) {

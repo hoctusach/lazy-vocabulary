@@ -2,7 +2,7 @@
 import { VocabularyWord } from '@/types/vocabulary';
 
 /**
- * Hook for validating speech execution preconditions
+ * Silent speech validation hook
  */
 export const useSpeechValidation = () => {
   const validatePreConditions = (
@@ -12,15 +12,11 @@ export const useSpeechValidation = () => {
     muted: boolean,
     wordTransitionRef: React.MutableRefObject<boolean>
   ) => {
-    console.log(`[SPEECH-VALIDATION-${sessionId}] Validating preconditions for: ${currentWord.word}`);
-    
     if (paused || muted) {
-      console.log(`[SPEECH-VALIDATION-${sessionId}] Skipping due to state - paused: ${paused}, muted: ${muted}`);
       return false;
     }
 
     if (wordTransitionRef.current) {
-      console.log(`[SPEECH-VALIDATION-${sessionId}] Skipping due to word transition in progress`);
       return false;
     }
 
@@ -34,7 +30,6 @@ export const useSpeechValidation = () => {
     goToNextWord: () => void
   ) => {
     if (!speechableText || speechableText.trim().length === 0) {
-      console.warn(`[SPEECH-VALIDATION-${sessionId}] No valid content to speak`);
       setPlayInProgress(false);
       setTimeout(() => goToNextWord(), 1500);
       return false;
