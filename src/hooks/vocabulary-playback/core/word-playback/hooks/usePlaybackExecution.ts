@@ -31,8 +31,6 @@ export const usePlaybackExecution = (
   const { validateAndPrepareContent } = useContentValidation();
   const { checkAll } = useUnifiedValidation();
   
-  // Permissions are always granted in this simplified setup
-  
   const { executeSpeech } = useSpeechExecution(
     findVoice,
     selectedVoice,
@@ -53,19 +51,6 @@ export const usePlaybackExecution = (
     isPlayInProgress: () => boolean,
     resetPlayInProgress: () => void
   ) => {
-    console.log('[PLAYBACK-EXECUTION] === Starting executePlayback ===');
-    
-    const debugState = {
-      hasCurrentWord: !!currentWord,
-      wordText: currentWord?.word,
-      muted,
-      paused,
-      playInProgress: isPlayInProgress(),
-      wordTransition: wordTransitionRef.current,
-    };
-    
-    console.log('[PLAYBACK-EXECUTION] Current conditions:', debugState);
-
     // Unified validation step
     const conditionCheck = checkAll(
       currentWord,
@@ -78,7 +63,6 @@ export const usePlaybackExecution = (
 
     if (!conditionCheck.canPlay) {
       if (conditionCheck.reason === 'muted') {
-        console.log('[PLAYBACK-EXECUTION] Speech is muted, auto-advancing after delay');
         scheduleAutoAdvance(3000);
       } else if (conditionCheck.reason === 'word-transition') {
         setTimeout(() => executePlayback(currentWord, setPlayInProgress, isPlayInProgress, resetPlayInProgress), 150);
@@ -88,12 +72,10 @@ export const usePlaybackExecution = (
 
     // Set play in progress flag
     setPlayInProgress(true);
-    console.log('[PLAYBACK-EXECUTION] Starting speech process for:', currentWord.word);
     
     try {
       // Ensure voices are loaded
       if (!voicesLoadedRef.current) {
-        console.log('[PLAYBACK-EXECUTION] Ensuring voices are loaded');
         await ensureVoicesLoaded();
       }
       
@@ -105,29 +87,20 @@ export const usePlaybackExecution = (
         return;
       }
 
-      console.log(`[PLAYBACK-EXECUTION] Processing word for speech: ${currentWord.word}`);
-
-      // Validate and prepare content with enhanced logging
+      // Validate and prepare content
       const { speechableText } = validateAndPrepareContent(currentWord);
 
-      console.log('[PLAYBACK-EXECUTION] Content validation result:', {
-        speechableTextLength: speechableText.length,
-        speechableTextPreview: speechableText.substring(0, 100) + '...'
-      });
-
       if (speechableText.trim().length === 0) {
-        console.log('[PLAYBACK-EXECUTION] No valid content to speak, advancing');
         scheduleAutoAdvance(2000);
         setPlayInProgress(false);
         return;
       }
 
       // Execute speech with the validated content
-      console.log('[PLAYBACK-EXECUTION] Executing speech with validated content');
       await executeSpeech(currentWord, speechableText, setPlayInProgress);
       
     } catch (error) {
-      console.error('[PLAYBACK-EXECUTION] Error in executePlayback:', error);
+      console.error('Error in executePlayback:', error);
       setPlayInProgress(false);
       setIsSpeaking(false);
       speakingRef.current = false;

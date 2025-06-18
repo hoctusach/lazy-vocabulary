@@ -13,13 +13,22 @@ export const useSpeechIntegration = (
   isMuted: boolean,
   isTransitioningRef: React.MutableRefObject<boolean>
 ) => {
-  const [speechState, setSpeechState] = useState(unifiedSpeechController.getState());
+  const [speechState, setSpeechState] = useState({
+    isActive: false,
+    audioUnlocked: true,
+    phase: 'idle' as 'idle' | 'speaking' | 'paused',
+    currentUtterance: null
+  });
   const isPlayingRef = useRef(false);
 
   // Subscribe to speech controller state changes
   useEffect(() => {
-    const unsubscribe = unifiedSpeechController.subscribe(setSpeechState);
-    return unsubscribe;
+    const updateState = () => {
+      setSpeechState(unifiedSpeechController.getState());
+    };
+    
+    const interval = setInterval(updateState, 100);
+    return () => clearInterval(interval);
   }, []);
 
   // Play current word with conflict prevention

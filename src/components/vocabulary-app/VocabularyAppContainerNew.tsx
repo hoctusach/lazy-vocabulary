@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
@@ -57,7 +56,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     isAudioUnlocked
   });
 
-  // [FIX-APPLIED] Enhanced auto-play with proper state monitoring
+  // Enhanced auto-play with proper state monitoring
   useEffect(() => {
     const speechState = simpleSpeechController.getState();
     
@@ -73,12 +72,7 @@ const VocabularyAppContainerNew: React.FC = () => {
       audioUnlockedFromController: speechState.audioUnlocked
     };
 
-    console.log('[AUTO-PLAY] Condition check:', autoPlayConditions);
-
     if (hasData && currentWord && hasInitialized && !isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
-      console.log('[AUTO-PLAY] ✓ All conditions met - scheduling word playback');
-      console.log('[FIX-APPLIED] Auto-play triggered with enhanced conditions');
-      
       const timeoutId = setTimeout(() => {
         // Double-check conditions before executing
         const finalCheck = {
@@ -89,23 +83,14 @@ const VocabularyAppContainerNew: React.FC = () => {
           stillHasWord: !!currentWord
         };
         
-        console.log('[AUTO-PLAY] Final condition check before execution:', finalCheck);
-        
         if (!isPaused && !isMuted && !isSpeaking && isAudioUnlocked && currentWord) {
-          console.log('[AUTO-PLAY] ✓ Executing delayed word playback');
-          console.log('[FIX-APPLIED] Auto-play execution with verified conditions');
           playCurrentWord();
-        } else {
-          console.log('[AUTO-PLAY] ✗ Conditions changed, skipping playback');
         }
       }, 800);
 
       return () => clearTimeout(timeoutId);
-    } else {
-      console.log('[AUTO-PLAY] Conditions not met for auto-play');
     }
   }, [hasData, currentWord, hasInitialized, isPaused, isMuted, isSpeaking, isAudioUnlocked, playCurrentWord]);
-
 
   const nextVoiceLabel =
     voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';

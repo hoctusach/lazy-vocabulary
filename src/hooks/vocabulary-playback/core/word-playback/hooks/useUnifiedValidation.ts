@@ -1,5 +1,11 @@
+
 import { VocabularyWord } from '@/types/vocabulary';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+
+interface ValidationResult {
+  canPlay: boolean;
+  reason?: string;
+}
 
 /**
  * Combined validation using the centralized speech guard.
@@ -12,7 +18,7 @@ export const useUnifiedValidation = () => {
     isPlayInProgress: () => boolean,
     resetPlayInProgress: () => void,
     wordTransitionRef: React.MutableRefObject<boolean>
-  ) => {
+  ): ValidationResult => {
     const guardResult = unifiedSpeechController.canSpeak();
     if (!guardResult.canPlay) {
       return guardResult;
