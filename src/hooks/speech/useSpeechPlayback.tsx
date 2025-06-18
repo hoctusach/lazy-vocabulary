@@ -1,6 +1,7 @@
 
 import { useCallback } from 'react';
 import { speak } from '@/utils/speech';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
 import { useSpeechState } from './useSpeechState';
@@ -74,8 +75,8 @@ export const useSpeechPlayback = () => {
         
         // Make sure UI gets updated with new text before speaking
         setTimeout(() => {
-          const voiceRegion = localStorage.getItem('buttonStates') ? 
-            JSON.parse(localStorage.getItem('buttonStates') || '{}').voiceRegion || 'US' : 
+          const voiceRegion = localStorage.getItem(BUTTON_STATES_KEY) ?
+            JSON.parse(localStorage.getItem(BUTTON_STATES_KEY) || '{}').voiceRegion || 'US' :
             'US';
 
           // Fix the Promise type issue by explicitly handling the return value from speak()

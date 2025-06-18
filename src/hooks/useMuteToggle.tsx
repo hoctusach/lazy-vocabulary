@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 export const useMuteToggle = (
   isMuted: boolean,
@@ -26,9 +27,9 @@ export const useMuteToggle = (
     
     // Don't restart speech, just update the muted state in localStorage
     try {
-      const buttonStates = JSON.parse(localStorage.getItem('buttonStates') || '{}');
+      const buttonStates = JSON.parse(localStorage.getItem(BUTTON_STATES_KEY) || '{}');
       buttonStates.isMuted = !mute;
-      localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
+      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(buttonStates));
     } catch (error) {
       console.error('Error updating mute state in localStorage:', error);
     }
