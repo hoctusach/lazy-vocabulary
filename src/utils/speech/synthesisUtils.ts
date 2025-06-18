@@ -1,5 +1,4 @@
 
-import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null): Promise<string> => {
   return new Promise((resolve, reject) => {

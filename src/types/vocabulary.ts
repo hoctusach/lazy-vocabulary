@@ -1,5 +1,4 @@
 
-import { SpeechSynthesisVoice } from './speech';
 
 export interface VocabularyWord {
   word: string;
@@ -21,6 +20,3 @@ export interface EditableWord {
 export interface SheetData {
   [key: string]: VocabularyWord[];
 }
-
-// Re-export the SpeechSynthesisVoice type
-export type { SpeechSynthesisVoice };
