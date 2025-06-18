@@ -1,7 +1,6 @@
 
 import { useCallback } from 'react';
 import { speak } from '@/utils/speech';
-import { SpeechSynthesisVoice } from '@/types/speech';
 
 export const useSequentialSpeech = () => {
   const speakChunksSequentially = useCallback(
