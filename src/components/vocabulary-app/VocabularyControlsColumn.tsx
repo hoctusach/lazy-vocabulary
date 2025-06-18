@@ -7,7 +7,7 @@ import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
-import { getCategoryLabel } from '@/utils/categoryLabels';
+import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -40,6 +40,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 }) => {
   const safeNextCategory = nextCategory || 'Next';
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
+  const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
 
   const handleToggleMute = () => {
     onToggleMute();
@@ -58,7 +59,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleSwitchCategory = () => {
     onSwitchCategory();
-    toast(`Switched to ${nextCategoryLabel}`);
+    toast(`Switched to ${nextCategoryMessageLabel}`);
   };
 
   const handleCycleVoice = () => {
