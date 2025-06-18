@@ -2,6 +2,7 @@
 import { useCallback } from "react";
 import { vocabularyService } from "@/services/vocabularyService";
 import { stopSpeaking } from "@/utils/speech";
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 export const useCategoryActions = (
   setCurrentWord: React.Dispatch<React.SetStateAction<any>>,
@@ -45,9 +46,9 @@ export const useCategoryActions = (
       
       // Store the current category in localStorage for persistence
       try {
-        const buttonStates = JSON.parse(localStorage.getItem('buttonStates') || '{}');
+        const buttonStates = JSON.parse(localStorage.getItem(BUTTON_STATES_KEY) || '{}');
         buttonStates.currentCategory = nextCategory;
-        localStorage.setItem('buttonStates', JSON.stringify(buttonStates));
+        localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(buttonStates));
       } catch (e) {
         // Ignore localStorage errors
       }

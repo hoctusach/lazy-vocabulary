@@ -1,5 +1,6 @@
 
 import { getVoiceByRegion } from '../voiceUtils';
+import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 // Store the current text being spoken for sync checking
 export function setCurrentTextBeingSpoken(processedText: string) {
@@ -12,7 +13,7 @@ export function setCurrentTextBeingSpoken(processedText: string) {
 
 export function isMutedFromLocalStorage(): boolean {
   try {
-    const storedStates = localStorage.getItem('buttonStates');
+    const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
     if (storedStates) {
       const parsedStates = JSON.parse(storedStates);
       return parsedStates.isMuted === true;
