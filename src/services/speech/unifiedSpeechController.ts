@@ -1,6 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { directSpeechService } from './directSpeechService';
+import { realSpeechService } from './realSpeechService';
 
 interface SpeechGuardResult {
   canPlay: boolean;
@@ -9,44 +9,55 @@ interface SpeechGuardResult {
 
 class UnifiedSpeechController {
   private wordCompleteCallback: (() => void) | null = null;
+  private isMutedState = false;
 
   async speak(
     word: VocabularyWord,
     region: 'US' | 'UK' | 'AU' = 'US'
   ): Promise<boolean> {
+    if (this.isMutedState) {
+      console.log('Speech is muted, skipping');
+      return false;
+    }
+
     const parts = [word.word, word.meaning, word.example]
       .filter(Boolean)
       .map(part => part.trim());
     const text = parts.join('. ');
 
-    return directSpeechService.speak(text, {
+    console.log('Speaking word:', word.word, 'in region:', region);
+
+    return realSpeechService.speak(text, {
       voiceRegion: region,
+      onStart: () => {
+        console.log('Word speech started:', word.word);
+      },
       onEnd: () => {
+        console.log('Word speech completed:', word.word);
         if (this.wordCompleteCallback) {
           this.wordCompleteCallback();
         }
+      },
+      onError: (error) => {
+        console.error('Word speech error:', error);
       }
     });
   }
 
   stop(): void {
-    directSpeechService.stop();
+    realSpeechService.stop();
   }
 
   pause(): void {
-    if (window.speechSynthesis?.speaking) {
-      window.speechSynthesis.pause();
-    }
+    realSpeechService.pause();
   }
 
   resume(): void {
-    if (window.speechSynthesis?.paused) {
-      window.speechSynthesis.resume();
-    }
+    realSpeechService.resume();
   }
 
   isCurrentlyActive(): boolean {
-    return directSpeechService.isCurrentlyActive();
+    return realSpeechService.isCurrentlyActive();
   }
 
   isPaused(): boolean {
@@ -54,10 +65,13 @@ class UnifiedSpeechController {
   }
 
   canSpeak(): SpeechGuardResult {
+    if (this.isMutedState) {
+      return { canPlay: false, reason: 'muted' };
+    }
     if (this.isPaused()) {
       return { canPlay: false, reason: 'paused' };
     }
-    if (directSpeechService.isCurrentlyActive()) {
+    if (realSpeechService.isCurrentlyActive()) {
       return { canPlay: false, reason: 'active' };
     }
     return { canPlay: true };
@@ -65,17 +79,21 @@ class UnifiedSpeechController {
 
   getState() {
     const paused = this.isPaused();
-    const isActive = directSpeechService.isCurrentlyActive();
+    const isActive = realSpeechService.isCurrentlyActive();
     return {
       isActive,
       audioUnlocked: true,
       phase: isActive ? 'speaking' : paused ? 'paused' : 'idle',
-      currentUtterance: directSpeechService.getCurrentUtterance()
+      currentUtterance: realSpeechService.getCurrentUtterance()
     };
   }
 
   setMuted(muted: boolean): void {
-    // Silent implementation
+    console.log('Setting muted state:', muted);
+    this.isMutedState = muted;
+    if (muted && this.isCurrentlyActive()) {
+      this.stop();
+    }
   }
 
   setWordCompleteCallback(callback: (() => void) | null): void {
