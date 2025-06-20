@@ -10,13 +10,15 @@ interface SpeechGuardResult {
 class UnifiedSpeechController {
   private wordCompleteCallback: (() => void) | null = null;
   private isMutedState = false;
+  private autoAdvanceTimer: number | null = null;
 
   async speak(
     word: VocabularyWord,
     region: 'US' | 'UK' | 'AU' = 'US'
   ): Promise<boolean> {
     if (this.isMutedState) {
-      console.log('Speech is muted, skipping');
+      console.log('Speech is muted, scheduling auto-advance instead');
+      this.scheduleAutoAdvance();
       return false;
     }
 
@@ -25,7 +27,7 @@ class UnifiedSpeechController {
       .map(part => part.trim());
     const text = parts.join('. ');
 
-    console.log('Speaking word:', word.word, 'in region:', region);
+    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
 
     return realSpeechService.speak(text, {
       voiceRegion: region,
@@ -34,18 +36,34 @@ class UnifiedSpeechController {
       },
       onEnd: () => {
         console.log('Word speech completed:', word.word);
-        if (this.wordCompleteCallback) {
-          this.wordCompleteCallback();
-        }
+        this.scheduleAutoAdvance();
       },
       onError: (error) => {
         console.error('Word speech error:', error);
+        this.scheduleAutoAdvance();
       }
     });
   }
 
+  private scheduleAutoAdvance(): void {
+    if (this.autoAdvanceTimer) {
+      clearTimeout(this.autoAdvanceTimer);
+    }
+    
+    this.autoAdvanceTimer = window.setTimeout(() => {
+      console.log('Auto-advance timer triggered');
+      if (this.wordCompleteCallback) {
+        this.wordCompleteCallback();
+      }
+    }, 2000);
+  }
+
   stop(): void {
     realSpeechService.stop();
+    if (this.autoAdvanceTimer) {
+      clearTimeout(this.autoAdvanceTimer);
+      this.autoAdvanceTimer = null;
+    }
   }
 
   pause(): void {
@@ -97,6 +115,7 @@ class UnifiedSpeechController {
   }
 
   setWordCompleteCallback(callback: (() => void) | null): void {
+    console.log('Setting word complete callback:', callback ? 'set' : 'cleared');
     this.wordCompleteCallback = callback;
   }
 

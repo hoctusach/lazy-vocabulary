@@ -2,7 +2,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { ensureVoicesLoaded } from '@/utils/speech/voiceLoader';
 
 /**
  * Real speech integration with actual browser speech synthesis
@@ -21,22 +20,7 @@ export const useSpeechIntegration = (
     currentUtterance: null
   });
   const isPlayingRef = useRef(false);
-  const voicesLoadedRef = useRef(false);
-
-  // Initialize voices on mount
-  useEffect(() => {
-    const initVoices = async () => {
-      try {
-        await ensureVoicesLoaded();
-        voicesLoadedRef.current = true;
-        console.log('Speech voices initialized successfully');
-      } catch (error) {
-        console.error('Failed to initialize speech voices:', error);
-      }
-    };
-
-    initVoices();
-  }, []);
+  const lastWordRef = useRef<string | null>(null);
 
   // Subscribe to speech controller state changes
   useEffect(() => {
@@ -44,7 +28,7 @@ export const useSpeechIntegration = (
       setSpeechState(unifiedSpeechController.getState());
     };
     
-    const interval = setInterval(updateState, 100);
+    const interval = setInterval(updateState, 200);
     return () => clearInterval(interval);
   }, []);
 
@@ -54,17 +38,18 @@ export const useSpeechIntegration = (
       return;
     }
 
-    if (!voicesLoadedRef.current) {
-      console.log('Voices not loaded yet, waiting...');
-      await ensureVoicesLoaded();
-      voicesLoadedRef.current = true;
+    if (isPaused || isMuted) {
+      console.log('Skipping playback - paused:', isPaused, 'muted:', isMuted);
+      return;
     }
 
-    if (speechState.isActive) {
-      unifiedSpeechController.stop();
-      await new Promise(resolve => setTimeout(resolve, 100));
+    // Check if this is the same word
+    if (lastWordRef.current === currentWord.word) {
+      console.log('Same word, skipping playback');
+      return;
     }
 
+    lastWordRef.current = currentWord.word;
     isPlayingRef.current = true;
 
     try {
@@ -76,11 +61,11 @@ export const useSpeechIntegration = (
     } finally {
       isPlayingRef.current = false;
     }
-  }, [currentWord, speechState.isActive, voiceRegion]);
+  }, [currentWord, isPaused, isMuted, voiceRegion, isTransitioningRef]);
 
   // Auto-play effect when word changes
   useEffect(() => {
-    if (currentWord && !isPaused && !isMuted && !speechState.isActive && !isPlayingRef.current && voicesLoadedRef.current) {
+    if (currentWord && !isPaused && !isMuted && !speechState.isActive && !isPlayingRef.current) {
       const timeout = setTimeout(() => {
         if (!isTransitioningRef.current && !isPlayingRef.current) {
           console.log('Auto-playing word:', currentWord.word);
@@ -91,6 +76,11 @@ export const useSpeechIntegration = (
       return () => clearTimeout(timeout);
     }
   }, [currentWord, isPaused, isMuted, playCurrentWord, speechState.isActive]);
+
+  // Reset last word when muted/unmuted or paused/unpaused
+  useEffect(() => {
+    lastWordRef.current = null;
+  }, [isPaused, isMuted]);
 
   return {
     speechState,

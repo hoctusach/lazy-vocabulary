@@ -11,10 +11,9 @@ import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
- * Fixed to prevent re-initialization and improve stability
  */
 export const useUnifiedVocabularyController = () => {
-  console.log('[UNIFIED-CONTROLLER] Using stable controller instance');
+  console.log('[UNIFIED-CONTROLLER] Initializing controller');
 
   // Core state management
   const {
@@ -89,7 +88,7 @@ export const useUnifiedVocabularyController = () => {
     clearAutoAdvanceTimer
   );
 
-  // Set up word completion callback with auto-advance - memoized to prevent re-creation
+  // Set up word completion callback with auto-advance
   const handleWordComplete = useMemo(() => {
     return () => {
       if (isTransitioningRef.current) {
@@ -102,10 +101,10 @@ export const useUnifiedVocabularyController = () => {
         return;
       }
       
-      console.log('[UNIFIED-CONTROLLER] Word completed, scheduling auto-advance');
-      scheduleAutoAdvance(1500, goToNext);
+      console.log('[UNIFIED-CONTROLLER] Word completed, advancing to next');
+      goToNext();
     };
-  }, [scheduleAutoAdvance, goToNext, isTransitioningRef, isPaused, isMuted]);
+  }, [goToNext, isTransitioningRef, isPaused, isMuted]);
 
   useEffect(() => {
     unifiedSpeechController.setWordCompleteCallback(handleWordComplete);
@@ -115,35 +114,17 @@ export const useUnifiedVocabularyController = () => {
     };
   }, [handleWordComplete]);
 
-  // Pause/resume speech when state changes - with debouncing
+  // Mute/unmute speech when state changes
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (isPaused) {
-        console.log('[UNIFIED-CONTROLLER] Pausing speech due to state change');
-        unifiedSpeechController.pause();
-      } else {
-        console.log('[UNIFIED-CONTROLLER] Resuming speech due to state change');
-        unifiedSpeechController.resume();
-      }
-    }, 50);
-
-    return () => clearTimeout(timeoutId);
-  }, [isPaused]);
-
-  // Mute/unmute speech when state changes - with debouncing
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
-      unifiedSpeechController.setMuted(isMuted);
-    }, 50);
-
-    return () => clearTimeout(timeoutId);
+    console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
+    unifiedSpeechController.setMuted(isMuted);
   }, [isMuted]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       clearAutoAdvanceTimer();
+      unifiedSpeechController.stop();
     };
   }, [clearAutoAdvanceTimer]);
 
