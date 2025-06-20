@@ -25,7 +25,13 @@ export const useSpeechIntegration = (
   // Subscribe to speech controller state changes
   useEffect(() => {
     const updateState = () => {
-      setSpeechState(unifiedSpeechController.getState());
+      const controllerState = unifiedSpeechController.getState();
+      setSpeechState({
+        isActive: controllerState.isActive,
+        audioUnlocked: controllerState.audioUnlocked,
+        phase: controllerState.phase as 'idle' | 'speaking' | 'paused',
+        currentUtterance: controllerState.currentUtterance
+      });
     };
     
     const interval = setInterval(updateState, 200);

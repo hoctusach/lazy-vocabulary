@@ -1,4 +1,3 @@
-
 import { VocabularyWord } from '@/types/vocabulary';
 import { SpeechStateManager } from './SpeechStateManager';
 import { AutoAdvanceTimer } from './AutoAdvanceTimer';
@@ -40,22 +39,17 @@ export class SpeechExecutor {
     
     console.log(`[SPEECH-EXECUTOR-${speechId}] Starting speech request for: ${word.word}`);
 
-    // Prevent overlapping executions
     if (this.isExecuting) {
       console.log(`[SPEECH-EXECUTOR-${speechId}] Speech already executing, rejecting`);
       return false;
     }
 
-    // Prevent rapid speak calls
     if (now - this.lastSpeakTime < this.MIN_SPEAK_INTERVAL) {
       console.log(`[SPEECH-EXECUTOR-${speechId}] Rate limited - too soon after last call`);
       return false;
     }
     this.lastSpeakTime = now;
 
-    // Audio unlocking is no longer required
-
-    // Wait for any existing speech to complete
     if (this.currentSpeechPromise) {
       console.log(`[SPEECH-EXECUTOR-${speechId}] Waiting for previous speech to complete`);
       try {
@@ -63,7 +57,6 @@ export class SpeechExecutor {
       } catch (e) {
         console.log(`[SPEECH-EXECUTOR-${speechId}] Previous speech completed with error`);
       }
-      // Add delay to ensure clean transition
       await new Promise(resolve => setTimeout(resolve, 200));
     }
 
@@ -75,8 +68,6 @@ export class SpeechExecutor {
 
     this.stateManager.setPhase('preparing');
     this.isExecuting = true;
-
-    // Proceed directly to speech execution
 
     try {
       this.currentSpeechPromise = this.executeSpeech(word, voiceRegion, speechId);
@@ -91,16 +82,13 @@ export class SpeechExecutor {
   private async executeSpeech(word: VocabularyWord, voiceRegion: 'US' | 'UK' | 'AU', speechId: string): Promise<boolean> {
     return new Promise((resolve) => {
       try {
-        // Clear any existing auto-advance timer
         this.autoAdvanceTimer.clear();
 
         const state = this.stateManager.getState();
 
-        // Stop any existing speech with proper cleanup
         if (state.isActive || state.currentUtterance) {
           console.log(`[SPEECH-EXECUTOR-${speechId}] Stopping existing utterance`);
           this.stopInternal();
-          // Longer delay for clean stop on mobile
           const stopDelay = isMobileDevice() ? 400 : 200;
           setTimeout(() => this.proceedWithSpeech(word, voiceRegion, speechId, resolve), stopDelay);
         } else {
@@ -120,21 +108,18 @@ export class SpeechExecutor {
     resolve: (value: boolean) => void
   ): void {
     try {
-      // Check browser support
       if (!window.speechSynthesis) {
         console.error(`[SPEECH-EXECUTOR-${speechId}] Speech synthesis not supported`);
         this.handleSpeechError(resolve, speechId);
         return;
       }
 
-      // On mobile devices, use direct speech service for better reliability
       if (isMobileDevice()) {
         console.log(`[SPEECH-EXECUTOR-${speechId}] Using mobile direct speech service`);
         this.executeMobileSpeech(word, voiceRegion, speechId, resolve);
         return;
       }
 
-      // Desktop speech synthesis
       this.executeDesktopSpeech(word, voiceRegion, speechId, resolve);
 
     } catch (error) {
@@ -149,11 +134,9 @@ export class SpeechExecutor {
     speechId: string, 
     resolve: (value: boolean) => void
   ): void {
-    directSpeechService.speak('', {
+    const speechText = this.voiceManager.createSpeechText(word);
+    directSpeechService.speak(speechText, {
       voiceRegion,
-      word: word.word,
-      meaning: word.meaning,
-      example: word.example,
       onStart: () => {
         console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Mobile speech started`);
         this.stateManager.updateState({
@@ -188,28 +171,23 @@ export class SpeechExecutor {
     const speechText = this.voiceManager.createSpeechText(word);
     const utterance = new SpeechSynthesisUtterance(speechText);
     
-    // Configure utterance
     const voice = this.voiceManager.findVoice(voiceRegion);
     if (voice) utterance.voice = voice;
     utterance.rate = 0.8;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 
-    // Set up event handlers
     this.setupUtteranceEvents(utterance, word, speechId, resolve);
 
-    // Store current utterance and reset flags
     this.stateManager.setCurrentUtterance(utterance);
     this.isStopping = false;
     this.cancelledUtterance = null;
     
     console.log(`[SPEECH-EXECUTOR-${speechId}] -> invoking window.speechSynthesis.speak`);
     
-    // Ensure speech synthesis is ready before speaking
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       console.log(`[SPEECH-EXECUTOR-${speechId}] Canceling existing speech before new utterance`);
       window.speechSynthesis.cancel();
-      // Wait for cancellation to complete
       setTimeout(() => {
         window.speechSynthesis.speak(utterance);
       }, 300);
@@ -217,7 +195,6 @@ export class SpeechExecutor {
       window.speechSynthesis.speak(utterance);
     }
 
-    // Enhanced fallback timeout
     setTimeout(() => {
       if (this.stateManager.getState().currentUtterance === utterance && 
           !window.speechSynthesis.speaking && 
@@ -267,7 +244,6 @@ export class SpeechExecutor {
     utterance.onerror = (event) => {
       console.error(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech error: ${event.error}`);
       
-      // Check if this was a manual cancellation
       const wasManual = (this.isStopping || this.cancelledUtterance === utterance) && event.error === 'canceled';
       
       if (wasManual) {
@@ -277,7 +253,6 @@ export class SpeechExecutor {
         return;
       }
 
-      // For other errors, advance immediately to prevent loops
       this.handleUtteranceError(event, utterance, speechId, resolve);
     };
 
