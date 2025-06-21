@@ -2,7 +2,7 @@
 export interface UnifiedSpeechState {
   isActive: boolean;
   audioUnlocked: boolean;
-  phase: 'idle' | 'speaking' | 'paused';
+  phase: 'idle' | 'speaking' | 'paused' | 'finished';
   currentUtterance: SpeechSynthesisUtterance | null;
 }
 
