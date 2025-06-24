@@ -14,37 +14,40 @@ import VocabularyAppContent from "./components/VocabularyAppContent";
 const VocabularyAppContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
   
-  // Get all app state
+  // Get all app state with error boundary
+  const appState = useVocabularyAppState();
+  
+  // Destructure with fallback values to prevent deployment issues
   const {
-    hasData,
-    hasAnyData,
-    handleFileUploaded,
-    jsonLoadError,
-    handleSwitchCategory,
-    currentCategory,
-    nextCategory,
-    displayTime,
-    wordList,
-    muted,
-    paused,
-    selectedVoice,
-    toggleMute,
-    togglePause,
-    goToNextWord,
-    cycleVoice,
-    playCurrentWord,
-    playbackCurrentWord,
-    userInteractionRef,
-    hasUserInteracted,
-    onUserInteraction,
-    isSpeaking,
-    isAddWordModalOpen,
-    isEditMode,
-    wordToEdit,
-    handleOpenAddWordModal,
-    handleOpenEditWordModal,
-    handleCloseModal
-  } = useVocabularyAppState();
+    hasData = false,
+    hasAnyData = false,
+    handleFileUploaded = () => {},
+    jsonLoadError = null,
+    handleSwitchCategory = () => {},
+    currentCategory = '',
+    nextCategory = '',
+    displayTime = 0,
+    wordList = [],
+    muted = false,
+    paused = false,
+    selectedVoice = 'UK',
+    toggleMute = () => {},
+    togglePause = () => {},
+    goToNextWord = () => {},
+    cycleVoice = () => {},
+    playCurrentWord = () => {},
+    playbackCurrentWord = null,
+    userInteractionRef = { current: false },
+    hasUserInteracted = false,
+    onUserInteraction = () => {},
+    isSpeaking = false,
+    isAddWordModalOpen = false,
+    isEditMode = false,
+    wordToEdit = null,
+    handleOpenAddWordModal = () => {},
+    handleOpenEditWordModal = () => {},
+    handleCloseModal = () => {}
+  } = appState || {};
 
   console.log('[VOCAB-CONTAINER] Container state:', {
     hasData,
@@ -53,20 +56,13 @@ const VocabularyAppContainer: React.FC = () => {
     currentCategory
   });
 
-  console.log('[VOCAB-CONTAINER] Playback state:', {
-    playbackCurrentWord: playbackCurrentWord?.word,
-    muted,
-    paused,
-    isSpeaking
-  });
-
   // Determine display word with fallback logic
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
 
-  // Get voice labels
+  // Get voice labels with fallback
   const { nextVoiceLabel } = useVoiceLabels(selectedVoice);
 
-  // Use our extracted hooks for audio initialization and interaction handling
+  // Audio initialization with error handling
   useAudioInitialization({
     userInteractionRef,
     playCurrentWord,
@@ -87,27 +83,25 @@ const VocabularyAppContainer: React.FC = () => {
     playCurrentWord
   });
 
-  // Word management operations
+  // Word management operations with null check
   const wordManager = displayWord ? VocabularyWordManager({
     currentWord: displayWord,
     currentCategory,
     onWordSaved: handleCloseModal
   }) : null;
 
-  const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
-    if (wordManager) {
-      wordManager.handleSaveWord(wordData, isEditMode, wordToEdit);
+  const handleSaveWord = React.useCallback((wordData: { word: string; meaning: string; example: string; category: string }) => {
+    try {
+      if (wordManager) {
+        wordManager.handleSaveWord(wordData, isEditMode, wordToEdit);
+      }
+    } catch (error) {
+      console.log('Error saving word:', error);
     }
-  };
+  }, [wordManager, isEditMode, wordToEdit]);
 
-  // Get interaction handlers with user interaction tracking
-  const {
-    handleCategorySwitchDirect,
-    handleManualNext,
-    handleTogglePauseWithInteraction,
-    handleCycleVoiceWithInteraction,
-    handleToggleMuteWithInteraction
-  } = useUserInteractionHandlers({
+  // Get interaction handlers with error boundaries
+  const interactionHandlers = useUserInteractionHandlers({
     userInteractionRef,
     goToNextWord,
     togglePause,
@@ -118,6 +112,14 @@ const VocabularyAppContainer: React.FC = () => {
     nextCategory,
     onUserInteraction
   });
+
+  const {
+    handleCategorySwitchDirect = () => {},
+    handleManualNext = () => {},
+    handleTogglePauseWithInteraction = () => {},
+    handleCycleVoiceWithInteraction = () => {},
+    handleToggleMuteWithInteraction = () => {}
+  } = interactionHandlers || {};
 
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>

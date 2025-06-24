@@ -1,9 +1,18 @@
+
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
 
-if (import.meta.env.MODE === 'production') {
+// Disable console logs in production for better performance
+if (import.meta.env.PROD) {
   console.log = () => {};
+  console.warn = () => {};
+  console.info = () => {};
 }
 
-createRoot(document.getElementById("root")!).render(<App />);
+const rootElement = document.getElementById("root");
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+createRoot(rootElement).render(<App />);

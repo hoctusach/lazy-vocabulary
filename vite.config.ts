@@ -7,6 +7,7 @@ import path from "path";
 export default defineConfig(async ({ mode }) => {
   const plugins = [react()];
   
+  // Only load lovable-tagger in development
   if (mode === 'development') {
     try {
       const { componentTagger } = await import("lovable-tagger");
@@ -27,5 +28,23 @@ export default defineConfig(async ({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    build: {
+      // Optimize build for deployment
+      target: 'es2015',
+      minify: 'esbuild',
+      sourcemap: false,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['react', 'react-dom'],
+            ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast'],
+          }
+        }
+      }
+    },
+    define: {
+      // Ensure proper environment variable handling
+      'process.env.NODE_ENV': JSON.stringify(mode)
+    }
   };
 });

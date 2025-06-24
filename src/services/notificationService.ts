@@ -8,58 +8,72 @@ export interface NotificationOptions {
 class NotificationService {
   private swRegistration: ServiceWorkerRegistration | null = null;
   private isSubscribed: boolean = false;
-  private applicationServerPublicKey: string | undefined = import.meta.env.VITE_VAPID_PUBLIC_KEY; // VAPID key loaded from environment
+  private applicationServerPublicKey: string | undefined;
   
-  async initialize() {
-    if (!this.applicationServerPublicKey) {
-      console.warn('VAPID public key is missing. Push notification setup skipped.');
+  constructor() {
+    // Only load VAPID key in browser environment
+    this.applicationServerPublicKey = typeof window !== 'undefined' 
+      ? import.meta.env.VITE_VAPID_PUBLIC_KEY 
+      : undefined;
+  }
+  
+  async initialize(): Promise<boolean> {
+    // Skip initialization in non-browser environments
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
       return false;
     }
+
+    if (!this.applicationServerPublicKey) {
+      console.log('VAPID public key not configured - push notifications disabled');
+      return false;
+    }
+    
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
         this.swRegistration = registration;
-        console.log('Service Worker registered with scope:', registration.scope);
+        console.log('Service Worker registered successfully');
         
-        this.checkSubscription();
+        await this.checkSubscription();
         return true;
       } catch (error) {
-        console.error('Service Worker registration failed:', error);
+        console.log('Service Worker registration skipped:', error);
         return false;
       }
     } else {
-      console.warn('Push notifications are not supported in this browser');
+      console.log('Push notifications not supported');
       return false;
     }
   }
   
-  private async checkSubscription() {
+  private async checkSubscription(): Promise<void> {
     if (!this.swRegistration) return;
     
     try {
       const subscription = await this.swRegistration.pushManager.getSubscription();
-      this.isSubscribed = !(subscription === null);
+      this.isSubscribed = subscription !== null;
     } catch (error) {
-      console.error('Failed to check subscription:', error);
+      console.log('Subscription check failed:', error);
+      this.isSubscribed = false;
     }
   }
   
   async requestPermission(): Promise<boolean> {
-    if (!('Notification' in window)) return false;
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      return false;
+    }
     
     try {
       const permission = await Notification.requestPermission();
       return permission === 'granted';
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
+      console.log('Permission request failed:', error);
       return false;
     }
   }
   
   async subscribe(): Promise<boolean> {
-    if (!this.swRegistration) return false;
-    if (!this.applicationServerPublicKey) {
-      console.error('Cannot subscribe: VAPID public key is missing.');
+    if (!this.swRegistration || !this.applicationServerPublicKey) {
       return false;
     }
 
@@ -70,15 +84,11 @@ class NotificationService {
         applicationServerKey: applicationServerKey
       });
       
-      console.log('User is subscribed:', subscription);
       this.isSubscribed = true;
-      
-      // In a real app, you would send the subscription to your server here
       localStorage.setItem('pushSubscription', JSON.stringify(subscription));
-      
       return true;
     } catch (error) {
-      console.error('Failed to subscribe to push notifications:', error);
+      console.log('Subscription failed:', error);
       return false;
     }
   }
@@ -96,29 +106,28 @@ class NotificationService {
       }
       return false;
     } catch (error) {
-      console.error('Error unsubscribing:', error);
+      console.log('Unsubscribe failed:', error);
       return false;
     }
   }
   
   sendNotification(options: NotificationOptions): void {
     if (!this.swRegistration || !this.isSubscribed) {
-      console.warn('Cannot send notification: not subscribed');
+      console.log('Cannot send notification: not properly initialized');
       return;
     }
     
-    // In a real app, you would send this to your server which would then send the push notification
-    // Here we'll simulate it with a local notification if we have permission
-    if (Notification.permission === 'granted') {
+    if (typeof window !== 'undefined' && Notification.permission === 'granted') {
       this.swRegistration.showNotification(options.title, {
         body: options.body,
         icon: '/favicon.ico',
         data: options.data
+      }).catch(error => {
+        console.log('Notification display failed:', error);
       });
     }
   }
   
-  // Helper function to convert base64 to Uint8Array
   private urlB64ToUint8Array(base64String: string): Uint8Array {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
@@ -135,11 +144,16 @@ class NotificationService {
   }
   
   get isNotificationsSupported(): boolean {
-    return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
+    return typeof window !== 'undefined' && 
+           'Notification' in window && 
+           'serviceWorker' in navigator && 
+           'PushManager' in window;
   }
   
   get notificationPermission(): NotificationPermission | null {
-    return 'Notification' in window ? Notification.permission : null;
+    return typeof window !== 'undefined' && 'Notification' in window 
+      ? Notification.permission 
+      : null;
   }
   
   get subscribed(): boolean {
@@ -152,7 +166,7 @@ class NotificationService {
     this.sendNotification({
       title: word,
       body: meaning,
-      data: { url: window.location.href }
+      data: { url: typeof window !== 'undefined' ? window.location.href : '/' }
     });
     
     return true;
