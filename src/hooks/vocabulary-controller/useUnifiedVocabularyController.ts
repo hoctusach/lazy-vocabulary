@@ -59,7 +59,7 @@ export const useUnifiedVocabularyController = () => {
     clearAutoAdvanceTimer
   );
 
-  // Control actions with proper audio management
+  // Control actions with proper audio management - fix the parameter count
   const {
     togglePause,
     toggleMute,
@@ -72,13 +72,7 @@ export const useUnifiedVocabularyController = () => {
     setIsMuted,
     voiceRegion,
     setVoiceRegion,
-    // Fix the speech state mapping to include all required properties
-    {
-      ...speechState,
-      isPaused,
-      isMuted,
-      currentWord
-    }
+    speechState
   );
 
   // Data loading
