@@ -59,10 +59,15 @@ const VocabularyAppContainer: React.FC = () => {
   // Determine display word with fallback logic
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
 
-  // Get voice labels with proper VoiceSelection structure
+  // Get voice labels with proper VoiceSelection structure - fix the type issue
   const voiceForLabels = typeof selectedVoice === 'string' 
-    ? { region: selectedVoice as 'US' | 'UK' | 'AU', label: selectedVoice, gender: 'female' as const, index: selectedVoice === 'US' ? 0 : selectedVoice === 'UK' ? 1 : 2 }
-    : selectedVoice;
+    ? { 
+        region: selectedVoice as 'US' | 'UK' | 'AU', 
+        label: selectedVoice, 
+        gender: 'female' as const, 
+        index: selectedVoice === 'US' ? 0 : selectedVoice === 'UK' ? 1 : 2 
+      }
+    : selectedVoice || { region: 'UK' as const, label: 'UK', gender: 'female' as const, index: 1 };
   const { nextVoiceLabel } = useVoiceLabels(voiceForLabels);
 
   // Audio initialization with error handling

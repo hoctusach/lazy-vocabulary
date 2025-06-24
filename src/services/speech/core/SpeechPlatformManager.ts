@@ -1,4 +1,3 @@
-
 import { VocabularyWord } from '@/types/vocabulary';
 import { SpeechOptions } from './SpeechOptions';
 import { VoiceManager } from './VoiceManager';
@@ -40,9 +39,7 @@ export class SpeechPlatformManager {
         });
         resetRetryCount();
         
-        if (options?.onStart) {
-          options.onStart();
-        }
+        options?.onStart?.();
       },
       onEnd: () => {
         console.log(`[SPEECH-PLATFORM-${speechId}] ✓ Mobile speech completed`);
@@ -51,9 +48,7 @@ export class SpeechPlatformManager {
         const state = getState();
         onScheduleAdvance(1500, state.isPaused, state.isMuted);
         
-        if (options?.onEnd) {
-          options.onEnd();
-        }
+        options?.onEnd?.();
         
         resolve(true);
       },
