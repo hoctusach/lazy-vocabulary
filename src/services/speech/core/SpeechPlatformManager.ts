@@ -1,5 +1,6 @@
+
 import { VocabularyWord } from '@/types/vocabulary';
-import { SpeechOptions } from './SpeechOptions';
+import { SpeechOptions } from '@/utils/speech/controller/types';
 import { VoiceManager } from './VoiceManager';
 import { SpeechEventHandler } from './SpeechEventHandler';
 import { isMobileDevice } from '@/utils/device';
