@@ -680,10 +680,10 @@
     },
     {
       "word": "Pay under the table",
-      "meaning": "To pay someone secretly or illegally, usually to avoid taxes or regulations.   The restaurant owner was caught paying employees under the table to avoid payroll taxes.t's illegal to pay workers under the table in many countries.   ",
-      "example": ".",
+      "meaning": "To pay someone secretly or illegally, usually to avoid taxes or regulations. (Trả tiền chui, trả lương không khai báo để né thuế hoặc quy định pháp luật.)",
+      "example": "It's illegal to pay workers under the table in many countries.",
       "count": 0
-    },
+    },    
     {
       "word": "Talk shop",
       "meaning": "To discuss work-related topics or engage in conversation about one's profession or industry.      ",
@@ -958,12 +958,6 @@
       "word": "answer back (/ˈɑːnsər bæk/)",
       "meaning": "reply rudely to someone who has more authority than you: cãi lại",
       "example": "I got into trouble for answering the teacher back.",
-      "count": 0
-    },
-    {
-      "word": "Abrupt (adjective)",
-      "meaning": "Without notice to prepare the mind for the event; sudden",
-      "example": "The ambulance came to an abrupt stop outside the patient’s home.",
       "count": 0
     },
     {
@@ -1375,7 +1369,7 @@
       "count": 0
     },
     {
-      "word": "come out\n/kʌm aʊt/",
+      "word": "come round\n/kʌm raʊnd/",
       "meaning": "if a regular event comes round, it happens again: tái diễn.",
       "example": "Jean’s annual garden party must be coming round soon.",
       "count": 0
@@ -3460,8 +3454,8 @@
     },
     {
       "word": "Out of the way",
-      "meaning": "Strange",
-      "example": ".",
+      "meaning": "Unusual or strange; not typical. Khác thường, kỳ lạ.",
+      "example": "He has some out-of-the-way ideas about how to run a business.",
       "count": 0
     },
     {
@@ -5003,6 +4997,12 @@
 
   ],
   "topic vocab": [
+    {
+      "word": "Abrupt (adjective)",
+      "meaning": "Without notice to prepare the mind for the event; sudden",
+      "example": "The ambulance came to an abrupt stop outside the patient’s home.",
+      "count": 0
+    },
     {
     "word": "yearn (v) /jɜːn/",
     "meaning": "to want something a lot, especially something difficult to get (ao ước)",
@@ -6985,14 +6985,8 @@
     },
     {
       "word": "leverage",
-      "meaning": "the mechanical advantage gained by being in a position to use a lever strategic advantage; power to act effectively investing with borrowed money as a way to amplify potential gains (at the risk of greater losses) supplement with leverage provide with leverage",
-      "example": ".",
-      "count": 0
-    },
-    {
-      "word": "apple",
-      "meaning": "Quả táo",
-      "example": ".",
+      "meaning": "Strategic advantage or the power to act effectively. Also used in finance to describe investing with borrowed money to amplify potential returns. Đòn bẩy, lợi thế chiến lược.",
+      "example": "The merger gave the company greater leverage in negotiating with international partners.",
       "count": 0
     },
     {
@@ -7045,9 +7039,9 @@
     },
     {
       "word": "Subjects: Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic",
-      "meaning": "Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic; Humanities; Business management; Archaeology; Agriculture",
-      "example": ".",
-      "count": 0
+      "meaning": "Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic; Humanities; Business management; Archaeology; Agriculture. (Các môn học: Thống kê; Mỹ thuật; Triết học; Chính trị học; Nghệ thuật biểu diễn; Logic; Nhân văn; Quản trị kinh doanh; Khảo cổ học; Nông nghiệp)",
+      "example": "In her first year, she explored various subjects like Philosophy, Visual Arts, and Statistics to find her true interests.",
+      "count": 0    
     },
     {
       "word": "abuzz",
@@ -7074,9 +7068,9 @@
       "count": 0
     },
     {
-      "word": "He would- he'd - He'd like to see you now. why have - Why've. Why've you come? I will - I'll - I'll think about it. where did - Where'd - Where'd you get that? they are - they're - They're already here",
-      "meaning": "Less common words/expressions",
-      "example": ".",
+      "word": "He would → He'd, Why have → Why've, I will → I'll, Where did → Where'd, They are → They're",
+      "meaning": "Common English contractions formed by shortening auxiliary or modal verbs with pronouns. These are used frequently in spoken and informal written English. (Các dạng rút gọn thông dụng trong tiếng Anh dùng trong văn nói hoặc viết không trang trọng)",
+      "example": "He'd like to see you now. Why've you come so early? I'll think about it. Where'd you get that jacket? They're already here.",
       "count": 0
     },
     {
@@ -7615,10 +7609,10 @@
     },
     {
       "word": "actually",
-      "meaning": "Use actually to give an unexpected or surprising response.",
-      "example": ".",
+      "meaning": "Use 'actually' to give an unexpected or surprising response. (Thực ra, thực tế là – dùng để diễn tả điều bất ngờ hoặc trái ngược với dự đoán.)",
+      "example": "I thought he was unfriendly, but actually he’s very kind once you get to know him.",
       "count": 0
-    },
+    },    
     {
       "word": "in fact",
       "meaning": "Use in fact to modify a previous statement, for example if you said something that is slightly inaccurate and you want to be more precise.",
@@ -8113,10 +8107,10 @@
     },
     {
       "word": "(A) Watercolour (adjective/noun)",
-      "meaning": "A type of paint or painting style that is based in water rather than oil.",
-      "example": ".",
+      "meaning": "A type of paint or painting style that is based in water rather than oil. Often used for soft, translucent artwork. (Màu nước hoặc tranh màu nước, dùng nước làm dung môi thay vì dầu)",
+      "example": "She painted a beautiful watercolour landscape of the mountains at sunset.",
       "count": 0
-    },
+    },    
     {
       "word": "Sculpture (noun)",
       "meaning": "A work of art produced by shaping a material e.g. clay, stone, wood, metal.",
@@ -10184,7 +10178,7 @@
     {
       "word": "consecutive (adjective)",
       "meaning": "Having some logical sequence",
-      "example": "When creating a password, be sure to avoid consecutive numbers, such as \"123456\".",
+      "example": "When creating a password, be sure to avoid consecutive numbers, such as 123456.",
       "count": 0
     },
     {
@@ -10783,304 +10777,304 @@
     },
     {
       "word": "manifest (adjective)",
-      "meaning": "Evident to the senses, especially to the sight",
-      "example": ".",
+      "meaning": "Evident to the senses, especially to the sight; clearly apparent or obvious. (Hiển nhiên, rõ ràng, dễ nhận thấy)",
+      "example": "Her disappointment was manifest in her facial expression.",
       "count": 0
-    },
+    },    
     {
       "word": "manipulate (verb)",
-      "meaning": "To influence, manage, direct, or control something",
-      "example": ".",
+      "meaning": "To influence, manage, direct, or control something. (Điều khiển, thao túng, kiểm soát.)",
+      "example": "He knows how to manipulate people to get what he wants.",
       "count": 0
     },
     {
       "word": "market (verb)",
-      "meaning": "A formally organized system of trading in specified goods or money",
-      "example": ".",
+      "meaning": "A formally organized system of trading in specified goods or money. (Tiếp thị, quảng bá, buôn bán.)",
+      "example": "The company is trying to market the new product to young consumers.",
       "count": 0
     },
     {
       "word": "metamorphosis (noun)",
-      "meaning": "A transformation; a noticeable change in character or appearance",
-      "example": ".",
+      "meaning": "A transformation; a noticeable change in character or appearance. (Sự biến đổi, sự chuyển mình rõ rệt.)",
+      "example": "The caterpillar's metamorphosis into a butterfly is fascinating.",
       "count": 0
     },
     {
       "word": "migrate (verb)",
-      "meaning": "To relocate from one location to another",
-      "example": ".",
+      "meaning": "To relocate from one location to another. (Di cư, chuyển đến nơi khác.)",
+      "example": "Many birds migrate south for the winter.",
       "count": 0
     },
     {
       "word": "minimize (verb)",
-      "meaning": "To make smaller or less significant",
-      "example": ".",
+      "meaning": "To make smaller or less significant. (Giảm thiểu, làm nhỏ lại.)",
+      "example": "We must minimize the environmental impact of the project.",
       "count": 0
     },
     {
       "word": "mourn (verb)",
-      "meaning": "To express sadness for; to grieve",
-      "example": ".",
+      "meaning": "To express sadness for; to grieve. (Thương tiếc, than khóc.)",
+      "example": "The entire community came to mourn the loss of their leader.",
       "count": 0
     },
     {
       "word": "myriad (noun)",
-      "meaning": "A countless number of specified things",
-      "example": ".",
+      "meaning": "A countless number of specified things. (Vô số, rất nhiều.)",
+      "example": "There are a myriad of stars in the night sky.",
       "count": 0
     },
     {
       "word": "narrative (adjective)",
-      "meaning": "Story",
-      "example": ".",
+      "meaning": "Story. (Có tính chất kể chuyện.)",
+      "example": "The novel has a strong narrative structure that keeps readers engaged.",
       "count": 0
     },
     {
       "word": "native (adjective)",
-      "meaning": "Belonging to somewhere or someone by birth",
-      "example": ".",
+      "meaning": "Belonging to somewhere or someone by birth. (Bản địa, thuộc về nơi sinh ra.)",
+      "example": "She is a native speaker of Spanish.",
       "count": 0
     },
     {
       "word": "nimble (adjective)",
-      "meaning": "Quick and light in movement or action; intelligent and alert",
-      "example": ".",
+      "meaning": "Quick and light in movement or action; intelligent and alert. (Nhanh nhẹn, lanh lợi.)",
+      "example": "With nimble fingers, he quickly fixed the broken watch.",
       "count": 0
-    },
+    },    
     {
       "word": "notable (adjective)",
-      "meaning": "Worthy of noticing; worthy of being praised",
-      "example": ".",
+      "meaning": "Worthy of noticing; worthy of being praised. (Đáng chú ý; đáng được khen ngợi.)",
+      "example": "She received a notable award for her contribution to science.",
       "count": 0
     },
     {
       "word": "notion (noun)",
-      "meaning": "Thought or opinion; ý niệm khái niệm",
-      "example": "I haven't a faintest notion what you've talking about.",
+      "meaning": "Thought or opinion. (Ý kiến, khái niệm, ý niệm.)",
+      "example": "I haven't the faintest notion what you're talking about.",
       "count": 0
     },
     {
       "word": "novel (adjective)",
-      "meaning": "New, original, especially in an interesting way",
-      "example": ".",
+      "meaning": "New, original, especially in an interesting way. (Mới lạ, độc đáo.)",
+      "example": "The startup introduced a novel approach to online education.",
       "count": 0
     },
     {
       "word": "object (verb)",
-      "meaning": "To disagree with something or someone",
-      "example": ".",
+      "meaning": "To disagree with something or someone. (Phản đối.)",
+      "example": "They objected to the new company policy.",
       "count": 0
     },
     {
       "word": "oblige (verb)",
-      "meaning": "Require to do something",
-      "example": ".",
+      "meaning": "Require to do something. (Bắt buộc, ép buộc.)",
+      "example": "The law obliges employers to provide a safe working environment.",
       "count": 0
     },
     {
       "word": "obliterate (verb)",
-      "meaning": "To remove completely; to destroy",
-      "example": ".",
+      "meaning": "To remove completely; to destroy. (Xóa sạch, hủy diệt.)",
+      "example": "The village was obliterated by the wildfire.",
       "count": 0
     },
     {
       "word": "obscure (adjective)",
-      "meaning": "Hidden, out of sight; difficult to understand",
-      "example": ".",
+      "meaning": "Hidden, out of sight; difficult to understand. (Tối nghĩa, mơ hồ.)",
+      "example": "His explanation was too obscure to follow.",
       "count": 0
     },
     {
       "word": "obsolete (adjective)",
-      "meaning": "No longer in use",
-      "example": ".",
+      "meaning": "No longer in use. (Lỗi thời, không còn sử dụng.)",
+      "example": "Cassette tapes have become obsolete.",
       "count": 0
     },
     {
       "word": "obstacle (noun)",
-      "meaning": "Something that stops progress",
-      "example": ".",
+      "meaning": "Something that stops progress. (Chướng ngại vật.)",
+      "example": "Poverty remains a major obstacle to education.",
       "count": 0
     },
     {
       "word": "offset (verb)",
-      "meaning": "To compensate for, by applying a change in the opposite direction; to balance out",
-      "example": ".",
+      "meaning": "To compensate for, by applying a change in the opposite direction; to balance out. (Bù lại, cân bằng.)",
+      "example": "Higher costs were offset by increased sales.",
       "count": 0
     },
     {
       "word": "onset (noun)",
-      "meaning": "Beginning of something",
-      "example": ".",
+      "meaning": "Beginning of something. (Sự bắt đầu, khởi đầu.)",
+      "example": "The onset of winter was earlier than expected.",
       "count": 0
     },
     {
       "word": "operation (noun)",
-      "meaning": "The method or practice by which actions are done; a planned undertaking",
-      "example": ".",
+      "meaning": "The method or practice by which actions are done; a planned undertaking. (Hoạt động, quy trình, cuộc phẫu thuật.)",
+      "example": "The military operation lasted two weeks.",
       "count": 0
     },
     {
       "word": "ordinary (adjective)",
-      "meaning": "Normal; routine",
-      "example": ".",
+      "meaning": "Normal; routine. (Bình thường, thông thường.)",
+      "example": "It was just an ordinary day at work.",
       "count": 0
     },
     {
       "word": "outdo (verb)",
-      "meaning": "To excel; go beyond in performance",
-      "example": ".",
+      "meaning": "To excel; go beyond in performance. (Vượt trội, làm tốt hơn.)",
+      "example": "He outdid all other competitors in the race.",
       "count": 0
     },
     {
       "word": "outsource (verb)",
-      "meaning": "To transfer the management and/or day-to-day execution of a business function to a third-party service provider, especially internationally",
-      "example": ".",
+      "meaning": "To transfer work to an external provider. (Thuê ngoài, chuyển giao công việc cho bên ngoài.)",
+      "example": "The company decided to outsource its customer support.",
       "count": 0
     },
     {
       "word": "outweigh (verb)",
-      "meaning": "To exceed in importance or value",
-      "example": ".",
+      "meaning": "To exceed in importance or value. (Nhiều hơn, có giá trị hơn.)",
+      "example": "The benefits of the new system outweigh the costs.",
       "count": 0
     },
     {
       "word": "overcome (verb)",
-      "meaning": "To win or prevail in some sort of battle, contest, etc.; to get the better of",
-      "example": ".",
+      "meaning": "To win or prevail; to get the better of. (Vượt qua, chiến thắng.)",
+      "example": "She overcame her fear of public speaking.",
       "count": 0
     },
     {
       "word": "overwhelm (verb)",
-      "meaning": "To overpower or crush; to overpower emotionally",
-      "example": ".",
+      "meaning": "To overpower or crush; emotionally overload. (Áp đảo, tràn ngập.)",
+      "example": "He was overwhelmed with emotion.",
       "count": 0
     },
     {
       "word": "pace (noun)",
-      "meaning": "Speed or velocity",
-      "example": ".",
+      "meaning": "Speed or velocity. (Tốc độ, nhịp độ.)",
+      "example": "The pace of technological change is accelerating.",
       "count": 0
     },
     {
       "word": "paradox (noun)",
-      "meaning": "An apparently self-contradictory statement, which can only be true if it is false, and vice versa",
-      "example": ".",
+      "meaning": "A self-contradictory statement. (Nghịch lý.)",
+      "example": "It's a paradox that standing is more tiring than walking.",
       "count": 0
     },
     {
       "word": "parity (noun)",
-      "meaning": "Equality; comparability of strength or intensity",
-      "example": ".",
+      "meaning": "Equality; comparability. (Sự ngang bằng, tương đương.)",
+      "example": "The movement calls for wage parity between men and women.",
       "count": 0
     },
     {
       "word": "partial (adjective)",
-      "meaning": "Existing as a part or portion of a whole; incomplete",
-      "example": ".",
+      "meaning": "Existing as part of a whole; incomplete. (Một phần, chưa hoàn chỉnh.)",
+      "example": "He gave only a partial answer to the question.",
       "count": 0
     },
     {
       "word": "peak (noun)",
-      "meaning": "The highest value reached by some quantity in a time period",
-      "example": ".",
+      "meaning": "The highest point. (Đỉnh cao, đỉnh điểm.)",
+      "example": "The athlete reached the peak of his career last year.",
       "count": 0
     },
     {
       "word": "perception (noun)",
-      "meaning": "Understanding of something; awareness of a situation",
-      "example": ".",
+      "meaning": "Understanding or awareness. (Sự nhận thức, sự cảm nhận.)",
+      "example": "Public perception of the brand has improved.",
       "count": 0
     },
     {
       "word": "periodic (adjective)",
-      "meaning": "Occurring at regular intervals",
-      "example": ".",
+      "meaning": "Occurring at regular intervals. (Định kỳ, thường kỳ.)",
+      "example": "Periodic checks are required for safety.",
       "count": 0
     },
     {
       "word": "permanent (adjective)",
-      "meaning": "Lasting a long time, perhaps forever",
-      "example": ".",
+      "meaning": "Lasting for a long time. (Vĩnh viễn, lâu dài.)",
+      "example": "She got a permanent tattoo on her wrist.",
       "count": 0
     },
     {
       "word": "persist (verb)",
-      "meaning": "To continue stubbornly in spite of opposition or warning",
-      "example": ".",
+      "meaning": "To continue despite opposition. (Kiên trì, bền bỉ.)",
+      "example": "If symptoms persist, consult a doctor.",
       "count": 0
     },
     {
       "word": "phase (noun)",
-      "meaning": "Part of a sequence or cycle occurring over time",
-      "example": ".",
+      "meaning": "A part of a process or development. (Giai đoạn, thời kỳ.)",
+      "example": "The project is in its final phase.",
       "count": 0
     },
     {
       "word": "precede (verb)",
-      "meaning": "To go before",
-      "example": ".",
+      "meaning": "To go before. (Đi trước, đến trước.)",
+      "example": "A brief speech will precede the performance.",
       "count": 0
     },
     {
       "word": "preserve (verb)",
-      "meaning": "To protect; To save from decay",
-      "example": ".",
+      "meaning": "To protect or maintain. (Bảo tồn, gìn giữ.)",
+      "example": "We must preserve our cultural heritage.",
       "count": 0
     },
     {
       "word": "prohibit (verb)",
-      "meaning": "To forbid or disallow officially; to make illegal",
-      "example": ".",
+      "meaning": "To forbid or ban. (Cấm, ngăn cấm.)",
+      "example": "Smoking is prohibited in the building.",
       "count": 0
     },
     {
       "word": "prominent (adjective)",
-      "meaning": "Standing out or projecting; distinguished above others",
-      "example": ".",
+      "meaning": "Standing out; well-known. (Nổi bật, xuất chúng.)",
+      "example": "She is a prominent figure in the fashion industry.",
       "count": 0
     },
     {
       "word": "protest (verb)",
-      "meaning": "To make a strong objection",
-      "example": ".",
+      "meaning": "To object strongly. (Phản đối, biểu tình.)",
+      "example": "Thousands protested against the new law.",
       "count": 0
     },
     {
       "word": "purpose (noun)",
-      "meaning": "An object to be reached; a target; an aim; a goal",
-      "example": ".",
+      "meaning": "An aim or goal. (Mục đích, ý định.)",
+      "example": "His main purpose is to help others.",
       "count": 0
     },
     {
       "word": "questionable (adjective)",
-      "meaning": "Problematic; open to doubt or challenge",
-      "example": ".",
+      "meaning": "Open to doubt; suspicious. (Đáng ngờ, có thể bị nghi ngờ.)",
+      "example": "His honesty is questionable after the incident.",
       "count": 0
     },
     {
       "word": "radical (adjective)",
-      "meaning": "Favoring fundamental change, or change at the root cause of a matter",
-      "example": ".",
+      "meaning": "Focusing on fundamental change. (Căn bản, triệt để, cấp tiến.)",
+      "example": "They proposed radical changes to the education system.",
       "count": 0
     },
     {
       "word": "ramification (noun)",
-      "meaning": "A result of a decision or event",
-      "example": ".",
+      "meaning": "A result or consequence. (Hệ quả, kết quả phức tạp.)",
+      "example": "The decision has serious legal ramifications.",
       "count": 0
     },
     {
       "word": "random (adjective)",
-      "meaning": "Made, done, or chosen without method or conscious decision",
-      "example": ".",
+      "meaning": "Without method or conscious decision. (Ngẫu nhiên.)",
+      "example": "They chose participants at random.",
       "count": 0
     },
     {
       "word": "range (noun)",
-      "meaning": "Selection or array; scope of something",
-      "example": ".",
+      "meaning": "Scope or extent. (Phạm vi, loại.)",
+      "example": "The product comes in a wide range of colors.",
       "count": 0
-    },
+    },    
     {
       "word": "readily",
       "meaning": "Without unwillingness or hesitation; showing readiness",
@@ -11581,10 +11575,10 @@
     },
     {
       "word": "vindication (noun)",
-      "meaning": "Roger got his vindication when the company that fired him went bankrupt a year later.",
-      "example": ".",
+      "meaning": "The act of being proven right or justified after being doubted or accused. (Sự minh oan, sự chứng minh là đúng.)",
+      "example": "Roger got his vindication when the company that fired him went bankrupt a year later.",
       "count": 0
-    },
+    },    
     {
       "word": "voracious (adjective)",
       "meaning": "having a great appetite for something",
