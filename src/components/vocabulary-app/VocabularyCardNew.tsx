@@ -1,7 +1,11 @@
 
-import React, { useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import React from 'react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { getCategoryLabel } from '@/utils/categoryLabels';
+import WordCountDisplay from './WordCountDisplay';
 
 interface VocabularyCardNewProps {
   word: string;
@@ -17,11 +21,11 @@ interface VocabularyCardNewProps {
   onNextWord: () => void;
   currentCategory: string;
   nextCategory: string;
-  isSpeaking?: boolean;
-  displayTime?: number;
-  category?: string;
+  isSpeaking: boolean;
+  category: string;
   voiceRegion: 'US' | 'UK' | 'AU';
   nextVoiceLabel: string;
+  showWordCount?: boolean;
 }
 
 const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
@@ -38,63 +42,72 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   onNextWord,
   currentCategory,
   nextCategory,
-  isSpeaking = false,
+  isSpeaking,
   category,
   voiceRegion,
-  nextVoiceLabel
+  nextVoiceLabel,
+  showWordCount = false
 }) => {
-  // Store current word in localStorage to help track sync issues
-  useEffect(() => {
-    if (word) {
-      localStorage.setItem('currentDisplayedWord', word);
-    }
-    
-    return () => {
-      localStorage.removeItem('currentDisplayedWord');
-    };
-  }, [word]);
+  const categoryLabel = getCategoryLabel(category);
+  const nextCategoryLabel = getCategoryLabel(nextCategory);
 
-  // Parse word to separate types and phonetics
-  const wordParts = word.split(/\s*\(([^)]+)\)/);
-  const mainWord = wordParts[0].trim();
-  const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
-  const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
+  const currentWordObj = { word, meaning, example, category };
 
   return (
     <Card 
       className={cn(
-        "w-full max-w-2xl mx-auto transition-colors duration-300",
-        "border-0 shadow-lg",
-        isSpeaking ? "ring-2 ring-blue-400" : ""
+        "w-full max-w-2xl mx-auto transition-all duration-500 ease-in-out shadow-lg border-2",
+        isSpeaking && "ring-2 ring-blue-400 ring-opacity-50"
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-4 sm:p-6 lg:p-8">
-        <div className="space-y-4">
-          <div className="flex justify-between items-start">
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
-              {wordType && (
-                <p className="text-xs sm:text-sm lg:text-base text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
-              )}
+      <CardContent className="p-6 sm:p-8">
+        <div className="space-y-6">
+          {/* Category and Word Count */}
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-medium text-gray-600 bg-white/80 px-3 py-1 rounded-full">
+              {categoryLabel}
             </div>
-            {isPaused && (
-              <span className="text-xs sm:text-sm bg-amber-100 text-amber-800 px-2 sm:px-3 py-1 rounded-full font-medium ml-2 flex-none">
-                Paused
-              </span>
-            )}
-          </div>
-          
-          <div className="text-sm sm:text-base lg:text-lg text-green-800 break-words">
-            <span className="font-medium">* </span>
-            {meaning}
+            <WordCountDisplay 
+              word={currentWordObj} 
+              showCount={showWordCount}
+            />
           </div>
 
-          <div className="text-sm sm:text-base lg:text-lg italic text-red-800 break-words">
-            <span className="font-medium">* </span>
-            {example}
+          {/* Word */}
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-2 tracking-wide">
+              {word}
+            </h1>
           </div>
-          
+
+          {/* Meaning */}
+          <div className="bg-white/90 p-4 rounded-lg">
+            <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
+              Meaning
+            </h2>
+            <p className="text-lg text-gray-800 leading-relaxed">
+              {meaning}
+            </p>
+          </div>
+
+          {/* Example */}
+          <div className="bg-white/90 p-4 rounded-lg">
+            <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
+              Example
+            </h2>
+            <p className="text-lg text-gray-800 leading-relaxed italic">
+              "{example}"
+            </p>
+          </div>
+
+          {/* Voice Region Indicator */}
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 text-xs text-gray-500 bg-white/60 px-3 py-1 rounded-full">
+              <Speaker size={12} />
+              <span>{voiceRegion} Voice</span>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

@@ -22,6 +22,7 @@ interface VocabularyMainNewProps {
   nextVoiceLabel: string;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
+  showWordCount?: boolean;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -41,6 +42,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   nextVoiceLabel,
   onOpenAddModal,
   onOpenEditModal,
+  showWordCount = false,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -49,41 +51,42 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
       {/* Main card - takes most of the space */}
       <div className="flex-1 min-w-0">
         <VocabularyCardNew
-        word={currentWord.word}
-        meaning={currentWord.meaning}
-        example={currentWord.example}
-        backgroundColor={backgroundColor}
-        isMuted={mute}
-        isPaused={isPaused}
-        onToggleMute={toggleMute}
-        onTogglePause={handleTogglePause}
-        onCycleVoice={handleCycleVoice}
-        onSwitchCategory={handleSwitchCategory}
-        onNextWord={handleManualNext}
-        currentCategory={currentCategory}
-        nextCategory={nextCategory || 'Next'}
-        isSpeaking={isSoundPlaying}
-        category={currentWord.category || currentCategory}
-        voiceRegion={voiceRegion}
-        nextVoiceLabel={nextVoiceLabel}
+          word={currentWord.word}
+          meaning={currentWord.meaning}
+          example={currentWord.example}
+          backgroundColor={backgroundColor}
+          isMuted={mute}
+          isPaused={isPaused}
+          onToggleMute={toggleMute}
+          onTogglePause={handleTogglePause}
+          onCycleVoice={handleCycleVoice}
+          onSwitchCategory={handleSwitchCategory}
+          onNextWord={handleManualNext}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory || 'Next'}
+          isSpeaking={isSoundPlaying}
+          category={currentWord.category || currentCategory}
+          voiceRegion={voiceRegion}
+          nextVoiceLabel={nextVoiceLabel}
+          showWordCount={showWordCount}
         />
       </div>
       
       {/* Controls column - positioned on the right side */}
       <div className="flex-none flex flex-col justify-start items-end">
         <VocabularyControlsColumn
-        isMuted={mute}
-        isPaused={isPaused}
-        onToggleMute={toggleMute}
-        onTogglePause={handleTogglePause}
-        onNextWord={handleManualNext}
-        onSwitchCategory={handleSwitchCategory}
-        onCycleVoice={handleCycleVoice}
-        nextCategory={nextCategory || 'Next'}
-        nextVoiceLabel={nextVoiceLabel}
-        currentWord={currentWord}
-        onOpenAddModal={onOpenAddModal}
-        onOpenEditModal={onOpenEditModal}
+          isMuted={mute}
+          isPaused={isPaused}
+          onToggleMute={toggleMute}
+          onTogglePause={handleTogglePause}
+          onNextWord={handleManualNext}
+          onSwitchCategory={handleSwitchCategory}
+          onCycleVoice={handleCycleVoice}
+          nextCategory={nextCategory || 'Next'}
+          nextVoiceLabel={nextVoiceLabel}
+          currentWord={currentWord}
+          onOpenAddModal={onOpenAddModal}
+          onOpenEditModal={onOpenEditModal}
         />
       </div>
     </div>
