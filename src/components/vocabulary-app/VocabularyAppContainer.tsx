@@ -1,3 +1,4 @@
+
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
@@ -59,13 +60,18 @@ const VocabularyAppContainer: React.FC = () => {
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
 
   // Ensure selectedVoice has all required properties for voice labels
+  // Handle both VoiceSelection and simplified { region } objects
   const voiceForLabels = {
     region: (typeof selectedVoice === 'string' ? selectedVoice : selectedVoice?.region || 'UK') as 'US' | 'UK' | 'AU',
-    label: typeof selectedVoice === 'string' ? selectedVoice : (selectedVoice?.label || selectedVoice?.region || 'UK'),
-    gender: (typeof selectedVoice === 'string' ? 'female' : (selectedVoice?.gender || 'female')) as 'male' | 'female',
+    label: typeof selectedVoice === 'string' 
+      ? selectedVoice 
+      : ('label' in selectedVoice ? selectedVoice.label : selectedVoice?.region || 'UK'),
+    gender: (typeof selectedVoice === 'string' 
+      ? 'female' 
+      : ('gender' in selectedVoice ? selectedVoice.gender : 'female')) as 'male' | 'female',
     index: typeof selectedVoice === 'string' 
       ? (selectedVoice === 'US' ? 0 : selectedVoice === 'UK' ? 1 : 2)
-      : (selectedVoice?.index ?? 1)
+      : ('index' in selectedVoice ? selectedVoice.index : 1)
   };
   
   const { nextVoiceLabel } = useVoiceLabels(voiceForLabels);
