@@ -2,10 +2,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import type { PluginOption } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => {
-  const plugins = [react()];
+  const plugins: PluginOption[] = [react()];
   
   // Only load lovable-tagger in development
   if (mode === 'development') {

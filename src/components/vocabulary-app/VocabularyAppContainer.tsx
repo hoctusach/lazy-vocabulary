@@ -30,7 +30,7 @@ const VocabularyAppContainer: React.FC = () => {
     wordList = [],
     muted = false,
     paused = false,
-    selectedVoice = 'UK',
+    selectedVoice = { region: 'UK' as const },
     toggleMute = () => {},
     togglePause = () => {},
     goToNextWord = () => {},
@@ -59,8 +59,9 @@ const VocabularyAppContainer: React.FC = () => {
   // Determine display word with fallback logic
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
 
-  // Get voice labels with fallback
-  const { nextVoiceLabel } = useVoiceLabels(selectedVoice);
+  // Get voice labels with fallback - ensure selectedVoice is properly typed
+  const voiceForLabels = typeof selectedVoice === 'string' ? { region: selectedVoice as 'US' | 'UK' | 'AU' } : selectedVoice;
+  const { nextVoiceLabel } = useVoiceLabels(voiceForLabels);
 
   // Audio initialization with error handling
   useAudioInitialization({
@@ -121,6 +122,9 @@ const VocabularyAppContainer: React.FC = () => {
     handleToggleMuteWithInteraction = () => {}
   } = interactionHandlers || {};
 
+  // Ensure selectedVoice is properly formatted for display
+  const displaySelectedVoice = typeof selectedVoice === 'string' ? selectedVoice : selectedVoice?.region || 'UK';
+
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       <VocabularyAppContent
@@ -131,7 +135,7 @@ const VocabularyAppContainer: React.FC = () => {
         muted={muted}
         paused={paused}
         isSpeaking={isSpeaking}
-        selectedVoice={selectedVoice}
+        selectedVoice={displaySelectedVoice}
         nextVoiceLabel={nextVoiceLabel}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
