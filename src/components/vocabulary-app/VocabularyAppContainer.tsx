@@ -1,4 +1,3 @@
-
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
@@ -59,7 +58,7 @@ const VocabularyAppContainer: React.FC = () => {
   // Determine display word with fallback logic
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
 
-  // Get voice labels with proper VoiceSelection structure - fix the type issue
+  // Get voice labels with proper VoiceSelection structure - ensure all required properties
   const voiceForLabels = typeof selectedVoice === 'string' 
     ? { 
         region: selectedVoice as 'US' | 'UK' | 'AU', 
