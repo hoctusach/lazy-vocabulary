@@ -67,11 +67,6 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         voiceRegion={voiceRegion}
         nextVoiceLabel={nextVoiceLabel}
         />
-        <div className="mt-2 text-xs italic text-gray-500 text-center">
-          <p>On Mobile:</p>
-          <p>- Tap any button (e.g., Next) to enable speech</p>
-          <p>- Only Australian voice may be available</p>
-        </div>
       </div>
       
       {/* Controls column - positioned on the right side */}

@@ -74,10 +74,17 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onOpenAddModal={handleOpenAddWordModal}
         onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       />
-      
-      
+
+
+      {/* Mobile speech note fixed above debug panel */}
+      <div className="fixed inset-x-0 bottom-24 text-xs italic text-gray-500 text-center pointer-events-none">
+        <p>On Mobile:</p>
+        <p>- Tap any button (e.g., Next) to enable speech</p>
+        <p>- Only Australian voice may be available</p>
+      </div>
+
       {/* Debug Panel */}
-      <DebugPanel 
+      <DebugPanel
         isMuted={muted}
         voiceRegion={voiceRegion}
         isPaused={paused}
