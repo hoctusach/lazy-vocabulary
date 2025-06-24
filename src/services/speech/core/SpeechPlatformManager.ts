@@ -1,6 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { SpeechOptions } from '@/utils/speech/controller/types';
+import { SpeechOptions } from './SpeechOptions';
 import { VoiceManager } from './VoiceManager';
 import { SpeechEventHandler } from './SpeechEventHandler';
 import { isMobileDevice } from '@/utils/device';
@@ -141,7 +141,10 @@ export class SpeechPlatformManager {
     resetRetryCount();
     
     if (options?.onError) {
-      options.onError(new Error('Mobile speech error'));
+      // Create a mock SpeechSynthesisErrorEvent for mobile errors
+      const mockErrorEvent = new Event('error') as SpeechSynthesisErrorEvent;
+      Object.defineProperty(mockErrorEvent, 'error', { value: 'network', writable: false });
+      options.onError(mockErrorEvent);
     }
     
     const state = getState();
