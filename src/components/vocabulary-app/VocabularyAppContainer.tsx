@@ -1,3 +1,4 @@
+
 import React from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
@@ -66,7 +67,12 @@ const VocabularyAppContainer: React.FC = () => {
         gender: 'female' as const, 
         index: selectedVoice === 'US' ? 0 : selectedVoice === 'UK' ? 1 : 2 
       }
-    : selectedVoice || { region: 'UK' as const, label: 'UK', gender: 'female' as const, index: 1 };
+    : selectedVoice || { 
+        region: 'UK' as const, 
+        label: 'UK', 
+        gender: 'female' as const, 
+        index: 1 
+      };
   const { nextVoiceLabel } = useVoiceLabels(voiceForLabels);
 
   // Audio initialization with error handling
