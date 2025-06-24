@@ -21,5 +21,37 @@ export const useUnifiedValidation = () => {
     return true;
   };
 
-  return { validatePreConditions };
+  const checkAll = (
+    currentWord: VocabularyWord,
+    muted: boolean,
+    paused: boolean,
+    isPlayInProgress: () => boolean,
+    resetPlayInProgress: () => void,
+    wordTransitionRef: React.MutableRefObject<boolean>
+  ) => {
+    if (!currentWord) {
+      return { canPlay: false, reason: 'no-word' };
+    }
+
+    if (muted) {
+      return { canPlay: false, reason: 'muted' };
+    }
+
+    if (paused) {
+      return { canPlay: false, reason: 'paused' };
+    }
+
+    if (isPlayInProgress()) {
+      resetPlayInProgress();
+      return { canPlay: false, reason: 'play-in-progress' };
+    }
+
+    if (wordTransitionRef.current) {
+      return { canPlay: false, reason: 'word-transition' };
+    }
+
+    return { canPlay: true, reason: null };
+  };
+
+  return { validatePreConditions, checkAll };
 };

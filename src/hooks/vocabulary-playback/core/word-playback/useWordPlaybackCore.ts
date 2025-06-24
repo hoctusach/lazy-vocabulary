@@ -1,4 +1,5 @@
 
+import * as React from 'react';
 import { useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../../useVoiceSelection';

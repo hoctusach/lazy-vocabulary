@@ -2,45 +2,87 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import { useSpeechValidation } from './speech-execution/useSpeechValidation';
+import { useSpeechCallbacks } from './speech-execution/useSpeechCallbacks';
+import { useSpeechErrorHandler } from './speech-execution/useSpeechErrorHandler';
+import { useSpeechController } from './speech-execution/useSpeechController';
 
 /**
- * Silent speech validation hook
+ * Hook for executing speech with comprehensive error handling and state management
  */
-export const useSpeechValidation = () => {
-  const validatePreConditions = (
-    sessionId: string,
+export const useSpeechExecution = (
+  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
+  selectedVoice: VoiceSelection,
+  setIsSpeaking: (isSpeaking: boolean) => void,
+  speakingRef: React.MutableRefObject<boolean>,
+  resetRetryAttempts: () => void,
+  incrementRetryAttempts: () => boolean,
+  paused: boolean,
+  muted: boolean,
+  wordTransitionRef: React.MutableRefObject<boolean>,
+  goToNextWord: (fromUser?: boolean) => void,
+  scheduleAutoAdvance: (delay: number) => void
+) => {
+  const { validatePreConditions, validateSpeechContent } = useSpeechValidation();
+  
+  const executeSpeech = useCallback(async (
     currentWord: VocabularyWord,
-    paused: boolean,
-    muted: boolean,
-    wordTransitionRef: React.MutableRefObject<boolean>
-  ) => {
-    if (paused || muted) {
-      return false;
-    }
-
-    if (wordTransitionRef.current) {
-      return false;
-    }
-
-    return true;
-  };
-
-  const validateSpeechContent = (
-    sessionId: string,
     speechableText: string,
-    setPlayInProgress: (inProgress: boolean) => void,
-    goToNextWord: () => void
-  ) => {
-    if (!speechableText || speechableText.trim().length === 0) {
+    setPlayInProgress: (inProgress: boolean) => void
+  ): Promise<boolean> => {
+    const sessionId = `speech-${Date.now()}`;
+    
+    // Pre-condition validation
+    if (!validatePreConditions(sessionId, currentWord, paused, muted, wordTransitionRef)) {
       setPlayInProgress(false);
-      setTimeout(() => goToNextWord(), 1500);
       return false;
     }
-    return true;
-  };
+
+    // Content validation
+    if (!validateSpeechContent(sessionId, speechableText, setPlayInProgress, goToNextWord)) {
+      return false;
+    }
+
+    try {
+      setIsSpeaking(true);
+      speakingRef.current = true;
+      
+      // Simple speech execution with auto-advance
+      setTimeout(() => {
+        setIsSpeaking(false);
+        speakingRef.current = false;
+        setPlayInProgress(false);
+        
+        if (!paused && !muted) {
+          scheduleAutoAdvance(1500);
+        }
+      }, Math.max(2000, speechableText.length * 40));
+      
+      return true;
+    } catch (error) {
+      setPlayInProgress(false);
+      setIsSpeaking(false);
+      speakingRef.current = false;
+      
+      if (!paused && !muted) {
+        scheduleAutoAdvance(2000);
+      }
+      return false;
+    }
+  }, [
+    validatePreConditions,
+    validateSpeechContent,
+    paused,
+    muted,
+    wordTransitionRef,
+    goToNextWord,
+    scheduleAutoAdvance,
+    setIsSpeaking,
+    speakingRef
+  ]);
 
   return {
-    validatePreConditions,
-    validateSpeechContent
+    executeSpeech
   };
 };
