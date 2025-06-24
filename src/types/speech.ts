@@ -5,3 +5,6 @@ export interface SpeechSettings {
   pitch: number;
   volume: number;
 }
+
+// Voice region type
+export type VoiceRegion = 'US' | 'UK' | 'AU';

@@ -72,17 +72,13 @@ export const useUnifiedVocabularyController = () => {
     setIsMuted,
     voiceRegion,
     setVoiceRegion,
-    currentWord,
     // Fix the speech state mapping to include all required properties
     {
       ...speechState,
       isPaused,
       isMuted,
       currentWord
-    },
-    playCurrentWord,
-    clearAutoAdvanceTimer,
-    scheduleAutoAdvance
+    }
   );
 
   // Data loading

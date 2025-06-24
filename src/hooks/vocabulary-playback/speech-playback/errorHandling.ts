@@ -1,4 +1,6 @@
 
+import * as React from 'react';
+
 // Speech error handling utilities
 export const handleSpeechError = (
   error: any, 
