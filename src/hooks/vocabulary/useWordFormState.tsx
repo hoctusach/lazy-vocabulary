@@ -1,5 +1,6 @@
+
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 interface WordFormState {
   word: string;
@@ -13,6 +14,9 @@ interface UseWordFormStateProps {
   initialMeaning?: string;
   initialExample?: string;
   initialCategory?: string;
+  editMode?: boolean;
+  wordToEdit?: { word: string; meaning: string; example: string; category: string };
+  isOpen?: boolean;
 }
 
 export const useWordFormState = (props: UseWordFormStateProps = {}) => {
@@ -20,13 +24,33 @@ export const useWordFormState = (props: UseWordFormStateProps = {}) => {
     initialWord = '',
     initialMeaning = '',
     initialExample = '',
-    initialCategory = ''
+    initialCategory = '',
+    editMode = false,
+    wordToEdit,
+    isOpen = false
   } = props;
 
-  const [word, setWord] = useState(initialWord);
-  const [meaning, setMeaning] = useState(initialMeaning);
-  const [example, setExample] = useState(initialExample);
-  const [category, setCategory] = useState(initialCategory);
+  const [word, setWord] = useState(editMode && wordToEdit ? wordToEdit.word : initialWord);
+  const [meaning, setMeaning] = useState(editMode && wordToEdit ? wordToEdit.meaning : initialMeaning);
+  const [example, setExample] = useState(editMode && wordToEdit ? wordToEdit.example : initialExample);
+  const [category, setCategory] = useState(editMode && wordToEdit ? wordToEdit.category : initialCategory);
+
+  // Reset form when modal opens/closes or when switching between edit/add modes
+  useEffect(() => {
+    if (isOpen) {
+      if (editMode && wordToEdit) {
+        setWord(wordToEdit.word);
+        setMeaning(wordToEdit.meaning);
+        setExample(wordToEdit.example);
+        setCategory(wordToEdit.category);
+      } else {
+        setWord(initialWord);
+        setMeaning(initialMeaning);
+        setExample(initialExample);
+        setCategory(initialCategory);
+      }
+    }
+  }, [isOpen, editMode, wordToEdit, initialWord, initialMeaning, initialExample, initialCategory]);
 
   const handleWordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setWord(e.target.value);

@@ -17,11 +17,7 @@ export const useVocabularyControls = (
   setIsMuted: (muted: boolean) => void,
   voiceRegion: 'US' | 'UK' | 'AU',
   setVoiceRegion: (region: 'US' | 'UK' | 'AU') => void,
-  currentWord: VocabularyWord | null,
-  speechState: SpeechState,
-  playCurrentWord: () => Promise<void>,
-  clearAutoAdvanceTimer: () => void,
-  scheduleAutoAdvance: (delay: number, onAdvance?: () => void) => void
+  speechState: SpeechState
 ) => {
   // Toggle pause with immediate feedback for mobile
   const togglePause = useCallback(() => {
@@ -33,16 +29,9 @@ export const useVocabularyControls = (
     
     // Clear timers when pausing
     if (newPausedState) {
-      clearAutoAdvanceTimer();
-    } else {
-      // When resuming, try to play current word if not speaking
-      if (currentWord && !speechState.isActive && !isMuted) {
-        setTimeout(() => {
-          playCurrentWord();
-        }, 100);
-      }
+      unifiedSpeechController.stop();
     }
-  }, [isPaused, setIsPaused, clearAutoAdvanceTimer, currentWord, speechState.isActive, isMuted, playCurrentWord]);
+  }, [isPaused, setIsPaused]);
 
   // Toggle mute with immediate feedback
   const toggleMute = useCallback(() => {
@@ -54,16 +43,9 @@ export const useVocabularyControls = (
     
     // Clear timers when muting
     if (newMutedState) {
-      clearAutoAdvanceTimer();
-    } else {
-      // When unmuting, try to play current word if not paused and not speaking
-      if (currentWord && !isPaused && !speechState.isActive) {
-        setTimeout(() => {
-          playCurrentWord();
-        }, 100);
-      }
+      unifiedSpeechController.stop();
     }
-  }, [isMuted, setIsMuted, clearAutoAdvanceTimer, currentWord, isPaused, speechState.isActive, playCurrentWord]);
+  }, [isMuted, setIsMuted]);
 
   // Toggle voice region
   const toggleVoice = useCallback(() => {
@@ -81,29 +63,16 @@ export const useVocabularyControls = (
   const switchCategory = useCallback(() => {
     console.log('[VOCABULARY-CONTROLS] Switching category');
 
-    // Clear timers and stop current speech during category switch
-    clearAutoAdvanceTimer();
+    // Stop current speech during category switch
     unifiedSpeechController.stop();
     
     try {
       const newCategory = vocabularyService.nextSheet();
       console.log('[VOCABULARY-CONTROLS] Switched to category:', newCategory);
-      
-      // Give time for the new category to load
-      setTimeout(() => {
-        if (!isPaused && !isMuted) {
-          // Try to play the first word of the new category
-          const newWord = vocabularyService.getCurrentWord();
-          if (newWord) {
-            playCurrentWord();
-          }
-        }
-      }, 300);
-      
     } catch (error) {
       console.error('[VOCABULARY-CONTROLS] Error switching category:', error);
     }
-  }, [clearAutoAdvanceTimer, isPaused, isMuted, playCurrentWord, unifiedSpeechController]);
+  }, []);
 
   return {
     togglePause,
