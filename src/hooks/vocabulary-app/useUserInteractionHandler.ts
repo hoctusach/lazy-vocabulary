@@ -1,4 +1,5 @@
 
+import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { unlockAudio } from '@/utils/speech/core/modules/speechUnlock';
 

@@ -1,4 +1,5 @@
 
+import * as React from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
