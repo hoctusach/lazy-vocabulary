@@ -1,5 +1,4 @@
-
-// Refactored: now this file just orchestrates the helpers
+import * as React from 'react';
 import { prepareTextForSpeech } from './speechText';
 import { ensureSpeechEngineReady, stopSpeaking } from './speechEngine';
 import { speakWithVoice } from './speakWithVoice';

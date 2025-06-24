@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { getSpeechRate } from './speechSettings';
 import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';

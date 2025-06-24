@@ -59,7 +59,7 @@ export const useUnifiedVocabularyController = () => {
     clearAutoAdvanceTimer
   );
 
-  // Control actions with proper audio management - fix the parameter count
+  // Control actions with simplified parameters
   const {
     togglePause,
     toggleMute,

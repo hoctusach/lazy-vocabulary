@@ -1,4 +1,4 @@
-
+import * as React from 'react';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 
 type ChunkResult = { success: boolean, error?: string };

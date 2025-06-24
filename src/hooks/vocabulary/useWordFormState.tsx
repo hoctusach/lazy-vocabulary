@@ -1,8 +1,7 @@
+import * as React from 'react';
+import { useState, useCallback } from 'react';
 
-import { useState, useEffect } from 'react';
-import { validateVocabularyWord, validateMeaning, validateExample } from '@/utils/security/inputValidation';
-
-interface WordFormData {
+interface WordFormState {
   word: string;
   meaning: string;
   example: string;
@@ -10,78 +9,61 @@ interface WordFormData {
 }
 
 interface UseWordFormStateProps {
-  editMode: boolean;
-  wordToEdit?: WordFormData | null;
-  isOpen: boolean;
+  initialWord?: string;
+  initialMeaning?: string;
+  initialExample?: string;
+  initialCategory?: string;
 }
 
-export const useWordFormState = ({ editMode, wordToEdit, isOpen }: UseWordFormStateProps) => {
-  const [word, setWord] = useState<string>('');
-  const [meaning, setMeaning] = useState<string>('');
-  const [example, setExample] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
+export const useWordFormState = (props: UseWordFormStateProps = {}) => {
+  const {
+    initialWord = '',
+    initialMeaning = '',
+    initialExample = '',
+    initialCategory = ''
+  } = props;
 
-  // Pre-populate form when in edit mode
-  useEffect(() => {
-    if (editMode && wordToEdit) {
-      // Sanitize input when loading for edit
-      const wordValidation = validateVocabularyWord(wordToEdit.word);
-      const meaningValidation = validateMeaning(wordToEdit.meaning);
-      const exampleValidation = validateExample(wordToEdit.example);
-      
-      setWord(wordValidation.sanitizedValue || wordToEdit.word);
-      setMeaning(meaningValidation.sanitizedValue || wordToEdit.meaning);
-      setExample(exampleValidation.sanitizedValue || wordToEdit.example);
-      setCategory(wordToEdit.category);
-    } else if (!editMode) {
-      // Reset form when not in edit mode
-      setWord('');
-      setMeaning('');
-      setExample('');
-      setCategory('');
-    }
-  }, [editMode, wordToEdit, isOpen]);
+  const [word, setWord] = useState(initialWord);
+  const [meaning, setMeaning] = useState(initialMeaning);
+  const [example, setExample] = useState(initialExample);
+  const [category, setCategory] = useState(initialCategory);
 
-  const handleWordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Basic real-time sanitization
-    const sanitized = value.replace(/[<>]/g, '');
-    setWord(sanitized);
-  };
+  const handleWordChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setWord(e.target.value);
+  }, []);
 
-  const handleMeaningChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    // Basic real-time sanitization
-    const sanitized = value.replace(/[<>]/g, '');
-    setMeaning(sanitized);
-  };
+  const handleMeaningChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMeaning(e.target.value);
+  }, []);
 
-  const handleExampleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const value = e.target.value;
-    // Basic real-time sanitization
-    const sanitized = value.replace(/[<>]/g, '');
-    setExample(sanitized);
-  };
+  const handleExampleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setExample(e.target.value);
+  }, []);
 
-  const resetForm = () => {
-    setWord('');
-    setMeaning('');
-    setExample('');
-    setCategory('');
-  };
+  const handleCategoryChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setCategory(e.target.value);
+  }, []);
+
+  const resetForm = useCallback(() => {
+    setWord(initialWord);
+    setMeaning(initialMeaning);
+    setExample(initialExample);
+    setCategory(initialCategory);
+  }, [initialWord, initialMeaning, initialExample, initialCategory]);
 
   return {
     word,
     meaning,
     example,
     category,
-    setWord,
-    setMeaning,
-    setExample,
-    setCategory,
     handleWordChange,
     handleMeaningChange,
     handleExampleChange,
-    resetForm
+    handleCategoryChange,
+    resetForm,
+    setWord,
+    setMeaning,
+    setExample,
+    setCategory
   };
 };
