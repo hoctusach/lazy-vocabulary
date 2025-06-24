@@ -67,11 +67,11 @@ const VocabularyAppContainer: React.FC = () => {
         gender: 'female' as const, 
         index: selectedVoice === 'US' ? 0 : selectedVoice === 'UK' ? 1 : 2 
       }
-    : selectedVoice || { 
-        region: 'UK' as const, 
-        label: 'UK', 
-        gender: 'female' as const, 
-        index: 1 
+    : {
+        region: selectedVoice?.region || 'UK' as const,
+        label: selectedVoice?.label || 'UK',
+        gender: selectedVoice?.gender || 'female' as const,
+        index: selectedVoice?.index ?? 1
       };
   const { nextVoiceLabel } = useVoiceLabels(voiceForLabels);
 
