@@ -1,4 +1,5 @@
 
+import * as React from 'react';
 import { useEffect, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { speak, stopSpeaking } from '@/utils/speech';
