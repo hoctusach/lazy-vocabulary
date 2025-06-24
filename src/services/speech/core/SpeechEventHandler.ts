@@ -109,7 +109,9 @@ export class SpeechEventHandler {
     }
 
     if (options?.onError) {
-      options.onError(event);
+      // Convert SpeechSynthesisErrorEvent to Error
+      const error = new Error(`Speech synthesis error: ${event.error}`);
+      options.onError(error);
     }
 
     const state = getState();
