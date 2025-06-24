@@ -1,4 +1,5 @@
-
+import * as React from 'react';
+import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { speechController } from '@/utils/speech/core/speechController';
 

@@ -1,5 +1,5 @@
-
-import { useCallback } from 'react';
+import * as React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';

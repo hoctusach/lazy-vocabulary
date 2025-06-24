@@ -1,4 +1,5 @@
 
+import * as React from 'react';
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 

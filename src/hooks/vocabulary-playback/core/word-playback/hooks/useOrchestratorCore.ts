@@ -1,6 +1,7 @@
-
-import { useCallback } from 'react';
+import * as React from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
+import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { usePlayInProgress } from './usePlayInProgress';
 import { useCurrentWordCalculation } from './useCurrentWordCalculation';
 import { usePlaybackExecution } from './usePlaybackExecution';

@@ -1,6 +1,6 @@
-
+import * as React from 'react';
 import { useCallback } from 'react';
-import { speechController } from '@/utils/speech/core/speechController';
+import { stopSpeaking } from '@/utils/speech';
 
 /**
  * Hook for handling speech cancellation using the centralized controller
@@ -15,7 +15,7 @@ export const useSpeechCancellation = (
     console.log('[CANCELLATION] Cancelling speech via controller');
 
     // Use the centralized controller to stop speech
-    speechController.stop();
+    stopSpeaking();
 
     // Reset the playback in progress flag
     resetPlayInProgress();
