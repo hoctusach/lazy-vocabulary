@@ -80,7 +80,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '1.25rem', textAlign: 'left' }}>{mainWord}</h2>
+              <h2 style={{ fontWeight: 'normal', fontSize: '1.25rem', textAlign: 'left', color: 'inherit', background: 'transparent', margin: 0 }}>{mainWord}</h2>
               {wordType && (
                 <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
@@ -91,13 +91,13 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               </span>
             )}
           </div>
-          {/* Meaning - pastel green background, left-aligned, smaller font */}
-          <div style={{ background: '#d8f3dc', color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem' }}>
-            <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
+          {/* Meaning - left-aligned, pastel green text, no background, italic star */}
+          <div style={{ color: '#d8f3dc', fontSize: '1rem', textAlign: 'left', background: 'transparent', fontStyle: 'normal', margin: 0 }}>
+            <span style={{ fontStyle: 'italic', color: '#d8f3dc' }}>* </span>{meaning}
           </div>
-ç          {/* Example - left-aligned, smaller font, no background */}
-          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic' }}>
-            <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
+          {/* Example - left-aligned, default color, no background, italic star */}
+          <div style={{ color: 'inherit', fontSize: '0.9rem', textAlign: 'left', background: 'transparent', fontStyle: 'normal', margin: 0 }}>
+            <span style={{ fontStyle: 'italic', color: 'inherit' }}>* </span>{example}
           </div>
           
           {/* Control buttons wrapper - optimized spacing */}
@@ -158,6 +158,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               {nextVoiceLabel}
             </Button>
           </div>
+        </div>
+        {/* Mobile note fixed at bottom of card */}
+        <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', color: '#666', fontStyle: 'italic', marginTop: '1.5rem' }}>
+          On Mobile: Tap any button to enable speech. Only Australian voice may be available.
         </div>
       </CardContent>
     </Card>
