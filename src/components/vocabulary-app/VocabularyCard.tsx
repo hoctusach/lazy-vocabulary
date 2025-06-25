@@ -80,7 +80,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
+              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '2rem', textAlign: 'left' }}>{mainWord}</h2>
             </div>
             {isPaused && (
               <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
@@ -90,15 +90,13 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           </div>
           
           {/* Meaning */}
-          <div className="meaning-text" style={{ backgroundColor: '#B8E1DD', padding: '0.5rem', borderRadius: '0.5rem' }}>
-            <span className="font-medium">* </span>
-            {meaning}
+          <div className="italic" style={{ color: '#2E7D32', fontSize: '1.25rem', textAlign: 'left' }}>
+            <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
 
           {/* Example */}
-          <div className="example-text" style={{ backgroundColor: '#FDE2E4', padding: '0.5rem', borderRadius: '0.5rem' }}>
-            <span className="font-medium">* </span>
-            <span className="italic">{example}</span>
+          <div className="italic" style={{ color: '#B71C1C', fontSize: '1rem', textAlign: 'left' }}>
+            <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
           
           {/* Control buttons wrapper - optimized spacing */}

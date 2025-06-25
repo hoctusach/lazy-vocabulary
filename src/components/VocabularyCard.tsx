@@ -79,7 +79,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
+              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '2rem', textAlign: 'left' }}>{mainWord}</h2>
               {wordType && (
                 <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
@@ -91,14 +91,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             )}
           </div>
           
-          <div className="text-sm text-green-800 break-words">
-            <span className="font-medium">* </span>
-            {meaning}
+          <div className="italic" style={{ color: '#2E7D32', fontSize: '1.25rem', textAlign: 'left' }}>
+            <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
           
-          <div className="text-sm italic text-red-800 break-words">
-            <span className="font-medium">* </span>
-            {example}
+          <div className="italic" style={{ color: '#B71C1C', fontSize: '1rem', textAlign: 'left' }}>
+            <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
           
         </div>

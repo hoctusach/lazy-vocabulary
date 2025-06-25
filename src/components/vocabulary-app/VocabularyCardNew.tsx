@@ -81,23 +81,15 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           </div>
 
           {/* Meaning */}
-          <div className="bg-white/90 p-4 rounded-lg">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
-              Meaning
-            </h2>
-            <p className="text-sm text-gray-800 leading-relaxed">
-              {meaning}
-            </p>
+          <div className="meaning-text" style={{ backgroundColor: '#B8E1DD', padding: '0.5rem', borderRadius: '0.5rem' }}>
+            <span className="font-medium">* </span>
+            {meaning}
           </div>
 
           {/* Example */}
-          <div className="bg-white/90 p-4 rounded-lg">
-            <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
-              Example
-            </h2>
-            <p className="text-sm text-gray-800 leading-relaxed italic">
-              "{example}"
-            </p>
+          <div className="example-text" style={{ backgroundColor: '#FDE2E4', padding: '0.5rem', borderRadius: '0.5rem' }}>
+            <span className="font-medium">* </span>
+            <span className="italic">{example}</span>
           </div>
         </div>
       </CardContent>
