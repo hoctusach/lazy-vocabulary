@@ -89,14 +89,16 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             )}
           </div>
           
-          <div className="text-sm text-green-800 break-words">
+          {/* Meaning */}
+          <div className="meaning-text" style={{ backgroundColor: '#B8E1DD', padding: '0.5rem', borderRadius: '0.5rem' }}>
             <span className="font-medium">* </span>
             {meaning}
           </div>
-          
-          <div className="text-sm italic text-red-800 break-words">
+
+          {/* Example */}
+          <div className="example-text" style={{ backgroundColor: '#FDE2E4', padding: '0.5rem', borderRadius: '0.5rem' }}>
             <span className="font-medium">* </span>
-            {example}
+            <span className="italic">{example}</span>
           </div>
           
           {/* Control buttons wrapper - optimized spacing */}
