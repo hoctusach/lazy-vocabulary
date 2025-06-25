@@ -74,22 +74,20 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           </div>
 
           {/* Word */}
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-2xl font-bold text-gray-800 mb-2 tracking-wide">
+          <div className="text-left">
+            <h1 className="font-bold" style={{ color: '#1F305E', fontSize: '1.25rem', textAlign: 'left' }}>
               {word}
             </h1>
           </div>
 
-          {/* Meaning */}
-          <div className="meaning-text" style={{ backgroundColor: '#B8E1DD', padding: '0.5rem', borderRadius: '0.5rem' }}>
-            <span className="font-medium">* </span>
-            {meaning}
+          {/* Meaning - pastel green background, left-aligned, smaller font */}
+          <div style={{ background: '#d8f3dc', color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem' }}>
+            <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
 
-          {/* Example */}
-          <div className="example-text" style={{ backgroundColor: '#FDE2E4', padding: '0.5rem', borderRadius: '0.5rem' }}>
-            <span className="font-medium">* </span>
-            <span className="italic">{example}</span>
+          {/* Example - left-aligned, smaller font, no background */}
+          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic' }}>
+            <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
         </div>
       </CardContent>

@@ -80,7 +80,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '2rem', textAlign: 'left' }}>{mainWord}</h2>
+              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '1.25rem', textAlign: 'left' }}>{mainWord}</h2>
+              {wordType && (
+                <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
+              )}
             </div>
             {isPaused && (
               <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
@@ -88,14 +91,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               </span>
             )}
           </div>
-          
-          {/* Meaning */}
-          <div className="italic" style={{ color: '#2E7D32', fontSize: '1.25rem', textAlign: 'left' }}>
+          {/* Meaning - pastel green background, left-aligned, smaller font */}
+          <div style={{ background: '#d8f3dc', color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem' }}>
             <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
-
-          {/* Example */}
-          <div className="italic" style={{ color: '#B71C1C', fontSize: '1rem', textAlign: 'left' }}>
+          {/* Example - left-aligned, smaller font, no background */}
+          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic' }}>
             <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
           
