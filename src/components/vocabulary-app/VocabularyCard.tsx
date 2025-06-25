@@ -78,90 +78,82 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
     >
       <CardContent className="p-3">
         <div className="space-y-2">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 style={{ fontWeight: 'normal', fontSize: '1.25rem', textAlign: 'left', color: 'inherit', background: 'transparent', margin: 0 }}>{mainWord}</h2>
-              {wordType && (
-                <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
-              )}
-            </div>
-            {isPaused && (
-              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
-                Paused
-              </span>
+          <div>
+            <h2 style={{ fontWeight: 600, fontSize: '1rem', textAlign: 'left', color: '#1f2937', lineHeight: 1.2, margin: 0 }}>{mainWord}</h2>
+            {wordType && (
+              <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
             )}
           </div>
-          {/* Meaning - left-aligned, pastel green text, no background, italic star */}
-          <div style={{ color: '#d8f3dc', fontSize: '1rem', textAlign: 'left', background: 'transparent', fontStyle: 'normal', margin: 0 }}>
-            <span style={{ fontStyle: 'italic', color: '#d8f3dc' }}>* </span>{meaning}
+          {/* Meaning line */}
+          <div style={{ color: '#10b981', fontSize: '0.9rem', textAlign: 'left', marginBottom: '0.5em', lineHeight: 1.2 }}>
+            <span style={{ fontStyle: 'italic', color: '#10b981' }}>* </span>{meaning}
           </div>
-          {/* Example - left-aligned, default color, no background, italic star */}
-          <div style={{ color: 'inherit', fontSize: '0.9rem', textAlign: 'left', background: 'transparent', fontStyle: 'normal', margin: 0 }}>
-            <span style={{ fontStyle: 'italic', color: 'inherit' }}>* </span>{example}
+          {/* Example line */}
+          <div style={{ color: '#dc2626', fontSize: '0.9rem', textAlign: 'left', marginBottom: '0.5em', lineHeight: 1.2 }}>
+            <span style={{ fontStyle: 'italic', color: '#dc2626' }}>* </span>{example}
           </div>
-          
-          {/* Control buttons wrapper - optimized spacing */}
-          <div className="flex flex-wrap gap-1 pt-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onToggleMute}
-              className={cn(
-                "h-6 text-xs px-1.5",
-                isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
-              )}
-            >
-              {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
-              {isMuted ? "Unmute" : "Mute"}
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onTogglePause}
-              className={cn(
-                "h-6 text-xs px-1.5",
-                isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
-              )}
-            >
-              {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}
-              {isPaused ? "Play" : "Pause"}
-            </Button>
-          
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onNextWord}
-              className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
-            >
-              <SkipForward size={12} className="mr-1" />
-              Next
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onSwitchCategory}
-              className="h-6 text-xs px-1.5 text-green-700"
-            >
-              <RefreshCw size={10} className="mr-1" />
-              {nextCategoryLabel}
-            </Button>
-            
-            {/* Single voice toggle button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onCycleVoice}
-              className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
-            >
-              {nextVoiceLabel}
-            </Button>
+          {/* Mobile note below example */}
+          <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', color: '#6b7280', fontStyle: 'italic', margin: 0 }}>
+            On Mobile: Tap any button to enable speech. Only Australian voice may be available.
           </div>
         </div>
-        {/* Mobile note fixed at bottom of card */}
-        <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', color: '#666', fontStyle: 'italic', marginTop: '1.5rem' }}>
-          On Mobile: Tap any button to enable speech. Only Australian voice may be available.
+        {/* Control buttons wrapper - optimized spacing */}
+        <div className="flex flex-wrap gap-1 pt-1">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onToggleMute}
+            className={cn(
+              "h-6 text-xs px-1.5",
+              isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
+            )}
+          >
+            {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
+            {isMuted ? "Unmute" : "Mute"}
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onTogglePause}
+            className={cn(
+              "h-6 text-xs px-1.5",
+              isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
+            )}
+          >
+            {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}
+            {isPaused ? "Play" : "Pause"}
+          </Button>
+        
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onNextWord}
+            className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
+          >
+            <SkipForward size={12} className="mr-1" />
+            Next
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSwitchCategory}
+            className="h-6 text-xs px-1.5 text-green-700"
+          >
+            <RefreshCw size={10} className="mr-1" />
+            {nextCategoryLabel}
+          </Button>
+          
+          {/* Single voice toggle button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onCycleVoice}
+            className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
+          >
+            {nextVoiceLabel}
+          </Button>
         </div>
       </CardContent>
     </Card>
