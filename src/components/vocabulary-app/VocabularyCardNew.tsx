@@ -80,13 +80,13 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             </h1>
           </div>
 
-          {/* Meaning - pastel green background, left-aligned, smaller font */}
-          <div style={{ background: '#d8f3dc', color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem' }}>
+          {/* Meaning - transparent background, left-aligned, smaller font */}
+          <div style={{ color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem', background: 'transparent' }}>
             <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
 
-          {/* Example - left-aligned, smaller font, no background */}
-          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic' }}>
+          {/* Example - transparent background, left-aligned, smaller font */}
+          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic', background: 'transparent' }}>
             <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
         </div>

@@ -63,37 +63,38 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
 
-  // Safety check for nextCategory - ensure it's a string
-  const safeNextCategory = nextCategory || 'Next';
-  const nextCategoryLabel = getCategoryLabel(safeNextCategory);
-
   return (
     <Card 
       className={cn(
-        "w-full max-w-xl mx-auto transition-colors duration-300",
-        "border-0 shadow-lg",
-        isSpeaking ? "ring-2 ring-blue-400" : ""
+        "w-full max-w-xl mx-auto border-0 shadow-lg"
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-3">
-        <div className="space-y-2">
-          <div>
-            <h2 style={{ fontWeight: 600, fontSize: '1rem', textAlign: 'left', color: '#1f2937', lineHeight: 1.2, margin: 0 }}>{mainWord}</h2>
-            {wordType && (
-              <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
-            )}
+      <CardContent className="p-0">
+        <div>
+          {/* Word */}
+          <h2
+            className="text-left font-semibold text-[1rem] text-gray-800 leading-tight mb-2"
+            style={{ marginTop: 0 }}
+          >
+            {mainWord}
+          </h2>
+          {/* Meaning */}
+          <div
+            className="text-left text-[0.9rem] text-emerald-400 italic mb-2"
+            style={{ background: 'transparent', marginTop: 0 }}
+          >
+            <span className="italic text-emerald-400">*</span> {meaning}
           </div>
-          {/* Meaning line */}
-          <div style={{ color: '#10b981', fontSize: '0.9rem', textAlign: 'left', marginBottom: '0.5em', lineHeight: 1.2 }}>
-            <span style={{ fontStyle: 'italic', color: '#10b981' }}>* </span>{meaning}
-          </div>
-          {/* Example line */}
-          <div style={{ color: '#dc2626', fontSize: '0.9rem', textAlign: 'left', marginBottom: '0.5em', lineHeight: 1.2 }}>
-            <span style={{ fontStyle: 'italic', color: '#dc2626' }}>* </span>{example}
+          {/* Example */}
+          <div
+            className="text-left text-[0.9rem] text-red-600 italic"
+            style={{ background: 'transparent', marginTop: 0 }}
+          >
+            <span className="italic text-red-600">*</span> {example}
           </div>
           {/* Mobile note below example */}
-          <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', color: '#6b7280', fontStyle: 'italic', margin: 0 }}>
+          <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', fontStyle: 'italic', marginTop: '0.5rem', color: '#6b7280' }}>
             On Mobile: Tap any button to enable speech. Only Australian voice may be available.
           </div>
         </div>
@@ -142,7 +143,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="h-6 text-xs px-1.5 text-green-700"
           >
             <RefreshCw size={10} className="mr-1" />
-            {nextCategoryLabel}
+            {/* Removed dynamic category label */}
           </Button>
           
           {/* Single voice toggle button */}
