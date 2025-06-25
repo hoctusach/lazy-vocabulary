@@ -18,7 +18,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   }
   
   return {
-    base: '', // for custom domain
+    base: '/', // for custom domain
     server: {
       host: "::",
       port: 8080,
