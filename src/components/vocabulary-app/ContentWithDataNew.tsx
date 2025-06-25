@@ -75,9 +75,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       />
 
-
-      {/* Mobile speech note fixed above debug panel */}
-      <div className="fixed inset-x-0 bottom-24 text-xs italic text-gray-500 text-center pointer-events-none">
+      {/* Mobile speech note statically above debug panel */}
+      <div className="mobile-note text-xs italic text-gray-500 text-center my-2">
         <p>On Mobile:</p>
         <p>- Tap any button (e.g., Next) to enable speech</p>
         <p>- Only Australian voice may be available</p>

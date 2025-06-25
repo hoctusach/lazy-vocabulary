@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
@@ -80,7 +79,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-xl font-bold text-blue-900 break-words">{mainWord}</h2>
+              <h2 className="text-2xl font-bold text-blue-900 break-words">{mainWord}</h2>
               {wordType && (
                 <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
@@ -92,12 +91,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             )}
           </div>
           
-          <div className="text-base text-green-800 break-words">
+          <div className="text-sm text-green-800 break-words">
             <span className="font-medium">* </span>
             {meaning}
           </div>
           
-          <div className="text-base italic text-red-800 break-words">
+          <div className="text-sm italic text-red-800 break-words">
             <span className="font-medium">* </span>
             {example}
           </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -76,7 +75,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
 
           {/* Word */}
           <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 mb-2 tracking-wide">
+            <h1 className="text-2xl sm:text-2xl font-bold text-gray-800 mb-2 tracking-wide">
               {word}
             </h1>
           </div>
@@ -86,7 +85,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
               Meaning
             </h2>
-            <p className="text-lg text-gray-800 leading-relaxed">
+            <p className="text-sm text-gray-800 leading-relaxed">
               {meaning}
             </p>
           </div>
@@ -96,17 +95,9 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             <h2 className="text-sm font-semibold text-gray-600 mb-2 uppercase tracking-wider">
               Example
             </h2>
-            <p className="text-lg text-gray-800 leading-relaxed italic">
+            <p className="text-sm text-gray-800 leading-relaxed italic">
               "{example}"
             </p>
-          </div>
-
-          {/* Voice Region Indicator */}
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 text-xs text-gray-500 bg-white/60 px-3 py-1 rounded-full">
-              <Speaker size={12} />
-              <span>{voiceRegion} Voice</span>
-            </div>
           </div>
         </div>
       </CardContent>
