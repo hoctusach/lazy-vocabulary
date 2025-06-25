@@ -18,7 +18,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   }
   
   return {
-    base: "/lazy-vocabulary/", // ✅ REQUIRED for GitHub Pages
+    base: '', // for custom domain
     server: {
       host: "::",
       port: 8080,
