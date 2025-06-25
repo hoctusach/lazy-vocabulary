@@ -70,7 +70,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-0">
+      <CardContent className="p-2 sm:p-4 transition-all duration-500 ease-in-out shadow-lg border-2 rounded-lg">
         <div>
           {/* Word */}
           <h2

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useVocabularyContainerState } from '@/hooks/vocabulary/useVocabularyContainerState';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';

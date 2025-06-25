@@ -61,7 +61,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
       style={{ backgroundColor }}
     >
       <CardContent className="p-6 sm:p-8">
-        <div className="space-y-6">
+        <div className="space-y-2">
           {/* Category and Word Count */}
           <div className="flex items-center justify-between">
             <div className="text-sm font-medium text-gray-600 bg-white/80 px-3 py-1 rounded-full">
@@ -81,7 +81,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           </div>
 
           {/* Meaning - transparent background, left-aligned, smaller font */}
-          <div style={{ color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', padding: '0.5rem 0.75rem', background: 'transparent' }}>
+          <div style={{ color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', background: 'transparent' }}>
             <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
 
