@@ -70,31 +70,31 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-2 sm:p-4 transition-all duration-500 ease-in-out shadow-lg border-2 rounded-lg">
+      <CardContent className="p-2 sm:p-4">
         <div>
           {/* Word */}
           <h2
-            className="text-left font-semibold text-[1rem] text-gray-800 leading-tight mb-2"
+            className="text-left font-semibold text-[0.8rem] text-gray-800 leading-tight mb-2"
             style={{ marginTop: 0 }}
           >
             {mainWord}
           </h2>
           {/* Meaning */}
           <div
-            className="text-left text-[0.9rem] text-emerald-400 italic mb-2"
+            className="text-left text-[0.7rem] text-emerald-400 italic mb-2"
             style={{ background: 'transparent', marginTop: 0 }}
           >
             <span className="italic text-emerald-400">*</span> {meaning}
           </div>
           {/* Example */}
           <div
-            className="text-left text-[0.9rem] text-red-600 italic"
+            className="text-left text-[0.7rem] text-red-600 italic"
             style={{ background: 'transparent', marginTop: 0 }}
           >
             <span className="italic text-red-600">*</span> {example}
           </div>
           {/* Mobile note below example */}
-          <div className="mobile-note" style={{ textAlign: 'left', fontSize: '0.8rem', fontStyle: 'italic', marginTop: '0.5rem', color: '#6b7280' }}>
+          <div className="mobile-note text-left italic mt-2" style={{ color: '#6b7280', fontSize: '0.8rem' }}>
             On Mobile: Tap any button to enable speech. Only Australian voice may be available.
           </div>
         </div>
