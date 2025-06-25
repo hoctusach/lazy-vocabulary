@@ -1,4 +1,3 @@
-
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -19,6 +18,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   }
   
   return {
+    base: "/lazy-vocabulary/", // ✅ REQUIRED for GitHub Pages
     server: {
       host: "::",
       port: 8080,
@@ -30,7 +30,6 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       },
     },
     build: {
-      // Optimize build for deployment
       target: 'es2015',
       minify: 'esbuild',
       sourcemap: false,
@@ -44,7 +43,6 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       }
     },
     define: {
-      // Ensure proper environment variable handling
       'process.env.NODE_ENV': JSON.stringify(mode)
     }
   };
