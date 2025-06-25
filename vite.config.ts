@@ -6,8 +6,7 @@ import type { PluginOption, UserConfig } from "vite";
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }): Promise<UserConfig> => {
   const plugins: PluginOption[] = [react()];
-  
-  // Only load lovable-tagger in development
+
   if (mode === 'development') {
     try {
       const { componentTagger } = await import("lovable-tagger");
@@ -16,9 +15,9 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       console.warn('Could not load lovable-tagger:', error);
     }
   }
-  
+
   return {
-    base: '/', // for custom domain
+    // No custom base needed when serving at root
     server: {
       host: "::",
       port: 8080,
@@ -30,6 +29,8 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       },
     },
     build: {
+      // output into `docs` for GitHub Pages
+      outDir: "docs",
       target: 'es2015',
       minify: 'esbuild',
       sourcemap: false,
