@@ -1,20 +1,19 @@
-import React, { useEffect } from "react";
+
+import React, { useMemo } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
 import AudioStatusIndicator from "./AudioStatusIndicator";
+import UserInteractionManager from "./UserInteractionManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
-import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
-import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
+import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
+import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
-import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 const VocabularyAppContainerNew: React.FC = () => {
-  console.log('[VOCAB-CONTAINER-NEW] === Component Render ===');
-  
-  // Use ONLY the unified vocabulary controller - single source of truth
+  // Use stable state management
   const {
     currentWord,
     hasData,
@@ -28,82 +27,24 @@ const VocabularyAppContainerNew: React.FC = () => {
     toggleMute,
     toggleVoice,
     switchCategory,
-    playCurrentWord
-  } = useUnifiedVocabularyController();
+    playCurrentWord,
+    userInteractionState,
+    nextVoiceLabel,
+    nextCategory,
+    handleInteractionUpdate
+  } = useStableVocabularyState();
 
-  console.log('[VOCAB-CONTAINER-NEW] Unified controller state:', {
-    currentWord: currentWord?.word,
+  // Optimized auto-play with reduced re-renders
+  useOptimizedAutoPlay({
     hasData,
-    currentCategory,
+    currentWord,
+    hasInitialized: userInteractionState.hasInitialized,
     isPaused,
     isMuted,
-    voiceRegion,
-    isSpeaking
-  });
-
-  // Enhanced user interaction handling with proper audio unlock
-  const { hasInitialized, interactionCount, isAudioUnlocked } = useEnhancedUserInteraction({
-    onUserInteraction: () => {
-      console.log('[VOCAB-CONTAINER-NEW] User interaction callback triggered');
-    },
-    currentWord,
+    isSpeaking,
+    isAudioUnlocked: userInteractionState.isAudioUnlocked,
     playCurrentWord
   });
-
-  console.log('[VOCAB-CONTAINER-NEW] User interaction state:', {
-    hasInitialized,
-    interactionCount,
-    isAudioUnlocked
-  });
-
-  // Enhanced auto-play with proper state monitoring
-  useEffect(() => {
-    const speechState = unifiedSpeechController.getState();
-    
-    const autoPlayConditions = {
-      hasData,
-      hasCurrentWord: !!currentWord,
-      hasInitialized,
-      isPaused,
-      isMuted,
-      isSpeaking,
-      isAudioUnlocked,
-      speechControllerActive: speechState.isActive,
-      audioUnlockedFromController: speechState.audioUnlocked
-    };
-
-    if (hasData && currentWord && hasInitialized && !isPaused && !isMuted && !isSpeaking && isAudioUnlocked) {
-      const timeoutId = setTimeout(() => {
-        // Double-check conditions before executing
-        const finalCheck = {
-          isPaused,
-          isMuted,
-          isSpeaking,
-          isAudioUnlocked,
-          stillHasWord: !!currentWord
-        };
-        
-        if (!isPaused && !isMuted && !isSpeaking && isAudioUnlocked && currentWord) {
-          playCurrentWord();
-        }
-      }, 800);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [hasData, currentWord, hasInitialized, isPaused, isMuted, isSpeaking, isAudioUnlocked, playCurrentWord]);
-
-  const nextVoiceLabel =
-    voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
-
-  // Get next category for display
-  const getNextCategory = () => {
-    const sheets = vocabularyService.getAllSheetNames();
-    const currentIndex = sheets.indexOf(currentCategory);
-    const nextIndex = (currentIndex + 1) % sheets.length;
-    return sheets[nextIndex] || 'Next';
-  };
-
-  const nextCategory = getNextCategory();
 
   // Modal state management
   const {
@@ -115,33 +56,42 @@ const VocabularyAppContainerNew: React.FC = () => {
     handleCloseModal
   } = useWordModalState();
 
-  // Word management operations
-  const wordManager = currentWord ? VocabularyWordManager({
-    currentWord,
-    currentCategory,
-    onWordSaved: handleCloseModal
-  }) : null;
+  // Memoize word manager to prevent recreation
+  const wordManager = useMemo(() => {
+    return currentWord ? VocabularyWordManager({
+      currentWord,
+      currentCategory,
+      onWordSaved: handleCloseModal
+    }) : null;
+  }, [currentWord?.word, currentCategory, handleCloseModal]);
 
-  const handleSaveWord = (wordData: { word: string; meaning: string; example: string; category: string }) => {
+  const handleSaveWord = React.useCallback((wordData: { word: string; meaning: string; example: string; category: string }) => {
     if (wordManager) {
       wordManager.handleSaveWord(wordData, isEditMode, wordToEdit);
     }
-  };
+  }, [wordManager, isEditMode, wordToEdit]);
 
-  // Debug data for the debug panel
-  const debugData = currentWord
-    ? { word: currentWord.word, category: currentWord.category || currentCategory }
-    : null;
+  // Memoize debug data
+  const debugData = useMemo(() => {
+    return currentWord
+      ? { word: currentWord.word, category: currentWord.category || currentCategory }
+      : null;
+  }, [currentWord?.word, currentWord?.category, currentCategory]);
 
-  // Show different states based on data availability
+  // Render different states based on data availability
   if (!hasData && !vocabularyService.hasData()) {
     return (
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
+          <UserInteractionManager
+            currentWord={currentWord}
+            playCurrentWord={playCurrentWord}
+            onInteractionUpdate={handleInteractionUpdate}
+          />
           <AudioStatusIndicator 
-            isAudioUnlocked={isAudioUnlocked}
-            hasInitialized={hasInitialized}
-            interactionCount={interactionCount}
+            isAudioUnlocked={userInteractionState.isAudioUnlocked}
+            hasInitialized={userInteractionState.hasInitialized}
+            interactionCount={userInteractionState.interactionCount}
           />
           <VocabularyCardNew
             word="No vocabulary data"
@@ -171,10 +121,15 @@ const VocabularyAppContainerNew: React.FC = () => {
     return (
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
+          <UserInteractionManager
+            currentWord={currentWord}
+            playCurrentWord={playCurrentWord}
+            onInteractionUpdate={handleInteractionUpdate}
+          />
           <AudioStatusIndicator 
-            isAudioUnlocked={isAudioUnlocked}
-            hasInitialized={hasInitialized}
-            interactionCount={interactionCount}
+            isAudioUnlocked={userInteractionState.isAudioUnlocked}
+            hasInitialized={userInteractionState.hasInitialized}
+            interactionCount={userInteractionState.interactionCount}
           />
           <VocabularyCardNew
             word={`No words in "${currentCategory}" category`}
@@ -204,10 +159,15 @@ const VocabularyAppContainerNew: React.FC = () => {
     return (
       <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
         <div className="space-y-4">
+          <UserInteractionManager
+            currentWord={currentWord}
+            playCurrentWord={playCurrentWord}
+            onInteractionUpdate={handleInteractionUpdate}
+          />
           <AudioStatusIndicator 
-            isAudioUnlocked={isAudioUnlocked}
-            hasInitialized={hasInitialized}
-            interactionCount={interactionCount}
+            isAudioUnlocked={userInteractionState.isAudioUnlocked}
+            hasInitialized={userInteractionState.hasInitialized}
+            interactionCount={userInteractionState.interactionCount}
           />
           <VocabularyCardNew
             word="Loading vocabulary..."
@@ -236,10 +196,16 @@ const VocabularyAppContainerNew: React.FC = () => {
   return (
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       <div className="space-y-4">
+        <UserInteractionManager
+          currentWord={currentWord}
+          playCurrentWord={playCurrentWord}
+          onInteractionUpdate={handleInteractionUpdate}
+        />
+        
         <AudioStatusIndicator 
-          isAudioUnlocked={isAudioUnlocked}
-          hasInitialized={hasInitialized}
-          interactionCount={interactionCount}
+          isAudioUnlocked={userInteractionState.isAudioUnlocked}
+          hasInitialized={userInteractionState.hasInitialized}
+          interactionCount={userInteractionState.interactionCount}
         />
         
         <ErrorDisplay jsonLoadError={false} />
