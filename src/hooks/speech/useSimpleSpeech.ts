@@ -48,7 +48,11 @@ export const useSimpleSpeech = () => {
       };
 
       // Use the correct signature with only word and region
-      const success = await unifiedSpeechController.speak(wordObject, 'US');
+      const success = await unifiedSpeechController.speak(
+        wordObject,
+        'US',
+        options.voice?.name
+      );
 
       if (success) {
         console.log(`[SIMPLE-SPEECH-${speechId}] Speech started successfully`);

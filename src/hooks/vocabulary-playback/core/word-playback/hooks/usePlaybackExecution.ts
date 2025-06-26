@@ -34,6 +34,7 @@ export const usePlaybackExecution = (
   const { executeSpeech } = useSpeechExecution(
     findVoice,
     selectedVoice,
+    selectedVoice.label,
     setIsSpeaking,
     speakingRef,
     resetRetryAttempts,

@@ -28,7 +28,8 @@ export const useSpeechPlaybackCore = (
     isPlayingRef,
     advanceToNext,
     muted,
-    paused
+    paused,
+    selectedVoice.label
   );
 
   const playWord = useCallback(async (wordToPlay: VocabularyWord | null) => {

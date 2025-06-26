@@ -1,5 +1,5 @@
 
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+import { BUTTON_STATES_KEY, VOICE_SETTINGS_KEY } from '@/utils/storageKeys';
 
 export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
   try {
@@ -35,6 +35,32 @@ export const saveVoiceRegionToStorage = (region: 'US' | 'UK' | 'AU'): void => {
     console.log(`Voice region saved to storage: ${region}`);
   } catch (error) {
     console.error('Error saving voice region to localStorage:', error);
+  }
+};
+
+export const getVoiceVariantFromStorage = (): string => {
+  try {
+    const stored = localStorage.getItem(VOICE_SETTINGS_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (typeof parsed.voiceVariant === 'string') {
+        return parsed.voiceVariant;
+      }
+    }
+  } catch (error) {
+    console.error('Error reading voice variant from localStorage:', error);
+  }
+  return '';
+};
+
+export const saveVoiceVariantToStorage = (variant: string): void => {
+  try {
+    const existing = localStorage.getItem(VOICE_SETTINGS_KEY);
+    const data = existing ? JSON.parse(existing) : {};
+    data.voiceVariant = variant;
+    localStorage.setItem(VOICE_SETTINGS_KEY, JSON.stringify(data));
+  } catch (error) {
+    console.error('Error saving voice variant to localStorage:', error);
   }
 };
 

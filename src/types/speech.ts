@@ -8,3 +8,5 @@ export interface SpeechSettings {
 
 // Voice region type
 export type VoiceRegion = 'US' | 'UK' | 'AU';
+
+export type VoiceVariant = string;
