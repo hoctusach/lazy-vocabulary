@@ -3,6 +3,8 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
+  /** Optional full voice name like "en-AU-Standard-A" */
+  voiceVariant?: string;
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
@@ -28,12 +30,26 @@ class RealSpeechService {
 
     return new Promise((resolve) => {
       const utterance = new SpeechSynthesisUtterance(text);
-      
-      // Set voice based on region
-      const voice = this.findVoiceByRegion(options.voiceRegion);
+
+      // Prefer exact voice variant when provided
+      let voice: SpeechSynthesisVoice | null = null;
+      if (options.voiceVariant) {
+        voice = this.findVoiceByName(options.voiceVariant);
+      }
+      if (!voice) {
+        voice = this.findVoiceByRegion(options.voiceRegion);
+      }
+
       if (voice) {
         utterance.voice = voice;
-        console.log('Using voice:', voice.name, 'for region:', options.voiceRegion);
+        console.log(
+          'Using voice:',
+          voice.name,
+          'for region:',
+          options.voiceRegion,
+          'variant:',
+          options.voiceVariant
+        );
       } else {
         console.warn('No suitable voice found for region:', options.voiceRegion);
       }
@@ -138,6 +154,22 @@ class RealSpeechService {
 
   getCurrentUtterance(): SpeechSynthesisUtterance | null {
     return this.currentUtterance;
+  }
+
+  /**
+   * Find a voice by its exact name.
+   */
+  private findVoiceByName(name: string): SpeechSynthesisVoice | null {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+      console.warn('No voices available');
+      return null;
+    }
+    const voice = voices.find(v => v.name === name);
+    if (voice) {
+      console.log('Found voice by name:', voice.name, voice.lang);
+    }
+    return voice || null;
   }
 
   private findVoiceByRegion(region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null {
