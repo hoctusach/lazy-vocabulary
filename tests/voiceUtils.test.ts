@@ -24,7 +24,7 @@ describe('hasAvailableVoices', () => {
 
   it('returns true when voices are available', () => {
     (window as MockWindow).speechSynthesis.getVoices = () => [
-      { lang: 'en-GB', name: 'en-GB-Standard-A' }
+      { lang: 'en-GB', name: 'Google UK English Female' }
     ];
     expect(hasAvailableVoices()).toBe(true);
   });
