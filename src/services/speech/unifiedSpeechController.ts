@@ -11,15 +11,6 @@ class UnifiedSpeechController {
   private wordCompleteCallback: (() => void) | null = null;
   private isMutedState = false;
   private autoAdvanceTimer: number | null = null;
-  private fallbackTimer: number | null = null;
-
-  private clearFallbackTimer() {
-    if (this.fallbackTimer) {
-      console.log('Clearing speech fallback timer');
-      clearTimeout(this.fallbackTimer);
-      this.fallbackTimer = null;
-    }
-  }
 
   async speak(
     word: VocabularyWord,
@@ -42,22 +33,13 @@ class UnifiedSpeechController {
       voiceRegion: region,
       onStart: () => {
         console.log('Word speech started:', word.word);
-        this.clearFallbackTimer();
-        this.fallbackTimer = window.setTimeout(() => {
-          console.warn('Speech fallback timer expired for', word.word);
-          realSpeechService.stop();
-          this.scheduleAutoAdvance();
-        }, 5000);
-        console.log('Started speech fallback timer for', word.word);
       },
       onEnd: () => {
         console.log('Word speech completed:', word.word);
-        this.clearFallbackTimer();
         this.scheduleAutoAdvance();
       },
       onError: (error) => {
         console.error('Word speech error:', error);
-        this.clearFallbackTimer();
         this.scheduleAutoAdvance();
       }
     });
@@ -78,7 +60,6 @@ class UnifiedSpeechController {
 
   stop(): void {
     realSpeechService.stop();
-    this.clearFallbackTimer();
     if (this.autoAdvanceTimer) {
       clearTimeout(this.autoAdvanceTimer);
       this.autoAdvanceTimer = null;
