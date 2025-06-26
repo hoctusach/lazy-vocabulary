@@ -60,7 +60,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-6 sm:p-8">
+      <CardContent className="p-2">
         <div className="space-y-2">
           {/* Category and Word Count */}
           <div className="flex items-center justify-between">
