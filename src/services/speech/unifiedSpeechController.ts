@@ -59,6 +59,10 @@ class UnifiedSpeechController {
         console.error('Word speech error:', error);
         this.clearFallbackTimer();
         this.scheduleAutoAdvance();
+      },
+      onCancel: () => {
+        console.log('Word speech canceled, resetting state');
+        this.clearFallbackTimer();
       }
     });
   }

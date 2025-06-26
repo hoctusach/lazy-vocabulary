@@ -5,6 +5,7 @@ interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
+  onCancel?: () => void;
   muted?: boolean;
   paused?: boolean;
   userInteracted?: boolean;
