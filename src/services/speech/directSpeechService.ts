@@ -3,6 +3,7 @@ import { realSpeechService } from './realSpeechService';
 
 interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
+  voiceVariant?: string;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
 }
