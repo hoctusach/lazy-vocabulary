@@ -2,9 +2,14 @@
  * @vitest-environment jsdom
  */
 import React from 'react';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+globalThis.expect = expect;
+beforeAll(async () => {
+  await import('@testing-library/jest-dom');
+});
+import { VoiceProvider } from '../src/hooks/context/useVoiceContext';
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
@@ -22,20 +27,22 @@ describe('VocabularyControlsColumn voice toggle', () => {
       const nextVoiceLabel = voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
       const toggleVoice = () => setVoiceRegion(r => (r === 'UK' ? 'US' : r === 'US' ? 'AU' : 'UK'));
       return (
-        <VocabularyControlsColumn
-          isMuted={false}
-          isPaused={false}
-          onToggleMute={() => {}}
-          onTogglePause={() => {}}
-          onNextWord={() => {}}
-          onSwitchCategory={() => {}}
-          onCycleVoice={toggleVoice}
-          nextCategory="next"
-          nextVoiceLabel={nextVoiceLabel}
-          currentWord={word}
-          onOpenAddModal={() => {}}
-          onOpenEditModal={() => {}}
-        />
+        <VoiceProvider playCurrentWord={() => {}}>
+          <VocabularyControlsColumn
+            isMuted={false}
+            isPaused={false}
+            onToggleMute={() => {}}
+            onTogglePause={() => {}}
+            onNextWord={() => {}}
+            onSwitchCategory={() => {}}
+            onCycleVoice={toggleVoice}
+            nextCategory="next"
+            nextVoiceLabel={nextVoiceLabel}
+            currentWord={word}
+            onOpenAddModal={() => {}}
+            onOpenEditModal={() => {}}
+          />
+        </VoiceProvider>
       );
     };
 

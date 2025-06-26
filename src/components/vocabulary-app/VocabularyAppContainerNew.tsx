@@ -1,6 +1,7 @@
 
 import React, { useMemo } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
+import { VoiceProvider } from "@/hooks/context/useVoiceContext";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
@@ -81,7 +82,8 @@ const VocabularyAppContainerNew: React.FC = () => {
   // Render different states based on data availability
   if (!hasData && !vocabularyService.hasData()) {
     return (
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+      <VoiceProvider playCurrentWord={playCurrentWord}>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
             currentWord={currentWord}
@@ -113,13 +115,15 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextVoiceLabel={nextVoiceLabel}
           />
         </div>
-      </VocabularyLayout>
+        </VocabularyLayout>
+      </VoiceProvider>
     );
   }
 
   if (!hasData) {
     return (
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+      <VoiceProvider playCurrentWord={playCurrentWord}>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
             currentWord={currentWord}
@@ -151,12 +155,14 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextVoiceLabel={nextVoiceLabel}
           />
         </div>
-      </VocabularyLayout>
+        </VocabularyLayout>
+      </VoiceProvider>
     );
   }
 
   if (!currentWord) {
     return (
+      <VoiceProvider playCurrentWord={playCurrentWord}>
       <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -190,10 +196,12 @@ const VocabularyAppContainerNew: React.FC = () => {
           />
         </div>
       </VocabularyLayout>
+      </VoiceProvider>
     );
   }
 
   return (
+    <VoiceProvider playCurrentWord={playCurrentWord}>
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       <div className="space-y-4">
         <UserInteractionManager
@@ -236,6 +244,7 @@ const VocabularyAppContainerNew: React.FC = () => {
         />
       </div>
     </VocabularyLayout>
+    </VoiceProvider>
   );
 };
 
