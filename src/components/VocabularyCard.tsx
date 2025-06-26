@@ -75,7 +75,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
       )}
       style={{ backgroundColor }}
     >
-      <CardContent className="p-3">
+      <CardContent className="p-2">
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
