@@ -4,25 +4,18 @@ import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { useSpeechValidation } from './speech-execution/useSpeechValidation';
-import { useSpeechCallbacks } from './speech-execution/useSpeechCallbacks';
-import { useSpeechErrorHandler } from './speech-execution/useSpeechErrorHandler';
-import { useSpeechController } from './speech-execution/useSpeechController';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Hook for executing speech with comprehensive error handling and state management
  */
 export const useSpeechExecution = (
-  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,
-  resetRetryAttempts: () => void,
-  incrementRetryAttempts: () => boolean,
   paused: boolean,
   muted: boolean,
-  wordTransitionRef: React.MutableRefObject<boolean>,
-  goToNextWord: (fromUser?: boolean) => void,
-  scheduleAutoAdvance: (delay: number) => void
+  wordTransitionRef: React.MutableRefObject<boolean>
 ) => {
   const { validatePreConditions, validateSpeechContent } = useSpeechValidation();
   
@@ -32,7 +25,7 @@ export const useSpeechExecution = (
     setPlayInProgress: (inProgress: boolean) => void
   ): Promise<boolean> => {
     const sessionId = `speech-${Date.now()}`;
-    
+
     // Pre-condition validation
     if (!validatePreConditions(sessionId, currentWord, paused, muted, wordTransitionRef)) {
       setPlayInProgress(false);
@@ -40,34 +33,30 @@ export const useSpeechExecution = (
     }
 
     // Content validation
-    if (!validateSpeechContent(sessionId, speechableText, setPlayInProgress, goToNextWord)) {
+    if (!validateSpeechContent(sessionId, speechableText, setPlayInProgress)) {
       return false;
     }
 
     try {
       setIsSpeaking(true);
       speakingRef.current = true;
-      
-      // Simple speech execution with auto-advance
-      setTimeout(() => {
-        setIsSpeaking(false);
-        speakingRef.current = false;
-        setPlayInProgress(false);
-        
-        if (!paused && !muted) {
-          scheduleAutoAdvance(1500);
-        }
-      }, Math.max(2000, speechableText.length * 40));
-      
-      return true;
+
+      // Trigger speech via unified controller and wait for completion
+      const success = await unifiedSpeechController.speak(
+        currentWord,
+        selectedVoice.region,
+        selectedVoice.label
+      );
+
+      setIsSpeaking(false);
+      speakingRef.current = false;
+      setPlayInProgress(false);
+
+      return success;
     } catch (error) {
       setPlayInProgress(false);
       setIsSpeaking(false);
       speakingRef.current = false;
-      
-      if (!paused && !muted) {
-        scheduleAutoAdvance(2000);
-      }
       return false;
     }
   }, [
@@ -76,8 +65,7 @@ export const useSpeechExecution = (
     paused,
     muted,
     wordTransitionRef,
-    goToNextWord,
-    scheduleAutoAdvance,
+    selectedVoice,
     setIsSpeaking,
     speakingRef
   ]);

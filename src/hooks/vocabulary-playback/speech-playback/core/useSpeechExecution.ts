@@ -10,7 +10,6 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
  */
 export const useSpeechExecution = (
   selectedVoice: VoiceSelection,
-  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   setIsSpeaking: (isSpeaking: boolean) => void,
   isPlayingRef: React.MutableRefObject<boolean>,
   advanceToNext: () => void,
@@ -39,35 +38,9 @@ export const useSpeechExecution = (
         selectedVoice.region,
         voiceVariant
       );
-      
-      if (success) {
-        setIsSpeaking(true);
-        
-        // Schedule completion callback with dynamic duration
-        const estimatedDuration = Math.max(2000, speechText.length * 40);
-        setTimeout(() => {
-          setIsSpeaking(false);
-          isPlayingRef.current = false;
-          
-          // Auto-advance with validation
-          if (!paused && !muted) {
-            setTimeout(() => {
-              // Double-check state before advancing
-              if (!paused && !muted) {
-                advanceToNext();
-              }
-            }, 1000);
-          }
-        }, estimatedDuration);
-      } else {
-        setIsSpeaking(false);
-        isPlayingRef.current = false;
-        
-        // Auto-advance on failure
-        if (!paused && !muted) {
-          setTimeout(() => advanceToNext(), 2000);
-        }
-      }
+
+      setIsSpeaking(false);
+      isPlayingRef.current = false;
 
       return success;
       

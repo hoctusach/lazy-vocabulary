@@ -11,12 +11,9 @@ import { toast } from 'sonner';
  * Hook for executing the playback process
  */
 export const usePlaybackExecution = (
-  findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
   setIsSpeaking: (isSpeaking: boolean) => void,
   speakingRef: React.MutableRefObject<boolean>,
-  resetRetryAttempts: () => void,
-  incrementRetryAttempts: () => boolean,
   goToNextWord: (fromUser?: boolean) => void,
   scheduleAutoAdvance: (delay: number) => void,
   lastManualActionTimeRef: React.MutableRefObject<number>,
@@ -32,18 +29,12 @@ export const usePlaybackExecution = (
   const { checkAll } = useUnifiedValidation();
   
   const { executeSpeech } = useSpeechExecution(
-    findVoice,
     selectedVoice,
-    selectedVoice.label,
     setIsSpeaking,
     speakingRef,
-    resetRetryAttempts,
-    incrementRetryAttempts,
     paused,
     muted,
-    wordTransitionRef,
-    goToNextWord,
-    scheduleAutoAdvance
+    wordTransitionRef
   );
 
   const executePlayback = useCallback(async (

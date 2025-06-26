@@ -3,11 +3,10 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
-import { 
-  useSpeechState, 
-  useVoiceManager, 
-  useContentProcessor, 
-  useSpeechExecution 
+import {
+  useSpeechState,
+  useContentProcessor,
+  useSpeechExecution
 } from './core';
 
 export const useSpeechPlaybackCore = (
@@ -19,11 +18,9 @@ export const useSpeechPlaybackCore = (
 ) => {
   // Use our refactored hooks
   const { isSpeaking, setIsSpeaking, isPlayingRef } = useSpeechState();
-  const { findVoice } = useVoiceManager(selectedVoice);
   const { createSpeechText } = useContentProcessor();
   const { executeSpeech } = useSpeechExecution(
     selectedVoice,
-    findVoice,
     setIsSpeaking,
     isPlayingRef,
     advanceToNext,
