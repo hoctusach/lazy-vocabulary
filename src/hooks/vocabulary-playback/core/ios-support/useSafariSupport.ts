@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
@@ -9,43 +9,40 @@ import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 export const useSafariSupport = (userInteractionRef: React.MutableRefObject<boolean>) => {
   // Special iOS and Safari initialization
   useEffect(() => {
-    // iOS needs user interaction to enable audio
+    const audioRef = { current: null as AudioContext | null };
+
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    
+
     if (isIOS || isSafari) {
       if (!userInteractionRef.current) {
         toast.error("Please tap anywhere to enable audio playback", { duration: 5000 });
       }
     }
-    
-    // Try to force browser to preload speech synthesis
-    const preloadSpeech = () => {
-      if ('speechSynthesis' in window) {
-        try {
-          // Create a minimal utterance - just a space
-          const utterance = new SpeechSynthesisUtterance(' ');
-          utterance.volume = 0.01;
-          utterance.rate = DEFAULT_SPEECH_RATE;
-          utterance.pitch = 1;
-          
-          // Try to speak it
-          window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(utterance);
-        } catch (e) {
-          console.warn('Speech preload failed:', e);
+
+    const handleFirstClick = () => {
+      try {
+        window.speechSynthesis.getVoices();
+        const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtor) {
+          if (!audioRef.current) {
+            audioRef.current = new AudioCtor();
+          }
+          if (audioRef.current.state === 'suspended') {
+            audioRef.current.resume().catch(() => {});
+          }
         }
+      } catch (e) {
+        console.warn('Speech preload failed:', e);
       }
     };
-    
-    // Try preloading once on mount
-    preloadSpeech();
-    
-    // Clean up
+
+    document.addEventListener('click', handleFirstClick, { once: true });
+    document.addEventListener('touchstart', handleFirstClick, { once: true });
+
     return () => {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
+      document.removeEventListener('click', handleFirstClick);
+      document.removeEventListener('touchstart', handleFirstClick);
     };
   }, [userInteractionRef]);
 };
