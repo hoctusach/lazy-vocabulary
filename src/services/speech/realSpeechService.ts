@@ -114,6 +114,10 @@ class RealSpeechService {
 
   stop(): void {
     if (window.speechSynthesis) {
+      if (this.currentUtterance) {
+        this.currentUtterance.onend = null;
+        this.currentUtterance.onerror = null;
+      }
       window.speechSynthesis.cancel();
     }
     this.isActive = false;
