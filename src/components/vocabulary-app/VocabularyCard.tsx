@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
 import { getCategoryLabel } from '@/utils/categoryLabels';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
 interface VocabularyCardProps {
   word: string;
@@ -62,6 +63,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const mainWord = wordParts[0].trim();
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
+  const { main, annotations } = parseWordAnnotations(word);
 
   return (
     <Card 
@@ -77,7 +79,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="text-left font-semibold text-[0.8rem] text-gray-800 leading-tight mb-2"
             style={{ marginTop: 0 }}
           >
-            {mainWord}
+            {main}
+            {annotations.map((t, i) => (
+              <span key={i} className="ml-1 text-xs text-gray-500">{t}</span>
+            ))}
           </h2>
           {/* Meaning */}
           <div
