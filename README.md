@@ -105,6 +105,17 @@ localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify({ preserveSpecial: true }
 When `preserveSpecial` is `true`, `extractSpeechableContent` will leave those
 characters intact when preparing text for speech.
 
+## Voice Settings
+
+The controls panel includes a **Change Voice Variant** button (speaker icon) that cycles the voice used for speech playback.
+Available variants are grouped by region:
+
+- **US:** `en-US-Standard-G`
+- **UK:** `Google UK English Female`, `Daniel`, `Kate`, `Susan`, `Hazel`
+- **AU:** `en-AU-Standard-C`, `Google AU English Male`, `Google AU English Female`, `Karen`, `Catherine`
+
+Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen voice persists between sessions.
+
 ## What technologies are used for this project?
 
 This project is built with:
