@@ -23,7 +23,8 @@ export const useUtteranceSetup = ({
   autoAdvanceTimerRef,
   muted,
   paused,
-  incrementRetryAttempts
+  incrementRetryAttempts,
+  userInteractionRef
 }) => {
   // Add a small delay before playing to ensure cancellation has completed
   setTimeout(() => {
@@ -85,6 +86,11 @@ export const useUtteranceSetup = ({
       
       utterance.onerror = (event) => {
         console.error(`Speech synthesis error:`, event);
+        if (event.error === 'canceled') {
+          console.log(
+            `Canceled context - muted: ${muted}, paused: ${paused}, userInteracted: ${userInteractionRef.current}`
+          );
+        }
         
         // Check if we're already in a word transition - if so, don't retry
         if (wordTransitionRef.current) {
@@ -111,7 +117,9 @@ export const useUtteranceSetup = ({
         
         // If error is "canceled" but it was intentional (during muting/pausing), don't retry
         if (event.error === 'canceled' && (muted || paused)) {
-          console.log('Speech canceled due to muting or pausing, not retrying');
+          console.log(
+            `Speech canceled due to muting or pausing, not retrying (muted: ${muted}, paused: ${paused}, userInteracted: ${userInteractionRef.current})`
+          );
           // Still auto-advance after a short delay
           scheduleAutoAdvance(2000);
           return;
@@ -143,7 +151,8 @@ export const useUtteranceSetup = ({
                 autoAdvanceTimerRef,
                 muted,
                 paused,
-                incrementRetryAttempts
+                incrementRetryAttempts,
+                userInteractionRef
               });
             }
           }, 500);
@@ -194,7 +203,8 @@ export const useUtteranceSetup = ({
                 autoAdvanceTimerRef,
                 muted,
                 paused,
-                incrementRetryAttempts
+                incrementRetryAttempts,
+                userInteractionRef
               });
             } else {
               // If we've tried enough times, move on
