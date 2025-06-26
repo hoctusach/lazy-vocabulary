@@ -16,47 +16,37 @@ export const useCorePlayback = (onUserInteraction?: () => void) => {
   
   // Initialize speech synthesis on mount
   useEffect(() => {
-    // Create our own user interaction detection
-    const detectUserInteraction = (e: MouseEvent | TouchEvent) => {
+    const audioRef = { current: null as AudioContext | null };
+
+    const initSpeechWithPermission = async () => {
+      if (speechInitializedRef.current) return;
+
+      try {
+        window.speechSynthesis.getVoices();
+        const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtor) {
+          if (!audioRef.current) {
+            audioRef.current = new AudioCtor();
+          }
+          if (audioRef.current.state === 'suspended') {
+            await audioRef.current.resume().catch(() => {});
+          }
+        }
+        speechInitializedRef.current = true;
+      } catch (err) {
+        console.error('Error initializing speech:', err);
+      }
+    };
+
+    const detectUserInteraction = () => {
       if (!userInteractionRef.current) {
         console.log('User interaction detected in useCorePlayback');
         userInteractionRef.current = true;
         onUserInteraction?.();
-        
-        // Initialize speech synthesis after user interaction
+
         if (!speechInitializedRef.current) {
-          initSpeechWithPermission();
+          void initSpeechWithPermission();
         }
-      }
-    };
-    
-    // Try to initialize speech synthesis
-    const initSpeechWithPermission = () => {
-      if (speechInitializedRef.current) return;
-      
-      try {
-        console.log('Initializing speech synthesis after user interaction');
-        // Create a silent utterance to initialize speech system
-        const silentUtterance = new SpeechSynthesisUtterance(' ');
-        silentUtterance.volume = 0; // Silent
-        silentUtterance.rate = 1;
-        
-        silentUtterance.onend = () => {
-          console.log("Speech initialization completed");
-          speechInitializedRef.current = true;
-        };
-        
-        silentUtterance.onerror = (e) => {
-          console.log("Speech initialization error", e);
-          // Still mark as initialized to avoid infinite retries
-          speechInitializedRef.current = true;
-        };
-        
-        // Try to speak the silent utterance
-        window.speechSynthesis.cancel(); // Clear any pending speech
-        window.speechSynthesis.speak(silentUtterance);
-      } catch (err) {
-        console.error('Error initializing speech:', err);
       }
     };
     
@@ -64,15 +54,7 @@ export const useCorePlayback = (onUserInteraction?: () => void) => {
     document.addEventListener('click', detectUserInteraction);
     document.addEventListener('touchstart', detectUserInteraction);
     
-    // Try to preload voices to improve first-time playback
-    if (window.speechSynthesis) {
-      try {
-        const voices = window.speechSynthesis.getVoices();
-        console.log(`Preloaded ${voices.length} voices at init`);
-      } catch (e) {
-        console.log('Voice preloading failed:', e);
-      }
-    }
+
     
     return () => {
       document.removeEventListener('click', detectUserInteraction);

@@ -1,7 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { useVoiceContext } from '@/hooks/useVoiceContext';
+import { useVoiceContext } from '@/contexts/VoiceContext';
 
 /**
  * Core vocabulary state management

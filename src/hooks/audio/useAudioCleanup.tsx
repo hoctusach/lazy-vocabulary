@@ -15,17 +15,21 @@ export const useAudioCleanup = (
 
   // Set up document-level interaction handler for speech permissions
   useEffect(() => {
+    const audioRef = { current: null as AudioContext | null };
     const documentClickHandler = () => {
-      // This empty handler helps enable speech in browsers that require user gesture
-      if (window.speechSynthesis && !speechSynthesis.speaking) {
-        try {
-          // Just create a silent utterance to "unlock" speech
-          const silentUtterance = new SpeechSynthesisUtterance('');
-          silentUtterance.volume = 0;
-          window.speechSynthesis.speak(silentUtterance);
-        } catch (error) {
-          // Ignore errors here, just trying to enable speech
+      try {
+        window.speechSynthesis.getVoices();
+        const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtor) {
+          if (!audioRef.current) {
+            audioRef.current = new AudioCtor();
+          }
+          if (audioRef.current.state === 'suspended') {
+            audioRef.current.resume().catch(() => {});
+          }
         }
+      } catch {
+        // ignore
       }
     };
 
