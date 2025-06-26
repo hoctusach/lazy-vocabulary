@@ -34,7 +34,7 @@ describe('unifiedSpeechController fallback', () => {
     const cb = vi.fn();
     unifiedSpeechController.setWordCompleteCallback(cb);
     await unifiedSpeechController.speak(word);
-    vi.advanceTimersByTime(7000); // 5s fallback + 2s auto advance
+    vi.advanceTimersByTime(9000); // fallback (min 7s) + 2s auto advance
     expect(cb).toHaveBeenCalledTimes(1);
   });
 });
