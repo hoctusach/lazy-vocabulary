@@ -1,6 +1,7 @@
 
 import React, { useMemo } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
+import { VoiceProvider } from "@/hooks/context/useVoiceContext";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
@@ -82,8 +83,9 @@ const VocabularyAppContainerNew: React.FC = () => {
   let content: React.ReactNode;
 
   if (!hasData && !vocabularyService.hasData()) {
-    content = (
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+    return (
+      <VoiceProvider playCurrentWord={playCurrentWord}>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
             currentWord={currentWord}
@@ -115,11 +117,15 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextVoiceLabel={nextVoiceLabel}
           />
         </div>
-      </VocabularyLayout>
+        </VocabularyLayout>
+      </VoiceProvider>
     );
-  } else if (!hasData) {
-    content = (
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+  }
+
+  if (!hasData) {
+    return (
+      <VoiceProvider playCurrentWord={playCurrentWord}>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
             currentWord={currentWord}
@@ -151,10 +157,14 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextVoiceLabel={nextVoiceLabel}
           />
         </div>
-      </VocabularyLayout>
+        </VocabularyLayout>
+      </VoiceProvider>
     );
-  } else if (!currentWord) {
-    content = (
+  }
+
+  if (!currentWord) {
+    return (
+      <VoiceProvider playCurrentWord={playCurrentWord}>
       <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -188,6 +198,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           />
         </div>
       </VocabularyLayout>
+      </VoiceProvider>
     );
   } else {
     content = (
@@ -236,7 +247,52 @@ const VocabularyAppContainerNew: React.FC = () => {
     );
   }
 
-  return <VoiceProvider playCurrentWord={playCurrentWord}>{content}</VoiceProvider>;
+  return (
+    <VoiceProvider playCurrentWord={playCurrentWord}>
+    <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+      <div className="space-y-4">
+        <UserInteractionManager
+          currentWord={currentWord}
+          playCurrentWord={playCurrentWord}
+          onInteractionUpdate={handleInteractionUpdate}
+        />
+        
+        <AudioStatusIndicator 
+          isAudioUnlocked={userInteractionState.isAudioUnlocked}
+          hasInitialized={userInteractionState.hasInitialized}
+          interactionCount={userInteractionState.interactionCount}
+        />
+        
+        <ErrorDisplay jsonLoadError={false} />
+        
+        <ContentWithDataNew
+          displayWord={currentWord}
+          muted={isMuted}
+          paused={isPaused}
+          toggleMute={toggleMute}
+          handleTogglePause={togglePause}
+          handleCycleVoice={toggleVoice}
+          nextVoiceLabel={nextVoiceLabel}
+          handleSwitchCategory={switchCategory}
+          currentCategory={currentCategory}
+          nextCategory={nextCategory}
+          isSpeaking={isSpeaking}
+          handleManualNext={goToNext}
+          displayTime={5000}
+          voiceRegion={voiceRegion}
+          debugPanelData={debugData}
+          isAddWordModalOpen={isAddWordModalOpen}
+          handleCloseModal={handleCloseModal}
+          handleSaveWord={handleSaveWord}
+          isEditMode={isEditMode}
+          wordToEdit={wordToEdit}
+          handleOpenAddWordModal={handleOpenAddWordModal}
+          handleOpenEditWordModal={handleOpenEditWordModal}
+        />
+      </div>
+    </VocabularyLayout>
+    </VoiceProvider>
+  );
 };
 
 export default VocabularyAppContainerNew;
