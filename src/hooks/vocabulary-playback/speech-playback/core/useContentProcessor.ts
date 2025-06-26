@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
+import { formatSpeechText } from '@/utils/speech';
 
 /**
  * Hook for processing vocabulary word content into speechable text
@@ -12,18 +13,8 @@ export const useContentProcessor = () => {
     const sanitizedWord = sanitizeForDisplay(word.word || '');
     const sanitizedMeaning = sanitizeForDisplay(word.meaning || '');
     const sanitizedExample = sanitizeForDisplay(word.example || '');
-    
-    let textToSpeak = sanitizedWord;
-    
-    if (sanitizedMeaning && sanitizedMeaning.trim().length > 0) {
-      textToSpeak += `. ${sanitizedMeaning}`;
-    }
-    
-    if (sanitizedExample && sanitizedExample.trim().length > 0) {
-      textToSpeak += `. ${sanitizedExample}`;
-    }
-    
-    return textToSpeak;
+
+    return formatSpeechText({ word: sanitizedWord, meaning: sanitizedMeaning, example: sanitizedExample });
   }, []);
 
   return {

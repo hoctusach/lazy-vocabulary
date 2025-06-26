@@ -2,6 +2,7 @@
 import { useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import { formatSpeechText } from '@/utils/speech';
 
 /**
  * Hook for managing utterance setup and reference
@@ -30,7 +31,7 @@ export const useUtteranceManager = () => {
     const utterance = new SpeechSynthesisUtterance();
     
     // Set up text
-    utterance.text = `${word.word}. ${word.meaning}. ${word.example}`;
+    utterance.text = formatSpeechText({ word: word.word, meaning: word.meaning, example: word.example });
     
     // Set up voice
     const voice = findVoice(selectedVoice.region);

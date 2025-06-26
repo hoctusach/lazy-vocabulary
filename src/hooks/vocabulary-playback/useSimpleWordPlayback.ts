@@ -4,6 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from './useVoiceSelection';
 import { useSimpleSpeech } from '@/hooks/speech/useSimpleSpeech';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { formatSpeechText } from '@/utils/speech';
 
 /**
  * Simplified word playback with improved coordination and pause handling
@@ -47,8 +48,12 @@ export const useSimpleWordPlayback = (
       const voice = findVoice(selectedVoice.region);
       console.log(`[WORD-PLAYBACK-${playbackId}] Using voice: ${voice?.name || 'default'}`);
 
-      // Create speech text
-      const speechText = `${word.word}. ${word.meaning || ''}. ${word.example || ''}`.trim();
+      // Create speech text with consistent pauses
+      const speechText = formatSpeechText({
+        word: word.word,
+        meaning: word.meaning || '',
+        example: word.example || ''
+      });
       
       if (!speechText || speechText.length === 0) {
         console.log(`[WORD-PLAYBACK-${playbackId}] No content to speak`);

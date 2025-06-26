@@ -1,5 +1,6 @@
 
 import { toast } from 'sonner';
+import { formatSpeechText } from '@/utils/speech';
 
 /**
  * Sets up and plays a speech utterance for the current word
@@ -34,8 +35,8 @@ export const useUtteranceSetup = ({
       const wordText = currentWord.word;
       const meaningText = currentWord.meaning || '';
       const exampleText = currentWord.example || '';
-      
-      utterance.text = `${wordText}. ${meaningText}. ${exampleText}`.trim();
+
+      utterance.text = formatSpeechText({ word: wordText, meaning: meaningText, example: exampleText });
       
       // Set language based on selected voice
       utterance.lang = selectedVoice.region === 'UK' ? 'en-GB' : 'en-US';
