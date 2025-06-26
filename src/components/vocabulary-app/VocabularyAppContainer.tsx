@@ -10,6 +10,7 @@ import { useVocabularyAppState } from "./hooks/useVocabularyAppState";
 import { useDisplayWord } from "./hooks/useDisplayWord";
 import { useVoiceLabels } from "./hooks/useVoiceLabels";
 import VocabularyAppContent from "./components/VocabularyAppContent";
+import { VoiceProvider } from "@/hooks/context/useVoiceContext";
 
 const VocabularyAppContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
@@ -139,8 +140,9 @@ const VocabularyAppContainer: React.FC = () => {
   const displaySelectedVoice = typeof selectedVoice === 'string' ? selectedVoice : selectedVoice?.region || 'UK';
 
   return (
-    <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      <VocabularyAppContent
+    <VoiceProvider playCurrentWord={playCurrentWord}>
+      <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+        <VocabularyAppContent
         hasData={hasData}
         hasAnyData={hasAnyData}
         displayWord={displayWord}
@@ -167,7 +169,8 @@ const VocabularyAppContainer: React.FC = () => {
         handleOpenAddWordModal={handleOpenAddWordModal}
         handleOpenEditWordModal={handleOpenEditWordModal}
       />
-    </VocabularyLayout>
+      </VocabularyLayout>
+    </VoiceProvider>
   );
 };
 

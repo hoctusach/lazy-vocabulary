@@ -1,7 +1,7 @@
 
 import { useState, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { getVoiceRegionFromStorage } from '@/utils/speech/core/speechSettings';
+import { useVoiceContext } from '@/hooks/useVoiceContext';
 
 /**
  * Core vocabulary state management
@@ -15,8 +15,12 @@ export const useVocabularyState = () => {
   // Control state
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const initialRegion = getVoiceRegionFromStorage();
-  const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>(initialRegion);
+  const {
+    voiceRegion,
+    setVoiceRegion,
+    voiceVariant,
+    setVoiceVariant
+  } = useVoiceContext();
 
   // Derived state - calculate currentWord safely
   const currentWord = wordList[currentIndex] ?? null;
@@ -39,6 +43,8 @@ export const useVocabularyState = () => {
     setIsMuted,
     voiceRegion,
     setVoiceRegion,
+    voiceVariant,
+    setVoiceVariant,
     currentWord,
     
     // Refs

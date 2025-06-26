@@ -3,7 +3,10 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
+<<<<<<< codex/add-findvoicebyname-method-and-update-logic
   /** Optional full voice name like "en-AU-Standard-A" */
+=======
+>>>>>>> main
   voiceVariant?: string;
   onStart?: () => void;
   onEnd?: () => void;
@@ -30,6 +33,7 @@ class RealSpeechService {
 
     return new Promise((resolve) => {
       const utterance = new SpeechSynthesisUtterance(text);
+<<<<<<< codex/add-findvoicebyname-method-and-update-logic
 
       // Prefer exact voice variant when provided
       let voice: SpeechSynthesisVoice | null = null;
@@ -40,6 +44,12 @@ class RealSpeechService {
         voice = this.findVoiceByRegion(options.voiceRegion);
       }
 
+=======
+      
+      // Set voice based on variant or region
+      const voice = this.findVoiceByVariant(options.voiceVariant) ||
+                    this.findVoiceByRegion(options.voiceRegion);
+>>>>>>> main
       if (voice) {
         utterance.voice = voice;
         console.log(
@@ -156,6 +166,7 @@ class RealSpeechService {
     return this.currentUtterance;
   }
 
+<<<<<<< codex/add-findvoicebyname-method-and-update-logic
   /**
    * Find a voice by its exact name.
    */
@@ -170,6 +181,12 @@ class RealSpeechService {
       console.log('Found voice by name:', voice.name, voice.lang);
     }
     return voice || null;
+=======
+  private findVoiceByVariant(name?: string): SpeechSynthesisVoice | null {
+    if (!name) return null;
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.name === name || v.name.includes(name)) || null;
+>>>>>>> main
   }
 
   private findVoiceByRegion(region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null {
