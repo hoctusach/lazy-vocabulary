@@ -10,7 +10,8 @@ export class SheetManager {
     "idioms",
     "topic vocab",
     "grammar",
-    "phrases, collocations"
+    "phrases, collocations",
+    "word formation"
   ];
   private sheetProcessor: SheetProcessor;
   private sheetNormalizer: SheetNormalizer;

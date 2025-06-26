@@ -14,6 +14,7 @@ export class SheetNormalizer {
     if (normalized.includes("idiom")) return "idioms";
     if (normalized.includes("advanced")) return "topic vocab";
     if (normalized.includes("grammar")) return "grammar";
+    if (normalized.includes("formation")) return "word formation";
     if (normalized.includes("phrase") || normalized.includes("collocation")) return "phrases, collocations";
     
     // Default to "phrasal verbs" if no match (instead of original name)

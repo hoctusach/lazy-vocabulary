@@ -21,7 +21,8 @@ export class VocabularyService {
       "idioms",
       "topic vocab",
       "grammar",
-      "phrases, collocations"
+      "phrases, collocations",
+      "word formation"
     ];
     
     // Initialize the components

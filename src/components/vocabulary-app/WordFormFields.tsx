@@ -16,11 +16,12 @@ interface WordFormFieldsProps {
 
 // Updated category options without "All words"
 const CATEGORY_OPTIONS = [
-  { value: "phrasal verbs", label: "Phrasal V" },
-  { value: "idioms", label: "Idioms" },
-  { value: "topic vocab", label: "Topic" },
+  { value: "phrasal verbs", label: "Phrasal Verb" },
+  { value: "idioms", label: "Idiom" },
+  { value: "topic vocab", label: "Topic vocabulary" },
   { value: "grammar", label: "Grammar" },
-  { value: "phrases, collocations", label: "Phrasals" }
+  { value: "phrases, collocations", label: "Phrase - Collocation" },
+  { value: "word formation", label: "Word formation" }
 ];
 
 const WordFormFields: React.FC<WordFormFieldsProps> = ({
