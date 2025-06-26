@@ -142,7 +142,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
   
   return (
     <Card className="w-full max-w-xl mx-auto">
-      <CardContent className="p-6">
+      <CardContent className="p-2">
         <div className="space-y-4">
           <h2 className="text-xl font-semibold">Notifications</h2>
           

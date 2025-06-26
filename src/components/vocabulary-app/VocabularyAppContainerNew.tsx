@@ -12,6 +12,7 @@ import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabu
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
+import { VoiceProvider } from "@/hooks/context/useVoiceContext";
 
 const VocabularyAppContainerNew: React.FC = () => {
   // Use stable state management
@@ -79,7 +80,8 @@ const VocabularyAppContainerNew: React.FC = () => {
       : null;
   }, [currentWord?.word, currentWord?.category, currentCategory]);
 
-  // Render different states based on data availability
+  let content: React.ReactNode;
+
   if (!hasData && !vocabularyService.hasData()) {
     return (
       <VoiceProvider playCurrentWord={playCurrentWord}>
@@ -90,7 +92,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-          <AudioStatusIndicator 
+          <AudioStatusIndicator
             isAudioUnlocked={userInteractionState.isAudioUnlocked}
             hasInitialized={userInteractionState.hasInitialized}
             interactionCount={userInteractionState.interactionCount}
@@ -130,7 +132,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-          <AudioStatusIndicator 
+          <AudioStatusIndicator
             isAudioUnlocked={userInteractionState.isAudioUnlocked}
             hasInitialized={userInteractionState.hasInitialized}
             interactionCount={userInteractionState.interactionCount}
@@ -170,7 +172,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-          <AudioStatusIndicator 
+          <AudioStatusIndicator
             isAudioUnlocked={userInteractionState.isAudioUnlocked}
             hasInitialized={userInteractionState.hasInitialized}
             interactionCount={userInteractionState.interactionCount}
@@ -197,6 +199,51 @@ const VocabularyAppContainerNew: React.FC = () => {
         </div>
       </VocabularyLayout>
       </VoiceProvider>
+    );
+  } else {
+    content = (
+      <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
+        <div className="space-y-4">
+          <UserInteractionManager
+            currentWord={currentWord}
+            playCurrentWord={playCurrentWord}
+            onInteractionUpdate={handleInteractionUpdate}
+          />
+
+          <AudioStatusIndicator
+            isAudioUnlocked={userInteractionState.isAudioUnlocked}
+            hasInitialized={userInteractionState.hasInitialized}
+            interactionCount={userInteractionState.interactionCount}
+          />
+
+          <ErrorDisplay jsonLoadError={false} />
+
+          <ContentWithDataNew
+            displayWord={currentWord}
+            muted={isMuted}
+            paused={isPaused}
+            toggleMute={toggleMute}
+            handleTogglePause={togglePause}
+            handleCycleVoice={toggleVoice}
+            nextVoiceLabel={nextVoiceLabel}
+            handleSwitchCategory={switchCategory}
+            currentCategory={currentCategory}
+            nextCategory={nextCategory}
+            isSpeaking={isSpeaking}
+            handleManualNext={goToNext}
+            displayTime={5000}
+            voiceRegion={voiceRegion}
+            debugPanelData={debugData}
+            isAddWordModalOpen={isAddWordModalOpen}
+            handleCloseModal={handleCloseModal}
+            handleSaveWord={handleSaveWord}
+            isEditMode={isEditMode}
+            wordToEdit={wordToEdit}
+            handleOpenAddWordModal={handleOpenAddWordModal}
+            handleOpenEditWordModal={handleOpenEditWordModal}
+          />
+        </div>
+      </VocabularyLayout>
     );
   }
 
