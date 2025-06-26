@@ -1,13 +1,19 @@
 export const CATEGORY_LABELS: Record<string, string> = {
-  'phrases, collocations': 'Phrasals',
-  'topic vocab': 'Topic',
-  'phrasal verbs': 'Phrasal V',
+  'phrasal verbs': 'Phrasal Verb',
+  'idioms': 'Idiom',
+  'topic vocab': 'Topic vocabulary',
+  'grammar': 'Grammar',
+  'phrases, collocations': 'Phrase - Collocation',
+  'word formation': 'Word formation',
 };
 
 export const CATEGORY_MESSAGE_LABELS: Record<string, string> = {
-  'phrases, collocations': 'Phrases, Collocations',
-  'topic vocab': 'Topic Vocabulary',
-  'phrasal verbs': 'Phrasal Verbs',
+  'phrasal verbs': 'Phrasal Verb',
+  'idioms': 'Idiom',
+  'topic vocab': 'Topic vocabulary',
+  'grammar': 'Grammar',
+  'phrases, collocations': 'Phrase - Collocation',
+  'word formation': 'Word formation',
 };
 
 export function getCategoryLabel(category: string): string {

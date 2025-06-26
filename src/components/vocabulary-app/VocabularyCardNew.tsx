@@ -5,6 +5,7 @@ import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker } from '
 import { cn } from '@/lib/utils';
 import { getCategoryLabel } from '@/utils/categoryLabels';
 import WordCountDisplay from './WordCountDisplay';
+import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
 interface VocabularyCardNewProps {
   word: string;
@@ -51,6 +52,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   const nextCategoryLabel = getCategoryLabel(nextCategory);
 
   const currentWordObj = { word, meaning, example, category };
+  const { main, annotations } = parseWordAnnotations(word);
 
   return (
     <Card 
@@ -76,7 +78,10 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           {/* Word */}
           <div className="text-left">
             <h1 className="font-bold" style={{ color: '#1F305E', fontSize: '1.25rem', textAlign: 'left' }}>
-              {word}
+              {main}
+              {annotations.map((t, i) => (
+                <span key={i} className="ml-1 text-xs text-gray-500">{t}</span>
+              ))}
             </h1>
           </div>
 

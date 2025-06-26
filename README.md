@@ -110,6 +110,10 @@ characters intact when preparing text for speech.
 The controls panel includes a speaker button that cycles through the available voice regions (US, UK, AU).
 Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen region persists between sessions.
 
+## Word display
+
+Any tags inside square brackets or pronunciations written between slashes/parentheses are shown next to the word in a smaller gray font. The main word text no longer includes these annotations.
+
 ## What technologies are used for this project?
 
 This project is built with:
