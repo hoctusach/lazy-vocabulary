@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "lint": "eslint . --ext .js,.ts",
+    "test": "jest"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.11",
