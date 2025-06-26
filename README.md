@@ -110,7 +110,7 @@ characters intact when preparing text for speech.
 The controls panel includes a **Change Voice Variant** button (speaker icon) that cycles the voice used for speech playback.
 Available variants are grouped by region:
 
-- **US:** `en-US-Standard-G`
+- **US:** `en-US-Standard-B`
 - **UK:** `Google UK English Female`, `Daniel`, `Kate`, `Susan`, `Hazel`
 - **AU:** `en-AU-Standard-C`, `Google AU English Male`, `Google AU English Female`, `Karen`, `Catherine`
 
