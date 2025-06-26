@@ -1,7 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
-import { calculateSpeechDuration } from '@/utils/speech/durationUtils';
 
 interface SpeechGuardResult {
   canPlay: boolean;
@@ -36,7 +35,6 @@ class UnifiedSpeechController {
       .filter(Boolean)
       .map(part => part.trim());
     const text = parts.join('. ');
-    const est = calculateSpeechDuration(text);
 
     console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
 
@@ -49,7 +47,7 @@ class UnifiedSpeechController {
           console.warn('Speech fallback timer expired for', word.word);
           realSpeechService.stop();
           this.scheduleAutoAdvance();
-        }, Math.max(est * 1.2, 7000));
+        }, 5000);
         console.log('Started speech fallback timer for', word.word);
       },
       onEnd: () => {
