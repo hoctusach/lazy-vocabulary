@@ -76,10 +76,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       />
 
       {/* Mobile speech note statically above debug panel */}
-      <div className="mobile-note text-xs italic text-gray-500 text-center my-2">
+      <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
         <p>On Mobile:</p>
-        <p>- Tap any button (e.g., Next) to enable speech</p>
-        <p>- Only Australian voice may be available</p>
+        <p>- Tap any button (e.g., Next) to enable speech.</p>
+        <p>- On Mobile, only one voice may be available.</p>
       </div>
 
       {/* Debug Panel */}

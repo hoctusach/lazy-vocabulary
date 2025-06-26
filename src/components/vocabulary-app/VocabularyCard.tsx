@@ -100,7 +100,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           </div>
           {/* Mobile note below example */}
           <div className="mobile-note text-left italic mt-2" style={{ color: '#6b7280', fontSize: '0.8rem' }}>
-            On Mobile: Tap any button to enable speech. Only Australian voice may be available.
+            Tap any button (e.g., Next) to enable speech. On Mobile, only one voice may be available.
           </div>
         </div>
         {/* Control buttons wrapper - optimized spacing */}
