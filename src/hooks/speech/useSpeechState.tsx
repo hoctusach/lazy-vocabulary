@@ -1,5 +1,5 @@
 
-import { useRef, useCallback, useEffect } from 'react';
+import { useRef, useCallback } from 'react';
 
 export const useSpeechState = () => {
   // For keeping track of speaking state
@@ -37,18 +37,6 @@ export const useSpeechState = () => {
     pauseRequestedRef.current = false;
     // The next word will be spoken when the regular flow continues
   }, []);
-
-  // Reset local flags if a speech cancellation error occurs
-  useEffect(() => {
-    const handleCanceled = () => {
-      console.log('[SpeechState] Resetting flags after cancellation');
-      stopSpeakingLocal();
-    };
-    document.addEventListener('speech-canceled', handleCanceled);
-    return () => {
-      document.removeEventListener('speech-canceled', handleCanceled);
-    };
-  }, [stopSpeakingLocal]);
 
   return {
     isSpeakingRef,
