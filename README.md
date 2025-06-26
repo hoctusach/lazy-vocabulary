@@ -114,7 +114,12 @@ Available variants are grouped by region:
 - **UK:** `Google UK English Female`, `Daniel`, `Kate`, `Susan`, `Hazel`
 - **AU:** `en-AU-Standard-C`, `Google AU English Male`, `Google AU English Female`, `Karen`, `Catherine`
 
+
 Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen voice persists between sessions.
+
+## Word display
+
+Any tags inside square brackets or pronunciations written between slashes/parentheses are shown next to the word in a smaller gray font. The main word text no longer includes these annotations.
 
 ## What technologies are used for this project?
 
