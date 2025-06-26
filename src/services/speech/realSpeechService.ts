@@ -7,6 +7,9 @@ interface SpeechOptions {
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
+  muted?: boolean;
+  paused?: boolean;
+  userInteracted?: boolean;
 }
 
 class RealSpeechService {
@@ -66,6 +69,11 @@ class RealSpeechService {
 
       utterance.onerror = (event) => {
         console.error('Speech error:', event.error, event);
+        if (event.error === 'canceled') {
+          console.log(
+            `Canceled context - muted: ${options.muted}, paused: ${options.paused}, userInteracted: ${options.userInteracted}`
+          );
+        }
         this.isActive = false;
         this.currentUtterance = null;
         if (options.onError) {

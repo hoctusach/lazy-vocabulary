@@ -25,7 +25,10 @@ export const useUtteranceSetup = ({
   paused,
   incrementRetryAttempts,
   userInteractionRef
+<<<<<<< codex/enhance-logging-for-autoplay-issues
+=======
 
+>>>>>>> main
 }) => {
   // If we've already exceeded the retry limit, log and advance once
   if (retryCount > maxRetries) {
@@ -93,6 +96,11 @@ export const useUtteranceSetup = ({
       
       utterance.onerror = (event) => {
         console.error(`Speech synthesis error:`, event);
+        if (event.error === 'canceled') {
+          console.log(
+            `Canceled context - muted: ${muted}, paused: ${paused}, userInteracted: ${userInteractionRef.current}`
+          );
+        }
         
         // Check if we're already in a word transition - if so, don't retry
         if (wordTransitionRef.current) {
@@ -119,7 +127,9 @@ export const useUtteranceSetup = ({
         
         // If error is "canceled" but it was intentional (during muting/pausing), don't retry
         if (event.error === 'canceled' && (muted || paused)) {
-          console.log('Speech canceled due to muting or pausing, not retrying');
+          console.log(
+            `Speech canceled due to muting or pausing, not retrying (muted: ${muted}, paused: ${paused}, userInteracted: ${userInteractionRef.current})`
+          );
           // Still auto-advance after a short delay
           scheduleAutoAdvance(2000);
           return;
@@ -163,7 +173,10 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
+<<<<<<< codex/enhance-logging-for-autoplay-issues
+=======
 
+>>>>>>> main
               });
             }
           }, 500);
@@ -216,7 +229,10 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
+<<<<<<< codex/enhance-logging-for-autoplay-issues
+=======
 
+>>>>>>> main
               });
             } else {
               // If we've tried enough times, move on
