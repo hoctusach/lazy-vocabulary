@@ -64,12 +64,9 @@ export const useOrchestratorCore = (
   
   // Use playback execution logic
   const { executePlayback } = usePlaybackExecution(
-    findVoice,
     selectedVoice,
     setIsSpeaking,
     speakingRef,
-    resetRetryAttempts,
-    incrementRetryAttempts,
     goToNextWord,
     scheduleAutoAdvance,
     lastManualActionTimeRef,

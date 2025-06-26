@@ -28,12 +28,10 @@ export const useSpeechValidation = () => {
   const validateSpeechContent = (
     sessionId: string,
     speechableText: string,
-    setPlayInProgress: (inProgress: boolean) => void,
-    goToNextWord: () => void
+    setPlayInProgress: (inProgress: boolean) => void
   ) => {
     if (!speechableText || speechableText.trim().length === 0) {
       setPlayInProgress(false);
-      setTimeout(() => goToNextWord(), 1500);
       return false;
     }
     return true;
