@@ -5,7 +5,16 @@ import { US_VOICE_NAME, UK_VOICE_NAME } from '@/utils/speech/voiceNames';
 
 // Backup voice names in case primary ones aren't found
 const BACKUP_US_VOICES = ["Google US English", "Microsoft David", "Alex"];
-const BACKUP_UK_VOICES = ["Microsoft Susan", "Daniel", "Kate"];
+const BACKUP_UK_VOICES = [
+  UK_VOICE_NAME,
+  "en-GB-Standard-B",
+  "en-GB-Standard-C",
+  "Google UK English Male",
+  "Google UK English Female",
+  "Microsoft Susan",
+  "Daniel",
+  "Kate"
+];
 
 // Simplified voice finding function using hardcoded voice names and better fallbacks
 export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceSelection): SpeechSynthesisVoice | null => {

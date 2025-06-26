@@ -1,8 +1,14 @@
 // Default US voice
 export const US_VOICE_NAME = "en-US-Standard-B";
-export const UK_VOICE_NAME = "Google UK English Female";
+// Default UK voice now uses a Google standard ID
+export const UK_VOICE_NAME = "en-GB-Standard-A";
 export const UK_VOICE_NAMES = [
   UK_VOICE_NAME,
+  "en-GB-Standard-B",
+  "en-GB-Standard-C",
+  // keep old Google voice labels for backward compatibility
+  "Google UK English Male",
+  "Google UK English Female",
   "Daniel",
   "Kate",
   "Susan",
