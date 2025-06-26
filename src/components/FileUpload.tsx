@@ -33,7 +33,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <Card className="w-full max-w-xl mx-auto">
-      <CardContent className="p-2">
+      <CardContent className="p-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
