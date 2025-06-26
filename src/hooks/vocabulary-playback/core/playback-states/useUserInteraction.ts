@@ -18,29 +18,23 @@ export const useUserInteraction = (onUserInteraction?: () => void) => {
     }
     
     // Function to handle user interaction
-    const audioRef = { current: null as AudioContext | null };
     const handleUserInteraction = () => {
       if (!userInteractionRef.current) {
         console.log('User interaction detected');
         userInteractionRef.current = true;
         onUserInteraction?.();
         localStorage.setItem('hadUserInteraction', 'true');
-
+        
+        // Try to initialize speech synthesis
         try {
-          window.speechSynthesis.getVoices();
-          const AudioCtor = window.AudioContext || (window as any).webkitAudioContext;
-          if (AudioCtor) {
-            if (!audioRef.current) {
-              audioRef.current = new AudioCtor();
-            }
-            if (audioRef.current.state === 'suspended') {
-              audioRef.current.resume().catch(() => {});
-            }
-          }
+          const silentUtterance = new SpeechSynthesisUtterance(' '); // Just a space
+          silentUtterance.volume = 0.01; // Nearly silent
+          window.speechSynthesis.speak(silentUtterance);
         } catch (e) {
-          console.warn('Voice preload failed:', e);
+          console.warn('Silent utterance initialization failed:', e);
         }
-
+        
+        // Remove event listeners
         document.removeEventListener('click', handleUserInteraction);
         document.removeEventListener('touchstart', handleUserInteraction);
         document.removeEventListener('keydown', handleUserInteraction);
