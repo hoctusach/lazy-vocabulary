@@ -1,6 +1,7 @@
 
 import { toast } from 'sonner';
-import { formatSpeechText } from '@/utils/speech';
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+
 
 /**
  * Sets up and plays a speech utterance for the current word
@@ -52,7 +53,7 @@ export const useUtteranceSetup = ({
       let fallbackTimer: number | null = null;
 
       // Set speech parameters for better clarity
-      utterance.rate = 0.95; // Slightly slower for better comprehension
+      utterance.rate = DEFAULT_SPEECH_RATE;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 

@@ -1,5 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
 interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
@@ -39,7 +40,7 @@ class RealSpeechService {
       }
 
       // Configure speech settings
-      utterance.rate = 0.8;
+      utterance.rate = DEFAULT_SPEECH_RATE;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 

@@ -5,6 +5,7 @@ import { VoiceManager } from './VoiceManager';
 import { SpeechEventHandler } from './SpeechEventHandler';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
 /**
  * Manages platform-specific speech execution (mobile vs desktop)
@@ -81,7 +82,7 @@ export class SpeechPlatformManager {
     
     const voice = this.voiceManager.findVoice(voiceRegion);
     if (voice) utterance.voice = voice;
-    utterance.rate = 0.8;
+    utterance.rate = DEFAULT_SPEECH_RATE;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
 

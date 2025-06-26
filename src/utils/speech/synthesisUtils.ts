@@ -1,4 +1,4 @@
-
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
 export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -22,7 +22,7 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     }
     
     // Set reasonable speech parameters
-    utterance.rate = 0.9;  // Slightly slower than default for better clarity
+    utterance.rate = DEFAULT_SPEECH_RATE;
     utterance.pitch = 1.0; // Normal pitch
     utterance.volume = 1.0; // Full volume
     
