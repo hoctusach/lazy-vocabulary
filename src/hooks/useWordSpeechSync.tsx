@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { stopSpeaking } from '@/utils/speech';
+import { stopSpeaking, formatSpeechText } from '@/utils/speech';
 import { useTimeoutManager } from './speech/useTimeoutManager';
 import { useWordStateManager } from './speech/useWordStateManager';
 import { useSpeechSync } from './speech/useSpeechSync';
@@ -98,7 +98,11 @@ export const useWordSpeechSync = (
       try {
         localStorage.setItem('currentDisplayedWord', wordToSpeak.word);
       } catch {}
-      const fullText = `${wordToSpeak.word}. ${wordToSpeak.meaning}. ${wordToSpeak.example}`;
+      const fullText = formatSpeechText({
+        word: wordToSpeak.word,
+        meaning: wordToSpeak.meaning,
+        example: wordToSpeak.example
+      });
       if ((isPaused && !forceSpeak) || isMuted) {
         console.log("App was paused/muted while preparing, aborting");
         isSpeakingRef.current = false;

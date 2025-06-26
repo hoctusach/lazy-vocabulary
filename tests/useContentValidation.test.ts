@@ -14,7 +14,7 @@ describe('useContentValidation', () => {
     };
 
     const { speechableText } = validateAndPrepareContent(word);
-    expect(speechableText).toBe('quick. (adj) [kwiːk]');
+    expect(speechableText).toBe('quick<break time="300ms"/>(adj) [kwiːk]');
   });
 
   it('returns full text even if it contains IPA', () => {

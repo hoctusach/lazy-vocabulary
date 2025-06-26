@@ -31,7 +31,7 @@ export const useUtteranceManager = () => {
     const utterance = new SpeechSynthesisUtterance();
     
     // Set up text
-    utterance.text = `${word.word}. ${word.meaning}. ${word.example}`;
+    utterance.text = formatSpeechText({ word: word.word, meaning: word.meaning, example: word.example });
     
     // Set up voice
     const voice = findVoice(selectedVoice.region);

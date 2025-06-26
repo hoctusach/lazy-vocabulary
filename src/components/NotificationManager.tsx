@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Bell, BellOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak } from '@/utils/speech';
+import { speak, formatSpeechText } from '@/utils/speech';
 
 const requestNotificationPermission = async () => {
   if (!('Notification' in window)) {
@@ -121,7 +121,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
     
     notification.onclick = async () => {
       notification.close();
-      const fullText = `${word}. ${meaning}. ${example}`;
+      const fullText = formatSpeechText({ word, meaning, example });
       await speak(fullText);
     };
     
