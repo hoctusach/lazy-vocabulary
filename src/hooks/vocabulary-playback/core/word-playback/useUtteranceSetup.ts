@@ -25,17 +25,7 @@ export const useUtteranceSetup = ({
   paused,
   incrementRetryAttempts,
   userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
 }) => {
-  // If we've already exceeded the retry limit, log and advance once
-  if (retryCount > maxRetries) {
-    console.log(`Max retries exceeded for ${currentWord.word}`);
-    scheduleAutoAdvance(1000);
-    return;
-  }
   // Add a small delay before playing to ensure cancellation has completed
   setTimeout(() => {
     try {
@@ -146,8 +136,8 @@ export const useUtteranceSetup = ({
         }
         
         // Handle retry logic
-        if (incrementRetryAttempts() && retryCount + 1 <= maxRetries) {
-          console.log(`Retry attempt ${retryCount + 1}`);
+        if (incrementRetryAttempts()) {
+          console.log(`Retry attempt in progress`);
 
           // Wait briefly then retry
           setTimeout(() => {
@@ -173,10 +163,6 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
               });
             }
           }, 500);
@@ -208,7 +194,7 @@ export const useUtteranceSetup = ({
             console.warn("Speech synthesis not speaking after 200ms - potential silent failure");
             
             // If we haven't exceeded retry attempts, try again
-            if (incrementRetryAttempts() && retryCount + 1 <= maxRetries) {
+            if (incrementRetryAttempts()) {
               console.log(`Silent failure detected, retrying`);
               useUtteranceSetup({
                 currentWord,
@@ -229,10 +215,6 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
               });
             } else {
               // If we've tried enough times, move on
