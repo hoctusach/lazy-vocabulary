@@ -10,7 +10,6 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
 export const useSpeechController = (
   findVoice: (region: 'US' | 'UK' | 'AU') => SpeechSynthesisVoice | null,
   selectedVoice: VoiceSelection,
-  voiceVariant: string,
   scheduleAutoAdvance: (delay: number) => void
 ) => {
   const executeSpeechSynthesis = useCallback(async (
@@ -36,8 +35,7 @@ export const useSpeechController = (
       // Use the unified speech controller
       const success = await unifiedSpeechController.speak(
         currentWord,
-        selectedVoice.region,
-        voiceVariant
+        selectedVoice.region
       );
 
       if (success) {
@@ -62,7 +60,7 @@ export const useSpeechController = (
       }
       return false;
     }
-  }, [selectedVoice, voiceVariant, scheduleAutoAdvance]);
+  }, [selectedVoice, scheduleAutoAdvance]);
 
   return {
     executeSpeechSynthesis

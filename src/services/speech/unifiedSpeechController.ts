@@ -14,8 +14,7 @@ class UnifiedSpeechController {
 
   async speak(
     word: VocabularyWord,
-    region: 'US' | 'UK' | 'AU' = 'US',
-    variant?: string
+    region: 'US' | 'UK' | 'AU' = 'US'
   ): Promise<boolean> {
     if (this.isMutedState) {
       console.log('Speech is muted, scheduling auto-advance instead');
@@ -28,11 +27,10 @@ class UnifiedSpeechController {
       .map(part => part.trim());
     const text = parts.join('. ');
 
-    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region, 'variant:', variant);
+    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
 
     return realSpeechService.speak(text, {
       voiceRegion: region,
-      voiceVariant: variant,
       onStart: () => {
         console.log('Word speech started:', word.word);
       },

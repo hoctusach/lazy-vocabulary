@@ -9,7 +9,6 @@ globalThis.expect = expect;
 beforeAll(async () => {
   await import('@testing-library/jest-dom');
 });
-import { VoiceProvider } from '../src/hooks/context/useVoiceContext';
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
@@ -27,7 +26,6 @@ describe('VocabularyControlsColumn voice toggle', () => {
       const nextVoiceLabel = voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
       const toggleVoice = () => setVoiceRegion(r => (r === 'UK' ? 'US' : r === 'US' ? 'AU' : 'UK'));
       return (
-        <VoiceProvider playCurrentWord={() => {}}>
           <VocabularyControlsColumn
             isMuted={false}
             isPaused={false}
@@ -42,7 +40,6 @@ describe('VocabularyControlsColumn voice toggle', () => {
             onOpenAddModal={() => {}}
             onOpenEditModal={() => {}}
           />
-        </VoiceProvider>
       );
     };
 
