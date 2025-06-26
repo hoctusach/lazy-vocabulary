@@ -23,7 +23,8 @@ export const useUtteranceSetup = ({
   autoAdvanceTimerRef,
   muted,
   paused,
-  incrementRetryAttempts
+  incrementRetryAttempts,
+  userInteractionRef
 }) => {
   // Add a small delay before playing to ensure cancellation has completed
   setTimeout(() => {
@@ -116,6 +117,16 @@ export const useUtteranceSetup = ({
           scheduleAutoAdvance(2000);
           return;
         }
+
+        // Handle unexpected cancellation when not paused or muted
+        if (event.error === 'canceled' && !muted && !paused) {
+          console.log('Speech canceled unexpectedly, skipping retries');
+          if (!userInteractionRef.current) {
+            toast.error('Please interact with the page to enable audio playback');
+          }
+          scheduleAutoAdvance(2000);
+          return;
+        }
         
         // Handle retry logic
         if (incrementRetryAttempts()) {
@@ -143,7 +154,8 @@ export const useUtteranceSetup = ({
                 autoAdvanceTimerRef,
                 muted,
                 paused,
-                incrementRetryAttempts
+                incrementRetryAttempts,
+                userInteractionRef
               });
             }
           }, 500);
@@ -194,7 +206,8 @@ export const useUtteranceSetup = ({
                 autoAdvanceTimerRef,
                 muted,
                 paused,
-                incrementRetryAttempts
+                incrementRetryAttempts,
+                userInteractionRef
               });
             } else {
               // If we've tried enough times, move on
