@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker } from 'lucide-react';
-import ChangeVariantIcon from '../ChangeVariantIcon';
 import { toast } from 'sonner';
 import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
@@ -126,7 +125,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Speaker size={16} />
       </Button>
 
-      <ChangeVariantIcon />
 
       <EditWordButton onClick={onOpenEditModal} disabled={!currentWord} />
       <AddWordButton onClick={onOpenAddModal} />

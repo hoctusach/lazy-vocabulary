@@ -14,8 +14,7 @@ export const useSpeechExecution = (
   isPlayingRef: React.MutableRefObject<boolean>,
   advanceToNext: () => void,
   muted: boolean,
-  paused: boolean,
-  voiceVariant: string
+  paused: boolean
 ) => {
   const executeSpeech = useCallback(async (
     wordToPlay: VocabularyWord,
@@ -35,8 +34,7 @@ export const useSpeechExecution = (
     try {
       const success = await unifiedSpeechController.speak(
         wordToPlay,
-        selectedVoice.region,
-        voiceVariant
+        selectedVoice.region
       );
 
       setIsSpeaking(false);
@@ -55,7 +53,7 @@ export const useSpeechExecution = (
       
       return false;
     }
-  }, [selectedVoice, voiceVariant, setIsSpeaking, isPlayingRef, advanceToNext, muted, paused]);
+  }, [selectedVoice, setIsSpeaking, isPlayingRef, advanceToNext, muted, paused]);
 
   return {
     executeSpeech

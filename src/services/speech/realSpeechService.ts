@@ -3,7 +3,6 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 interface SpeechOptions {
   voiceRegion: 'US' | 'UK' | 'AU';
-  voiceVariant?: string;
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
@@ -30,9 +29,8 @@ class RealSpeechService {
     return new Promise((resolve) => {
       const utterance = new SpeechSynthesisUtterance(text);
       
-      // Set voice based on variant or region
-      const voice = this.findVoiceByVariant(options.voiceVariant) ||
-                    this.findVoiceByRegion(options.voiceRegion);
+      // Set voice based on region
+      const voice = this.findVoiceByRegion(options.voiceRegion);
       if (voice) {
         utterance.voice = voice;
         console.log('Using voice:', voice.name, 'for region:', options.voiceRegion);
@@ -140,12 +138,6 @@ class RealSpeechService {
 
   getCurrentUtterance(): SpeechSynthesisUtterance | null {
     return this.currentUtterance;
-  }
-
-  private findVoiceByVariant(name?: string): SpeechSynthesisVoice | null {
-    if (!name) return null;
-    const voices = window.speechSynthesis.getVoices();
-    return voices.find(v => v.name === name || v.name.includes(name)) || null;
   }
 
   private findVoiceByRegion(region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null {

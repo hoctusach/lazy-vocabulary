@@ -107,14 +107,8 @@ characters intact when preparing text for speech.
 
 ## Voice Settings
 
-The controls panel includes a **Change Voice Variant** button (speaker icon) that cycles the voice used for speech playback.
-Available variants are grouped by region:
-
-- **US:** `en-US-Standard-G`
-- **UK:** `Google UK English Female`, `Daniel`, `Kate`, `Susan`, `Hazel`
-- **AU:** `en-AU-Standard-C`, `Google AU English Male`, `Google AU English Female`, `Karen`, `Catherine`
-
-Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen voice persists between sessions.
+The controls panel includes a speaker button that cycles through the available voice regions (US, UK, AU).
+Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen region persists between sessions.
 
 ## What technologies are used for this project?
 

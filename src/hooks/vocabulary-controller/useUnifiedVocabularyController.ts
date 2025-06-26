@@ -29,8 +29,6 @@ export const useUnifiedVocabularyController = () => {
     setIsMuted,
     voiceRegion,
     setVoiceRegion,
-    voiceVariant,
-    setVoiceVariant,
     currentWord,
     isTransitioningRef,
     lastWordChangeRef
@@ -46,7 +44,7 @@ export const useUnifiedVocabularyController = () => {
   const {
     speechState,
     playCurrentWord
-  } = useSpeechIntegration(currentWord, voiceRegion, voiceVariant, isPaused, isMuted, isTransitioningRef);
+  } = useSpeechIntegration(currentWord, voiceRegion, isPaused, isMuted, isTransitioningRef);
 
   // Word navigation with proper state management
   const {
@@ -136,7 +134,6 @@ export const useUnifiedVocabularyController = () => {
     isPaused,
     isMuted,
     voiceRegion,
-    voiceVariant,
     isSpeaking: speechState.isActive,
     
     // Actions
