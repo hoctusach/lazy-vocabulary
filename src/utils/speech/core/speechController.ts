@@ -1,4 +1,6 @@
 
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+
 /**
  * Centralized Speech Controller - Single source of truth for all speech operations
  * Fixed version with improved state management and throttling
@@ -244,7 +246,7 @@ class SpeechController {
         
         // Configure utterance
         if (options.voice) utterance.voice = options.voice;
-        utterance.rate = options.rate || 0.8;
+        utterance.rate = options.rate || DEFAULT_SPEECH_RATE;
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;
 

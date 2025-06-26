@@ -3,6 +3,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
 import { findVoice } from './findVoice';
 import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
 // Function to create and configure a speech utterance
 export const createUtterance = (
@@ -63,8 +64,8 @@ export const createUtterance = (
       console.log(`No voice found, using default with language: ${utterance.lang}`);
     }
     
-    // Configure speech properties for much slower, clearer speech
-    utterance.rate = 0.6;   // Much slower rate for better comprehension
+    // Configure speech properties
+    utterance.rate = DEFAULT_SPEECH_RATE;
     utterance.pitch = 1.0;  // Default pitch
     utterance.volume = 1.0; // Full volume
     
