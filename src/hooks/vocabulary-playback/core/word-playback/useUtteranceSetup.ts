@@ -24,8 +24,8 @@ export const useUtteranceSetup = ({
   muted,
   paused,
   incrementRetryAttempts,
-  retryCount,
-  maxRetries
+  userInteractionRef
+
 }) => {
   // If we've already exceeded the retry limit, log and advance once
   if (retryCount > maxRetries) {
@@ -124,6 +124,16 @@ export const useUtteranceSetup = ({
           scheduleAutoAdvance(2000);
           return;
         }
+
+        // Handle unexpected cancellation when not paused or muted
+        if (event.error === 'canceled' && !muted && !paused) {
+          console.log('Speech canceled unexpectedly, skipping retries');
+          if (!userInteractionRef.current) {
+            toast.error('Please interact with the page to enable audio playback');
+          }
+          scheduleAutoAdvance(2000);
+          return;
+        }
         
         // Handle retry logic
         if (incrementRetryAttempts() && retryCount + 1 <= maxRetries) {
@@ -152,8 +162,8 @@ export const useUtteranceSetup = ({
                 muted,
                 paused,
                 incrementRetryAttempts,
-                retryCount: retryCount + 1,
-                maxRetries
+                userInteractionRef
+
               });
             }
           }, 500);
@@ -205,8 +215,8 @@ export const useUtteranceSetup = ({
                 muted,
                 paused,
                 incrementRetryAttempts,
-                retryCount: retryCount + 1,
-                maxRetries
+                userInteractionRef
+
               });
             } else {
               // If we've tried enough times, move on
