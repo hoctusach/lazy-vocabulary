@@ -1,6 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
-import { prepareTextForSpeech } from '@/utils/speech';
+import { prepareTextForSpeech, formatSpeechText } from '@/utils/speech';
 import { hasValidSpeechableContent, getPreserveSpecialFromStorage } from '@/utils/text/contentFilters';
 import { toast } from '@/components/ui/use-toast';
 
@@ -13,13 +13,11 @@ export const useContentValidation = () => {
     const preserveSpecial = getPreserveSpecialFromStorage();
     
     // Construct text to speak
-    let rawTextToSpeak = currentWord.word;
-    if (currentWord.meaning) {
-      rawTextToSpeak += `. ${currentWord.meaning}`;
-    }
-    if (currentWord.example) {
-      rawTextToSpeak += `. ${currentWord.example}`;
-    }
+    let rawTextToSpeak = formatSpeechText({
+      word: currentWord.word,
+      meaning: currentWord.meaning,
+      example: currentWord.example
+    });
 
     // Prepare text for speech (whitespace cleanup only)
     const speechableText = prepareTextForSpeech(rawTextToSpeak);

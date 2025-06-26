@@ -3,6 +3,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
 import { findVoice } from './findVoice';
 import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
+import { formatSpeechText } from '@/utils/speech';
 
 // Function to create and configure a speech utterance
 export const createUtterance = (
@@ -23,15 +24,11 @@ export const createUtterance = (
     const sanitizedExample = sanitizeForDisplay(word.example || '');
     
     // Construct the text to speak with pauses
-    let textToSpeak = sanitizedWord;
-    
-    if (sanitizedMeaning && sanitizedMeaning.trim().length > 0) {
-      textToSpeak += `. ${sanitizedMeaning}`;
-    }
-    
-    if (sanitizedExample && sanitizedExample.trim().length > 0) {
-      textToSpeak += `. ${sanitizedExample}`;
-    }
+    let textToSpeak = formatSpeechText({
+      word: sanitizedWord,
+      meaning: sanitizedMeaning,
+      example: sanitizedExample
+    });
     
     // Additional sanitization for speech synthesis
     // Remove any remaining HTML entities and control characters

@@ -2,16 +2,18 @@
 /**
  * Manages voice selection and text formatting for speech
  */
+import { formatSpeechText } from '@/utils/speech';
+
 export class VoiceManager {
-  // Create formatted speech text
+  // Create formatted speech text with SSML pauses
   createSpeechText(word: { word: string; meaning: string; example: string }): string {
     const cleanText = (text: string) => text.trim().replace(/\s+/g, ' ');
-    
+
     const wordText = cleanText(word.word);
     const meaningText = cleanText(word.meaning);
     const exampleText = cleanText(word.example);
-    
-    return `${wordText}. ${meaningText}. ${exampleText}`;
+
+    return formatSpeechText({ word: wordText, meaning: meaningText, example: exampleText });
   }
 
   // Find voice by region

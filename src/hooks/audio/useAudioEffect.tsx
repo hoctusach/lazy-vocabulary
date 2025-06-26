@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak, stopSpeaking } from '@/utils/speech';
+import { speak, stopSpeaking, formatSpeechText } from '@/utils/speech';
 
 export const useAudioEffect = (
   currentWord: VocabularyWord | null,
@@ -81,8 +81,12 @@ export const useAudioEffect = (
           
           console.log('[APP] ⚡ Speaking word:', currentWord.word);
           
-          // Create the text to speak with periods to create natural pauses
-          const fullText = `${currentWord.word}. ${currentWord.meaning}. ${currentWord.example}.`;
+          // Create the text to speak with explicit pauses
+          const fullText = formatSpeechText({
+            word: currentWord.word,
+            meaning: currentWord.meaning,
+            example: currentWord.example
+          });
           
           try {
             // Speak the text and wait for completion
