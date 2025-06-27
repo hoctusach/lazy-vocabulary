@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { saveLastWord } from '@/utils/lastWordStorage';
 
 /**
  * Word navigation logic
@@ -51,6 +52,10 @@ export const useWordNavigation = (
       const nextIndex = (currentIndex + 1) % wordList.length;
       console.log('[WORD-NAVIGATION] Moving from word', currentIndex, 'to', nextIndex);
       setCurrentIndex(nextIndex);
+      const nextWord = wordList[nextIndex];
+      if (nextWord) {
+        saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
+      }
 
     } catch (error) {
       console.error('[WORD-NAVIGATION] Error navigating to next word:', error);

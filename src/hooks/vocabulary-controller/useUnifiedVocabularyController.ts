@@ -8,6 +8,7 @@ import { useSpeechIntegration } from './core/useSpeechIntegration';
 import { useWordNavigation } from './core/useWordNavigation';
 import { useVocabularyControls } from './core/useVocabularyControls';
 import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
+import { saveLastWord } from '@/utils/lastWordStorage';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
@@ -115,6 +116,13 @@ export const useUnifiedVocabularyController = () => {
     console.log(`[UNIFIED-CONTROLLER] Setting muted: ${isMuted}`);
     unifiedSpeechController.setMuted(isMuted);
   }, [isMuted]);
+
+  // Persist last viewed word for the current category
+  useEffect(() => {
+    if (currentWord) {
+      saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
+    }
+  }, [currentWord?.word]);
 
   // Cleanup on unmount
   useEffect(() => {
