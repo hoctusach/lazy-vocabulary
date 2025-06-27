@@ -48,7 +48,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [isOpen, loading]);
 
   const highlightMatch = (text: string) => {
-    const idx = text.indexOf(query);
+    const q = query.toLowerCase();
+    const idx = text.toLowerCase().indexOf(q);
     if (idx === -1 || !query) return text;
     return (
       <>
@@ -81,11 +82,12 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
 
     const id = setTimeout(() => {
       if (wordsRef.current) {
+        const q = query.toLowerCase();
         const filtered = wordsRef.current.filter(
           w =>
-            w.word.includes(query) ||
-            w.meaning.includes(query) ||
-            w.example.includes(query)
+            w.word.toLowerCase().includes(q) ||
+            w.meaning.toLowerCase().includes(q) ||
+            w.example.toLowerCase().includes(q)
         );
         setResults(filtered);
       }
@@ -152,7 +154,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               <p className="p-2 text-sm text-destructive">{loadError}</p>
             )}
             {results.map((item) => (
-
               <div
                 key={`${item.word}-${item.category}`}
                 className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
