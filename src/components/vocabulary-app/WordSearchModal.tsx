@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader, Search, Volume2 } from 'lucide-react';
+import { Loader, Search } from 'lucide-react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { Badge } from '@/components/ui/badge';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
@@ -198,17 +198,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               nextCategory=""
               selectedVoice={previewVoice}
               nextVoiceLabel=""
+              searchPreview={true}
             />
-            <div className="flex justify-end">
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={handlePlay}
-                title="Play"
-              >
-                <Volume2 className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
         )}
       </DialogContent>

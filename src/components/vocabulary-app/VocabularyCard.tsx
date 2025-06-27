@@ -26,6 +26,7 @@ interface VocabularyCardProps {
   category?: string;
   selectedVoice: VoiceSelection;
   nextVoiceLabel: string;
+  searchPreview?: boolean;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -45,7 +46,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   isSpeaking = false,
   category,
   selectedVoice,
-  nextVoiceLabel
+  nextVoiceLabel,
+  searchPreview = false
 }) => {
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
@@ -99,68 +101,75 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <span className="italic text-red-600">*</span> {example}
           </div>
           {/* Mobile note below example */}
-          <div className="mobile-note text-left italic mt-2" style={{ color: '#6b7280', fontSize: '0.8rem' }}>
-            Tap any button (e.g., Next) to enable speech. On Mobile, only one voice may be available.
-          </div>
+          {!searchPreview && (
+            <div
+              className="mobile-note text-left italic mt-2"
+              style={{ color: '#6b7280', fontSize: '0.8rem' }}
+            >
+              Tap any button (e.g., Next) to enable speech. On Mobile, only one voice may be available.
+            </div>
+          )}
         </div>
         {/* Control buttons wrapper - optimized spacing */}
-        <div className="flex flex-wrap gap-1 pt-1">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToggleMute}
-            className={cn(
-              "h-6 text-xs px-1.5",
-              isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
-            )}
-          >
-            {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
-            {isMuted ? "Unmute" : "Mute"}
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onTogglePause}
-            className={cn(
-              "h-6 text-xs px-1.5",
-              isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
-            )}
-          >
-            {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}
-            {isPaused ? "Play" : "Pause"}
-          </Button>
-        
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onNextWord}
-            className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
-          >
-            <SkipForward size={12} className="mr-1" />
-            Next
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onSwitchCategory}
-            className="h-6 text-xs px-1.5 text-green-700"
-          >
-            <RefreshCw size={10} className="mr-1" />
-            {/* Removed dynamic category label */}
-          </Button>
-          
-          {/* Single voice toggle button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onCycleVoice}
-            className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
-          >
-            {nextVoiceLabel}
-          </Button>
-        </div>
+        {!searchPreview && (
+          <div className="flex flex-wrap gap-1 pt-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onToggleMute}
+              className={cn(
+                "h-6 text-xs px-1.5",
+                isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
+              )}
+            >
+              {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
+              {isMuted ? "Unmute" : "Mute"}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onTogglePause}
+              className={cn(
+                "h-6 text-xs px-1.5",
+                isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
+              )}
+            >
+              {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}
+              {isPaused ? "Play" : "Pause"}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onNextWord}
+              className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
+            >
+              <SkipForward size={12} className="mr-1" />
+              Next
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSwitchCategory}
+              className="h-6 text-xs px-1.5 text-green-700"
+            >
+              <RefreshCw size={10} className="mr-1" />
+              {/* Removed dynamic category label */}
+            </Button>
+
+            {/* Single voice toggle button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCycleVoice}
+              className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
+            >
+              {nextVoiceLabel}
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
