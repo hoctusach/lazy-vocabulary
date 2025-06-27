@@ -121,7 +121,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md max-h-[90vh]">
+      <DialogContent
+        className="sm:max-w-md max-h-[90vh] top-[5%] sm:top-[10%] md:top-1/2 translate-y-0 md:translate-y-[-50%]"
+      >
         <DialogHeader>
           <DialogTitle>Quick Search</DialogTitle>
         </DialogHeader>
