@@ -78,7 +78,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div>
           {/* Word */}
           <h2
-            className="text-left font-semibold text-[0.8rem] text-gray-800 leading-tight mb-2"
+            className="text-left font-semibold text-base md:text-sm text-gray-800 leading-tight mb-2"
             style={{ marginTop: 0 }}
           >
             {main}
@@ -88,14 +88,14 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           </h2>
           {/* Meaning */}
           <div
-            className="text-left text-[0.7rem] text-emerald-400 italic mb-2"
+            className="text-left text-base md:text-sm text-emerald-400 italic mb-2"
             style={{ background: 'transparent', marginTop: 0 }}
           >
             <span className="italic text-emerald-400">*</span> {meaning}
           </div>
           {/* Example */}
           <div
-            className="text-left text-[0.7rem] text-red-600 italic"
+            className="text-left text-base md:text-sm text-red-600 italic"
             style={{ background: 'transparent', marginTop: 0 }}
           >
             <span className="italic text-red-600">*</span> {example}
