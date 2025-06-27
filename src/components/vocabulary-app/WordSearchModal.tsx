@@ -152,6 +152,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               <p className="p-2 text-sm text-destructive">{loadError}</p>
             )}
             {results.map((item) => (
+
               <div
                 key={`${item.word}-${item.category}`}
                 className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
