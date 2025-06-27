@@ -19,7 +19,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState<Fuse.FuseResult<VocabularyWord>[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
 
@@ -62,17 +61,20 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   };
 
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedQuery(query), 200);
-    return () => clearTimeout(id);
-  }, [query]);
-
-  useEffect(() => {
-    if (!fuseRef.current || !debouncedQuery.trim()) {
+    if (query.trim() === '') {
       setResults([]);
+      setSelectedWord(null);
       return;
     }
-    setResults(fuseRef.current.search(debouncedQuery));
-  }, [debouncedQuery]);
+
+    const id = setTimeout(() => {
+      if (fuseRef.current) {
+        setResults(fuseRef.current.search(query));
+      }
+    }, 200);
+
+    return () => clearTimeout(id);
+  }, [query]);
 
   const handlePlay = () => {
     if (!selectedWord) return;
@@ -81,6 +83,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
       .join('. ');
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
+  };
+
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (value.trim() === '') {
+      setResults([]);
+      setSelectedWord(null);
+    }
   };
 
   const handleClose = () => {
@@ -100,7 +110,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
           <Input
             placeholder="Search word..."
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => handleInputChange(e.target.value)}
+            onKeyUp={e => handleInputChange((e.target as HTMLInputElement).value)}
             onKeyDown={e => {
               if (e.key === 'Enter') e.preventDefault();
             }}
@@ -133,7 +144,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               )}
             </div>
           ))}
-          {results.length === 0 && debouncedQuery.trim() && !loading && !loadError && (
+          {results.length === 0 && query.trim() && !loading && !loadError && (
             <p className="p-2 text-sm text-muted-foreground">No results</p>
           )}
         </ScrollArea>
