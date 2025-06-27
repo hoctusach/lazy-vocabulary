@@ -1,10 +1,11 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
+import WordSearchModal from './WordSearchModal';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
@@ -65,6 +66,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     onCycleVoice();
     toast(`Voice changed to ${nextVoiceLabel}`);
   };
+
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const openSearch = () => setIsSearchOpen(true);
+  const closeSearch = () => setIsSearchOpen(false);
 
   return (
     <div className="flex flex-col gap-2 items-end">
@@ -128,6 +133,16 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
       <EditWordButton onClick={onOpenEditModal} disabled={!currentWord} />
       <AddWordButton onClick={onOpenAddModal} />
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={openSearch}
+        className="h-8 w-8 p-0"
+        title="Quick Search"
+      >
+        <Search size={16} />
+      </Button>
+      <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
     </div>
   );
 };
