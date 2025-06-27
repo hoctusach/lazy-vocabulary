@@ -21,7 +21,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState<Fuse.FuseResult<VocabularyWord>[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
   const previewVoice: VoiceSelection = {
@@ -82,11 +81,20 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
 
   useEffect(() => {
     if (!fuseRef.current || !debouncedQuery.trim()) {
+
       setResults([]);
+      setSelectedWord(null);
       return;
     }
-    setResults(fuseRef.current.search(debouncedQuery));
-  }, [debouncedQuery]);
+
+    const id = setTimeout(() => {
+      if (fuseRef.current) {
+        setResults(fuseRef.current.search(query));
+      }
+    }, 200);
+
+    return () => clearTimeout(id);
+  }, [query]);
 
   const handlePlay = () => {
     if (!selectedWord) return;
@@ -95,6 +103,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
       .join('. ');
     const utterance = new SpeechSynthesisUtterance(text);
     window.speechSynthesis.speak(utterance);
+  };
+
+  const handleInputChange = (value: string) => {
+    setQuery(value);
+    if (value.trim() === '') {
+      setResults([]);
+      setSelectedWord(null);
+    }
   };
 
   const handleClose = () => {
@@ -114,7 +130,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
           <Input
             placeholder="Search word..."
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => handleInputChange(e.target.value)}
+            onKeyUp={e => handleInputChange((e.target as HTMLInputElement).value)}
             onKeyDown={e => {
               if (e.key === 'Enter') e.preventDefault();
             }}
@@ -123,12 +140,12 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
             <Search className="h-4 w-4" />
           </Button>
         </div>
-
         {!selectedWord ? (
           <ScrollArea className="h-40 mt-3 border rounded-md">
             {loading && !fuseRef.current && (
               <div className="flex justify-center py-4" aria-label="loading">
                 <Loader className="h-4 w-4 animate-spin" />
+
               </div>
             )}
             {loadError && (
