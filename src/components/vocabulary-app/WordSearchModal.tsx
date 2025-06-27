@@ -48,16 +48,16 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [isOpen, loading]);
 
   const highlightMatch = (text: string) => {
-    const q = query.toLowerCase();
-    const idx = text.toLowerCase().indexOf(q);
-    if (idx === -1 || !query) return text;
+    const normalized = query.trim();
+    const idx = text.indexOf(normalized);
+    if (idx === -1 || !normalized) return text;
     return (
       <>
         {text.slice(0, idx)}
         <mark className="bg-yellow-200">
-          {text.slice(idx, idx + query.length)}
+          {text.slice(idx, idx + normalized.length)}
         </mark>
-        {text.slice(idx + query.length)}
+        {text.slice(idx + normalized.length)}
       </>
     );
   };
@@ -74,42 +74,24 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [query]);
 
   useEffect(() => {
-    if (!wordsRef.current || !debouncedQuery.trim()) {
+    if (!wordsRef.current) return;
+
+    const normalized = debouncedQuery.trim();
+    if (normalized === '') {
       setResults([]);
       setSelectedWord(null);
       return;
     }
 
-    const id = setTimeout(() => {
-      if (wordsRef.current) {
-        const q = query.toLowerCase();
-        const matches = wordsRef.current.filter(
-          w =>
-            w.word.toLowerCase().includes(q) ||
-            w.meaning.toLowerCase().includes(q) ||
-            w.example.toLowerCase().includes(q)
-        );
+    const filtered = wordsRef.current.filter(
+      w =>
+        w.word.includes(normalized) ||
+        w.meaning.includes(normalized) ||
+        w.example.includes(normalized)
+    );
 
-        const inWord = matches.filter(w => w.word.toLowerCase().includes(q));
-        const inMeaning = matches.filter(
-          w =>
-            !w.word.toLowerCase().includes(q) &&
-            w.meaning.toLowerCase().includes(q)
-        );
-        const inExample = matches.filter(
-          w =>
-            !w.word.toLowerCase().includes(q) &&
-            !w.meaning.toLowerCase().includes(q) &&
-            w.example.toLowerCase().includes(q)
-        );
-        const sorted = [...inWord, ...inMeaning, ...inExample];
-
-        setResults(sorted);
-      }
-    }, 200);
-
-    return () => clearTimeout(id);
-  }, [query]);
+    setResults(filtered);
+  }, [debouncedQuery]);
 
   const handlePlay = () => {
     if (!selectedWord) return;
