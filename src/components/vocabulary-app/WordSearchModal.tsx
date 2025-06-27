@@ -83,13 +83,28 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
     const id = setTimeout(() => {
       if (wordsRef.current) {
         const q = query.toLowerCase();
-        const filtered = wordsRef.current.filter(
+        const matches = wordsRef.current.filter(
           w =>
             w.word.toLowerCase().includes(q) ||
             w.meaning.toLowerCase().includes(q) ||
             w.example.toLowerCase().includes(q)
         );
-        setResults(filtered);
+
+        const inWord = matches.filter(w => w.word.toLowerCase().includes(q));
+        const inMeaning = matches.filter(
+          w =>
+            !w.word.toLowerCase().includes(q) &&
+            w.meaning.toLowerCase().includes(q)
+        );
+        const inExample = matches.filter(
+          w =>
+            !w.word.toLowerCase().includes(q) &&
+            !w.meaning.toLowerCase().includes(q) &&
+            w.example.toLowerCase().includes(q)
+        );
+        const sorted = [...inWord, ...inMeaning, ...inExample];
+
+        setResults(sorted);
       }
     }, 200);
 
