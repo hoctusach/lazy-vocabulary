@@ -1,10 +1,7 @@
 import type { VocabularyWord } from '@/types/vocabulary';
-import Fuse from 'fuse.js';
-
 export type WordEntry = VocabularyWord;
 
 let cachedWords: WordEntry[] | null = null;
-let cachedFuse: Fuse<WordEntry> | null = null;
 
 async function fetchAllWords(): Promise<WordEntry[]> {
   if (cachedWords) return cachedWords;
@@ -19,16 +16,10 @@ async function fetchAllWords(): Promise<WordEntry[]> {
   return cachedWords;
 }
 
-export async function loadFuse(): Promise<Fuse<WordEntry>> {
-  if (cachedFuse) return cachedFuse;
+export async function loadAllWords(): Promise<WordEntry[]> {
   const words = await fetchAllWords();
-  cachedFuse = new Fuse(words, {
-    keys: ['word', 'meaning', 'example'],
-    threshold: 0.3,
-    includeMatches: true,
-  });
-  console.info(`QuickSearch: indexed ${words.length} words`);
-  return cachedFuse;
+  console.info(`QuickSearch: loaded ${words.length} words`);
+  return words;
 }
 
 export { cachedWords as allWords };
