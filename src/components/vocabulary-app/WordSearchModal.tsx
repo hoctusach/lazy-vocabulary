@@ -21,6 +21,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [results, setResults] = useState<Fuse.FuseResult<VocabularyWord>[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
   const previewVoice: VoiceSelection = {
