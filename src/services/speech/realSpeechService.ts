@@ -1,9 +1,13 @@
-
-import { VocabularyWord } from '@/types/vocabulary';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { VocabularyWord } from "@/types/vocabulary";
+import { DEFAULT_SPEECH_RATE } from "@/services/speech/core/constants";
+import {
+  initializeSpeechSystem,
+  speechInitialized,
+} from "@/utils/speech/core/modules/speechInit";
+import { logSpeechEvent } from "@/utils/speechLogger";
 
 interface SpeechOptions {
-  voiceRegion: 'US' | 'UK' | 'AU';
+  voiceRegion: "US" | "UK" | "AU";
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
@@ -18,28 +22,49 @@ class RealSpeechService {
 
   async speak(text: string, options: SpeechOptions): Promise<boolean> {
     if (!window.speechSynthesis) {
-      console.error('Speech synthesis not supported');
+      console.error("Speech synthesis not supported");
       return false;
     }
 
-    console.log('RealSpeechService: Starting speech for:', text.substring(0, 50) + '...');
-    
+    if (!speechInitialized) {
+      await initializeSpeechSystem();
+    }
+
+    logSpeechEvent({
+      timestamp: Date.now(),
+      event: "speak-attempt",
+      text: text.substring(0, 60),
+      voice: options.voiceRegion,
+    });
+    console.log(
+      "RealSpeechService: Starting speech for:",
+      text.substring(0, 50) + "...",
+    );
+
     // Stop any current speech
     this.stop();
-    
+
     // Wait for voices to be loaded
     await this.ensureVoicesLoaded();
 
     return new Promise((resolve) => {
       const utterance = new SpeechSynthesisUtterance(text);
-      
+
       // Set voice based on region
       const voice = this.findVoiceByRegion(options.voiceRegion);
       if (voice) {
         utterance.voice = voice;
-        console.log('Using voice:', voice.name, 'for region:', options.voiceRegion);
+        console.log(
+          "Using voice:",
+          voice.name,
+          "for region:",
+          options.voiceRegion,
+        );
       } else {
-        console.warn('No suitable voice found for region:', options.voiceRegion);
+        console.warn(
+          "No suitable voice found for region:",
+          options.voiceRegion,
+        );
       }
 
       // Configure speech settings
@@ -49,18 +74,30 @@ class RealSpeechService {
 
       // Set up event handlers
       utterance.onstart = () => {
-        console.log('Speech started for:', text.substring(0, 30) + '...');
+        console.log("Speech started for:", text.substring(0, 30) + "...");
         this.isActive = true;
         this.currentUtterance = utterance;
+        logSpeechEvent({
+          timestamp: Date.now(),
+          event: "start",
+          text: text.substring(0, 60),
+          voice: utterance.voice?.name,
+        });
         if (options.onStart) {
           options.onStart();
         }
       };
 
       utterance.onend = () => {
-        console.log('Speech ended');
+        console.log("Speech ended");
         this.isActive = false;
         this.currentUtterance = null;
+        logSpeechEvent({
+          timestamp: Date.now(),
+          event: "end",
+          text: text.substring(0, 60),
+          voice: utterance.voice?.name,
+        });
         if (options.onEnd) {
           options.onEnd();
         }
@@ -68,10 +105,17 @@ class RealSpeechService {
       };
 
       utterance.onerror = (event) => {
-        console.error('Speech error:', event.error, event);
-        if (event.error === 'canceled') {
+        console.error("Speech error:", event.error, event);
+        logSpeechEvent({
+          timestamp: Date.now(),
+          event: "error",
+          text: text.substring(0, 60),
+          voice: utterance.voice?.name,
+          details: event.error,
+        });
+        if (event.error === "canceled") {
           console.log(
-            `Canceled context - muted: ${options.muted}, paused: ${options.paused}, userInteracted: ${options.userInteracted}`
+            `Canceled context - muted: ${options.muted}, paused: ${options.paused}, userInteracted: ${options.userInteracted}`,
           );
         }
         this.isActive = false;
@@ -85,9 +129,9 @@ class RealSpeechService {
       // Start speech
       try {
         window.speechSynthesis.speak(utterance);
-        console.log('Speech synthesis started successfully');
+        console.log("Speech synthesis started successfully");
       } catch (error) {
-        console.error('Failed to start speech synthesis:', error);
+        console.error("Failed to start speech synthesis:", error);
         this.isActive = false;
         this.currentUtterance = null;
         resolve(false);
@@ -106,16 +150,18 @@ class RealSpeechService {
       const loadVoices = () => {
         const newVoices = window.speechSynthesis.getVoices();
         if (newVoices.length > 0) {
-          console.log('Voices loaded:', newVoices.length, 'voices available');
+          console.log("Voices loaded:", newVoices.length, "voices available");
           resolve();
         }
       };
 
-      window.speechSynthesis.addEventListener('voiceschanged', loadVoices, { once: true });
-      
+      window.speechSynthesis.addEventListener("voiceschanged", loadVoices, {
+        once: true,
+      });
+
       // Fallback timeout
       setTimeout(() => {
-        console.log('Voice loading timeout, continuing anyway');
+        console.log("Voice loading timeout, continuing anyway");
         resolve();
       }, 2000);
     });
@@ -153,27 +199,34 @@ class RealSpeechService {
     return this.currentUtterance;
   }
 
-  private findVoiceByRegion(region: 'US' | 'UK' | 'AU'): SpeechSynthesisVoice | null {
+  private findVoiceByRegion(
+    region: "US" | "UK" | "AU",
+  ): SpeechSynthesisVoice | null {
     const voices = window.speechSynthesis.getVoices();
-    
+
     if (voices.length === 0) {
-      console.warn('No voices available');
+      console.warn("No voices available");
       return null;
     }
 
-    console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
-    
+    console.log(
+      "Available voices:",
+      voices.map((v) => `${v.name} (${v.lang})`),
+    );
+
     const regionPatterns = {
-      US: ['en-US', 'en_US'],
-      UK: ['en-GB', 'en_GB'],
-      AU: ['en-AU', 'en_AU']
+      US: ["en-US", "en_US"],
+      UK: ["en-GB", "en_GB"],
+      AU: ["en-AU", "en_AU"],
     };
 
     const patterns = regionPatterns[region];
-    
+
     // First try to find exact language matches
     for (const pattern of patterns) {
-      const voice = voices.find(v => v.lang === pattern || v.lang.startsWith(pattern.substring(0, 5)));
+      const voice = voices.find(
+        (v) => v.lang === pattern || v.lang.startsWith(pattern.substring(0, 5)),
+      );
       if (voice) {
         console.log(`Found ${region} voice:`, voice.name, voice.lang);
         return voice;
@@ -181,9 +234,12 @@ class RealSpeechService {
     }
 
     // Fallback to any English voice
-    const englishVoice = voices.find(v => v.lang.startsWith('en'));
+    const englishVoice = voices.find((v) => v.lang.startsWith("en"));
     if (englishVoice) {
-      console.log(`Using fallback English voice for ${region}:`, englishVoice.name);
+      console.log(
+        `Using fallback English voice for ${region}:`,
+        englishVoice.name,
+      );
       return englishVoice;
     }
 

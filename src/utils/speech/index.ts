@@ -1,7 +1,6 @@
-
-import { getVoiceByRegion, findFallbackVoice } from './voiceUtils';
-import { calculateSpeechDuration } from './durationUtils';
-import { speak } from './core/speechPlayer';
+import { getVoiceByRegion, findFallbackVoice } from "./voiceUtils";
+import { calculateSpeechDuration } from "./durationUtils";
+import { speak } from "./core/speechPlayer";
 import {
   stopSpeaking,
   pauseSpeaking,
@@ -11,26 +10,31 @@ import {
   resetSpeechEngine,
   validateCurrentSpeech,
   ensureSpeechEngineReady,
-  isSpeechSynthesisSupported
-} from './core/speechEngine';
+  isSpeechSynthesisSupported,
+} from "./core/speechEngine";
 import {
   extractMainWord,
   prepareTextForSpeech,
   addPausesToText,
   checkSoundDisplaySync,
-  forceResyncIfNeeded
-} from './core/speechText';
+  forceResyncIfNeeded,
+} from "./core/speechText";
 import {
   getSpeechRate,
   getSpeechPitch,
-  getSpeechVolume
-} from './core/speechSettings';
-import { splitTextIntoChunks } from './core/textChunker';
-import { speakChunksInSequence } from './core/chunkSequencer';
-import { createSpeechMonitor, clearSpeechMonitor } from './core/speechMonitor';
-import { synthesizeAudio } from './synthesisUtils';
-import { US_VOICE_NAME, UK_VOICE_NAME, AU_VOICE_NAME } from './voiceNames';
-import { formatSpeechText } from './formatSpeechText';
+  getSpeechVolume,
+} from "./core/speechSettings";
+import { splitTextIntoChunks } from "./core/textChunker";
+import { speakChunksInSequence } from "./core/chunkSequencer";
+import { createSpeechMonitor, clearSpeechMonitor } from "./core/speechMonitor";
+import { synthesizeAudio } from "./synthesisUtils";
+import { US_VOICE_NAME, UK_VOICE_NAME, AU_VOICE_NAME } from "./voiceNames";
+import { formatSpeechText } from "./formatSpeechText";
+import {
+  initializeSpeechSystem,
+  registerSpeechInitGesture,
+  speechInitialized,
+} from "./core/speechEngine";
 
 export {
   speak,
@@ -62,5 +66,7 @@ export {
   US_VOICE_NAME,
   UK_VOICE_NAME,
   AU_VOICE_NAME,
-  formatSpeechText
+  formatSpeechText,
 };
+
+export { initializeSpeechSystem, registerSpeechInitGesture, speechInitialized };
