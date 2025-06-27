@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Fuse from 'fuse.js';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader, Search } from 'lucide-react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { Badge } from '@/components/ui/badge';
-import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
@@ -17,12 +15,12 @@ interface WordSearchModalProps {
 }
 
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) => {
-  const fuseRef = useRef<Fuse<VocabularyWord> | null>(null);
+  const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [results, setResults] = useState<Fuse.FuseResult<VocabularyWord>[]>([]);
+  const [results, setResults] = useState<VocabularyWord[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
   const previewVoice: VoiceSelection = {
     label: 'US',
@@ -32,12 +30,12 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   };
 
   useEffect(() => {
-    if (isOpen && !fuseRef.current && !loading) {
+    if (isOpen && !wordsRef.current && !loading) {
       setLoading(true);
       import('@/utils/allWords')
-        .then(mod => mod.loadFuse())
-        .then(fuse => {
-          fuseRef.current = fuse;
+        .then(async mod => {
+          await mod.loadAllWords();
+          wordsRef.current = mod.allWords || [];
           setLoading(false);
           setLoadError('');
         })
@@ -49,24 +47,18 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
     }
   }, [isOpen, loading]);
 
-  const highlightMatch = (
-    text: string,
-    match: Fuse.FuseResultMatch | undefined
-  ) => {
-    if (!match || !match.indices.length) return text;
-    const elements: React.ReactNode[] = [];
-    let last = 0;
-    match.indices.forEach(([start, end], idx) => {
-      if (last < start) elements.push(text.slice(last, start));
-      elements.push(
-        <mark key={idx} className="bg-yellow-200">
-          {text.slice(start, end + 1)}
+  const highlightMatch = (text: string) => {
+    const idx = text.indexOf(query);
+    if (idx === -1 || !query) return text;
+    return (
+      <>
+        {text.slice(0, idx)}
+        <mark className="bg-yellow-200">
+          {text.slice(idx, idx + query.length)}
         </mark>
-      );
-      last = end + 1;
-    });
-    if (last < text.length) elements.push(text.slice(last));
-    return <>{elements}</>;
+        {text.slice(idx + query.length)}
+      </>
+    );
   };
 
   useEffect(() => {
@@ -81,16 +73,21 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [query]);
 
   useEffect(() => {
-    if (!fuseRef.current || !debouncedQuery.trim()) {
-
+    if (!wordsRef.current || !debouncedQuery.trim()) {
       setResults([]);
       setSelectedWord(null);
       return;
     }
 
     const id = setTimeout(() => {
-      if (fuseRef.current) {
-        setResults(fuseRef.current.search(query));
+      if (wordsRef.current) {
+        const filtered = wordsRef.current.filter(
+          w =>
+            w.word.includes(query) ||
+            w.meaning.includes(query) ||
+            w.example.includes(query)
+        );
+        setResults(filtered);
       }
     }, 200);
 
@@ -145,7 +142,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
         </div>
         {!selectedWord ? (
           <ScrollArea className="h-40 mt-3 border rounded-md">
-            {loading && !fuseRef.current && (
+            {loading && !wordsRef.current && (
               <div className="flex justify-center py-4" aria-label="loading">
                 <Loader className="h-4 w-4 animate-spin" />
 
@@ -154,17 +151,15 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
             {loadError && (
               <p className="p-2 text-sm text-destructive">{loadError}</p>
             )}
-              {results.map(({ item, matches }) => (
+            {results.map((item) => (
+
               <div
                 key={`${item.word}-${item.category}`}
                 className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
                 onClick={() => setSelectedWord(item)}
               >
-                <span className="mr-2 flex-1 text-base md:text-sm">
-                  {highlightMatch(
-                    item.word,
-                    matches?.find(m => m.key === 'word')
-                  )}
+                <span className="mr-2 flex-1">
+                  {highlightMatch(item.word)}
                 </span>
                 {item.category && (
                   <Badge variant="secondary" className="shrink-0">
