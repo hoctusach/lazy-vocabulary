@@ -154,13 +154,13 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
             {loadError && (
               <p className="p-2 text-sm text-destructive">{loadError}</p>
             )}
-            {results.map(({ item, matches }) => (
+              {results.map(({ item, matches }) => (
               <div
                 key={`${item.word}-${item.category}`}
                 className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
                 onClick={() => setSelectedWord(item)}
               >
-                <span className="mr-2 flex-1">
+                <span className="mr-2 flex-1 text-base md:text-sm">
                   {highlightMatch(
                     item.word,
                     matches?.find(m => m.key === 'word')
