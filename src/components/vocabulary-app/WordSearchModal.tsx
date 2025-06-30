@@ -48,16 +48,21 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [isOpen, loading]);
 
   const highlightMatch = (text: string) => {
-    const normalized = query.trim();
-    const idx = text.indexOf(normalized);
-    if (idx === -1 || !normalized) return text;
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return text;
+
+    const regex = new RegExp(`\\b${normalized}\\b`, 'i');
+    const match = text.match(regex);
+    if (!match || match.index === undefined) return text;
+
+    const idx = match.index;
+    const matchText = match[0];
+
     return (
       <>
         {text.slice(0, idx)}
-        <mark className="bg-yellow-200">
-          {text.slice(idx, idx + normalized.length)}
-        </mark>
-        {text.slice(idx + normalized.length)}
+        <mark className="bg-yellow-200">{matchText}</mark>
+        {text.slice(idx + matchText.length)}
       </>
     );
   };
@@ -76,18 +81,17 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   useEffect(() => {
     if (!wordsRef.current) return;
 
-    const normalized = debouncedQuery.trim();
+    const normalized = debouncedQuery.trim().toLowerCase();
     if (normalized === '') {
       setResults([]);
       setSelectedWord(null);
       return;
     }
 
-    const filtered = wordsRef.current.filter(
-      w =>
-        w.word.includes(normalized) ||
-        w.meaning.includes(normalized) ||
-        w.example.includes(normalized)
+    const filtered = wordsRef.current.filter(w =>
+      w.word
+        .split(/\s+/)
+        .some(part => part.toLowerCase() === normalized)
     );
 
     setResults(filtered);
