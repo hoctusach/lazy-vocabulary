@@ -34,27 +34,49 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
 
     const enableOnGesture = () => {
       preloadSpeech();
+      userInteractionRef.current = true;
+      try {
+        localStorage.setItem('hadUserInteraction', 'true');
+      } catch (err) {
+        console.warn('Failed to persist interaction state:', err);
+      }
       document.removeEventListener('click', enableOnGesture);
       document.removeEventListener('touchstart', enableOnGesture);
       document.removeEventListener('keydown', enableOnGesture);
+    };
+
+    const addGestureListeners = () => {
+      document.addEventListener('click', enableOnGesture);
+      document.addEventListener('touchstart', enableOnGesture);
+      document.addEventListener('keydown', enableOnGesture);
+    };
+
+    const startUnlockFlow = () => {
+      toast.error('Please tap anywhere to enable audio playback', { duration: 5000 });
+      addGestureListeners();
     };
 
     if (userInteractionRef.current) {
       preloadSpeech();
     } else {
-      toast.error('Please tap anywhere to enable audio playback', { duration: 5000 });
-      document.addEventListener('click', enableOnGesture);
-      document.addEventListener('touchstart', enableOnGesture);
-      document.addEventListener('keydown', enableOnGesture);
+      startUnlockFlow();
     }
+
+    const handleBlocked = () => {
+      userInteractionRef.current = false;
+      startUnlockFlow();
+    };
+
+    window.addEventListener('speechblocked', handleBlocked);
 
     return () => {
       document.removeEventListener('click', enableOnGesture);
       document.removeEventListener('touchstart', enableOnGesture);
       document.removeEventListener('keydown', enableOnGesture);
+      window.removeEventListener('speechblocked', handleBlocked);
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     };
-  }, [userInteractionRef]);
+  }, [userInteractionRef.current]);
 };

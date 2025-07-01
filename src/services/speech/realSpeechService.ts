@@ -26,6 +26,18 @@ class RealSpeechService {
       return false;
     }
 
+    try {
+      if (localStorage.getItem('hadUserInteraction') !== 'true') {
+        console.warn('[SPEECH] Blocked: waiting for user interaction');
+        if (options.onError) {
+          const evt = new Event('error') as SpeechSynthesisErrorEvent;
+          Object.defineProperty(evt, 'error', { value: 'not-allowed' });
+          options.onError(evt);
+        }
+        return false;
+      }
+    } catch {}
+
     if (!speechInitialized) {
       await initializeSpeechSystem();
     }
@@ -118,7 +130,15 @@ class RealSpeechService {
       };
 
       utterance.onerror = (event) => {
-        console.error("Speech error:", event.error, event);
+        console.error(
+          "[Speech ERROR]",
+          event.error,
+          text.substring(0, 60),
+          utterance.voice?.name,
+          utterance.voice?.lang,
+          "speaking:",
+          window.speechSynthesis.speaking,
+        );
         logSpeechEvent({
           timestamp: Date.now(),
           event: "error",
@@ -130,6 +150,14 @@ class RealSpeechService {
           console.log(
             `Canceled context - muted: ${options.muted}, paused: ${options.paused}, userInteracted: ${options.userInteracted}`,
           );
+        }
+        if (event.error === "not-allowed") {
+          try {
+            localStorage.setItem('hadUserInteraction', 'false');
+          } catch (e) {
+            console.warn('Failed to update interaction state after block:', e);
+          }
+          window.dispatchEvent(new Event('speechblocked'));
         }
         this.isActive = false;
         this.currentUtterance = null;
