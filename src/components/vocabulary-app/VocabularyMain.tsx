@@ -23,6 +23,7 @@ interface VocabularyMainProps {
   nextVoiceLabel: string;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
+  voiceRegion: 'US' | 'UK' | 'AU';
 }
 
 const VocabularyMain: React.FC<VocabularyMainProps> = ({
@@ -42,6 +43,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   nextVoiceLabel,
   onOpenAddModal,
   onOpenEditModal,
+  voiceRegion,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -79,6 +81,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         currentWord={currentWord}
         onOpenAddModal={onOpenAddModal}
         onOpenEditModal={onOpenEditModal}
+        voiceRegion={selectedVoice.region}
       />
     </div>
   );

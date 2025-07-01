@@ -8,6 +8,11 @@ import userEvent from '@testing-library/user-event';
 globalThis.expect = expect;
 beforeAll(async () => {
   await import('@testing-library/jest-dom');
+  (window as any).speechSynthesis = {
+    getVoices: () => [{ name: 'Test', lang: 'en-GB' }],
+    addEventListener: () => {},
+    removeEventListener: () => {}
+  };
 });
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
@@ -33,13 +38,14 @@ describe('VocabularyControlsColumn voice toggle', () => {
             onTogglePause={() => {}}
             onNextWord={() => {}}
             onSwitchCategory={() => {}}
-            onCycleVoice={toggleVoice}
-            nextCategory="next"
-            nextVoiceLabel={nextVoiceLabel}
-            currentWord={word}
-            onOpenAddModal={() => {}}
-            onOpenEditModal={() => {}}
-          />
+          onCycleVoice={toggleVoice}
+          nextCategory="next"
+          nextVoiceLabel={nextVoiceLabel}
+          currentWord={word}
+          onOpenAddModal={() => {}}
+          onOpenEditModal={() => {}}
+          voiceRegion={voiceRegion}
+        />
       );
     };
 

@@ -84,10 +84,11 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           onCycleVoice={handleCycleVoice}
           nextCategory={nextCategory || 'Next'}
           nextVoiceLabel={nextVoiceLabel}
-          currentWord={currentWord}
-          onOpenAddModal={onOpenAddModal}
-          onOpenEditModal={onOpenEditModal}
-        />
+        currentWord={currentWord}
+        onOpenAddModal={onOpenAddModal}
+        onOpenEditModal={onOpenEditModal}
+        voiceRegion={voiceRegion}
+      />
       </div>
     </div>
   );
