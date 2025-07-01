@@ -57,6 +57,11 @@ class RealSpeechService {
     // Stop any current speech
     this.stop();
 
+    // Ensure no lingering utterances remain
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      window.speechSynthesis.cancel();
+    }
+
     // Wait for voices to be loaded
     await this.ensureVoicesLoaded();
 
@@ -124,10 +129,14 @@ class RealSpeechService {
           text: text.substring(0, 60),
           voice: utterance.voice?.name,
         });
-        if (options.onEnd) {
-          options.onEnd();
-        }
-        resolve(true);
+        const finalize = () => {
+          if (options.onEnd) {
+            options.onEnd();
+          }
+          resolve(true);
+        };
+        // Wait briefly to allow speaking state to reset
+        setTimeout(finalize, 100);
       };
 
       utterance.onerror = (event) => {

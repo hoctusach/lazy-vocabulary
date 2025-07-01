@@ -44,7 +44,9 @@ class UnifiedSpeechController {
 
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       console.log('Speech engine busy, waiting to speak');
-      setTimeout(() => this.queue.unshift({ word, region, resolve }), 50);
+      this.queue.unshift({ word, region, resolve });
+      window.speechSynthesis.cancel();
+      setTimeout(() => this.processQueue(), 100);
       return;
     }
 
