@@ -113,7 +113,6 @@ export const useUtteranceSetup = ({
         if (event.error === 'not-allowed') {
           setHasSpeechPermission(false);
           if (!permissionErrorShownRef.current) {
-            toast.error("Please click anywhere on the page to enable audio playback");
             permissionErrorShownRef.current = true;
           }
           // Continue to next word even without audio
@@ -135,7 +134,7 @@ export const useUtteranceSetup = ({
         if (event.error === 'canceled' && !muted && !paused) {
           console.log('Speech canceled unexpectedly, skipping retries');
           if (!userInteractionRef.current) {
-            toast.error('Please interact with the page to enable audio playback');
+            // awaiting user interaction to enable audio
           }
           scheduleAutoAdvance(2000);
           return;

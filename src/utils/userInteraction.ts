@@ -17,28 +17,25 @@ export const resetUserInteraction = () => {
 export const hasUserInteracted = () => userInteracted;
 
 export const setupUserInteractionListeners = () => {
-  const enable = () => {
+  const enableAudio = () => {
     markUserInteraction();
-    preloadSpeech();
-    document.removeEventListener('click', enable);
-    document.removeEventListener('keydown', enable);
-    document.removeEventListener('touchstart', enable);
+    try {
+      speechSynthesis.cancel();
+      const silent = new SpeechSynthesisUtterance(' ');
+      silent.volume = 0.01;
+      speechSynthesis.speak(silent);
+    } catch (e) {
+      console.warn('Speech preload failed:', e);
+    }
+    document.removeEventListener('click', enableAudio);
+    document.removeEventListener('keydown', enableAudio);
+    document.removeEventListener('touchstart', enableAudio);
   };
 
-  document.addEventListener('click', enable);
-  document.addEventListener('keydown', enable);
-  document.addEventListener('touchstart', enable);
+  document.addEventListener('click', enableAudio);
+  document.addEventListener('keydown', enableAudio);
+  document.addEventListener('touchstart', enableAudio);
 };
 
 export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 export const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-
-const preloadSpeech = () => {
-  try {
-    const u = new SpeechSynthesisUtterance(' ');
-    u.volume = 0.01;
-    window.speechSynthesis.speak(u);
-  } catch (e) {
-    console.warn('Speech preload failed:', e);
-  }
-};

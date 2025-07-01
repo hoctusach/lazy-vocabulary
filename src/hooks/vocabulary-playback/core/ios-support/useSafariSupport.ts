@@ -52,7 +52,6 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
     };
 
     const startUnlockFlow = () => {
-      toast.error('Please tap anywhere to enable audio playback', { duration: 5000 });
       addGestureListeners();
     };
 
