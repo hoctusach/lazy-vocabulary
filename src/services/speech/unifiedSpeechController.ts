@@ -11,12 +11,12 @@ interface SpeechGuardResult {
 class UnifiedSpeechController {
   private wordCompleteCallback: (() => void) | null = null;
   private isMutedState = false;
-  private queue: Array<{ word: VocabularyWord; region: 'US' | 'UK' | 'AU'; resolve: (v: boolean) => void }> = [];
+  private queue: Array<{ word: VocabularyWord; voiceName: string; resolve: (v: boolean) => void }> = [];
   private isSpeaking = false;
 
   async speak(
     word: VocabularyWord,
-    region: 'US' | 'UK' | 'AU' = 'US'
+    voiceName: string
   ): Promise<boolean> {
     return new Promise(resolve => {
       if (this.isMutedState) {
@@ -28,7 +28,7 @@ class UnifiedSpeechController {
         return;
       }
 
-      this.queue.push({ word, region, resolve });
+      this.queue.push({ word, voiceName, resolve });
       this.processQueue();
     });
   }
@@ -36,7 +36,7 @@ class UnifiedSpeechController {
   private processQueue(): void {
     if (this.isSpeaking || this.queue.length === 0) return;
 
-    const { word, region, resolve } = this.queue.shift()!;
+    const { word, voiceName, resolve } = this.queue.shift()!;
     const parts = [word.word, word.meaning, word.example]
       .filter(Boolean)
       .map(part => part.trim());
@@ -44,20 +44,20 @@ class UnifiedSpeechController {
 
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       console.log('Speech engine busy, waiting to speak');
-      this.queue.unshift({ word, region, resolve });
+      this.queue.unshift({ word, voiceName, resolve });
       window.speechSynthesis.cancel();
       setTimeout(() => this.processQueue(), 100);
       return;
     }
 
-    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
+    console.log('UnifiedSpeechController: Speaking word:', word.word, 'with voice:', voiceName);
     console.log('Selected speech rate:', getSpeechRate());
     console.log('Queue length:', this.queue.length);
 
     this.isSpeaking = true;
 
     realSpeechService.speak(text, {
-      voiceRegion: region,
+      voiceName,
       onStart: () => {
         console.log('Word speech started:', word.word);
       },

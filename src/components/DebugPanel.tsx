@@ -4,7 +4,7 @@ import { vocabularyService } from '@/services/vocabularyService';
 
 interface DebugPanelProps {
   isMuted: boolean;
-  voiceRegion: 'US' | 'UK' | 'AU';
+  selectedVoiceName: string;
   isPaused: boolean;
   currentWord?: {
     word: string;
@@ -14,7 +14,7 @@ interface DebugPanelProps {
 
 const DebugPanel: React.FC<DebugPanelProps> = ({
   isMuted,
-  voiceRegion,
+  selectedVoiceName,
   isPaused,
   currentWord
 }) => {
@@ -35,7 +35,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({
       <pre>
         {`DEBUG:
 Audio: ${isMuted ? 'MUTED' : 'UNMUTED'}
-Accent: ${voiceRegion}
+Voice: ${selectedVoiceName}
 State: ${isPaused ? 'PAUSED' : 'PLAYING'}
 UI Category: ${currentCategory}
 Word Category: ${currentWord?.category || 'N/A'}

@@ -107,8 +107,7 @@ characters intact when preparing text for speech.
 
 ## Voice Settings
 
-The controls panel includes a "Change Voice" button. Clicking it cycles through all voices returned by `speechSynthesis.getVoices()`.
-Your selected voice name is saved in `localStorage` so it persists between sessions.
+The controls panel includes a single **Change Voice** button. Clicking it cycles through the voices available on the current device via `speechSynthesis.getVoices()`. The chosen voice name is stored in `localStorage` so it persists between sessions and is loaded on start.
 
 ## Word display
 

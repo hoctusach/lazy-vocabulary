@@ -8,7 +8,7 @@ import { logSpeechEvent } from "@/utils/speechLogger";
 import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 
 interface SpeechOptions {
-  voiceRegion: "US" | "UK" | "AU";
+  voiceName?: string;
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (error: SpeechSynthesisErrorEvent) => void;
@@ -47,7 +47,7 @@ class RealSpeechService {
       timestamp: Date.now(),
       event: "speak-attempt",
       text: text.substring(0, 60),
-      voice: options.voiceRegion,
+      voice: options.voiceName,
     });
     console.log(
       "RealSpeechService: Starting speech for:",
@@ -68,20 +68,21 @@ class RealSpeechService {
     return new Promise((resolve) => {
       const utterance = new SpeechSynthesisUtterance(text);
 
-      // Set voice based on region
-      const voice = this.findVoiceByRegion(options.voiceRegion);
+      // Set voice by name when provided
+      const allVoices = speechSynthesis.getVoices();
+      const voice = options.voiceName
+        ? allVoices.find(v => v.name === options.voiceName) || null
+        : null;
       if (voice) {
         utterance.voice = voice;
         console.log(
           "Using voice:",
           voice.name,
-          "for region:",
-          options.voiceRegion,
         );
       } else {
         console.warn(
-          "No suitable voice found for region:",
-          options.voiceRegion,
+          "No voice found with name:",
+          options.voiceName,
         );
       }
 
@@ -249,59 +250,6 @@ class RealSpeechService {
     return this.currentUtterance;
   }
 
-  private findVoiceByRegion(
-    region: "US" | "UK" | "AU",
-  ): SpeechSynthesisVoice | null {
-    const voices = window.speechSynthesis.getVoices();
-
-    if (voices.length === 0) {
-      console.warn("No voices available");
-      return null;
-    }
-
-    console.log(
-      "Available voices:",
-      voices.map((v) => `${v.name} (${v.lang})`),
-    );
-
-    const regionPatterns = {
-      US: ["en-US", "en_US"],
-      UK: ["en-GB", "en_GB"],
-      AU: ["en-AU", "en_AU"],
-    };
-
-    const patterns = regionPatterns[region];
-
-    // First try to find exact language matches
-    for (const pattern of patterns) {
-      const voice = voices.find(
-        (v) => v.lang === pattern || v.lang.startsWith(pattern.substring(0, 5)),
-      );
-      if (voice) {
-        console.log(`Found ${region} voice:`, voice.name, voice.lang);
-        return voice;
-      }
-    }
-
-    // Fallback to any English voice
-    const englishVoice = voices.find((v) => v.lang.startsWith("en"));
-    if (englishVoice) {
-      console.log(
-        `Using fallback English voice for ${region}:`,
-        englishVoice.name,
-      );
-      return englishVoice;
-    }
-
-    // Last resort - use first available voice
-    if (voices.length > 0) {
-      console.log(`Using first available voice for ${region}:`, voices[0].name);
-      return voices[0];
-    }
-
-    console.warn(`No suitable voice found for region ${region}`);
-    return null;
-  }
 }
 
 export const realSpeechService = new RealSpeechService();

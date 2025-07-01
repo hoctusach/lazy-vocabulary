@@ -17,19 +17,18 @@ beforeAll(async () => {
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
-type Region = 'US' | 'UK' | 'AU';
-
 describe('VocabularyControlsColumn voice toggle', () => {
   it('cycles voice label and updates state', async () => {
     const word: VocabularyWord = { word: 'water', meaning: 'H2O', example: 'Drink', category: 'general' };
-    const controllerState = { voiceRegion: 'UK' as Region };
+    const voices = ['Voice 1', 'Voice 2'];
+    const controllerState = { voiceName: voices[0] };
     const Wrapper: React.FC = () => {
-      const [voiceRegion, setVoiceRegion] = React.useState<Region>(controllerState.voiceRegion);
+      const [voiceName, setVoiceName] = React.useState(controllerState.voiceName);
       React.useEffect(() => {
-        controllerState.voiceRegion = voiceRegion;
-      }, [voiceRegion]);
-      const nextVoiceLabel = voiceRegion === 'UK' ? 'US' : voiceRegion === 'US' ? 'AU' : 'UK';
-      const toggleVoice = () => setVoiceRegion(r => (r === 'UK' ? 'US' : r === 'US' ? 'AU' : 'UK'));
+        controllerState.voiceName = voiceName;
+      }, [voiceName]);
+      const nextVoiceLabel = voiceName === voices[0] ? voices[1] : voices[0];
+      const toggleVoice = () => setVoiceName(v => (v === voices[0] ? voices[1] : voices[0]));
       return (
           <VocabularyControlsColumn
             isMuted={false}
@@ -38,25 +37,24 @@ describe('VocabularyControlsColumn voice toggle', () => {
             onTogglePause={() => {}}
             onNextWord={() => {}}
             onSwitchCategory={() => {}}
-          onCycleVoice={toggleVoice}
-          nextCategory="next"
-          nextVoiceLabel={nextVoiceLabel}
-          currentWord={word}
-          onOpenAddModal={() => {}}
-          onOpenEditModal={() => {}}
-          voiceRegion={voiceRegion}
-        />
+            onCycleVoice={toggleVoice}
+            nextCategory="next"
+            selectedVoiceName={voiceName}
+            currentWord={word}
+            onOpenAddModal={() => {}}
+            onOpenEditModal={() => {}}
+          />
       );
     };
 
     render(<Wrapper />);
 
-    const toggleBtn = screen.getByRole('button', { name: 'US' });
-    expect(controllerState.voiceRegion).toBe('UK');
+    const toggleBtn = screen.getByRole('button', { name: voices[1] });
+    expect(controllerState.voiceName).toBe(voices[0]);
 
     await userEvent.click(toggleBtn);
 
-    expect(screen.getByRole('button', { name: 'AU' })).toBeInTheDocument();
-    expect(controllerState.voiceRegion).toBe('US');
+    expect(screen.getByRole('button', { name: voices[0] })).toBeInTheDocument();
+    expect(controllerState.voiceName).toBe(voices[1]);
   });
 });
