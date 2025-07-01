@@ -32,9 +32,34 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
 
 export const logAvailableVoices = () => {
   const voices = window.speechSynthesis.getVoices();
-  console.log('Available voices:', voices.map(v => ({
+
+  if (voices.length === 0) {
+    console.warn('[Voices] No voices available (yet). Waiting for voiceschanged event.');
+    return;
+  }
+
+  const voiceInfo = voices.map(v => ({
     name: v.name,
     lang: v.lang,
-    default: v.default
-  })));
+    default: v.default,
+    localService: v.localService,
+  }));
+
+  console.log('[Voices] Available voices:', voiceInfo);
+};
+
+export const initializeVoiceLogging = () => {
+  const logHandler = () => {
+    console.log('[Voices] voiceschanged event triggered');
+    logAvailableVoices();
+  };
+
+  // Log immediately on init
+  logAvailableVoices();
+
+  if ('addEventListener' in window.speechSynthesis) {
+    window.speechSynthesis.addEventListener('voiceschanged', logHandler);
+  } else {
+    window.speechSynthesis.onvoiceschanged = logHandler;
+  }
 };
