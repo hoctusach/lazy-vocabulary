@@ -28,8 +28,9 @@ export const useUnifiedVocabularyController = () => {
     setIsPaused,
     isMuted,
     setIsMuted,
-    voiceRegion,
-    setVoiceRegion,
+    selectedVoiceName,
+    setSelectedVoiceName,
+    allVoices,
     currentWord,
     isTransitioningRef,
     lastWordChangeRef
@@ -45,7 +46,7 @@ export const useUnifiedVocabularyController = () => {
   const {
     speechState,
     playCurrentWord
-  } = useSpeechIntegration(currentWord, voiceRegion, isPaused, isMuted, isTransitioningRef);
+  } = useSpeechIntegration(currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef);
 
   // Word navigation with proper state management
   const {
@@ -75,7 +76,7 @@ export const useUnifiedVocabularyController = () => {
     if (nextWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
       if (!isMuted && !isPaused) {
-        unifiedSpeechController.speak(nextWord, voiceRegion);
+        unifiedSpeechController.speak(nextWord, selectedVoiceName);
       }
     }
 
@@ -88,7 +89,7 @@ export const useUnifiedVocabularyController = () => {
     setCurrentIndex,
     isMuted,
     isPaused,
-    voiceRegion,
+    selectedVoiceName,
     clearAutoAdvanceTimer
   ]);
 
@@ -103,8 +104,9 @@ export const useUnifiedVocabularyController = () => {
     setIsPaused,
     isMuted,
     setIsMuted,
-    voiceRegion,
-    setVoiceRegion,
+    allVoices,
+    selectedVoiceName,
+    setSelectedVoiceName,
     speechState
   );
 
@@ -113,7 +115,7 @@ export const useUnifiedVocabularyController = () => {
     setWordList,
     setHasData,
     setCurrentIndex,
-    voiceRegion,
+    selectedVoiceName,
     clearAutoAdvanceTimer
   );
 
@@ -173,7 +175,8 @@ export const useUnifiedVocabularyController = () => {
     // Control state
     isPaused,
     isMuted,
-    voiceRegion,
+    selectedVoiceName,
+    allVoices,
     isSpeaking: speechState.isActive,
 
     // Actions

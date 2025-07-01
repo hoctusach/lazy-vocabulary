@@ -1,45 +1,31 @@
 import { useState, useEffect } from 'react';
-import { VOICE_SETTINGS_KEY } from '@/utils/storageKeys';
 
-export type VoiceRegion = 'US' | 'UK' | 'AU';
-
-interface VoiceContext {
-  voiceRegion: VoiceRegion;
-  setVoiceRegion: (region: VoiceRegion) => void;
+export interface VoiceContext {
+  allVoices: SpeechSynthesisVoice[];
+  selectedVoiceName: string;
+  setSelectedVoiceName: (name: string) => void;
 }
 
 export const useVoiceContext = (): VoiceContext => {
-  const loadSettings = () => {
-    try {
-      const raw = localStorage.getItem(VOICE_SETTINGS_KEY);
-      if (raw) {
-        return JSON.parse(raw) as { voiceRegion?: VoiceRegion };
-      }
-    } catch (err) {
-      console.error('Failed to load voice settings', err);
-    }
-    return {};
-  };
-
-  const saved = loadSettings();
-  const defaultRegion: VoiceRegion = saved.voiceRegion || 'UK';
-
-  const [voiceRegion, setVoiceRegionState] = useState<VoiceRegion>(defaultRegion);
+  const [allVoices, setAllVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [selectedVoiceName, setSelectedVoiceName] = useState(
+    localStorage.getItem('selectedVoiceName') || ''
+  );
 
   useEffect(() => {
-    try {
-      localStorage.setItem(
-        VOICE_SETTINGS_KEY,
-        JSON.stringify({ voiceRegion })
-      );
-    } catch (err) {
-      console.error('Failed to save voice settings', err);
+    const loadVoices = () => setAllVoices(window.speechSynthesis.getVoices());
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    loadVoices();
+    return () => {
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedVoiceName) {
+      localStorage.setItem('selectedVoiceName', selectedVoiceName);
     }
-  }, [voiceRegion]);
+  }, [selectedVoiceName]);
 
-  const setVoiceRegion = (region: VoiceRegion) => {
-    setVoiceRegionState(region);
-  };
-
-  return { voiceRegion, setVoiceRegion };
+  return { allVoices, selectedVoiceName, setSelectedVoiceName };
 };

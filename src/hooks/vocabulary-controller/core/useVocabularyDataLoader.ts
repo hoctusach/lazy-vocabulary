@@ -13,20 +13,20 @@ export const useVocabularyDataLoader = (
   setWordList: (words: VocabularyWord[]) => void,
   setHasData: (hasData: boolean) => void,
   setCurrentIndex: (index: number) => void,
-  voiceRegion: 'US' | 'UK' | 'AU',
+  selectedVoiceName: string,
   clearAutoAdvanceTimer: () => void
 ) => {
-  // Persist voice region whenever it changes
+  // Persist selected voice whenever it changes
   useEffect(() => {
     try {
       const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const states = storedStates ? JSON.parse(storedStates) : {};
-      states.voiceRegion = voiceRegion;
+      states.selectedVoiceName = selectedVoiceName;
       localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
     } catch (error) {
-      console.error('Error saving voice region to localStorage:', error);
+      console.error('Error saving voice to localStorage:', error);
     }
-  }, [voiceRegion]);
+  }, [selectedVoiceName]);
 
   // Load initial data
   useEffect(() => {

@@ -19,7 +19,8 @@ const VocabularyAppContainerNew: React.FC = () => {
     currentCategory,
     isPaused,
     isMuted,
-    voiceRegion,
+    selectedVoiceName,
+    allVoices,
     isSpeaking,
     goToNextAndSpeak,
     togglePause,
@@ -28,7 +29,6 @@ const VocabularyAppContainerNew: React.FC = () => {
     switchCategory,
     playCurrentWord,
     userInteractionState,
-    nextVoiceLabel,
     nextCategory,
     handleInteractionUpdate
   } = useStableVocabularyState();
@@ -104,8 +104,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextCategory={nextCategory}
             isSpeaking={false}
             category="No Data"
-            voiceRegion={voiceRegion}
-            nextVoiceLabel={nextVoiceLabel}
+            selectedVoiceName={selectedVoiceName}
           />
         </div>
         </VocabularyLayout>
@@ -137,8 +136,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextCategory={nextCategory}
             isSpeaking={false}
             category={currentCategory}
-            voiceRegion={voiceRegion}
-            nextVoiceLabel={nextVoiceLabel}
+            selectedVoiceName={selectedVoiceName}
           />
         </div>
         </VocabularyLayout>
@@ -170,8 +168,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             nextCategory={nextCategory}
             isSpeaking={false}
             category="Loading"
-            voiceRegion={voiceRegion}
-            nextVoiceLabel={nextVoiceLabel}
+            selectedVoiceName={selectedVoiceName}
           />
         </div>
       </VocabularyLayout>
@@ -195,14 +192,13 @@ const VocabularyAppContainerNew: React.FC = () => {
             toggleMute={toggleMute}
             handleTogglePause={togglePause}
             handleCycleVoice={toggleVoice}
-            nextVoiceLabel={nextVoiceLabel}
             handleSwitchCategory={switchCategory}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSpeaking={isSpeaking}
             handleManualNext={goToNextAndSpeak}
             displayTime={5000}
-            voiceRegion={voiceRegion}
+            selectedVoiceName={selectedVoiceName}
             debugPanelData={debugData}
             isAddWordModalOpen={isAddWordModalOpen}
             handleCloseModal={handleCloseModal}
@@ -235,14 +231,13 @@ const VocabularyAppContainerNew: React.FC = () => {
           toggleMute={toggleMute}
           handleTogglePause={togglePause}
           handleCycleVoice={toggleVoice}
-          nextVoiceLabel={nextVoiceLabel}
           handleSwitchCategory={switchCategory}
           currentCategory={currentCategory}
           nextCategory={nextCategory}
           isSpeaking={isSpeaking}
           handleManualNext={goToNextAndSpeak}
           displayTime={5000}
-          voiceRegion={voiceRegion}
+          selectedVoiceName={selectedVoiceName}
           debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}

@@ -16,8 +16,9 @@ export const useVocabularyState = () => {
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const {
-    voiceRegion,
-    setVoiceRegion
+    allVoices,
+    selectedVoiceName,
+    setSelectedVoiceName
   } = useVoiceContext();
 
   // Derived state - calculate currentWord safely
@@ -39,8 +40,9 @@ export const useVocabularyState = () => {
     setIsPaused,
     isMuted,
     setIsMuted,
-    voiceRegion,
-    setVoiceRegion,
+    selectedVoiceName,
+    setSelectedVoiceName,
+    allVoices,
     currentWord,
     
     // Refs

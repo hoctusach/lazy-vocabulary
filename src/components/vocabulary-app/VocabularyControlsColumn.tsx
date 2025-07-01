@@ -11,7 +11,7 @@ import WordSearchModal from './WordSearchModal';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
-import { useRegionVoices } from '@/hooks/useRegionVoices';
+import { useVoiceContext } from '@/hooks/useVoiceContext';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -22,11 +22,10 @@ interface VocabularyControlsColumnProps {
   onSwitchCategory: () => void;
   onCycleVoice: () => void;
   nextCategory: string;
-  nextVoiceLabel: string;
   currentWord: VocabularyWord | null;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
-  voiceRegion: 'US' | 'UK' | 'AU';
+  selectedVoiceName: string;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -38,14 +37,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onSwitchCategory,
   onCycleVoice,
   nextCategory,
-  nextVoiceLabel,
   currentWord,
   onOpenAddModal,
   onOpenEditModal,
-  voiceRegion
+  selectedVoiceName
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
-  const regionVoices = useRegionVoices(voiceRegion);
+  const { allVoices } = useVoiceContext();
   const safeNextCategory = nextCategory || 'Next';
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
   const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
@@ -70,12 +68,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const handleCycleVoice = () => {
-    if (regionVoices.length === 0) {
-      toast.warning('No voices available for this region');
+    if (allVoices.length === 0) {
+      toast.warning('No voices available');
       return;
     }
     onCycleVoice();
-    toast(`Voice changed to ${nextVoiceLabel}`);
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -135,15 +132,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleCycleVoice}
         className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50"
-        title={
-          regionVoices.length === 0
-            ? 'No voices available for this region'
-            : `Change to ${nextVoiceLabel}`
-        }
-        disabled={regionVoices.length === 0}
-        aria-label={nextVoiceLabel}
+        title={allVoices.length === 0 ? 'No voices available' : `Change Voice`}
+        disabled={allVoices.length === 0}
+        aria-label="Change Voice"
       >
-        <Speaker size={16} />
+        <Speaker size={16} /> {selectedVoiceName || 'Default'}
       </Button>
 
       <SpeechRateControl rate={speechRate} onChange={setSpeechRate} />

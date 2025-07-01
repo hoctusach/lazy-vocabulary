@@ -107,8 +107,8 @@ characters intact when preparing text for speech.
 
 ## Voice Settings
 
-The controls panel includes a speaker button that cycles through the available voice regions (US, UK, AU).
-Your last selection is stored in `localStorage` under the `vocabularySettings` key so the chosen region persists between sessions.
+The controls panel includes a "Change Voice" button. Clicking it cycles through all voices returned by `speechSynthesis.getVoices()`.
+Your selected voice name is saved in `localStorage` so it persists between sessions.
 
 ## Word display
 
