@@ -2,6 +2,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { initializeSpeechSystem } from '@/utils/speech';
+import {
+  setupUserInteractionListeners,
+  markUserInteraction,
+  resetUserInteraction
+} from '@/utils/userInteraction';
 
 interface UseEnhancedUserInteractionProps {
   onUserInteraction?: () => void;
@@ -21,7 +26,8 @@ export const useEnhancedUserInteraction = ({
   const [isAudioUnlocked, setIsAudioUnlocked] = useState(false);
 
   const handleInteraction = useCallback(async () => {
-    setInteractionCount((c) => c + 1);
+    setInteractionCount(c => c + 1);
+    markUserInteraction();
     if (!hasInitialized || !isAudioUnlocked) {
       await initializeSpeechSystem();
       if (!hasInitialized) {
@@ -29,16 +35,12 @@ export const useEnhancedUserInteraction = ({
       }
     }
     setIsAudioUnlocked(true);
-    try {
-      localStorage.setItem('hadUserInteraction', 'true');
-    } catch (err) {
-      console.warn('Failed to persist interaction state:', err);
-    }
     onUserInteraction?.();
     playCurrentWord?.();
   }, [hasInitialized, isAudioUnlocked, onUserInteraction, playCurrentWord]);
 
   useEffect(() => {
+    setupUserInteractionListeners();
     const listener = () => handleInteraction();
     document.addEventListener('click', listener);
     document.addEventListener('touchstart', listener);
@@ -62,11 +64,7 @@ export const useEnhancedUserInteraction = ({
     const blocked = () => {
       setIsAudioUnlocked(false);
       setHasInitialized(false);
-      try {
-        localStorage.setItem('hadUserInteraction', 'false');
-      } catch (err) {
-        console.warn('Failed to reset interaction state:', err);
-      }
+      resetUserInteraction();
     };
     const resume = () => handleInteraction();
     window.addEventListener('speechblocked', blocked);

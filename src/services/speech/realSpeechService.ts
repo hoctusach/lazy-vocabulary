@@ -5,6 +5,7 @@ import {
   speechInitialized,
 } from "@/utils/speech/core/modules/speechInit";
 import { logSpeechEvent } from "@/utils/speechLogger";
+import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 
 interface SpeechOptions {
   voiceRegion: "US" | "UK" | "AU";
@@ -27,7 +28,7 @@ class RealSpeechService {
     }
 
     try {
-      if (localStorage.getItem('hadUserInteraction') !== 'true') {
+      if (localStorage.getItem('hadUserInteraction') !== 'true' || !hasUserInteracted()) {
         console.warn('[SPEECH] Blocked: waiting for user interaction');
         if (options.onError) {
           const evt = new Event('error') as SpeechSynthesisErrorEvent;
@@ -152,11 +153,7 @@ class RealSpeechService {
           );
         }
         if (event.error === "not-allowed") {
-          try {
-            localStorage.setItem('hadUserInteraction', 'false');
-          } catch (e) {
-            console.warn('Failed to update interaction state after block:', e);
-          }
+          resetUserInteraction();
           window.dispatchEvent(new Event('speechblocked'));
         }
         this.isActive = false;

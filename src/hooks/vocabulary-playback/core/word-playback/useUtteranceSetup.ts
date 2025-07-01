@@ -25,10 +25,6 @@ export const useUtteranceSetup = ({
   paused,
   incrementRetryAttempts,
   userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
 }) => {
   // If we've already exceeded the retry limit, log and advance once
   if (retryCount > maxRetries) {
@@ -173,10 +169,6 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
               });
             }
           }, 500);
@@ -229,10 +221,6 @@ export const useUtteranceSetup = ({
                 paused,
                 incrementRetryAttempts,
                 userInteractionRef
-<<<<<<< codex/enhance-logging-for-autoplay-issues
-=======
-
->>>>>>> main
               });
             } else {
               // If we've tried enough times, move on

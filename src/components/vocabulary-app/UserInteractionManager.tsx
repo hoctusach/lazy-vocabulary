@@ -2,6 +2,7 @@
 import React, { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useEnhancedUserInteraction } from '@/hooks/vocabulary-app/useEnhancedUserInteraction';
+import EnableAudioButton from './EnableAudioButton';
 
 interface UserInteractionManagerProps {
   currentWord: VocabularyWord | null;
@@ -36,6 +37,14 @@ const UserInteractionManager: React.FC<UserInteractionManagerProps> = ({
       onInteractionUpdate({ hasInitialized, interactionCount, isAudioUnlocked });
     }
   }, [hasInitialized, interactionCount, isAudioUnlocked, onInteractionUpdate]);
+
+  if (!isAudioUnlocked) {
+    return (
+      <div className="my-2 text-center">
+        <EnableAudioButton onEnable={playCurrentWord} />
+      </div>
+    );
+  }
 
   return null; // This component only manages state
 };
