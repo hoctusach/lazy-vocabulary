@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { useVocabularyState } from './core/useVocabularyState';
@@ -59,6 +59,38 @@ export const useUnifiedVocabularyController = () => {
     lastWordChangeRef,
     clearAutoAdvanceTimer
   );
+
+  const goToNextAndSpeak = useCallback(() => {
+    const now = Date.now();
+    if (isTransitioningRef.current) return;
+    if (now - lastWordChangeRef.current < 300) return;
+    lastWordChangeRef.current = now;
+    isTransitioningRef.current = true;
+    clearAutoAdvanceTimer();
+    unifiedSpeechController.stop();
+
+    const nextIndex = (currentIndex + 1) % wordList.length;
+    setCurrentIndex(nextIndex);
+    const nextWord = wordList[nextIndex];
+    if (nextWord) {
+      saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
+      if (!isMuted && !isPaused) {
+        unifiedSpeechController.speak(nextWord, voiceRegion);
+      }
+    }
+
+    setTimeout(() => {
+      isTransitioningRef.current = false;
+    }, 200);
+  }, [
+    currentIndex,
+    wordList.length,
+    setCurrentIndex,
+    isMuted,
+    isPaused,
+    voiceRegion,
+    clearAutoAdvanceTimer
+  ]);
 
   // Control actions with simplified parameters
   const {
@@ -143,9 +175,10 @@ export const useUnifiedVocabularyController = () => {
     isMuted,
     voiceRegion,
     isSpeaking: speechState.isActive,
-    
+
     // Actions
     goToNext,
+    goToNextAndSpeak,
     togglePause,
     toggleMute,
     toggleVoice,
