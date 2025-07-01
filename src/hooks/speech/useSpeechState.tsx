@@ -12,7 +12,7 @@ export const useSpeechState = () => {
   // Function to stop current speech
   const stopSpeakingLocal = useCallback(() => {
     // Cancel any ongoing speech synthesis
-    if (window.speechSynthesis) {
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
     

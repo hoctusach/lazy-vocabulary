@@ -1,16 +1,23 @@
 let userInteracted = false;
 
+export const loadUserInteractionState = () => {
+  try {
+    userInteracted = localStorage.getItem('speechUnlocked') === 'true';
+  } catch {}
+  return userInteracted;
+};
+
 export const markUserInteraction = () => {
   userInteracted = true;
   try {
-    localStorage.setItem('hadUserInteraction', 'true');
+    localStorage.setItem('speechUnlocked', 'true');
   } catch {}
 };
 
 export const resetUserInteraction = () => {
   userInteracted = false;
   try {
-    localStorage.setItem('hadUserInteraction', 'false');
+    localStorage.setItem('speechUnlocked', 'false');
   } catch {}
 };
 
@@ -18,23 +25,28 @@ export const hasUserInteracted = () => userInteracted;
 
 export const setupUserInteractionListeners = () => {
   const enableAudio = () => {
+    if (userInteracted) return;
     markUserInteraction();
     try {
-      speechSynthesis.cancel();
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+      }
       const silent = new SpeechSynthesisUtterance(' ');
       silent.volume = 0.01;
       speechSynthesis.speak(silent);
     } catch (e) {
       console.warn('Speech preload failed:', e);
     }
-    document.removeEventListener('click', enableAudio);
-    document.removeEventListener('keydown', enableAudio);
-    document.removeEventListener('touchstart', enableAudio);
   };
 
-  document.addEventListener('click', enableAudio);
-  document.addEventListener('keydown', enableAudio);
-  document.addEventListener('touchstart', enableAudio);
+  if (userInteracted) {
+    enableAudio();
+    return;
+  }
+
+  document.addEventListener('click', enableAudio, { once: true });
+  document.addEventListener('keydown', enableAudio, { once: true });
+  document.addEventListener('touchstart', enableAudio, { once: true });
 };
 
 export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

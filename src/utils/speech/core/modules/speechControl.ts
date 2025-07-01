@@ -13,7 +13,7 @@ export const stopSpeaking = (): void => {
     pending: window.speechSynthesis?.pending
   });
   
-  if (window.speechSynthesis) {
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
     window.speechSynthesis.cancel();
     console.log('[ENGINE] Speech stopped');
   }
