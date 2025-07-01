@@ -38,3 +38,7 @@ export const hasAvailableVoices = (): boolean => {
     return false;
   }
 };
+
+export const getAllAvailableVoices = (): SpeechSynthesisVoice[] => {
+  return window.speechSynthesis.getVoices();
+};

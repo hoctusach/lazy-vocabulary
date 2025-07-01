@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { getSpeechRate } from './speechSettings';
-import { getVoiceByRegion } from '../voiceUtils';
 import { stopSpeaking } from './speechEngine';
 import { calculateSpeechDuration } from '../durationUtils';
 import { splitTextIntoChunks } from './textChunker';
@@ -9,7 +8,7 @@ import { createSpeechMonitor, clearSpeechMonitor, SpeechMonitorRefs } from './sp
 
 interface SpeakWithVoiceParams {
   utterance: SpeechSynthesisUtterance;
-  region: 'US' | 'UK' | 'AU';
+  voice: SpeechSynthesisVoice | null;
   text: string;
   processedText: string;
   onComplete: () => void;
@@ -19,7 +18,7 @@ interface SpeakWithVoiceParams {
 
 export async function speakWithVoice({
   utterance,
-  region,
+  voice,
   text,
   processedText,
   onComplete,
@@ -37,20 +36,19 @@ export async function speakWithVoice({
   console.log(`[VOICE] Waiting ${domUpdateDelay}ms for DOM updates`);
   await new Promise(resolve => setTimeout(resolve, domUpdateDelay));
   
-  // Use the correct language code based on the selected region
-  const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
-  console.log(`[VOICE] Using ${region} voice (${langCode})`);
+  // Determine language from the selected voice when available
+  const langCode = voice?.lang || 'en-US';
+  console.log(`[VOICE] Using voice ${voice?.name || 'default'} (${langCode})`);
   
   // First wait for voices to load (addressing the not-allowed error)
   await new Promise(resolve => setTimeout(resolve, 0));
   window.speechSynthesis.getVoices(); // Trigger loading of voices
   
-  // Specifically get a voice for the selected region
-  const voice = getVoiceByRegion(region);
+  // voice is provided directly; log if missing
   if (voice) {
     console.log(`[VOICE] Selected voice: ${voice.name} (${voice.lang})`);
   } else {
-    console.warn(`[VOICE] No ${region} voice found, will use default`);
+    console.warn('[VOICE] No voice specified, will use default');
   }
   
   // Split text into smaller chunks for better mobile compatibility

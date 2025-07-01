@@ -1,10 +1,8 @@
 
-import { getVoiceByRegion } from '../voiceUtils';
 import { getSpeechPitch, getSpeechVolume, getSpeechRate } from './speechSettings';
 
-export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 'US' | 'UK' | 'AU'): void => {
-  const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
-  const voice = getVoiceByRegion(region);
+export const configureUtterance = (utterance: SpeechSynthesisUtterance, voice: SpeechSynthesisVoice | null): void => {
+  const langCode = voice?.lang || 'en-US';
   
   if (voice) {
     console.log(`Found voice: ${voice.name} (${voice.lang})`);

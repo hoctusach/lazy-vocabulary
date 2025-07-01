@@ -10,8 +10,8 @@ import {
 } from './speechPlayerUtils';
 
 export const speak = (
-  text: string, 
-  region: 'US' | 'UK' | 'AU' = 'US', 
+  text: string,
+  voice: SpeechSynthesisVoice | null,
   pauseRequestedRef?: React.MutableRefObject<boolean>
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -51,7 +51,7 @@ export const speak = (
         try {
           await speakWithVoice({
             utterance,
-            region,
+            voice,
             text,
             processedText,
             pauseRequestedRef,
