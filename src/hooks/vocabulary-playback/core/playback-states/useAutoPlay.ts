@@ -71,7 +71,6 @@ export const useAutoPlay = (
       
       // Double-check conditions before playing
       if (!hasUserInteracted()) {
-        toast.error('Tap to enable audio playback');
         return;
       }
       if (!muted && !paused && !speechController.isActive()) {
