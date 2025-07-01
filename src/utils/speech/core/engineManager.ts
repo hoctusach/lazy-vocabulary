@@ -1,7 +1,6 @@
 
 import { getVoiceByRegion } from '../voiceUtils';
-import { getSpeechPitch, getSpeechVolume } from './speechSettings';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechPitch, getSpeechVolume, getSpeechRate } from './speechSettings';
 
 export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 'US' | 'UK' | 'AU'): void => {
   const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
@@ -16,7 +15,7 @@ export const configureUtterance = (utterance: SpeechSynthesisUtterance, region: 
     utterance.lang = langCode;
   }
   
-  utterance.rate = DEFAULT_SPEECH_RATE;
+  utterance.rate = getSpeechRate();
   utterance.pitch = getSpeechPitch();
   utterance.volume = getSpeechVolume();
   

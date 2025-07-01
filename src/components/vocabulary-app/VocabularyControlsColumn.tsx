@@ -2,6 +2,8 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker, Search } from 'lucide-react';
+import SpeechRateControl from './SpeechRateControl';
+import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
 import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
@@ -39,6 +41,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenAddModal,
   onOpenEditModal,
 }) => {
+  const { speechRate, setSpeechRate } = useSpeechRate();
   const safeNextCategory = nextCategory || 'Next';
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
   const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
@@ -130,6 +133,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Speaker size={16} />
       </Button>
 
+      <SpeechRateControl rate={speechRate} onChange={setSpeechRate} />
 
       <EditWordButton onClick={onOpenEditModal} disabled={!currentWord} />
       <AddWordButton onClick={onOpenAddModal} />

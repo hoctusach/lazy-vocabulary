@@ -1,6 +1,6 @@
 
 import { toast } from 'sonner';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 
 /**
@@ -64,7 +64,7 @@ export const useUtteranceSetup = ({
       let fallbackTimer: number | null = null;
 
       // Set speech parameters for better clarity
-      utterance.rate = DEFAULT_SPEECH_RATE;
+      utterance.rate = getSpeechRate();
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
