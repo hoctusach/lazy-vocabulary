@@ -2,6 +2,8 @@
 import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { speechController } from '@/utils/speech/core/speechController';
+import { hasUserInteracted } from '@/utils/userInteraction';
+import { toast } from 'sonner';
 
 /**
  * Hook for auto-playing the current word when it changes
@@ -68,6 +70,10 @@ export const useAutoPlay = (
       autoPlayTimeoutRef.current = null;
       
       // Double-check conditions before playing
+      if (!hasUserInteracted()) {
+        toast.error('Tap to enable audio playback');
+        return;
+      }
       if (!muted && !paused && !speechController.isActive()) {
         console.log(`[AUTO-PLAY] Executing auto-play for: ${currentWord.word}`);
         playCurrentWord();
