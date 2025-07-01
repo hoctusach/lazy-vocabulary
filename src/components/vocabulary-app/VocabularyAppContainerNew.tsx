@@ -21,7 +21,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     isMuted,
     voiceRegion,
     isSpeaking,
-    goToNext,
+    goToNextAndSpeak,
     togglePause,
     toggleMute,
     toggleVoice,
@@ -99,7 +99,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             onTogglePause={togglePause}
             onCycleVoice={toggleVoice}
             onSwitchCategory={switchCategory}
-            onNextWord={goToNext}
+            onNextWord={goToNextAndSpeak}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSpeaking={false}
@@ -132,7 +132,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             onTogglePause={togglePause}
             onCycleVoice={toggleVoice}
             onSwitchCategory={switchCategory}
-            onNextWord={goToNext}
+            onNextWord={goToNextAndSpeak}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSpeaking={false}
@@ -165,7 +165,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             onTogglePause={togglePause}
             onCycleVoice={toggleVoice}
             onSwitchCategory={switchCategory}
-            onNextWord={goToNext}
+            onNextWord={goToNextAndSpeak}
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSpeaking={false}
@@ -200,7 +200,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             currentCategory={currentCategory}
             nextCategory={nextCategory}
             isSpeaking={isSpeaking}
-            handleManualNext={goToNext}
+            handleManualNext={goToNextAndSpeak}
             displayTime={5000}
             voiceRegion={voiceRegion}
             debugPanelData={debugData}
@@ -240,7 +240,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           currentCategory={currentCategory}
           nextCategory={nextCategory}
           isSpeaking={isSpeaking}
-          handleManualNext={goToNext}
+          handleManualNext={goToNextAndSpeak}
           displayTime={5000}
           voiceRegion={voiceRegion}
           debugPanelData={debugData}
