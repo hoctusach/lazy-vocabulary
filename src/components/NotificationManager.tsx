@@ -26,13 +26,11 @@ const requestNotificationPermission = async () => {
 interface NotificationManagerProps {
   onNotificationsEnabled: () => void;
   currentWord?: VocabularyWord | null;
-  voiceRegion?: 'US' | 'UK' | 'AU';
 }
 
-const NotificationManager: React.FC<NotificationManagerProps> = ({ 
+const NotificationManager: React.FC<NotificationManagerProps> = ({
   onNotificationsEnabled,
-  currentWord,
-  voiceRegion = 'US'
+  currentWord
 }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [permissionState, setPermissionState] = useState<string>('default');

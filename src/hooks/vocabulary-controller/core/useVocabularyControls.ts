@@ -18,7 +18,8 @@ export const useVocabularyControls = (
   allVoices: SpeechSynthesisVoice[],
   selectedVoiceName: string,
   setSelectedVoiceName: (name: string) => void,
-  speechState: SpeechState
+  speechState: SpeechState,
+  currentWord: VocabularyWord | null
 ) => {
   // Toggle pause with immediate feedback for mobile
   const togglePause = useCallback(() => {
@@ -56,8 +57,20 @@ export const useVocabularyControls = (
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
     localStorage.setItem('selectedVoiceName', nextVoice.name);
-    toast.success(`Voice ${nextVoice.name} selected!`);
-  }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
+    if (currentWord && !isMuted && !isPaused) {
+      unifiedSpeechController.stop();
+      unifiedSpeechController.speak(currentWord, nextVoice.name);
+    }
+    alert(`Voice "${nextVoice.name}" selected!`);
+  }, [
+    allVoices,
+    selectedVoiceName,
+    setSelectedVoiceName,
+    currentWord,
+    isMuted,
+    isPaused
+  ]);
+
 
   // Switch category with mobile-friendly handling
   const switchCategory = useCallback(() => {

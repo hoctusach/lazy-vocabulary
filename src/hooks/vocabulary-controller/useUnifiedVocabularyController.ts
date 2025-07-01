@@ -107,7 +107,8 @@ export const useUnifiedVocabularyController = () => {
     allVoices,
     selectedVoiceName,
     setSelectedVoiceName,
-    speechState
+    speechState,
+    currentWord
   );
 
   // Data loading

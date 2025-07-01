@@ -4,19 +4,18 @@ export interface VoiceContext {
   allVoices: SpeechSynthesisVoice[];
   selectedVoiceName: string;
   setSelectedVoiceName: (name: string) => void;
+  cycleVoice: () => void;
 }
 
 export const useVoiceContext = (): VoiceContext => {
   const [allVoices, setAllVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [selectedVoiceName, setSelectedVoiceName] = useState(
-    localStorage.getItem('selectedVoiceName') || ''
-  );
+  const [selectedVoiceName, setSelectedVoiceName] = useState('');
 
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
       setAllVoices(voices);
-      if (!selectedVoiceName && voices.length > 0) {
+      if (!selectedVoiceName && voices.length > 1) {
         setSelectedVoiceName(voices[0].name);
       }
     };
@@ -33,5 +32,15 @@ export const useVoiceContext = (): VoiceContext => {
     }
   }, [selectedVoiceName]);
 
-  return { allVoices, selectedVoiceName, setSelectedVoiceName };
+  const cycleVoice = () => {
+    if (allVoices.length === 0) return;
+    const index = allVoices.findIndex(v => v.name === selectedVoiceName);
+    const nextIndex = (index + 1) % allVoices.length;
+    const nextVoice = allVoices[nextIndex];
+    setSelectedVoiceName(nextVoice.name);
+    localStorage.setItem('selectedVoiceName', nextVoice.name);
+    alert(`Voice "${nextVoice.name}" selected!`);
+  };
+
+  return { allVoices, selectedVoiceName, setSelectedVoiceName, cycleVoice };
 };
