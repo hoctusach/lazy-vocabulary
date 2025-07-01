@@ -29,6 +29,11 @@ export const useEnhancedUserInteraction = ({
       }
     }
     setIsAudioUnlocked(true);
+    try {
+      localStorage.setItem('hadUserInteraction', 'true');
+    } catch (err) {
+      console.warn('Failed to persist interaction state:', err);
+    }
     onUserInteraction?.();
     playCurrentWord?.();
   }, [hasInitialized, isAudioUnlocked, onUserInteraction, playCurrentWord]);
@@ -46,8 +51,24 @@ export const useEnhancedUserInteraction = ({
     };
   }, [handleInteraction]);
 
+  // Detect prior interaction to optionally skip showing the prompt
   useEffect(() => {
-    const blocked = () => setIsAudioUnlocked(false);
+    if (localStorage.getItem('hadUserInteraction') === 'true') {
+      console.log('[USER-INTERACTION] Previous interaction detected');
+    }
+  }, []);
+
+  useEffect(() => {
+    const blocked = () => {
+      setIsAudioUnlocked(false);
+      setHasInitialized(false);
+      try {
+        localStorage.setItem('hadUserInteraction', 'false');
+      } catch (err) {
+        console.warn('Failed to reset interaction state:', err);
+      }
+    };
+    const resume = () => handleInteraction();
     window.addEventListener('speechblocked', blocked);
     return () => {
       window.removeEventListener('speechblocked', blocked);
