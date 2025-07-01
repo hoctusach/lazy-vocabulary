@@ -15,10 +15,8 @@ export const useVoiceContext = (): VoiceContext => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
       setAllVoices(voices);
-      if (voices.length > 0) {
-        const stored = localStorage.getItem('selectedVoiceName');
-        const match = stored ? voices.find(v => v.name === stored) : null;
-        setSelectedVoiceName(match ? match.name : voices[0].name);
+      if (!selectedVoiceName && voices.length > 1) {
+        setSelectedVoiceName(voices[0].name);
       }
     };
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
@@ -26,7 +24,7 @@ export const useVoiceContext = (): VoiceContext => {
     return () => {
       window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     };
-  }, []);
+  }, [selectedVoiceName]);
 
   useEffect(() => {
     if (selectedVoiceName) {
