@@ -131,12 +131,12 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleCycleVoice}
-        className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50"
+        className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50 flex items-center justify-center"
         title={allVoices.length === 0 ? 'No voices available' : `Change Voice`}
         disabled={allVoices.length === 0}
         aria-label="Change Voice"
       >
-        <Speaker size={16} /> {selectedVoiceName || 'Default'}
+        <Speaker size={16} />
       </Button>
 
       <SpeechRateControl rate={speechRate} onChange={setSpeechRate} />

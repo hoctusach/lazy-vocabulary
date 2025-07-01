@@ -13,13 +13,19 @@ export const useVoiceContext = (): VoiceContext => {
   );
 
   useEffect(() => {
-    const loadVoices = () => setAllVoices(window.speechSynthesis.getVoices());
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      setAllVoices(voices);
+      if (!selectedVoiceName && voices.length > 0) {
+        setSelectedVoiceName(voices[0].name);
+      }
+    };
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
     loadVoices();
     return () => {
       window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
     };
-  }, []);
+  }, [selectedVoiceName]);
 
   useEffect(() => {
     if (selectedVoiceName) {

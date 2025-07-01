@@ -4,6 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { toast } from 'sonner';
 
 /**
  * Vocabulary control actions
@@ -55,6 +56,7 @@ export const useVocabularyControls = (
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
     localStorage.setItem('selectedVoiceName', nextVoice.name);
+    toast.success(`Voice ${nextVoice.name} selected!`);
   }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
 
   // Switch category with mobile-friendly handling
