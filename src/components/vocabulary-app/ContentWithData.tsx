@@ -74,6 +74,7 @@ const ContentWithData: React.FC<ContentWithDataProps> = ({
         nextVoiceLabel={nextVoiceLabel}
         onOpenAddModal={handleOpenAddWordModal}
         onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
+        voiceRegion={selectedVoice.region}
       />
       
       
