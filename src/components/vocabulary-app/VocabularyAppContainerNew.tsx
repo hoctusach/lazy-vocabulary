@@ -4,7 +4,6 @@ import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
-import AudioStatusIndicator from "./AudioStatusIndicator";
 import UserInteractionManager from "./UserInteractionManager";
 import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
@@ -89,10 +88,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-          <AudioStatusIndicator
-            isAudioUnlocked={userInteractionState.isAudioUnlocked}
-            hasInitialized={userInteractionState.hasInitialized}
-          />
           <VocabularyCardNew
             word="No vocabulary data"
             meaning="Please upload a vocabulary file to get started"
@@ -125,10 +120,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             currentWord={currentWord}
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
-          />
-          <AudioStatusIndicator
-            isAudioUnlocked={userInteractionState.isAudioUnlocked}
-            hasInitialized={userInteractionState.hasInitialized}
           />
           <VocabularyCardNew
             word={`No words in "${currentCategory}" category`}
@@ -163,13 +154,9 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-        <AudioStatusIndicator
-          isAudioUnlocked={userInteractionState.isAudioUnlocked}
-          hasInitialized={userInteractionState.hasInitialized}
-        />
-          <VocabularyCardNew
-            word="Loading vocabulary..."
-            meaning="Please wait while we load your vocabulary data"
+        <VocabularyCardNew
+          word="Loading vocabulary..."
+          meaning="Please wait while we load your vocabulary data"
             example=""
             backgroundColor="#F0F8FF"
             isMuted={isMuted}
@@ -199,12 +186,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             onInteractionUpdate={handleInteractionUpdate}
           />
 
-        <AudioStatusIndicator
-          isAudioUnlocked={userInteractionState.isAudioUnlocked}
-          hasInitialized={userInteractionState.hasInitialized}
-        />
-
-          <ErrorDisplay jsonLoadError={false} />
+        <ErrorDisplay jsonLoadError={false} />
 
           <ContentWithDataNew
             displayWord={currentWord}
@@ -242,11 +224,6 @@ const VocabularyAppContainerNew: React.FC = () => {
           currentWord={currentWord}
           playCurrentWord={playCurrentWord}
           onInteractionUpdate={handleInteractionUpdate}
-        />
-        
-        <AudioStatusIndicator
-          isAudioUnlocked={userInteractionState.isAudioUnlocked}
-          hasInitialized={userInteractionState.hasInitialized}
         />
         
         <ErrorDisplay jsonLoadError={false} />
