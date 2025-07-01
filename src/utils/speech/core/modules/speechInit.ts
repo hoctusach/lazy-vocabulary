@@ -8,17 +8,19 @@ import { loadVoicesAndWait } from "./speechVoiceLoader";
  * Initialize speech synthesis on first user gesture.
  * Subsequent calls return the same promise.
  */
-export const initializeSpeechSystem = (): Promise<void> => {
-  if (speechInitialized) return Promise.resolve();
+export const initializeSpeechSystem = async (): Promise<void> => {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
     await unlockAudio();
-    await loadVoicesAndWait();
-    speechInitialized = true;
+    if (!speechInitialized) {
+      await loadVoicesAndWait();
+      speechInitialized = true;
+    }
   })();
 
-  return initPromise;
+  await initPromise;
+  initPromise = null;
 };
 
 /**

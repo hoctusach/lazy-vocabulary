@@ -22,9 +22,11 @@ export const useEnhancedUserInteraction = ({
 
   const handleInteraction = useCallback(async () => {
     setInteractionCount((c) => c + 1);
-    if (!hasInitialized) {
+    if (!hasInitialized || !isAudioUnlocked) {
       await initializeSpeechSystem();
-      setHasInitialized(true);
+      if (!hasInitialized) {
+        setHasInitialized(true);
+      }
     }
     setIsAudioUnlocked(true);
     try {
@@ -34,7 +36,7 @@ export const useEnhancedUserInteraction = ({
     }
     onUserInteraction?.();
     playCurrentWord?.();
-  }, [hasInitialized, onUserInteraction, playCurrentWord]);
+  }, [hasInitialized, isAudioUnlocked, onUserInteraction, playCurrentWord]);
 
   useEffect(() => {
     const listener = () => handleInteraction();
@@ -68,12 +70,10 @@ export const useEnhancedUserInteraction = ({
     };
     const resume = () => handleInteraction();
     window.addEventListener('speechblocked', blocked);
-    window.addEventListener('resume-speech', resume);
     return () => {
       window.removeEventListener('speechblocked', blocked);
-      window.removeEventListener('resume-speech', resume);
     };
-  }, [handleInteraction]);
+  }, []);
 
   return {
     hasInitialized,

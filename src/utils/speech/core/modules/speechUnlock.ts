@@ -24,7 +24,7 @@ export const unlockAudio = (): Promise<boolean> => {
       }
 
       const u = new SpeechSynthesisUtterance(" ");
-      u.volume = 0;
+      u.volume = 0.01;
       u.onend = () => resolve(true);
       u.onerror = () => resolve(false);
 

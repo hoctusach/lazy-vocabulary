@@ -1,7 +1,6 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
-import { toast } from 'sonner';
 
 interface SpeechGuardResult {
   canPlay: boolean;
@@ -40,10 +39,7 @@ class UnifiedSpeechController {
         this.scheduleAutoAdvance();
       },
       onError: (error) => {
-        console.error('Word speech error:', error);
         if ((error as SpeechSynthesisErrorEvent).error === 'not-allowed') {
-          console.warn('Speech blocked: browser requires user interaction.');
-          toast.error('Speech blocked: browser requires user interaction.');
           window.dispatchEvent(new Event('speechblocked'));
           // Do not auto advance when blocked
           return;
