@@ -1,6 +1,7 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 interface SpeechGuardResult {
   canPlay: boolean;
@@ -10,64 +11,84 @@ interface SpeechGuardResult {
 class UnifiedSpeechController {
   private wordCompleteCallback: (() => void) | null = null;
   private isMutedState = false;
-  private autoAdvanceTimer: number | null = null;
+  private queue: Array<{ word: VocabularyWord; region: 'US' | 'UK' | 'AU'; resolve: (v: boolean) => void }> = [];
+  private isSpeaking = false;
 
   async speak(
     word: VocabularyWord,
     region: 'US' | 'UK' | 'AU' = 'US'
   ): Promise<boolean> {
-    if (this.isMutedState) {
-      console.log('Speech is muted, scheduling auto-advance instead');
-      this.scheduleAutoAdvance();
-      return false;
-    }
+    return new Promise(resolve => {
+      if (this.isMutedState) {
+        console.log('Speech is muted, skipping to next word');
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(false);
+        return;
+      }
 
+      this.queue.push({ word, region, resolve });
+      this.processQueue();
+    });
+  }
+
+  private processQueue(): void {
+    if (this.isSpeaking || this.queue.length === 0) return;
+
+    const { word, region, resolve } = this.queue.shift()!;
     const parts = [word.word, word.meaning, word.example]
       .filter(Boolean)
       .map(part => part.trim());
     const text = parts.join('. ');
 
-    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
+    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+      console.log('Speech engine busy, waiting to speak');
+      setTimeout(() => this.queue.unshift({ word, region, resolve }), 50);
+      return;
+    }
 
-    return realSpeechService.speak(text, {
+    console.log('UnifiedSpeechController: Speaking word:', word.word, 'in region:', region);
+    console.log('Selected speech rate:', getSpeechRate());
+    console.log('Queue length:', this.queue.length);
+
+    this.isSpeaking = true;
+
+    realSpeechService.speak(text, {
       voiceRegion: region,
       onStart: () => {
         console.log('Word speech started:', word.word);
       },
       onEnd: () => {
         console.log('Word speech completed:', word.word);
-        this.scheduleAutoAdvance();
+        this.isSpeaking = false;
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(true);
+        this.processQueue();
       },
       onError: (error) => {
         if ((error as SpeechSynthesisErrorEvent).error === 'not-allowed') {
           window.dispatchEvent(new Event('speechblocked'));
-          // Do not auto advance when blocked
+          this.isSpeaking = false;
+          resolve(false);
           return;
         }
-        this.scheduleAutoAdvance();
+        this.isSpeaking = false;
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(false);
+        this.processQueue();
       }
     });
   }
 
-  private scheduleAutoAdvance(): void {
-    if (this.autoAdvanceTimer) {
-      clearTimeout(this.autoAdvanceTimer);
-    }
-    
-    this.autoAdvanceTimer = window.setTimeout(() => {
-      console.log('Auto-advance timer triggered');
-      if (this.wordCompleteCallback) {
-        this.wordCompleteCallback();
-      }
-    }, 2000);
-  }
-
   stop(): void {
     realSpeechService.stop();
-    if (this.autoAdvanceTimer) {
-      clearTimeout(this.autoAdvanceTimer);
-      this.autoAdvanceTimer = null;
-    }
+    this.isSpeaking = false;
+    this.queue = [];
   }
 
   pause(): void {
