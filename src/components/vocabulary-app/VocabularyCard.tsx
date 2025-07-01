@@ -106,7 +106,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               className="mobile-note text-left italic mt-2"
               style={{ color: '#6b7280', fontSize: '0.8rem' }}
             >
-              Tap any button (e.g., Next) to enable speech. On Mobile, only one voice may be available.
+              <p>⭐ Tap any button (e.g., Next) to enable speech.</p>
+              <p>⭐ On Mobile, only one voice may be available.</p>
             </div>
           )}
         </div>
