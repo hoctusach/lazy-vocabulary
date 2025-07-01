@@ -58,9 +58,9 @@ export const useSimpleWordPlayback = (
       if (!speechText || speechText.length === 0) {
         console.log(`[WORD-PLAYBACK-${playbackId}] No content to speak`);
         playingRef.current = false;
-        setTimeout(() => {
-          if (!paused && !muted) goToNextWord();
-        }, 1500);
+        if (!paused && !muted) {
+          goToNextWord();
+        }
         return;
       }
 
@@ -68,21 +68,14 @@ export const useSimpleWordPlayback = (
 
       const success = await speak(speechText, {
         voice,
+        region: selectedVoice.region,
         onComplete: () => {
           console.log(`[WORD-PLAYBACK-${playbackId}] Speech completed, checking auto-advance`);
           playingRef.current = false;
-          
-          // Check all conditions before auto-advancing
+
           if (!paused && !muted && !unifiedSpeechController.isPaused()) {
             console.log(`[WORD-PLAYBACK-${playbackId}] Auto-advancing to next word`);
-            setTimeout(() => {
-              // Double-check state before advancing
-              if (!paused && !muted && !unifiedSpeechController.isPaused()) {
-                goToNextWord();
-              } else {
-                console.log(`[WORD-PLAYBACK-${playbackId}] State changed during delay, skipping auto-advance`);
-              }
-            }, 1500);
+            goToNextWord();
           } else {
             console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, muted: ${muted}, controllerPaused: ${unifiedSpeechController.isPaused()}`);
           }
@@ -90,10 +83,9 @@ export const useSimpleWordPlayback = (
         onError: () => {
           console.log(`[WORD-PLAYBACK-${playbackId}] Speech error, advancing anyway`);
           playingRef.current = false;
-          
-          // Still advance on error to prevent getting stuck
+
           if (!paused && !muted && !unifiedSpeechController.isPaused()) {
-            setTimeout(() => goToNextWord(), 2000);
+            goToNextWord();
           }
         }
       });
@@ -102,7 +94,7 @@ export const useSimpleWordPlayback = (
         console.log(`[WORD-PLAYBACK-${playbackId}] Speech failed to start, advancing`);
         playingRef.current = false;
         if (!paused && !muted && !unifiedSpeechController.isPaused()) {
-          setTimeout(() => goToNextWord(), 2000);
+          goToNextWord();
         }
       }
 
@@ -110,9 +102,8 @@ export const useSimpleWordPlayback = (
       console.error(`[WORD-PLAYBACK-${playbackId}] Exception:`, error);
       playingRef.current = false;
       
-      // Always advance on exception
       if (!paused && !muted && !unifiedSpeechController.isPaused()) {
-        setTimeout(() => goToNextWord(), 2000);
+        goToNextWord();
       }
     }
   }, [speak, selectedVoice, findVoice, goToNextWord, muted, paused]);

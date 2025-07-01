@@ -14,6 +14,7 @@ export const useSimpleSpeech = () => {
     text: string,
     options: {
       voice?: SpeechSynthesisVoice | null;
+      region?: 'US' | 'UK' | 'AU';
       onComplete?: () => void;
       onError?: () => void;
     } = {}
@@ -47,30 +48,20 @@ export const useSimpleSpeech = () => {
         count: 0
       };
 
-      // Use the correct signature with only word and region
       const success = await unifiedSpeechController.speak(
         wordObject,
-        'US',
-        options.voice?.name
+        options.region || 'US'
       );
 
+      setIsSpeaking(false);
+      currentSpeechRef.current = null;
+
       if (success) {
-        console.log(`[SIMPLE-SPEECH-${speechId}] Speech started successfully`);
-        // Set up completion callback
-        setTimeout(() => {
-          setIsSpeaking(false);
-          currentSpeechRef.current = null;
-          if (options.onComplete) {
-            options.onComplete();
-          }
-        }, 2000); // Estimate completion time
+        console.log(`[SIMPLE-SPEECH-${speechId}] Speech completed successfully`);
+        options.onComplete?.();
       } else {
-        console.log(`[SIMPLE-SPEECH-${speechId}] Speech failed to start`);
-        setIsSpeaking(false);
-        currentSpeechRef.current = null;
-        if (options.onError) {
-          options.onError();
-        }
+        console.log(`[SIMPLE-SPEECH-${speechId}] Speech failed to complete`);
+        options.onError?.();
       }
 
       return success;
