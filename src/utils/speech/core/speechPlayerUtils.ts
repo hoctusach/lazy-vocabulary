@@ -1,5 +1,4 @@
 
-import { getVoiceByRegion } from '../voiceUtils';
 import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 
 // Store the current text being spoken for sync checking

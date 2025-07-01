@@ -122,7 +122,7 @@ const NotificationManager: React.FC<NotificationManagerProps> = ({
     notification.onclick = async () => {
       notification.close();
       const fullText = formatSpeechText({ word, meaning, example });
-      await speak(fullText);
+      await speak(fullText, null);
     };
     
     setTimeout(() => {

@@ -1,6 +1,5 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getVoiceByRegion } from '@/utils/speech';
 
 export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
@@ -15,11 +14,11 @@ export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
     if (voices.length > 0) {
       console.log('Voices loaded successfully:', voices.length);
       setIsVoicesLoaded(true);
-      currentVoiceRef.current = getVoiceByRegion(voiceRegion);
+      currentVoiceRef.current = voices[0] || null;
       return true;
     }
     return false;
-  }, [voiceRegion]);
+  }, []);
 
   useEffect(() => {
     const supported = 'speechSynthesis' in window;

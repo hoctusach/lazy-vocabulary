@@ -1,4 +1,4 @@
-import { getVoiceByRegion, findFallbackVoice } from "./voiceUtils";
+import { findFallbackVoice, getAllAvailableVoices } from "./voiceUtils";
 import { calculateSpeechDuration } from "./durationUtils";
 import { speak } from "./core/speechPlayer";
 import {
@@ -39,7 +39,7 @@ import {
 export {
   speak,
   findFallbackVoice,
-  getVoiceByRegion,
+  getAllAvailableVoices,
   calculateSpeechDuration,
   isSpeechSynthesisSupported,
   stopSpeaking,
