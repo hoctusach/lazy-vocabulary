@@ -1,5 +1,6 @@
 
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+import { BUTTON_STATES_KEY, SPEECH_RATE_KEY } from '@/utils/storageKeys';
+import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 
 export const getVoiceRegionFromStorage = (): 'US' | 'UK' | 'AU' => {
   try {
@@ -39,12 +40,30 @@ export const saveVoiceRegionToStorage = (region: 'US' | 'UK' | 'AU'): void => {
 };
 
 
-export const getSpeechRate = (): number => {
-  const region = getVoiceRegionFromStorage();
-  if (region === 'US' || region === 'AU') {
-    return 0.6;
+export const getStoredSpeechRate = (): number => {
+  try {
+    const stored = localStorage.getItem(SPEECH_RATE_KEY);
+    const parsed = stored ? parseFloat(stored) : NaN;
+    if (!isNaN(parsed)) return parsed;
+  } catch (error) {
+    console.error('Error reading speech rate from localStorage:', error);
   }
-  return 1.0;
+  return DEFAULT_SPEECH_RATE;
+};
+
+export const saveSpeechRateToStorage = (rate: number): void => {
+  try {
+    localStorage.setItem(SPEECH_RATE_KEY, rate.toString());
+    console.log(`Speech rate saved: ${rate}`);
+  } catch (error) {
+    console.error('Error saving speech rate to localStorage:', error);
+  }
+};
+
+export const getSpeechRate = (): number => {
+  const rate = getStoredSpeechRate();
+  console.log('[Speech Rate]', rate);
+  return rate;
 };
 
 export const getSpeechPitch = (): number => {

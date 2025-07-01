@@ -1,5 +1,5 @@
 import { VocabularyWord } from "@/types/vocabulary";
-import { DEFAULT_SPEECH_RATE } from "@/services/speech/core/constants";
+import { getSpeechRate } from "@/utils/speech/core/speechSettings";
 import {
   initializeSpeechSystem,
   speechInitialized,
@@ -93,7 +93,7 @@ class RealSpeechService {
       }
 
       // Configure speech settings
-      utterance.rate = DEFAULT_SPEECH_RATE;
+      utterance.rate = getSpeechRate();
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 

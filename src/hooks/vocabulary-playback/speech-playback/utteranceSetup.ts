@@ -3,7 +3,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '../useVoiceSelection';
 import { findVoice } from './findVoice';
 import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 
 // Function to create and configure a speech utterance
@@ -62,7 +62,7 @@ export const createUtterance = (
     }
     
     // Configure speech properties
-    utterance.rate = DEFAULT_SPEECH_RATE;
+    utterance.rate = getSpeechRate();
     utterance.pitch = 1.0;  // Default pitch
     utterance.volume = 1.0; // Full volume
     

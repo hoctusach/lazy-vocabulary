@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 /**
  * Hook to handle Safari and iOS-specific initialization
@@ -21,7 +21,7 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
         try {
           const utterance = new SpeechSynthesisUtterance(' ');
           utterance.volume = 0.01;
-          utterance.rate = DEFAULT_SPEECH_RATE;
+          utterance.rate = getSpeechRate();
           utterance.pitch = 1;
 
           window.speechSynthesis.cancel();

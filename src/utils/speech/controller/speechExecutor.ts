@@ -6,7 +6,7 @@ import {
 } from '../core/speechEngine';
 import { SpeechStateManager } from './speechStateManager';
 import { SpeechOptions } from './types';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 /**
  * Handles speech execution with comprehensive pause state checking
@@ -68,7 +68,7 @@ export class SpeechExecutor {
           utterance.voice = options.voice;
           console.log(`[SPEECH-EXECUTOR-${speechId}] Using voice:`, options.voice.name);
         }
-        utterance.rate = options.rate || DEFAULT_SPEECH_RATE;
+        utterance.rate = options.rate || getSpeechRate();
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;
         

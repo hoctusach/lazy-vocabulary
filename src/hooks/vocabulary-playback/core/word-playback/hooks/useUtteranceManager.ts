@@ -2,7 +2,7 @@
 import { useCallback, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 
 /**
  * Hook for managing utterance setup and reference
@@ -45,7 +45,7 @@ export const useUtteranceManager = () => {
     }
     
     // Configure properties
-    utterance.rate = DEFAULT_SPEECH_RATE;
+    utterance.rate = getSpeechRate();
     utterance.pitch = 1;
     utterance.volume = 1.0;
     
