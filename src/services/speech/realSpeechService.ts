@@ -67,6 +67,19 @@ class RealSpeechService {
         );
       }
 
+      if (!utterance.voice) {
+        const allVoices = speechSynthesis.getVoices();
+        const fallback =
+          allVoices.find(v => v.lang.startsWith('en')) || allVoices[0] || null;
+        if (fallback) {
+          utterance.voice = fallback;
+          console.log(
+            "Falling back to voice:",
+            fallback.name,
+          );
+        }
+      }
+
       // Configure speech settings
       utterance.rate = DEFAULT_SPEECH_RATE;
       utterance.pitch = 1.0;
