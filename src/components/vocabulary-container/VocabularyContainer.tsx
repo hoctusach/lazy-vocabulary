@@ -107,7 +107,7 @@ const VocabularyContainer: React.FC = () => {
         onTogglePause={controllerState.togglePause}
         onCycleVoice={controllerState.toggleVoice}
         onSwitchCategory={controllerState.switchCategory}
-        onNextWord={controllerState.goToNext}
+        onNextWord={controllerState.goToNextAndSpeak}
         currentCategory={currentCategory}
         nextCategory={nextCategory}
         selectedVoice={selectedVoice}
