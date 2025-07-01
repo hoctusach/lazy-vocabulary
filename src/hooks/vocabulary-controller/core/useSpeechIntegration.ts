@@ -2,12 +2,11 @@
 import * as React from 'react';
 import { useEffect, useCallback, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { VoiceRegion } from '@/types/speech';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 interface SpeechIntegrationProps {
   currentWord: VocabularyWord | null;
-  voiceRegion: VoiceRegion;
+  selectedVoiceName: string;
   isPaused: boolean;
   isMuted: boolean;
   isTransitioningRef: React.MutableRefObject<boolean>;
@@ -15,7 +14,7 @@ interface SpeechIntegrationProps {
 
 export const useSpeechIntegration = (
   currentWord: VocabularyWord | null,
-  voiceRegion: VoiceRegion,
+  selectedVoiceName: string,
   isPaused: boolean,
   isMuted: boolean,
   isTransitioningRef: React.MutableRefObject<boolean>
@@ -41,13 +40,13 @@ export const useSpeechIntegration = (
     setSpeechState(prev => ({ ...prev, isActive: true, phase: 'speaking' }));
     
     try {
-      await unifiedSpeechController.speak(currentWord, voiceRegion);
+      await unifiedSpeechController.speak(currentWord, selectedVoiceName);
     } catch (error) {
       console.error('[SPEECH-INTEGRATION] Error playing word:', error);
     } finally {
       setSpeechState(prev => ({ ...prev, isActive: false, phase: 'idle' }));
     }
-  }, [currentWord, voiceRegion, isPaused, isMuted, isTransitioningRef]);
+  }, [currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef]);
 
   // Effect to trigger speech when dependencies change
   useEffect(() => {
@@ -64,7 +63,7 @@ export const useSpeechIntegration = (
     console.log('[SPEECH-INTEGRATION] Dependencies changed, attempting to speak:', currentWord.word);
     playCurrentWord();
 
-  }, [currentWord, isMuted, isPaused, voiceRegion, playCurrentWord]);
+  }, [currentWord, isMuted, isPaused, selectedVoiceName, playCurrentWord]);
 
   return {
     speechState,

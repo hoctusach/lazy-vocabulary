@@ -14,10 +14,12 @@ export const useStableVocabularyState = () => {
   const controllerState = useUnifiedVocabularyController();
   
   // Memoize computed values to prevent recalculation
-  const nextVoiceLabel = useMemo(() => 
-    controllerState.voiceRegion === 'UK' ? 'US' : 
-    controllerState.voiceRegion === 'US' ? 'AU' : 'UK'
-  , [controllerState.voiceRegion]);
+  const nextVoiceLabel = useMemo(() => {
+    if (controllerState.allVoices.length === 0) return 'Default';
+    const index = controllerState.allVoices.findIndex(v => v.name === controllerState.selectedVoiceName);
+    const nextIndex = (index + 1) % controllerState.allVoices.length;
+    return controllerState.allVoices[nextIndex].name;
+  }, [controllerState.selectedVoiceName, controllerState.allVoices]);
 
   const nextCategory = useMemo(() => {
     const sheets = vocabularyService.getAllSheetNames();

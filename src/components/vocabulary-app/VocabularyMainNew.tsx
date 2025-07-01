@@ -18,8 +18,7 @@ interface VocabularyMainNewProps {
   nextCategory: string | null;
   isSoundPlaying: boolean;
   displayTime: number;
-  voiceRegion: 'US' | 'UK' | 'AU';
-  nextVoiceLabel: string;
+  selectedVoiceName: string;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
   showWordCount?: boolean;
@@ -38,8 +37,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   isSoundPlaying,
   handleManualNext,
   displayTime,
-  voiceRegion,
-  nextVoiceLabel,
+  selectedVoiceName,
   onOpenAddModal,
   onOpenEditModal,
   showWordCount = false,
@@ -66,8 +64,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           nextCategory={nextCategory || 'Next'}
           isSpeaking={isSoundPlaying}
           category={currentWord.category || currentCategory}
-          voiceRegion={voiceRegion}
-          nextVoiceLabel={nextVoiceLabel}
+          selectedVoiceName={selectedVoiceName}
           showWordCount={showWordCount}
         />
       </div>
@@ -83,11 +80,10 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           onSwitchCategory={handleSwitchCategory}
           onCycleVoice={handleCycleVoice}
           nextCategory={nextCategory || 'Next'}
-          nextVoiceLabel={nextVoiceLabel}
-        currentWord={currentWord}
+          currentWord={currentWord}
         onOpenAddModal={onOpenAddModal}
         onOpenEditModal={onOpenEditModal}
-        voiceRegion={voiceRegion}
+          selectedVoiceName={selectedVoiceName}
       />
       </div>
     </div>

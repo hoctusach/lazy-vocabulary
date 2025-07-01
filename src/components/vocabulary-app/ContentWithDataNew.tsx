@@ -11,14 +11,13 @@ interface ContentWithDataNewProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleCycleVoice: () => void;
-  nextVoiceLabel: string;
   handleSwitchCategory: () => void;
   currentCategory: string;
   nextCategory: string | null;
   isSpeaking: boolean;
   handleManualNext: () => void;
   displayTime: number;
-  voiceRegion: 'US' | 'UK' | 'AU';
+  selectedVoiceName: string;
   debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
@@ -36,14 +35,13 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   toggleMute,
   handleTogglePause,
   handleCycleVoice,
-  nextVoiceLabel,
   handleSwitchCategory,
   currentCategory,
   nextCategory,
   isSpeaking,
   handleManualNext,
   displayTime,
-  voiceRegion,
+  selectedVoiceName,
   debugPanelData,
   isAddWordModalOpen,
   handleCloseModal,
@@ -69,9 +67,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         isSoundPlaying={isSpeaking}
         handleManualNext={handleManualNext}
         displayTime={displayTime}
-        voiceRegion={voiceRegion}
-        nextVoiceLabel={nextVoiceLabel}
-        onOpenAddModal={handleOpenAddWordModal}
+        selectedVoiceName={selectedVoiceName}
+      onOpenAddModal={handleOpenAddWordModal}
         onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       />
 
@@ -84,7 +81,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {/* Debug Panel */}
       <DebugPanel
         isMuted={muted}
-        voiceRegion={voiceRegion}
+        voiceRegion={selectedVoiceName}
         isPaused={paused}
         currentWord={debugPanelData}
       />

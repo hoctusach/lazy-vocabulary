@@ -22,7 +22,7 @@ export function useVocabularyAppHandlers({
   handleToggleMute,
   handleChangeVoice,
   handleSwitchCategory,
-  voiceRegion,
+  selectedVoiceName,
   setBackgroundColorIndex,
   backgroundColors
 }: any) {
@@ -63,14 +63,14 @@ export function useVocabularyAppHandlers({
     resetLastSpokenWord();
 
     setBackgroundColorIndex((prevIndex: number) => (prevIndex + 1) % backgroundColors.length);
-    handleSwitchCategory(isMuted, voiceRegion);
+    handleSwitchCategory(isMuted, selectedVoiceName);
 
     setTimeout(() => {
       if (!isMuted && !isPaused) {
         speakCurrentWord(true);
       }
     }, 1500);
-  }, [isMuted, voiceRegion, isPaused, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts, setBackgroundColorIndex, backgroundColors.length]);
+  }, [isMuted, selectedVoiceName, isPaused, handleSwitchCategory, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts, setBackgroundColorIndex, backgroundColors.length]);
 
   return {
     handleToggleMuteWithSpeaking,

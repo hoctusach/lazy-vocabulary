@@ -2,7 +2,6 @@
 import { useCallback } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
-import { saveVoiceRegionToStorage } from '@/utils/speech/core/speechSettings';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
@@ -15,8 +14,9 @@ export const useVocabularyControls = (
   setIsPaused: (paused: boolean) => void,
   isMuted: boolean,
   setIsMuted: (muted: boolean) => void,
-  voiceRegion: 'US' | 'UK' | 'AU',
-  setVoiceRegion: (region: 'US' | 'UK' | 'AU') => void,
+  allVoices: SpeechSynthesisVoice[],
+  selectedVoiceName: string,
+  setSelectedVoiceName: (name: string) => void,
   speechState: SpeechState
 ) => {
   // Toggle pause with immediate feedback for mobile
@@ -47,17 +47,15 @@ export const useVocabularyControls = (
     }
   }, [isMuted, setIsMuted]);
 
-  // Toggle voice region
+  // Cycle to the next available voice
   const toggleVoice = useCallback(() => {
-    const voiceOrder: ('US' | 'UK' | 'AU')[] = ['US', 'UK', 'AU'];
-    const currentIndex = voiceOrder.indexOf(voiceRegion);
-    const nextIndex = (currentIndex + 1) % voiceOrder.length;
-    const nextRegion = voiceOrder[nextIndex];
-    
-    console.log(`[VOCABULARY-CONTROLS] Toggle voice: ${voiceRegion} -> ${nextRegion}`);
-    setVoiceRegion(nextRegion);
-    saveVoiceRegionToStorage(nextRegion);
-  }, [voiceRegion, setVoiceRegion]);
+    if (allVoices.length === 0) return;
+    const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
+    const nextIndex = (currentIndex + 1) % allVoices.length;
+    const nextVoice = allVoices[nextIndex];
+    setSelectedVoiceName(nextVoice.name);
+    localStorage.setItem('selectedVoiceName', nextVoice.name);
+  }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
 
   // Switch category with mobile-friendly handling
   const switchCategory = useCallback(() => {

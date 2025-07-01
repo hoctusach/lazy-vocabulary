@@ -23,8 +23,7 @@ interface VocabularyCardNewProps {
   nextCategory: string;
   isSpeaking: boolean;
   category: string;
-  voiceRegion: 'US' | 'UK' | 'AU';
-  nextVoiceLabel: string;
+  selectedVoiceName: string;
   showWordCount?: boolean;
 }
 
@@ -44,8 +43,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   nextCategory,
   isSpeaking,
   category,
-  voiceRegion,
-  nextVoiceLabel,
+  selectedVoiceName,
   showWordCount = false
 }) => {
   const categoryLabel = getCategoryLabel(category);
