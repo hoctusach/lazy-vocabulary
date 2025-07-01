@@ -92,7 +92,6 @@ const VocabularyAppContainerNew: React.FC = () => {
           <AudioStatusIndicator
             isAudioUnlocked={userInteractionState.isAudioUnlocked}
             hasInitialized={userInteractionState.hasInitialized}
-            interactionCount={userInteractionState.interactionCount}
           />
           <VocabularyCardNew
             word="No vocabulary data"
@@ -130,7 +129,6 @@ const VocabularyAppContainerNew: React.FC = () => {
           <AudioStatusIndicator
             isAudioUnlocked={userInteractionState.isAudioUnlocked}
             hasInitialized={userInteractionState.hasInitialized}
-            interactionCount={userInteractionState.interactionCount}
           />
           <VocabularyCardNew
             word={`No words in "${currentCategory}" category`}
@@ -165,11 +163,10 @@ const VocabularyAppContainerNew: React.FC = () => {
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
-          <AudioStatusIndicator
-            isAudioUnlocked={userInteractionState.isAudioUnlocked}
-            hasInitialized={userInteractionState.hasInitialized}
-            interactionCount={userInteractionState.interactionCount}
-          />
+        <AudioStatusIndicator
+          isAudioUnlocked={userInteractionState.isAudioUnlocked}
+          hasInitialized={userInteractionState.hasInitialized}
+        />
           <VocabularyCardNew
             word="Loading vocabulary..."
             meaning="Please wait while we load your vocabulary data"
@@ -202,11 +199,10 @@ const VocabularyAppContainerNew: React.FC = () => {
             onInteractionUpdate={handleInteractionUpdate}
           />
 
-          <AudioStatusIndicator
-            isAudioUnlocked={userInteractionState.isAudioUnlocked}
-            hasInitialized={userInteractionState.hasInitialized}
-            interactionCount={userInteractionState.interactionCount}
-          />
+        <AudioStatusIndicator
+          isAudioUnlocked={userInteractionState.isAudioUnlocked}
+          hasInitialized={userInteractionState.hasInitialized}
+        />
 
           <ErrorDisplay jsonLoadError={false} />
 
@@ -248,10 +244,9 @@ const VocabularyAppContainerNew: React.FC = () => {
           onInteractionUpdate={handleInteractionUpdate}
         />
         
-        <AudioStatusIndicator 
+        <AudioStatusIndicator
           isAudioUnlocked={userInteractionState.isAudioUnlocked}
           hasInitialized={userInteractionState.hasInitialized}
-          interactionCount={userInteractionState.interactionCount}
         />
         
         <ErrorDisplay jsonLoadError={false} />
