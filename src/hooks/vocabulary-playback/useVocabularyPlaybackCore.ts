@@ -35,7 +35,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem('hadUserInteraction') === 'true') {
+      if (localStorage.getItem('speechUnlocked') === 'true') {
         setHasUserInteracted(true);
       }
     } catch (e) {

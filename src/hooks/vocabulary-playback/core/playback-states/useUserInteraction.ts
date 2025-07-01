@@ -11,7 +11,7 @@ export const useUserInteraction = (onUserInteraction?: () => void) => {
   // Set up interaction tracking
   useEffect(() => {
     // Try to load from localStorage
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
+    if (localStorage.getItem('speechUnlocked') === 'true') {
       console.log('User interaction detected from localStorage');
       userInteractionRef.current = true;
       onUserInteraction?.();
@@ -23,7 +23,7 @@ export const useUserInteraction = (onUserInteraction?: () => void) => {
         console.log('User interaction detected');
         userInteractionRef.current = true;
         onUserInteraction?.();
-        localStorage.setItem('hadUserInteraction', 'true');
+        localStorage.setItem('speechUnlocked', 'true');
         
         // Try to initialize speech synthesis
         try {

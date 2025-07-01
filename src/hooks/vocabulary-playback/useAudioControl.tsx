@@ -38,7 +38,7 @@ export const useAudioControl = (wordList: VocabularyWord[]) => {
   
   // Function to cancel any speech
   const cancelSpeech = useCallback(() => {
-    if (window.speechSynthesis) {
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
     utteranceRef.current = null;

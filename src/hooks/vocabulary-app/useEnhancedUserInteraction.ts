@@ -5,7 +5,8 @@ import { initializeSpeechSystem } from '@/utils/speech';
 import {
   setupUserInteractionListeners,
   markUserInteraction,
-  resetUserInteraction
+  resetUserInteraction,
+  loadUserInteractionState
 } from '@/utils/userInteraction';
 
 interface UseEnhancedUserInteractionProps {
@@ -55,7 +56,9 @@ export const useEnhancedUserInteraction = ({
 
   // Detect prior interaction to optionally skip showing the prompt
   useEffect(() => {
-    if (localStorage.getItem('hadUserInteraction') === 'true') {
+    if (loadUserInteractionState()) {
+      setIsAudioUnlocked(true);
+      setHasInitialized(true);
       console.log('[USER-INTERACTION] Previous interaction detected');
     }
   }, []);

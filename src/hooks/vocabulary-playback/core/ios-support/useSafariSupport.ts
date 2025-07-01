@@ -24,7 +24,9 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
           utterance.rate = getSpeechRate();
           utterance.pitch = 1;
 
-          window.speechSynthesis.cancel();
+          if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+          }
           window.speechSynthesis.speak(utterance);
         } catch (e) {
           console.warn('Speech preload failed:', e);
@@ -36,7 +38,7 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
       preloadSpeech();
       userInteractionRef.current = true;
       try {
-        localStorage.setItem('hadUserInteraction', 'true');
+        localStorage.setItem('speechUnlocked', 'true');
       } catch (err) {
         console.warn('Failed to persist interaction state:', err);
       }
@@ -73,7 +75,7 @@ export const useSafariSupport = (userInteractionRef: React.MutableRefObject<bool
       document.removeEventListener('touchstart', enableOnGesture);
       document.removeEventListener('keydown', enableOnGesture);
       window.removeEventListener('speechblocked', handleBlocked);
-      if (window.speechSynthesis) {
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
       }
     };

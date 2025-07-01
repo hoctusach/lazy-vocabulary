@@ -15,24 +15,27 @@ export const useAudioCleanup = (
 
   // Set up document-level interaction handler for speech permissions
   useEffect(() => {
+    if (localStorage.getItem('speechUnlocked') === 'true') {
+      return () => {
+        clearAllAudioState();
+      };
+    }
+
     const documentClickHandler = () => {
-      // This empty handler helps enable speech in browsers that require user gesture
       if (window.speechSynthesis && !speechSynthesis.speaking) {
         try {
-          // Just create a silent utterance to "unlock" speech
           const silentUtterance = new SpeechSynthesisUtterance('');
           silentUtterance.volume = 0;
           window.speechSynthesis.speak(silentUtterance);
-        } catch (error) {
-          // Ignore errors here, just trying to enable speech
+          localStorage.setItem('speechUnlocked', 'true');
+        } catch {
+          // Ignore errors
         }
       }
     };
 
-    // Add the event listener to the document
-    document.addEventListener('click', documentClickHandler);
-    
-    // Clean up
+    document.addEventListener('click', documentClickHandler, { once: true });
+
     return () => {
       document.removeEventListener('click', documentClickHandler);
       clearAllAudioState();

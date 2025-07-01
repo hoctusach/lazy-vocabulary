@@ -181,7 +181,9 @@ export const useUtteranceSetup = ({
       // Attempt to wait for any potential race conditions to resolve
       setTimeout(() => {
         // Cancel any existing speech just before speaking
-        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
 
         // Actually start speaking
         window.speechSynthesis.speak(utterance);

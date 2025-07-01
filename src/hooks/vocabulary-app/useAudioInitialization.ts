@@ -30,7 +30,9 @@ export const useAudioInitialization = ({
       // Clean up
       return () => {
         window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
-        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.speaking) {
+          window.speechSynthesis.cancel();
+        }
       };
     }
   }, []);

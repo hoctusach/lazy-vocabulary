@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useEffect, useRef } from "react";
+import { loadUserInteractionState } from "@/utils/userInteraction";
 import {
   initializeSpeechSystem,
   registerSpeechInitGesture,
@@ -25,6 +26,13 @@ export const useUserInteractionHandler = ({
   useEffect(() => {
     console.log("[USER-INTERACTION] Handler mounted");
 
+    if (loadUserInteractionState()) {
+      initializedRef.current = true;
+      userInteractionRef.current = true;
+      initializeSpeechSystem();
+      return;
+    }
+
     registerSpeechInitGesture();
 
     const enableAudioPlayback = async () => {
@@ -41,7 +49,7 @@ export const useUserInteractionHandler = ({
       // Mark that we've had user interaction
       userInteractionRef.current = true;
       initializedRef.current = true;
-      localStorage.setItem("hadUserInteraction", "true");
+      localStorage.setItem("speechUnlocked", "true");
 
       // Initialize speech system (unlock audio and preload voices)
       await initializeSpeechSystem();
@@ -56,7 +64,7 @@ export const useUserInteractionHandler = ({
 
     // Check if we've had interaction before. We still wait for a new user
     // gesture to actually unlock audio again, so simply log this information.
-    if (localStorage.getItem("hadUserInteraction") === "true") {
+    if (localStorage.getItem("speechUnlocked") === "true") {
       console.log(
         "[USER-INTERACTION] Previous interaction found; waiting for new gesture to unlock audio",
       );

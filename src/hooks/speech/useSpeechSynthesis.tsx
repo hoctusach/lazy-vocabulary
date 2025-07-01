@@ -54,7 +54,7 @@ export const useSpeechSynthesis = () => {
   // Clean up speech synthesis when component unmounts
   useEffect(() => {
     return () => {
-      if (window.speechSynthesis) {
+      if (window.speechSynthesis && window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel();
       }
     };

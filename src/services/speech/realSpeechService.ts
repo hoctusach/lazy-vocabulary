@@ -28,7 +28,7 @@ class RealSpeechService {
     }
 
     try {
-      if (localStorage.getItem('hadUserInteraction') !== 'true' || !hasUserInteracted()) {
+      if (localStorage.getItem('speechUnlocked') !== 'true' || !hasUserInteracted()) {
         console.warn('[SPEECH] Blocked: waiting for user interaction');
         if (options.onError) {
           const evt = new Event('error') as SpeechSynthesisErrorEvent;
@@ -131,13 +131,14 @@ class RealSpeechService {
       };
 
       utterance.onerror = (event) => {
-        console.error(
-          "[Speech ERROR]",
+        const logFn = event.error === 'canceled' ? console.info : console.error;
+        logFn(
+          event.error === 'canceled' ? '[Speech canceled]' : '[Speech ERROR]',
           event.error,
           text.substring(0, 60),
           utterance.voice?.name,
           utterance.voice?.lang,
-          "speaking:",
+          'speaking:',
           window.speechSynthesis.speaking,
         );
         logSpeechEvent({
@@ -211,7 +212,9 @@ class RealSpeechService {
         this.currentUtterance.onend = null;
         this.currentUtterance.onerror = null;
       }
-      window.speechSynthesis.cancel();
+      if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+        window.speechSynthesis.cancel();
+      }
     }
     this.isActive = false;
     this.currentUtterance = null;

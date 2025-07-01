@@ -9,7 +9,7 @@ export const useSpeechError = () => {
 
   // Function to reset speech state after errors
   const resetSpeechState = useCallback(() => {
-    if (window.speechSynthesis) {
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
     console.log('Speech state reset after error');
@@ -27,7 +27,7 @@ export const useSpeechError = () => {
     setHasSpeechPermission(true);
     setSpeechError(null);
     retryAttemptsRef.current = 0;
-    if (window.speechSynthesis) {
+    if (window.speechSynthesis && window.speechSynthesis.speaking) {
       window.speechSynthesis.cancel();
     }
   }, []);
