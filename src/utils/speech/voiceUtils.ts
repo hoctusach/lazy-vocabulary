@@ -31,6 +31,41 @@ export const getVoiceByRegion = (region: 'US' | 'UK' | 'AU', gender: 'male' | 'f
   }
   
   console.log(`Looking for ${region} voice with ${voices.length} voices available`);
+
+  const isApple =
+    typeof navigator !== 'undefined' &&
+    /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
+
+  if (isApple) {
+    const APPLE_US_VOICES = ["Alex", "Samantha", "Aaron"] as const;
+    const APPLE_UK_VOICES = ["Daniel", "Kate"] as const;
+    const APPLE_AU_VOICES = ["Karen", "Lee"] as const;
+
+    const tryAppleVoices = (names: readonly string[]) =>
+      names.map(name => voices.find(v => v.name === name)).find(Boolean) || null;
+
+    if (region === 'US') {
+      const voice = tryAppleVoices(APPLE_US_VOICES);
+      if (voice) {
+        console.log('[Voice Picker] Selected Apple US voice:', voice.name);
+        return voice;
+      }
+    } else if (region === 'UK') {
+      const voice = tryAppleVoices(APPLE_UK_VOICES);
+      if (voice) {
+        console.log('[Voice Picker] Selected Apple UK voice:', voice.name);
+        return voice;
+      }
+    } else if (region === 'AU') {
+      const voice = tryAppleVoices(APPLE_AU_VOICES);
+      if (voice) {
+        console.log('[Voice Picker] Selected Apple AU voice:', voice.name);
+        return voice;
+      }
+    }
+
+    console.log('[Voice Picker] Falling back to standard selection');
+  }
   
   if (region === 'US') {
     // US voice logic (unchanged)
