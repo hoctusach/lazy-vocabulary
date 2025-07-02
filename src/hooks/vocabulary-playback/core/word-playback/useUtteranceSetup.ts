@@ -48,11 +48,12 @@ export const useUtteranceSetup = ({
       
       // Set language based on selected voice
       utterance.lang = selectedVoice.region === 'UK' ? 'en-GB' : 'en-US';
-      
+
       // Find and apply the voice
       const voice = findVoice(selectedVoice.region);
       if (voice) {
         utterance.voice = voice;
+        utterance.lang = voice.lang;
         console.log(`Using voice: ${voice.name}`);
       } else {
         console.log('No matching voice found, using system default');

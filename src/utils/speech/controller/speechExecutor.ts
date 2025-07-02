@@ -66,6 +66,7 @@ export class SpeechExecutor {
         // Set properties
         if (options.voice) {
           utterance.voice = options.voice;
+          utterance.lang = options.voice.lang;
           console.log(`[SPEECH-EXECUTOR-${speechId}] Using voice:`, options.voice.name);
         }
         utterance.rate = options.rate || getSpeechRate();

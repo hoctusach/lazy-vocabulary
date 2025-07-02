@@ -8,6 +8,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { Badge } from '@/components/ui/badge';
 import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -103,6 +104,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
       .filter(Boolean)
       .join('. ');
     const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    const voice = findVoice(voices, previewVoice);
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    } else {
+      utterance.lang = previewVoice.region === 'US' ? 'en-US' : 'en-GB';
+    }
     window.speechSynthesis.speak(utterance);
   };
 
