@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
+import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
 import {
   US_VOICE_NAME,
   UK_VOICE_NAME,
@@ -112,16 +113,35 @@ export const useVoiceSelection = () => {
         console.log(`AU voice: ${voiceOptions[2].voice?.name || 'not found'}`);
         
         setVoices(voiceOptions);
-        
-        // Try to restore saved voice preference
+
         try {
-          const savedSettings = localStorage.getItem('vocabularySettings');
-          if (savedSettings) {
-            const { voiceIndex } = JSON.parse(savedSettings);
-            if (typeof voiceIndex === 'number' && voiceIndex >= 0 && voiceIndex < VOICE_OPTIONS.length) {
-              console.log(`Restoring saved voice: ${VOICE_OPTIONS[voiceIndex].label}`);
-              setVoiceIndex(voiceIndex);
-              setSelectedVoice(VOICE_OPTIONS[voiceIndex]);
+          const storedName = localStorage.getItem(PREFERRED_VOICE_KEY);
+          const matched = storedName
+            ? voiceOptions.find(v => v.voice?.name === storedName)
+            : null;
+
+          if (matched) {
+            setVoiceIndex(matched.index);
+            setSelectedVoice({
+              label: matched.label,
+              region: matched.region,
+              gender: matched.gender,
+              index: matched.index
+            });
+            console.log(`Restored voice from localStorage: ${matched.voice?.name}`);
+          } else {
+            const savedSettings = localStorage.getItem('vocabularySettings');
+            if (savedSettings) {
+              const { voiceIndex } = JSON.parse(savedSettings);
+              if (
+                typeof voiceIndex === 'number' &&
+                voiceIndex >= 0 &&
+                voiceIndex < VOICE_OPTIONS.length
+              ) {
+                setVoiceIndex(voiceIndex);
+                setSelectedVoice(VOICE_OPTIONS[voiceIndex]);
+                console.log(`Restoring saved voice: ${VOICE_OPTIONS[voiceIndex].label}`);
+              }
             }
           }
         } catch (error) {
@@ -148,6 +168,14 @@ export const useVoiceSelection = () => {
       }
     };
   }, []);
+
+  // Persist selected voice name whenever it changes
+  useEffect(() => {
+    const voiceName = voices[voiceIndex]?.voice?.name;
+    if (voiceName) {
+      localStorage.setItem(PREFERRED_VOICE_KEY, voiceName);
+    }
+  }, [voiceIndex, voices]);
   
   // Function to cycle through available voices in the desired order
   const cycleVoice = () => {
@@ -170,6 +198,10 @@ export const useVoiceSelection = () => {
         ...settings,
         voiceIndex: nextVoice.index
       }));
+      const voiceName = voices[nextVoice.index]?.voice?.name;
+      if (voiceName) {
+        localStorage.setItem(PREFERRED_VOICE_KEY, voiceName);
+      }
     } catch (error) {
       console.error('Error saving voice preference:', error);
     }
