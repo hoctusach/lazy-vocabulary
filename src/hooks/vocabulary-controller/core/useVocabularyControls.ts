@@ -5,6 +5,7 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { toast } from 'sonner';
+import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
 
 /**
  * Vocabulary control actions
@@ -56,7 +57,7 @@ export const useVocabularyControls = (
     const nextIndex = (currentIndex + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
-    localStorage.setItem('selectedVoiceName', nextVoice.name);
+    localStorage.setItem(PREFERRED_VOICE_KEY, nextVoice.name);
     if (currentWord && !isMuted && !isPaused) {
       unifiedSpeechController.stop();
       unifiedSpeechController.speak(currentWord, nextVoice.name);
