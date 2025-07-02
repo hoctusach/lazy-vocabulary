@@ -132,8 +132,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleCycleVoice}
         className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50 flex items-center justify-center"
-        title={allVoices.length === 0 ? 'No voices available' : `Change Voice`}
-        disabled={allVoices.length === 0}
+        title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
+        disabled={allVoices.length < 2}
         aria-label="Change Voice"
       >
         <Speaker size={16} />

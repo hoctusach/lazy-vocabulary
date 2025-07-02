@@ -9,7 +9,10 @@ globalThis.expect = expect;
 beforeAll(async () => {
   await import('@testing-library/jest-dom');
   (window as any).speechSynthesis = {
-    getVoices: () => [{ name: 'Test', lang: 'en-GB' }],
+    getVoices: () => [
+      { name: 'Test 1', lang: 'en-US' },
+      { name: 'Test 2', lang: 'en-GB' }
+    ],
     addEventListener: () => {},
     removeEventListener: () => {}
   };
@@ -27,7 +30,6 @@ describe('VocabularyControlsColumn voice toggle', () => {
       React.useEffect(() => {
         controllerState.voiceName = voiceName;
       }, [voiceName]);
-      const nextVoiceLabel = voiceName === voices[0] ? voices[1] : voices[0];
       const toggleVoice = () => setVoiceName(v => (v === voices[0] ? voices[1] : voices[0]));
       return (
           <VocabularyControlsColumn
@@ -49,12 +51,10 @@ describe('VocabularyControlsColumn voice toggle', () => {
 
     render(<Wrapper />);
 
-    const toggleBtn = screen.getByRole('button', { name: voices[1] });
+    const toggleBtn = screen.getByRole('button', { name: 'Change Voice' });
     expect(controllerState.voiceName).toBe(voices[0]);
 
     await userEvent.click(toggleBtn);
-
-    expect(screen.getByRole('button', { name: voices[0] })).toBeInTheDocument();
     expect(controllerState.voiceName).toBe(voices[1]);
   });
 });
