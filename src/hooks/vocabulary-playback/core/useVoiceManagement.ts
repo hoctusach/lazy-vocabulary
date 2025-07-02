@@ -3,11 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
-import {
-  US_VOICE_NAME,
-  UK_VOICE_NAME,
-  AU_VOICE_NAME
-} from '@/utils/speech/voiceNames';
 
 /**
  * Hook for managing voice selection and finding appropriate voices
@@ -55,12 +50,12 @@ export const useVoiceManagement = () => {
         console.log(`Voices loaded: found ${availableVoices.length} voices`);
         setVoicesLoaded(true);
         
-        // Check if our required voices are available
-        const hasUSVoice = availableVoices.some(v => v.name === US_VOICE_NAME || v.name.includes(US_VOICE_NAME));
-        const hasUKVoice = availableVoices.some(v => v.name === UK_VOICE_NAME || v.name.includes(UK_VOICE_NAME));
-        
+        // Warn if no US or UK voices are available
+        const hasUSVoice = availableVoices.some(v => v.lang && v.lang.toLowerCase().startsWith('en-us'));
+        const hasUKVoice = availableVoices.some(v => v.lang && v.lang.toLowerCase().startsWith('en-gb'));
+
         if (!hasUSVoice || !hasUKVoice) {
-          toast.warning("Some required voices may not be available. Speech quality might be affected.");
+          toast.warning('Some English voices may not be available. Speech quality might be affected.');
         }
       }
     };
@@ -92,39 +87,19 @@ export const useVoiceManagement = () => {
       return null;
     }
     
-    // Use hardcoded voice names
-    const targetVoiceName =
-      region === 'US' ? US_VOICE_NAME : region === 'UK' ? UK_VOICE_NAME : AU_VOICE_NAME;
-    
-    // Strategy 1: Find exact name match
-    let voice = allVoices.find(v => v.name === targetVoiceName);
-    
-    if (voice) {
-      console.log(`Found exact match for ${region}: ${voice.name} (${voice.lang})`);
-      return voice;
-    }
-    
-    // Strategy 2: Partial name match
-    voice = allVoices.find(v => v.name.includes(targetVoiceName));
-    
-    if (voice) {
-      console.log(`Found partial match for ${region}: ${voice.name} (${voice.lang})`);
-      return voice;
-    }
-    
-    // Fallback strategies
-    
-    // Strategy 3: Match by language code
+    // Strategy 1: Match by language code
     const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
-    voice = allVoices.find(v => v.lang === langCode);
-    
+    let voice = allVoices.find(
+      v => v.lang && v.lang.toLowerCase().startsWith(langCode.toLowerCase())
+    );
+
     if (voice) {
       console.log(`Selected ${region} voice by language code: ${voice.name} (${voice.lang})`);
       return voice;
     }
-    
-    // Strategy 4: Any English voice
-    voice = allVoices.find(v => v.lang.startsWith('en'));
+
+    // Strategy 2: Any English voice
+    voice = allVoices.find(v => v.lang && v.lang.startsWith('en'));
     
     if (voice) {
       console.log(`Selected any English voice for ${region}: ${voice.name} (${voice.lang})`);

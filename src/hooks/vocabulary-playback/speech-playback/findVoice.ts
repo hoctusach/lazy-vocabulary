@@ -1,9 +1,11 @@
 
 import { VoiceSelection } from '../useVoiceSelection';
-import { US_VOICE_NAME, UK_VOICE_NAME } from '@/utils/speech/voiceNames';
 
 
 // Backup voice names in case primary ones aren't found
+// Backup voice names in case primary voices aren't found. These remain as
+// additional fallbacks but will only be used if no matching language code
+// voices are available.
 const BACKUP_US_VOICES = ["Google US English", "Microsoft David", "Alex"];
 const BACKUP_UK_VOICES = ["Microsoft Susan", "Daniel", "Kate"];
 
@@ -22,28 +24,20 @@ export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceS
   });
   
   const { region } = voiceSelection;
-  const targetVoiceName = region === 'US' ? US_VOICE_NAME : UK_VOICE_NAME;
+  const langCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
+
+  console.log(`Looking for voice with language code: ${langCode}`);
+
+  // First try: exact language code match
+  let voice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(langCode.toLowerCase()));
+
+  if (voice) {
+    console.log(`Found language match: ${voice.name} (${voice.lang})`);
+    return voice;
+  }
+
+  // Attempt using backup voice lists for US/UK regions
   const backupVoices = region === 'US' ? BACKUP_US_VOICES : BACKUP_UK_VOICES;
-  
-  console.log(`Looking for ${region} voice with name: ${targetVoiceName}`);
-  
-  // First try: exact name match
-  let voice = voices.find(v => v.name === targetVoiceName);
-  
-  if (voice) {
-    console.log(`Found exact match: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Second try: partial name match
-  voice = voices.find(v => v.name.includes(targetVoiceName));
-  
-  if (voice) {
-    console.log(`Found partial match: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Third try: check for backup voice options
   for (const backupName of backupVoices) {
     voice = voices.find(v => v.name === backupName || v.name.includes(backupName));
     if (voice) {
@@ -51,18 +45,9 @@ export const findVoice = (voices: SpeechSynthesisVoice[], voiceSelection: VoiceS
       return voice;
     }
   }
-  
-  // Fallback to language code
-  const langCode = region === 'US' ? 'en-US' : 'en-GB';
-  voice = voices.find(v => v.lang === langCode);
-  
-  if (voice) {
-    console.log(`Fallback to language code: ${voice.name} (${voice.lang})`);
-    return voice;
-  }
-  
-  // Last resort - any English voice
-  voice = voices.find(v => v.lang.startsWith('en'));
+
+  // Fallback to any English voice
+  voice = voices.find(v => v.lang && v.lang.startsWith('en'));
   
   if (voice) {
     console.log(`Last resort - any English voice: ${voice.name} (${voice.lang})`);

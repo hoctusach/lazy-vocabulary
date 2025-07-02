@@ -2,11 +2,6 @@
 import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
-import {
-  US_VOICE_NAME,
-  UK_VOICE_NAME,
-  AU_VOICE_NAMES
-} from '@/utils/speech/voiceNames';
 
 
 export type VoiceOption = {
@@ -65,25 +60,18 @@ export const useVoiceSelection = () => {
       console.log(`Loading ${availableVoices.length} voices`);
       
       if (availableVoices.length) {
-        // Look specifically for our hardcoded voices
-        const usVoice = availableVoices.find(v => v.name === US_VOICE_NAME) || 
-                       availableVoices.find(v => v.name.includes(US_VOICE_NAME)) ||
-                       availableVoices.find(v => v.lang === 'en-US');
-                       
-        const ukVoice = availableVoices.find(v => v.name === UK_VOICE_NAME) ||
-                       availableVoices.find(v => v.name.includes(UK_VOICE_NAME)) ||
-                       availableVoices.find(v => v.lang === 'en-GB');
+        // Only keep voices with en-US, en-GB, en-AU language codes
+        const filteredVoices = availableVoices.filter(v =>
+          v.lang && (
+            v.lang.toLowerCase().startsWith('en-us') ||
+            v.lang.toLowerCase().startsWith('en-gb') ||
+            v.lang.toLowerCase().startsWith('en-au')
+          )
+        );
 
-        let auVoice: SpeechSynthesisVoice | undefined;
-        for (const auName of AU_VOICE_NAMES) {
-          auVoice =
-            availableVoices.find(v => v.name === auName) ||
-            availableVoices.find(v => v.name.includes(auName));
-          if (auVoice) break;
-        }
-        if (!auVoice) {
-          auVoice = availableVoices.find(v => v.lang === 'en-AU');
-        }
+        const usVoice = filteredVoices.find(v => v.lang.toLowerCase().startsWith('en-us')) || null;
+        const ukVoice = filteredVoices.find(v => v.lang.toLowerCase().startsWith('en-gb')) || null;
+        const auVoice = filteredVoices.find(v => v.lang.toLowerCase().startsWith('en-au')) || null;
         
         // Create simplified voice options
         const voiceOptions: VoiceOption[] = [
