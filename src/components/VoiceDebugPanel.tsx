@@ -6,16 +6,22 @@ const VoiceDebugPanel: React.FC = () => {
   const loadVoices = () => {
     const list = window.speechSynthesis.getVoices();
     if (list.length > 0) {
-      setVoices(list);
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      const filtered = list.filter(
+        (v) =>
+          v.lang &&
+          (v.lang.toLowerCase().startsWith('en-us') ||
+            v.lang.toLowerCase().startsWith('en-gb') ||
+            v.lang.toLowerCase().startsWith('en-au'))
+      );
+      setVoices(filtered);
     }
   };
 
   useEffect(() => {
     loadVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    window.speechSynthesis.onvoiceschanged = loadVoices;
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis.onvoiceschanged = null;
     };
   }, []);
 
