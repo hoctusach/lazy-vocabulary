@@ -245,7 +245,10 @@ class SpeechController {
         const utterance = new SpeechSynthesisUtterance(text);
         
         // Configure utterance
-        if (options.voice) utterance.voice = options.voice;
+        if (options.voice) {
+          utterance.voice = options.voice;
+          utterance.lang = options.voice.lang;
+        }
         utterance.rate = options.rate || getSpeechRate();
         utterance.pitch = options.pitch || 1.0;
         utterance.volume = options.volume || 1.0;

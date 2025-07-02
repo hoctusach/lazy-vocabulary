@@ -77,6 +77,7 @@ class RealSpeechService {
         : null;
       if (voice) {
         utterance.voice = voice;
+        utterance.lang = voice.lang;
         console.log(
           "Using voice:",
           voice.name,
@@ -95,6 +96,7 @@ class RealSpeechService {
           allVoices.find(v => v.lang.startsWith('en')) || allVoices[0] || null;
         if (fallback) {
           utterance.voice = fallback;
+          utterance.lang = fallback.lang;
           console.log(
             "Falling back to voice:",
             fallback.name,

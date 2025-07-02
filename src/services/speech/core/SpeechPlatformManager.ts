@@ -81,7 +81,17 @@ export class SpeechPlatformManager {
     const utterance = new SpeechSynthesisUtterance(speechText);
     
     const voice = this.voiceManager.findVoice(voiceRegion);
-    if (voice) utterance.voice = voice;
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    } else {
+      utterance.lang =
+        voiceRegion === 'UK'
+          ? 'en-GB'
+          : voiceRegion === 'US'
+          ? 'en-US'
+          : 'en-AU';
+    }
     utterance.rate = getSpeechRate();
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
