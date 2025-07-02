@@ -1,6 +1,7 @@
 
 import * as React from 'react';
 import { useEffect } from 'react';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 interface AudioInitializationProps {
   userInteractionRef: React.MutableRefObject<boolean>;
@@ -21,6 +22,7 @@ export const useAudioInitialization = ({
       const loadVoices = () => {
         const voices = window.speechSynthesis.getVoices();
         console.log(`Initial voices loaded: ${voices.length} voices available`);
+        logAvailableVoices(voices);
       };
       
       // Try to load immediately and also listen for the voiceschanged event

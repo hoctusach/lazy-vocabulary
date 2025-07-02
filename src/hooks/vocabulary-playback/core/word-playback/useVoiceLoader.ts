@@ -1,6 +1,7 @@
 
 import { useCallback, useRef } from 'react';
 import { toast } from 'sonner';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 /**
  * Hook for loading and managing speech synthesis voices
@@ -14,6 +15,7 @@ export const useVoiceLoader = () => {
     return new Promise((resolve) => {
       // If voices are already loaded, resolve immediately
       const voices = window.speechSynthesis.getVoices();
+      logAvailableVoices(voices);
       if (voices.length > 0) {
         voicesLoadedRef.current = true;
         console.log(`Voices already loaded: ${voices.length} voices available`);
@@ -24,6 +26,7 @@ export const useVoiceLoader = () => {
       // Set up event listener for voices changed
       const voiceChangedHandler = () => {
         const newVoices = window.speechSynthesis.getVoices();
+        logAvailableVoices(newVoices);
         if (newVoices.length > 0) {
           console.log(`Voices loaded via event: ${newVoices.length} voices`);
           voicesLoadedRef.current = true;
@@ -38,6 +41,7 @@ export const useVoiceLoader = () => {
       // Fallback timeout - try to get voices directly after a delay
       setTimeout(() => {
         const fallbackVoices = window.speechSynthesis.getVoices();
+        logAvailableVoices(fallbackVoices);
         if (fallbackVoices.length > 0 && !voicesLoadedRef.current) {
           console.log(`Fallback voices loaded: ${fallbackVoices.length} voices`);
           voicesLoadedRef.current = true;
