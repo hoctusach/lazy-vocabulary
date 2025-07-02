@@ -5,7 +5,10 @@ const VoiceDebugPanel: React.FC = () => {
 
   const loadVoices = () => {
     const list = window.speechSynthesis.getVoices();
-    setVoices(list);
+    if (list.length > 0) {
+      setVoices(list);
+      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+    }
   };
 
   useEffect(() => {
@@ -16,16 +19,21 @@ const VoiceDebugPanel: React.FC = () => {
     };
   }, []);
 
-  if (!import.meta.env.DEV) return null;
-
   return (
     <div className="voice-debug-panel">
-      <div>[Speech] Available voices from device/browser:</div>
-      {voices.map((v) => (
-        <div key={`${v.name}-${v.lang}`}>
-          [Voice] name: {v.name}, lang: {v.lang}, local: {String(v.localService)}, default: {String(v.default)}
-        </div>
-      ))}
+      {voices.length === 0 ? (
+        <div>No voices available on this device/browser.</div>
+      ) : (
+        <pre>
+          {`[Speech] Available voices from device/browser:
+${voices
+  .map(
+    (v) =>
+      `[Voice] name: ${v.name}, lang: ${v.lang}, local: ${v.localService}, default: ${v.default}`
+  )
+  .join('\n')}`}
+        </pre>
+      )}
     </div>
   );
 };
