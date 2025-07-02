@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+import { BUTTON_STATES_KEY, PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
 import { getLastWord } from '@/utils/lastWordStorage';
 import { findFuzzyIndex } from '@/utils/text/findFuzzyIndex';
 
@@ -21,8 +21,9 @@ export const useVocabularyDataLoader = (
     try {
       const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       const states = storedStates ? JSON.parse(storedStates) : {};
-      states.selectedVoiceName = selectedVoiceName;
+      states.preferredVoiceName = selectedVoiceName;
       localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
+      localStorage.setItem(PREFERRED_VOICE_KEY, selectedVoiceName);
     } catch (error) {
       console.error('Error saving voice to localStorage:', error);
     }
