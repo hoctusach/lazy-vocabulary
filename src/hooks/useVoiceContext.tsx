@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
-
 export interface VoiceContext {
   allVoices: SpeechSynthesisVoice[];
   selectedVoiceName: string;
@@ -18,7 +17,6 @@ export const useVoiceContext = (): VoiceContext => {
         .getVoices()
         .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
       setAllVoices(voices);
-
       const saved = localStorage.getItem('preferredVoiceName');
       const preferred = voices.find(v => v.name === saved);
       if (preferred) {

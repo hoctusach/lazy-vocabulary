@@ -5,6 +5,7 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { toast } from 'sonner';
+import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
 
 /**
  * Vocabulary control actions
