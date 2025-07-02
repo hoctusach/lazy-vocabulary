@@ -3,6 +3,7 @@ import { getSpeechRate } from './speechSettings';
 import { stopSpeaking } from './speechEngine';
 import { calculateSpeechDuration } from '../durationUtils';
 import { splitTextIntoChunks } from './textChunker';
+import { logAvailableVoices } from '../debug/logVoices';
 import { speakChunksInSequence } from './chunkSequencer';
 import { createSpeechMonitor, clearSpeechMonitor, SpeechMonitorRefs } from './speechMonitor';
 
@@ -42,7 +43,8 @@ export async function speakWithVoice({
   
   // First wait for voices to load (addressing the not-allowed error)
   await new Promise(resolve => setTimeout(resolve, 0));
-  window.speechSynthesis.getVoices(); // Trigger loading of voices
+  const debugVoices = window.speechSynthesis.getVoices(); // Trigger loading of voices
+  logAvailableVoices(debugVoices);
   
   // voice is provided directly; log if missing
   if (voice) {

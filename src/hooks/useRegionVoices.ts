@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 export const useRegionVoices = (region: 'US' | 'UK' | 'AU') => {
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -6,6 +7,7 @@ export const useRegionVoices = (region: 'US' | 'UK' | 'AU') => {
   const loadVoices = useCallback(() => {
     if (!window.speechSynthesis) return;
     const allVoices = window.speechSynthesis.getVoices();
+    logAvailableVoices(allVoices);
     const regionLangCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
     const filtered = allVoices
       .filter(v => v && v.lang && v.lang.toLowerCase().startsWith(regionLangCode.toLowerCase()))

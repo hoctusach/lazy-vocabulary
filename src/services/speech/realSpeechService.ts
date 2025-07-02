@@ -5,6 +5,7 @@ import {
   speechInitialized,
 } from "@/utils/speech/core/modules/speechInit";
 import { logSpeechEvent } from "@/utils/speechLogger";
+import { logAvailableVoices } from "@/utils/speech/debug/logVoices";
 import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 
 interface SpeechOptions {
@@ -70,6 +71,7 @@ class RealSpeechService {
 
       // Set voice by name when provided
       const allVoices = speechSynthesis.getVoices();
+      logAvailableVoices(allVoices);
       const voice = options.voiceName
         ? allVoices.find(v => v.name === options.voiceName) || null
         : null;
@@ -88,6 +90,7 @@ class RealSpeechService {
 
       if (!utterance.voice) {
         const allVoices = speechSynthesis.getVoices();
+        logAvailableVoices(allVoices);
         const fallback =
           allVoices.find(v => v.lang.startsWith('en')) || allVoices[0] || null;
         if (fallback) {
@@ -191,6 +194,7 @@ class RealSpeechService {
   private async ensureVoicesLoaded(): Promise<void> {
     return new Promise((resolve) => {
       const voices = window.speechSynthesis.getVoices();
+      logAvailableVoices(voices);
       if (voices.length > 0) {
         resolve();
         return;
@@ -198,6 +202,7 @@ class RealSpeechService {
 
       const loadVoices = () => {
         const newVoices = window.speechSynthesis.getVoices();
+        logAvailableVoices(newVoices);
         if (newVoices.length > 0) {
           console.log("Voices loaded:", newVoices.length, "voices available");
           resolve();

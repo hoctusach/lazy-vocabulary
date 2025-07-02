@@ -1,4 +1,5 @@
 // Utilities for selecting speech synthesis voices
+import { logAvailableVoices } from './debug/logVoices';
 
 /**
  * Return the first English voice available. Used as a final fallback.
@@ -20,6 +21,7 @@ export const findFallbackVoice = (
  */
 export const getVoiceByName = (name: string): SpeechSynthesisVoice | null => {
   const voices = window.speechSynthesis.getVoices();
+  logAvailableVoices(voices);
   if (!voices || voices.length === 0) return null;
 
   const match = voices.find(v => v.name === name);
@@ -33,12 +35,16 @@ export const hasAvailableVoices = (): boolean => {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       return false;
     }
-    return window.speechSynthesis.getVoices().length > 0;
+    const list = window.speechSynthesis.getVoices();
+    logAvailableVoices(list);
+    return list.length > 0;
   } catch {
     return false;
   }
 };
 
 export const getAllAvailableVoices = (): SpeechSynthesisVoice[] => {
-  return window.speechSynthesis.getVoices();
+  const voices = window.speechSynthesis.getVoices();
+  logAvailableVoices(voices);
+  return voices;
 };

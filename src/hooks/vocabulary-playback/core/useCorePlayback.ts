@@ -4,6 +4,7 @@ import {
   initializeSpeechSystem,
   registerSpeechInitGesture,
 } from "@/utils/speech/core/modules/speechInit";
+import { logAvailableVoices } from "@/utils/speech/debug/logVoices";
 
 /**
  * Core playback state and utility functions
@@ -37,6 +38,7 @@ export const useCorePlayback = (onUserInteraction?: () => void) => {
     if (window.speechSynthesis) {
       try {
         const voices = window.speechSynthesis.getVoices();
+        logAvailableVoices(voices);
         console.log(`Preloaded ${voices.length} voices at init`);
       } catch (e) {
         console.log("Voice preloading failed:", e);

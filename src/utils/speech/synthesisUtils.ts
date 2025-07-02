@@ -1,4 +1,5 @@
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -78,7 +79,8 @@ export const synthesizeAudio = (text: string, voice: SpeechSynthesisVoice | null
     // Use try-catch to handle potential errors during speech initiation
     try {
       // Ensure voices are loaded before speaking
-      window.speechSynthesis.getVoices();
+      const debugVoices = window.speechSynthesis.getVoices();
+      logAvailableVoices(debugVoices);
       
       // Short delay before speaking to ensure system is ready
       setTimeout(() => {

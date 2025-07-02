@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 export interface VoiceContext {
   allVoices: SpeechSynthesisVoice[];
   selectedVoiceName: string;
@@ -16,6 +17,7 @@ export const useVoiceContext = (): VoiceContext => {
       const voices = window.speechSynthesis
         .getVoices()
         .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+      logAvailableVoices(voices);
       setAllVoices(voices);
       const saved = localStorage.getItem('preferredVoiceName');
       const preferred = voices.find(v => v.name === saved);

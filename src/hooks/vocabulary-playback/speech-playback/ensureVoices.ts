@@ -1,4 +1,6 @@
 
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
+
 // Maximum number of attempts to load voices
 const MAX_VOICE_LOAD_ATTEMPTS = 10;
 
@@ -11,6 +13,7 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
     const checkVoices = (): SpeechSynthesisVoice[] => {
       if (window.speechSynthesis) {
         const availableVoices = window.speechSynthesis.getVoices();
+        logAvailableVoices(availableVoices);
         return availableVoices;
       }
       return [];
@@ -20,6 +23,7 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
     let voices = checkVoices();
     if (voices.length > 0) {
       console.log(`Voices already loaded: ${voices.length} voices available`);
+      logAvailableVoices(voices);
       resolve(voices);
       return;
     }
@@ -28,6 +32,7 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
     const voicesChangedHandler = () => {
       voices = checkVoices();
       console.log(`Voices loaded via event: ${voices.length} voices available`);
+      logAvailableVoices(voices);
       window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
       resolve(voices);
     };
@@ -43,6 +48,7 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
       
       if (voices.length > 0) {
         console.log(`Voices loaded after ${attempts + 1} attempts: ${voices.length} voices`);
+        logAvailableVoices(voices);
         window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
         resolve(voices);
         return;

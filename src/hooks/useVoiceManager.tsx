@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { findFallbackVoice } from '@/utils/speech';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 export const useVoiceManager = () => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
@@ -12,6 +13,7 @@ export const useVoiceManager = () => {
     try {
       const synth = window.speechSynthesis;
       const voices = synth.getVoices();
+      logAvailableVoices(voices);
       
       if (voices.length > 0) {
         console.log("Speech voices loaded:", voices.length);

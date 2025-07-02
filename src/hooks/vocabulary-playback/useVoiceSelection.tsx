@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import {
   US_VOICE_NAME,
   UK_VOICE_NAME,
@@ -58,6 +59,7 @@ export const useVoiceSelection = () => {
     const loadVoices = () => {
       const synth = window.speechSynthesis;
       const availableVoices = synth.getVoices();
+      logAvailableVoices(availableVoices);
       
       console.log(`Loading ${availableVoices.length} voices`);
       

@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
 import {
@@ -49,6 +50,7 @@ export const useVoiceManagement = () => {
     // Also try to preload voices
     const loadVoicesAndNotify = () => {
       const availableVoices = window.speechSynthesis.getVoices();
+      logAvailableVoices(availableVoices);
       if (availableVoices.length > 0) {
         console.log(`Voices loaded: found ${availableVoices.length} voices`);
         setVoicesLoaded(true);
@@ -82,6 +84,7 @@ export const useVoiceManagement = () => {
     
     // Always get fresh voices
     const allVoices = window.speechSynthesis.getVoices();
+    logAvailableVoices(allVoices);
     console.log(`Finding voice among ${allVoices.length} voices`);
     
     if (allVoices.length === 0) {
