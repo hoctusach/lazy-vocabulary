@@ -52,17 +52,17 @@ export const useVocabularyControls = (
 
   // Cycle to the next available voice
   const toggleVoice = useCallback(() => {
-    if (allVoices.length === 0) return;
+    if (allVoices.length < 2) return;
     const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
     const nextIndex = (currentIndex + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
-    localStorage.setItem(PREFERRED_VOICE_KEY, nextVoice.name);
+    localStorage.setItem('preferredVoiceName', nextVoice.name);
     if (currentWord && !isMuted && !isPaused) {
       unifiedSpeechController.stop();
       unifiedSpeechController.speak(currentWord, nextVoice.name);
     }
-    alert(`Voice "${nextVoice.name}" selected!`);
+    toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
   }, [
     allVoices,
     selectedVoiceName,
