@@ -1,5 +1,6 @@
 
 import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 // Store the current text being spoken for sync checking
 export function setCurrentTextBeingSpoken(processedText: string) {
@@ -24,7 +25,9 @@ export function isMutedFromLocalStorage(): boolean {
 }
 
 export function loadVoices(): SpeechSynthesisVoice[] {
-  return window.speechSynthesis.getVoices();
+  const voices = window.speechSynthesis.getVoices();
+  logAvailableVoices(voices);
+  return voices;
 }
 
 export function waitForVoices(): Promise<SpeechSynthesisVoice[]> {

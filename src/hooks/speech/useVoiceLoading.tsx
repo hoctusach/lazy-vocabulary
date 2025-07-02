@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   const [isVoicesLoaded, setIsVoicesLoaded] = useState(false);
@@ -11,6 +12,7 @@ export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   // Initialize voice loading
   const loadVoices = useCallback(() => {
     const voices = window.speechSynthesis.getVoices();
+    logAvailableVoices(voices);
     if (voices.length > 0) {
       console.log('Voices loaded successfully:', voices.length);
       setIsVoicesLoaded(true);

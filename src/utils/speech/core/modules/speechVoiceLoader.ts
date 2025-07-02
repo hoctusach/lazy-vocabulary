@@ -1,5 +1,7 @@
 
 
+import { logAvailableVoices } from '../../debug/logVoices';
+
 // Enhanced voice loading with comprehensive monitoring
 export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise((resolve) => {
@@ -9,9 +11,11 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
     
     // Try to get voices immediately
     let voices = window.speechSynthesis.getVoices();
+    logAvailableVoices(voices);
     
     if (voices.length > 0) {
       console.log('[ENGINE] ✓ Voices already available:', voices.length);
+      logAvailableVoices(voices);
       voicesLoaded = true;
       resolve(voices);
       return;
@@ -26,6 +30,7 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
       voices = window.speechSynthesis.getVoices();
       const elapsed = Date.now() - startTime;
       console.log(`[ENGINE] ✓ Voices loaded via event (${elapsed}ms):`, voices.length);
+      logAvailableVoices(voices);
       
       if (voices.length > 0) {
         voicesLoaded = true;
@@ -45,12 +50,14 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
           voices = window.speechSynthesis.getVoices();
           const elapsed = Date.now() - startTime;
           console.log(`[ENGINE] Checkpoint ${index + 1} (${elapsed}ms): ${voices.length} voices`);
+          logAvailableVoices(voices);
           
           // Resolve if we found voices or this is our final attempt
           if (voices.length > 0 || index === checkpoints.length - 1) {
             if (!voicesLoaded) {
               window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
               console.log(`[ENGINE] ✓ Voice loading complete (${elapsed}ms): ${voices.length} voices`);
+              logAvailableVoices(voices);
               voicesLoaded = true;
               resolve(voices);
             }

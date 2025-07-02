@@ -2,12 +2,15 @@
 /**
  * Utility to ensure speech synthesis voices are loaded
  */
+import { logAvailableVoices } from './debug/logVoices';
+
 export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
   return new Promise((resolve) => {
     let voices = window.speechSynthesis.getVoices();
     
     if (voices.length > 0) {
       console.log('Voices already loaded:', voices.length, 'voices available');
+      logAvailableVoices(voices);
       resolve(voices);
       return;
     }
@@ -16,6 +19,7 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
     const loadVoices = () => {
       voices = window.speechSynthesis.getVoices();
       console.log('Voices loaded:', voices.length, 'voices available');
+      logAvailableVoices(voices);
       resolve(voices);
     };
 
@@ -25,16 +29,8 @@ export const ensureVoicesLoaded = (): Promise<SpeechSynthesisVoice[]> => {
     setTimeout(() => {
       voices = window.speechSynthesis.getVoices();
       console.log('Voices loaded after timeout:', voices.length, 'voices available');
+      logAvailableVoices(voices);
       resolve(voices);
     }, 1000);
   });
-};
-
-export const logAvailableVoices = () => {
-  const voices = window.speechSynthesis.getVoices();
-  console.log('Available voices:', voices.map(v => ({
-    name: v.name,
-    lang: v.lang,
-    default: v.default
-  })));
 };
