@@ -8,7 +8,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 py-4">
       <header className="mb-4">
         <h1 className="text-xl font-bold text-center text-blue-900">Lazy Vocabulary</h1>
-        <p className="text-center text-blue-600 mt-1 text-sm font-medium">
+        <p className="text-center text-[#333333] mt-1 text-sm font-medium">
           Master vocabulary with passive learning
         </p>
         {/* Removed "Are you new?" section */}
