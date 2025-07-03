@@ -116,6 +116,10 @@
   text-align: center;
   margin-top: 8px;
   font-size: 0.85em;
+  padding: 0 20px;
+  word-wrap: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .app-name {
   color: #333333;
