@@ -11,6 +11,9 @@ const Index = () => {
         <p className="text-center text-blue-600 mt-1 text-sm font-medium">
           Master vocabulary with passive learning
         </p>
+        <p className="slogan-note">
+          Don’t memorize. Just skim, get it, and read examples out loud if you can!
+        </p>
         {/* Removed "Are you new?" section */}
       </header>
       

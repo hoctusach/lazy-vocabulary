@@ -110,3 +110,10 @@
   font-family: monospace;
 }
 
+.slogan-note {
+  color: #FF6F00;
+  font-style: italic;
+  margin-top: 8px;
+  font-size: 0.95em;
+}
+
