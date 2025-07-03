@@ -9,7 +9,7 @@ const Index = () => {
       <header className="mb-4">
         <h1 className="text-xl font-bold text-center text-blue-900">Lazy Vocabulary</h1>
         <p className="text-center text-[#333333] mt-1 text-sm font-medium">
-          Master vocabulary with passive learning
+          Master vocabulary with passive learning!
         </p>
         <p className="slogan-note">
           Don’t memorize. Just skim, get it, and read examples out loud if you can!
