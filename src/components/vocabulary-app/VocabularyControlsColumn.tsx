@@ -12,6 +12,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -73,6 +74,14 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       return;
     }
     onCycleVoice();
+  };
+
+  const handleRateChange = (r: number) => {
+    setSpeechRate(r);
+    if (currentWord && !isMuted && !isPaused) {
+      unifiedSpeechController.stop();
+      unifiedSpeechController.speak(currentWord, selectedVoiceName);
+    }
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
@@ -139,7 +148,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Speaker size={16} />
       </Button>
 
-      <SpeechRateControl rate={speechRate} onChange={setSpeechRate} />
+      <SpeechRateControl rate={speechRate} onChange={handleRateChange} />
 
       <EditWordButton onClick={onOpenEditModal} disabled={!currentWord} />
       <AddWordButton onClick={onOpenAddModal} />

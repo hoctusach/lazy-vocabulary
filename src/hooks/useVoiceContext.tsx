@@ -49,7 +49,6 @@ export const useVoiceContext = (): VoiceContext => {
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
     localStorage.setItem('preferredVoiceName', nextVoice.name);
-    toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
   };
 
   return { allVoices, selectedVoiceName, setSelectedVoiceName, cycleVoice };
