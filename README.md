@@ -83,6 +83,13 @@ npm test       # execute unit tests with vitest
 npm run lint   # check code style with ESLint
 ```
 
+## Developer workflow
+
+1. Install dependencies with `npm i`.
+2. Start the dev server using `npm run dev`.
+3. Run `npm test` and `npm run lint` before committing changes.
+4. Build for production with `npm run build`.
+
 
 ## Enabling speech playback
 

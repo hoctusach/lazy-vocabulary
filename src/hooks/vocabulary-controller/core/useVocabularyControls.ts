@@ -30,10 +30,7 @@ export const useVocabularyControls = (
     // Update state immediately for responsive UI
     setIsPaused(newPausedState);
     
-    // Clear timers when pausing
-    if (newPausedState) {
-      unifiedSpeechController.stop();
-    }
+    // Do not interrupt current speech; just update state
   }, [isPaused, setIsPaused]);
 
   // Toggle mute with immediate feedback

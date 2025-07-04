@@ -128,8 +128,8 @@ export const useUnifiedVocabularyController = () => {
         return;
       }
       
-      if (isPaused || isMuted) {
-        console.log('[UNIFIED-CONTROLLER] Paused or muted, skipping auto-advance');
+      if (isPaused) {
+        console.log('[UNIFIED-CONTROLLER] Paused, skipping auto-advance');
         return;
       }
       
