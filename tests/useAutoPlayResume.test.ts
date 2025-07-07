@@ -3,6 +3,7 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { markUserInteraction, resetUserInteraction } from '../src/utils/userInteraction';
 import { useAutoPlay } from '../src/hooks/vocabulary-playback/core/playback-states/useAutoPlay';
 import { VocabularyWord } from '../src/types/vocabulary';
 import { speechController } from '../src/utils/speech/core/speechController';
@@ -16,10 +17,12 @@ const word: VocabularyWord = { word: 'hello', meaning: '', example: '', category
 describe('useAutoPlay resume', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    markUserInteraction();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    resetUserInteraction();
   });
 
   it('replays current word when unpaused', () => {
