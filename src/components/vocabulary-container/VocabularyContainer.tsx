@@ -62,7 +62,7 @@ const VocabularyContainer: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-gray-800">No Vocabulary Data</h2>
+          <h3 className="text-2xl font-bold text-gray-800">No Vocabulary Data</h3>
           <p className="text-gray-600 max-w-md">
             Upload an Excel file with your vocabulary words to get started.
           </p>
