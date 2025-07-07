@@ -64,11 +64,11 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
         <div className="space-y-2">
           {/* Category and Word Count */}
           <div className="flex items-center justify-between">
-            <div className="text-sm font-medium text-gray-600 bg-white/80 px-3 py-1 rounded-full">
+            <h3 className="text-sm font-medium text-gray-600 bg-white/80 px-3 py-1 rounded-full">
               {categoryLabel}
-            </div>
-            <WordCountDisplay 
-              word={currentWordObj} 
+            </h3>
+            <WordCountDisplay
+              word={currentWordObj}
               showCount={showWordCount}
             />
           </div>

@@ -8,9 +8,9 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 py-4">
       <header className="mb-4">
         <h1 className="text-xl font-bold text-center text-blue-900">Lazy Vocabulary</h1>
-        <p className="text-center text-[#333333] mt-1 text-sm font-medium">
+        <h2 className="text-center text-[#333333] mt-1 text-sm font-medium">
           Master vocabulary with passive learning!
-        </p>
+        </h2>
         <p className="slogan-note">
           Don’t memorize. Just skim, get it,
           <br />
