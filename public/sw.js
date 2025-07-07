@@ -51,3 +51,24 @@ self.addEventListener('install', function(event) {
 self.addEventListener('activate', function(event) {
   event.waitUntil(self.clients.claim());
 });
+
+self.addEventListener('fetch', function(event) {
+  const requestURL = new URL(event.request.url);
+  if (requestURL.origin === location.origin && (requestURL.pathname.startsWith('/assets/') || requestURL.pathname.match(/\.(js|css|svg|png|ico)$/))) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then(async cache => {
+        const cached = await cache.match(event.request);
+        if (cached) return cached;
+        const response = await fetch(event.request);
+        const cachedResponse = new Response(response.clone().body, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+        cachedResponse.headers.set('Cache-Control', 'public, max-age=31536000');
+        cache.put(event.request, cachedResponse.clone());
+        return cachedResponse;
+      })
+    );
+  }
+});

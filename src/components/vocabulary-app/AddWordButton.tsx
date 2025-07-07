@@ -15,6 +15,7 @@ const AddWordButton: React.FC<AddWordButtonProps> = ({ onClick }) => {
       variant="outline"
       size="sm"
       title="Add Word"
+      aria-label="Add Word"
     >
       <Plus size={16} />
     </Button>

@@ -17,6 +17,7 @@ const EditWordButton: React.FC<EditWordButtonProps> = ({ onClick, disabled }) =>
       size="sm"
       disabled={disabled}
       title="Edit Word"
+      aria-label="Edit Word"
     >
       <Edit size={16} />
     </Button>

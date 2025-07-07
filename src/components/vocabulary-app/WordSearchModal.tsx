@@ -148,7 +148,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               if (e.key === 'Enter') e.preventDefault();
             }}
           />
-          <Button size="icon" variant="outline">
+          <Button size="icon" variant="outline" aria-label="Search">
             <Search className="h-4 w-4" />
           </Button>
         </div>
