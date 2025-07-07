@@ -99,6 +99,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           isMuted ? 'text-purple-700 border-purple-300 bg-purple-50' : 'text-gray-700'
         )}
         title={isMuted ? 'Unmute' : 'Mute'}
+        aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
         {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       </Button>
@@ -112,6 +113,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           isPaused ? 'text-orange-500 border-orange-300 bg-orange-50' : 'text-gray-700'
         )}
         title={isPaused ? 'Play' : 'Pause'}
+        aria-label={isPaused ? 'Play' : 'Pause'}
       >
         {isPaused ? <Play size={16} /> : <Pause size={16} />}
       </Button>
@@ -122,6 +124,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleNextWord}
         className="h-8 w-8 p-0 text-indigo-700 bg-indigo-50"
         title="Next Word"
+        aria-label="Next Word"
       >
         <SkipForward size={16} />
       </Button>
@@ -132,6 +135,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleSwitchCategory}
         className="h-8 w-8 p-0 text-green-700"
         title={`Switch to ${nextCategoryLabel}`}
+        aria-label={`Switch to ${nextCategoryLabel}`}
       >
         <RefreshCw size={16} />
       </Button>
@@ -158,6 +162,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={openSearch}
         className="h-8 w-8 p-0"
         title="Quick Search"
+        aria-label="Quick Search"
       >
         <Search size={16} />
       </Button>
