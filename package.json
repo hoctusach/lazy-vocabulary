@@ -2,6 +2,7 @@
   "name": "lazy-vocabulary",
   "version": "1.0.0",
   "description": "Vocabulary learning app",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

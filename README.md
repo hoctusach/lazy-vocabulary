@@ -8,7 +8,9 @@
 
 This project requires **Node.js >=18**. A `.nvmrc` file is provided so you can
 quickly switch to the correct version with
-[`nvm`](https://github.com/nvm-sh/nvm#installing-and-updating):
+[`nvm`](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+This project uses Node's ES module syntax; `package.json` specifies `"type": "module"`.
 
 ```sh
 nvm install
