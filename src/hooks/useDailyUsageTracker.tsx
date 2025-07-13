@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { addStreakDay } from '@/utils/streak';
 
 const STICKERS_KEY = 'stickers';
 const MINUTES_15 = 15 * 60 * 1000;
@@ -37,6 +38,7 @@ export const useDailyUsageTracker = () => {
         if (!stickers.includes(today)) {
           stickers.push(today);
           localStorage.setItem(STICKERS_KEY, JSON.stringify(stickers));
+          addStreakDay(today);
         }
       } catch (err) {
         console.error('Failed to update stickers', err);
