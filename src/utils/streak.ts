@@ -1,5 +1,7 @@
 export const STREAK_DAYS_KEY = 'streakDays';
 export const USED_STREAK_DAYS_KEY = 'usedStreakDays';
+export const BADGES_KEY = 'badges';
+export const REDEEMABLE_STREAKS_KEY = 'redeemableStreaks';
 
 function dayDiff(a: Date, b: Date): number {
   const ms = 24 * 60 * 60 * 1000;
@@ -58,5 +60,38 @@ export function addStreakDay(date: string): void {
     try {
       localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(current));
     } catch {}
+    handleStreakMilestone(current);
   }
+}
+
+const MILESTONES = [5, 10, 15, 20, 30];
+
+function handleStreakMilestone(days: string[]): void {
+  if (!MILESTONES.includes(days.length)) {
+    return;
+  }
+
+  const count = days.length;
+
+  try {
+    const badges = JSON.parse(localStorage.getItem(BADGES_KEY) || '{}');
+    badges[`${count}_day_streak`] = true;
+    localStorage.setItem(BADGES_KEY, JSON.stringify(badges));
+  } catch {}
+
+  try {
+    const used = JSON.parse(localStorage.getItem(USED_STREAK_DAYS_KEY) || '[]');
+    const updated = used.concat(days);
+    localStorage.setItem(USED_STREAK_DAYS_KEY, JSON.stringify(updated));
+  } catch {}
+
+  try {
+    localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify([]));
+  } catch {}
+
+  try {
+    const redeem = JSON.parse(localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '[]');
+    redeem.push(days);
+    localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
+  } catch {}
 }

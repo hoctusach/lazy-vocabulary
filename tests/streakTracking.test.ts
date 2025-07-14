@@ -37,4 +37,35 @@ describe('streak days loading', () => {
     localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(['2024-07-10','2024-07-11']));
     expect(loadStreakDays()).toEqual(['2024-07-10','2024-07-11']);
   });
+
+  it('unlocks badge at milestone and resets streak', () => {
+    for (let i = 1; i <= 5; i++) {
+      const date = `2024-07-0${i}`;
+      vi.setSystemTime(new Date(`${date}T00:00:00Z`));
+      addStreakDay(date);
+    }
+
+    const badges = JSON.parse(localStorage.getItem('badges') || '{}');
+    expect(badges['5_day_streak']).toBe(true);
+
+    expect(JSON.parse(localStorage.getItem(STREAK_DAYS_KEY)!)).toEqual([]);
+
+    expect(JSON.parse(localStorage.getItem(USED_STREAK_DAYS_KEY)!)).toEqual([
+      '2024-07-01',
+      '2024-07-02',
+      '2024-07-03',
+      '2024-07-04',
+      '2024-07-05'
+    ]);
+
+    expect(JSON.parse(localStorage.getItem('redeemableStreaks') || '[]')).toEqual([
+      [
+        '2024-07-01',
+        '2024-07-02',
+        '2024-07-03',
+        '2024-07-04',
+        '2024-07-05'
+      ]
+    ]);
+  });
 });
