@@ -91,7 +91,18 @@ function handleStreakMilestone(days: string[]): void {
   } catch {}
 
   try {
-    const redeem = JSON.parse(localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '{}');
+    const redeem: Record<string, string[]> = JSON.parse(
+      localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '{}'
+    );
+    for (const key of Object.keys(redeem)) {
+      const match = key.match(/^(\d+)_day_streak$/);
+      if (match && parseInt(match[1], 10) < count) {
+        const oldDays: string[] = redeem[key];
+        if (oldDays.some(d => days.includes(d))) {
+          delete redeem[key];
+        }
+      }
+    }
     redeem[`${count}_day_streak`] = days;
     localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
   } catch {}
