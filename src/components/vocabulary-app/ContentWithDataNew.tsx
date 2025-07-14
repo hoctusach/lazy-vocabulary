@@ -3,6 +3,8 @@ import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
 import DebugPanel from '@/components/DebugPanel';
 import AddWordModal from './AddWordModal';
+import MedalCabinet from '@/components/MedalCabinet';
+import StickerHistory from '@/components/StickerHistory';
 
 interface ContentWithDataNewProps {
   displayWord: VocabularyWord;
@@ -67,10 +69,14 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         isSoundPlaying={isSpeaking}
         handleManualNext={handleManualNext}
         displayTime={displayTime}
-        selectedVoiceName={selectedVoiceName}
+      selectedVoiceName={selectedVoiceName}
       onOpenAddModal={handleOpenAddWordModal}
-        onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
+      onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       />
+
+      {/* Achievements and learning days */}
+      <MedalCabinet />
+      <StickerHistory />
 
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
