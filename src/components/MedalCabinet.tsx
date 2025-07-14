@@ -102,29 +102,29 @@ const MedalCabinet: React.FC = () => {
   return (
     <div className="mt-6">
       <h3 className="font-semibold mb-2">Medals</h3>
-      <Accordion type="multiple" className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+      <Accordion type="multiple" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
         {medals.map(medal => {
           const count = parseInt(medal.key);
           const achieved = medal.days[medal.days.length - 1];
           return (
-            <AccordionItem
-              key={medal.key}
-              value={medal.key}
-              className={cn('border rounded-md', !medal.earned && 'opacity-50')}
-            >
-              <AccordionTrigger className="flex flex-col items-center p-2 focus:outline-none">
-                <span role="img" aria-label={`${count}-day medal`} className="text-3xl">
-                  {ICONS[count]}
-                </span>
-                {medal.earned && achieved && (
-                  <span className="text-xs mt-1">
-                    {new Date(achieved).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+              <AccordionItem
+                key={medal.key}
+                value={medal.key}
+                className={cn('medal-item', !medal.earned && 'opacity-50')}
+              >
+                <AccordionTrigger className="flex flex-col items-center gap-1 p-2 focus:outline-none">
+                  <span role="img" aria-label={`${count}-day medal`} className="medal-icon">
+                    {ICONS[count]}
                   </span>
-                )}
-                <span className="text-xs">{count}d Streak</span>
-                {medal.redeemed && <span className="text-[10px] text-green-600">Redeemed</span>}
-                {!medal.earned && <span className="text-[10px] text-muted-foreground">Locked</span>}
-              </AccordionTrigger>
+                  {medal.earned && achieved && (
+                    <span className="medal-date">
+                      {new Date(achieved).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                    </span>
+                  )}
+                  <span className="medal-label">{count}d Streak</span>
+                  {medal.redeemed && <span className="text-[10px] text-green-600">Redeemed</span>}
+                  {!medal.earned && <span className="text-[10px] text-muted-foreground">Locked</span>}
+                </AccordionTrigger>
               <AccordionContent className="space-y-1 px-2 pb-2">
                 {medal.days.length > 0 && (
                   <ul className="space-y-1 text-sm">
