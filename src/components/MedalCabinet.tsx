@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
+
+const MILESTONES = [5, 10, 15, 20, 30];
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { saveMedalRedemption, loadMedalRedemptions } from '@/utils/medals';
 import { redeemBadge } from '@/utils/streak';
+import { cn } from '@/lib/utils';
 
 interface MedalInfo {
   key: string;
+  earned: boolean;
   redeemed: boolean;
   text: string;
 }
@@ -25,11 +29,15 @@ const MedalCabinet: React.FC = () => {
         badges = {};
       }
       const redemptions = loadMedalRedemptions();
-      const list: MedalInfo[] = Object.keys(badges).map(key => ({
-        key,
-        redeemed: !!redemptions[key],
-        text: redemptions[key] || ''
-      }));
+      const list: MedalInfo[] = MILESTONES.map(count => {
+        const key = `${count}_day_streak`;
+        return {
+          key,
+          earned: !!badges[key],
+          redeemed: !!redemptions[key],
+          text: redemptions[key] || ''
+        };
+      });
       setMedals(list);
     };
     load();
@@ -64,7 +72,10 @@ const MedalCabinet: React.FC = () => {
       {medals.map(medal => (
         <div
           key={medal.key}
-          className="flex items-center justify-between border rounded-md p-2"
+          className={cn(
+            'flex items-center justify-between border rounded-md p-2',
+            !medal.earned && 'opacity-50'
+          )}
         >
           <div>
             <p className="text-sm font-medium">{medal.key}</p>
@@ -73,10 +84,18 @@ const MedalCabinet: React.FC = () => {
                 Redeemed: {medal.text}
               </p>
             )}
+            {!medal.earned && (
+              <p className="text-xs text-muted-foreground">Locked</p>
+            )}
           </div>
-          {!medal.redeemed && (
+          {medal.earned && !medal.redeemed && (
             <Button size="sm" onClick={() => openRedeem(medal.key)}>
               Redeem
+            </Button>
+          )}
+          {medal.earned && medal.redeemed && (
+            <Button size="sm" disabled>
+              Redeemed
             </Button>
           )}
         </div>
