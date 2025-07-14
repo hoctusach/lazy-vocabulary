@@ -3,6 +3,7 @@ import React from 'react';
 import VocabularyApp from '@/components/VocabularyApp';
 import VoiceDebugPanel from '@/components/VoiceDebugPanel';
 import MedalCabinet from '@/components/MedalCabinet';
+import StickerHistory from '@/components/StickerHistory';
 
 const Index = () => {
   return (
@@ -23,6 +24,7 @@ const Index = () => {
       <main className="container mx-auto px-2">
         <VocabularyApp />
         <MedalCabinet />
+        <StickerHistory />
       </main>
       
       <footer className="mt-6 text-center text-sm text-muted-foreground">
