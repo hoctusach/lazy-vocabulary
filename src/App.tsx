@@ -7,10 +7,15 @@ import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
+import { useEffect } from "react";
+import { loadStreakDays } from "./utils/streak";
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  useEffect(() => {
+    loadStreakDays();
+  }, []);
   useDailyUsageTracker();
   return (
     <QueryClientProvider client={queryClient}>
