@@ -23,8 +23,6 @@ const Index = () => {
       
       <main className="container mx-auto px-2">
         <VocabularyApp />
-        <MedalCabinet />
-        <StickerHistory />
       </main>
       
       <footer className="mt-6 text-center text-sm text-muted-foreground">
