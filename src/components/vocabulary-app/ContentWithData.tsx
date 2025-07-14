@@ -1,7 +1,6 @@
 import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMain from './VocabularyMain';
-import DebugPanel from '@/components/DebugPanel';
 import AddWordModal from './AddWordModal';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 
@@ -20,7 +19,6 @@ interface ContentWithDataProps {
   displayTime: number;
   selectedVoice: VoiceSelection;
   nextVoiceLabel: string;
-  debugPanelData: any;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
   handleSaveWord: (wordData: { word: string; meaning: string; example: string; category: string }) => void;
@@ -45,7 +43,6 @@ const ContentWithData: React.FC<ContentWithDataProps> = ({
   displayTime,
   selectedVoice,
   nextVoiceLabel,
-  debugPanelData,
   isAddWordModalOpen,
   handleCloseModal,
   handleSaveWord,
@@ -78,13 +75,7 @@ const ContentWithData: React.FC<ContentWithDataProps> = ({
       />
       
       
-      {/* Debug Panel */}
-      <DebugPanel 
-        isMuted={muted}
-        voiceRegion={selectedVoice.region}
-        isPaused={paused}
-        currentWord={debugPanelData}
-      />
+
       
       {/* Enhanced Word Modal (handles both add and edit) */}
       <AddWordModal 

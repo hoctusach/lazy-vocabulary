@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
+import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 interface DebugPanelProps {
-  isMuted: boolean;
-  selectedVoiceName: string;
-  isPaused: boolean;
+  isMuted?: boolean;
+  selectedVoiceName?: string;
+  isPaused?: boolean;
   currentWord?: {
     word: string;
     category: string;
@@ -13,11 +14,16 @@ interface DebugPanelProps {
 }
 
 const DebugPanel: React.FC<DebugPanelProps> = ({
-  isMuted,
-  selectedVoiceName,
-  isPaused,
-  currentWord
+  isMuted: mutedProp,
+  selectedVoiceName: voiceProp,
+  isPaused: pausedProp,
+  currentWord: wordProp
 }) => {
+  const context = useContext(DebugInfoContext);
+  const isMuted = mutedProp ?? context?.isMuted ?? false;
+  const selectedVoiceName = voiceProp ?? context?.selectedVoiceName ?? '';
+  const isPaused = pausedProp ?? context?.isPaused ?? false;
+  const currentWord = wordProp ?? context?.currentWord ?? null;
   const currentCategory = vocabularyService.getCurrentSheetName();
   
   return (

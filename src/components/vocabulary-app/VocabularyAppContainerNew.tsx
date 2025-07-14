@@ -10,6 +10,7 @@ import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabu
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
+import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 const VocabularyAppContainerNew: React.FC = () => {
   // Use stable state management
@@ -77,10 +78,18 @@ const VocabularyAppContainerNew: React.FC = () => {
       : null;
   }, [currentWord?.word, currentWord?.category, currentCategory]);
 
+  const debugInfo = useMemo(() => ({
+    isMuted,
+    selectedVoiceName,
+    isPaused,
+    currentWord: debugData
+  }), [isMuted, selectedVoiceName, isPaused, debugData]);
+
   let content: React.ReactNode;
 
   if (!hasData && !vocabularyService.hasData()) {
     return (
+      <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -108,11 +117,13 @@ const VocabularyAppContainerNew: React.FC = () => {
           />
         </div>
         </VocabularyLayout>
-      );
+      </DebugInfoContext.Provider>
+    );
   }
 
   if (!hasData) {
     return (
+      <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -140,11 +151,13 @@ const VocabularyAppContainerNew: React.FC = () => {
           />
         </div>
         </VocabularyLayout>
-      );
+      </DebugInfoContext.Provider>
+    );
   }
 
   if (!currentWord) {
     return (
+      <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -172,6 +185,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           />
         </div>
       </VocabularyLayout>
+      </DebugInfoContext.Provider>
       );
   } else {
     content = (
@@ -199,7 +213,6 @@ const VocabularyAppContainerNew: React.FC = () => {
             handleManualNext={goToNextAndSpeak}
             displayTime={5000}
             selectedVoiceName={selectedVoiceName}
-            debugPanelData={debugData}
             isAddWordModalOpen={isAddWordModalOpen}
             handleCloseModal={handleCloseModal}
             handleSaveWord={handleSaveWord}
@@ -214,6 +227,7 @@ const VocabularyAppContainerNew: React.FC = () => {
   }
 
   return (
+    <DebugInfoContext.Provider value={debugInfo}>
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
       <div className="space-y-4">
         <UserInteractionManager
@@ -238,7 +252,6 @@ const VocabularyAppContainerNew: React.FC = () => {
           handleManualNext={goToNextAndSpeak}
           displayTime={5000}
           selectedVoiceName={selectedVoiceName}
-          debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}
           handleSaveWord={handleSaveWord}
@@ -249,6 +262,7 @@ const VocabularyAppContainerNew: React.FC = () => {
         />
       </div>
     </VocabularyLayout>
+    </DebugInfoContext.Provider>
   );
 };
 

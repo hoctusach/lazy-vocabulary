@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import VocabularyLayout from "@/components/VocabularyLayout";
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { useAudioInitialization } from "@/hooks/vocabulary-app/useAudioInitialization";
@@ -10,6 +10,7 @@ import { useVocabularyAppState } from "./hooks/useVocabularyAppState";
 import { useDisplayWord } from "./hooks/useDisplayWord";
 import { useVoiceLabels } from "./hooks/useVoiceLabels";
 import VocabularyAppContent from "./components/VocabularyAppContent";
+import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 const VocabularyAppContainer: React.FC = () => {
   console.log('[VOCAB-CONTAINER] === Component Render ===');
@@ -58,6 +59,13 @@ const VocabularyAppContainer: React.FC = () => {
 
   // Determine display word with fallback logic
   const { displayWord, debugData } = useDisplayWord(playbackCurrentWord, wordList || [], hasData);
+
+  const debugInfo = useMemo(() => ({
+    isMuted: muted,
+    selectedVoiceName: typeof selectedVoice === 'string' ? selectedVoice : selectedVoice?.region || 'UK',
+    isPaused: paused,
+    currentWord: debugData
+  }), [muted, selectedVoice, paused, debugData]);
 
   // Ensure selectedVoice has all required properties for voice labels
   // Handle both VoiceSelection and simplified { region } objects
@@ -139,6 +147,7 @@ const VocabularyAppContainer: React.FC = () => {
   const displaySelectedVoice = typeof selectedVoice === 'string' ? selectedVoice : selectedVoice?.region || 'UK';
 
   return (
+    <DebugInfoContext.Provider value={debugInfo}>
     <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
         <VocabularyAppContent
         hasData={hasData}
@@ -153,7 +162,6 @@ const VocabularyAppContainer: React.FC = () => {
         currentCategory={currentCategory}
         nextCategory={nextCategory}
         displayTime={displayTime}
-        debugData={debugData}
         isAddWordModalOpen={isAddWordModalOpen}
         isEditMode={isEditMode}
         wordToEdit={wordToEdit}
@@ -168,6 +176,7 @@ const VocabularyAppContainer: React.FC = () => {
         handleOpenEditWordModal={handleOpenEditWordModal}
       />
     </VocabularyLayout>
+    </DebugInfoContext.Provider>
   );
 };
 
