@@ -24,6 +24,7 @@ export function loadStreakDays(): string[] {
     usedDays = [];
   }
   let filtered = streakDays.filter(day => !usedDays.includes(day));
+  filtered = Array.from(new Set(filtered));
   if (filtered.length !== streakDays.length) {
     try {
       localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(filtered));
@@ -81,7 +82,7 @@ function handleStreakMilestone(days: string[]): void {
 
   try {
     const used = JSON.parse(localStorage.getItem(USED_STREAK_DAYS_KEY) || '[]');
-    const updated = used.concat(days);
+    const updated = Array.from(new Set(used.concat(days)));
     localStorage.setItem(USED_STREAK_DAYS_KEY, JSON.stringify(updated));
   } catch {}
 
