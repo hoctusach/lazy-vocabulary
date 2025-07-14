@@ -90,8 +90,18 @@ function handleStreakMilestone(days: string[]): void {
   } catch {}
 
   try {
-    const redeem = JSON.parse(localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '[]');
-    redeem.push(days);
+    const redeem = JSON.parse(localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '{}');
+    redeem[`${count}_day_streak`] = days;
     localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
+  } catch {}
+}
+
+export function redeemBadge(badgeKey: string): void {
+  try {
+    const redeem = JSON.parse(localStorage.getItem(REDEEMABLE_STREAKS_KEY) || '{}');
+    if (redeem[badgeKey]) {
+      delete redeem[badgeKey];
+      localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
+    }
   } catch {}
 }

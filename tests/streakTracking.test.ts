@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { loadStreakDays, addStreakDay, STREAK_DAYS_KEY, USED_STREAK_DAYS_KEY } from '../src/utils/streak';
+import { loadStreakDays, addStreakDay, STREAK_DAYS_KEY, USED_STREAK_DAYS_KEY, redeemBadge } from '../src/utils/streak';
 
 describe('streak days loading', () => {
   beforeEach(() => {
@@ -58,14 +58,22 @@ describe('streak days loading', () => {
       '2024-07-05'
     ]);
 
-    expect(JSON.parse(localStorage.getItem('redeemableStreaks') || '[]')).toEqual([
-      [
+    expect(JSON.parse(localStorage.getItem('redeemableStreaks') || '{}')).toEqual({
+      '5_day_streak': [
         '2024-07-01',
         '2024-07-02',
         '2024-07-03',
         '2024-07-04',
         '2024-07-05'
       ]
-    ]);
+    });
+  });
+
+  it('allows redeeming a badge', () => {
+    localStorage.setItem('redeemableStreaks', JSON.stringify({
+      '5_day_streak': ['2024-07-01']
+    }));
+    redeemBadge('5_day_streak');
+    expect(JSON.parse(localStorage.getItem('redeemableStreaks') || '{}')).toEqual({});
   });
 });
