@@ -104,4 +104,48 @@ describe('streak days loading', () => {
       '2024-07-10'
     ]);
   });
+
+  it('removes overlapping lower redeemable streaks', () => {
+    vi.setSystemTime(new Date('2024-07-10T00:00:00Z'));
+    localStorage.setItem('redeemableStreaks', JSON.stringify({
+      '5_day_streak': [
+        '2024-07-01',
+        '2024-07-02',
+        '2024-07-03',
+        '2024-07-04',
+        '2024-07-05'
+      ]
+    }));
+    localStorage.setItem(
+      STREAK_DAYS_KEY,
+      JSON.stringify([
+        '2024-07-01',
+        '2024-07-02',
+        '2024-07-03',
+        '2024-07-04',
+        '2024-07-05',
+        '2024-07-06',
+        '2024-07-07',
+        '2024-07-08',
+        '2024-07-09'
+      ])
+    );
+
+    addStreakDay('2024-07-10');
+
+    expect(JSON.parse(localStorage.getItem('redeemableStreaks') || '{}')).toEqual({
+      '10_day_streak': [
+        '2024-07-01',
+        '2024-07-02',
+        '2024-07-03',
+        '2024-07-04',
+        '2024-07-05',
+        '2024-07-06',
+        '2024-07-07',
+        '2024-07-08',
+        '2024-07-09',
+        '2024-07-10'
+      ]
+    });
+  });
 });
