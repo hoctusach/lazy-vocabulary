@@ -108,6 +108,14 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             >
               <p>⭐ Tap any button (e.g., Next) to enable speech.</p>
               <p>⭐ On Mobile, only one voice may be available.</p>
+              <p>
+                ⭐ No personal login or data is stored on any server. Your
+                progress (stickers, rewards) is saved locally in your browser on
+                your device. Available voices depend on your browser and
+                device—at first, try different browsers to find the best one for
+                learning. Make sure you use the same device and browser to keep
+                your progress.
+              </p>
             </div>
           )}
         </div>
