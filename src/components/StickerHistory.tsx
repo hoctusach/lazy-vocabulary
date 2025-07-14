@@ -21,13 +21,20 @@ const StickerHistory: React.FC = () => {
   return (
     <div className="mt-6 space-y-1">
       <h3 className="font-semibold">Learning Days</h3>
-      <ul className="list-disc pl-4">
+      <div className="flex flex-wrap gap-2 justify-start">
         {dates.map(date => (
-          <li key={date} className="text-sm">
-            {date}
-          </li>
+          <div key={date} className="flex flex-col items-center w-16">
+            <img
+              src="/assets/star-sticker.png"
+              alt={`Sticker earned on ${date}`}
+              className="w-12 h-12"
+            />
+            <span className="text-[0.75rem] text-gray-600 mt-1">
+              {date}
+            </span>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
