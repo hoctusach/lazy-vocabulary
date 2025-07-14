@@ -133,3 +133,37 @@
   white-space: nowrap;
 }
 
+/* Medal styling */
+.medal-item {
+  border: 2px solid #FFC107;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  background-color: #fff;
+}
+
+.dark .medal-item {
+  background-color: hsl(var(--card));
+}
+
+.medal-icon {
+  font-size: 6rem;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  .medal-icon {
+    font-size: 4rem;
+  }
+}
+
+.medal-label {
+  font-weight: 600;
+  text-align: center;
+}
+
+.medal-date {
+  text-align: center;
+  font-size: 0.75rem;
+}
+
