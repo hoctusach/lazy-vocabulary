@@ -19,7 +19,6 @@ interface VocabularyAppContentProps {
   currentCategory: string;
   nextCategory: string | null;
   displayTime: number;
-  debugData: any;
   isAddWordModalOpen: boolean;
   isEditMode: boolean;
   wordToEdit: any;
@@ -47,7 +46,6 @@ const VocabularyAppContent: React.FC<VocabularyAppContentProps> = ({
   currentCategory,
   nextCategory,
   displayTime,
-  debugData,
   isAddWordModalOpen,
   isEditMode,
   wordToEdit,
@@ -82,7 +80,6 @@ const VocabularyAppContent: React.FC<VocabularyAppContentProps> = ({
           handleManualNext={handleManualNext}
           displayTime={displayTime}
           selectedVoice={selectedVoice}
-          debugPanelData={debugData}
           isAddWordModalOpen={isAddWordModalOpen}
           handleCloseModal={handleCloseModal}
           handleSaveWord={handleSaveWord}

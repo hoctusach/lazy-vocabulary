@@ -2,8 +2,7 @@
 import React from 'react';
 import VocabularyApp from '@/components/VocabularyApp';
 import VoiceDebugPanel from '@/components/VoiceDebugPanel';
-import MedalCabinet from '@/components/MedalCabinet';
-import StickerHistory from '@/components/StickerHistory';
+import DebugPanel from '@/components/DebugPanel';
 
 const Index = () => {
   return (
@@ -29,6 +28,7 @@ const Index = () => {
         <p>© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
       </footer>
       <VoiceDebugPanel />
+      <DebugPanel />
     </div>
   );
 };
