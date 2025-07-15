@@ -31,7 +31,7 @@ export const useVocabularyState = () => {
   const [isMuted, setIsMuted] = useState<boolean>(() => getInitialFlag('isMuted'));
   const {
     allVoices,
-    selectedVoiceNames,
+    selectedVoiceName,
     setSelectedVoiceName
   } = useVoiceContext();
 
@@ -67,7 +67,7 @@ export const useVocabularyState = () => {
     setIsPaused,
     isMuted,
     setIsMuted,
-    selectedVoiceNames,
+    selectedVoiceName,
     setSelectedVoiceName,
     allVoices,
     currentWord,
