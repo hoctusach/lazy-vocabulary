@@ -55,19 +55,9 @@ export const useVocabularyControls = (
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
     localStorage.setItem('preferredVoiceName', nextVoice.name);
-    if (currentWord && !isMuted && !isPaused) {
-      unifiedSpeechController.stop();
-      unifiedSpeechController.speak(currentWord, nextVoice.name);
-    }
+    unifiedSpeechController.stop();
     toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
-  }, [
-    allVoices,
-    selectedVoiceName,
-    setSelectedVoiceName,
-    currentWord,
-    isMuted,
-    isPaused
-  ]);
+  }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
 
 
   // Switch category with mobile-friendly handling
