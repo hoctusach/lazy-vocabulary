@@ -10,8 +10,10 @@ beforeAll(async () => {
   await import('@testing-library/jest-dom');
   (window as any).speechSynthesis = {
     getVoices: () => [
-      { name: 'Test 1', lang: 'en-US' },
-      { name: 'Test 2', lang: 'en-GB' }
+      { name: 'US1', lang: 'en-US' },
+      { name: 'US2', lang: 'en-US' },
+      { name: 'UK1', lang: 'en-GB' },
+      { name: 'UK2', lang: 'en-GB' }
     ],
     addEventListener: () => {},
     removeEventListener: () => {}
@@ -23,15 +25,23 @@ import { VocabularyWord } from '../src/types/vocabulary';
 describe('VocabularyControlsColumn voice toggle', () => {
   it('cycles voice label and updates state', async () => {
     const word: VocabularyWord = { word: 'water', meaning: 'H2O', example: 'Drink', category: 'general' };
-    const voices = ['Voice 1', 'Voice 2'];
-    const controllerState = { voiceName: voices[0] };
+    const usVoices = ['US 1', 'US 2'];
+    const ukVoices = ['UK 1', 'UK 2'];
+    const state = { us: usVoices[0], uk: ukVoices[0] };
+
     const Wrapper: React.FC = () => {
-      const [voiceName, setVoiceName] = React.useState(controllerState.voiceName);
-      React.useEffect(() => {
-        controllerState.voiceName = voiceName;
-      }, [voiceName]);
-      const toggleVoice = () => setVoiceName(v => (v === voices[0] ? voices[1] : voices[0]));
+      const [us, setUs] = React.useState(state.us);
+      const [uk, setUk] = React.useState(state.uk);
+
+      React.useEffect(() => { state.us = us; state.uk = uk; }, [us, uk]);
+
+      const toggle = (region: 'US' | 'UK') => {
+        if (region === 'US') setUs(v => (v === usVoices[0] ? usVoices[1] : usVoices[0]));
+        else setUk(v => (v === ukVoices[0] ? ukVoices[1] : ukVoices[0]));
+      };
+
       return (
+        <>
           <VocabularyControlsColumn
             isMuted={false}
             isPaused={false}
@@ -39,22 +49,44 @@ describe('VocabularyControlsColumn voice toggle', () => {
             onTogglePause={() => {}}
             onNextWord={() => {}}
             onSwitchCategory={() => {}}
-            onCycleVoice={toggleVoice}
+            onCycleVoice={() => toggle('US')}
             nextCategory="next"
-            selectedVoiceName={voiceName}
+            voiceRegion="US"
+            nextVoiceLabel="US"
             currentWord={word}
             onOpenAddModal={() => {}}
             onOpenEditModal={() => {}}
           />
+          <VocabularyControlsColumn
+            isMuted={false}
+            isPaused={false}
+            onToggleMute={() => {}}
+            onTogglePause={() => {}}
+            onNextWord={() => {}}
+            onSwitchCategory={() => {}}
+            onCycleVoice={() => toggle('UK')}
+            nextCategory="next"
+            voiceRegion="UK"
+            nextVoiceLabel="UK"
+            currentWord={word}
+            onOpenAddModal={() => {}}
+            onOpenEditModal={() => {}}
+          />
+        </>
       );
     };
 
     render(<Wrapper />);
 
-    const toggleBtn = screen.getByRole('button', { name: 'Change Voice' });
-    expect(controllerState.voiceName).toBe(voices[0]);
+    const buttons = screen.getAllByRole('button', { name: 'Change Voice' });
+    expect(state.us).toBe(usVoices[0]);
+    expect(state.uk).toBe(ukVoices[0]);
 
-    await userEvent.click(toggleBtn);
-    expect(controllerState.voiceName).toBe(voices[1]);
+    await userEvent.click(buttons[0]);
+    expect(state.us).toBe(usVoices[1]);
+    expect(state.uk).toBe(ukVoices[0]);
+
+    await userEvent.click(buttons[1]);
+    expect(state.uk).toBe(ukVoices[1]);
   });
 });
