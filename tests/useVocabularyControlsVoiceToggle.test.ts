@@ -30,16 +30,16 @@ describe('useVocabularyControls toggleVoice', () => {
         () => {},
         false,
         () => {},
-        voices,
-        voiceName,
-        n => (voiceName = n),
+        { US: voices, UK: [], AU: [] },
+        { US: voiceName, UK: '', AU: '' },
+        (region, n) => { if(region==='US') voiceName = n; },
         { phase: 'idle', isActive: false, isPaused: false, isMuted: false, currentWord: word, currentUtterance: null },
         word
       )
     );
 
     act(() => {
-      result.current.toggleVoice();
+      result.current.cycleVoice('US');
     });
 
     expect(voiceName).toBe(voices[1].name);

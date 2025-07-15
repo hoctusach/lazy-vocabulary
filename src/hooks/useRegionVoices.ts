@@ -1,20 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
-export const useRegionVoices = (region: 'US' | 'UK' | 'AU') => {
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+export const useRegionVoices = () => {
+  const [usVoices, setUsVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [ukVoices, setUkVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [auVoices, setAuVoices] = useState<SpeechSynthesisVoice[]>([]);
 
   const loadVoices = useCallback(() => {
     if (!window.speechSynthesis) return;
     const allVoices = window.speechSynthesis.getVoices();
     logAvailableVoices(allVoices);
-    const regionLangCode = region === 'US' ? 'en-US' : region === 'UK' ? 'en-GB' : 'en-AU';
-    const filtered = allVoices
-      .filter(v => v && v.lang && v.lang.toLowerCase().startsWith(regionLangCode.toLowerCase()))
-      .filter((v, i, arr) => arr.findIndex(o => o.name === v.name) === i);
-    setVoices(filtered);
-    console.log(`[useRegionVoices] ${filtered.length} voices for ${region}`);
-  }, [region]);
+
+    const filterByLang = (lang: string) =>
+      allVoices
+        .filter(v => v && v.lang && v.lang.toLowerCase().startsWith(lang.toLowerCase()))
+        .filter((v, i, arr) => arr.findIndex(o => o.name === v.name) === i);
+
+    const us = filterByLang('en-US');
+    const uk = filterByLang('en-GB');
+    const au = filterByLang('en-AU');
+
+    setUsVoices(us);
+    setUkVoices(uk);
+    setAuVoices(au);
+
+    console.log(`[useRegionVoices] US:${us.length} UK:${uk.length} AU:${au.length}`);
+  }, []);
 
   useEffect(() => {
     loadVoices();
@@ -24,5 +35,5 @@ export const useRegionVoices = (region: 'US' | 'UK' | 'AU') => {
     };
   }, [loadVoices]);
 
-  return voices;
+  return { usVoices, ukVoices, auVoices };
 };

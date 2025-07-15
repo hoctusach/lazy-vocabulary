@@ -5,7 +5,6 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { toast } from 'sonner';
-import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
 
 /**
  * Vocabulary control actions
@@ -16,9 +15,9 @@ export const useVocabularyControls = (
   setIsPaused: (paused: boolean) => void,
   isMuted: boolean,
   setIsMuted: (muted: boolean) => void,
-  allVoices: SpeechSynthesisVoice[],
-  selectedVoiceName: string,
-  setSelectedVoiceName: (name: string) => void,
+  allVoices: { US: SpeechSynthesisVoice[]; UK: SpeechSynthesisVoice[]; AU: SpeechSynthesisVoice[] },
+  selectedVoiceNames: { US: string; UK: string; AU: string },
+  setSelectedVoiceName: (region: 'US' | 'UK' | 'AU', name: string) => void,
   speechState: SpeechState,
   currentWord: VocabularyWord | null
 ) => {
@@ -47,17 +46,18 @@ export const useVocabularyControls = (
     }
   }, [isMuted, setIsMuted]);
 
-  // Cycle to the next available voice
-  const toggleVoice = useCallback(() => {
-    if (allVoices.length < 2) return;
-    const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
-    const nextIndex = (currentIndex + 1) % allVoices.length;
-    const nextVoice = allVoices[nextIndex];
-    setSelectedVoiceName(nextVoice.name);
-    localStorage.setItem('preferredVoiceName', nextVoice.name);
+  // Cycle to the next available voice in a region
+  const cycleVoice = useCallback((region: 'US' | 'UK' | 'AU') => {
+    const list = allVoices[region];
+    if (list.length < 2) return;
+    const currentName = selectedVoiceNames[region];
+    const index = list.findIndex(v => v.name === currentName);
+    const nextIndex = (index + 1) % list.length;
+    const nextVoice = list[nextIndex];
+    setSelectedVoiceName(region, nextVoice.name);
     unifiedSpeechController.stop();
     toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
-  }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
+  }, [allVoices, selectedVoiceNames, setSelectedVoiceName]);
 
 
   // Switch category with mobile-friendly handling
@@ -78,7 +78,7 @@ export const useVocabularyControls = (
   return {
     togglePause,
     toggleMute,
-    toggleVoice,
+    cycleVoice,
     switchCategory
   };
 };
