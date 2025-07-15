@@ -77,37 +77,42 @@ export class VocabularyDataManager {
     try {
       console.log("Loading default vocabulary data");
       
-      // Try to fetch updated default vocabulary if the Fetch API is available
-      if (typeof fetch === 'function') {
-        fetch('/defaultVocabulary.json')
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(fetchedData => {
-            console.log('Successfully loaded default vocabulary from JSON file');
-            console.log(
-              'Fetched data preview:',
-              Object.keys(fetchedData).map(key => `${key}: ${fetchedData[key]?.length || 0} words`)
-            );
-            this.data = this.dataProcessor.processDataTypes(fetchedData);
-            this.storage.saveData(this.data);
-            this.notifyVocabularyChange();
-          })
-          .catch(error => {
-            console.warn('Failed to load from JSON file, using embedded default data:', error);
-            this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-            this.storage.saveData(this.data);
-            this.notifyVocabularyChange();
-          });
-      } else {
-        console.warn('Fetch API not available, using embedded default vocabulary data');
-        this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-        this.storage.saveData(this.data);
-        this.notifyVocabularyChange();
-      }
+      // Try to fetch the updated default vocabulary from public directory
+      fetch('/defaultVocabulary.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(fetchedData => {
+          console.log("Successfully loaded default vocabulary from JSON file");
+          console.log("Fetched data preview:", Object.keys(fetchedData).map(key => 
+            `${key}: ${fetchedData[key]?.length || 0} words`
+          ));
+          
+          // Process data to ensure all fields have proper types
+          this.data = this.dataProcessor.processDataTypes(fetchedData);
+          this.storage.saveData(this.data);
+          
+          // Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
+        })
+        .catch(error => {
+          console.warn("Failed to load from JSON file, using embedded default data:", error);
+          
+          // Use the embedded default data as fallback
+          console.log("Using embedded default vocabulary data");
+          this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
+          this.storage.saveData(this.data);
+          
+          console.log("Embedded data loaded:", Object.keys(this.data).map(key => 
+            `${key}: ${this.data[key]?.length || 0} words`
+          ));
+          
+          // Notify listeners about vocabulary change
+          this.notifyVocabularyChange();
+        });
       
       return true;
     } catch (error) {
