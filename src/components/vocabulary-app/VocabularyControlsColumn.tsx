@@ -21,13 +21,12 @@ interface VocabularyControlsColumnProps {
   onTogglePause: () => void;
   onNextWord: () => void;
   onSwitchCategory: () => void;
-  onCycleVoice: (region: 'US' | 'UK' | 'AU') => void;
+  onCycleVoice: () => void;
   nextCategory: string;
   currentWord: VocabularyWord | null;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
-  voiceRegion: 'US' | 'UK' | 'AU';
-  nextVoiceLabel?: string;
+  selectedVoiceName: string;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -42,8 +41,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   currentWord,
   onOpenAddModal,
   onOpenEditModal,
-  voiceRegion,
-  nextVoiceLabel
+  selectedVoiceName
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -71,19 +69,18 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const handleCycleVoice = () => {
-    const regionVoices = allVoices[voiceRegion];
-    if (regionVoices.length === 0) {
+    if (allVoices.length === 0) {
       toast.warning('No voices available');
       return;
     }
-    onCycleVoice(voiceRegion);
+    onCycleVoice();
   };
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
     if (currentWord && !isMuted && !isPaused) {
       unifiedSpeechController.stop();
-      unifiedSpeechController.speak(currentWord, voiceRegion);
+      unifiedSpeechController.speak(currentWord, selectedVoiceName);
     }
   };
 
@@ -148,8 +145,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleCycleVoice}
         className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50 flex items-center justify-center"
-        title={allVoices[voiceRegion].length < 2 ? 'No other voices available' : `Change Voice (${nextVoiceLabel})`}
-        disabled={allVoices[voiceRegion].length < 2}
+        title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
+        disabled={allVoices.length < 2}
         aria-label="Change Voice"
       >
         <Speaker size={16} />
