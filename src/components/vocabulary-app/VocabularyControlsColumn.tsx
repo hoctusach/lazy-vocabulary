@@ -27,6 +27,7 @@ interface VocabularyControlsColumnProps {
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
   selectedVoiceName: string;
+  playCurrentWord: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -41,7 +42,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   currentWord,
   onOpenAddModal,
   onOpenEditModal,
-  selectedVoiceName
+  selectedVoiceName,
+  playCurrentWord
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -78,9 +80,9 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
-    if (currentWord && !isMuted && !isPaused) {
-      unifiedSpeechController.stop();
-      unifiedSpeechController.speak(currentWord, selectedVoiceName);
+    unifiedSpeechController.stop();
+    if (!isMuted && !isPaused) {
+      playCurrentWord();
     }
   };
 

@@ -220,6 +220,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             wordToEdit={wordToEdit}
             handleOpenAddWordModal={handleOpenAddWordModal}
             handleOpenEditWordModal={handleOpenEditWordModal}
+            playCurrentWord={playCurrentWord}
           />
         </div>
       </VocabularyLayout>

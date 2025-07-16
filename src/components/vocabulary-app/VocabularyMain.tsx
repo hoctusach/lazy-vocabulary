@@ -24,6 +24,7 @@ interface VocabularyMainProps {
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
   voiceRegion: 'US' | 'UK' | 'AU';
+  playCurrentWord: () => void;
 }
 
 const VocabularyMain: React.FC<VocabularyMainProps> = ({
@@ -44,6 +45,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
   onOpenAddModal,
   onOpenEditModal,
   voiceRegion,
+  playCurrentWord
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -82,6 +84,7 @@ const VocabularyMain: React.FC<VocabularyMainProps> = ({
         onOpenAddModal={onOpenAddModal}
         onOpenEditModal={onOpenEditModal}
         voiceRegion={selectedVoice.region}
+        playCurrentWord={playCurrentWord}
       />
     </div>
   );

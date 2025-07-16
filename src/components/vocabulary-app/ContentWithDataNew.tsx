@@ -23,9 +23,10 @@ interface ContentWithDataNewProps {
   handleCloseModal: () => void;
   handleSaveWord: (wordData: { word: string; meaning: string; example: string; category: string }) => void;
   isEditMode: boolean;
-  wordToEdit: any;
+  wordToEdit: VocabularyWord | null;
   handleOpenAddWordModal: () => void;
   handleOpenEditWordModal: (word: VocabularyWord) => void;
+  playCurrentWord: () => void;
 }
 
 const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
@@ -48,7 +49,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   isEditMode,
   wordToEdit,
   handleOpenAddWordModal,
-  handleOpenEditWordModal
+  handleOpenEditWordModal,
+  playCurrentWord
 }) => {
   return (
     <>
@@ -69,6 +71,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       selectedVoiceName={selectedVoiceName}
       onOpenAddModal={handleOpenAddWordModal}
       onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
+      playCurrentWord={playCurrentWord}
       />
 
       {/* Achievements and learning days */}

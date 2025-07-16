@@ -8,6 +8,7 @@ import userEvent from '@testing-library/user-event';
 globalThis.expect = expect;
 beforeAll(async () => {
   await import('@testing-library/jest-dom');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (window as any).speechSynthesis = {
     getVoices: () => [
       { name: 'Test 1', lang: 'en-US' },
@@ -45,6 +46,7 @@ describe('VocabularyControlsColumn voice toggle', () => {
             currentWord={word}
             onOpenAddModal={() => {}}
             onOpenEditModal={() => {}}
+            playCurrentWord={() => {}}
           />
       );
     };
