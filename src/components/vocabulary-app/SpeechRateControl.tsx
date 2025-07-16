@@ -11,8 +11,15 @@ interface SpeechRateControlProps {
 const RATE_VALUES = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.25, 1.5];
 
 const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange }) => {
+  const [open, setOpen] = React.useState(false);
+
+  const handleChange = (v: number) => {
+    onChange(v);
+    setOpen(false); // close popup after selecting rate
+  };
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -31,7 +38,7 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
               size="sm"
               variant={rate === v ? 'default' : 'outline'}
               className="h-7 px-2 text-xs"
-              onClick={() => onChange(v)}
+              onClick={() => handleChange(v)}
             >
               {v}x
             </Button>
