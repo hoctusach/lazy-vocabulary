@@ -14,6 +14,33 @@ function getTodayKey() {
 
 export const useDailyUsageTracker = () => {
   const sessionStart = useRef<number | null>(null);
+  // Tracks accumulated time for the current day across all sessions
+  const dailyTotal = useRef<number>(0);
+
+  const loadDailyTotal = () => {
+    const key = getTodayKey();
+    dailyTotal.current = parseInt(localStorage.getItem(key) || '0', 10);
+  };
+
+  const saveDailyTotal = () => {
+    const key = getTodayKey();
+    localStorage.setItem(key, dailyTotal.current.toString());
+  };
+
+  const awardStickerIfNeeded = () => {
+    if (dailyTotal.current < MINUTES_15) return;
+    try {
+      const today = formatDate(new Date());
+      const stickers: string[] = JSON.parse(localStorage.getItem(STICKERS_KEY) || '[]');
+      if (!stickers.includes(today)) {
+        stickers.push(today);
+        localStorage.setItem(STICKERS_KEY, JSON.stringify(stickers));
+        addStreakDay(today);
+      }
+    } catch (err) {
+      console.error('Failed to update stickers', err);
+    }
+  };
 
   const startSession = () => {
     if (sessionStart.current === null) {
@@ -26,27 +53,15 @@ export const useDailyUsageTracker = () => {
     const duration = Date.now() - sessionStart.current;
     sessionStart.current = null;
 
-    const key = getTodayKey();
-    const previous = parseInt(localStorage.getItem(key) || '0', 10);
-    const total = previous + duration;
-    localStorage.setItem(key, total.toString());
-
-    if (total >= MINUTES_15) {
-      try {
-        const today = formatDate(new Date());
-        const stickers: string[] = JSON.parse(localStorage.getItem(STICKERS_KEY) || '[]');
-        if (!stickers.includes(today)) {
-          stickers.push(today);
-          localStorage.setItem(STICKERS_KEY, JSON.stringify(stickers));
-          addStreakDay(today);
-        }
-      } catch (err) {
-        console.error('Failed to update stickers', err);
-      }
-    }
+    // Accumulate today's total usage time
+    dailyTotal.current += duration;
+    saveDailyTotal();
+    awardStickerIfNeeded();
   };
 
   useEffect(() => {
+    loadDailyTotal();
+    awardStickerIfNeeded();
     startSession();
 
     const handleVisibility = () => {
