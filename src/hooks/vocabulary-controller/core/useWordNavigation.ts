@@ -16,7 +16,8 @@ export const useWordNavigation = (
   currentWord: VocabularyWord | null,
   isTransitioningRef: React.MutableRefObject<boolean>,
   lastWordChangeRef: React.MutableRefObject<number>,
-  clearAutoAdvanceTimer: () => void
+  clearAutoAdvanceTimer: () => void,
+  playCurrentWord: () => void
 ) => {
   // Go to next word with proper mobile handling
   const goToNext = useCallback(() => {
@@ -55,6 +56,8 @@ export const useWordNavigation = (
       const nextWord = wordList[nextIndex];
       if (nextWord) {
         saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
+        // Speak the new word immediately
+        setTimeout(() => playCurrentWord(), 10);
       }
 
     } catch (error) {
@@ -72,7 +75,8 @@ export const useWordNavigation = (
     setCurrentIndex,
     isTransitioningRef,
     lastWordChangeRef,
-    clearAutoAdvanceTimer
+    clearAutoAdvanceTimer,
+    playCurrentWord
   ]);
 
   return {

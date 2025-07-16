@@ -58,7 +58,8 @@ export const useUnifiedVocabularyController = () => {
     currentWord,
     isTransitioningRef,
     lastWordChangeRef,
-    clearAutoAdvanceTimer
+    clearAutoAdvanceTimer,
+    playCurrentWord
   );
 
   const goToNextAndSpeak = useCallback(() => {
