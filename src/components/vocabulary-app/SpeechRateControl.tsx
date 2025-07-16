@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
+import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from '@/components/ui/popover';
 import { Gauge } from 'lucide-react';
 
 interface SpeechRateControlProps {
@@ -33,15 +33,16 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
       <PopoverContent className="w-44 p-2" side="right" align="start">
         <div className="grid grid-cols-4 gap-2">
           {RATE_VALUES.map((v) => (
-            <Button
-              key={v}
-              size="sm"
-              variant={rate === v ? 'default' : 'outline'}
-              className="h-7 px-2 text-xs"
-              onClick={() => handleChange(v)}
-            >
-              {v}x
-            </Button>
+            <PopoverClose asChild key={v}>
+              <Button
+                size="sm"
+                variant={rate === v ? 'default' : 'outline'}
+                className="h-7 px-2 text-xs"
+                onClick={() => handleChange(v)}
+              >
+                {v}x
+              </Button>
+            </PopoverClose>
           ))}
         </div>
       </PopoverContent>
