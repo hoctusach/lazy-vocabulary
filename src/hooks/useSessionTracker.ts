@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 const STORAGE_KEY = 'deviceId';
 const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzILC47slquqsE81mxYDWbUJDIRTonpK0lTVa2jd7tMgT6-P9IU4ejupwDHTnIDHiHH/exec';
 
+// Generate or reuse a persistent device ID
 function getDeviceId(): string {
   try {
     const existing = localStorage.getItem(STORAGE_KEY);
@@ -15,6 +16,7 @@ function getDeviceId(): string {
   }
 }
 
+// Detect browser and OS for analytics
 function getBrowserInfo(): string {
   if (typeof navigator === 'undefined') return 'unknown';
   const ua = navigator.userAgent;
@@ -34,6 +36,7 @@ function getBrowserInfo(): string {
   return `${browser} on ${os}`;
 }
 
+// Main hook
 export const useSessionTracker = () => {
   const isBrowser = typeof window !== 'undefined';
   const startRef = useRef<number>(isBrowser ? Date.now() : 0);
@@ -57,9 +60,11 @@ export const useSessionTracker = () => {
         locationRef.current = 'unknown';
       });
 
+    // Send session data via beacon (no fetch to avoid CORS)
     const sendSession = () => {
       if (sentRef.current) return;
       sentRef.current = true;
+
       const sessionEnd = Date.now();
       const payload = {
         deviceId,
@@ -69,22 +74,26 @@ export const useSessionTracker = () => {
         browser,
         location: locationRef.current || 'unknown',
       };
+
       try {
         if ('sendBeacon' in navigator) {
-          const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+          // Important: omit MIME type to prevent CORS preflight
+          const blob = new Blob([JSON.stringify(payload)]);
           navigator.sendBeacon(ENDPOINT, blob);
         }
-      } catch {
-        // ignore
+      } catch (err) {
+        console.error('Session beacon failed', err);
       }
     };
 
+    // Trigger on tab switch or close
     const handleVisibility = () => {
       if (document.visibilityState === 'hidden') {
         sendSession();
       }
     };
 
+    // Optional: menu interaction tracking
     const handleMenuClick = (e: Event) => {
       const target = e.target as HTMLElement | null;
       if (target && target.closest('[data-sidebar="menu-item"]')) {
@@ -92,10 +101,12 @@ export const useSessionTracker = () => {
       }
     };
 
+    // Register event listeners
     window.addEventListener('beforeunload', sendSession);
     document.addEventListener('visibilitychange', handleVisibility);
     document.addEventListener('click', handleMenuClick);
 
+    // Cleanup on unmount
     return () => {
       sendSession();
       window.removeEventListener('beforeunload', sendSession);
