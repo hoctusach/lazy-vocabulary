@@ -156,6 +156,7 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
     hasUserInteracted,
     onUserInteraction: () => setHasUserInteracted(true),
     isSpeaking,
+    cancelSpeech: () => cancelSpeechRef.current(),
     hasSpeechPermission,
     allVoiceOptions
   };
