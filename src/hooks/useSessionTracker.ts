@@ -35,14 +35,16 @@ function getBrowserInfo(): string {
 }
 
 export const useSessionTracker = () => {
-  if (typeof window === 'undefined') return;
-  const startRef = useRef<number>(Date.now());
+  const isBrowser = typeof window !== 'undefined';
+  const startRef = useRef<number>(isBrowser ? Date.now() : 0);
   const sentRef = useRef<boolean>(false);
-  const locationRef = useRef<string>('');
-  const deviceId = getDeviceId();
-  const browser = getBrowserInfo();
+  const locationRef = useRef<string>('unknown');
+  const deviceId = isBrowser ? getDeviceId() : 'unknown';
+  const browser = isBrowser ? getBrowserInfo() : 'unknown';
 
   useEffect(() => {
+    if (!isBrowser) return;
+
     // Fetch location once
     fetch('https://ipinfo.io/json')
       .then(res => res.json())
@@ -68,11 +70,13 @@ export const useSessionTracker = () => {
         location: locationRef.current || 'unknown',
       };
       try {
-        if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        if ('sendBeacon' in navigator) {
           const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
           navigator.sendBeacon(ENDPOINT, blob);
         }
-      } catch {}
+      } catch {
+        // ignore
+      }
     };
 
     const handleVisibility = () => {
@@ -98,5 +102,5 @@ export const useSessionTracker = () => {
       document.removeEventListener('visibilitychange', handleVisibility);
       document.removeEventListener('click', handleMenuClick);
     };
-  }, [browser, deviceId]);
+  }, [browser, deviceId, isBrowser]);
 };
