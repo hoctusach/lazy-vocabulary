@@ -12,6 +12,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -27,7 +28,6 @@ interface VocabularyControlsColumnProps {
   onOpenEditModal: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onCancelSpeech: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -43,8 +43,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenAddModal,
   onOpenEditModal,
   selectedVoiceName,
-  playCurrentWord,
-  onCancelSpeech
+  playCurrentWord
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -81,7 +80,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
-    onCancelSpeech();
+    unifiedSpeechController.stop();
     if (!isMuted && !isPaused) {
       playCurrentWord();
     }
