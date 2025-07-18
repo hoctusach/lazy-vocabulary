@@ -11,6 +11,7 @@ interface VocabularyCardNewProps {
   word: string;
   meaning: string;
   example: string;
+  translation?: string;
   backgroundColor: string;
   isMuted: boolean;
   isPaused: boolean;
@@ -31,6 +32,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   word,
   meaning,
   example,
+  translation,
   backgroundColor,
   isMuted,
   isPaused,
@@ -49,7 +51,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   const categoryLabel = getCategoryLabel(category);
   const nextCategoryLabel = getCategoryLabel(nextCategory);
 
-  const currentWordObj = { word, meaning, example, category };
+  const currentWordObj = { word, meaning, example, translation, category };
   const { main, annotations } = parseWordAnnotations(word);
 
   return (
@@ -92,6 +94,11 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic', background: 'transparent' }}>
             <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
+          {translation && (
+            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left' }}>
+              <em>* Translation: {translation}</em>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

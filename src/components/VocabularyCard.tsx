@@ -9,6 +9,7 @@ interface VocabularyCardProps {
   word: string;
   meaning: string;
   example: string;
+  translation?: string;
   backgroundColor: string;
   isMuted: boolean;
   isPaused: boolean;
@@ -30,6 +31,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   word,
   meaning,
   example,
+  translation,
   backgroundColor,
   isMuted,
   isPaused,
@@ -98,6 +100,12 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           <div className="italic" style={{ color: '#B71C1C', fontSize: '1rem', textAlign: 'left' }}>
             <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
+
+          {translation && (
+            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left' }}>
+              <em>* Translation: {translation}</em>
+            </div>
+          )}
           
         </div>
       </CardContent>

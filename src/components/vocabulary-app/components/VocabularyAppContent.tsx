@@ -93,6 +93,7 @@ const VocabularyAppContent: React.FC<VocabularyAppContentProps> = ({
           word="No data for this category"
           meaning=""
           example=""
+          translation={undefined}
           backgroundColor="#F0F8FF"
           isMuted={muted}
           isPaused={paused}

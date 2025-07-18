@@ -54,6 +54,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           word={currentWord.word}
           meaning={currentWord.meaning}
           example={currentWord.example}
+          translation={currentWord.translation}
           backgroundColor={backgroundColor}
           isMuted={mute}
           isPaused={isPaused}
