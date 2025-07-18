@@ -99,6 +99,7 @@ const VocabularyContainer: React.FC = () => {
         word={controllerState.currentWord.word}
         meaning={controllerState.currentWord.meaning}
         example={controllerState.currentWord.example}
+        translation={controllerState.currentWord.translation}
         backgroundColor="#F0F8FF"
         isMuted={controllerState.isMuted}
         isPaused={controllerState.isPaused}

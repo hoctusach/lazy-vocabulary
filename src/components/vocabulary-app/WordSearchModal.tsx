@@ -192,6 +192,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
               word={selectedWord.word}
               meaning={selectedWord.meaning}
               example={selectedWord.example}
+              translation={selectedWord.translation}
               backgroundColor="#ffffff"
               isMuted={false}
               isPaused={false}
