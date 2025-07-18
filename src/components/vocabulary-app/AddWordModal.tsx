@@ -105,6 +105,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
           />
           
           <WordFormFields
+            word={word}
             meaning={meaning}
             onMeaningChange={handleMeaningChange}
             example={example}

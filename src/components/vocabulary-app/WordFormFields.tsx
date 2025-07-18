@@ -4,8 +4,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { translate } from '@/services/translationService';
 
 interface WordFormFieldsProps {
+  word: string;
   meaning: string;
   onMeaningChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   example: string;
@@ -27,7 +36,19 @@ const CATEGORY_OPTIONS = [
   { value: "word formation", label: "Word formation" }
 ];
 
+const LANGUAGES = [
+  { code: 'vi', label: 'Vietnamese' },
+  { code: 'fr', label: 'French' },
+  { code: 'es', label: 'Spanish' },
+  { code: 'ja', label: 'Japanese' },
+  { code: 'zh', label: 'Chinese' },
+  { code: 'ko', label: 'Korean' },
+  { code: 'de', label: 'German' },
+  { code: 'ru', label: 'Russian' }
+];
+
 const WordFormFields: React.FC<WordFormFieldsProps> = ({
+  word,
   meaning,
   onMeaningChange,
   example,
@@ -71,9 +92,28 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="translation" className="text-right">
-          Translation
-        </Label>
+        <div className="flex justify-between items-center">
+          <Label htmlFor="translation" className="text-right whitespace-nowrap">
+            Translation
+          </Label>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="sm" className="px-1">
+                🌐 Translate To
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {LANGUAGES.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onSelect={() => translate(word, lang.code)}
+                >
+                  {lang.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <Input
           id="translation"
           value={translation}
