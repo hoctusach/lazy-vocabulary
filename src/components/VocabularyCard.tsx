@@ -103,7 +103,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
 
           {translation && (
             <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left' }}>
-              <em>* Translation: {translation}</em>
+              <em>* {translation}</em>
             </div>
           )}
           
