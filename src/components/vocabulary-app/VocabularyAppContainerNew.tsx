@@ -65,7 +65,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     }) : null;
   }, [currentWord?.word, currentCategory, handleCloseModal]);
 
-  const handleSaveWord = React.useCallback((wordData: { word: string; meaning: string; example: string; category: string }) => {
+  const handleSaveWord = React.useCallback((wordData: { word: string; meaning: string; example: string; translation: string; category: string }) => {
     if (wordManager) {
       wordManager.handleSaveWord(wordData, isEditMode, wordToEdit);
     }
