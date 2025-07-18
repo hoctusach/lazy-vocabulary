@@ -11,7 +11,8 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { translate } from '@/services/translationService';
+import { translate } from '@/utils/translate';
+import { toast } from 'sonner';
 
 interface WordFormFieldsProps {
   word: string;
@@ -21,6 +22,7 @@ interface WordFormFieldsProps {
   onExampleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   translation: string;
   onTranslationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setTranslation: (value: string) => void;
   category: string;
   onCategoryChange: (value: string) => void;
   isDisabled: boolean;
@@ -55,10 +57,21 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
   onExampleChange,
   translation,
   onTranslationChange,
+  setTranslation,
   category,
   onCategoryChange,
   isDisabled
 }) => {
+  const handleTranslate = async (lang: { code: string; label: string }) => {
+    try {
+      const result = await translate(word, lang.code);
+      setTranslation(result);
+      toast.success(`✅ Translated to ${lang.label}!`);
+    } catch (error) {
+      console.error('Translation error', error);
+      toast.error('Failed to translate');
+    }
+  };
   return (
     <>
       <div className="grid grid-cols-4 items-center gap-4">
@@ -106,7 +119,7 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
               {LANGUAGES.map((lang) => (
                 <DropdownMenuItem
                   key={lang.code}
-                  onSelect={() => translate(word, lang.code)}
+                  onSelect={() => handleTranslate(lang)}
                 >
                   {lang.label}
                 </DropdownMenuItem>
