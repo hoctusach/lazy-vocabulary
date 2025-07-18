@@ -112,6 +112,7 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
             onExampleChange={handleExampleChange}
             translation={translation}
             onTranslationChange={handleTranslationChange}
+            setTranslation={setTranslation}
             category={category}
             onCategoryChange={setCategory}
             isDisabled={isSearching}
