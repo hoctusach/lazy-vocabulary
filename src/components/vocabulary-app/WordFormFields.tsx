@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -9,6 +10,8 @@ interface WordFormFieldsProps {
   onMeaningChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   example: string;
   onExampleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  translation: string;
+  onTranslationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   category: string;
   onCategoryChange: (value: string) => void;
   isDisabled: boolean;
@@ -29,6 +32,8 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
   onMeaningChange,
   example,
   onExampleChange,
+  translation,
+  onTranslationChange,
   category,
   onCategoryChange,
   isDisabled
@@ -62,6 +67,20 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
           disabled={isDisabled}
           rows={4}
           maxLength={1000}
+        />
+      </div>
+
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="translation" className="text-right">
+          Translation
+        </Label>
+        <Input
+          id="translation"
+          value={translation}
+          onChange={onTranslationChange}
+          className="col-span-3"
+          disabled={isDisabled}
+          maxLength={200}
         />
       </div>
       

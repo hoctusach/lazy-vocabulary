@@ -21,7 +21,7 @@ interface ContentWithDataNewProps {
   selectedVoiceName: string;
   isAddWordModalOpen: boolean;
   handleCloseModal: () => void;
-  handleSaveWord: (wordData: { word: string; meaning: string; example: string; category: string }) => void;
+  handleSaveWord: (wordData: { word: string; meaning: string; example: string; translation: string; category: string }) => void;
   isEditMode: boolean;
   wordToEdit: VocabularyWord | null;
   handleOpenAddWordModal: () => void;
@@ -94,15 +94,16 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
 
       
       {/* Enhanced Word Modal (handles both add and edit) */}
-      <AddWordModal 
-        isOpen={isAddWordModalOpen} 
-        onClose={handleCloseModal} 
+      <AddWordModal
+        isOpen={isAddWordModalOpen}
+        onClose={handleCloseModal}
         onSave={handleSaveWord}
         editMode={isEditMode}
         wordToEdit={isEditMode && wordToEdit ? {
           word: wordToEdit.word,
           meaning: wordToEdit.meaning,
           example: wordToEdit.example,
+          translation: wordToEdit.translation || '',
           category: wordToEdit.category || currentCategory
         } : undefined}
       />

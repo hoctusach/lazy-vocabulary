@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { validateVocabularyWord, validateMeaning, validateExample } from '@/utils/security/inputValidation';
+import { validateVocabularyWord, validateMeaning, validateExample, sanitizeUserInput } from '@/utils/security/inputValidation';
 import { htmlEncode } from '@/utils/security/contentSecurity';
 import { useWordFormState } from '@/hooks/vocabulary/useWordFormState';
 import { useWordFormValidation } from '@/hooks/vocabulary/useWordFormValidation';
@@ -15,9 +15,9 @@ import WordFormFields from './WordFormFields';
 interface AddWordModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (newWord: { word: string; meaning: string; example: string; category: string }) => void;
+  onSave: (newWord: { word: string; meaning: string; example: string; translation: string; category: string }) => void;
   editMode?: boolean;
-  wordToEdit?: { word: string; meaning: string; example: string; category: string };
+  wordToEdit?: { word: string; meaning: string; example: string; translation?: string; category: string };
 }
 
 const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, editMode = false, wordToEdit }) => {
@@ -26,13 +26,16 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
     word,
     meaning,
     example,
+    translation,
     category,
     setMeaning,
     setExample,
+    setTranslation,
     setCategory,
     handleWordChange,
     handleMeaningChange,
     handleExampleChange,
+    handleTranslationChange,
     resetForm
   } = useWordFormState({ editMode, wordToEdit, isOpen });
 
@@ -52,12 +55,14 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
       const wordValidation = validateVocabularyWord(word);
       const meaningValidation = validateMeaning(meaning);
       const exampleValidation = validateExample(example);
+      const sanitizedTranslation = sanitizeUserInput(translation);
       
       if (wordValidation.isValid && meaningValidation.isValid && exampleValidation.isValid) {
         onSave({
           word: wordValidation.sanitizedValue!,
           meaning: meaningValidation.sanitizedValue!,
           example: exampleValidation.sanitizedValue!,
+          translation: sanitizedTranslation,
           category
         });
         
@@ -104,6 +109,8 @@ const AddWordModal: React.FC<AddWordModalProps> = ({ isOpen, onClose, onSave, ed
             onMeaningChange={handleMeaningChange}
             example={example}
             onExampleChange={handleExampleChange}
+            translation={translation}
+            onTranslationChange={handleTranslationChange}
             category={category}
             onCategoryChange={setCategory}
             isDisabled={isSearching}

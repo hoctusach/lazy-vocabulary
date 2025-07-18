@@ -17,7 +17,7 @@ const VocabularyWordManager = ({
   onWordSaved 
 }: VocabularyWordManagerProps) => {
   const handleSaveWord = (
-    wordData: { word: string; meaning: string; example: string; category: string },
+    wordData: { word: string; meaning: string; example: string; translation: string; category: string },
     isEditMode: boolean,
     wordToEdit: VocabularyWord | null
   ) => {
@@ -29,6 +29,7 @@ const VocabularyWordManager = ({
             word: wordData.word,
             meaning: wordData.meaning,
             example: wordData.example,
+            translation: wordData.translation,
             count: wordToEdit.count || 1
           }]
         };
@@ -43,6 +44,7 @@ const VocabularyWordManager = ({
             word: wordData.word,
             meaning: wordData.meaning,
             example: wordData.example,
+            translation: wordData.translation,
             count: 1
           }]
         };
