@@ -4,6 +4,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { translate } from '@/utils/translate';
+import { toast } from 'sonner';
+import { useTranslationLang } from '@/hooks/useTranslationLang';
 
 interface WordFormFieldsProps {
   word: string;
@@ -13,6 +23,7 @@ interface WordFormFieldsProps {
   onExampleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   translation: string;
   onTranslationChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  setTranslation: (value: string) => void;
   category: string;
   onCategoryChange: (value: string) => void;
   isDisabled: boolean;
@@ -28,6 +39,17 @@ const CATEGORY_OPTIONS = [
   { value: "word formation", label: "Word formation" }
 ];
 
+const LANGUAGES = [
+  { code: 'vi', label: 'Vietnamese' },
+  { code: 'fr', label: 'French' },
+  { code: 'es', label: 'Spanish' },
+  { code: 'ja', label: 'Japanese' },
+  { code: 'zh', label: 'Chinese' },
+  { code: 'ko', label: 'Korean' },
+  { code: 'de', label: 'German' },
+  { code: 'ru', label: 'Russian' }
+];
+
 
 const WordFormFields: React.FC<WordFormFieldsProps> = ({
   word,
@@ -37,10 +59,45 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
   onExampleChange,
   translation,
   onTranslationChange,
+  setTranslation,
   category,
   onCategoryChange,
   isDisabled
 }) => {
+  const { lang, setLang } = useTranslationLang();
+  const [open, setOpen] = React.useState(false);
+
+  const performTranslation = async (code: string) => {
+    try {
+      const result = await translate(word, code);
+      setTranslation(result);
+      const label = LANGUAGES.find(l => l.code === code)?.label || code;
+      toast.success(`Translated to ${label}`);
+    } catch (err) {
+      console.error('Translation error', err);
+      toast.error('Failed to translate');
+    }
+  };
+
+  const handleGoClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!lang) {
+      setOpen(true);
+      return;
+    }
+    performTranslation(lang);
+  };
+
+  const handleForceSelect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setOpen(true);
+  };
+
+  const handleSelect = async (code: string) => {
+    setLang(code);
+    setOpen(false);
+    await performTranslation(code);
+  };
   return (
     <>
       <div className="grid grid-cols-4 items-center gap-4">
@@ -77,14 +134,37 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
         <Label htmlFor="translation" className="text-right whitespace-nowrap">
           <span role="img" aria-label="translation">🌐</span> Translation
         </Label>
-        <Input
-          id="translation"
-          value={translation}
-          onChange={onTranslationChange}
-          className="col-span-3"
-          disabled={isDisabled}
-          maxLength={200}
-        />
+        <div className="col-span-3 flex gap-2">
+          <Input
+            id="translation"
+            value={translation}
+            onChange={onTranslationChange}
+            className="flex-grow"
+            disabled={isDisabled}
+            maxLength={200}
+          />
+          <DropdownMenu open={open} onOpenChange={setOpen}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                className="shrink-0 px-2"
+                onClick={handleGoClick}
+                onContextMenu={handleForceSelect}
+                disabled={isDisabled || !word.trim()}
+              >
+                Go
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {LANGUAGES.map((l) => (
+                <DropdownMenuItem key={l.code} onSelect={() => handleSelect(l.code)}>
+                  {l.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       
       <div className="grid grid-cols-4 items-center gap-4">
