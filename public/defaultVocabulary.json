@@ -1,5 +1,6 @@
 {
   "phrasal verbs": [
+    {
       "word": "to be under house arrest",
       "meaning": "to be legally forced to stay inside one's home instead of going to prison",
       "example": "He was under house arrest while awaiting the final verdict.",
@@ -237,7 +238,7 @@
       "translation": "phát hành, tung ra",
       "count": 0
     },
-{
+    {
       "word": "go off [intransitive]",
       "meaning": "to begin making a sound (like an alarm) or to explode suddenly",
       "example": "The fire alarm went off in the middle of the night.",
@@ -364,6 +365,19 @@
       "count": 0
     },
     {
+      "word": "get together [intransitive]",
+      "meaning": "to meet or gather with someone for a purpose, often social",
+      "example": "Let’s get together this weekend for a barbecue.",
+      "translation": "gặp gỡ, tụ tập",
+      "count": 0
+    },
+    {
+      "word": "put off something [transitive]",
+      "meaning": "to delay or postpone something to a later time",
+      "example": "They had to put off the meeting until next week.",
+      "translation": "hoãn lại",
+      "count": 0
+    },
     {
       "word": "put on something [transitive]",
       "meaning": "to start wearing clothes or to gain weight",
@@ -657,7 +671,7 @@
       "example": "She set me up with her cousin last weekend.",
       "translation": "mai mối",
       "count": 0
-    }
+    },
     {
       "word": "get on (with somebody) [intransitive]",
       "meaning": "to have a friendly or harmonious relationship with someone",
@@ -833,104 +847,104 @@
       "translation": "suy nghĩ đột phá",
       "count": 0
     },
-  {
+    {
     "word": "Get off on the wrong foot",
     "meaning": "To start something, especially a relationship, in a bad or awkward way.",
     "example": "Our meeting got off on the wrong foot because of a scheduling mistake.",
     "translation": "Bắt đầu mối quan hệ một cách không suôn sẻ",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Stand your ground",
     "meaning": "To maintain your beliefs or position firmly even when others oppose you.",
     "example": "Despite criticism, she stood her ground on the issue.",
     "translation": "Giữ vững lập trường",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Run around like a headless chicken",
     "meaning": "To act in a panicked, confused, or unorganized way.",
     "example": "Everyone was running around like headless chickens before the event started.",
     "translation": "Chạy loạn xạ, hành xử thiếu tổ chức",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Cut to the chase",
     "meaning": "To skip the details and get straight to the main point.",
     "example": "Let’s cut to the chase—what do you need from me?",
     "translation": "Vào thẳng vấn đề",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Be a blessing in disguise",
     "meaning": "Something that seems bad at first but results in something good.",
     "example": "Losing that job was a blessing in disguise—it led me to a better one.",
     "translation": "Phúc họa đan xen",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Cost an arm and a leg",
     "meaning": "To be very expensive.",
     "example": "That designer bag costs an arm and a leg!",
     "translation": "Rất đắt đỏ",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Learn the ropes",
     "meaning": "To learn how to do a particular job or task.",
     "example": "She’s still learning the ropes at her new job.",
     "translation": "Học việc, học cách làm việc",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Cook the books",
     "meaning": "To dishonestly change financial records.",
     "example": "They were accused of cooking the books to hide losses.",
     "translation": "Gian lận sổ sách kế toán",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Make a cold call",
     "meaning": "To contact someone you don't know to sell something or promote a service.",
     "example": "He makes 20 cold calls a day to find new customers.",
     "translation": "Gọi điện thoại tiếp thị",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Get the green light",
     "meaning": "To receive permission to proceed.",
     "example": "We got the green light to begin the project.",
     "translation": "Được bật đèn xanh, được cho phép",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Twist somebody’s arm",
     "meaning": "To strongly persuade someone to do something they are reluctant to do.",
     "example": "She twisted my arm to get me to join the team.",
     "translation": "Thuyết phục ai đó làm điều họ không muốn",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Run on a shoestring",
     "meaning": "To operate with a very small budget.",
     "example": "The charity runs on a shoestring but manages to help many.",
     "translation": "Chạy với ngân sách eo hẹp",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Be snowed under",
     "meaning": "To be overwhelmed with too much work.",
     "example": "I'm snowed under with assignments this week.",
     "translation": "Ngập trong công việc",
     "count": 0
-  },
-  {
+    },
+    {
     "word": "Be in the red / black",
     "meaning": "To be operating at a financial loss (in the red) or profit (in the black).",
     "example": "Thanks to good sales, we’re finally in the black.",
     "translation": "Lỗ (in the red) / Lãi (in the black)",
     "count": 0
-  },
+    },
     {
       "word": "Miss the boat",
       "meaning": "To fail to seize an opportunity or take timely action.",
@@ -1142,7 +1156,6 @@
       "count": 0
     },
     {
-     {
       "word": "bump into ",
       "meaning": "to collide with something by accident",
       "example": "I wasn't watching where I was going and bumped into a table.",
@@ -4949,7 +4962,6 @@
       "example": "Although I don’t like the idea of being a cog in the machine, my company does have excellent benefits and career advancement opportunities.",
       "count": 0
     },
-    {
     {
     "word": "Be a big fish in a small pond",
     "meaning": "To be important or influential in a limited or smaller environment.",
