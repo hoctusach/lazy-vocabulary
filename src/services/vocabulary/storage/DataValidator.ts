@@ -94,6 +94,7 @@ export class DataValidator {
         word: word.word,
         meaning: word.meaning,
         example: word.example,
+        translation: word.translation,
         count: word.count,
         category: word.category
       }));
