@@ -42,6 +42,7 @@ export class VocabularyImporter {
           word: String(importedWord.word),
           meaning: String(importedWord.meaning || ""),
           example: String(importedWord.example || ""),
+          translation: String(importedWord.translation || ""),
           count: importedWord.count !== undefined ? importedWord.count : 0,
           category: importedWord.category || sheetName // Use sheet name as default category if not provided
         };
