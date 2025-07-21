@@ -17,7 +17,6 @@ export class VocabularyDataProcessor {
             word: String(word.word || ""),
             meaning: String(word.meaning || ""),
             example: String(word.example || ""),
-            translation: String(word.translation || ""),
             count: word.count !== undefined ? word.count : 0,
             category: word.category || sheetName // Use sheet name as default category
           });
