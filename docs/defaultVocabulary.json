@@ -1,809 +1,943 @@
 {
   "phrasal verbs": [
-    {
-      "word": "to be under house arrest ",
-      "meaning": "the state of being a prisoner in your own house rather than in a prison",
-      "example": "She was placed under house arrest.",
+      "word": "to be under house arrest",
+      "meaning": "to be legally forced to stay inside one's home instead of going to prison",
+      "example": "He was under house arrest while awaiting the final verdict.",
+      "translation": "bị quản thúc tại nhà",
       "count": 0
     },
     {
       "word": "Knuckle down",
-      "meaning": "to start focusing on your work/study. (Inseparable)",
-      "example": "I work as a teacher and we’ve got exams coming soon, so we all need to knuckle down. I study law, and I have exams soon, so I need to knuckle down.",
+      "meaning": "to start working or studying seriously with full effort",
+      "example": "You'll need to knuckle down if you want to pass the final exams.",
+      "translation": "bắt tay vào làm việc nghiêm túc",
       "count": 0
     },
     {
-      "word": "To get a round to",
-      "meaning": "to do something you have intended to do,but not had time. (Inseparable)",
-      "example": "Can you cook? I would love learn how to cook, but I just haven't got round to it. I’ve been too busy. Can you paint? I like painting, but I cannot do it very well. I’ve just never got round to taking classes.",
+      "word": "To get around to",
+      "meaning": "to finally do something that you have intended to do for a long time",
+      "example": "I finally got around to reading that book you lent me.",
+      "translation": "cuối cùng cũng làm được điều gì đó",
       "count": 0
     },
     {
       "word": "To cook the books",
-      "meaning": "To alter facts and figures",
-      "example": "Their accountant was charged with cooking the books, and now he’s in jail.",
+      "meaning": "to dishonestly change financial records to make them appear better than they are",
+      "example": "The accountant was fired for cooking the books to hide the losses.",
+      "translation": "gian lận sổ sách kế toán",
       "count": 0
     },
     {
       "word": "Burn the midnight oil",
-      "meaning": "Work or study hard",
-      "example": "I have a big exam tomorrow, so I’ll be burning the midnight oil to review all the material.”",
+      "meaning": "to work or study late into the night",
+      "example": "She burned the midnight oil to finish the project on time.",
+      "translation": "thức khuya làm việc hoặc học bài",
       "count": 0
     },
     {
       "word": "Count on somebody [transitive]",
-      "meaning": "to depend on someone to do what you want or expect",
-      "example": "I always knew I could count on her if I needed anything. I always knew I could depend on her if I needed anything. Whenever I need to borrow money I can always depend on my sister. Whenever I need to borrow money I can always count on my sister. ",
+      "meaning": "to rely on someone to do what they say or expect",
+      "example": "You can count on Tom to get the job done well.",
+      "translation": "dựa vào ai đó",
       "count": 0
     },
     {
       "word": "Take after somebody [transitive]",
-      "meaning": "to behave like someone else - usually a relative | to have the same personality traits as somebody",
-      "example": "I defifinitely take after my father. I defifinitely behave like/am similar to my father. I behave like my mother, not my father. Who do you behave like? I take after my mother, not my father. Who do you take after? ",
+      "meaning": "to resemble a family member in appearance or behavior",
+      "example": "She really takes after her mother in both looks and attitude.",
+      "translation": "giống ai đó trong gia đình",
       "count": 0
     },
     {
       "word": "sneak out [intransitive]",
-      "meaning": "to go out or leave a place quietly or in secret",
-      "example": "My older sister was always sneaking out late at night. My older sister was always leaving the house quietly and in secret late at night. I used to secretly leave the house to visit my girlfriend when I was young. I used to sneak out of the house to visit my girlfriend when I was young.",
+      "meaning": "to leave a place quietly and secretly to avoid being noticed",
+      "example": "He tried to sneak out of the meeting without anyone seeing him.",
+      "translation": "lẻn ra ngoài",
       "count": 0
     },
     {
       "word": "barge in [intransitive]",
-      "meaning": "to enter a place abruptly - uninvited or interrupting someone",
-      "example": "My father would barge in to check if my sister was there. My father would enter our room abruptly without knocking to check if my sister was there. \"You cannot just enter my offiffiffice uninvited without knocking.\" said my boss \"You cannot just barge into my offiffiffice without knocking.\" said my boss",
+      "meaning": "to enter a place or conversation rudely and unexpectedly",
+      "example": "He barged in without knocking and interrupted our discussion.",
+      "translation": "xông vào, chen ngang",
       "count": 0
     },
     {
-      "word": "calm down / calm down somebody [transitive/intransitive]",
-      "meaning": "to relax or stop being angry or emotionally excited | to make someone less angry or emotionally excited",
-      "example": "My mother was always the one to calm him down. My mother was always the one to make him less angry/stop him from being angry. \"Relax! I don't know why you are so angry\" \"Calm down! I don’t know why you are so angry\"",
+      "word": "calm down [intransitive] / calm down somebody [transitive]",
+      "meaning": "to become or make someone become more relaxed and less upset",
+      "example": "It took a few minutes to calm her down after the argument.",
+      "translation": "bình tĩnh lại; làm ai đó bình tĩnh",
       "count": 0
     },
     {
       "word": "fall out (with somebody) [transitive]",
-      "meaning": "to stop being friendly with someone because you have had a disagreement with them.",
-      "example": "Even now whenever we fall out, she's the mediator. Even now whenever we have a disagreement, she's the mediator. \"I had an argument with my parents because they didn’t like my new boyfriend\" said Susan \"I fell out with my parents because they didn’t like my new boyfriend\" said Susan",
+      "meaning": "to stop being friendly with someone after having a disagreement",
+      "example": "After their heated discussion, they fell out and stopped talking.",
+      "translation": "cãi nhau, nghỉ chơi",
       "count": 0
     },
     {
       "word": "to bring up someone [transitive]",
-      "meaning": "to raise or mention something for discussion | start talking about sth",
-      "example": "..every Christmas it seems someone brings something up to start an argument. *Separable ..every Christmas it seems someone mentions | starts talking about something to start an argument. When we argue, my boyfriend always mentions things from the past. When we argue, my boyfriend always brings up things from the past.",
+      "meaning": "to raise a child or help them grow into an adult",
+      "example": "He was brought up by his aunt after his parents passed away.",
+      "translation": "nuôi dưỡng",
       "count": 0
     },
     {
       "word": "be fed up [intransitive]",
-      "meaning": "to be annoyed, tired or bored (with something)",
-      "example": "I started a new job 2 months ago but to be honest I am fed up with it already! I started a new job 2 months ago but to be honest I am bored with it already! I am tired of all the lies the government tell us. I am fed up with all the lies the government tell us",
+      "meaning": "to feel annoyed or tired because of repeated or unpleasant experiences",
+      "example": "She's fed up with working late every day without appreciation.",
+      "translation": "chán ngấy",
       "count": 0
     },
     {
       "word": "be in bad taste",
-      "meaning": "causing offence by being insensitive or downright rude to someone else, perhaps by not taking account of their cultural sensibilities.",
-      "example": "He told a joke about death that I thought was in bad taste considering that Steve's father had just died. offering a bacon sandwich to someone you know is a strict vegetarian, could be in bad taste.",
+      "meaning": "to be offensive or disrespectful, especially in sensitive situations",
+      "example": "His comment about the tragedy was definitely in bad taste.",
+      "translation": "phản cảm, thiếu tế nhị",
       "count": 0
     },
     {
       "word": "be in the public eye",
-      "meaning": "to be famous and written about in newspapers and magazines and seen on television",
-      "example": "Celebrities like Taylor Swift are often in the public eye. Many politicians are not comfortable being in the public eye.",
+      "meaning": "to be frequently seen or discussed in the media",
+      "example": "Public figures must accept that they are always in the public eye.",
+      "translation": "bị chú ý bởi công chúng",
       "count": 0
     },
     {
       "word": "turn down something/somebody [transitive]",
-      "meaning": "to reject something or someone (an offer, invitation, job, marriage proposal).",
-      "example": "I turned down other jobs for this one. I turned other jobs down for this one. I rejected other jobs for this one. The man asked the woman he loved to marry him, but she rejected him. The man asked the woman he loved to marry him, but she turned him down.",
+      "meaning": "to refuse or reject an offer, request, or proposal",
+      "example": "She turned down the scholarship because she wanted to stay close to home.",
+      "translation": "từ chối",
       "count": 0
     },
     {
       "word": "dwell on something [transitive]",
-      "meaning": "to spend a lot of time thinking about something negative.",
-      "example": "I'm trying not to dwell on the problems, but it's very difficult. \"Don't spend a lot of time thinking about the past. You need to be positive about the future.\"",
+      "meaning": "to spend too much time thinking or talking about something negative",
+      "example": "Instead of dwelling on his failures, he focused on future goals.",
+      "translation": "suy nghĩ tiêu cực mãi về",
       "count": 0
     },
     {
       "word": "look forward to something [transitive]",
-      "meaning": "to be happy or excited about something that is going to happen in the future.",
-      "example": "I was really looking forward to starting with the company, but it is not what I expected. Mary is excited about her holiday to Spain. Mary is looking forward to her holiday to Spain",
+      "meaning": "to be excited or happy about something that is going to happen",
+      "example": "I’m looking forward to seeing my family this weekend.",
+      "translation": "mong đợi",
       "count": 0
     },
     {
       "word": "look down on somebody [transitive]",
-      "meaning": "to have a low opinion of someone or to think you are better than someone else.",
-      "example": "I feel like she constantly looks down on me. He has a low opinion of people who don't have as much money as him. He looks down on people who don't have as much money as him.",
+      "meaning": "to think that you are better or more important than someone else",
+      "example": "He tends to look down on people who don’t share his opinions.",
+      "translation": "xem thường",
       "count": 0
     },
     {
       "word": "boss around somebody [transitive]",
-      "meaning": "to give (someone) orders or tell someone what to do in a domineering/autocratic way.",
-      "example": "She loves to boss people around. No one likes working with Jane. She gives orders to everyone in a domineering way.",
+      "meaning": "to keep telling someone what to do in an overly controlling way",
+      "example": "Stop bossing your little brother around all the time.",
+      "translation": "ra lệnh một cách hách dịch",
       "count": 0
     },
     {
       "word": "stand up to somebody [transitive]",
-      "meaning": "to confront/challenge someone and not allow yourself to be treated badly, especially by someone in authority.",
-      "example": "Everyone complains about her, but no one will stand up to her. The boy challenged the school bully and told him he wasn't afraid of him.",
+      "meaning": "to confront someone and refuse to be treated unfairly by them",
+      "example": "She finally stood up to her boss and demanded respect.",
+      "translation": "đối đầu, chống lại",
       "count": 0
     },
     {
       "word": "back up somebody [transitive]",
-      "meaning": "to help or support someone in a particular situation or take someone's side in an argument or disagreement.",
-      "example": "I tried to challenge her about her attitude, but no one backed me up. The rest of the workers supported him when he complained about the working conditions.",
+      "meaning": "to support or defend someone in a difficult situation",
+      "example": "Her friends backed her up when she spoke out against the manager.",
+      "translation": "hỗ trợ, ủng hộ",
       "count": 0
     },
     {
-      "word": "look up something [transitive]  ",
-      "meaning": "to research or look for a specific piece of information (in a book or on the internet).",
-      "example": "I still spend most of my time on the internet looking up potential clients. I didn't know the meaning of \"silly,\" so I had to look the meaning up in the dictionary.",
+      "word": "look up something [transitive]",
+      "meaning": "to search for information in a source like a dictionary or online",
+      "example": "I had to look up the recipe online before cooking.",
+      "translation": "tra cứu",
       "count": 0
     },
     {
       "word": "think through something [transitive]",
-      "meaning": "to consider all the possibilities and outcomes of a situation.",
-      "example": "I need some time to think through my options and decide what to do. I got married when I was 18. I was young and stupid and didn’t think it through.",
+      "meaning": "to carefully consider all aspects before making a decision",
+      "example": "He needs to think through the plan before presenting it.",
+      "translation": "suy nghĩ thấu đáo",
       "count": 0
     },
     {
       "word": "break down [intransitive]",
-      "meaning": "to stop working or cease to function (talking about a machine or motor vehicle).",
-      "example": "The bus broke down on the way to the concert. His car broke down, so he had to call a taxi.",
+      "meaning": "to stop working due to mechanical failure",
+      "example": "My old laptop broke down during the presentation.",
+      "translation": "hư hỏng (máy móc)",
       "count": 0
     },
     {
       "word": "freak out [intransitive]",
-      "meaning": "to become very angry or to panic and become afraid.",
-      "example": "Everyone started panicking and freaking out. My parents freaked out when I told them I failed the exam.",
+      "meaning": "to become extremely upset or lose control due to fear or anger",
+      "example": "He freaked out when he lost his phone.",
+      "translation": "hoảng loạn, nổi giận",
       "count": 0
     },
     {
       "word": "turn up [intransitive]",
-      "meaning": "to arrive somewhere or appear.",
-      "example": "45 minutes later, an empty bus turned up. I hadn’t seen my friend in 3 years when he turned up at my doorstep asking if he could sleep on the couch.",
+      "meaning": "to arrive or appear unexpectedly or after being missing",
+      "example": "She turned up late to the meeting without explanation.",
+      "translation": "xuất hiện, đến nơi",
       "count": 0
     },
     {
       "word": "get on / get on something [transitive/intransitive]",
-      "meaning": "to enter a vehicle (bus, plane, boat) | to mount (a horse or bike).",
-      "example": "An empty bus turned up, and we got on it. When I was on holidays in Morocco, I got on a camel.",
+      "meaning": "to board a vehicle such as a bus, plane, or bicycle",
+      "example": "We got on the train just before it left the station.",
+      "translation": "lên xe, tàu, máy bay",
       "count": 0
     },
     {
       "word": "sell out [intransitive]",
-      "meaning": "everything is sold - if something is sold out, there are no more available - the place is full.",
-      "example": "I was so lucky to be able to go because the concert was sold out. When U2 play a concert, the tickets sell out very fast.",
+      "meaning": "to have no more items available for sale because everything has been bought",
+      "example": "The concert tickets sold out in just ten minutes.",
+      "translation": "bán hết",
       "count": 0
     },
     {
       "word": "join in / join in something [transitive/intransitive]",
-      "meaning": "to do an activity with people who are already doing it.",
-      "example": "The band came on stage and started to sing “Viva La Vida,” and everyone joined in. I started to sing \"Happy Birthday\" for my friend, and everyone joined in.",
+      "meaning": "to participate in an activity that others are already doing",
+      "example": "He joined in the game even though he arrived late.",
+      "translation": "tham gia vào",
       "count": 0
     },
     {
       "word": "pass out [intransitive]",
-      "meaning": "to faint or lose consciousness.",
-      "example": "I sang and danced so much I almost passed out! He drank a lot of alcohol and passed out on the street.",
+      "meaning": "to suddenly become unconscious",
+      "example": "He passed out from exhaustion after the marathon.",
+      "translation": "ngất xỉu",
       "count": 0
     },
     {
       "word": "carry on (doing something) [transitive/intransitive]",
-      "meaning": "to continue an activity or task.",
-      "example": "They were supposed to finish at 10:00 pm, but they carried on playing until 10:45. I'll carry on working and meet you when I finish.",
+      "meaning": "to continue an activity that was already in progress",
+      "example": "Despite the noise, she carried on reading her book.",
+      "translation": "tiếp tục",
       "count": 0
     },
     {
       "word": "blow away somebody [transitive]",
-      "meaning": "to really impress someone by doing something. (làm kinh ngạc)",
-      "example": "They were incredible and blew everyone away. The beaches in Thailand really impressed me.",
+      "meaning": "to greatly impress or amaze someone",
+      "example": "Her performance blew everyone away at the talent show.",
+      "translation": "làm kinh ngạc",
       "count": 0
     },
     {
       "word": "bring out something [transitive]",
-      "meaning": "to release or publish a product, album, book, or movie (make it available to the public).",
-      "example": "The singer announced that they are bringing out a new album next month. The writer brings out a new book every year.",
+      "meaning": "to make a new product, book, or album available to the public",
+      "example": "They brought out a new smartphone model last week.",
+      "translation": "phát hành, tung ra",
       "count": 0
     },
-    {
+{
       "word": "go off [intransitive]",
-      "meaning": "to start ringing (in the case of an alarm) | to explode (in the case of a bomb).",
-      "example": "I almost missed the flight because my alarm didn't go off. The bomb went off at 9:20.",
+      "meaning": "to begin making a sound (like an alarm) or to explode suddenly",
+      "example": "The fire alarm went off in the middle of the night.",
+      "translation": "reo lên, nổ tung",
       "count": 0
     },
     {
       "word": "sleep in [intransitive]",
-      "meaning": "to wake up later than you intended or needed to.",
-      "example": "I woke up later than I intended, but thankfully I arrived at the airport just in time to board. I slept in this morning and missed my train to work.",
+      "meaning": "to wake up later than planned or necessary",
+      "example": "I accidentally slept in and missed the first meeting.",
+      "translation": "ngủ nướng",
       "count": 0
     },
     {
       "word": "hang out (with somebody) [transitive]",
-      "meaning": "to spend time socially with someone | to stay or spend time socially somewhere.",
-      "example": "We spent most of the time hanging out by the pool during the day. My mother doesn't like the people I hang out with.",
+      "meaning": "to spend time relaxing with someone or at a place",
+      "example": "They often hang out at the coffee shop near campus.",
+      "translation": "đi chơi, tụ tập",
       "count": 0
     },
     {
       "word": "rip off somebody [transitive]",
-      "meaning": "to cheat someone by charging too much for something or charge someone unfairly.",
-      "example": "I was ripped off at a market selling souvenirs. The taxi driver ripped me off by not taking the shortest route to my house.",
+      "meaning": "to charge someone too much or cheat them financially",
+      "example": "Tourists are often ripped off at local markets.",
+      "translation": "lừa gạt tiền",
       "count": 0
     },
     {
       "word": "watch out (for something) [transitive]",
-      "meaning": "to be careful of someone or something.",
-      "example": "The tour guide had told us to watch out for pickpockets. \"Be careful of cars when you are crossing the road,\" said my grandmother.",
+      "meaning": "to be cautious or careful of possible danger or problems",
+      "example": "Watch out for slippery floors after it rains.",
+      "translation": "cẩn thận, coi chừng",
       "count": 0
     },
     {
       "word": "run out of something [transitive]",
-      "meaning": "to have no more of something left because you have used it all.",
-      "example": "We all ran out of money before the end of the week. We have run out of milk. I'll go to the shop to get some.",
+      "meaning": "to no longer have something because it has been used up",
+      "example": "We ran out of coffee during the meeting.",
+      "translation": "hết, cạn kiệt",
       "count": 0
     },
     {
       "word": "talk (someone) into something [transitive]",
-      "meaning": "to persuade someone to do something.",
-      "example": "He talked us into going to the most famous nightclub on the island. I talked my parents into lending me their car for the weekend.",
+      "meaning": "to convince or persuade someone to do something",
+      "example": "She talked me into applying for the internship.",
+      "translation": "thuyết phục",
       "count": 0
     },
     {
       "word": "run into somebody [transitive]",
-      "meaning": "to meet someone unexpectedly or by chance.",
-      "example": "We ran into some old friends from school when we were there. I ran into an old friend from college in a bar last night.",
+      "meaning": "to meet someone unexpectedly by chance",
+      "example": "I ran into my old professor at the bookstore.",
+      "translation": "tình cờ gặp",
       "count": 0
     },
     {
       "word": "throw up [intransitive]",
-      "meaning": "to vomit.",
-      "example": "I ate some fish, but I got food poisoning and spent the evening throwing up. John drank too much alcohol last night and threw up.",
+      "meaning": "to vomit suddenly",
+      "example": "He felt dizzy and threw up after the rollercoaster ride.",
+      "translation": "nôn mửa",
       "count": 0
     },
     {
       "word": "break up / break up with somebody [transitive/intransitive]",
-      "meaning": "to finish or end a relationship (with someone).",
-      "example": "But why did they break up? Mary and her boyfriend broke up last week.",
+      "meaning": "to end a romantic relationship",
+      "example": "They broke up after five years together.",
+      "translation": "chia tay",
       "count": 0
     },
     {
       "word": "show off [intransitive]",
-      "meaning": "to behave in a way that is intended to attract people’s attention and make them admire you | to try to appear great.",
-      "example": "He was quite arrogant and was always showing off. No one in school likes Bob because he is always showing off.",
+      "meaning": "to act in a way that draws attention or admiration to oneself",
+      "example": "He always shows off his expensive gadgets.",
+      "translation": "khoe khoang",
       "count": 0
     },
     {
       "word": "split up / split up with somebody [transitive/intransitive]",
-      "meaning": "to finish a relationship (also for married couples).",
-      "example": "But why did they split up? After 5 years of marriage, the couple decided to split up.",
+      "meaning": "to end a relationship or marriage",
+      "example": "The couple decided to split up after years of disagreement.",
+      "translation": "chia tay",
       "count": 0
     },
     {
       "word": "move in (with somebody) [transitive]",
-      "meaning": "to start living in a new accommodation.",
-      "example": "They only moved in together last month. John moved in with his grandmother to be closer to university.",
+      "meaning": "to begin living in a new house or with someone",
+      "example": "They moved in together after getting engaged.",
+      "translation": "chuyển đến sống chung",
       "count": 0
     },
     {
       "word": "hit on somebody [transitive]",
-      "meaning": "to make sexual advances on someone.",
-      "example": "Apparently, she saw him hitting on another girl in Starbucks. The woman made sexual advances on her boss at the Christmas party.",
+      "meaning": "to flirt with someone in a romantic or sexual way",
+      "example": "He was hitting on her all night at the party.",
+      "translation": "tán tỉnh",
       "count": 0
     },
     {
       "word": "keep on 'doing' something [transitive]",
-      "meaning": "to continue 'doing' something (usually something negative).",
-      "example": "In fact, he kept on denying it until she told him she had taken a video of it. The child continued asking her parents for chocolate and eventually her parents gave her some.",
+      "meaning": "to continue doing something persistently, often annoyingly",
+      "example": "She kept on talking even after the class had ended.",
+      "translation": "tiếp tục (làm gì đó)",
       "count": 0
     },
     {
       "word": "joke around [intransitive]",
-      "meaning": "to make jokes playfully or try to be funny - to do something but not in a serious way.",
-      "example": "Once he saw the video he admitted it but said he was only joking around. Tim always tries to be funny and playful at work.",
+      "meaning": "to act playfully or not take things seriously",
+      "example": "He was just joking around and didn’t mean any harm.",
+      "translation": "đùa giỡn",
       "count": 0
     },
     {
       "word": "move out [intransitive]",
-      "meaning": "to leave an accommodation.",
-      "example": "She broke up with him and told him to move out. My housemate is leaving the accommodation next month so I need to find someone to rent his room.",
+      "meaning": "to leave a house or apartment permanently",
+      "example": "She moved out last week and found her own place.",
+      "translation": "chuyển đi",
       "count": 0
     },
     {
       "word": "get over something or someone [transitive]",
-      "meaning": "to recover emotionally from something negative (a breakup, trauma) | to stop having strong feelings for someone.",
-      "example": "I think she will get over him soon. James found it difficult to recover emotionally from his divorce.",
+      "meaning": "to recover from emotional pain or stop being upset about something",
+      "example": "It took her months to get over the breakup.",
+      "translation": "vượt qua (cảm xúc)",
       "count": 0
     },
     {
+    {
       "word": "put on something [transitive]",
-      "meaning": "to start wearing something (clothes); to gain body weight or become heavier.",
-      "example": "I put on a lot of weight so I want to get fit again. Most professional athletes put on weight after they stop competing.",
+      "meaning": "to start wearing clothes or to gain weight",
+      "example": "She put on a warm jacket before going outside.",
+      "translation": "mặc vào; tăng cân",
       "count": 0
     },
     {
       "word": "get back into something [transitive]",
-      "meaning": "to start doing something that you used to do but that you stopped doing (routine, habit, activity).",
-      "example": "I also want to get back into yoga. My sister is getting back into dancing. She used to dance when she was younger but stopped when she went to University.",
+      "meaning": "to return to a previous activity or habit",
+      "example": "He's getting back into painting after a long break.",
+      "translation": "quay lại với điều gì đó",
       "count": 0
     },
     {
       "word": "give up / give up something [transitive/intransitive]",
-      "meaning": "to stop doing something or consuming something that has been a habit.",
-      "example": "Are you going to give up sweet food like cake and biscuits? I am stopping to consume alcohol for 3 months.",
+      "meaning": "to stop a habit or regular activity",
+      "example": "She's decided to give up drinking coffee for a month.",
+      "translation": "từ bỏ",
       "count": 0
     },
     {
       "word": "cut down on something [transitive]",
-      "meaning": "to reduce the amount or quantity of something (something you consume or use).",
-      "example": "I am going to cut down on sweet foods. I am trying to reduce the amount of caffeine I consume so I will have a juice.",
+      "meaning": "to reduce the use or intake of something",
+      "example": "I'm trying to cut down on sugar this month.",
+      "translation": "cắt giảm",
       "count": 0
     },
     {
       "word": "eat out [intransitive]",
-      "meaning": "to eat food in a restaurant or cafe - not in your home.",
-      "example": "...so I am going to eat out less and buy less clothes. On Friday nights, me and my wife always eat out.",
+      "meaning": "to have a meal at a restaurant instead of at home",
+      "example": "We usually eat out on the weekends.",
+      "translation": "ăn ngoài",
       "count": 0
     },
     {
       "word": "save up [intransative]",
-      "meaning": "to save money for a particular reason.",
-      "example": "...so I can save up (money) for a holiday. My sister and her husband are saving up to buy a new car.",
+      "meaning": "to put aside money for a purpose",
+      "example": "He's saving up to buy a new laptop.",
+      "translation": "tiết kiệm tiền",
       "count": 0
     },
     {
       "word": "throw out something [transitive]",
-      "meaning": "discard something, put something in the rubbish.",
-      "example": "Another NYR is to throw out all the clothes I don’t use anymore. I threw out the milk because it smelled very bad.",
+      "meaning": "to dispose of or discard something",
+      "example": "I threw out the old magazines to make space.",
+      "translation": "vứt bỏ",
       "count": 0
     },
     {
       "word": "figure out something [transitive]",
-      "meaning": "to find the answer to a problem, solve a problem, or be able to understand something.",
-      "example": "- Have you figured out what you will do if you do drop out? - The police couldn't figure out how the bank was robbed.",
+      "meaning": "to understand or solve something",
+      "example": "We need to figure out why the system keeps crashing.",
+      "translation": "tìm ra",
       "count": 0
     },
     {
       "word": "set up something [transitive]",
-      "meaning": "to start a company or an organization.",
-      "example": "- I would love to set up my own business in the future. - Facebook was set up in 2006.",
+      "meaning": "to establish a business or organization",
+      "example": "They set up a new startup focused on education.",
+      "translation": "thành lập",
       "count": 0
     },
     {
       "word": "call around [intransitive]",
-      "meaning": "to visit or go to someone's house.",
-      "example": "- My sister called around with her son and asked me to look after him. - I visited my friend's house, but she wasn't there.",
+      "meaning": "to visit someone's house casually",
+      "example": "My aunt called around yesterday to say hello.",
+      "translation": "ghé qua",
       "count": 0
     },
     {
       "word": "look after something or someone [transitive]",
-      "meaning": "to take care of someone or something.",
-      "example": "- My sister called around with her son and asked me to look after him. - She quit her job to stay home and look after her children.",
+      "meaning": "to take care of someone or something",
+      "example": "Can you look after my dog while I’m away?",
+      "translation": "chăm sóc",
       "count": 0
     },
     {
       "word": "end up [intransitive]",
-      "meaning": "to become or do something unplanned, expressing the end or final result of something.",
-      "example": "- She had a really important business dinner, so I ended up babysitting. - At the end of the night, we found ourselves in a Karaoke bar.",
+      "meaning": "to reach a final or unexpected situation",
+      "example": "We ended up going to a different restaurant.",
+      "translation": "kết cục là",
       "count": 0
     },
     {
       "word": "keep up [intransitive]",
-      "meaning": "to move at the same speed as someone or something.",
-      "example": "- My nephew didn't fall asleep until midnight, and he was running around the whole time. I can't keep up with him! - I went jogging with my friend, but he runs so fast I can't keep up with him.",
+      "meaning": "to maintain the same pace or level",
+      "example": "I couldn’t keep up with the fast runners.",
+      "translation": "theo kịp",
       "count": 0
     },
     {
       "word": "wait up [intransitive]",
-      "meaning": "to not go to sleep or stay awake until someone comes home.",
-      "example": "- Then I had to wait up until my sister got back. - \"Don't stay awake until I come home!\" said the girl to her parents.",
+      "meaning": "to stay awake until someone arrives",
+      "example": "She waited up for her son to get home.",
+      "translation": "thức chờ",
       "count": 0
     },
     {
       "word": "get back [intransitive]",
-      "meaning": "to return from some place.",
-      "example": "- Then I had to wait up until my sister got back. - \"What time will you return from lunch?\" asked my boss.",
+      "meaning": "to return to a place",
+      "example": "What time did you get back from work?",
+      "translation": "quay lại",
       "count": 0
     },
     {
       "word": "wander off [intransitive]",
-      "meaning": "to leave a place alone, usually without telling other people, or to start walking alone away from where you should stay (usually used with kids).",
-      "example": "- I can't take my eyes off him in case he wanders off and hurts himself. - Dogs will wander off if you let them, but they will always return home.",
+      "meaning": "to move away from a place without permission or direction",
+      "example": "The toddler wandered off while we were distracted.",
+      "translation": "đi lang thang",
       "count": 0
     },
     {
       "word": "mess up something [transitive]",
-      "meaning": "to make something untidy or dirty.",
-      "example": "- Plus, I had to tidy up; he messed up my entire house! - My husband always messes up the kitchen when he cooks.",
+      "meaning": "to make something untidy or dirty",
+      "example": "He messed up the kitchen while cooking.",
+      "translation": "làm bừa bộn",
       "count": 0
     },
     {
       "word": "give back something [transitive]",
-      "meaning": "to return something or someone to someone (something that you borrowed or took care of).",
-      "example": "- I'm glad I can give him back at the end of the evening. - I gave my friend my fishing rod to go fishing, and he gave it back to me when he finished.",
+      "meaning": "to return something that was borrowed",
+      "example": "Don't forget to give back the book you borrowed.",
+      "translation": "trả lại",
       "count": 0
     },
     {
       "word": "miss out [intransitive]",
-      "meaning": "to not be able to experience or attend something, or to fail to take advantage of an opportunity or chance.",
-      "example": "- Definitely! I don't want to miss out again! - I missed out on the Christmas party because I was sick.",
+      "meaning": "to not experience or take part in something",
+      "example": "She missed out on the concert because of work.",
+      "translation": "bỏ lỡ",
       "count": 0
     },
     {
       "word": "catch up [intransitive]",
-      "meaning": "to talk to someone whom you have not seen for some time in order to find out what they have been doing.",
-      "example": "- James, it's so good to finally catch up with you again! - I used to live in New York, so when I go there for work now, I like to catch up with old friends.",
+      "meaning": "to reconnect and update with someone after a while",
+      "example": "We finally caught up over lunch last weekend.",
+      "translation": "nói chuyện lại",
       "count": 0
     },
     {
-      "word": "meet up [intransitive]",
-      "meaning": "to meet with someone to spend time together.",
-      "example": "- I wanted to meet up sooner, but I didn't feel up to it. - I meet up with my friends every Friday night.",
+      "word": "meet up (phrasal verb)",
+      "meaning": "to get together with someone to spend time",
+      "example": "Let’s meet up next weekend for coffee.",
+      "translation": "gặp nhau",
       "count": 0
     },
     {
-      "word": "feel up to something [transitive]",
-      "meaning": "to feel capable of doing something.",
-      "example": "- I wanted to meet up sooner, but I didn't feel up to it. - Do you feel up to walking in the park?",
+      "word": "feel up to something (phrasal verb)",
+      "meaning": "to feel capable or ready to do something",
+      "example": "I don’t feel up to going out tonight.",
+      "translation": "cảm thấy đủ sức để làm gì",
       "count": 0
     },
     {
-      "word": "fall through [intransitive]",
-      "meaning": "to fail to happen or be unsuccessful.",
-      "example": "- I wanted to meet up sooner, but I didn't feel up to it. - Do you feel up to walking in the park?",
+      "word": "fall through (phrasal verb)",
+      "meaning": "to not happen as planned",
+      "example": "Our holiday plans fell through at the last minute.",
+      "translation": "thất bại, không xảy ra",
       "count": 0
     },
     {
-      "word": "give away something [transitive]",
-      "meaning": "to give something to someone for free because you don't need it anymore or to distribute something for free, often for promotional purposes.",
-      "example": "1. Another New Year's resolution is to give away all the clothes I don't use anymore. 2. I gave a lot of my old music records for free to the charity shop.",
+      "word": "give away something (phrasal verb)",
+      "meaning": "to donate or hand something out for free",
+      "example": "He gave away his old books to the local library.",
+      "translation": "tặng, phát miễn phí",
       "count": 0
     },
     {
-      "word": "take up something [transitive]",
-      "meaning": "to start learning something new, like a new hobby or pastime.",
-      "example": "1. This year my main resolution is to take up a musical instrument, maybe the guitar. 2. She took up dancing at the age of 10 and now she is a professional dancer.",
+      "word": "take up something (phrasal verb)",
+      "meaning": "to begin a new activity or hobby",
+      "example": "She recently took up painting as a hobby.",
+      "translation": "bắt đầu làm gì (thói quen mới)",
       "count": 0
     },
     {
-      "word": "stick at something [transitive]",
-      "meaning": "to continue doing something despite difficulties or not wanting to, to not give up or quit.",
-      "example": "1. My second resolution is to stick at the first resolution, even if it's difficult. 2. He found learning English difficult, but he stuck at it and now he speaks fluently.",
+      "word": "stick at something (phrasal verb)",
+      "meaning": "to continue doing something even when it’s hard",
+      "example": "He stuck at learning piano despite the challenges.",
+      "translation": "kiên trì làm điều gì",
       "count": 0
     },
     {
-      "word": "drop out [intransitive]",
-      "meaning": "to quit or stop attending a course, class, or sports team.",
-      "example": "1. To be honest, I am not enjoying it. I am thinking of dropping out! 2. Steve Jobs dropped out of college to start Apple Computers.",
+      "word": "drop out (phrasal verb)",
+      "meaning": "to leave school, college, or an activity before completing it",
+      "example": "She dropped out of college to start her own business.",
+      "translation": "bỏ học, bỏ dở giữa chừng",
       "count": 0
     },
     {
-      "word": "last [intransitive]",
-      "meaning": "to continue for a longer time than expected or desired.",
-      "example": "1. Lectures seem to last forever. 2. The meeting dragged on for 3 hours. It should have been 1 hour.",
+      "word": "last (phrasal verb)",
+      "meaning": "to continue for a period of time",
+      "example": "The movie lasted over three hours.",
+      "translation": "kéo dài",
       "count": 0
     },
     {
-      "word": "zone out [intransitive]",
-      "meaning": "to stop paying attention and become lost in one's thoughts.",
-      "example": "1. I'm constantly zoning out in class. 2. I zoned out in the middle of the meeting and didn't hear what my boss asked me to do.",
+      "word": "zone out (phrasal verb)",
+      "meaning": "to stop focusing and become distracted",
+      "example": "He zoned out during the long meeting.",
+      "translation": "mất tập trung",
       "count": 0
     },
     {
-      "word": "take down something [transitive]",
-      "meaning": "to write something down on paper.",
-      "example": "1. It is also quite stressful because we have to take down so many notes in class. 2. The police officer took down the driver's information.",
+      "word": "take down something (phrasal verb)",
+      "meaning": "to write or record information",
+      "example": "She took down the instructions carefully.",
+      "translation": "ghi chép lại",
       "count": 0
     },
     {
-      "word": "fall behind [intransitive]",
-      "meaning": "to become 'not up to date' or behind with something, such as work or payments.",
-      "example": "1. If you miss a day, it is very difficult to catch up. 2. Bob stayed in the office until nighttime to catch up on work.",
+      "word": "fall behind (phrasal verb)",
+      "meaning": "to not keep up with progress or schedule",
+      "example": "He fell behind in his schoolwork after being sick.",
+      "translation": "tụt lại phía sau",
       "count": 0
     },
     {
-      "word": "drift off [intransitive]",
-      "meaning": "to start to fall asleep.",
-      "example": "I couldn't help drifting off in the middle of that lecture - it was so boring!",
+      "word": "drift off (phrasal verb)",
+      "meaning": "to slowly fall asleep",
+      "example": "I drifted off while watching the movie.",
+      "translation": "ngủ gật",
       "count": 0
     },
     {
-      "word": "knuckle down [intransitive]",
-      "meaning": "to make a great effort on a task, to concentrate and work hard on something.",
-      "example": "1. In the beginning, all the students were interested, but now they are all drifting off in class. 2. Paul was tired and drifted off in the middle of the movie.",
+      "word": "knuckle down (phrasal verb)",
+      "meaning": "to start working hard on something seriously",
+      "example": "It’s time to knuckle down and finish this report.",
+      "translation": "bắt tay vào làm việc chăm chỉ",
       "count": 0
     },
     {
-      "word": "bring back something [transitive]",
-      "meaning": "to bring something for someone from another country or to return something that has been borrowed.",
-      "example": "1. They just told me I need to knuckle down! 2. The boss told his employees to knuckle down and finish the project.",
+      "word": "bring back something (phrasal verb)",
+      "meaning": "to return something or carry it from another place",
+      "example": "He brought back souvenirs from Japan.",
+      "translation": "mang về",
       "count": 0
     },
     {
-      "word": "grow on somebody [transitive]",
-      "meaning": "if something or someone grows on you, you start to like them more.",
-      "example": "I wasn't sure about this album when I bought it, but it's really grown on me.",
+      "word": "grow on somebody (phrasal verb)",
+      "meaning": "to become more liked over time",
+      "example": "At first I disliked the song, but it grew on me.",
+      "translation": "dần dần yêu thích",
       "count": 0
     },
     {
-      "word": "grow up [intransitive]",
-      "meaning": "to become more mature or an adult.",
-      "example": "1. Anyway, eventually it grew on me, and by the end, I was very sad to leave. 2. I didn't like my sister's boyfriend in the beginning, but he is growing on me. 1. It's a great experience; it made me grow up a lot. 2. Living alone when I went to university made me grow up a lot.",
+      "word": "grow up (phrasal verb)",
+      "meaning": "to become older and more mature",
+      "example": "She grew up in a small village by the sea.",
+      "translation": "trưởng thành",
       "count": 0
     },
     {
-      "word": "sort out something [transitive]",
-      "meaning": "to resolve a problem or to organize or make arrangements for something.",
-      "example": "1. I am happy to be home, but I'm still trying to sort out everything at the moment. 2. Have you sorted out your accommodation for University yet?",
+      "word": "sort out something (phrasal verb)",
+      "meaning": "to fix a problem or organize something",
+      "example": "We need to sort out the issues before launching.",
+      "translation": "giải quyết, sắp xếp",
       "count": 0
     },
     {
-      "word": "look for something or somebody [transitive]",
-      "meaning": "to search for someone or something.",
-      "example": "One thing that employers always look for in a candidate is a strong work ethic.",
+      "word": "look for something or somebody (phrasal verb)",
+      "meaning": "to try to find something or someone",
+      "example": "I’m looking for my lost keys.",
+      "translation": "tìm kiếm",
       "count": 0
     },
     {
-      "word": "fill in for somebody ",
-      "meaning": "to replace someone in a job or position temporarily.",
-      "example": "I still spend most of my time on the internet looking up potential clients. I didn't know the meaning of \"silly,\" so I had to look the meaning up in the dictionary.",
+      "word": "fill in for somebody (phrasal verb)",
+      "meaning": "to temporarily take someone’s place",
+      "example": "Can you fill in for me at the meeting tomorrow?",
+      "translation": "làm thay ai đó",
       "count": 0
     },
     {
-      "word": "get by",
-      "meaning": "to have just enough money to buy the things you need - to survive financially.",
-      "example": "So I'm getting by, but I really need to find a permanent job as soon as possible. Mary has 2 children and she works part-time. It is difficult for her to get by.",
+      "word": "get by (phrasal verb)",
+      "meaning": "to manage with what you have, especially money",
+      "example": "We’re not rich, but we get by just fine.",
+      "translation": "xoay sở",
       "count": 0
     },
     {
-      "word": "pay back something or somebody",
-      "meaning": "to return money you borrowed from someone (a bank or a friend).",
-      "example": "I have to start paying back my student loans next month! Mike is still paying back the money he borrowed for his car.",
+      "word": "pay back something or somebody (phrasal verb)",
+      "meaning": "to return borrowed money",
+      "example": "I’ll pay you back next week after payday.",
+      "translation": "trả lại tiền",
       "count": 0
     },
     {
-      "word": "set up somebody (with somebody) [transitive]",
-      "meaning": "to arrange for two people who you know to go out together on a date because you think they might like each other.",
-      "example": "I've have a friend I want to set you up with.   My sister is always trying to set me up with her friends.",
+      "word": "set up somebody (with somebody) (phrasal verb)",
+      "meaning": "to arrange a romantic meeting between two people",
+      "example": "She set me up with her cousin last weekend.",
+      "translation": "mai mối",
       "count": 0
-    },
+    }
     {
       "word": "get on (with somebody) [intransitive]",
-      "meaning": "to have a good relationship with someone or to like a person.",
-      "example": "I think you'd get on really well.  I have a good relationship with my new classmates.",
+      "meaning": "to have a friendly or harmonious relationship with someone",
+      "example": "She gets on really well with her coworkers at the new job.",
+      "translation": "hòa hợp với ai đó",
       "count": 0
     },
     {
       "word": "work out [intransitive]",
-      "meaning": "to be successful, to end with a desired result, or to happen as planned.",
-      "example": "I know you said you'd given up on dating after it didn't work out with Lucy.  My plan to hitchhike to the music festival wasn't successful/didn't happen as planned.",
+      "meaning": "to result in a successful or satisfactory way",
+      "example": "Everything worked out in the end despite the initial problems.",
+      "translation": "diễn ra tốt đẹp",
       "count": 0
     },
     {
       "word": "move on [intransitive]",
-      "meaning": "to change the subject of conversation, to change the company you work in, or to find another romantic partner after you have broken up with someone.",
-      "example": "It's been almost a year since you broke up, and it's time to move on.   After 10 years working for the same company, I decided it was time to move on.",
+      "meaning": "to let go of the past and begin a new stage in life",
+      "example": "After the breakup, she decided it was time to move on.",
+      "translation": "tiến về phía trước",
       "count": 0
     },
     {
       "word": "cheer up / cheer up somebody [transitive/intransitive]",
-      "meaning": "to become happier or less sad, or to make someone feel happier or less sad.",
-      "example": "I think it's a really good idea, you need something to cheer you up.   Feel happier/Be less sad! It is not the end of the world.",
+      "meaning": "to become or make someone feel happier",
+      "example": "He bought her flowers to cheer her up after a tough week.",
+      "translation": "làm vui lên",
       "count": 0
     },
     {
       "word": "fall for somebody [transitive]",
-      "meaning": "to become attracted to somebody or start to fall in love with someone.",
-      "example": "I know you will fall for her when you see her.  She fell in love with a younger man, and they got married.",
+      "meaning": "to develop romantic feelings for someone",
+      "example": "He fell for her the moment they met at the conference.",
+      "translation": "phải lòng ai đó",
       "count": 0
     },
     {
       "word": "ask out somebody [transitive]",
-      "meaning": "to invite someone for a date.",
-      "example": "Just give her a call and ask her out.  Kate always complains that no one ever asks her out.",
+      "meaning": "to invite someone on a date",
+      "example": "He finally asked her out after weeks of hesitation.",
+      "translation": "mời ai đó đi chơi",
       "count": 0
     },
     {
       "word": "chat up somebody [transitive]",
-      "meaning": "to talk to someone you are romantically interested in to try to make them interested in you or to flirt with someone.",
-      "example": "At least give it a chance, it's been months since you even chatted anyone up.   He spent the whole night talking to/flirting with a girl he liked.",
+      "meaning": "to start a flirtatious conversation with someone",
+      "example": "He tried to chat her up at the party, but she wasn’t interested.",
+      "translation": "tán tỉnh ai đó",
       "count": 0
     },
     {
       "word": "back out [intransitive]",
-      "meaning": "to withdraw from a commitment, arrangement, or promise, or to cancel or decide not to do something because you are afraid.",
-      "example": "Just turn up and see how things go - and don't back out at the last minute!   Paul was supposed to come on holidays with us, but he backed out.",
+      "meaning": "to withdraw from an agreement or commitment",
+      "example": "She backed out of the project just days before the deadline.",
+      "translation": "rút lui",
       "count": 0
     },
     {
       "word": "come up with something [transitive]",
-      "meaning": "to have an idea for something or to think of, create, invent, or discover something new.",
-      "example": "If it doesn't go well, you can always come up with an excuse and leave early.   How did you think of the name for the band?",
+      "meaning": "to think of or create a new idea or plan",
+      "example": "They came up with a creative solution to reduce costs.",
+      "translation": "nghĩ ra điều gì",
       "count": 0
     },
     {
       "word": "bring back something",
-      "meaning": "to return from somewhere with something",
-      "example": "1. I brought back a present for you; it's in my house. 2. My brother borrowed my car yesterday and hasn't brought it back yet.",
+      "meaning": "to return with something from another place",
+      "example": "He brought back souvenirs from his trip to Japan.",
+      "translation": "mang về",
       "count": 0
     },
     {
       "word": "fall behind",
-      "meaning": "If you fall behind, you do not make progress or move forward as fast as other people. f you fall behind, you do not make progress or move forward as fast as other people.",
-      "example": "1. Now, I have fallen behind so much! 2. She fell behind on her mortgage repayments, and now the bank wants to take her house.",
+      "meaning": "to lag behind in progress or performance",
+      "example": "He fell behind in his studies after missing several classes.",
+      "translation": "tụt lại phía sau",
       "count": 0
     },
     {
       "word": "puzzle over something",
-      "meaning": "to think about or try to understand something that is confusing or perplexing.",
-      "example": "For centuries, historians and archaeologists have puzzled over the many mysteries of Stonehenge, a prehistoric monument that took an estimated 1,500 years to erect.",
+      "meaning": "to think hard about something confusing",
+      "example": "She puzzled over the strange message for hours.",
+      "translation": "suy nghĩ về điều khó hiểu",
       "count": 0
     },
     {
       "word": "be comprised of",
-      "meaning": "to be made up or composed of something; to consist of.",
-      "example": "Located on Salisbury Plain in southern England, it is comprised of roughly 100 massive upright stones placed in a circular layout. The committee is comprised of five members.",
+      "meaning": "to consist of specific parts or elements",
+      "example": "The team is comprised of developers and designers.",
+      "translation": "bao gồm",
       "count": 0
     },
     {
       "word": "To set someone up (phrasal verb)",
-      "meaning": "To arrange for two people to go on a date together or start a romantic relationship.",
-      "example": "I set up my best friend with a lady that I work with, and now they are happily married.",
+      "meaning": "to arrange a date between two people",
+      "example": "She set up her cousin with a colleague from work.",
+      "translation": "mai mối ai đó",
       "count": 0
     },
     {
       "word": "Get one’s big break (phrasal verb)",
-      "meaning": "To have the opportunity to become famous and/or successful.",
-      "example": "Many people work hard for years searching and waiting for their big break, but never quite find it.",
+      "meaning": "to get an opportunity for success or fame",
+      "example": "He got his big break when a producer discovered his video.",
+      "translation": "cơ hội đột phá",
       "count": 0
     },
     {
       "word": "Office politics (noun)",
-      "meaning": "Competition for power or influence in an office between different people. Considered usually to be negative.",
-      "example": "People who retire often remark that they miss the camaraderie of working with people every day, but are glad to be free of office politics.",
+      "meaning": "rivalry for influence or power within a workplace",
+      "example": "She found it exhausting dealing with office politics every day.",
+      "translation": "chính trị nơi công sở",
       "count": 0
     },
     {
       "word": "Pick holes in something",
-      "meaning": "To find faults, flaws, or weaknesses in something, often by criticizing or scrutinizing it.",
-      "example": "Instead of constantly picking holes in others' work, let's focus on constructive feedback and improvement. The reviewer seemed determined to pick holes in the author's argument rather than appreciating the overall message. ",
+      "meaning": "to find and point out flaws or weaknesses",
+      "example": "Instead of supporting her idea, they kept picking holes in it.",
+      "translation": "bới móc lỗi",
       "count": 0
     },
     {
       "word": "Get your foot in the door",
-      "meaning": "To establish an initial connection or opportunity that may lead to further success or advancement.",
-      "example": "1. I managed to get my foot in the door at that company by starting as an intern.. Networking events are a great way to get your foot in the door and meet potential employers.   ",
+      "meaning": "to gain a starting opportunity in a field or company",
+      "example": "He took the internship just to get his foot in the door.",
+      "translation": "bắt đầu tạo dựng chỗ đứng",
       "count": 0
     },
     {
       "word": "See eye to eye",
-      "meaning": "To agree or have the same opinion as someone else. ",
-      "example": "We don't always see eye to eye, but we respect each other's perspectives.t's important for team members to see eye to eye on the project's objectives.",
+      "meaning": "to share the same opinion or viewpoint",
+      "example": "We rarely see eye to eye on political issues.",
+      "translation": "đồng quan điểm",
       "count": 0
     },
     {
       "word": "Pay under the table",
-      "meaning": "To pay someone secretly or illegally, usually to avoid taxes or regulations. (Trả tiền chui, trả lương không khai báo để né thuế hoặc quy định pháp luật.)",
-      "example": "It's illegal to pay workers under the table in many countries.",
+      "meaning": "to pay someone secretly to avoid legal obligations",
+      "example": "They hired workers and paid them under the table.",
+      "translation": "trả lương chui",
       "count": 0
-    },    
+    },
     {
       "word": "Talk shop",
-      "meaning": "To discuss work-related topics or engage in conversation about one's profession or industry.      ",
-      "example": "Whenever we meet up, we always end up talking shop and sharing industry insights.et's grab a coffee and talk shop sometime.",
+      "meaning": "to talk about work outside the workplace",
+      "example": "They ended up talking shop during the entire dinner.",
+      "translation": "nói chuyện công việc",
       "count": 0
     },
     {
       "word": "Put something on the back burner",
-      "meaning": "To postpone or delay something, usually a task or project, in order to focus on more immediate or pressing matters.   I had to put my plans to start a business on the back burner because of other commitments.he company decided to put the new product development on the back burner until the market conditions improved.   ",
-      "example": "She put her travel plans on the back burner while she focused on finishing her thesis.",
+      "meaning": "to delay something less urgent to focus on other things",
+      "example": "She put her travel plans on the back burner to finish her project.",
+      "translation": "tạm gác lại",
       "count": 0
     },
     {
       "word": "Throw in the towel",
-      "meaning": "To give up or surrender; to admit defeat.",
-      "example": "After struggling for hours, he finally threw in the towel and accepted that he couldn't solve the problem.It's important to persevere and not throw in the towel when faced with challenges.   ",
+      "meaning": "to stop trying or admit defeat",
+      "example": "After many failed attempts, he threw in the towel.",
+      "translation": "bỏ cuộc",
       "count": 0
     },
     {
       "word": "Go the extra mile",
-      "meaning": "To put in additional effort or do more than what is expected.",
-      "example": "If you want to succeed, you need to be willing to go the extra mile and exceed expectations.The employee always goes the extra mile to ensure customer satisfaction.   ",
+      "meaning": "to make a special effort beyond what is required",
+      "example": "She always goes the extra mile to help her team succeed.",
+      "translation": "nỗ lực hơn mong đợi",
       "count": 0
     },
     {
       "word": "Think outside of the box",
-      "meaning": "To think creatively or unconventionally; to approach a problem or situation in an innovative way.",
-      "example": "In order to find a solution, we need to think outside of the box and consider alternative approaches.The company encourages its employees to think outside of the box and come up with fresh ideas.   ",
+      "meaning": "to use creative or unconventional thinking",
+      "example": "The company values employees who think outside of the box.",
+      "translation": "suy nghĩ đột phá",
       "count": 0
     },
-    {
-      "word": "Get off on the wrong foot",
-      "meaning": "To start a relationship or situation in a negative or unfavorable way.",
-      "example": "We got off on the wrong foot when we had a misunderstanding during our first meeting.It's important to establish a positive first impression and avoid getting off on the wrong foot.  ",
-      "count": 0
-    },
-    {
-      "word": "Stand your ground",
-      "meaning": "To maintain one's position, opinions, or beliefs firmly, especially in the face of opposition or pressure.",
-      "example": "Even when others disagree, it's important to stand your ground if you truly believe in something.The negotiator stood his ground and refused to compromise on the key terms of the agreement.   ",
-      "count": 0
-    },
-    {
-      "word": "Run around like a headless chicken",
-      "meaning": "To act in a frantic, disorganized, or chaotic manner.",
-      "example": "When the deadline was approaching, everyone was running around like headless chickens trying to get everything done.Instead of panicking and running around like headless chickens, let's approach the situation calmly and systematically.   ",
-      "count": 0
-    },
-    {
-      "word": "Cut to the chase",
-      "meaning": "To get to the main point or important information without wasting time on unnecessary details.",
-      "example": "We don't have much time, so let's cut to the chase and discuss the key issues.Instead of beating around the bush, it's better to cut to the chase and address the core problem.   ",
-      "count": 0
-    },
-    {
-      "word": "Be a blessing in disguise",
-      "meaning": "Something that initially appears to be negative or unfortunate but turns out to be beneficial or advantageous.",
-      "example": "Losing my job was a blessing in disguise because it pushed me to pursue a career I truly love.Sometimes, setbacks can be a blessing in disguise and lead to unexpected opportunities.   ",
-      "count": 0
-    },
-    {
-      "word": "Cost an arm and a leg",
-      "meaning": "To be very expensive; to cost a lot of money.",
-      "example": "The new smartphone model looks great, but it costs an arm and a leg.Traveling during peak season can be expensive and may cost you an arm and a leg.   ",
-      "count": 0
-    },
-    {
-      "word": "Learn the ropes",
-      "meaning": "To learn the basic skills or procedures of a job or activity.",
-      "example": "As a new employee, it takes time to learn the ropes and become familiar with the company's processes.It's important to have a mentor who can help you learn the ropes in your chosen field.   ",
-      "count": 0
-    },
-    {
-      "word": "Cook the books",
-      "meaning": "To manipulate financial records or accounts dishonestly, usually for personal gain or to deceive others.",
-      "example": "The company was caught cooking the books to inflate their profits and mislead investors.It's illegal and unethical to cook the books in order to evade taxes or deceive stakeholders.   ",
-      "count": 0
-    },
-    {
-      "word": "Make a cold call",
-      "meaning": "To make an unsolicited phone call or visit to someone, typically for sales or business purposes.",
-      "example": "As a salesperson, you need to be prepared when making cold calls to potential clients.Making cold calls can be challenging, but it can also lead to new business opportunities.   ",
-      "count": 0
-    },
-    {
-      "word": "Get the green light",
-      "meaning": "To receive approval or permission to proceed with a project, plan, or action.",
-      "example": "After presenting our proposal, we finally got the green light to start the project.The team can't start the development until they get the green light from the management.   ",
-      "count": 0
-    },
-    {
-      "word": "Twist somebody’s arm",
-      "meaning": "To persuade or convince someone to do something, often through persistent or forceful means.",
-      "example": "I had to twist his arm to get him to join us for the team outing.The salesperson managed to twist my arm and convince me to buy the product.   ",
-      "count": 0
-    },
-    {
-      "word": "Run on a shoestring",
-      "meaning": "To operate with a very limited budget or resources.",
-      "example": "As a startup, we had to run on a shoestring budget until we secured more funding.The nonprofit organization manages to run on a shoestring and still make a positive impact.   ",
-      "count": 0
-    },
-    {
-      "word": "Be snowed under",
-      "meaning": "To be overwhelmed or swamped with a large amount of work or responsibilities.",
-      "example": "I can't meet for lunch today; I'm snowed under with deadlines.During the holiday season, retail workers are often snowed under with customer demands.   ",
-      "count": 0
-    },
-    {
-      "word": "Be in the red / black",
-      "meaning": "To be in a state of financial loss (in the red) or profit (in the black).",
-      "example": "The company has been struggling and is currently in the red.Thanks to increased sales, the business is finally back in the black.   ",
-      "count": 0
-    },
-    {
-      "word": "Be a big fish in a small pond",
-      "meaning": "To be important or influential in a small or limited environment or context.",
-      "example": "He enjoys being a big fish in a small pond in his hometown, but he wants to explore bigger opportunities.Some people prefer to be a big fish in a small pond rather than a small fish in a big pond.   ",
-      "count": 0
-    },
+  {
+    "word": "Get off on the wrong foot",
+    "meaning": "To start something, especially a relationship, in a bad or awkward way.",
+    "example": "Our meeting got off on the wrong foot because of a scheduling mistake.",
+    "translation": "Bắt đầu mối quan hệ một cách không suôn sẻ",
+    "count": 0
+  },
+  {
+    "word": "Stand your ground",
+    "meaning": "To maintain your beliefs or position firmly even when others oppose you.",
+    "example": "Despite criticism, she stood her ground on the issue.",
+    "translation": "Giữ vững lập trường",
+    "count": 0
+  },
+  {
+    "word": "Run around like a headless chicken",
+    "meaning": "To act in a panicked, confused, or unorganized way.",
+    "example": "Everyone was running around like headless chickens before the event started.",
+    "translation": "Chạy loạn xạ, hành xử thiếu tổ chức",
+    "count": 0
+  },
+  {
+    "word": "Cut to the chase",
+    "meaning": "To skip the details and get straight to the main point.",
+    "example": "Let’s cut to the chase—what do you need from me?",
+    "translation": "Vào thẳng vấn đề",
+    "count": 0
+  },
+  {
+    "word": "Be a blessing in disguise",
+    "meaning": "Something that seems bad at first but results in something good.",
+    "example": "Losing that job was a blessing in disguise—it led me to a better one.",
+    "translation": "Phúc họa đan xen",
+    "count": 0
+  },
+  {
+    "word": "Cost an arm and a leg",
+    "meaning": "To be very expensive.",
+    "example": "That designer bag costs an arm and a leg!",
+    "translation": "Rất đắt đỏ",
+    "count": 0
+  },
+  {
+    "word": "Learn the ropes",
+    "meaning": "To learn how to do a particular job or task.",
+    "example": "She’s still learning the ropes at her new job.",
+    "translation": "Học việc, học cách làm việc",
+    "count": 0
+  },
+  {
+    "word": "Cook the books",
+    "meaning": "To dishonestly change financial records.",
+    "example": "They were accused of cooking the books to hide losses.",
+    "translation": "Gian lận sổ sách kế toán",
+    "count": 0
+  },
+  {
+    "word": "Make a cold call",
+    "meaning": "To contact someone you don't know to sell something or promote a service.",
+    "example": "He makes 20 cold calls a day to find new customers.",
+    "translation": "Gọi điện thoại tiếp thị",
+    "count": 0
+  },
+  {
+    "word": "Get the green light",
+    "meaning": "To receive permission to proceed.",
+    "example": "We got the green light to begin the project.",
+    "translation": "Được bật đèn xanh, được cho phép",
+    "count": 0
+  },
+  {
+    "word": "Twist somebody’s arm",
+    "meaning": "To strongly persuade someone to do something they are reluctant to do.",
+    "example": "She twisted my arm to get me to join the team.",
+    "translation": "Thuyết phục ai đó làm điều họ không muốn",
+    "count": 0
+  },
+  {
+    "word": "Run on a shoestring",
+    "meaning": "To operate with a very small budget.",
+    "example": "The charity runs on a shoestring but manages to help many.",
+    "translation": "Chạy với ngân sách eo hẹp",
+    "count": 0
+  },
+  {
+    "word": "Be snowed under",
+    "meaning": "To be overwhelmed with too much work.",
+    "example": "I'm snowed under with assignments this week.",
+    "translation": "Ngập trong công việc",
+    "count": 0
+  },
+  {
+    "word": "Be in the red / black",
+    "meaning": "To be operating at a financial loss (in the red) or profit (in the black).",
+    "example": "Thanks to good sales, we’re finally in the black.",
+    "translation": "Lỗ (in the red) / Lãi (in the black)",
+    "count": 0
+  },
+  {
+    "word": "Be a big fish in a small pond",
+    "meaning": "To be important or influential in a limited or smaller environment.",
+    "example": "He enjoys being a big fish in a small pond.",
+    "translation": "Cá lớn trong ao nhỏ",
+    "count": 0
+  }
     {
       "word": "Be ahead of the curve",
       "meaning": "To be more advanced, innovative, or knowledgeable than others in a particular area.",
