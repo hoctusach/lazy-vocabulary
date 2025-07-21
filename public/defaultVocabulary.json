@@ -237,112 +237,130 @@
       "translation": "phát hành, tung ra",
       "count": 0
     },
-    {
+{
       "word": "go off [intransitive]",
-      "meaning": "to start ringing (in the case of an alarm) | to explode (in the case of a bomb).",
-      "example": "I almost missed the flight because my alarm didn't go off. The bomb went off at 9:20.",
+      "meaning": "to begin making a sound (like an alarm) or to explode suddenly",
+      "example": "The fire alarm went off in the middle of the night.",
+      "translation": "reo lên, nổ tung",
       "count": 0
     },
     {
       "word": "sleep in [intransitive]",
-      "meaning": "to wake up later than you intended or needed to.",
-      "example": "I woke up later than I intended, but thankfully I arrived at the airport just in time to board. I slept in this morning and missed my train to work.",
+      "meaning": "to wake up later than planned or necessary",
+      "example": "I accidentally slept in and missed the first meeting.",
+      "translation": "ngủ nướng",
       "count": 0
     },
     {
       "word": "hang out (with somebody) [transitive]",
-      "meaning": "to spend time socially with someone | to stay or spend time socially somewhere.",
-      "example": "We spent most of the time hanging out by the pool during the day. My mother doesn't like the people I hang out with.",
+      "meaning": "to spend time relaxing with someone or at a place",
+      "example": "They often hang out at the coffee shop near campus.",
+      "translation": "đi chơi, tụ tập",
       "count": 0
     },
     {
       "word": "rip off somebody [transitive]",
-      "meaning": "to cheat someone by charging too much for something or charge someone unfairly.",
-      "example": "I was ripped off at a market selling souvenirs. The taxi driver ripped me off by not taking the shortest route to my house.",
+      "meaning": "to charge someone too much or cheat them financially",
+      "example": "Tourists are often ripped off at local markets.",
+      "translation": "lừa gạt tiền",
       "count": 0
     },
     {
       "word": "watch out (for something) [transitive]",
-      "meaning": "to be careful of someone or something.",
-      "example": "The tour guide had told us to watch out for pickpockets. \"Be careful of cars when you are crossing the road,\" said my grandmother.",
+      "meaning": "to be cautious or careful of possible danger or problems",
+      "example": "Watch out for slippery floors after it rains.",
+      "translation": "cẩn thận, coi chừng",
       "count": 0
     },
     {
       "word": "run out of something [transitive]",
-      "meaning": "to have no more of something left because you have used it all.",
-      "example": "We all ran out of money before the end of the week. We have run out of milk. I'll go to the shop to get some.",
+      "meaning": "to no longer have something because it has been used up",
+      "example": "We ran out of coffee during the meeting.",
+      "translation": "hết, cạn kiệt",
       "count": 0
     },
     {
       "word": "talk (someone) into something [transitive]",
-      "meaning": "to persuade someone to do something.",
-      "example": "He talked us into going to the most famous nightclub on the island. I talked my parents into lending me their car for the weekend.",
+      "meaning": "to convince or persuade someone to do something",
+      "example": "She talked me into applying for the internship.",
+      "translation": "thuyết phục",
       "count": 0
     },
     {
       "word": "run into somebody [transitive]",
-      "meaning": "to meet someone unexpectedly or by chance.",
-      "example": "We ran into some old friends from school when we were there. I ran into an old friend from college in a bar last night.",
+      "meaning": "to meet someone unexpectedly by chance",
+      "example": "I ran into my old professor at the bookstore.",
+      "translation": "tình cờ gặp",
       "count": 0
     },
     {
       "word": "throw up [intransitive]",
-      "meaning": "to vomit.",
-      "example": "I ate some fish, but I got food poisoning and spent the evening throwing up. John drank too much alcohol last night and threw up.",
+      "meaning": "to vomit suddenly",
+      "example": "He felt dizzy and threw up after the rollercoaster ride.",
+      "translation": "nôn mửa",
       "count": 0
     },
     {
       "word": "break up / break up with somebody [transitive/intransitive]",
-      "meaning": "to finish or end a relationship (with someone).",
-      "example": "But why did they break up? Mary and her boyfriend broke up last week.",
+      "meaning": "to end a romantic relationship",
+      "example": "They broke up after five years together.",
+      "translation": "chia tay",
       "count": 0
     },
     {
       "word": "show off [intransitive]",
-      "meaning": "to behave in a way that is intended to attract people’s attention and make them admire you | to try to appear great.",
-      "example": "He was quite arrogant and was always showing off. No one in school likes Bob because he is always showing off.",
+      "meaning": "to act in a way that draws attention or admiration to oneself",
+      "example": "He always shows off his expensive gadgets.",
+      "translation": "khoe khoang",
       "count": 0
     },
     {
       "word": "split up / split up with somebody [transitive/intransitive]",
-      "meaning": "to finish a relationship (also for married couples).",
-      "example": "But why did they split up? After 5 years of marriage, the couple decided to split up.",
+      "meaning": "to end a relationship or marriage",
+      "example": "The couple decided to split up after years of disagreement.",
+      "translation": "chia tay",
       "count": 0
     },
     {
       "word": "move in (with somebody) [transitive]",
-      "meaning": "to start living in a new accommodation.",
-      "example": "They only moved in together last month. John moved in with his grandmother to be closer to university.",
+      "meaning": "to begin living in a new house or with someone",
+      "example": "They moved in together after getting engaged.",
+      "translation": "chuyển đến sống chung",
       "count": 0
     },
     {
       "word": "hit on somebody [transitive]",
-      "meaning": "to make sexual advances on someone.",
-      "example": "Apparently, she saw him hitting on another girl in Starbucks. The woman made sexual advances on her boss at the Christmas party.",
+      "meaning": "to flirt with someone in a romantic or sexual way",
+      "example": "He was hitting on her all night at the party.",
+      "translation": "tán tỉnh",
       "count": 0
     },
     {
       "word": "keep on 'doing' something [transitive]",
-      "meaning": "to continue 'doing' something (usually something negative).",
-      "example": "In fact, he kept on denying it until she told him she had taken a video of it. The child continued asking her parents for chocolate and eventually her parents gave her some.",
+      "meaning": "to continue doing something persistently, often annoyingly",
+      "example": "She kept on talking even after the class had ended.",
+      "translation": "tiếp tục (làm gì đó)",
       "count": 0
     },
     {
       "word": "joke around [intransitive]",
-      "meaning": "to make jokes playfully or try to be funny - to do something but not in a serious way.",
-      "example": "Once he saw the video he admitted it but said he was only joking around. Tim always tries to be funny and playful at work.",
+      "meaning": "to act playfully or not take things seriously",
+      "example": "He was just joking around and didn’t mean any harm.",
+      "translation": "đùa giỡn",
       "count": 0
     },
     {
       "word": "move out [intransitive]",
-      "meaning": "to leave an accommodation.",
-      "example": "She broke up with him and told him to move out. My housemate is leaving the accommodation next month so I need to find someone to rent his room.",
+      "meaning": "to leave a house or apartment permanently",
+      "example": "She moved out last week and found her own place.",
+      "translation": "chuyển đi",
       "count": 0
     },
     {
       "word": "get over something or someone [transitive]",
-      "meaning": "to recover emotionally from something negative (a breakup, trauma) | to stop having strong feelings for someone.",
-      "example": "I think she will get over him soon. James found it difficult to recover emotionally from his divorce.",
+      "meaning": "to recover from emotional pain or stop being upset about something",
+      "example": "It took her months to get over the breakup.",
+      "translation": "vượt qua (cảm xúc)",
       "count": 0
     },
     {
