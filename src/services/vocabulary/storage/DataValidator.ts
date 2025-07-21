@@ -89,14 +89,15 @@ export class DataValidator {
   getDefaultData(): SheetData {
     // Convert DEFAULT_VOCABULARY_DATA to the expected format for ensureDataTypes
     const convertedData: Record<string, Array<Record<string, unknown>>> = {};
-    for (const [sheetName, words] of Object.entries(DEFAULT_VOCABULARY_DATA)) {
-      convertedData[sheetName] = words.map(word => ({
-        word: word.word,
-        meaning: word.meaning,
-        example: word.example,
-        count: word.count,
-        category: word.category
-      }));
+      for (const [sheetName, words] of Object.entries(DEFAULT_VOCABULARY_DATA)) {
+        convertedData[sheetName] = words.map(word => ({
+          word: word.word,
+          meaning: word.meaning,
+          example: word.example,
+          translation: word.translation,
+          count: word.count,
+          category: word.category
+        }));
     }
     return this.ensureDataTypes(convertedData);
   }

@@ -101,6 +101,7 @@ export class TypeProcessor {
               word: prepareTextForDisplay(wordValidation.sanitizedValue!),
               meaning: prepareTextForDisplay(meaningValidation.sanitizedValue!),
               example: prepareTextForDisplay(exampleValidation.sanitizedValue!),
+              translation: prepareTextForDisplay(String(word.translation || "")),
               count: this.wordValidator.sanitizeCount(String(word.count || 0)),
               category: sanitizeInput(String(word.category || sanitizedSheetName))
             };
