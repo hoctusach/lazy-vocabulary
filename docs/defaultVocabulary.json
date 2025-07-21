@@ -931,131 +931,74 @@
     "translation": "Lỗ (in the red) / Lãi (in the black)",
     "count": 0
   },
-  {
-    "word": "Be a big fish in a small pond",
-    "meaning": "To be important or influential in a limited or smaller environment.",
-    "example": "He enjoys being a big fish in a small pond.",
-    "translation": "Cá lớn trong ao nhỏ",
-    "count": 0
-  }
-    {
-      "word": "Be ahead of the curve",
-      "meaning": "To be more advanced, innovative, or knowledgeable than others in a particular area.",
-      "example": "The company invests in research and development to stay ahead of the curve in the industry.By constantly learning and adapting, you can stay ahead of the curve in your career.   ",
-      "count": 0
-    },
-    {
-      "word": "Stay on top of things",
-      "meaning": "To remain well-informed, organized, and in control of a situation or tasks.",
-      "example": "It's important to stay on top of things to ensure nothing falls through the cracks.With effective time management, you can stay on top of things and avoid feeling overwhelmed.   ",
-      "count": 0
-    },
-    {
-      "word": "Play something by ear",
-      "meaning": "To handle a situation or make decisions as it unfolds, without a predetermined plan.",
-      "example": "We don't have a fixed agenda for the meeting, so let's play it by ear and see how the discussion goes.When traveling, it's sometimes more exciting to play things by ear and be open to unexpected opportunities.   ",
-      "count": 0
-    },
-    {
-      "word": "Pick somebody’s brains",
-      "meaning": "To ask someone for advice, information, or opinions on a particular topic.",
-      "example": "I need to pick your brains about the best practices in project management.The new intern is eager to pick the experienced team members' brains and learn from their expertise.   ",
-      "count": 0
-    },
-    {
-      "word": "Cut corners",
-      "meaning": "To take shortcuts or bypass proper procedures in order to save time, effort, or money.",
-      "example": "Cutting corners in quality control can lead to product defects and customer dissatisfaction.It's important to follow the established guidelines and not cut corners when it comes to safety.   ",
-      "count": 0
-    },
-    {
-      "word": "Take the bull by the horns",
-      "meaning": "To confront or tackle a difficult or challenging situation directly and with determination.",
-      "example": "Instead of avoiding the problem, it's time to take the bull by the horns and find a solution.The team leader decided to take the bull by the horns and address the team's performance issues.   ",
-      "count": 0
-    },
-    {
-      "word": "Get fired",
-      "meaning": "To be dismissed or lose one's job, usually due to poor performance, misconduct, or downsizing.",
-      "example": "He got fired for consistently arriving late to work.Getting fired can be a difficult experience, but it can also be an opportunity for growth and change.   ",
-      "count": 0
-    },
-    {
-      "word": "Be dead wood",
-      "meaning": "To be unproductive, ineffective, or no longer useful in a particular role or organization.",
-      "example": "The company had to let go of employees who were considered dead wood and not contributing to the team.It's important to continuously develop new skills and stay relevant to avoid becoming dead wood in your career.   ",
-      "count": 0
-    },
-    {
-      "word": "Quit the rat race",
-      "meaning": "To leave a stressful, competitive, and demanding job or lifestyle in pursuit of a simpler, more fulfilling life.",
-      "example": "After years of working in the corporate world, she decided to quit the rat race and start her own business.Many people dream of quitting the rat race and finding a better work-life balance.   ",
-      "count": 0
-    },
-    {
-      "word": "Go back to the drawing board",
-      "meaning": "To start over or reconsider a plan, idea, or design because it is not working or needs improvement.",
-      "example": "The initial concept was not well-received, so we had to go back to the drawing board and come up with a new approach.Sometimes, it's necessary to go back to the drawing board and make revisions to achieve better results.   ",
-      "count": 0
-    },
     {
       "word": "Miss the boat",
-      "meaning": "To miss an opportunity or fail to take advantage of a favorable situation.",
-      "example": "I missed the boat on investing in that company, and now their stock price has skyrocketed.It's important to stay alert and seize opportunities; otherwise, you may miss the boat.   ",
+      "meaning": "To fail to seize an opportunity or take timely action.",
+      "example": "I missed the boat on that investment opportunity, and now the company has tripled in value.",
+      "translation": "Bỏ lỡ cơ hội",
       "count": 0
     },
     {
       "word": "Jump the gun",
-      "meaning": "To act prematurely or before the appropriate time; to start or do something too soon.",
-      "example": "Let's not jump the gun and make a decision without considering all the facts.The team announced the product launch date, but they jumped the gun as the development was not yet complete.   ",
+      "meaning": "To act before the appropriate or expected time.",
+      "example": "They jumped the gun by announcing the product before it was ready.",
+      "translation": "Hấp tấp, vội vàng",
       "count": 0
     },
     {
       "word": "Be in the loop",
-      "meaning": "To be informed or included in a group or situation where important information is shared.",
-      "example": "As a project manager, it's crucial to be in the loop and aware of any updates or changes.The team members meet regularly to ensure everyone is in the loop and aligned with the project goals.   ",
+      "meaning": "To be informed or included in communication regarding decisions or developments.",
+      "example": "She wants to be in the loop for all project updates going forward.",
+      "translation": "Nắm bắt thông tin",
       "count": 0
     },
     {
       "word": "Move the goalposts",
-      "meaning": "To change the rules, requirements, or expectations of a situation or agreement, often to make it more difficult for someone to succeed.",
-      "example": "The company kept moving the goalposts, making it challenging for the employees to meet their targets.It's important to establish clear expectations and not move the goalposts during a project.   ",
+      "meaning": "To change the rules or conditions unfairly during a process.",
+      "example": "They moved the goalposts by changing the targets halfway through the project.",
+      "translation": "Thay đổi tiêu chuẩn/luật chơi",
       "count": 0
     },
     {
       "word": "Be put on the map",
-      "meaning": "To become well-known, recognized, or famous, especially in a particular field or location.",
-      "example": "The success of their latest product launch put the company on the map in the tech industry.The city's vibrant art scene has put it on the map as a cultural destination.   ",
+      "meaning": "To become widely known or important.",
+      "example": "The new innovation put the startup on the map in the tech world.",
+      "translation": "Được biết đến rộng rãi",
       "count": 0
     },
     {
       "word": "Do the donkey work",
-      "meaning": "To do the hard, tedious, or laborious tasks or groundwork that are necessary but not glamorous.",
-      "example": "The interns were assigned to do the donkey work, such as data entry and filing.Before the event, the team had to do the donkey work of setting up the venue and arranging logistics.   ",
+      "meaning": "To do the hard, boring parts of a task.",
+      "example": "The junior team handled the donkey work before the main event.",
+      "translation": "Làm việc nặng nhọc",
       "count": 0
     },
     {
       "word": "Jump on the bandwagon",
-      "meaning": "To join or support a popular trend, movement, or opinion, often without considering it critically.",
-      "example": "Many companies jumped on the bandwagon and started offering subscription-based services.It's important to evaluate the pros and cons before jumping on the bandwagon of a new investment trend.   ",
+      "meaning": "To join a trend or activity that is currently popular.",
+      "example": "Several competitors jumped on the bandwagon after our product succeeded.",
+      "translation": "Theo trào lưu",
       "count": 0
     },
     {
       "word": "Hold the fort",
-      "meaning": "To maintain control or responsibility for a situation or place while someone is temporarily absent.",
-      "example": "I need to step out for a meeting; can you hold the fort until I return.The manager asked the team to hold the fort while she was on vacation.   ",
+      "meaning": "To take responsibility temporarily in someone’s absence.",
+      "example": "She held the fort while the manager was away on leave.",
+      "translation": "Tạm thời quản lý",
       "count": 0
     },
     {
       "word": "Pay dividends",
-      "meaning": "To yield positive results or benefits over time, often as a result of an investment or effort.",
-      "example": "Regular exercise and a healthy diet pay dividends in terms of improved overall well-being.Investing in employee training and development can pay dividends in the form of increased productivity.   ",
+      "meaning": "To bring benefits or positive returns, often over time.",
+      "example": "Their training investments paid dividends in productivity.",
+      "translation": "Mang lại lợi ích",
       "count": 0
     },
     {
       "word": "Hold all the aces",
-      "meaning": "To have all the advantages, power, or control in a situation.",
-      "example": "With their extensive network and resources, they hold all the aces in the industry.The team with the most data and insights holds all the aces when it comes to making informed decisions.   ",
+      "meaning": "To be in a position of power or advantage.",
+      "example": "With the key patents, they held all the aces in negotiation.",
+      "translation": "Nắm mọi lợi thế",
       "count": 0
     },
     {
@@ -4967,10 +4910,12 @@
       "count": 0
     },
     {
-      "word": "A big fish in a small pond (idiom, noun)",
-      "meaning": "An important person in a small or medium-sized organisation.",
-      "example": "One of the advantages of being a big fish in a small pond is that you can influence the direction that the organisation takes.",
-      "count": 0
+    {
+    "word": "Be a big fish in a small pond",
+    "meaning": "To be important or influential in a limited or smaller environment.",
+    "example": "He enjoys being a big fish in a small pond.",
+    "translation": "Cá lớn trong ao nhỏ",
+    "count": 0
     },
     {
       "word": "before your time",
