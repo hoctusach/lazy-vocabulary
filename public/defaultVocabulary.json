@@ -1,123 +1,142 @@
 {
   "phrasal verbs": [
-    {
-      "word": "to be under house arrest ",
-      "meaning": "the state of being a prisoner in your own house rather than in a prison",
-      "example": "She was placed under house arrest.",
+      "word": "to be under house arrest",
+      "meaning": "to be legally forced to stay inside one's home instead of going to prison",
+      "example": "He was under house arrest while awaiting the final verdict.",
+      "translation": "bị quản thúc tại nhà",
       "count": 0
     },
     {
       "word": "Knuckle down",
-      "meaning": "to start focusing on your work/study. (Inseparable)",
-      "example": "I work as a teacher and we’ve got exams coming soon, so we all need to knuckle down. I study law, and I have exams soon, so I need to knuckle down.",
+      "meaning": "to start working or studying seriously with full effort",
+      "example": "You'll need to knuckle down if you want to pass the final exams.",
+      "translation": "bắt tay vào làm việc nghiêm túc",
       "count": 0
     },
     {
-      "word": "To get a round to",
-      "meaning": "to do something you have intended to do,but not had time. (Inseparable)",
-      "example": "Can you cook? I would love learn how to cook, but I just haven't got round to it. I’ve been too busy. Can you paint? I like painting, but I cannot do it very well. I’ve just never got round to taking classes.",
+      "word": "To get around to",
+      "meaning": "to finally do something that you have intended to do for a long time",
+      "example": "I finally got around to reading that book you lent me.",
+      "translation": "cuối cùng cũng làm được điều gì đó",
       "count": 0
     },
     {
       "word": "To cook the books",
-      "meaning": "To alter facts and figures",
-      "example": "Their accountant was charged with cooking the books, and now he’s in jail.",
+      "meaning": "to dishonestly change financial records to make them appear better than they are",
+      "example": "The accountant was fired for cooking the books to hide the losses.",
+      "translation": "gian lận sổ sách kế toán",
       "count": 0
     },
     {
       "word": "Burn the midnight oil",
-      "meaning": "Work or study hard",
-      "example": "I have a big exam tomorrow, so I’ll be burning the midnight oil to review all the material.”",
+      "meaning": "to work or study late into the night",
+      "example": "She burned the midnight oil to finish the project on time.",
+      "translation": "thức khuya làm việc hoặc học bài",
       "count": 0
     },
     {
       "word": "Count on somebody [transitive]",
-      "meaning": "to depend on someone to do what you want or expect",
-      "example": "I always knew I could count on her if I needed anything. I always knew I could depend on her if I needed anything. Whenever I need to borrow money I can always depend on my sister. Whenever I need to borrow money I can always count on my sister. ",
+      "meaning": "to rely on someone to do what they say or expect",
+      "example": "You can count on Tom to get the job done well.",
+      "translation": "dựa vào ai đó",
       "count": 0
     },
     {
       "word": "Take after somebody [transitive]",
-      "meaning": "to behave like someone else - usually a relative | to have the same personality traits as somebody",
-      "example": "I defifinitely take after my father. I defifinitely behave like/am similar to my father. I behave like my mother, not my father. Who do you behave like? I take after my mother, not my father. Who do you take after? ",
+      "meaning": "to resemble a family member in appearance or behavior",
+      "example": "She really takes after her mother in both looks and attitude.",
+      "translation": "giống ai đó trong gia đình",
       "count": 0
     },
     {
       "word": "sneak out [intransitive]",
-      "meaning": "to go out or leave a place quietly or in secret",
-      "example": "My older sister was always sneaking out late at night. My older sister was always leaving the house quietly and in secret late at night. I used to secretly leave the house to visit my girlfriend when I was young. I used to sneak out of the house to visit my girlfriend when I was young.",
+      "meaning": "to leave a place quietly and secretly to avoid being noticed",
+      "example": "He tried to sneak out of the meeting without anyone seeing him.",
+      "translation": "lẻn ra ngoài",
       "count": 0
     },
     {
       "word": "barge in [intransitive]",
-      "meaning": "to enter a place abruptly - uninvited or interrupting someone",
-      "example": "My father would barge in to check if my sister was there. My father would enter our room abruptly without knocking to check if my sister was there. \"You cannot just enter my offiffiffice uninvited without knocking.\" said my boss \"You cannot just barge into my offiffiffice without knocking.\" said my boss",
+      "meaning": "to enter a place or conversation rudely and unexpectedly",
+      "example": "He barged in without knocking and interrupted our discussion.",
+      "translation": "xông vào, chen ngang",
       "count": 0
     },
     {
-      "word": "calm down / calm down somebody [transitive/intransitive]",
-      "meaning": "to relax or stop being angry or emotionally excited | to make someone less angry or emotionally excited",
-      "example": "My mother was always the one to calm him down. My mother was always the one to make him less angry/stop him from being angry. \"Relax! I don't know why you are so angry\" \"Calm down! I don’t know why you are so angry\"",
+      "word": "calm down [intransitive] / calm down somebody [transitive]",
+      "meaning": "to become or make someone become more relaxed and less upset",
+      "example": "It took a few minutes to calm her down after the argument.",
+      "translation": "bình tĩnh lại; làm ai đó bình tĩnh",
       "count": 0
     },
     {
       "word": "fall out (with somebody) [transitive]",
-      "meaning": "to stop being friendly with someone because you have had a disagreement with them.",
-      "example": "Even now whenever we fall out, she's the mediator. Even now whenever we have a disagreement, she's the mediator. \"I had an argument with my parents because they didn’t like my new boyfriend\" said Susan \"I fell out with my parents because they didn’t like my new boyfriend\" said Susan",
+      "meaning": "to stop being friendly with someone after having a disagreement",
+      "example": "After their heated discussion, they fell out and stopped talking.",
+      "translation": "cãi nhau, nghỉ chơi",
       "count": 0
     },
     {
       "word": "to bring up someone [transitive]",
-      "meaning": "to raise or mention something for discussion | start talking about sth",
-      "example": "..every Christmas it seems someone brings something up to start an argument. *Separable ..every Christmas it seems someone mentions | starts talking about something to start an argument. When we argue, my boyfriend always mentions things from the past. When we argue, my boyfriend always brings up things from the past.",
+      "meaning": "to raise a child or help them grow into an adult",
+      "example": "He was brought up by his aunt after his parents passed away.",
+      "translation": "nuôi dưỡng",
       "count": 0
     },
     {
       "word": "be fed up [intransitive]",
-      "meaning": "to be annoyed, tired or bored (with something)",
-      "example": "I started a new job 2 months ago but to be honest I am fed up with it already! I started a new job 2 months ago but to be honest I am bored with it already! I am tired of all the lies the government tell us. I am fed up with all the lies the government tell us",
+      "meaning": "to feel annoyed or tired because of repeated or unpleasant experiences",
+      "example": "She's fed up with working late every day without appreciation.",
+      "translation": "chán ngấy",
       "count": 0
     },
     {
       "word": "be in bad taste",
-      "meaning": "causing offence by being insensitive or downright rude to someone else, perhaps by not taking account of their cultural sensibilities.",
-      "example": "He told a joke about death that I thought was in bad taste considering that Steve's father had just died. offering a bacon sandwich to someone you know is a strict vegetarian, could be in bad taste.",
+      "meaning": "to be offensive or disrespectful, especially in sensitive situations",
+      "example": "His comment about the tragedy was definitely in bad taste.",
+      "translation": "phản cảm, thiếu tế nhị",
       "count": 0
     },
     {
       "word": "be in the public eye",
-      "meaning": "to be famous and written about in newspapers and magazines and seen on television",
-      "example": "Celebrities like Taylor Swift are often in the public eye. Many politicians are not comfortable being in the public eye.",
+      "meaning": "to be frequently seen or discussed in the media",
+      "example": "Public figures must accept that they are always in the public eye.",
+      "translation": "bị chú ý bởi công chúng",
       "count": 0
     },
     {
       "word": "turn down something/somebody [transitive]",
-      "meaning": "to reject something or someone (an offer, invitation, job, marriage proposal).",
-      "example": "I turned down other jobs for this one. I turned other jobs down for this one. I rejected other jobs for this one. The man asked the woman he loved to marry him, but she rejected him. The man asked the woman he loved to marry him, but she turned him down.",
+      "meaning": "to refuse or reject an offer, request, or proposal",
+      "example": "She turned down the scholarship because she wanted to stay close to home.",
+      "translation": "từ chối",
       "count": 0
     },
     {
       "word": "dwell on something [transitive]",
-      "meaning": "to spend a lot of time thinking about something negative.",
-      "example": "I'm trying not to dwell on the problems, but it's very difficult. \"Don't spend a lot of time thinking about the past. You need to be positive about the future.\"",
+      "meaning": "to spend too much time thinking or talking about something negative",
+      "example": "Instead of dwelling on his failures, he focused on future goals.",
+      "translation": "suy nghĩ tiêu cực mãi về",
       "count": 0
     },
     {
       "word": "look forward to something [transitive]",
-      "meaning": "to be happy or excited about something that is going to happen in the future.",
-      "example": "I was really looking forward to starting with the company, but it is not what I expected. Mary is excited about her holiday to Spain. Mary is looking forward to her holiday to Spain",
+      "meaning": "to be excited or happy about something that is going to happen",
+      "example": "I’m looking forward to seeing my family this weekend.",
+      "translation": "mong đợi",
       "count": 0
     },
     {
       "word": "look down on somebody [transitive]",
-      "meaning": "to have a low opinion of someone or to think you are better than someone else.",
-      "example": "I feel like she constantly looks down on me. He has a low opinion of people who don't have as much money as him. He looks down on people who don't have as much money as him.",
+      "meaning": "to think that you are better or more important than someone else",
+      "example": "He tends to look down on people who don’t share his opinions.",
+      "translation": "xem thường",
       "count": 0
     },
     {
       "word": "boss around somebody [transitive]",
-      "meaning": "to give (someone) orders or tell someone what to do in a domineering/autocratic way.",
-      "example": "She loves to boss people around. No one likes working with Jane. She gives orders to everyone in a domineering way.",
+      "meaning": "to keep telling someone what to do in an overly controlling way",
+      "example": "Stop bossing your little brother around all the time.",
+      "translation": "ra lệnh một cách hách dịch",
       "count": 0
     },
     {
