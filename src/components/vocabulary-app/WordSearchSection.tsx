@@ -23,15 +23,17 @@ const WordSearchSection: React.FC<WordSearchSectionProps> = ({
   searchError,
   editMode
 }) => {
+  const WORD_INPUT_ID = "word-input";
+
   return (
     <>
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="word" className="text-right">
+        <Label htmlFor={WORD_INPUT_ID} className="text-right">
           Word
         </Label>
         <div className="col-span-3 flex gap-2">
           <Input
-            id="word"
+            id={WORD_INPUT_ID}
             value={word}
             onChange={onWordChange}
             className="flex-grow"
