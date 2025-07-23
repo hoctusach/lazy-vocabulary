@@ -98,14 +98,19 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
     setOpen(false);
     await performTranslation(code);
   };
+  const MEANING_INPUT_ID = "meaning-input";
+  const EXAMPLE_INPUT_ID = "example-input";
+  const TRANSLATION_INPUT_ID = "translation-input";
+  const CATEGORY_INPUT_ID = "category-select";
+
   return (
     <>
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="meaning" className="text-right">
+        <Label htmlFor={MEANING_INPUT_ID} className="text-right">
           Meaning
         </Label>
         <Textarea
-          id="meaning"
+          id={MEANING_INPUT_ID}
           value={meaning}
           onChange={onMeaningChange}
           className="col-span-3"
@@ -114,13 +119,13 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
           maxLength={500}
         />
       </div>
-      
+
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="example" className="text-right">
+        <Label htmlFor={EXAMPLE_INPUT_ID} className="text-right">
           Example
         </Label>
         <Textarea
-          id="example"
+          id={EXAMPLE_INPUT_ID}
           value={example}
           onChange={onExampleChange}
           className="col-span-3"
@@ -131,12 +136,12 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
       </div>
 
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="translation" className="text-right whitespace-nowrap">
+        <Label htmlFor={TRANSLATION_INPUT_ID} className="text-right whitespace-nowrap">
           <span role="img" aria-label="translation">🌐</span> Translation
         </Label>
         <div className="col-span-3 flex gap-2">
           <Input
-            id="translation"
+            id={TRANSLATION_INPUT_ID}
             value={translation}
             onChange={onTranslationChange}
             className="flex-grow"
@@ -168,12 +173,12 @@ const WordFormFields: React.FC<WordFormFieldsProps> = ({
       </div>
       
       <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="category" className="text-right">
+        <Label htmlFor={CATEGORY_INPUT_ID} className="text-right">
           Category
         </Label>
         <div className="col-span-3">
           <Select value={category} onValueChange={onCategoryChange} disabled={isDisabled}>
-            <SelectTrigger className="w-28">
+            <SelectTrigger id={CATEGORY_INPUT_ID} className="w-28">
               <SelectValue placeholder="Select a category" />
             </SelectTrigger>
             <SelectContent>
