@@ -5616,184 +5616,198 @@
         "translation": "vừa kịp lúc",
         "count": 0
     },
-	{
-	  "word": "in the sticks",
-	  "meaning": "in a remote or rural area far from urban life",
-	  "example": "They moved to a farmhouse way out in the sticks.",
-	  "translation": "nơi hẻo lánh",
-	  "count": 0
-	},
-	{
-	  "word": "it’s as broad as it’s long",
-	  "meaning": "used when two options are equally acceptable or undesirable",
-	  "example": "We’ll get there either way—it’s as broad as it’s long.",
-	  "translation": "cũng thế cả thôi",
-	  "count": 0
-	},
-	{
-	  "word": "a drop in the ocean",
-	  "meaning": "a small amount that makes little impact in a large context",
-	  "example": "Donating one dollar feels like a drop in the ocean compared to the total needed.",
-	  "translation": "muối bỏ bể",
-	  "count": 0
-	},
-	{
-	  "word": "a home from home",
-	  "meaning": "a place where you feel as comfortable as at home",
-	  "example": "This cozy inn felt like a home from home during our travels.",
-	  "translation": "ngôi nhà thứ hai",
-	  "count": 0
-	},
-	{
-	  "word": "a leopard can’t change its spots",
-	  "meaning": "someone's true nature cannot be changed",
-	  "example": "No matter what he says, a leopard can’t change its spots.",
-	  "translation": "giang sơn dễ đổi, bản tính khó dời",
-	  "count": 0
-	},
-	{
-	  "word": "a sight for sore eyes",
-	  "meaning": "someone or something you’re delighted to see",
-	  "example": "After weeks abroad, her smile was a sight for sore eyes.",
-	  "translation": "cảnh đẹp ý vui",
-	  "count": 0
-	},
-	{
-	  "word": "a stitch in time (saves nine)",
-	  "meaning": "fixing a problem early prevents it from getting worse",
-	  "example": "You should repair that leak now—a stitch in time saves nine.",
-	  "translation": "một mũi khâu lúc này hơn chín mũi khâu sau",
-	  "count": 0
-	},
-	{
-	  "word": "a stone’s throw (away/from)",
-	  "meaning": "a very short distance away",
-	  "example": "The hotel is just a stone’s throw from the beach.",
-	  "translation": "rất gần",
-	  "count": 0
-	},
-	{
-	  "word": "Achilles’ heel",
-	  "meaning": "a weakness in someone or something otherwise strong",
-	  "example": "Her Achilles’ heel is her tendency to overthink.",
-	  "translation": "gót chân Achilles, điểm yếu",
-	  "count": 0
-	},
-	{
-	  "word": "add fuel to the fire",
-	  "meaning": "to make an already tense situation worse",
-	  "example": "Criticizing him in public only added fuel to the fire.",
-	  "translation": "đổ thêm dầu vào lửa",
-	  "count": 0
-	},
-	{
-	  "word": "all in good time",
-	  "meaning": "be patient, things will happen when ready",
-	  "example": "You’ll hear the results soon— all in good time.",
-	  "translation": "kiên nhẫn, lặng lẽ",
-	  "count": 0
-	},
-	{
-	  "word": "all mod cons",
-	  "meaning": "modern appliances and facilities in a home",
-	  "example": "The apartment has all mod cons, including a smart fridge.",
-	  "translation": "tất cả tiện nghi hiện đại",
-	  "count": 0
-	},
-	{
-	  "word": "an act of God",
-	  "meaning": "a natural disaster that is beyond human control",
-	  "example": "The damage was caused by an act of God—no one could prevent it.",
-	  "translation": "thảm họa thiên nhiên",
-	  "count": 0
-	},
-	{
-	  "word": "as the crow flies",
-	  "meaning": "in a straight line, without taking roads into account",
-	  "example": "It’s 20 miles as the crow flies, but longer by road.",
-	  "translation": "theo đường chim bay",
-	  "count": 0
-	},
-	{
-	  "word": "at a loose end",
-	  "meaning": "with nothing planned or to occupy your time",
-	  "example": "I was at a loose end, so I decided to visit an old friend.",
-	  "translation": "vô công rồi nghề",
-	  "count": 0
-	},
-	{
-	  "word": "at the drop of a hat",
-	  "meaning": "without hesitation or delay",
-	  "example": "She’s always ready to travel at the drop of a hat.",
-	  "translation": "ngay lập tức",
-	  "count": 0
-	},
-	{
-	  "word": "for good",
-	  "meaning": "permanently, without the intention of changing",
-	  "example": "He moved abroad for good after graduating.",
-	  "translation": "mãi mãi",
-	  "count": 0
-	}
-
-  ],
-  "topic vocab": [
     {
-	  "word": "Abrupt (adjective)",
-	  "meaning": "happening suddenly without warning",
-	  "example": "His departure was so abrupt that no one had time to say goodbye.",
-	  "translation": "đột ngột",
-	  "count": 0
-	},
-	{
-	  "word": "yearn (v) /jɜːn/",
-	  "meaning": "to strongly desire something that is hard to get",
-	  "example": "They yearned for a simpler life in the countryside.",
-	  "translation": "ao ước",
-	  "count": 0
-	},
-	{
-	  "word": "absorbing (adj) /əbˈzɔːbɪŋ/",
-	  "meaning": "so interesting that it captures your full attention",
-	  "example": "The documentary was incredibly absorbing from start to finish.",
-	  "translation": "hấp dẫn",
-	  "count": 0
-	},
-	{
-	  "word": "casual (adj) /ˈkæʒuəl/",
-	  "meaning": "relaxed, not formal or serious",
-	  "example": "His casual tone made the meeting feel informal.",
-	  "translation": "tự nhiên, không trịnh trọng",
-	  "count": 0
-	},
-	{
-	  "word": "exhilarating (adj) /ɪɡˈzɪləreɪtɪŋ/",
-	  "meaning": "causing excitement and great happiness",
-	  "example": "Skydiving was the most exhilarating experience of my life.",
-	  "translation": "gây hứng khởi, hồi hộp",
-	  "count": 0
-	},
-	{
-	  "word": "fatigue (n) /fəˈtiːɡ/",
-	  "meaning": "extreme physical or mental tiredness",
-	  "example": "Working non-stop for hours left her in a state of fatigue.",
-	  "translation": "mệt nhọc",
-	  "count": 0
-	},
-	{
-	  "word": "idle (adj) /ˈaɪdl/",
-	  "meaning": "not doing any work or avoiding activity",
-	  "example": "The kids were idle all day during summer vacation.",
-	  "translation": "lười biếng, vô công rồi nghề",
-	  "count": 0
-	},
-	{
-	  "word": "idle (adj) /ˈaɪdl/",
-	  "meaning": "not in use or not active",
-	  "example": "The machines sat idle after the plant was shut down.",
-	  "translation": "ăn không ngồi rồi",
-	  "count": 0
-	},
+      "word": "in the sticks",
+      "meaning": "in a remote or rural area far from urban life",
+      "example": "They moved to a farmhouse way out in the sticks.",
+      "translation": "nơi hẻo lánh",
+      "count": 0
+    },
+    {
+      "word": "it’s as broad as it’s long",
+      "meaning": "used when two options are equally acceptable or undesirable",
+      "example": "We’ll get there either way—it’s as broad as it’s long.",
+      "translation": "cũng thế cả thôi",
+      "count": 0
+    },
+    {
+      "word": "a drop in the ocean",
+      "meaning": "a small amount that makes little impact in a large context",
+      "example": "Donating one dollar feels like a drop in the ocean compared to the total needed.",
+      "translation": "muối bỏ bể",
+      "count": 0
+    },
+    {
+      "word": "a home from home",
+      "meaning": "a place where you feel as comfortable as at home",
+      "example": "This cozy inn felt like a home from home during our travels.",
+      "translation": "ngôi nhà thứ hai",
+      "count": 0
+    },
+    {
+      "word": "a leopard can’t change its spots",
+      "meaning": "someone's true nature cannot be changed",
+      "example": "No matter what he says, a leopard can’t change its spots.",
+      "translation": "giang sơn dễ đổi, bản tính khó dời",
+      "count": 0
+    },
+    {
+      "word": "a sight for sore eyes",
+      "meaning": "someone or something you’re delighted to see",
+      "example": "After weeks abroad, her smile was a sight for sore eyes.",
+      "translation": "cảnh đẹp ý vui",
+      "count": 0
+    },
+    {
+      "word": "a stitch in time (saves nine)",
+      "meaning": "fixing a problem early prevents it from getting worse",
+      "example": "You should repair that leak now—a stitch in time saves nine.",
+      "translation": "một mũi khâu lúc này hơn chín mũi khâu sau",
+      "count": 0
+    },
+    {
+      "word": "a stone’s throw (away/from)",
+      "meaning": "a very short distance away",
+      "example": "The hotel is just a stone’s throw from the beach.",
+      "translation": "rất gần",
+      "count": 0
+    },
+    {
+      "word": "Achilles’ heel",
+      "meaning": "a weakness in someone or something otherwise strong",
+      "example": "Her Achilles’ heel is her tendency to overthink.",
+      "translation": "gót chân Achilles, điểm yếu",
+      "count": 0
+    },
+    {
+      "word": "add fuel to the fire",
+      "meaning": "to make an already tense situation worse",
+      "example": "Criticizing him in public only added fuel to the fire.",
+      "translation": "đổ thêm dầu vào lửa",
+      "count": 0
+    },
+    {
+      "word": "all in good time",
+      "meaning": "be patient, things will happen when ready",
+      "example": "You’ll hear the results soon— all in good time.",
+      "translation": "kiên nhẫn, lặng lẽ",
+      "count": 0
+    },
+    {
+      "word": "all mod cons",
+      "meaning": "modern appliances and facilities in a home",
+      "example": "The apartment has all mod cons, including a smart fridge.",
+      "translation": "tất cả tiện nghi hiện đại",
+      "count": 0
+    },
+    {
+      "word": "an act of God",
+      "meaning": "a natural disaster that is beyond human control",
+      "example": "The damage was caused by an act of God—no one could prevent it.",
+      "translation": "thảm họa thiên nhiên",
+      "count": 0
+    },
+    {
+      "word": "as the crow flies",
+      "meaning": "in a straight line, without taking roads into account",
+      "example": "It’s 20 miles as the crow flies, but longer by road.",
+      "translation": "theo đường chim bay",
+      "count": 0
+    },
+    {
+      "word": "at a loose end",
+      "meaning": "with nothing planned or to occupy your time",
+      "example": "I was at a loose end, so I decided to visit an old friend.",
+      "translation": "vô công rồi nghề",
+      "count": 0
+    },
+    {
+      "word": "at the drop of a hat",
+      "meaning": "without hesitation or delay",
+      "example": "She’s always ready to travel at the drop of a hat.",
+      "translation": "ngay lập tức",
+      "count": 0
+    },
+    {
+      "word": "for good",
+      "meaning": "permanently, without the intention of changing",
+      "example": "He moved abroad for good after graduating.",
+      "translation": "mãi mãi",
+      "count": 0
+    }
+
+    ],
+    "topic vocab": [
+      {
+      "word": "Abrupt (adjective)",
+      "meaning": "happening suddenly without warning",
+      "example": "His departure was so abrupt that no one had time to say goodbye.",
+      "translation": "đột ngột",
+      "count": 0
+    },
+    {
+      "word": "yearn (v) /jɜːn/",
+      "meaning": "to strongly desire something that is hard to get",
+      "example": "They yearned for a simpler life in the countryside.",
+      "translation": "ao ước",
+      "count": 0
+    },
+    {
+      "word": "absorbing (adj) /əbˈzɔːbɪŋ/",
+      "meaning": "so interesting that it captures your full attention",
+      "example": "The documentary was incredibly absorbing from start to finish.",
+      "translation": "hấp dẫn",
+      "count": 0
+    },
+    {
+      "word": "casual (adj) /ˈkæʒuəl/",
+      "meaning": "relaxed, not formal or serious",
+      "example": "His casual tone made the meeting feel informal.",
+      "translation": "tự nhiên, không trịnh trọng",
+      "count": 0
+    },
+    {
+      "word": "exhilarating (adj) /ɪɡˈzɪləreɪtɪŋ/",
+      "meaning": "causing excitement and great happiness",
+      "example": "Skydiving was the most exhilarating experience of my life.",
+      "translation": "gây hứng khởi, hồi hộp",
+      "count": 0
+    },
+    {
+      "word": "fatigue (n) /fəˈtiːɡ/",
+      "meaning": "extreme physical or mental tiredness",
+      "example": "Working non-stop for hours left her in a state of fatigue.",
+      "translation": "mệt nhọc",
+      "count": 0
+    },
+    {
+      "word": "idle (adj) /ˈaɪdl/",
+      "meaning": "not doing any work or avoiding activity",
+      "example": "The kids were idle all day during summer vacation.",
+      "translation": "lười biếng, vô công rồi nghề",
+      "count": 0
+    },
+    {
+      "word": "idle (adj) /ˈaɪdl/",
+      "meaning": "not in use or not active",
+      "example": "The machines sat idle after the plant was shut down.",
+      "translation": "ăn không ngồi rồi",
+      "count": 0
+    },
+    {
+      "word": "impractical (adj) /ɪmˈpræktɪkl/",
+      "meaning": "not sensible or realistic for practical use",
+      "example": "The plan was deemed impractical due to its high costs.",
+      "translation": "không thực tế",
+      "count": 0
+    },
+    {
+      "word": "indispensable (adj) /ˌɪndɪˈspensəbl/",
+      "meaning": "absolutely necessary, cannot be done without",
+      "example": "Water is indispensable for all forms of life.",
+      "translation": "không thể thiếu",
+      "count": 0
+    },
     {
       "word": "indulge (v) /ɪnˈdʌldʒ/",
       "meaning": "to treat yourself to something you enjoy",
@@ -7537,7 +7551,7 @@
       "translation": "được miễn",
       "count": 0
     },
-	{
+	  {
       "word": "former (adj)",
       "meaning": "used to describe someone or something that held a particular position or state in the past",
       "example": "The former manager now works as an independent consultant.",
@@ -7901,1596 +7915,1596 @@
       "translation": "nâng cao, cải thiện",
       "count": 0
     },
-	{
-		"word": "evaluate (v)",
-		"meaning": "to carefully assess something before forming a decision or opinion",
-		"example": "It's important to evaluate all options before choosing a strategy.",
-		"translation": "đánh giá",
-		"count": 0
-	},
-	{
-		"word": "exacerbate (v)",
-		"meaning": "to make a difficult situation even worse",
-		"example": "Adding more stress will only exacerbate the problem.",
-		"translation": "làm trầm trọng thêm",
-		"count": 0
-	},
-	{
-		"word": "exquisite (adj)",
-		"meaning": "extremely elegant, beautiful, or finely detailed",
-		"example": "The gallery displayed an exquisite collection of paintings.",
-		"translation": "tinh xảo",
-		"count": 0
-	},
-	{
-		"word": "first-rate (adj)",
-		"meaning": "of exceptional quality or performance",
-		"example": "They provide first-rate customer service at that hotel.",
-		"translation": "hàng đầu, xuất sắc",
-		"count": 0
-	},
-	{
-		"word": "flaw (n)",
-		"meaning": "a defect or weakness that reduces something’s value or effectiveness",
-		"example": "The design had a critical flaw that needed fixing.",
-		"translation": "lỗi, khuyết điểm",
-		"count": 0
-	},
-	{
-		"word": "bureaucracy (n)",
-		"meaning": "an overly complex and slow system of rules and administration",
-		"example": "We faced too much bureaucracy while applying for the license.",
-		"translation": "quan liêu",
-		"count": 0
-	},
-	{
-		"word": "charity (n)",
-		"meaning": "an organization that helps people in need, often funded by donations",
-		"example": "The charity raised money to support orphaned children.",
-		"translation": "tổ chức từ thiện",
-		"count": 0
-	},
-	{
-		"word": "class (n)",
-		"meaning": "a social division based on income, background, or education",
-		"example": "He comes from a working-class family.",
-		"translation": "giai cấp, tầng lớp",
-		"count": 0
-	},
-	{
-		"word": "community (n)",
-		"meaning": "a group of people living in the same area or sharing common interests",
-		"example": "The entire community came together for the festival.",
-		"translation": "cộng đồng",
-		"count": 0
-	},
-	{
-		"word": "convict (v)",
-		"meaning": "to legally declare someone guilty of a crime",
-		"example": "The court convicted him of armed robbery.",
-		"translation": "kết tội",
-		"count": 0
-	},
-	{
-		"word": "convict (n)",
-		"meaning": "a person who has been found guilty and is serving a sentence",
-		"example": "The convict escaped during a prison transfer.",
-		"translation": "tù nhân",
-		"count": 0
-	},
-	{
-		"word": "corruption (n)",
-		"meaning": "unethical or illegal acts by people in positions of power",
-		"example": "The journalist uncovered widespread political corruption.",
-		"translation": "sự tham nhũng",
-		"count": 0
-	},
-	{
-		"word": "deterrent (n)",
-		"meaning": "something that discourages people from doing something harmful",
-		"example": "Tough penalties act as a deterrent to criminals.",
-		"translation": "răn đe",
-		"count": 0
-	},
-	{
-		"word": "heritage (n)",
-		"meaning": "the cultural, historical, or natural legacy of a group or nation",
-		"example": "We must safeguard our national heritage for future generations.",
-		"translation": "di sản",
-		"count": 0
-	},
-	{
-		"word": "immigration (n)",
-		"meaning": "the process of entering and settling in a foreign country",
-		"example": "The country experienced a rise in immigration last year.",
-		"translation": "sự nhập cư",
-		"count": 0
-	},
-	{
-		"word": "industrial action (n phr)",
-		"meaning": "a protest by employees, often involving strikes, over working conditions",
-		"example": "Industrial action halted production at the factory.",
-		"translation": "trừng phạt lao động",
-		"count": 0
-	},
-	{
-		"word": "institution (n)",
-		"meaning": "a large and established organization such as a school, bank, or prison",
-		"example": "She was raised in a government institution.",
-		"translation": "cơ quan, tổ chức",
-		"count": 0
-	},
-	{
-		"word": "legislation (n)",
-		"meaning": "a collection of laws or legal rules",
-		"example": "New legislation aims to reduce carbon emissions.",
-		"translation": "pháp luật",
-		"count": 0
-	},
-	{
-		"word": "prejudice (n)",
-		"meaning": "a biased and often negative attitude toward a group without valid reason",
-		"example": "The film explores how prejudice affects social justice.",
-		"translation": "định kiến",
-		"count": 0
-	},
-	{
-		"word": "prison reform (n phr)",
-		"meaning": "changes made to improve how the prison system operates",
-		"example": "There’s growing support for prison reform to improve rehabilitation.",
-		"translation": "cải cách nhà tù",
-		"count": 0
-	},
-	{
-		"word": "privileged (adj)",
-		"meaning": "having special benefits or advantages not available to others",
-		"example": "She lived a privileged life in an upscale neighborhood.",
-		"translation": "được ưu tiên",
-		"count": 0
-	},
-	{
-		"word": "prosecute (v)",
-		"meaning": "to bring legal action against someone for a criminal act",
-		"example": "The company was prosecuted for violating safety laws.",
-		"translation": "khởi tố",
-		"count": 0
-	},
-	{
-		"word": "state (n)",
-		"meaning": "the government of a country or a particular condition something is in",
-		"example": "The state provides healthcare for its citizens.",
-		"translation": "nhà nước",
-		"count": 0
-	},
-	{
-		"word": "leverage",
-		"meaning": "the use of strategic influence or borrowed resources to gain advantage",
-		"example": "The company used its market leverage to secure better terms.",
-		"translation": "đòn bẩy, lợi thế chiến lược",
-		"count": 0
-	},
-	{
-		"word": "abandon",
-		"meaning": "to leave something behind permanently or stop supporting it",
-		"example": "The project was abandoned due to budget cuts.",
-		"translation": "bỏ rơi, từ bỏ",
-		"count": 0
-	},
-	{
-		"word": "abysmal",
-		"meaning": "extremely bad or appalling in quality",
-		"example": "Their performance in the competition was abysmal.",
-		"translation": "tồi tệ",
-		"count": 0
-	},
-	{
-		"word": "abominable",
-		"meaning": "causing strong disgust or hatred due to being very bad or unpleasant",
-		"example": "His behavior at the event was absolutely abominable.",
-		"translation": "đáng ghê tởm, kinh tởm",
-		"count": 0
-	},
-	{
-		"word": "assertive",
-		"meaning": "confidently expressing ideas or needs in a firm but respectful way",
-		"example": "Being assertive helps you communicate your needs clearly without aggression.",
-		"translation": "quả quyết, quyết đoán",
-		"count": 0
-	},
-	{
-		"word": "bias - biased",
-		"meaning": "a tendency to favor one side unfairly, often due to personal views or background",
-		"example": "The article was clearly biased against the candidate.",
-		"translation": "thiên vị, định kiến",
-		"count": 0
-	},
-	{
-		"word": "bottom line",
-		"meaning": "the final financial result after all calculations, especially profits or losses",
-		"example": "Improving efficiency will positively impact the bottom line.",
-		"translation": "kết quả tài chính cuối cùng",
-		"count": 0
-	},
-	{
-		"word": "bygone",
-		"meaning": "belonging to a time in the distant past",
-		"example": "The museum displayed artifacts from a bygone era.",
-		"translation": "quá khứ, xưa cũ",
-		"count": 0
-	},
-	{
-		"word": "chief claim to fame",
-		"meaning": "the main reason a person or place is well-known",
-		"example": "The town's chief claim to fame is its historic castle.",
-		"translation": "lý do chính khiến nổi tiếng",
-		"count": 0
-	},
-	{
-		"word": "Subjects: Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic",
-		"meaning": "various academic fields within humanities, business, and sciences",
-		"example": "She focused on subjects like Statistics and Philosophy during her degree.",
-		"translation": "Thống kê; Mỹ thuật; Triết học; Chính trị học; Nghệ thuật biểu diễn; Logic",
-		"count": 0
-	},
-	{
-		"word": "abuzz",
-		"meaning": "full of lively noise, activity, or excitement",
-		"example": "The whole city was abuzz with excitement before the concert.",
-		"translation": "ồn ào, náo nhiệt",
-		"count": 0
-	},
-	{
-		"word": "abdomen - abdominal",
-		"meaning": "the area of the body between the chest and hips; related to this region",
-		"example": "He experienced severe abdominal pain after the meal.",
-		"translation": "bụng - thuộc về bụng",
-		"count": 0
-	},
-	{
-		"word": "BEING SPONTANEOUS",
-		"meaning": "freely expressing thoughts and ideas without pre-planning during speech",
-		"example": "She impressed the interviewer with her spontaneous and fluent responses.",
-		"translation": "ứng biến tự nhiên",
-		"count": 0
-	},
-	{
-		"word": "In order to achieve a very high band in the IELTS speaking test, you need to show that you can use some ‘less common’ vocabulary, including idioms and less common collocations.",
-		"meaning": "using rare vocabulary and idiomatic expressions can demonstrate advanced speaking skills",
-		"example": "She used a few idioms naturally to raise her IELTS score.",
-		"translation": "từ vựng ít gặp, thành ngữ, cụm từ ít dùng",
-		"count": 0
-	},
-	{
-		"word": "He would → He'd, Why have → Why've, I will → I'll, Where did → Where'd, They are → They're",
-		"meaning": "shortened forms of common auxiliary verbs and pronouns used in informal English",
-		"example": "I'll call you later, and they'll come too.",
-		"translation": "dạng rút gọn phổ biến",
-		"count": 0
-	},
-	{
-		"word": "some ‘less common’ vocabulary, including idioms and less common collocations.",
-		"meaning": "expressions and phrases that are not used frequently but enrich language usage",
-		"example": "He impressed the examiner by using less common collocations effectively.",
-		"translation": "từ vựng, thành ngữ ít dùng",
-		"count": 0
-	},
-	{
-		"word": "appropriate [A]",
-		"meaning": "suitable for a particular time, place, or situation",
-		"example": "It’s appropriate to wear formal clothes to a wedding.",
-		"translation": "phù hợp",
-		"count": 0
-	},
-	{
-		"word": "detrimental [A]",
-		"meaning": "causing negative effects or harm",
-		"example": "Skipping meals regularly can be detrimental to your health.",
-		"translation": "gây hại",
-		"count": 0
-	},
-	{
-		"word": "nasty [A]",
-		"meaning": "unpleasant in nature or behavior",
-		"example": "He made a nasty comment that offended everyone.",
-		"translation": "khó chịu, xấu tính",
-		"count": 0
-	},
-	{
-		"word": "scenic [A]",
-		"meaning": "offering attractive or picturesque views",
-		"example": "We took the scenic route through the mountains.",
-		"translation": "có cảnh đẹp",
-		"count": 0
-	},
-	{
-		"word": "forbidden [A]",
-		"meaning": "not allowed by law or rule",
-		"example": "Taking photos is strictly forbidden inside the gallery.",
-		"translation": "bị cấm",
-		"count": 0
-	},
-	{
-		"word": "attractive [A]",
-		"meaning": "pleasing to look at or appealing in quality",
-		"example": "She has an attractive personality and appearance.",
-		"translation": "hấp dẫn",
-		"count": 0
-	},
-	{
-		"word": "vast [A]",
-		"meaning": "extremely large in size, amount, or range",
-		"example": "The desert stretched across a vast area of land.",
-		"translation": "rộng lớn",
-		"count": 0
-	},
-	{
-		"word": "dull [A]",
-		"meaning": "lacking interest or excitement",
-		"example": "The lecture was so dull that half the audience fell asleep.",
-		"translation": "nhàm chán",
-		"count": 0
-	},
-	{
-		"word": "hectic [A]",
-		"meaning": "very busy or full of activity and chaos",
-		"example": "Work has been hectic this week with tight deadlines.",
-		"translation": "bận rộn, sôi động",
-		"count": 0
-	},
-	{
-		"word": "inexpensive [A]",
-		"meaning": "affordable or costing little money",
-		"example": "They stayed in an inexpensive guesthouse near the beach.",
-		"translation": "rẻ, không đắt",
-		"count": 0
-	},
-	{
-		"word": "obligatory [A]",
-		"meaning": "something required by law or rules",
-		"example": "Wearing seatbelts is obligatory in most countries.",
-		"translation": "bắt buộc",
-		"count": 0
-	},
-	{
-		"word": "hazardous [A]",
-		"meaning": "dangerous or likely to cause harm",
-		"example": "Working in a chemical factory can be hazardous.",
-		"translation": "nguy hiểm",
-		"count": 0
-	},
-	{
-		"word": "tricky [A]",
-		"meaning": "complicated or difficult to handle",
-		"example": "That’s a tricky question that requires careful thought.",
-		"translation": "khó, phức tạp",
-		"count": 0
-	},
-	{
-		"word": "effortless [A]",
-		"meaning": "requiring little effort to accomplish",
-		"example": "She gave an effortless performance on stage.",
-		"translation": "dễ dàng",
-		"count": 0
-	},
-	{
-		"word": "pleasurable [A]",
-		"meaning": "providing enjoyment or satisfaction",
-		"example": "The evening with friends was truly pleasurable.",
-		"translation": "thú vị",
-		"count": 0
-	},
-	{
-		"word": "stimulating [A]",
-		"meaning": "mentally or physically exciting or motivating",
-		"example": "The discussion was both deep and stimulating.",
-		"translation": "kích thích, thú vị",
-		"count": 0
-	},
-	{
-		"word": "pricey [A]",
-		"meaning": "more expensive than expected or reasonable",
-		"example": "That restaurant is great but quite pricey.",
-		"translation": "đắt tiền",
-		"count": 0
-	},
-	{
-		"word": "spare [A]",
-		"meaning": "extra and available for use if needed",
-		"example": "I always keep a spare charger in my bag.",
-		"translation": "dự phòng",
-		"count": 0
-	},
-	{
-		"word": "well-known [A]",
-		"meaning": "familiar to many people; widely recognized",
-		"example": "He’s a well-known author in the region.",
-		"translation": "nổi tiếng",
-		"count": 0
-	},
-	{
-		"word": "rapid [A]",
-		"meaning": "happening quickly or in a short time",
-		"example": "The company saw rapid growth in just two years.",
-		"translation": "nhanh chóng",
-		"count": 0
-	},
-	{
-		"word": "preferred [A]",
-		"meaning": "chosen or favored over other options",
-		"example": "My preferred method of study is online learning.",
-		"translation": "ưa thích",
-		"count": 0
-	},
-	{
-		"word": "Checking understanding",
-		"meaning": "ways to confirm that you understood someone correctly",
-		"example": "When you say 'hometown', do you mean where I was born or where I live now?",
-		"translation": "kiểm tra sự hiểu",
-		"count": 0
-	},
-	{
-		"word": "amusing",
-		"meaning": "entertaining or funny in a light-hearted way",
-		"example": "The comedian told an amusing story about his childhood.",
-		"translation": "vui nhộn",
-		"count": 0
-	},
-	{
-		"word": "hilarious",
-		"meaning": "extremely funny or laugh-out-loud amusing",
-		"example": "That movie was absolutely hilarious.",
-		"translation": "rất buồn cười",
-		"count": 0
-	},
-	{
-		"word": "witty",
-		"meaning": "clever and amusing in speech or writing",
-		"example": "She gave a witty reply that made everyone laugh.",
-		"translation": "hóm hỉnh",
-		"count": 0
-	},
-	{
-		"word": "enjoyable, pleasant, pleasurable, nice",
-		"meaning": "giving pleasure or satisfaction",
-		"example": "We had an enjoyable evening at the concert.",
-		"translation": "dễ chịu, thú vị",
-		"count": 0
-	},
-	{
-		"word": "beneficial, helpful",
-		"meaning": "producing good or helpful results",
-		"example": "Regular exercise is beneficial for your health.",
-		"translation": "có lợi",
-		"count": 0
-	},
-	{
-		"word": "nutritious, wholesome",
-		"meaning": "containing substances needed for good health",
-		"example": "She always prepares nutritious meals for her children.",
-		"translation": "bổ dưỡng",
-		"count": 0
-	},
-	{
-		"word": "supportive, cooperative",
-		"meaning": "willing to help or work with others",
-		"example": "The team has a very supportive atmosphere.",
-		"translation": "hỗ trợ, hợp tác",
-		"count": 0
-	},
-	{
-		"word": "perfect, model",
-		"meaning": "an ideal or flawless version of something",
-		"example": "They live in a perfect home with a model garden.",
-		"translation": "hoàn hảo, mẫu mực",
-		"count": 0
-	},
-	{
-		"word": "major, significant, essential, vital (= very important)",
-		"meaning": "extremely important or necessary",
-		"example": "Clean water is vital for survival.",
-		"translation": "quan trọng",
-		"count": 0
-	},
-	{
-		"word": "smart, clever, brainy, bright",
-		"meaning": "showing intelligence or quick thinking",
-		"example": "He’s a bright student who always asks good questions.",
-		"translation": "thông minh",
-		"count": 0
-	},
-	{
-		"word": "intriguing, engaging, fascinating",
-		"meaning": "very interesting or capturing attention",
-		"example": "The plot of the book was truly fascinating.",
-		"translation": "hấp dẫn",
-		"count": 0
-	},
-	{
-		"word": "tardy, behind time, unpunctual",
-		"meaning": "not arriving or happening on time",
-		"example": "He got in trouble at school for being tardy every day.",
-		"translation": "đi trễ",
-		"count": 0
-	},
-	{
-		"word": "principal, major",
-		"meaning": "most important or main",
-		"example": "Tourism is one of the principal sources of income.",
-		"translation": "chính, chủ yếu",
-		"count": 0
-	},
-	{
-		"word": "unforgettable",
-		"meaning": "so remarkable that it cannot be forgotten",
-		"example": "Our trip to Japan was truly unforgettable.",
-		"translation": "không thể quên",
-		"count": 0
-	},
-	{
-		"word": "contemporary, present-day, up-to-date",
-		"meaning": "belonging to the current time period",
-		"example": "She prefers contemporary art over classical pieces.",
-		"translation": "hiện đại, đương đại",
-		"count": 0
-	},
-	{
-		"word": "undesirable, detrimental",
-		"meaning": "likely to cause harm or be unwanted",
-		"example": "The policy may have undesirable effects on the economy.",
-		"translation": "bất lợi",
-		"count": 0
-	},
-	{
-		"word": "outdated, unfashionable, out-of-style",
-		"meaning": "no longer modern or in style",
-		"example": "Those jeans look outdated compared to current trends.",
-		"translation": "lỗi thời",
-		"count": 0
-	},
-	{
-		"word": "nutritious, wholesome I try to eat wholesome food.",
-		"meaning": "containing substances essential for health",
-		"example": "She prepares nutritious meals every day.",
-		"translation": "bổ dưỡng",
-		"count": 0
-	},
-	{
-		"word": "well-mannered",
-		"meaning": "polite and respectful in behavior",
-		"example": "He's a well-mannered child who always says thank you.",
-		"translation": "lễ phép",
-		"count": 0
-	},
-	{
-		"word": "hard-up, impoverished, penniless (= very poor)",
-		"meaning": "having very little or no money",
-		"example": "She grew up in an impoverished village.",
-		"translation": "nghèo khó",
-		"count": 0
-	},
-	{
-		"word": "widespread, prevalent, common",
-		"meaning": "existing or happening over a large area or among many people",
-		"example": "That belief is still widespread in rural areas.",
-		"translation": "phổ biến",
-		"count": 0
-	},
-	{
-		"word": "well-liked",
-		"meaning": "enjoyed or admired by many people",
-		"example": "She’s well-liked by her colleagues.",
-		"translation": "được yêu thích",
-		"count": 0
-	},
-	{
-		"word": "favourable, beneficial, constructive",
-		"meaning": "producing a good or helpful result",
-		"example": "The new policy had a favourable effect on employment.",
-		"translation": "tích cực",
-		"count": 0
-	},
-	{
-		"word": "punctual",
-		"meaning": "arriving or happening at the correct time",
-		"example": "He is always punctual for meetings.",
-		"translation": "đúng giờ",
-		"count": 0
-	},
-	{
-		"word": "wealthy, affluent",
-		"meaning": "having a lot of money or resources",
-		"example": "She comes from an affluent family.",
-		"translation": "giàu có",
-		"count": 0
-	},
-	{
-		"word": "secure",
-		"meaning": "safe and protected from danger or harm",
-		"example": "They live in a very secure neighborhood.",
-		"translation": "an toàn",
-		"count": 0
-	},
-	{
-		"word": "unusual, distinctive, characteristic, unique",
-		"meaning": "different from others in a special way",
-		"example": "Her style is very distinctive and artistic.",
-		"translation": "đặc biệt",
-		"count": 0
-	},
-	{
-		"word": "fruitful, prosperous",
-		"meaning": "producing good results or success",
-		"example": "They had a fruitful discussion that led to a solution.",
-		"translation": "thành công, hiệu quả",
-		"count": 0
-	},
-	{
-		"word": "conventional",
-		"meaning": "following traditional or commonly accepted ways",
-		"example": "He prefers conventional teaching methods.",
-		"translation": "truyền thống",
-		"count": 0
-	},
-	{
-		"word": "characteristic, popular",
-		"meaning": "typical or commonly associated with something",
-		"example": "Pho is a characteristic dish of Vietnam.",
-		"translation": "đặc trưng",
-		"count": 0
-	},
-	{
-		"word": "practical, convenient",
-		"meaning": "useful and easy to apply",
-		"example": "Online banking is a convenient option for many people.",
-		"translation": "tiện lợi, hữu ích",
-		"count": 0
-	},
-	{
-		"word": "favourable, beneficial, constructive",
-		"meaning": "having a positive or helpful effect",
-		"example": "Her feedback was very constructive.",
-		"translation": "có lợi",
-		"count": 0
-	},
-	{
-		"word": "A LAWNMOWER",
-		"meaning": "a machine used for cutting grass",
-		"example": "I used the lawnmower to trim the front yard.",
-		"translation": "máy cắt cỏ",
-		"count": 0
-	},
-	{
-		"word": "A REMOTE CONTROL",
-		"meaning": "a handheld device used to operate electronic equipment from a distance",
-		"example": "He lost the remote control for the TV again.",
-		"translation": "điều khiển từ xa",
-		"count": 0
-	},
-	{
-		"word": "GOGGLES",
-		"meaning": "protective eyewear used in specific conditions like swimming or lab work",
-		"example": "She put on her goggles before diving into the pool.",
-		"translation": "kính bảo hộ",
-		"count": 0
-	},
-	{
-		"word": "SALMON",
-		"meaning": "a type of fish known for its pink flesh, often eaten as food",
-		"example": "Grilled salmon is one of my favorite dishes.",
-		"translation": "cá hồi",
-		"count": 0
-	},
-	{
-		"word": "A FLIGHT ATTENDANT",
-		"meaning": "a person who assists passengers during a flight",
-		"example": "The flight attendant gave us safety instructions.",
-		"translation": "tiếp viên hàng không",
-		"count": 0
-	},
-	{
-		"word": "DYE",
-		"meaning": "a substance used to change the color of something",
-		"example": "She dyed her hair bright red last summer.",
-		"translation": "thuốc nhuộm",
-		"count": 0
-	},
-	{
-		"word": "EMBEZZLEMENT",
-		"meaning": "the act of illegally taking money that you were trusted to manage",
-		"example": "He was found guilty of embezzlement and sentenced to five years in prison.",
-		"translation": "tham ô",
-		"count": 0
-	},
-	{
-		"word": "ASTHMA",
-		"meaning": "a chronic condition that causes difficulty in breathing",
-		"example": "He uses an inhaler to manage his asthma.",
-		"translation": "hen suyễn",
-		"count": 0
-	},
-	{
-		"word": "AN OWL",
-		"meaning": "a nocturnal bird with large eyes and a flat face, known for its hooting sound",
-		"example": "The owl hooted softly in the quiet forest.",
-		"translation": "con cú",
-		"count": 0
-	},
     {
-        "word": "You didn’t understand something",
-        "meaning": "phrases used to ask for clarification when a word is unclear or unfamiliar",
-        "example": "Sorry, I’m not sure what 'exaggerate' means. Could you explain it another way?",
-        "translation": "bạn không hiểu điều gì đó",
-        "count": 0
+      "word": "evaluate (v)",
+      "meaning": "to carefully assess something before forming a decision or opinion",
+      "example": "It's important to evaluate all options before choosing a strategy.",
+      "translation": "đánh giá",
+      "count": 0
     },
     {
-        "word": "You didn’t hear something",
-        "meaning": "ways to ask the speaker to repeat something you didn’t catch",
-        "example": "Excuse me, could you repeat that? I didn’t quite catch it.",
-        "translation": "bạn không nghe rõ điều gì đó",
-        "count": 0
+      "word": "exacerbate (v)",
+      "meaning": "to make a difficult situation even worse",
+      "example": "Adding more stress will only exacerbate the problem.",
+      "translation": "làm trầm trọng thêm",
+      "count": 0
     },
     {
-        "word": "BUYING TIME",
-        "meaning": "techniques used to delay your response and gain time to think",
-        "example": "Hmm... that’s a good question. Let me think for a moment.",
-        "translation": "câu kéo thời gian",
-        "count": 0
+      "word": "exquisite (adj)",
+      "meaning": "extremely elegant, beautiful, or finely detailed",
+      "example": "The gallery displayed an exquisite collection of paintings.",
+      "translation": "tinh xảo",
+      "count": 0
     },
     {
-        "word": "Direct vs. indirect questions",
-        "meaning": "types of questions differing in how directly they are asked",
-        "example": "Direct: What time is it? Indirect: Could you tell me what time it is?",
-        "translation": "câu hỏi trực tiếp và gián tiếp",
-        "count": 0
+      "word": "first-rate (adj)",
+      "meaning": "of exceptional quality or performance",
+      "example": "They provide first-rate customer service at that hotel.",
+      "translation": "hàng đầu, xuất sắc",
+      "count": 0
     },
     {
-        "word": "Ask for time",
-        "meaning": "phrases to politely request more time to think before answering",
-        "example": "That’s a tricky one. Can I take a moment to think it over?",
-        "translation": "xin thời gian suy nghĩ",
-        "count": 0
+      "word": "flaw (n)",
+      "meaning": "a defect or weakness that reduces something’s value or effectiveness",
+      "example": "The design had a critical flaw that needed fixing.",
+      "translation": "lỗi, khuyết điểm",
+      "count": 0
     },
     {
-        "word": "Use conversation fillers",
-        "meaning": "short expressions to fill pauses and buy thinking time",
-        "example": "Well, I guess I’d say it depends on the situation.",
-        "translation": "dùng từ đệm trong hội thoại",
-        "count": 0
+      "word": "bureaucracy (n)",
+      "meaning": "an overly complex and slow system of rules and administration",
+      "example": "We faced too much bureaucracy while applying for the license.",
+      "translation": "quan liêu",
+      "count": 0
     },
     {
-        "word": "Combine techniques",
-        "meaning": "using multiple strategies like repeating, fillers, or asking for time",
-        "example": "Hmm… let me think. So you're asking about local food types?",
-        "translation": "kết hợp nhiều kỹ thuật",
-        "count": 0
+      "word": "charity (n)",
+      "meaning": "an organization that helps people in need, often funded by donations",
+      "example": "The charity raised money to support orphaned children.",
+      "translation": "tổ chức từ thiện",
+      "count": 0
     },
     {
-        "word": "CONNECTING IDEAS",
-        "meaning": "phrases used to organize and link parts of a spoken response",
-        "example": "Firstly, cities offer more jobs. Also, they have better infrastructure. However, they can be noisy.",
-        "translation": "kết nối ý tưởng",
-        "count": 0
+      "word": "class (n)",
+      "meaning": "a social division based on income, background, or education",
+      "example": "He comes from a working-class family.",
+      "translation": "giai cấp, tầng lớp",
+      "count": 0
     },
     {
-        "word": "On the whole",
-        "meaning": "used to express a general opinion or summary",
-        "example": "On the whole, I prefer working from home.",
-        "translation": "nhìn chung",
-        "count": 0
+      "word": "community (n)",
+      "meaning": "a group of people living in the same area or sharing common interests",
+      "example": "The entire community came together for the festival.",
+      "translation": "cộng đồng",
+      "count": 0
     },
     {
-        "word": "Regarding (transport)",
-        "meaning": "used to introduce the topic of transportation",
-        "example": "Regarding transport, buses are more eco-friendly.",
-        "translation": "liên quan đến (giao thông)",
-        "count": 0
+      "word": "convict (v)",
+      "meaning": "to legally declare someone guilty of a crime",
+      "example": "The court convicted him of armed robbery.",
+      "translation": "kết tội",
+      "count": 0
     },
     {
-        "word": "On top of that, Also,",
-        "meaning": "phrases used to add more points to your response",
-        "example": "Also, public transport is cheaper. On top of that, it reduces pollution.",
-        "translation": "thêm vào đó",
-        "count": 0
+      "word": "convict (n)",
+      "meaning": "a person who has been found guilty and is serving a sentence",
+      "example": "The convict escaped during a prison transfer.",
+      "translation": "tù nhân",
+      "count": 0
     },
     {
-        "word": "On the other hand, However, Despite (those disadvantages),",
-        "meaning": "phrases used to show contrast or exception",
-        "example": "However, small towns offer peace and quiet.",
-        "translation": "mặt khác, tuy nhiên, mặc dù",
-        "count": 0
+      "word": "corruption (n)",
+      "meaning": "unethical or illegal acts by people in positions of power",
+      "example": "The journalist uncovered widespread political corruption.",
+      "translation": "sự tham nhũng",
+      "count": 0
     },
     {
-        "word": "In fact,",
-        "meaning": "used to introduce something surprising or to emphasize",
-        "example": "In fact, I used to live in a very crowded city.",
-        "translation": "thực tế là",
-        "count": 0
+      "word": "deterrent (n)",
+      "meaning": "something that discourages people from doing something harmful",
+      "example": "Tough penalties act as a deterrent to criminals.",
+      "translation": "răn đe",
+      "count": 0
     },
     {
-        "word": "In short,",
-        "meaning": "used to summarize what has been said",
-        "example": "In short, both have their pros and cons.",
-        "translation": "nói ngắn gọn",
-        "count": 0
+      "word": "heritage (n)",
+      "meaning": "the cultural, historical, or natural legacy of a group or nation",
+      "example": "We must safeguard our national heritage for future generations.",
+      "translation": "di sản",
+      "count": 0
     },
     {
-        "word": "well",
-        "meaning": "used to begin a statement or give yourself time to think",
-        "example": "Well, I think that depends on the context.",
-        "translation": "à thì",
-        "count": 0
+      "word": "immigration (n)",
+      "meaning": "the process of entering and settling in a foreign country",
+      "example": "The country experienced a rise in immigration last year.",
+      "translation": "sự nhập cư",
+      "count": 0
     },
     {
-        "word": "so/therefore",
-        "meaning": "used to introduce a logical result or conclusion",
-        "example": "The weather was bad, so we canceled the trip.",
-        "translation": "vì vậy",
-        "count": 0
+      "word": "industrial action (n phr)",
+      "meaning": "a protest by employees, often involving strikes, over working conditions",
+      "example": "Industrial action halted production at the factory.",
+      "translation": "trừng phạt lao động",
+      "count": 0
     },
     {
-        "word": "basically",
-        "meaning": "used to simplify or highlight the main idea",
-        "example": "Basically, I just want to be happy.",
-        "translation": "nói chung là",
-        "count": 0
+      "word": "institution (n)",
+      "meaning": "a large and established organization such as a school, bank, or prison",
+      "example": "She was raised in a government institution.",
+      "translation": "cơ quan, tổ chức",
+      "count": 0
     },
     {
-        "word": "however/yet",
-        "meaning": "used to express contrast between ideas",
-        "example": "It sounds interesting. However, it’s quite risky.",
-        "translation": "tuy nhiên",
-        "count": 0
+      "word": "legislation (n)",
+      "meaning": "a collection of laws or legal rules",
+      "example": "New legislation aims to reduce carbon emissions.",
+      "translation": "pháp luật",
+      "count": 0
     },
     {
-        "word": "though",
-        "meaning": "used at the end of a sentence to show contrast",
-        "example": "I liked the movie. It was a bit long, though.",
-        "translation": "mặc dù vậy",
-        "count": 0
+      "word": "prejudice (n)",
+      "meaning": "a biased and often negative attitude toward a group without valid reason",
+      "example": "The film explores how prejudice affects social justice.",
+      "translation": "định kiến",
+      "count": 0
     },
     {
-        "word": "in other words",
-        "meaning": "used to explain or rephrase something",
-        "example": "He's very frugal. In other words, he rarely spends money.",
-        "translation": "nói cách khác",
-        "count": 0
+      "word": "prison reform (n phr)",
+      "meaning": "changes made to improve how the prison system operates",
+      "example": "There’s growing support for prison reform to improve rehabilitation.",
+      "translation": "cải cách nhà tù",
+      "count": 0
     },
     {
-        "word": "if we’re talking ...",
-        "meaning": "used to narrow down or clarify the topic",
-        "example": "If we’re talking food, I’d say Vietnamese cuisine is my favorite.",
-        "translation": "nếu nói về...",
-        "count": 0
+      "word": "privileged (adj)",
+      "meaning": "having special benefits or advantages not available to others",
+      "example": "She lived a privileged life in an upscale neighborhood.",
+      "translation": "được ưu tiên",
+      "count": 0
     },
     {
-        "word": "as far as ... is concerned",
-        "meaning": "used to introduce your opinion on a specific topic",
-        "example": "As far as traffic is concerned, it's a big issue in major cities.",
-        "translation": "xét về mặt...",
-        "count": 0
+      "word": "prosecute (v)",
+      "meaning": "to bring legal action against someone for a criminal act",
+      "example": "The company was prosecuted for violating safety laws.",
+      "translation": "khởi tố",
+      "count": 0
     },
     {
-        "word": "eventually",
-        "meaning": "used to describe something that happens after a delay or effort",
-        "example": "After several tries, I eventually passed the test.",
-        "translation": "cuối cùng",
-        "count": 0
+      "word": "state (n)",
+      "meaning": "the government of a country or a particular condition something is in",
+      "example": "The state provides healthcare for its citizens.",
+      "translation": "nhà nước",
+      "count": 0
     },
     {
-        "word": "on top of that/what’s more",
-        "meaning": "used to add extra information that strengthens your point",
-        "example": "The food was expensive. On top of that, it wasn’t even tasty.",
-        "translation": "thêm vào đó",
-        "count": 0
+      "word": "leverage",
+      "meaning": "the use of strategic influence or borrowed resources to gain advantage",
+      "example": "The company used its market leverage to secure better terms.",
+      "translation": "đòn bẩy, lợi thế chiến lược",
+      "count": 0
     },
     {
-        "word": "anyway/anyhow",
-        "meaning": "used to return to a previous topic or close a discussion",
-        "example": "Anyway, let’s move on to the next question.",
-        "translation": "dù sao thì",
-        "count": 0
+      "word": "abandon",
+      "meaning": "to leave something behind permanently or stop supporting it",
+      "example": "The project was abandoned due to budget cuts.",
+      "translation": "bỏ rơi, từ bỏ",
+      "count": 0
     },
     {
-        "word": "actually",
-        "meaning": "used to introduce a response that may be surprising or unexpected",
-        "example": "I thought he wouldn’t come, but actually he arrived early.",
-        "translation": "thực ra",
-        "count": 0
+      "word": "abysmal",
+      "meaning": "extremely bad or appalling in quality",
+      "example": "Their performance in the competition was abysmal.",
+      "translation": "tồi tệ",
+      "count": 0
     },
     {
-        "word": "in fact",
-        "meaning": "used to clarify or correct a previous statement",
-        "example": "He said he didn’t like movies. In fact, he rarely watches TV at all.",
-        "translation": "thực tế là",
-        "count": 0
+      "word": "abominable",
+      "meaning": "causing strong disgust or hatred due to being very bad or unpleasant",
+      "example": "His behavior at the event was absolutely abominable.",
+      "translation": "đáng ghê tởm, kinh tởm",
+      "count": 0
     },
     {
-        "word": "to cut a long story short",
-        "meaning": "used to summarize a story by only mentioning the main point",
-        "example": "To cut a long story short, we missed the flight and had to rebook.",
-        "translation": "nói ngắn gọn",
-        "count": 0
+      "word": "assertive",
+      "meaning": "confidently expressing ideas or needs in a firm but respectful way",
+      "example": "Being assertive helps you communicate your needs clearly without aggression.",
+      "translation": "quả quyết, quyết đoán",
+      "count": 0
     },
     {
-        "word": "on the whole / in general",
-        "meaning": "used to express a broad or general opinion",
-        "example": "On the whole, people in this town are very welcoming.",
-        "translation": "nhìn chung",
-        "count": 0
+      "word": "bias - biased",
+      "meaning": "a tendency to favor one side unfairly, often due to personal views or background",
+      "example": "The article was clearly biased against the candidate.",
+      "translation": "thiên vị, định kiến",
+      "count": 0
     },
     {
-        "word": "overall",
-        "meaning": "used to give a general conclusion or final assessment",
-        "example": "Overall, the trip was a great success despite the weather.",
-        "translation": "tổng thể",
-        "count": 0
+      "word": "bottom line",
+      "meaning": "the final financial result after all calculations, especially profits or losses",
+      "example": "Improving efficiency will positively impact the bottom line.",
+      "translation": "kết quả tài chính cuối cùng",
+      "count": 0
     },
     {
-        "word": "for example/for instance",
-        "meaning": "used to give a specific case or illustration",
-        "example": "Many cities have excellent public transport. For example, Tokyo's train system is highly efficient.",
-        "translation": "ví dụ",
-        "count": 0
+      "word": "bygone",
+      "meaning": "belonging to a time in the distant past",
+      "example": "The museum displayed artifacts from a bygone era.",
+      "translation": "quá khứ, xưa cũ",
+      "count": 0
     },
     {
-        "word": "alternatively",
-        "meaning": "used to offer another possibility or choice",
-        "example": "You can go by train. Alternatively, you can take a bus if it’s cheaper.",
-        "translation": "hoặc là",
-        "count": 0
+      "word": "chief claim to fame",
+      "meaning": "the main reason a person or place is well-known",
+      "example": "The town's chief claim to fame is its historic castle.",
+      "translation": "lý do chính khiến nổi tiếng",
+      "count": 0
     },
     {
-        "word": "Neolithic",
-        "meaning": "relating to the later Stone Age period when farming and settled life began",
-        "example": "The Neolithic era introduced farming and permanent homes.",
-        "translation": "thời kỳ đồ đá mới",
-        "count": 0
+      "word": "Subjects: Statistics; Visual arts; Philosophy; Politics; Performing arts; Logic",
+      "meaning": "various academic fields within humanities, business, and sciences",
+      "example": "She focused on subjects like Statistics and Philosophy during her degree.",
+      "translation": "Thống kê; Mỹ thuật; Triết học; Chính trị học; Nghệ thuật biểu diễn; Logic",
+      "count": 0
     },
     {
-        "word": "bluestones",
-        "meaning": "a type of rock used in ancient monuments like Stonehenge",
-        "example": "The bluestones at Stonehenge were brought from over 200 kilometers away.",
-        "translation": "đá xanh",
-        "count": 0
+      "word": "abuzz",
+      "meaning": "full of lively noise, activity, or excitement",
+      "example": "The whole city was abuzz with excitement before the concert.",
+      "translation": "ồn ào, náo nhiệt",
+      "count": 0
     },
     {
-        "word": "haul",
-        "meaning": "to drag or pull something with effort over a distance",
-        "example": "Workers had to haul the logs up the hill using ropes.",
-        "translation": "kéo, vận chuyển",
-        "count": 0
+      "word": "abdomen - abdominal",
+      "meaning": "the area of the body between the chest and hips; related to this region",
+      "example": "He experienced severe abdominal pain after the meal.",
+      "translation": "bụng - thuộc về bụng",
+      "count": 0
     },
     {
-        "word": "prehistoric",
-        "meaning": "relating to the time before written history",
-        "example": "Prehistoric humans left cave paintings as evidence of their lives.",
-        "translation": "thời tiền sử",
-        "count": 0
+      "word": "BEING SPONTANEOUS",
+      "meaning": "freely expressing thoughts and ideas without pre-planning during speech",
+      "example": "She impressed the interviewer with her spontaneous and fluent responses.",
+      "translation": "ứng biến tự nhiên",
+      "count": 0
     },
     {
-        "word": "sophisticated",
-        "meaning": "highly developed or advanced in design, knowledge, or culture",
-        "example": "The ancient city had a sophisticated system of water distribution.",
-        "translation": "tinh vi",
-        "count": 0
+      "word": "In order to achieve a very high band in the IELTS speaking test, you need to show that you can use some ‘less common’ vocabulary, including idioms and less common collocations.",
+      "meaning": "using rare vocabulary and idiomatic expressions can demonstrate advanced speaking skills",
+      "example": "She used a few idioms naturally to raise her IELTS score.",
+      "translation": "từ vựng ít gặp, thành ngữ, cụm từ ít dùng",
+      "count": 0
     },
     {
-        "word": "boulders",
-        "meaning": "large, rounded rocks often shaped by erosion",
-        "example": "The path was blocked by massive boulders.",
-        "translation": "tảng đá lớn",
-        "count": 0
+      "word": "He would → He'd, Why have → Why've, I will → I'll, Where did → Where'd, They are → They're",
+      "meaning": "shortened forms of common auxiliary verbs and pronouns used in informal English",
+      "example": "I'll call you later, and they'll come too.",
+      "translation": "dạng rút gọn phổ biến",
+      "count": 0
     },
     {
-        "word": "primitive",
-        "meaning": "simple and not developed; from an early stage of evolution",
-        "example": "Primitive tools were made of stone and animal bones.",
-        "translation": "nguyên thủy",
-        "count": 0
+      "word": "some ‘less common’ vocabulary, including idioms and less common collocations.",
+      "meaning": "expressions and phrases that are not used frequently but enrich language usage",
+      "example": "He impressed the examiner by using less common collocations effectively.",
+      "translation": "từ vựng, thành ngữ ít dùng",
+      "count": 0
     },
     {
-        "word": "timber",
-        "meaning": "wood prepared for building or carpentry",
-        "example": "They built the shelter using timber from nearby trees.",
-        "translation": "gỗ xây dựng",
-        "count": 0
+      "word": "appropriate [A]",
+      "meaning": "suitable for a particular time, place, or situation",
+      "example": "It’s appropriate to wear formal clothes to a wedding.",
+      "translation": "phù hợp",
+      "count": 0
     },
     {
-        "word": "deer antlers",
-        "meaning": "branched horns that grow on deer and fall off annually",
-        "example": "Early humans crafted tools from deer antlers.",
-        "translation": "gạc hươu",
-        "count": 0
+      "word": "detrimental [A]",
+      "meaning": "causing negative effects or harm",
+      "example": "Skipping meals regularly can be detrimental to your health.",
+      "translation": "gây hại",
+      "count": 0
     },
     {
-        "word": "ditch",
-               "meaning": "a narrow channel dug in the ground to drain or mark boundaries",
-        "example": "Farmers dug a ditch around the field to keep animals out.",
-        "translation": "hào, rãnh",
-        "count": 0
+      "word": "nasty [A]",
+      "meaning": "unpleasant in nature or behavior",
+      "example": "He made a nasty comment that offended everyone.",
+      "translation": "khó chịu, xấu tính",
+      "count": 0
     },
     {
-        "word": "bank",
-        "meaning": "a raised area of ground, especially along a river or ditch",
-        "example": "They stood on the river bank to watch the boats pass by.",
-        "translation": "bờ đất",
-        "count": 0
+      "word": "scenic [A]",
+      "meaning": "offering attractive or picturesque views",
+      "example": "We took the scenic route through the mountains.",
+      "translation": "có cảnh đẹp",
+      "count": 0
     },
     {
-        "word": "henge",
-        "meaning": "a prehistoric earthwork typically consisting of a circle of stones or posts",
-        "example": "Stonehenge is the most famous henge in Britain.",
-        "translation": "di tích vòng tròn cổ",
-        "count": 0
+      "word": "forbidden [A]",
+      "meaning": "not allowed by law or rule",
+      "example": "Taking photos is strictly forbidden inside the gallery.",
+      "translation": "bị cấm",
+      "count": 0
     },
     {
-        "word": "pits",
-        "meaning": "holes dug in the ground, often for storage or construction",
-        "example": "Archaeologists discovered storage pits under the ancient site.",
-        "translation": "hố đất",
-        "count": 0
+      "word": "attractive [A]",
+      "meaning": "pleasing to look at or appealing in quality",
+      "example": "She has an attractive personality and appearance.",
+      "translation": "hấp dẫn",
+      "count": 0
     },
     {
-        "word": "scholars",
-        "meaning": "experts who study a particular subject deeply",
-        "example": "Many scholars have tried to interpret the function of Stonehenge.",
-        "translation": "học giả",
-        "count": 0
+      "word": "vast [A]",
+      "meaning": "extremely large in size, amount, or range",
+      "example": "The desert stretched across a vast area of land.",
+      "translation": "rộng lớn",
+      "count": 0
     },
     {
-        "word": "antiquarian",
-        "meaning": "a person who studies or collects ancient artifacts or antiques",
-        "example": "The antiquarian recorded detailed drawings of the site in his journal.",
-        "translation": "nhà nghiên cứu cổ vật",
-        "count": 0
+      "word": "dull [A]",
+      "meaning": "lacking interest or excitement",
+      "example": "The lecture was so dull that half the audience fell asleep.",
+      "translation": "nhàm chán",
+      "count": 0
     },
     {
-        "word": "indigenous",
-        "meaning": "native to a particular place or region",
-        "example": "These plants are indigenous to Southeast Asia.",
-        "translation": "bản địa",
-        "count": 0
+      "word": "hectic [A]",
+      "meaning": "very busy or full of activity and chaos",
+      "example": "Work has been hectic this week with tight deadlines.",
+      "translation": "bận rộn, sôi động",
+      "count": 0
     },
     {
-        "word": "astrological",
-        "meaning": "related to the belief in the influence of stars and planets on human affairs",
-        "example": "He studied the astrological alignment of the monument's stones.",
-        "translation": "thuộc chiêm tinh",
-        "count": 0
+      "word": "inexpensive [A]",
+      "meaning": "affordable or costing little money",
+      "example": "They stayed in an inexpensive guesthouse near the beach.",
+      "translation": "rẻ, không đắt",
+      "count": 0
     },
     {
-        "word": "curative",
-        "meaning": "having healing or medicinal properties",
-        "example": "They believed the spring water had curative effects.",
-        "translation": "có tác dụng chữa bệnh",
-        "count": 0
+      "word": "obligatory [A]",
+      "meaning": "something required by law or rules",
+      "example": "Wearing seatbelts is obligatory in most countries.",
+      "translation": "bắt buộc",
+      "count": 0
     },
     {
-		"word": "New Stone Age",
-		"meaning": "a time marked by early farming, animal domestication, and polished stone tools",
-		"example": "During the New Stone Age, people began to grow crops and settle in villages.",
-		"translation": "Thời kỳ đồ đá mới",
-		"count": 0
-	},
-	{
-		"word": "Iron Age",
-		"meaning": "a historical era known for the use of iron for making tools and weapons",
-		"example": "Many ancient civilizations expanded during the Iron Age due to better tools.",
-		"translation": "Thời kỳ đồ sắt",
-		"count": 0
-	},
-	{
-		"word": "hypothesis",
-		"meaning": "a proposed idea to explain something, based on limited data",
-		"example": "One hypothesis suggests that the stones were transported by water.",
-		"translation": "giả thuyết",
-		"count": 0
-	},
-	{
-		"word": "consensus",
-		"meaning": "a shared agreement among a group of people",
-		"example": "There is a consensus that Stonehenge was used for ceremonial purposes.",
-		"translation": "sự đồng thuận",
-		"count": 0
-	},
-	{
-		"word": "megalithic",
-		"meaning": "relating to large stones used in ancient constructions",
-		"example": "The megalithic design of Stonehenge is still admired today.",
-		"translation": "liên quan đến đá lớn",
-		"count": 0
-	},
-	{
-		"word": "archaeologist",
-		"meaning": "a researcher who studies history through physical remains",
-		"example": "The archaeologist uncovered burial tools near the monument.",
-		"translation": "nhà khảo cổ học",
-		"count": 0
-	},
-	{
-		"word": "radiocarbon dating",
-		"meaning": "a scientific method to estimate the age of ancient organic material",
-		"example": "Radiocarbon dating revealed the stones are over 4,000 years old.",
-		"translation": "phương pháp định tuổi bằng carbon",
-		"count": 0
-	},
-	{
-		"word": "sceptical",
-		"meaning": "having doubts or questioning something",
-		"example": "Many remain sceptical about the new excavation findings.",
-		"translation": "hoài nghi",
-		"count": 0
-	},
-	{
-		"word": "artifacts",
-		"meaning": "historical objects created by humans",
-		"example": "Artifacts found at the site included tools and pottery shards.",
-		"translation": "hiện vật",
-		"count": 0
-	},
-	{
-		"word": "communal",
-		"meaning": "shared by a group or community",
-		"example": "The villagers worked together in a communal effort to build the site.",
-		"translation": "chung, cộng đồng",
-		"count": 0
-	},
-	{
-		"word": "descended",
-		"meaning": "originating from a particular ancestor",
-		"example": "The tribe is believed to have descended from early Neolithic settlers.",
-		"translation": "xuất thân từ",
-		"count": 0
-	},
-	{
-		"word": "dense cloud cover",
-		"meaning": "a thick blanket of clouds blocking visibility",
-		"example": "Dense cloud cover often limits sky visibility in this region.",
-		"translation": "mây dày đặc",
-		"count": 0
-	},
-	{
-		"word": "astronomical",
-		"meaning": "related to stars, planets, or space science",
-		"example": "Astronomical studies suggest the stones align with solstices.",
-		"translation": "thuộc thiên văn học",
-		"count": 0
-	},
-	{
-		"word": "monoliths",
-		"meaning": "very large single stone structures",
-		"example": "The builders transported massive monoliths across great distances.",
-		"translation": "khối đá đơn lớn",
-		"count": 0
-	},
-	{
-		"word": "ritual",
-		"meaning": "a series of formal actions performed for religious or cultural reasons",
-		"example": "They likely gathered there for seasonal rituals.",
-		"translation": "nghi lễ",
-		"count": 0
-	},
-	{
-		"word": "enigmatic",
-		"meaning": "hard to understand or explain; mysterious",
-		"example": "The purpose of the site remains enigmatic to this day.",
-		"translation": "bí ẩn",
-		"count": 0
-	},
-	{
-		"word": "celestial bodies",
-		"meaning": "natural objects like stars and planets visible in the sky",
-		"example": "The monument may have been aligned with celestial bodies.",
-		"translation": "thiên thể",
-		"count": 0
-	},
-	{
-		"word": "astronomical alignments",
-		"meaning": "positions of stars or planets matching specific locations on Earth",
-		"example": "Some stones correspond to key astronomical alignments.",
-		"translation": "sự sắp xếp thiên văn",
-		"count": 0
-	},
-	{
-		"word": "megalithic culture",
-		"meaning": "an ancient civilization known for using massive stones in construction",
-		"example": "The region once flourished under a megalithic culture.",
-		"translation": "văn hóa đá lớn",
-		"count": 0
-	},
-	{
-		"word": "astronomical observatory",
-		"meaning": "a place for studying stars and other space objects",
-		"example": "Researchers suggest the site may have served as an astronomical observatory.",
-		"translation": "đài thiên văn",
-		"count": 0
-	},
-	{
-		"word": "cultural significance",
-		"meaning": "the importance of something in a culture",
-		"example": "Stonehenge holds deep cultural significance in British heritage.",
-		"translation": "ý nghĩa văn hóa",
-		"count": 0
-	},
-	{
-		"word": "paradigm",
-		"meaning": "a standard example or model of something",
-		"example": "The discovery introduced a new paradigm in scientific thought.",
-		"translation": "mô hình, khuôn mẫu",
-		"count": 0
-	},
-	{
-		"word": "ubiquitous",
-		"meaning": "existing or being everywhere at once",
-		"example": "Smart devices have become ubiquitous in modern life.",
-		"translation": "phổ biến, có mặt khắp nơi",
-		"count": 0
-	},
-	{
-		"word": "dichotomy",
-		"meaning": "a contrast or division between two things",
-		"example": "There is a clear dichotomy between ancient beliefs and science.",
-		"translation": "sự phân đôi, đối lập",
-		"count": 0
-	},
-	{
-		"word": "conundrum",
-		"meaning": "a difficult or puzzling question or situation",
-		"example": "The origin of the stones remains a conundrum.",
-		"translation": "vấn đề nan giải",
-		"count": 0
-	},
-	{
-		"word": "cognitive dissonance",
-		"meaning": "a psychological conflict resulting from holding contradictory thoughts or beliefs at the same time",
-		"example": "She felt cognitive dissonance after spending money on something she believed was wasteful.",
-		"translation": "mâu thuẫn nhận thức",
-		"count": 0
-	},
-	{
-		"word": "conjectural (adjective)",
-		"meaning": "based on guesswork rather than solid proof; speculative",
-		"example": "Most explanations about the monument’s origin are purely conjectural.",
-		"translation": "dự đoán, không chắc chắn",
-		"count": 0
-	},
-	{
-		"word": "Brand awareness (noun)",
-		"meaning": "the level at which consumers recognize or recall a brand",
-		"example": "Social media marketing can rapidly boost brand awareness among young audiences.",
-		"translation": "nhận diện thương hiệu",
-		"count": 0
-	},
-	{
-		"word": "Manipulate (verb)",
-		"meaning": "to influence someone’s behavior secretly or unfairly",
-		"example": "The advertisement was designed to manipulate viewers into buying the product without realizing it.",
-		"translation": "thao túng",
-		"count": 0
-	},
-	{
-		"word": "Target audience (noun)",
-		"meaning": "the specific group a product or message is intended for",
-		"example": "Teenagers were identified as the target audience for the new fashion line.",
-		"translation": "đối tượng mục tiêu",
-		"count": 0
-	},
-	{
-		"word": "A call to action (noun)",
-		"meaning": "a prompt in marketing encouraging people to take a specific step",
-		"example": "Adding a strong call to action like 'Buy now' helps increase sales conversions.",
-		"translation": "lời kêu gọi hành động",
-		"count": 0
-	},
-	{
-		"word": "Commercial break (noun)",
-		"meaning": "a short interruption in a broadcast to air advertisements",
-		"example": "She used the commercial break to grab a drink from the kitchen.",
-		"translation": "quảng cáo giữa chương trình",
-		"count": 0
-	},
-	{
-		"word": "Word of mouth (noun)",
-		"meaning": "informal promotion by people talking about products with others",
-		"example": "The restaurant became popular thanks to positive word of mouth.",
-		"translation": "truyền miệng",
-		"count": 0
-	},
-	{
-		"word": "Product placement (noun)",
-		"meaning": "showing products in entertainment content to advertise them subtly",
-		"example": "The car featured prominently in the movie through strategic product placement.",
-		"translation": "quảng cáo chèn sản phẩm",
-		"count": 0
-	},
-	{
-		"word": "Jingle (noun)",
-		"meaning": "a catchy tune used in an advertisement to make it memorable",
-		"example": "That fast-food chain’s jingle is stuck in my head all day.",
-		"translation": "giai điệu quảng cáo",
-		"count": 0
-	},
-	{
-		"word": "Slogan (noun)",
-		"meaning": "a short, memorable phrase used in advertising to convey a brand message",
-		"example": "Nike’s slogan ‘Just Do It’ has become iconic worldwide.",
-		"translation": "khẩu hiệu",
-		"count": 0
-	},
-	{
-		"word": "(Celebrity) endorsement (noun)",
-		"meaning": "a famous person publicly supporting a product to boost sales",
-		"example": "The perfume sales increased after a celebrity endorsement by a pop star.",
-		"translation": "sự chứng thực từ người nổi tiếng",
-		"count": 0
-	},
-	{
-		"word": "Carnivore (noun)",
-		"meaning": "an animal whose primary diet consists of meat",
-		"example": "Lions are classic examples of carnivores that dominate their habitats.",
-		"translation": "động vật ăn thịt",
-		"count": 0
-	},
-	{
-		"word": "Herbivore (noun)",
-		"meaning": "an animal that only eats plants",
-		"example": "Giraffes, as herbivores, feed mostly on leaves and fruits.",
-		"translation": "động vật ăn cỏ",
-		"count": 0
-	},
-	{
-		"word": "Domesticated (adjective)",
-		"meaning": "tamed or trained to live with humans and serve specific purposes",
-		"example": "Domesticated cats rely on humans for food and shelter.",
-		"translation": "đã thuần hóa",
-		"count": 0
-	},
-	{
-		"word": "Poach (verb)",
-		"meaning": "to illegally hunt or capture animals",
-		"example": "Efforts to stop elephant poaching are increasing in Africa.",
-		"translation": "săn trộm",
-		"count": 0
-	},
-	{
-		"word": "Territory (noun)",
-		"meaning": "an area that an animal claims and defends as its own",
-		"example": "Wolves mark their territory with scent to warn other packs.",
-		"translation": "lãnh thổ",
-		"count": 0
-	},
-	{
-		"word": "Reproduce (verb)",
-		"meaning": "to produce offspring or new generations",
-		"example": "Frogs can reproduce quickly in wet environments.",
-		"translation": "sinh sản",
-		"count": 0
-	},
-	{
-		"word": "Apex Predator (noun)",
-		"meaning": "a top-level predator with no natural enemies",
-		"example": "Polar bears are apex predators in Arctic ecosystems.",
-		"translation": "động vật săn mồi đầu chuỗi",
-		"count": 0
-	},
-	{
-		"word": "Migrate (verb)",
-		"meaning": "to move from one region to another at certain times of the year",
-		"example": "Geese migrate south to avoid harsh winter conditions.",
-		"translation": "di cư",
-		"count": 0
-	},
-	{
-		"word": "Endangered (adjective)",
-		"meaning": "at risk of disappearing completely from the wild",
-		"example": "The panda is considered an endangered species needing protection.",
-		"translation": "bị đe dọa tuyệt chủng",
-		"count": 0
-	},
-	{
-		"word": "Aggressive (adjective)",
-		"meaning": "likely to attack or confront; hostile in behavior",
-		"example": "Some animals become aggressive if they feel threatened.",
-		"translation": "hung dữ",
-		"count": 0
-	},
-	{
-		"word": "Architect (noun)",
-		"meaning": "a professional who designs buildings or structures",
-		"example": "The architect created blueprints for a modern museum.",
-		"translation": "kiến trúc sư",
-		"count": 0
-	},
-	{
-		"word": "Controversial (adjective)",
-		"meaning": "causing strong disagreement or public debate",
-		"example": "The new skyscraper sparked controversial opinions among citizens.",
-		"translation": "gây tranh cãi",
-		"count": 0
-	},
-	{
-		"word": "Eyesore (noun)",
-		"meaning": "something very unpleasant to look at",
-		"example": "The abandoned factory became a city eyesore.",
-		"translation": "cảnh chướng mắt",
-		"count": 0
-	},
+      "word": "hazardous [A]",
+      "meaning": "dangerous or likely to cause harm",
+      "example": "Working in a chemical factory can be hazardous.",
+      "translation": "nguy hiểm",
+      "count": 0
+    },
     {
-		"word": "Demolish (verb)",
-		"meaning": "To completely tear down or destroy a structure, often to make way for something new.",
-		"example": "The old theater was demolished to build a modern shopping complex.",
-		"translation": "Phá hủy",
-		"count": 0
-	},
-	{
-		"word": "Planning Permission (noun)",
-		"meaning": "Official approval from authorities to build or modify a structure at a specific site.",
-		"example": "They had to wait six months to get planning permission for the new office building.",
-		"translation": "Giấy phép xây dựng",
-		"count": 0
-	},
-	{
-		"word": "Gothic (adjective)",
-		"meaning": "Describing an architectural style known for its pointed arches and detailed ornamentation, prominent in medieval Europe.",
-		"example": "The Gothic cathedral towered above the city with its intricate stone carvings.",
-		"translation": "Kiến trúc Gothic",
-		"count": 0
-	},
-	{
-		"word": "Modernist (adjective)",
-		"meaning": "Relating to a style of architecture using clean lines and geometric shapes, often minimal in design.",
-		"example": "The modernist museum features bold shapes and a sleek glass exterior.",
-		"translation": "Hiện đại (trong kiến trúc)",
-		"count": 0
-	},
-	{
-		"word": "Sticks out like a sore thumb (idiom, verb)",
-		"meaning": "To be noticeably different or mismatched with the surroundings, often unpleasantly.",
-		"example": "That neon sign sticks out like a sore thumb on a historic street.",
-		"translation": "Lạc lõng, không phù hợp",
-		"count": 0
-	},
-	{
-		"word": "Futuristic (noun)",
-		"meaning": "Involving designs or ideas that seem advanced or ahead of the present time.",
-		"example": "The futuristic building features vertical gardens and solar panel walls.",
-		"translation": "Tương lai (kiến trúc)",
-		"count": 0
-	},
-	{
-		"word": "Iconic (adjective)",
-		"meaning": "Widely recognized and symbolically significant, often admired across cultures.",
-		"example": "The Eiffel Tower is an iconic symbol of Paris.",
-		"translation": "Mang tính biểu tượng",
-		"count": 0
-	},
-	{
-		"word": "Abstract (adjective)",
-		"meaning": "Art that represents ideas or feelings through shapes and colors rather than realistic forms.",
-		"example": "She enjoys creating abstract paintings using only circles and lines.",
-		"translation": "Trừu tượng",
-		"count": 0
-	},
-	{
-		"word": "(A) Watercolour (adjective/noun)",
-		"meaning": "A type of painting using pigments mixed with water, producing soft and translucent effects.",
-		"example": "He painted a peaceful countryside scene in soft watercolours.",
-		"translation": "Màu nước / tranh màu nước",
-		"count": 0
-	},
-	{
-		"word": "Sculpture (noun)",
-		"meaning": "A three-dimensional piece of art made by shaping materials like stone, wood, or metal.",
-		"example": "The bronze sculpture in the park draws attention from every visitor.",
-		"translation": "Tượng điêu khắc",
-		"count": 0
-	},
-	{
-		"word": "A still life (noun)",
-		"meaning": "A painting or artwork showing inanimate objects, like flowers or bowls of fruit.",
-		"example": "She spent hours painting a still life of wine bottles and fruit.",
-		"translation": "Tĩnh vật",
-		"count": 0
-	},
-	{
-		"word": "Masterpiece (noun)",
-		"meaning": "An exceptional or highly praised work of art, often seen as the creator’s best.",
-		"example": "Many consider The Starry Night to be Van Gogh's masterpiece.",
-		"translation": "Kiệt tác",
-		"count": 0
-	},
-	{
-		"word": "To depict (verb)",
-		"meaning": "To represent something in a visual or artistic form.",
-		"example": "The mural depicts the struggles of everyday life in the city.",
-		"translation": "Miêu tả, khắc họa",
-		"count": 0
-	},
-	{
-		"word": "Impenetrable (adjective)",
-		"meaning": "Extremely difficult to understand or interpret.",
-		"example": "His explanation of the art was so impenetrable that no one followed.",
-		"translation": "Khó hiểu",
-		"count": 0
-	},
-	{
-		"word": "Interpretation (noun)",
-		"meaning": "The way someone understands or explains the meaning of something.",
-		"example": "Everyone had a different interpretation of the painting’s message.",
-		"translation": "Sự diễn giải",
-		"count": 0
-	},
-	{
-		"word": "Motor skills (noun)",
-		"meaning": "The ability to make precise movements with the hands and fingers.",
-		"example": "Clay sculpting helps children develop fine motor skills.",
-		"translation": "Kỹ năng vận động",
-		"count": 0
-	},
-	{
-		"word": "Innovative (adjective)",
-		"meaning": "Describes someone or something that introduces new ideas or methods.",
-		"example": "Her innovative designs won first place in the architecture contest.",
-		"translation": "Sáng tạo, đổi mới",
-		"count": 0
-	},
-	{
-		"word": "The center of attention (noun)",
-		"meaning": "A person or thing that everyone is watching or focusing on.",
-		"example": "The birthday girl was the center of attention all evening.",
-		"translation": "Tâm điểm chú ý",
-		"count": 0
-	},
-	{
-		"word": "To turn + age (verb)",
-		"meaning": "To reach a particular age in years.",
-		"example": "He just turned 30 and had a big celebration.",
-		"translation": "Tròn (bao nhiêu tuổi)",
-		"count": 0
-	},
-	{
-		"word": "The birthday boy/girl (noun)",
-		"meaning": "The person whose birthday is being celebrated.",
-		"example": "Everyone sang to the birthday girl before she blew out the candles.",
-		"translation": "Nhân vật chính trong tiệc sinh nhật",
-		"count": 0
-	},
-	{
-		"word": "Low-key (adjective)",
-		"meaning": "Quiet, modest, or restrained in style or celebration.",
-		"example": "They chose a low-key dinner instead of a big party.",
-		"translation": "Đơn giản, kín đáo",
-		"count": 0
-	},
-	{
-		"word": "To wrap (verb)",
-		"meaning": "To cover something in paper, especially as a gift.",
-		"example": "She carefully wrapped the book in red foil paper.",
-		"translation": "Gói quà",
-		"count": 0
-	},
-	{
-		"word": "A surprise party (noun)",
-		"meaning": "A party that is planned secretly for someone who doesn't know it will happen.",
-		"example": "They threw him a surprise party for his 21st birthday.",
-		"translation": "Tiệc bất ngờ",
-		"count": 0
-	},
-	{
-		"word": "Get-together (noun)",
-		"meaning": "An informal meeting or small gathering of friends or family.",
-		"example": "We had a weekend get-together with old classmates.",
-		"translation": "Buổi tụ họp",
-		"count": 0
-	},
-	{
-		"word": "Decorate (verb)",
-		"meaning": "To make something more attractive by adding items or colors.",
-		"example": "They decorated the house with balloons for the party.",
-		"translation": "Trang trí",
-		"count": 0
-	},
-	{
+      "word": "tricky [A]",
+      "meaning": "complicated or difficult to handle",
+      "example": "That’s a tricky question that requires careful thought.",
+      "translation": "khó, phức tạp",
+      "count": 0
+    },
+    {
+      "word": "effortless [A]",
+      "meaning": "requiring little effort to accomplish",
+      "example": "She gave an effortless performance on stage.",
+      "translation": "dễ dàng",
+      "count": 0
+    },
+    {
+      "word": "pleasurable [A]",
+      "meaning": "providing enjoyment or satisfaction",
+      "example": "The evening with friends was truly pleasurable.",
+      "translation": "thú vị",
+      "count": 0
+    },
+    {
+      "word": "stimulating [A]",
+      "meaning": "mentally or physically exciting or motivating",
+      "example": "The discussion was both deep and stimulating.",
+      "translation": "kích thích, thú vị",
+      "count": 0
+    },
+    {
+      "word": "pricey [A]",
+      "meaning": "more expensive than expected or reasonable",
+      "example": "That restaurant is great but quite pricey.",
+      "translation": "đắt tiền",
+      "count": 0
+    },
+    {
+      "word": "spare [A]",
+      "meaning": "extra and available for use if needed",
+      "example": "I always keep a spare charger in my bag.",
+      "translation": "dự phòng",
+      "count": 0
+    },
+    {
+      "word": "well-known [A]",
+      "meaning": "familiar to many people; widely recognized",
+      "example": "He’s a well-known author in the region.",
+      "translation": "nổi tiếng",
+      "count": 0
+    },
+    {
+      "word": "rapid [A]",
+      "meaning": "happening quickly or in a short time",
+      "example": "The company saw rapid growth in just two years.",
+      "translation": "nhanh chóng",
+      "count": 0
+    },
+    {
+      "word": "preferred [A]",
+      "meaning": "chosen or favored over other options",
+      "example": "My preferred method of study is online learning.",
+      "translation": "ưa thích",
+      "count": 0
+    },
+    {
+      "word": "Checking understanding",
+      "meaning": "ways to confirm that you understood someone correctly",
+      "example": "When you say 'hometown', do you mean where I was born or where I live now?",
+      "translation": "kiểm tra sự hiểu",
+      "count": 0
+    },
+    {
+      "word": "amusing",
+      "meaning": "entertaining or funny in a light-hearted way",
+      "example": "The comedian told an amusing story about his childhood.",
+      "translation": "vui nhộn",
+      "count": 0
+    },
+    {
+      "word": "hilarious",
+      "meaning": "extremely funny or laugh-out-loud amusing",
+      "example": "That movie was absolutely hilarious.",
+      "translation": "rất buồn cười",
+      "count": 0
+    },
+    {
+      "word": "witty",
+      "meaning": "clever and amusing in speech or writing",
+      "example": "She gave a witty reply that made everyone laugh.",
+      "translation": "hóm hỉnh",
+      "count": 0
+    },
+    {
+      "word": "enjoyable, pleasant, pleasurable, nice",
+      "meaning": "giving pleasure or satisfaction",
+      "example": "We had an enjoyable evening at the concert.",
+      "translation": "dễ chịu, thú vị",
+      "count": 0
+    },
+    {
+      "word": "beneficial, helpful",
+      "meaning": "producing good or helpful results",
+      "example": "Regular exercise is beneficial for your health.",
+      "translation": "có lợi",
+      "count": 0
+    },
+    {
+      "word": "nutritious, wholesome",
+      "meaning": "containing substances needed for good health",
+      "example": "She always prepares nutritious meals for her children.",
+      "translation": "bổ dưỡng",
+      "count": 0
+    },
+    {
+      "word": "supportive, cooperative",
+      "meaning": "willing to help or work with others",
+      "example": "The team has a very supportive atmosphere.",
+      "translation": "hỗ trợ, hợp tác",
+      "count": 0
+    },
+    {
+      "word": "perfect, model",
+      "meaning": "an ideal or flawless version of something",
+      "example": "They live in a perfect home with a model garden.",
+      "translation": "hoàn hảo, mẫu mực",
+      "count": 0
+    },
+    {
+      "word": "major, significant, essential, vital (= very important)",
+      "meaning": "extremely important or necessary",
+      "example": "Clean water is vital for survival.",
+      "translation": "quan trọng",
+      "count": 0
+    },
+    {
+      "word": "smart, clever, brainy, bright",
+      "meaning": "showing intelligence or quick thinking",
+      "example": "He’s a bright student who always asks good questions.",
+      "translation": "thông minh",
+      "count": 0
+    },
+    {
+      "word": "intriguing, engaging, fascinating",
+      "meaning": "very interesting or capturing attention",
+      "example": "The plot of the book was truly fascinating.",
+      "translation": "hấp dẫn",
+      "count": 0
+    },
+    {
+      "word": "tardy, behind time, unpunctual",
+      "meaning": "not arriving or happening on time",
+      "example": "He got in trouble at school for being tardy every day.",
+      "translation": "đi trễ",
+      "count": 0
+    },
+    {
+      "word": "principal, major",
+      "meaning": "most important or main",
+      "example": "Tourism is one of the principal sources of income.",
+      "translation": "chính, chủ yếu",
+      "count": 0
+    },
+    {
+      "word": "unforgettable",
+      "meaning": "so remarkable that it cannot be forgotten",
+      "example": "Our trip to Japan was truly unforgettable.",
+      "translation": "không thể quên",
+      "count": 0
+    },
+    {
+      "word": "contemporary, present-day, up-to-date",
+      "meaning": "belonging to the current time period",
+      "example": "She prefers contemporary art over classical pieces.",
+      "translation": "hiện đại, đương đại",
+      "count": 0
+    },
+    {
+      "word": "undesirable, detrimental",
+      "meaning": "likely to cause harm or be unwanted",
+      "example": "The policy may have undesirable effects on the economy.",
+      "translation": "bất lợi",
+      "count": 0
+    },
+    {
+      "word": "outdated, unfashionable, out-of-style",
+      "meaning": "no longer modern or in style",
+      "example": "Those jeans look outdated compared to current trends.",
+      "translation": "lỗi thời",
+      "count": 0
+    },
+    {
+      "word": "nutritious, wholesome I try to eat wholesome food.",
+      "meaning": "containing substances essential for health",
+      "example": "She prepares nutritious meals every day.",
+      "translation": "bổ dưỡng",
+      "count": 0
+    },
+    {
+      "word": "well-mannered",
+      "meaning": "polite and respectful in behavior",
+      "example": "He's a well-mannered child who always says thank you.",
+      "translation": "lễ phép",
+      "count": 0
+    },
+    {
+      "word": "hard-up, impoverished, penniless (= very poor)",
+      "meaning": "having very little or no money",
+      "example": "She grew up in an impoverished village.",
+      "translation": "nghèo khó",
+      "count": 0
+    },
+    {
+      "word": "widespread, prevalent, common",
+      "meaning": "existing or happening over a large area or among many people",
+      "example": "That belief is still widespread in rural areas.",
+      "translation": "phổ biến",
+      "count": 0
+    },
+    {
+      "word": "well-liked",
+      "meaning": "enjoyed or admired by many people",
+      "example": "She’s well-liked by her colleagues.",
+      "translation": "được yêu thích",
+      "count": 0
+    },
+    {
+      "word": "favourable, beneficial, constructive",
+      "meaning": "producing a good or helpful result",
+      "example": "The new policy had a favourable effect on employment.",
+      "translation": "tích cực",
+      "count": 0
+    },
+    {
+      "word": "punctual",
+      "meaning": "arriving or happening at the correct time",
+      "example": "He is always punctual for meetings.",
+      "translation": "đúng giờ",
+      "count": 0
+    },
+    {
+      "word": "wealthy, affluent",
+      "meaning": "having a lot of money or resources",
+      "example": "She comes from an affluent family.",
+      "translation": "giàu có",
+      "count": 0
+    },
+    {
+      "word": "secure",
+      "meaning": "safe and protected from danger or harm",
+      "example": "They live in a very secure neighborhood.",
+      "translation": "an toàn",
+      "count": 0
+    },
+    {
+      "word": "unusual, distinctive, characteristic, unique",
+      "meaning": "different from others in a special way",
+      "example": "Her style is very distinctive and artistic.",
+      "translation": "đặc biệt",
+      "count": 0
+    },
+    {
+      "word": "fruitful, prosperous",
+      "meaning": "producing good results or success",
+      "example": "They had a fruitful discussion that led to a solution.",
+      "translation": "thành công, hiệu quả",
+      "count": 0
+    },
+    {
+      "word": "conventional",
+      "meaning": "following traditional or commonly accepted ways",
+      "example": "He prefers conventional teaching methods.",
+      "translation": "truyền thống",
+      "count": 0
+    },
+    {
+      "word": "characteristic, popular",
+      "meaning": "typical or commonly associated with something",
+      "example": "Pho is a characteristic dish of Vietnam.",
+      "translation": "đặc trưng",
+      "count": 0
+    },
+    {
+      "word": "practical, convenient",
+      "meaning": "useful and easy to apply",
+      "example": "Online banking is a convenient option for many people.",
+      "translation": "tiện lợi, hữu ích",
+      "count": 0
+    },
+    {
+      "word": "favourable, beneficial, constructive",
+      "meaning": "having a positive or helpful effect",
+      "example": "Her feedback was very constructive.",
+      "translation": "có lợi",
+      "count": 0
+    },
+    {
+      "word": "A LAWNMOWER",
+      "meaning": "a machine used for cutting grass",
+      "example": "I used the lawnmower to trim the front yard.",
+      "translation": "máy cắt cỏ",
+      "count": 0
+    },
+    {
+      "word": "A REMOTE CONTROL",
+      "meaning": "a handheld device used to operate electronic equipment from a distance",
+      "example": "He lost the remote control for the TV again.",
+      "translation": "điều khiển từ xa",
+      "count": 0
+    },
+    {
+      "word": "GOGGLES",
+      "meaning": "protective eyewear used in specific conditions like swimming or lab work",
+      "example": "She put on her goggles before diving into the pool.",
+      "translation": "kính bảo hộ",
+      "count": 0
+    },
+    {
+      "word": "SALMON",
+      "meaning": "a type of fish known for its pink flesh, often eaten as food",
+      "example": "Grilled salmon is one of my favorite dishes.",
+      "translation": "cá hồi",
+      "count": 0
+    },
+    {
+      "word": "A FLIGHT ATTENDANT",
+      "meaning": "a person who assists passengers during a flight",
+      "example": "The flight attendant gave us safety instructions.",
+      "translation": "tiếp viên hàng không",
+      "count": 0
+    },
+    {
+      "word": "DYE",
+      "meaning": "a substance used to change the color of something",
+      "example": "She dyed her hair bright red last summer.",
+      "translation": "thuốc nhuộm",
+      "count": 0
+    },
+    {
+      "word": "EMBEZZLEMENT",
+      "meaning": "the act of illegally taking money that you were trusted to manage",
+      "example": "He was found guilty of embezzlement and sentenced to five years in prison.",
+      "translation": "tham ô",
+      "count": 0
+    },
+    {
+      "word": "ASTHMA",
+      "meaning": "a chronic condition that causes difficulty in breathing",
+      "example": "He uses an inhaler to manage his asthma.",
+      "translation": "hen suyễn",
+      "count": 0
+    },
+    {
+      "word": "AN OWL",
+      "meaning": "a nocturnal bird with large eyes and a flat face, known for its hooting sound",
+      "example": "The owl hooted softly in the quiet forest.",
+      "translation": "con cú",
+      "count": 0
+    },
+      {
+          "word": "You didn’t understand something",
+          "meaning": "phrases used to ask for clarification when a word is unclear or unfamiliar",
+          "example": "Sorry, I’m not sure what 'exaggerate' means. Could you explain it another way?",
+          "translation": "bạn không hiểu điều gì đó",
+          "count": 0
+      },
+      {
+          "word": "You didn’t hear something",
+          "meaning": "ways to ask the speaker to repeat something you didn’t catch",
+          "example": "Excuse me, could you repeat that? I didn’t quite catch it.",
+          "translation": "bạn không nghe rõ điều gì đó",
+          "count": 0
+      },
+      {
+          "word": "BUYING TIME",
+          "meaning": "techniques used to delay your response and gain time to think",
+          "example": "Hmm... that’s a good question. Let me think for a moment.",
+          "translation": "câu kéo thời gian",
+          "count": 0
+      },
+      {
+          "word": "Direct vs. indirect questions",
+          "meaning": "types of questions differing in how directly they are asked",
+          "example": "Direct: What time is it? Indirect: Could you tell me what time it is?",
+          "translation": "câu hỏi trực tiếp và gián tiếp",
+          "count": 0
+      },
+      {
+          "word": "Ask for time",
+          "meaning": "phrases to politely request more time to think before answering",
+          "example": "That’s a tricky one. Can I take a moment to think it over?",
+          "translation": "xin thời gian suy nghĩ",
+          "count": 0
+      },
+      {
+          "word": "Use conversation fillers",
+          "meaning": "short expressions to fill pauses and buy thinking time",
+          "example": "Well, I guess I’d say it depends on the situation.",
+          "translation": "dùng từ đệm trong hội thoại",
+          "count": 0
+      },
+      {
+          "word": "Combine techniques",
+          "meaning": "using multiple strategies like repeating, fillers, or asking for time",
+          "example": "Hmm… let me think. So you're asking about local food types?",
+          "translation": "kết hợp nhiều kỹ thuật",
+          "count": 0
+      },
+      {
+          "word": "CONNECTING IDEAS",
+          "meaning": "phrases used to organize and link parts of a spoken response",
+          "example": "Firstly, cities offer more jobs. Also, they have better infrastructure. However, they can be noisy.",
+          "translation": "kết nối ý tưởng",
+          "count": 0
+      },
+      {
+          "word": "On the whole",
+          "meaning": "used to express a general opinion or summary",
+          "example": "On the whole, I prefer working from home.",
+          "translation": "nhìn chung",
+          "count": 0
+      },
+      {
+          "word": "Regarding (transport)",
+          "meaning": "used to introduce the topic of transportation",
+          "example": "Regarding transport, buses are more eco-friendly.",
+          "translation": "liên quan đến (giao thông)",
+          "count": 0
+      },
+      {
+          "word": "On top of that, Also,",
+          "meaning": "phrases used to add more points to your response",
+          "example": "Also, public transport is cheaper. On top of that, it reduces pollution.",
+          "translation": "thêm vào đó",
+          "count": 0
+      },
+      {
+          "word": "On the other hand, However, Despite (those disadvantages),",
+          "meaning": "phrases used to show contrast or exception",
+          "example": "However, small towns offer peace and quiet.",
+          "translation": "mặt khác, tuy nhiên, mặc dù",
+          "count": 0
+      },
+      {
+          "word": "In fact,",
+          "meaning": "used to introduce something surprising or to emphasize",
+          "example": "In fact, I used to live in a very crowded city.",
+          "translation": "thực tế là",
+          "count": 0
+      },
+      {
+          "word": "In short,",
+          "meaning": "used to summarize what has been said",
+          "example": "In short, both have their pros and cons.",
+          "translation": "nói ngắn gọn",
+          "count": 0
+      },
+      {
+          "word": "well",
+          "meaning": "used to begin a statement or give yourself time to think",
+          "example": "Well, I think that depends on the context.",
+          "translation": "à thì",
+          "count": 0
+      },
+      {
+          "word": "so/therefore",
+          "meaning": "used to introduce a logical result or conclusion",
+          "example": "The weather was bad, so we canceled the trip.",
+          "translation": "vì vậy",
+          "count": 0
+      },
+      {
+          "word": "basically",
+          "meaning": "used to simplify or highlight the main idea",
+          "example": "Basically, I just want to be happy.",
+          "translation": "nói chung là",
+          "count": 0
+      },
+      {
+          "word": "however/yet",
+          "meaning": "used to express contrast between ideas",
+          "example": "It sounds interesting. However, it’s quite risky.",
+          "translation": "tuy nhiên",
+          "count": 0
+      },
+      {
+          "word": "though",
+          "meaning": "used at the end of a sentence to show contrast",
+          "example": "I liked the movie. It was a bit long, though.",
+          "translation": "mặc dù vậy",
+          "count": 0
+      },
+      {
+          "word": "in other words",
+          "meaning": "used to explain or rephrase something",
+          "example": "He's very frugal. In other words, he rarely spends money.",
+          "translation": "nói cách khác",
+          "count": 0
+      },
+      {
+          "word": "if we’re talking ...",
+          "meaning": "used to narrow down or clarify the topic",
+          "example": "If we’re talking food, I’d say Vietnamese cuisine is my favorite.",
+          "translation": "nếu nói về...",
+          "count": 0
+      },
+      {
+          "word": "as far as ... is concerned",
+          "meaning": "used to introduce your opinion on a specific topic",
+          "example": "As far as traffic is concerned, it's a big issue in major cities.",
+          "translation": "xét về mặt...",
+          "count": 0
+      },
+      {
+          "word": "eventually",
+          "meaning": "used to describe something that happens after a delay or effort",
+          "example": "After several tries, I eventually passed the test.",
+          "translation": "cuối cùng",
+          "count": 0
+      },
+      {
+          "word": "on top of that/what’s more",
+          "meaning": "used to add extra information that strengthens your point",
+          "example": "The food was expensive. On top of that, it wasn’t even tasty.",
+          "translation": "thêm vào đó",
+          "count": 0
+      },
+      {
+          "word": "anyway/anyhow",
+          "meaning": "used to return to a previous topic or close a discussion",
+          "example": "Anyway, let’s move on to the next question.",
+          "translation": "dù sao thì",
+          "count": 0
+      },
+      {
+          "word": "actually",
+          "meaning": "used to introduce a response that may be surprising or unexpected",
+          "example": "I thought he wouldn’t come, but actually he arrived early.",
+          "translation": "thực ra",
+          "count": 0
+      },
+      {
+          "word": "in fact",
+          "meaning": "used to clarify or correct a previous statement",
+          "example": "He said he didn’t like movies. In fact, he rarely watches TV at all.",
+          "translation": "thực tế là",
+          "count": 0
+      },
+      {
+          "word": "to cut a long story short",
+          "meaning": "used to summarize a story by only mentioning the main point",
+          "example": "To cut a long story short, we missed the flight and had to rebook.",
+          "translation": "nói ngắn gọn",
+          "count": 0
+      },
+      {
+          "word": "on the whole / in general",
+          "meaning": "used to express a broad or general opinion",
+          "example": "On the whole, people in this town are very welcoming.",
+          "translation": "nhìn chung",
+          "count": 0
+      },
+      {
+          "word": "overall",
+          "meaning": "used to give a general conclusion or final assessment",
+          "example": "Overall, the trip was a great success despite the weather.",
+          "translation": "tổng thể",
+          "count": 0
+      },
+      {
+          "word": "for example/for instance",
+          "meaning": "used to give a specific case or illustration",
+          "example": "Many cities have excellent public transport. For example, Tokyo's train system is highly efficient.",
+          "translation": "ví dụ",
+          "count": 0
+      },
+      {
+          "word": "alternatively",
+          "meaning": "used to offer another possibility or choice",
+          "example": "You can go by train. Alternatively, you can take a bus if it’s cheaper.",
+          "translation": "hoặc là",
+          "count": 0
+      },
+      {
+          "word": "Neolithic",
+          "meaning": "relating to the later Stone Age period when farming and settled life began",
+          "example": "The Neolithic era introduced farming and permanent homes.",
+          "translation": "thời kỳ đồ đá mới",
+          "count": 0
+      },
+      {
+          "word": "bluestones",
+          "meaning": "a type of rock used in ancient monuments like Stonehenge",
+          "example": "The bluestones at Stonehenge were brought from over 200 kilometers away.",
+          "translation": "đá xanh",
+          "count": 0
+      },
+      {
+          "word": "haul",
+          "meaning": "to drag or pull something with effort over a distance",
+          "example": "Workers had to haul the logs up the hill using ropes.",
+          "translation": "kéo, vận chuyển",
+          "count": 0
+      },
+      {
+          "word": "prehistoric",
+          "meaning": "relating to the time before written history",
+          "example": "Prehistoric humans left cave paintings as evidence of their lives.",
+          "translation": "thời tiền sử",
+          "count": 0
+      },
+      {
+          "word": "sophisticated",
+          "meaning": "highly developed or advanced in design, knowledge, or culture",
+          "example": "The ancient city had a sophisticated system of water distribution.",
+          "translation": "tinh vi",
+          "count": 0
+      },
+      {
+          "word": "boulders",
+          "meaning": "large, rounded rocks often shaped by erosion",
+          "example": "The path was blocked by massive boulders.",
+          "translation": "tảng đá lớn",
+          "count": 0
+      },
+      {
+          "word": "primitive",
+          "meaning": "simple and not developed; from an early stage of evolution",
+          "example": "Primitive tools were made of stone and animal bones.",
+          "translation": "nguyên thủy",
+          "count": 0
+      },
+      {
+          "word": "timber",
+          "meaning": "wood prepared for building or carpentry",
+          "example": "They built the shelter using timber from nearby trees.",
+          "translation": "gỗ xây dựng",
+          "count": 0
+      },
+      {
+          "word": "deer antlers",
+          "meaning": "branched horns that grow on deer and fall off annually",
+          "example": "Early humans crafted tools from deer antlers.",
+          "translation": "gạc hươu",
+          "count": 0
+      },
+      {
+          "word": "ditch",
+                "meaning": "a narrow channel dug in the ground to drain or mark boundaries",
+          "example": "Farmers dug a ditch around the field to keep animals out.",
+          "translation": "hào, rãnh",
+          "count": 0
+      },
+      {
+          "word": "bank",
+          "meaning": "a raised area of ground, especially along a river or ditch",
+          "example": "They stood on the river bank to watch the boats pass by.",
+          "translation": "bờ đất",
+          "count": 0
+      },
+      {
+          "word": "henge",
+          "meaning": "a prehistoric earthwork typically consisting of a circle of stones or posts",
+          "example": "Stonehenge is the most famous henge in Britain.",
+          "translation": "di tích vòng tròn cổ",
+          "count": 0
+      },
+      {
+          "word": "pits",
+          "meaning": "holes dug in the ground, often for storage or construction",
+          "example": "Archaeologists discovered storage pits under the ancient site.",
+          "translation": "hố đất",
+          "count": 0
+      },
+      {
+          "word": "scholars",
+          "meaning": "experts who study a particular subject deeply",
+          "example": "Many scholars have tried to interpret the function of Stonehenge.",
+          "translation": "học giả",
+          "count": 0
+      },
+      {
+          "word": "antiquarian",
+          "meaning": "a person who studies or collects ancient artifacts or antiques",
+          "example": "The antiquarian recorded detailed drawings of the site in his journal.",
+          "translation": "nhà nghiên cứu cổ vật",
+          "count": 0
+      },
+      {
+          "word": "indigenous",
+          "meaning": "native to a particular place or region",
+          "example": "These plants are indigenous to Southeast Asia.",
+          "translation": "bản địa",
+          "count": 0
+      },
+      {
+          "word": "astrological",
+          "meaning": "related to the belief in the influence of stars and planets on human affairs",
+          "example": "He studied the astrological alignment of the monument's stones.",
+          "translation": "thuộc chiêm tinh",
+          "count": 0
+      },
+      {
+          "word": "curative",
+          "meaning": "having healing or medicinal properties",
+          "example": "They believed the spring water had curative effects.",
+          "translation": "có tác dụng chữa bệnh",
+          "count": 0
+      },
+      {
+      "word": "New Stone Age",
+      "meaning": "a time marked by early farming, animal domestication, and polished stone tools",
+      "example": "During the New Stone Age, people began to grow crops and settle in villages.",
+      "translation": "Thời kỳ đồ đá mới",
+      "count": 0
+    },
+    {
+      "word": "Iron Age",
+      "meaning": "a historical era known for the use of iron for making tools and weapons",
+      "example": "Many ancient civilizations expanded during the Iron Age due to better tools.",
+      "translation": "Thời kỳ đồ sắt",
+      "count": 0
+    },
+    {
+      "word": "hypothesis",
+      "meaning": "a proposed idea to explain something, based on limited data",
+      "example": "One hypothesis suggests that the stones were transported by water.",
+      "translation": "giả thuyết",
+      "count": 0
+    },
+    {
+      "word": "consensus",
+      "meaning": "a shared agreement among a group of people",
+      "example": "There is a consensus that Stonehenge was used for ceremonial purposes.",
+      "translation": "sự đồng thuận",
+      "count": 0
+    },
+    {
+      "word": "megalithic",
+      "meaning": "relating to large stones used in ancient constructions",
+      "example": "The megalithic design of Stonehenge is still admired today.",
+      "translation": "liên quan đến đá lớn",
+      "count": 0
+    },
+    {
+      "word": "archaeologist",
+      "meaning": "a researcher who studies history through physical remains",
+      "example": "The archaeologist uncovered burial tools near the monument.",
+      "translation": "nhà khảo cổ học",
+      "count": 0
+    },
+    {
+      "word": "radiocarbon dating",
+      "meaning": "a scientific method to estimate the age of ancient organic material",
+      "example": "Radiocarbon dating revealed the stones are over 4,000 years old.",
+      "translation": "phương pháp định tuổi bằng carbon",
+      "count": 0
+    },
+    {
+      "word": "sceptical",
+      "meaning": "having doubts or questioning something",
+      "example": "Many remain sceptical about the new excavation findings.",
+      "translation": "hoài nghi",
+      "count": 0
+    },
+    {
+      "word": "artifacts",
+      "meaning": "historical objects created by humans",
+      "example": "Artifacts found at the site included tools and pottery shards.",
+      "translation": "hiện vật",
+      "count": 0
+    },
+    {
+      "word": "communal",
+      "meaning": "shared by a group or community",
+      "example": "The villagers worked together in a communal effort to build the site.",
+      "translation": "chung, cộng đồng",
+      "count": 0
+    },
+    {
+      "word": "descended",
+      "meaning": "originating from a particular ancestor",
+      "example": "The tribe is believed to have descended from early Neolithic settlers.",
+      "translation": "xuất thân từ",
+      "count": 0
+    },
+    {
+      "word": "dense cloud cover",
+      "meaning": "a thick blanket of clouds blocking visibility",
+      "example": "Dense cloud cover often limits sky visibility in this region.",
+      "translation": "mây dày đặc",
+      "count": 0
+    },
+    {
+      "word": "astronomical",
+      "meaning": "related to stars, planets, or space science",
+      "example": "Astronomical studies suggest the stones align with solstices.",
+      "translation": "thuộc thiên văn học",
+      "count": 0
+    },
+    {
+      "word": "monoliths",
+      "meaning": "very large single stone structures",
+      "example": "The builders transported massive monoliths across great distances.",
+      "translation": "khối đá đơn lớn",
+      "count": 0
+    },
+    {
+      "word": "ritual",
+      "meaning": "a series of formal actions performed for religious or cultural reasons",
+      "example": "They likely gathered there for seasonal rituals.",
+      "translation": "nghi lễ",
+      "count": 0
+    },
+    {
+      "word": "enigmatic",
+      "meaning": "hard to understand or explain; mysterious",
+      "example": "The purpose of the site remains enigmatic to this day.",
+      "translation": "bí ẩn",
+      "count": 0
+    },
+    {
+      "word": "celestial bodies",
+      "meaning": "natural objects like stars and planets visible in the sky",
+      "example": "The monument may have been aligned with celestial bodies.",
+      "translation": "thiên thể",
+      "count": 0
+    },
+    {
+      "word": "astronomical alignments",
+      "meaning": "positions of stars or planets matching specific locations on Earth",
+      "example": "Some stones correspond to key astronomical alignments.",
+      "translation": "sự sắp xếp thiên văn",
+      "count": 0
+    },
+    {
+      "word": "megalithic culture",
+      "meaning": "an ancient civilization known for using massive stones in construction",
+      "example": "The region once flourished under a megalithic culture.",
+      "translation": "văn hóa đá lớn",
+      "count": 0
+    },
+    {
+      "word": "astronomical observatory",
+      "meaning": "a place for studying stars and other space objects",
+      "example": "Researchers suggest the site may have served as an astronomical observatory.",
+      "translation": "đài thiên văn",
+      "count": 0
+    },
+    {
+      "word": "cultural significance",
+      "meaning": "the importance of something in a culture",
+      "example": "Stonehenge holds deep cultural significance in British heritage.",
+      "translation": "ý nghĩa văn hóa",
+      "count": 0
+    },
+    {
+      "word": "paradigm",
+      "meaning": "a standard example or model of something",
+      "example": "The discovery introduced a new paradigm in scientific thought.",
+      "translation": "mô hình, khuôn mẫu",
+      "count": 0
+    },
+    {
+      "word": "ubiquitous",
+      "meaning": "existing or being everywhere at once",
+      "example": "Smart devices have become ubiquitous in modern life.",
+      "translation": "phổ biến, có mặt khắp nơi",
+      "count": 0
+    },
+    {
+      "word": "dichotomy",
+      "meaning": "a contrast or division between two things",
+      "example": "There is a clear dichotomy between ancient beliefs and science.",
+      "translation": "sự phân đôi, đối lập",
+      "count": 0
+    },
+    {
+      "word": "conundrum",
+      "meaning": "a difficult or puzzling question or situation",
+      "example": "The origin of the stones remains a conundrum.",
+      "translation": "vấn đề nan giải",
+      "count": 0
+    },
+    {
+      "word": "cognitive dissonance",
+      "meaning": "a psychological conflict resulting from holding contradictory thoughts or beliefs at the same time",
+      "example": "She felt cognitive dissonance after spending money on something she believed was wasteful.",
+      "translation": "mâu thuẫn nhận thức",
+      "count": 0
+    },
+    {
+      "word": "conjectural (adjective)",
+      "meaning": "based on guesswork rather than solid proof; speculative",
+      "example": "Most explanations about the monument’s origin are purely conjectural.",
+      "translation": "dự đoán, không chắc chắn",
+      "count": 0
+    },
+    {
+      "word": "Brand awareness (noun)",
+      "meaning": "the level at which consumers recognize or recall a brand",
+      "example": "Social media marketing can rapidly boost brand awareness among young audiences.",
+      "translation": "nhận diện thương hiệu",
+      "count": 0
+    },
+    {
+      "word": "Manipulate (verb)",
+      "meaning": "to influence someone’s behavior secretly or unfairly",
+      "example": "The advertisement was designed to manipulate viewers into buying the product without realizing it.",
+      "translation": "thao túng",
+      "count": 0
+    },
+    {
+      "word": "Target audience (noun)",
+      "meaning": "the specific group a product or message is intended for",
+      "example": "Teenagers were identified as the target audience for the new fashion line.",
+      "translation": "đối tượng mục tiêu",
+      "count": 0
+    },
+    {
+      "word": "A call to action (noun)",
+      "meaning": "a prompt in marketing encouraging people to take a specific step",
+      "example": "Adding a strong call to action like 'Buy now' helps increase sales conversions.",
+      "translation": "lời kêu gọi hành động",
+      "count": 0
+    },
+    {
+      "word": "Commercial break (noun)",
+      "meaning": "a short interruption in a broadcast to air advertisements",
+      "example": "She used the commercial break to grab a drink from the kitchen.",
+      "translation": "quảng cáo giữa chương trình",
+      "count": 0
+    },
+    {
+      "word": "Word of mouth (noun)",
+      "meaning": "informal promotion by people talking about products with others",
+      "example": "The restaurant became popular thanks to positive word of mouth.",
+      "translation": "truyền miệng",
+      "count": 0
+    },
+    {
+      "word": "Product placement (noun)",
+      "meaning": "showing products in entertainment content to advertise them subtly",
+      "example": "The car featured prominently in the movie through strategic product placement.",
+      "translation": "quảng cáo chèn sản phẩm",
+      "count": 0
+    },
+    {
+      "word": "Jingle (noun)",
+      "meaning": "a catchy tune used in an advertisement to make it memorable",
+      "example": "That fast-food chain’s jingle is stuck in my head all day.",
+      "translation": "giai điệu quảng cáo",
+      "count": 0
+    },
+    {
+      "word": "Slogan (noun)",
+      "meaning": "a short, memorable phrase used in advertising to convey a brand message",
+      "example": "Nike’s slogan ‘Just Do It’ has become iconic worldwide.",
+      "translation": "khẩu hiệu",
+      "count": 0
+    },
+    {
+      "word": "(Celebrity) endorsement (noun)",
+      "meaning": "a famous person publicly supporting a product to boost sales",
+      "example": "The perfume sales increased after a celebrity endorsement by a pop star.",
+      "translation": "sự chứng thực từ người nổi tiếng",
+      "count": 0
+    },
+    {
+      "word": "Carnivore (noun)",
+      "meaning": "an animal whose primary diet consists of meat",
+      "example": "Lions are classic examples of carnivores that dominate their habitats.",
+      "translation": "động vật ăn thịt",
+      "count": 0
+    },
+    {
+      "word": "Herbivore (noun)",
+      "meaning": "an animal that only eats plants",
+      "example": "Giraffes, as herbivores, feed mostly on leaves and fruits.",
+      "translation": "động vật ăn cỏ",
+      "count": 0
+    },
+    {
+      "word": "Domesticated (adjective)",
+      "meaning": "tamed or trained to live with humans and serve specific purposes",
+      "example": "Domesticated cats rely on humans for food and shelter.",
+      "translation": "đã thuần hóa",
+      "count": 0
+    },
+    {
+      "word": "Poach (verb)",
+      "meaning": "to illegally hunt or capture animals",
+      "example": "Efforts to stop elephant poaching are increasing in Africa.",
+      "translation": "săn trộm",
+      "count": 0
+    },
+    {
+      "word": "Territory (noun)",
+      "meaning": "an area that an animal claims and defends as its own",
+      "example": "Wolves mark their territory with scent to warn other packs.",
+      "translation": "lãnh thổ",
+      "count": 0
+    },
+    {
+      "word": "Reproduce (verb)",
+      "meaning": "to produce offspring or new generations",
+      "example": "Frogs can reproduce quickly in wet environments.",
+      "translation": "sinh sản",
+      "count": 0
+    },
+    {
+      "word": "Apex Predator (noun)",
+      "meaning": "a top-level predator with no natural enemies",
+      "example": "Polar bears are apex predators in Arctic ecosystems.",
+      "translation": "động vật săn mồi đầu chuỗi",
+      "count": 0
+    },
+    {
+      "word": "Migrate (verb)",
+      "meaning": "to move from one region to another at certain times of the year",
+      "example": "Geese migrate south to avoid harsh winter conditions.",
+      "translation": "di cư",
+      "count": 0
+    },
+    {
+      "word": "Endangered (adjective)",
+      "meaning": "at risk of disappearing completely from the wild",
+      "example": "The panda is considered an endangered species needing protection.",
+      "translation": "bị đe dọa tuyệt chủng",
+      "count": 0
+    },
+    {
+      "word": "Aggressive (adjective)",
+      "meaning": "likely to attack or confront; hostile in behavior",
+      "example": "Some animals become aggressive if they feel threatened.",
+      "translation": "hung dữ",
+      "count": 0
+    },
+    {
+      "word": "Architect (noun)",
+      "meaning": "a professional who designs buildings or structures",
+      "example": "The architect created blueprints for a modern museum.",
+      "translation": "kiến trúc sư",
+      "count": 0
+    },
+    {
+      "word": "Controversial (adjective)",
+      "meaning": "causing strong disagreement or public debate",
+      "example": "The new skyscraper sparked controversial opinions among citizens.",
+      "translation": "gây tranh cãi",
+      "count": 0
+    },
+    {
+      "word": "Eyesore (noun)",
+      "meaning": "something very unpleasant to look at",
+      "example": "The abandoned factory became a city eyesore.",
+      "translation": "cảnh chướng mắt",
+      "count": 0
+    },
+    {
+      "word": "Demolish (verb)",
+      "meaning": "To completely tear down or destroy a structure, often to make way for something new.",
+      "example": "The old theater was demolished to build a modern shopping complex.",
+      "translation": "Phá hủy",
+      "count": 0
+    },
+    {
+      "word": "Planning Permission (noun)",
+      "meaning": "Official approval from authorities to build or modify a structure at a specific site.",
+      "example": "They had to wait six months to get planning permission for the new office building.",
+      "translation": "Giấy phép xây dựng",
+      "count": 0
+    },
+    {
+      "word": "Gothic (adjective)",
+      "meaning": "Describing an architectural style known for its pointed arches and detailed ornamentation, prominent in medieval Europe.",
+      "example": "The Gothic cathedral towered above the city with its intricate stone carvings.",
+      "translation": "Kiến trúc Gothic",
+      "count": 0
+    },
+    {
+      "word": "Modernist (adjective)",
+      "meaning": "Relating to a style of architecture using clean lines and geometric shapes, often minimal in design.",
+      "example": "The modernist museum features bold shapes and a sleek glass exterior.",
+      "translation": "Hiện đại (trong kiến trúc)",
+      "count": 0
+    },
+    {
+      "word": "Sticks out like a sore thumb (idiom, verb)",
+      "meaning": "To be noticeably different or mismatched with the surroundings, often unpleasantly.",
+      "example": "That neon sign sticks out like a sore thumb on a historic street.",
+      "translation": "Lạc lõng, không phù hợp",
+      "count": 0
+    },
+    {
+      "word": "Futuristic (noun)",
+      "meaning": "Involving designs or ideas that seem advanced or ahead of the present time.",
+      "example": "The futuristic building features vertical gardens and solar panel walls.",
+      "translation": "Tương lai (kiến trúc)",
+      "count": 0
+    },
+    {
+      "word": "Iconic (adjective)",
+      "meaning": "Widely recognized and symbolically significant, often admired across cultures.",
+      "example": "The Eiffel Tower is an iconic symbol of Paris.",
+      "translation": "Mang tính biểu tượng",
+      "count": 0
+    },
+    {
+      "word": "Abstract (adjective)",
+      "meaning": "Art that represents ideas or feelings through shapes and colors rather than realistic forms.",
+      "example": "She enjoys creating abstract paintings using only circles and lines.",
+      "translation": "Trừu tượng",
+      "count": 0
+    },
+    {
+      "word": "(A) Watercolour (adjective/noun)",
+      "meaning": "A type of painting using pigments mixed with water, producing soft and translucent effects.",
+      "example": "He painted a peaceful countryside scene in soft watercolours.",
+      "translation": "Màu nước / tranh màu nước",
+      "count": 0
+    },
+    {
+      "word": "Sculpture (noun)",
+      "meaning": "A three-dimensional piece of art made by shaping materials like stone, wood, or metal.",
+      "example": "The bronze sculpture in the park draws attention from every visitor.",
+      "translation": "Tượng điêu khắc",
+      "count": 0
+    },
+    {
+      "word": "A still life (noun)",
+      "meaning": "A painting or artwork showing inanimate objects, like flowers or bowls of fruit.",
+      "example": "She spent hours painting a still life of wine bottles and fruit.",
+      "translation": "Tĩnh vật",
+      "count": 0
+    },
+    {
+      "word": "Masterpiece (noun)",
+      "meaning": "An exceptional or highly praised work of art, often seen as the creator’s best.",
+      "example": "Many consider The Starry Night to be Van Gogh's masterpiece.",
+      "translation": "Kiệt tác",
+      "count": 0
+    },
+    {
+      "word": "To depict (verb)",
+      "meaning": "To represent something in a visual or artistic form.",
+      "example": "The mural depicts the struggles of everyday life in the city.",
+      "translation": "Miêu tả, khắc họa",
+      "count": 0
+    },
+    {
+      "word": "Impenetrable (adjective)",
+      "meaning": "Extremely difficult to understand or interpret.",
+      "example": "His explanation of the art was so impenetrable that no one followed.",
+      "translation": "Khó hiểu",
+      "count": 0
+    },
+    {
+      "word": "Interpretation (noun)",
+      "meaning": "The way someone understands or explains the meaning of something.",
+      "example": "Everyone had a different interpretation of the painting’s message.",
+      "translation": "Sự diễn giải",
+      "count": 0
+    },
+    {
+      "word": "Motor skills (noun)",
+      "meaning": "The ability to make precise movements with the hands and fingers.",
+      "example": "Clay sculpting helps children develop fine motor skills.",
+      "translation": "Kỹ năng vận động",
+      "count": 0
+    },
+    {
+      "word": "Innovative (adjective)",
+      "meaning": "Describes someone or something that introduces new ideas or methods.",
+      "example": "Her innovative designs won first place in the architecture contest.",
+      "translation": "Sáng tạo, đổi mới",
+      "count": 0
+    },
+    {
+      "word": "The center of attention (noun)",
+      "meaning": "A person or thing that everyone is watching or focusing on.",
+      "example": "The birthday girl was the center of attention all evening.",
+      "translation": "Tâm điểm chú ý",
+      "count": 0
+    },
+    {
+      "word": "To turn + age (verb)",
+      "meaning": "To reach a particular age in years.",
+      "example": "He just turned 30 and had a big celebration.",
+      "translation": "Tròn (bao nhiêu tuổi)",
+      "count": 0
+    },
+    {
+      "word": "The birthday boy/girl (noun)",
+      "meaning": "The person whose birthday is being celebrated.",
+      "example": "Everyone sang to the birthday girl before she blew out the candles.",
+      "translation": "Nhân vật chính trong tiệc sinh nhật",
+      "count": 0
+    },
+    {
+      "word": "Low-key (adjective)",
+      "meaning": "Quiet, modest, or restrained in style or celebration.",
+      "example": "They chose a low-key dinner instead of a big party.",
+      "translation": "Đơn giản, kín đáo",
+      "count": 0
+    },
+    {
+      "word": "To wrap (verb)",
+      "meaning": "To cover something in paper, especially as a gift.",
+      "example": "She carefully wrapped the book in red foil paper.",
+      "translation": "Gói quà",
+      "count": 0
+    },
+    {
+      "word": "A surprise party (noun)",
+      "meaning": "A party that is planned secretly for someone who doesn't know it will happen.",
+      "example": "They threw him a surprise party for his 21st birthday.",
+      "translation": "Tiệc bất ngờ",
+      "count": 0
+    },
+    {
+      "word": "Get-together (noun)",
+      "meaning": "An informal meeting or small gathering of friends or family.",
+      "example": "We had a weekend get-together with old classmates.",
+      "translation": "Buổi tụ họp",
+      "count": 0
+    },
+    {
+      "word": "Decorate (verb)",
+      "meaning": "To make something more attractive by adding items or colors.",
+      "example": "They decorated the house with balloons for the party.",
+      "translation": "Trang trí",
+      "count": 0
+    },
+    {
       "word": "Make a birthday wish ",
       "meaning": "A tradition where the birthday boy/girl makes a secret wish in their head before blowing out the candles on the birthday cake.",
       "example": "I remember that my parents could always guess what I had made my birthday wish about. I don’t know how they always knew!",
