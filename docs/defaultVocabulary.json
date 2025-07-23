@@ -4580,7 +4580,7 @@
       "translation": "đột phá",
       "count": 0
     },
- {
+    { 
       "word": "To steal the show",
       "meaning": "To unexpectedly become the center of attention due to excellence or charm.",
       "example": "The little girl portraying the daughter truly stole the show with her captivating performance.",
@@ -7026,181 +7026,181 @@
       "translation": "rối ren, hỗn loạn",
       "count": 0
     },
-	{
-	  "word": "shoddy (adj) /ˈʃɒdi/",
-	  "meaning": "poorly made or done with low standards",
-	  "example": "Some parts of the road were repaired with shoddy workmanship.",
-	  "translation": "chất lượng kém",
-	  "count": 0
-	},
-	{
-	  "word": "sound (adj) /saʊnd/",
-	  "meaning": "based on solid reasoning or effective methods",
-	  "example": "Before starting, you need a sound grasp of teaching basics.",
-	  "translation": "hợp lý, đúng đắn",
-	  "count": 0
-	},
-	{
-	  "word": "sound (adj) /saʊnd/",
-	  "meaning": "strong, secure, or in good condition",
-	  "example": "Use foil to keep the bread sound and fresh.",
-	  "translation": "toàn diện, vững chắc",
-	  "count": 0
-	},
-	{
-	  "word": "stale (adj) /steɪl/",
-	  "meaning": "no longer fresh or good to eat",
-	  "example": "Throw away that bread—it's gone stale.",
-	  "translation": "ôi, thiu",
-	  "count": 0
-	},
-	{
-	  "word": "streamline (v) /ˈstriːmlaɪn/",
-	  "meaning": "to simplify and make more efficient",
-	  "example": "The company plans to streamline its operations.",
-	  "translation": "tinh gọn",
-	  "count": 0
-	},
-	{
-	  "word": "strengthen (v) /ˈstreŋθn/",
-	  "meaning": "to make something more secure or effective",
-	  "example": "The bridge strengthens the link between the two cities.",
-	  "translation": "gia cố, củng cố",
-	  "count": 0
-	},
-	{
-	  "word": "surpass (v) /səˈpɑːs/",
-	  "meaning": "to exceed expectations or standards",
-	  "example": "Winning the championship surpassed what we had hoped.",
-	  "translation": "vượt qua",
-	  "count": 0
-	},
-	{
-	  "word": "ultimate (adj) /ˈʌltɪmət/",
-	  "meaning": "occurring at the final stage or outcome",
-	  "example": "The event influenced the ultimate verdict.",
-	  "translation": "cuối cùng",
-	  "count": 0
-	},
-	{
-	  "word": "ultimate (adj) /ˈʌltɪmət/",
-	  "meaning": "the best or most extreme possible",
-	  "example": "This competition is the ultimate challenge.",
-	  "translation": "tối thượng, tốt nhất",
-	  "count": 0
-	},
-	{
-	  "word": "worsen (v) /ˈwɜːsn/",
-	  "meaning": "to become or make something more severe",
-	  "example": "The bad weather continued to worsen.",
-	  "translation": "làm trầm trọng hơn",
-	  "count": 0
-	},
-	{
-	  "word": "wreck (n) /rek/",
-	  "meaning": "something that is badly destroyed or damaged",
-	  "example": "The vehicle was a complete wreck after the crash.",
-	  "translation": "đống đổ nát",
-	  "count": 0
-	},
-	{
-	  "word": "wreck (v) /rek/",
-	  "meaning": "to cause great damage or ruin",
-	  "example": "The explosion wrecked several nearby houses.",
-	  "translation": "phá hủy",
-	  "count": 0
-	},
-	{
-	  "word": "abstract (adj) /ˈæbstrækt/",
-	  "meaning": "relating to ideas rather than realistic images",
-	  "example": "I’m not fond of abstract art pieces.",
-	  "translation": "trừu tượng",
-	  "count": 0
-	},
-	{
-	  "word": "abstract (n) /ˈæbstrækt/",
-	  "meaning": "a work of art representing ideas, not objects",
-	  "example": "An abstract doesn't need to be understood literally.",
-	  "translation": "tác phẩm trừu tượng",
-	  "count": 0
-	},
-	{
-	  "word": "auction (n) /ˈɔːkʃn/",
-	  "meaning": "a public sale where the highest bidder wins",
-	  "example": "They purchased the antique chair at auction.",
-	  "translation": "buổi đấu giá",
-	  "count": 0
-	},
-	{
-	  "word": "audition (n) /ɔːˈdɪʃn/",
-	  "meaning": "a short performance to test talent",
-	  "example": "She has an audition for the lead role tomorrow.",
-	  "translation": "buổi thử vai",
-	  "count": 0
-	},
-	{
-	  "word": "bestseller (n) /ˌbestˈselə/",
-	  "meaning": "a book or product that sells in large numbers",
-	  "example": "His debut novel became an instant bestseller.",
-	  "translation": "sách bán chạy",
-	  "count": 0
-	},
-	{
-	  "word": "collector’s item (n phr) /kəˈlektəz ˈaɪtəm/",
-	  "meaning": "a rare object highly valued by collectors",
-	  "example": "This limited-edition coin is a collector’s item.",
-	  "translation": "đồ hiếm",
-	  "count": 0
-	},
-	{
-	  "word": "curator (n) /kjʊˈreɪtə/",
-	  "meaning": "someone responsible for a museum or exhibition",
-	  "example": "Ask the curator if you have any questions about the painting.",
-	  "translation": "bảo tàng viên",
-	  "count": 0
-	},
-	{
-	  "word": "fine art (n phr) /ˌfaɪn ˈɑːt/",
-	  "meaning": "creative visual art like painting or sculpture",
-	  "example": "He’s considering studying fine art at college.",
-	  "translation": "mỹ thuật",
-	  "count": 0
-	},
-	{
-	  "word": "diagnosis (n)",
-	  "meaning": "the identification of a disease based on symptoms",
-	  "example": "Doctors confirmed the diagnosis of appendicitis through lab tests.",
-	  "translation": "chẩn đoán",
-	  "count": 0
-	},
-	{
-	  "word": "inoculate (v)",
-	  "meaning": "to protect from disease via vaccination",
-	  "example": "Children should be inoculated before flu season begins.",
-	  "translation": "tiêm phòng",
-	  "count": 0
-	},
-	{
-	  "word": "irritation (n)",
-	  "meaning": "discomfort or inflammation in a body part",
-	  "example": "His eyes showed signs of irritation after swimming.",
-	  "translation": "kích ứng",
-	  "count": 0
-	},
-	{
-	  "word": "numb (adj)",
-	  "meaning": "unable to feel due to cold or shock",
-	  "example": "His hands went numb in the freezing air.",
-	  "translation": "tê liệt",
-	  "count": 0
-	},
-	{
-	  "word": "numb (v)",
-	  "meaning": "to cause someone to feel no emotion or sensation",
-	  "example": "The trauma numbed him emotionally.",
-	  "translation": "làm tê liệt",
-	  "count": 0
-	},
+    {
+      "word": "shoddy (adj) /ˈʃɒdi/",
+      "meaning": "poorly made or done with low standards",
+      "example": "Some parts of the road were repaired with shoddy workmanship.",
+      "translation": "chất lượng kém",
+      "count": 0
+    },
+    {
+      "word": "sound (adj) /saʊnd/",
+      "meaning": "based on solid reasoning or effective methods",
+      "example": "Before starting, you need a sound grasp of teaching basics.",
+      "translation": "hợp lý, đúng đắn",
+      "count": 0
+    },
+    {
+      "word": "sound (adj) /saʊnd/",
+      "meaning": "strong, secure, or in good condition",
+      "example": "Use foil to keep the bread sound and fresh.",
+      "translation": "toàn diện, vững chắc",
+      "count": 0
+    },
+    {
+      "word": "stale (adj) /steɪl/",
+      "meaning": "no longer fresh or good to eat",
+      "example": "Throw away that bread—it's gone stale.",
+      "translation": "ôi, thiu",
+      "count": 0
+    },
+    {
+      "word": "streamline (v) /ˈstriːmlaɪn/",
+      "meaning": "to simplify and make more efficient",
+      "example": "The company plans to streamline its operations.",
+      "translation": "tinh gọn",
+      "count": 0
+    },
+    {
+      "word": "strengthen (v) /ˈstreŋθn/",
+      "meaning": "to make something more secure or effective",
+      "example": "The bridge strengthens the link between the two cities.",
+      "translation": "gia cố, củng cố",
+      "count": 0
+    },
+    {
+      "word": "surpass (v) /səˈpɑːs/",
+      "meaning": "to exceed expectations or standards",
+      "example": "Winning the championship surpassed what we had hoped.",
+      "translation": "vượt qua",
+      "count": 0
+    },
+    {
+      "word": "ultimate (adj) /ˈʌltɪmət/",
+      "meaning": "occurring at the final stage or outcome",
+      "example": "The event influenced the ultimate verdict.",
+      "translation": "cuối cùng",
+      "count": 0
+    },
+    {
+      "word": "ultimate (adj) /ˈʌltɪmət/",
+      "meaning": "the best or most extreme possible",
+      "example": "This competition is the ultimate challenge.",
+      "translation": "tối thượng, tốt nhất",
+      "count": 0
+    },
+    {
+      "word": "worsen (v) /ˈwɜːsn/",
+      "meaning": "to become or make something more severe",
+      "example": "The bad weather continued to worsen.",
+      "translation": "làm trầm trọng hơn",
+      "count": 0
+    },
+    {
+      "word": "wreck (n) /rek/",
+      "meaning": "something that is badly destroyed or damaged",
+      "example": "The vehicle was a complete wreck after the crash.",
+      "translation": "đống đổ nát",
+      "count": 0
+    },
+    {
+      "word": "wreck (v) /rek/",
+      "meaning": "to cause great damage or ruin",
+      "example": "The explosion wrecked several nearby houses.",
+      "translation": "phá hủy",
+      "count": 0
+    },
+    {
+      "word": "abstract (adj) /ˈæbstrækt/",
+      "meaning": "relating to ideas rather than realistic images",
+      "example": "I’m not fond of abstract art pieces.",
+      "translation": "trừu tượng",
+      "count": 0
+    },
+    {
+      "word": "abstract (n) /ˈæbstrækt/",
+      "meaning": "a work of art representing ideas, not objects",
+      "example": "An abstract doesn't need to be understood literally.",
+      "translation": "tác phẩm trừu tượng",
+      "count": 0
+    },
+    {
+      "word": "auction (n) /ˈɔːkʃn/",
+      "meaning": "a public sale where the highest bidder wins",
+      "example": "They purchased the antique chair at auction.",
+      "translation": "buổi đấu giá",
+      "count": 0
+    },
+    {
+      "word": "audition (n) /ɔːˈdɪʃn/",
+      "meaning": "a short performance to test talent",
+      "example": "She has an audition for the lead role tomorrow.",
+      "translation": "buổi thử vai",
+      "count": 0
+    },
+    {
+      "word": "bestseller (n) /ˌbestˈselə/",
+      "meaning": "a book or product that sells in large numbers",
+      "example": "His debut novel became an instant bestseller.",
+      "translation": "sách bán chạy",
+      "count": 0
+    },
+    {
+      "word": "collector’s item (n phr) /kəˈlektəz ˈaɪtəm/",
+      "meaning": "a rare object highly valued by collectors",
+      "example": "This limited-edition coin is a collector’s item.",
+      "translation": "đồ hiếm",
+      "count": 0
+    },
+    {
+      "word": "curator (n) /kjʊˈreɪtə/",
+      "meaning": "someone responsible for a museum or exhibition",
+      "example": "Ask the curator if you have any questions about the painting.",
+      "translation": "bảo tàng viên",
+      "count": 0
+    },
+    {
+      "word": "fine art (n phr) /ˌfaɪn ˈɑːt/",
+      "meaning": "creative visual art like painting or sculpture",
+      "example": "He’s considering studying fine art at college.",
+      "translation": "mỹ thuật",
+      "count": 0
+    },
+    {
+      "word": "diagnosis (n)",
+      "meaning": "the identification of a disease based on symptoms",
+      "example": "Doctors confirmed the diagnosis of appendicitis through lab tests.",
+      "translation": "chẩn đoán",
+      "count": 0
+    },
+    {
+      "word": "inoculate (v)",
+      "meaning": "to protect from disease via vaccination",
+      "example": "Children should be inoculated before flu season begins.",
+      "translation": "tiêm phòng",
+      "count": 0
+    },
+    {
+      "word": "irritation (n)",
+      "meaning": "discomfort or inflammation in a body part",
+      "example": "His eyes showed signs of irritation after swimming.",
+      "translation": "kích ứng",
+      "count": 0
+    },
+    {
+      "word": "numb (adj)",
+      "meaning": "unable to feel due to cold or shock",
+      "example": "His hands went numb in the freezing air.",
+      "translation": "tê liệt",
+      "count": 0
+    },
+    {
+      "word": "numb (v)",
+      "meaning": "to cause someone to feel no emotion or sensation",
+      "example": "The trauma numbed him emotionally.",
+      "translation": "làm tê liệt",
+      "count": 0
+    },
     {
       "word": "nursing home (n phr)",
       "meaning": "a place where elderly or sick people receive long-term care",
