@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
 import AddWordModal from './AddWordModal';
@@ -52,6 +52,18 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleOpenEditWordModal,
   playCurrentWord
 }) => {
+  const editingWordData = useMemo(
+    () => (
+      isEditMode && wordToEdit
+        ? {
+            ...wordToEdit,
+            translation: wordToEdit.translation || '',
+            category: wordToEdit.category || currentCategory
+          }
+        : undefined
+    ),
+    [isEditMode, wordToEdit, currentCategory]
+  );
   return (
     <>
       {/* Main vocabulary display */}
@@ -99,13 +111,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onClose={handleCloseModal}
         onSave={handleSaveWord}
         editMode={isEditMode}
-        wordToEdit={isEditMode && wordToEdit ? {
-          word: wordToEdit.word,
-          meaning: wordToEdit.meaning,
-          example: wordToEdit.example,
-          translation: wordToEdit.translation || '',
-          category: wordToEdit.category || currentCategory
-        } : undefined}
+        wordToEdit={editingWordData}
       />
     </>
   );
