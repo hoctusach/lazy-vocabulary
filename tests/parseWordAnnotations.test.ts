@@ -13,4 +13,10 @@ describe('parseWordAnnotations', () => {
     expect(main).toBe('add up');
     expect(annotations).toEqual(['(/æd ʌp tə/)']);
   });
+
+  it('handles multiple annotations', () => {
+    const { main, annotations } = parseWordAnnotations('word (noun) /wɜːd/');
+    expect(main).toBe('word');
+    expect(annotations).toEqual(['(noun)', '/wɜːd/']);
+  });
 });

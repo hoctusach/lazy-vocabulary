@@ -4,6 +4,7 @@ import { VoiceSelection } from '../useVoiceSelection';
 import { findVoice } from './findVoice';
 import { sanitizeForDisplay } from '@/utils/security/contentSecurity';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
 
 // Function to create and configure a speech utterance
@@ -20,7 +21,8 @@ export const createUtterance = (
   
   try {
     // Sanitize input text for security
-    const sanitizedWord = sanitizeForDisplay(word.word || '');
+    const cleanedWord = parseWordAnnotations(word.word || '').main;
+    const sanitizedWord = sanitizeForDisplay(cleanedWord);
     const sanitizedMeaning = sanitizeForDisplay(word.meaning || '');
     const sanitizedExample = sanitizeForDisplay(word.example || '');
     
