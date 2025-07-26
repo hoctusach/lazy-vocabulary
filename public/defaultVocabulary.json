@@ -13881,904 +13881,1005 @@
     },
     {
       "word": "academic (n) /ˌækəˈdemɪk/",
-      "meaning": "someone who teaches or researches: nhà học thuật.",
-      "example": "She’s certainly bright, but she’s not very academic.",
+      "meaning": "A person involved in teaching or research in a scholarly field",
+      "example": "She's a respected academic in economics.",
+      "translation": "nhà học thuật",
       "count": 0
     },
     {
       "word": "conscientious (adj) /ˌkɒnʃiˈenʃəs/",
-      "meaning": "working hard and being careful: chu đáo.",
-      "example": "Simon is a very conscientious worker.",
+      "meaning": "Showing great care and attention to detail in one's work",
+      "example": "He’s always been a conscientious student.",
+      "translation": "chu đáo",
       "count": 0
     },
     {
       "word": "cram (v) /kræm/",
-      "meaning": "to study in a short time: nhồi nhét.",
-      "example": "So, I’m cramming at the moment.",
+      "meaning": "To study intensively over a short period of time",
+      "example": "She crammed all night before the test.",
+      "translation": "nhồi nhét",
       "count": 0
     },
     {
       "word": "curriculum (n) /kəˈrɪkjələm/",
-      "meaning": "the subjects that are taught: chương trình giảng dạy.",
-      "example": "Our mathematics curriculum is much broader now.",
+      "meaning": "The set of courses or subjects taught in a school",
+      "example": "The curriculum includes math, science, and literature.",
+      "translation": "chương trình giảng dạy",
       "count": 0
     },
     {
       "word": "distance learning (n ph) /ˈdɪstəns ˈlɜːnɪŋ/",
-      "meaning": "a system to study from home: học từ xa.",
-      "example": "Are you doing the course by distance learning?",
+      "meaning": "A method of studying remotely without being physically present in a classroom",
+      "example": "He enrolled in a university through distance learning.",
+      "translation": "học từ xa",
       "count": 0
     },
     {
       "word": "graduate (n) /ˈɡrædʒuət/",
-      "meaning": "someone who has a degree: người tốt nghiệp.",
-      "example": "There aren’t many careers for history graduates.",
+      "meaning": "A person who has completed a university degree",
+      "example": "He’s a law graduate from Harvard.",
+      "translation": "người tốt nghiệp",
       "count": 0
     },
     {
       "word": "graduate (v) /ˈɡrædʒueɪt/",
-      "meaning": "to complete your studies: tốt nghiệp.",
-      "example": "He graduated from Yale University in 1936.",
+      "meaning": "To successfully complete a degree or course",
+      "example": "She graduated with honors in 2020.",
+      "translation": "tốt nghiệp",
       "count": 0
     },
     {
       "word": "ignorant (adj) /ˈɪɡnərənt/",
-      "meaning": "not knowing something you should: thiếu hiểu biết.",
-      "example": "I was ignorant of the terms used in business.",
+      "meaning": "Lacking knowledge or awareness in general or in a specific subject",
+      "example": "He was ignorant of the local customs.",
+      "translation": "thiếu hiểu biết",
       "count": 0
     },
     {
       "word": "inattentive (adj) /ˌɪnəˈtentɪv/",
-      "meaning": "not paying attention: không chú ý.",
-      "example": "I hate speaking in front of an inattentive audience.",
+      "meaning": "Not paying enough attention",
+      "example": "Students became inattentive during the long lecture.",
+      "translation": "không chú ý",
       "count": 0
     },
     {
       "word": "intellectual (adj) /ˌɪntəˈlektʃuəl/",
-      "meaning": "relating to the ability to think intelligently: trí tuệ.",
-      "example": "Surely an intelligent person like you can deal with this?",
+      "meaning": "Involving serious thought or mental effort",
+      "example": "Chess is considered an intellectual game.",
+      "translation": "trí tuệ",
       "count": 0
     },
     {
       "word": "intellectual (n) /ˌɪntəˈlektʃuəl/",
-      "meaning": "well-educated and interested in art, literature, etc.: trí thức.",
-      "example": "Though not an intellectual, my mother was highly intelligent.",
+      "meaning": "A person interested in learning, art, or literature",
+      "example": "The cafe was popular with artists and intellectuals.",
+      "translation": "trí thức",
       "count": 0
     },
     {
       "word": "intelligent (adj) /ɪnˈtelɪdʒənt/",
-      "meaning": "good at thinking clearly and quickly: thông minh.",
-      "example": "Surely an intelligent person like you can deal with this?",
+      "meaning": "Having or showing high mental capacity",
+      "example": "She's very intelligent and picks up things quickly.",
+      "translation": "thông minh",
       "count": 0
     },
     {
       "word": "intensive (adj) /ɪnˈtensɪv/",
-      "meaning": "involving a lot of teaching: tập trung.",
-      "example": "It’s an intensive language course for beginners.",
+      "meaning": "Involving a lot of concentrated effort or activity",
+      "example": "He attended an intensive training program.",
+      "translation": "tập trung",
       "count": 0
     },
     {
       "word": "knowledgeable (adj) /ˈnɒlɪdʒəbl/",
-      "meaning": "knowing a lot about subjects: am hiểu.",
-      "example": "He’s extremely knowledgeable about business and finance.",
+      "meaning": "Having a lot of knowledge or understanding",
+      "example": "She’s very knowledgeable about classical music.",
+      "translation": "am hiểu",
       "count": 0
     },
     {
       "word": "lecture (n) /ˈlektʃər/",
-      "meaning": "a talk to a group of people: bài thuyết giảng.",
-      "example": "The course will be taught through a series of lectures.",
+      "meaning": "A formal talk given to students or an audience",
+      "example": "He gave a lecture on modern architecture.",
+      "translation": "bài thuyết giảng",
       "count": 0
     },
     {
       "word": "lecture (v) /ˈlektʃər/",
-      "meaning": "to give a talk: giảng bài.",
-      "example": "She lectures on Greek Literature at the Sorbonne.",
+      "meaning": "To give an educational talk to an audience",
+      "example": "She lectures in art history at the university.",
+      "translation": "giảng bài",
       "count": 0
     },
     {
       "word": "mock exam (n ph) /mɒk ɪɡˈzæm/",
-      "meaning": "an exam to practice: bài thi thử.",
-      "example": "We've got our mock GCSE exams next week.",
+      "meaning": "A practice test taken before the real one",
+      "example": "Mock exams help students prepare for finals.",
+      "translation": "bài thi thử",
       "count": 0
     },
     {
       "word": "plagiarise (v) /ˈpleɪdʒəraɪz/",
-      "meaning": "to take someone else's work: đạo văn.",
-      "example": "They accused her of plagiarising her speech.",
+      "meaning": "To copy another’s work without permission",
+      "example": "He was caught plagiarising a published article.",
+      "translation": "đạo văn",
       "count": 0
     },
     {
       "word": "manual (adj)",
-      "meaning": "operated by people rather than automatically or using computers: thủ công.",
-      "example": "The pilot switched to manual control as the plane approached the runway.",
+      "meaning": "Done by hand rather than automatically or digitally",
+      "example": "This machine still needs manual control.",
+      "translation": "thủ công",
       "count": 0
     },
     {
       "word": "manual (n)",
-      "meaning": "a book containing instructions for doing something, especially for operating a machine: sách hướng dẫn.",
-      "example": "See what it says about this problem in the manual.",
+      "meaning": "A book containing instructions or information",
+      "example": "Refer to the manual for setup guidelines.",
+      "translation": "sách hướng dẫn",
       "count": 0
     },
     {
       "word": "network (v)",
-      "meaning": "to connect computers together so that each computer can send and receive information to and from the other computers: kết nối.",
-      "example": "We set up a network in the office so that we can send files to each other more easily.",
+      "meaning": "To link computers for sharing information",
+      "example": "They networked all the office devices together.",
+      "translation": "kết nối",
       "count": 0
     },
     {
       "word": "network (n)",
-      "meaning": "a set of computers that are connected to each other so that each computer can send and receive information to and from the other computers: mạng lưới các máy tính được kết nối.",
-      "example": "There is a network of computers managing the data.",
+      "meaning": "A system of connected computers",
+      "example": "The company's internal network was down.",
+      "translation": "mạng lưới các máy tính được kết nối",
       "count": 0
     },
     {
       "word": "nuclear (adj)",
-      "meaning": "relating to energy produced by changing the structure of the central part of an atom: hạt nhân.",
-      "example": "Nuclear power is the only way we can meet our energy needs.",
+      "meaning": "Related to atomic energy or weapons",
+      "example": "Nuclear power is a major energy source.",
+      "translation": "hạt nhân",
       "count": 0
     },
     {
       "word": "offline (adj)",
-      "meaning": "working on a computer but not connected to the Internet: ngoại tuyến, không ở trên mạng.",
-      "example": "Download it now and read it when you are offline.",
+      "meaning": "Not connected to the Internet",
+      "example": "You can play the game offline too.",
+      "translation": "ngoại tuyến",
       "count": 0
     },
     {
       "word": "online (adj)",
-      "meaning": "connected to or available through a computer or the Internet: trực tuyến, ở trên mạng.",
-      "example": "I’ve started an online library of songs.",
+      "meaning": "Connected to or available on the Internet",
+      "example": "Online learning is now widely accessible.",
+      "translation": "trực tuyến",
       "count": 0
     },
     {
       "word": "primitive (adj)",
-      "meaning": "at a very simple stage of development, before modern technology: nguyên thủy.",
-      "example": "Da Vinci drew pictures of what might be seen as a primitive helicopter.",
+      "meaning": "At an early stage of development, lacking modern features or advancements",
+      "example": "Early humans used primitive tools made of stone.",
+      "translation": "nguyên thủy",
       "count": 0
     },
     {
       "word": "programmer (n)",
-      "meaning": "someone whose job is to create computer programs: lập trình viên.",
-      "example": "I’d like to be a programmer and work on computer games.",
+      "meaning": "A person who writes and maintains computer software",
+      "example": "He works as a programmer specializing in mobile apps.",
+      "translation": "lập trình viên",
       "count": 0
     },
     {
       "word": "resource (n)",
-      "meaning": "something you can use to help you to achieve something, especially in your work or study: tài nguyên.",
-      "example": "The main resource for my research was the library.",
+      "meaning": "Something used for support or help in achieving a goal",
+      "example": "Books and online databases are essential research resources.",
+      "translation": "tài nguyên",
       "count": 0
     },
     {
       "word": "technique (n)",
-      "meaning": "a method of doing something using a special skill that you have developed: kỹ thuật.",
-      "example": "She’s trying to develop a new technique to get the work done quicker.",
+      "meaning": "A particular way of doing something that involves skill",
+      "example": "She improved her painting technique through practice.",
+      "translation": "kỹ thuật",
       "count": 0
     },
     {
       "word": "upload (v)",
-      "meaning": "to send documents or programs from your computer to a larger system using the Internet: tải lên mạng.",
-      "example": "I’m just uploading something to my website.",
+      "meaning": "To send data from a local system to the internet or another system",
+      "example": "He uploaded the presentation to the shared drive.",
+      "translation": "tải lên mạng",
       "count": 0
     },
     {
       "word": "abrupt (adj)",
-      "meaning": "sudden and unexpected, often in an unpleasant way: đột ngột.",
-      "example": "Our friendship came to an abrupt end.",
+      "meaning": "Happening suddenly and unexpectedly",
+      "example": "His departure was so abrupt it surprised everyone.",
+      "translation": "đột ngột",
       "count": 0
     },
     {
       "word": "anachronism (n)",
-      "meaning": "something that is no longer suitable for or relevant to modern times: vật không đúng niên đại, việc lỗi thời.",
-      "example": "She regards the marriage ceremony as a quaint anachronism.",
+      "meaning": "Something outdated or belonging to a different time period",
+      "example": "Using floppy disks today feels like an anachronism.",
+      "translation": "vật không đúng niên đại, việc lỗi thời",
       "count": 0
     },
     {
       "word": "annual (adj)",
-      "meaning": "happening once a year: hàng năm, thường niên.",
-      "example": "We’re having our annual conference next month.",
+      "meaning": "Happening once every year",
+      "example": "They hold an annual company picnic each summer.",
+      "translation": "hàng năm, thường niên",
       "count": 0
     },
     {
       "word": "antique (adj)",
-      "meaning": "old and valuable: cổ xưa.",
-      "example": "We offer a wide range of antique furniture.",
+      "meaning": "Very old and often valuable",
+      "example": "She collects antique clocks from the 19th century.",
+      "translation": "cổ xưa",
       "count": 0
     },
     {
       "word": "antique (n)",
-      "meaning": "an old object such as a piece of furniture or jewellery that is valuable because it is rare, beautiful or well made: đồ cổ.",
-      "example": "She deals in antique furniture.",
+      "meaning": "A valuable old item, often collected or displayed",
+      "example": "The shop sells antiques and rare books.",
+      "translation": "đồ cổ",
       "count": 0
     },
     {
       "word": "century (n)",
-      "meaning": "a period of 100 years, usually counted from a year ending in 00, for example, the 20th century is the period from 1900 to 1999: thế kỷ.",
-      "example": "Morocco rose to prominence during the 12th century.",
+      "meaning": "A period of one hundred years",
+      "example": "The 21st century began in the year 2000.",
+      "translation": "thế kỷ",
       "count": 0
     },
     {
       "word": "chronological (adj)",
-      "meaning": "arranged or described in the order in which events happened: (theo) thứ tự thời gian.",
-      "example": "The paintings are presented in chronological order.",
+      "meaning": "Arranged in time order",
+      "example": "The events were listed in chronological sequence.",
+      "translation": "(theo) thứ tự thời gian",
       "count": 0
     },
     {
       "word": "contemporary (adj)",
-      "meaning": "modern or relating to the present time: đương đại.",
-      "example": "I’m not very keen on contemporary art.",
+      "meaning": "Related to or existing in the present time",
+      "example": "Contemporary music often blends multiple genres.",
+      "translation": "đương đại",
       "count": 0
     },
     {
       "word": "contemporary (adj)",
-      "meaning": "alive or existing at the same time as a particular event or person: cùng thời.",
-      "example": "Contemporary accounts offer a very different interpretation.",
+      "meaning": "Living or existing at the same time as something or someone else",
+      "example": "He was a contemporary of Albert Einstein.",
+      "translation": "cùng thời",
       "count": 0
     },
     {
       "word": "decade (n)",
-      "meaning": "a period of ten years, especially one beginning with a year ending in 0, for example 1980 to 1989: thập kỷ.",
-      "example": "Prices rose sharply in the last decade of the 20th century.",
+      "meaning": "A span of ten years",
+      "example": "She worked for the same company for a decade.",
+      "translation": "thập kỷ",
       "count": 0
     },
     {
       "word": "duration (n)",
-      "meaning": "the period of time during which something continues to happen or exist: khoảng thời gian.",
-      "example": "The film is 125 minutes in duration.",
+      "meaning": "The length of time that something lasts",
+      "example": "The duration of the exam is two hours.",
+      "translation": "khoảng thời gian",
       "count": 0
     },
     {
       "word": "eternal (adj)",
-      "meaning": "continuing forever or for a very long time: vĩnh cửu.",
-      "example": "She has earned our eternal gratitude.",
+      "meaning": "Lasting forever or for an unlimited time",
+      "example": "They promised each other eternal love.",
+      "translation": "vĩnh cửu",
       "count": 0
     },
     {
       "word": "expire (v)",
-      "meaning": "if an agreement or document expires, it no longer has any legal authority: hết hiệu lực.",
-      "example": "The contract between the two companies will expire at the end of the year.",
+      "meaning": "To come to an end, usually for legal or official documents",
+      "example": "Her passport will expire next month.",
+      "translation": "hết hiệu lực",
       "count": 0
     },
     {
       "word": "frequency (n)",
-      "meaning": "the number of times that something happens during a period of time: tần suất.",
-      "example": "Changes in sea temperature will increase the frequency of hurricanes.",
+      "meaning": "How often something happens in a period of time",
+      "example": "The frequency of traffic jams has increased.",
+      "translation": "tần suất",
       "count": 0
     },
     {
       "word": "instantaneous (adj)",
-      "meaning": "immediate: tức thời.",
-      "example": "Recently developed medical tests can give instantaneous results.",
+      "meaning": "Happening or done immediately",
+      "example": "The reaction was almost instantaneous.",
+      "translation": "tức thời",
       "count": 0
     },
     {
       "word": "interim (adj)",
-      "meaning": "intended to last or perform an activity only until someone or something permanent or final is available: tạm thời.",
-      "example": "This is an interim government.",
+      "meaning": "Temporary or provisional until something permanent is available",
+      "example": "They appointed an interim manager.",
+      "translation": "tạm thời",
       "count": 0
     },
     {
       "word": "interim (n)",
-      "meaning": "the time between one thing happening and another, or while waiting for something permanent or final to become available: thời gian chuyển tiếp.",
-      "example": "Margaret Beckett served as Labour leader in the interim between John Smith dying and Tony Blair being elected.",
+      "meaning": "The time between two events or periods",
+      "example": "He took up painting in the interim between jobs.",
+      "translation": "thời gian chuyển tiếp",
       "count": 0
     },
     {
       "word": "interval (n)",
-      "meaning": "a short break between the parts of something such as a play or concert: giờ giải lao.",
-      "example": "How long is the interval?",
+      "meaning": "A short break between parts of a performance or activity",
+      "example": "There will be a 15-minute interval between acts.",
+      "translation": "giờ giải lao",
       "count": 0
     },
     {
       "word": "lapse (n)",
-      "meaning": "a period of time between two events: khoảng thời gian giữa 2 sự việc.",
-      "example": "There was a lapse of ten years between his visits.",
+      "meaning": "A pause or break in continuity",
+      "example": "There was a lapse of memory during the speech.",
+      "translation": "khoảng thời gian giữa 2 sự việc",
       "count": 0
     },
     {
       "word": "lapse (v)",
-      "meaning": "to stop gradually or for a short time: dần ngưng lại.",
-      "example": "At this point the waiter came up with Maggie’s drink and conversation lapsed.",
+      "meaning": "To gradually stop or slip into a different state",
+      "example": "His concentration lapsed after the first hour.",
+      "translation": "dần ngưng lại",
       "count": 0
     },
     {
       "word": "lifetime (n)",
-      "meaning": "the period of time when someone is alive: cuộc đời.",
-      "example": "He achieved a lot in his short lifetime.",
+      "meaning": "The span of time someone is alive",
+      "example": "He made remarkable contributions during his lifetime.",
+      "translation": "cuộc đời",
       "count": 0
     },
     {
       "word": "long-standing (adj)",
-      "meaning": "having existed for a long time: lâu đời, lâu dài.",
-      "example": "There’s a long-standing tradition in our family of giving presents on Christmas Eve.",
+      "meaning": "Having existed for a significant period",
+      "example": "Their long-standing collaboration led to many achievements.",
+      "translation": "lâu đời, lâu dài",
       "count": 0
     },
     {
       "word": "millennium (n)",
-      "meaning": "a period of 1,000 years or the beginning of a period of 1,000 years: thiên niên kỷ.",
-      "example": "People celebrating the millennium filled the streets.",
+      "meaning": "A time period of one thousand years",
+      "example": "The monument dates back to the previous millennium.",
+      "translation": "thiên niên kỷ",
       "count": 0
     },
     {
       "word": "obsolete (adj)",
-      "meaning": "no longer used because of being replaced by something newer and more effective: lỗi thời.",
-      "example": "Most computer hardware rapidly becomes obsolete.",
+      "meaning": "Outdated and no longer useful",
+      "example": "Many VHS tapes are now obsolete.",
+      "translation": "lỗi thời",
       "count": 0
     },
     {
       "word": "overdue (adj)",
-      "meaning": "if something is overdue, it should have arrived or been done, paid etc before now: quá chậm, quá hạn.",
-      "example": "This change in attitude is long overdue.",
+      "meaning": "Past the expected or scheduled time",
+      "example": "The project report is long overdue.",
+      "translation": "quá hạn",
       "count": 0
     },
     {
       "word": "lapse (n)",
-      "meaning": "a period of time between events: khoảng thời gian. There was a lapse of ten years between his visits.",
-      "example": "There was a lapse of ten years between his visits.",
+      "meaning": "A temporary break or pause in activity",
+      "example": "There was a lapse in communication between the teams.",
+      "translation": "khoảng thời gian",
       "count": 0
     },
     {
       "word": "lapse (v)",
-      "meaning": "to stop gradually or for a short time: dần ngừng lại. At this point the waiter came up with Maggie’s drink and conversation lapsed.",
-      "example": "At this point the waiter came up with Maggie’s drink and conversation lapsed.",
-      "count": 0
-    },
-    {
-      "word": "lifetime (n)",
-      "meaning": "the period of time when someone is alive: cuộc đời. He achieved a lot in his short lifetime.",
-      "example": "He achieved a lot in his short lifetime.",
-      "count": 0
-    },
-    {
-      "word": "long-standing (adj)",
-      "meaning": "having existed for a long time: lâu đời, lâu dài. There’s a long-standing tradition in our family of giving presents on Christmas Eve.",
-      "example": "There’s a long-standing tradition in our family of giving presents on Christmas Eve.",
-      "count": 0
-    },
-    {
-      "word": "millennium (n)",
-      "meaning": "a period of 1,000 years or the beginning of a period of 1,000 years: thiên niên kỉ. People celebrating the millennium filled the streets.",
-      "example": "People celebrating the millennium filled the streets.",
-      "count": 0
-    },
-    {
-      "word": "obsolete (adj)",
-      "meaning": "no longer used because of being replaced by something newer and better or more fashionable: lỗi thời. Most computer hardware rapidly becomes obsolete.",
-      "example": "Most computer hardware rapidly becomes obsolete.",
-      "count": 0
-    },
-    {
-      "word": "overdue (adj)",
-      "meaning": "if something is overdue, it should have arrived/been done before now: quá hạn. This change in attitude is long overdue.",
-      "example": "This change in attitude is long overdue.",
+      "meaning": "To gradually cease or come to a stop",
+      "example": "Her concentration lapsed after the long meeting.",
+      "translation": "dần ngừng lại",
       "count": 0
     },
     {
       "word": "period (n)",
-      "meaning": "an amount of time during which something happens: thời kỳ. The long dry period ended with torrential rain.",
-      "example": "The long dry period ended with torrential rain.",
+      "meaning": "A defined stretch of time",
+      "example": "They faced a difficult period after the merger.",
+      "translation": "thời kỳ",
       "count": 0
     },
     {
       "word": "permanent (adj)",
-      "meaning": "happening or existing for a long time or forever: vĩnh viễn. She suffered permanent brain damage as a result of the accident.",
-      "example": "She suffered permanent brain damage as a result of the accident.",
+      "meaning": "Meant to last indefinitely",
+      "example": "The tattoo is a permanent reminder of his trip.",
+      "translation": "vĩnh viễn",
       "count": 0
     },
     {
       "word": "phase (n)",
-      "meaning": "a particular period of time during the development of something: giai đoạn. The war was about to enter its final phase.",
-      "example": "The war was about to enter its final phase.",
+      "meaning": "A specific stage in a sequence of events",
+      "example": "They entered the testing phase of the project.",
+      "translation": "giai đoạn",
       "count": 0
     },
     {
       "word": "postpone (v)",
-      "meaning": "to decide that something will not be done at the time planned, but at a later time: trì hoãn. Our exam has been postponed until next Monday.",
-      "example": "Our exam has been postponed until next Monday.",
+      "meaning": "To reschedule for a later time",
+      "example": "The school trip was postponed due to weather.",
+      "translation": "trì hoãn",
       "count": 0
     },
     {
       "word": "prior (adj)",
-      "meaning": "happening, existing or done before a particular time: trước. Illegally parked cars may be removed at any time prior to your arrival.",
-      "example": "Illegally parked cars may be removed at any time prior to your arrival.",
+      "meaning": "Occurring earlier in time",
+      "example": "You need prior approval to access the data.",
+      "translation": "trước",
       "count": 0
     },
     {
       "word": "prompt (adj)",
-      "meaning": "immediate or quick: nhanh chóng. Prompt action is required.",
-      "example": "Prompt action is required.",
+      "meaning": "Done without delay or hesitation",
+      "example": "Prompt action prevented further damage.",
+      "translation": "nhanh chóng",
       "count": 0
     },
     {
       "word": "provisional (adj)",
-      "meaning": "intended to be temporary, and likely to be changed when other arrangements are made: lâm thời. The provisional government lasted three months.",
-      "example": "The provisional government lasted three months.",
+      "meaning": "Intended to be temporary or conditional",
+      "example": "The provisional schedule is subject to change.",
+      "translation": "lâm thời",
       "count": 0
     },
     {
       "word": "punctual (adj)",
-      "meaning": "arriving or happening at the time agreed on: đúng giờ. Mrs Marsh liked her guests to be punctual.",
-      "example": "Mrs Marsh liked her guests to be punctual.",
+      "meaning": "Happening at the agreed or scheduled time",
+      "example": "He’s always punctual for team meetings.",
+      "translation": "đúng giờ",
       "count": 0
     },
     {
       "word": "seasonal (adj)",
-      "meaning": "happening only during a particular time of year: theo mùa. We only employ seasonal workers.",
-      "example": "We only employ seasonal workers.",
+      "meaning": "Associated with or occurring in a season",
+      "example": "Seasonal discounts are available during the holidays.",
+      "translation": "theo mùa",
       "count": 0
     },
     {
       "word": "simultaneous (adj)",
-      "meaning": "happening or done at the same time: đồng thời. In simultaneous announcements, the two men resigned their jobs.",
-      "example": "In simultaneous announcements, the two men resigned their jobs.",
+      "meaning": "Occurring at the same moment",
+      "example": "They held simultaneous press conferences in two cities.",
+      "translation": "đồng thời",
       "count": 0
     },
     {
       "word": "span (v)",
-      "meaning": "to last for a particular period of time: kéo dài. Nearly 100 witnesses testified over a span of 20 days.",
-      "example": "Nearly 100 witnesses testified over a span of 20 days.",
+      "meaning": "To cover a length of time",
+      "example": "Her career spans over four decades.",
+      "translation": "kéo dài",
       "count": 0
     },
     {
       "word": "span (n)",
-      "meaning": "the amount of time that something lasts: quãng thời gian. Nearly 100 witnesses testified over a span of 20 days.",
-      "example": "Nearly 100 witnesses testified over a span of 20 days.",
+      "meaning": "A measurable extent of time",
+      "example": "The course lasted a span of eight weeks.",
+      "translation": "quãng thời gian",
       "count": 0
     },
     {
       "word": "spell (n)",
-      "meaning": "a short period of time, usually a short one: đợt. A week spent in Spain.",
-      "example": "A week spent in Spain.",
+      "meaning": "A short duration of time",
+      "example": "He spent a brief spell in the countryside.",
+      "translation": "đợt",
       "count": 0
     },
     {
       "word": "stint (n)",
-      "meaning": "a period of time spent doing something: thời gian. He gave a brief stint as a waiter in New York.",
-      "example": "He gave a brief stint as a waiter in New York.",
+      "meaning": "a limited period spent doing a specific task or role",
+      "example": "He worked a short stint as a server in New York.",
+      "translation": "thời gian làm việc",
       "count": 0
     },
     {
       "word": "subsequent (adj)",
-      "meaning": "happening or coming after something else: tiếp theo. In subsequent interviews, Steele has contradicted his original story.",
-      "example": "In subsequent interviews, Steele has contradicted his original story.",
+      "meaning": "happening after something else",
+      "example": "In later interviews, he contradicted what he initially said.",
+      "translation": "tiếp theo",
       "count": 0
     },
     {
       "word": "temporary (adj)",
-      "meaning": "existing, done or used for only a limited period of time: tạm thời. The UN’s timely intervention, a crisis was avoided.",
-      "example": "The UN’s timely intervention, a crisis was avoided.",
+      "meaning": "lasting or intended to last for a short time only",
+      "example": "He found a temporary job during the summer break.",
+      "translation": "tạm thời",
       "count": 0
     },
     {
       "word": "timely (adj)",
-      "meaning": "happening at the most suitable time: đúng thời gian. The UN’s timely intervention, a crisis was avoided.",
-      "example": "The UN’s timely intervention, a crisis was avoided.",
+      "meaning": "happening at the right or useful moment",
+      "example": "Their timely arrival prevented a major delay.",
+      "translation": "đúng lúc",
       "count": 0
     },
     {
       "word": "vintage (adj)",
-      "meaning": "showing the best or most typical qualities of something: điển hình. She turned in a vintage display of tennis in the title.",
-      "example": "She turned in a vintage display of tennis in the title.",
+      "meaning": "typical or best of its kind, often from the past",
+      "example": "She gave a vintage performance in the final match.",
+      "translation": "điển hình, cổ điển",
       "count": 0
     },
     {
       "word": "vintage (n)",
-      "meaning": "the time when something was produced: năm sản xuất. He’s got a collection of guns of all types and vintages.",
-      "example": "He’s got a collection of guns of all types and vintages.",
+      "meaning": "the year or period something was made or produced",
+      "example": "He collects wines from different vintages.",
+      "translation": "năm sản xuất",
       "count": 0
     },
     {
       "word": "civil service (n phr)",
-      "meaning": "a country’s government departments and the people who work for them: cơ quan nhà nước. How long have you worked for the civil service?",
-      "example": "How long have you worked for the civil service?",
+      "meaning": "government departments and the employees working in them",
+      "example": "He has worked in the civil service for over a decade.",
+      "translation": "cơ quan nhà nước",
       "count": 0
     },
     {
       "word": "client (n)",
-      "meaning": "someone who pays for or uses the services of a professional person: khách hàng. She advises clients on their investments.",
-      "example": "She advises clients on their investments.",
+      "meaning": "a person who pays for professional services",
+      "example": "Our firm provides financial advice to wealthy clients.",
+      "translation": "khách hàng",
       "count": 0
     },
     {
       "word": "colleague (n)",
-      "meaning": "someone who works in the same organisation or department as you: đồng nghiệp. He advised colleagues to use their discretion.",
-      "example": "He advised colleagues to use their discretion.",
+      "meaning": "a person you work with",
+      "example": "She always shares her ideas with her colleagues.",
+      "translation": "đồng nghiệp",
       "count": 0
     },
     {
       "word": "consultant (n)",
-      "meaning": "an expert or a professional person: chuyên gia tư vấn. She is a design consultant.",
-      "example": "She is a design consultant.",
+      "meaning": "a person with expertise hired for advice",
+      "example": "They hired a marketing consultant to improve outreach.",
+      "translation": "chuyên gia tư vấn",
       "count": 0
     },
     {
       "word": "effective (adj)",
-      "meaning": "something that is effective works well: hiệu quả. This is a highly effective solution to the problem.",
-      "example": "This is a highly effective solution to the problem.",
+      "meaning": "producing the intended result successfully",
+      "example": "This medication is highly effective for treating colds.",
+      "translation": "hiệu quả",
       "count": 0
     },
     {
       "word": "efficient (adj)",
-      "meaning": "something that is efficient works quickly and well: hiệu suất cao. This machine is far more efficient than the one at the factory.",
-      "example": "This machine is far more efficient than the one at the factory.",
+      "meaning": "working well without wasting time or effort",
+      "example": "Solar panels are becoming more efficient each year.",
+      "translation": "hiệu suất cao",
       "count": 0
     },
     {
       "word": "executive (n)",
-      "meaning": "someone in a high position: điều hành. She attends meetings with the company's top executives.",
-      "example": "She attends meetings with the company's top executives.",
+      "meaning": "a person with a senior managerial role",
+      "example": "The company’s top executives met to discuss the merger.",
+      "translation": "giám đốc điều hành",
       "count": 0
     },
     {
       "word": "headhunt (v)",
-      "meaning": "to persuade someone to leave their job by offering them another job: săn đầu người. He was headhunted by a rival firm.",
-      "example": "He was headhunted by a rival firm.",
+      "meaning": "to recruit someone directly for a job",
+      "example": "She was headhunted by a tech startup.",
+      "translation": "săn đầu người",
       "count": 0
     },
     {
       "word": "income (n)",
-      "meaning": "the money that someone earns from work: thu nhập. I have a job that brings in a lot of income.",
-      "example": "I have a job that brings in a lot of income.",
+      "meaning": "the money earned from work or investments",
+      "example": "Her main source of income comes from freelance writing.",
+      "translation": "thu nhập",
       "count": 0
     },
     {
       "word": "industry (n)",
-      "meaning": "the production of goods, especially in factories: ngành công nghiệp. Most industries now use technology.",
-      "example": "Most industries now use technology.",
+      "meaning": "a field of economic activity producing goods or services",
+      "example": "The fashion industry changes rapidly each season.",
+      "translation": "ngành công nghiệp",
       "count": 0
     },
     {
       "word": "leave (n)",
-      "meaning": "a period of time away from your job: nghỉ phép. I’ve applied for three days’ leave to visit my mother.",
-      "example": "I’ve applied for three days’ leave to visit my mother.",
+      "meaning": "a period of time off from work",
+      "example": "She took maternity leave after giving birth.",
+      "translation": "nghỉ phép",
       "count": 0
     },
     {
       "word": "marketing (n)",
-      "meaning": "a job that involves encouraging people to buy a product or service: tiếp thị. We are running a big marketing campaign.",
-      "example": "We are running a big marketing campaign.",
+      "meaning": "activities to promote and sell products or services",
+      "example": "Their marketing strategy boosted product sales quickly.",
+      "translation": "tiếp thị",
       "count": 0
     },
     {
       "word": "multinational (n)",
-      "meaning": "a large company operating in several countries: đa quốc gia. He works for a multinational.",
-      "example": "He works for a multinational.",
+      "meaning": "a large corporation operating in multiple countries",
+      "example": "He works at a leading multinational in electronics.",
+      "translation": "công ty đa quốc gia",
       "count": 0
     },
     {
       "word": "multinational (adj)",
-      "meaning": "involving people or ideas from several countries: đa quốc gia. The company is multinational.",
-      "example": "The company is multinational.",
+      "meaning": "involving or relating to many countries",
+      "example": "The conference had multinational participants from five continents.",
+      "translation": "đa quốc gia",
       "count": 0
     },
     {
       "word": "promotion (n)",
-      "meaning": "a move to a more important job: thăng chức. His promotion to Head of Marketing.",
-      "example": "His promotion to Head of Marketing.",
+      "meaning": "advancement to a higher job position",
+      "example": "She received a promotion after just six months.",
+      "translation": "thăng chức",
       "count": 0
     },
     {
       "word": "prospects (n pl)",
-      "meaning": "the chances of being successful in the future: triển vọng. She spoke about her career prospects.",
-      "example": "She spoke about her career prospects.",
+      "meaning": "chances for success or advancement",
+      "example": "He moved to the city for better career prospects.",
+      "translation": "triển vọng",
       "count": 0
     },
     {
       "word": "fire (v)",
-      "meaning": "/ˈfaɪər/",
-      "example": "to make someone leave their job, sometimes as a punishment: sa thải.",
-      "count": 0
-    },
-    {
-      "word": "headhunt (v)",
-      "meaning": "/ˈhɛdhʌnt/",
-      "example": "to persuade someone to leave their job and go to work for another company: săn đầu người.",
-      "count": 0
-    },
-    {
-      "word": "leave (n)",
-      "meaning": "/liːv/",
-      "example": "a period of time away from your job: thời gian nghỉ việc.",
-      "count": 0
-    },
-    {
-      "word": "marketing (n)",
-      "meaning": "/ˈmɑːrkɪtɪŋ/",
-      "example": "the ways in which a company encourages people to buy its products: tiếp thị.",
-      "count": 0
-    },
-    {
-      "word": "multinational (n)",
-      "meaning": "/ˌmʌltɪˈnæʃənəl/",
-      "example": "a large company that has offices in several countries: công ty đa quốc gia.",
-      "count": 0
-    },
-    {
-      "word": "multinational (adj)",
-      "meaning": "/ˌmʌltɪˈnæʃənəl/",
-      "example": "having offices in several countries: thuộc về công ty đa quốc gia.",
-      "count": 0
-    },
-    {
-      "word": "private sector (n)",
-      "meaning": "/ˈpraɪvət ˈsɛktər/",
-      "example": "all the businesses not controlled by the government: khối tư nhân.",
-      "count": 0
-    },
-    {
-      "word": "promotion (n)",
-      "meaning": "/prəˈmoʊʃən/",
-      "example": "a move to a higher level in an organization: sự thăng tiến.",
-      "count": 0
-    },
-    {
-      "word": "promotion (n)",
-      "meaning": "/prəˈmoʊʃən/",
-      "example": "the activity of attracting people's attention to a product: sự quảng cáo.",
-      "count": 0
-    },
-    {
-      "word": "prospects (n phr)",
-      "meaning": "/ˈprɒspɛkts/",
-      "example": "the possibility that something will happen: triển vọng.",
-      "count": 0
-    },
-    {
-      "word": "public sector (n)",
-      "meaning": "/ˈpʌblɪk ˈsɛktər/",
-      "example": "the industries and services controlled by the government: khu vực nhà nước.",
-      "count": 0
-    },
-    {
-      "word": "recruit (n) /rɪˈkruːt/",
-      "meaning": "a person who has recently joined an organization: lính mới.",
-      "example": "Our team just have a recruit this week, let's welcome him.",
-      "count": 0
-    },
-    {
-      "word": "recruit (v)",
-      "meaning": "/rɪˈkruːt/",
-      "example": "to get someone to work in a company: tuyển dụng.",
-      "count": 0
-    },
-    {
-      "word": "redundant (adj)",
-      "meaning": "/rɪˈdʌndənt/",
-      "example": "if someone is redundant, they are told they must leave their job: bị sa thải.",
-      "count": 0
-    },
-    {
-      "word": "sack (v)",
-      "meaning": "/sæk/",
-      "example": "to tell someone they can no longer work at their job: sa thải.",
-      "count": 0
-    },
-    {
-      "word": "strike (n)",
-      "meaning": "/straɪk/",
-      "example": "a period of time when people refuse to work: đình công.",
-      "count": 0
-    },
-    {
-      "word": "strike (v)",
-      "meaning": "/straɪk/",
-      "example": "to refuse to work for a period of time: đình công.",
-      "count": 0
-    },
-    {
-      "word": "union (n)",
-      "meaning": "/ˈjuːnjən/",
-      "example": "an organization that represents workers: công đoàn.",
-      "count": 0
-    },
-    {
-      "word": "accelerate (v)",
-      "meaning": "/əkˈsɛləˌreɪt/",
-      "example": "to happen or make something happen faster: tăng tốc.",
-      "count": 0
-    },
-    {
-      "word": "approach (v)",
-      "meaning": "/əˈproʊʧ/",
-      "example": "to move closer to someone: tiến gần.",
-      "count": 0
-    },
-    {
-      "word": "approach (v)",
-      "meaning": "/əˈproʊʧ/",
-      "example": "to speak to someone about something: tiếp cận.",
-      "count": 0
-    },
-    {
-      "word": "approach (n)",
-      "meaning": "/əˈproʊʧ/",
-      "example": "a particular way of thinking about something: cách tiếp cận.",
-      "count": 0
-    },
-    {
-      "word": "ascend (v)",
-      "meaning": "/əˈsɛnd/",
-      "example": "to move up a mountain, stairs, etc.: đi lên.",
-      "count": 0
-    },
-    {
-      "word": "bounce (v)",
-      "meaning": "/baʊns/",
-      "example": "if a ball bounces, it moves away from a surface: nảy.",
-      "count": 0
-    },
-    {
-      "word": "bounce (n)",
-      "meaning": "/baʊns/",
-      "example": "the movement of a ball or other object: sự nảy.",
-      "count": 0
-    },
-    {
-      "word": "clamber (v)",
-      "meaning": "/ˈklæmbər/",
-      "example": "to climb something using hands and feet: leo.",
-      "count": 0
-    },
-    {
-      "word": "clench (v)",
-      "meaning": "/klɛnʧ/",
-      "example": "to close your mouth or it closes tightly: nghiến.",
-      "count": 0
-    },
-    {
-      "word": "clutch (v)",
-      "meaning": "/klʌʧ/",
-      "example": "to hold something firmly because you are afraid: giữ chặt.",
-      "count": 0
-    },
-    {
-      "word": "crawl (v)",
-      "meaning": "/krɔːl/",
-      "example": "to move along the ground on your hands: bò.",
-      "count": 0
-    },
-    {
-      "word": "creep (v)",
-      "meaning": "/kriːp/",
-      "example": "to move slowly somewhere: trườn.",
-      "count": 0
-    },
-    {
-      "word": "dash (v)",
-      "meaning": "/dæʃ/",
-      "example": "to run or go quickly somewhere: lao tới.",
-      "count": 0
-    },
-    {
-      "word": "descend (v)",
-      "meaning": "/dɪˈsɛnd/",
-      "example": "to move down or go down: xuống.",
-      "count": 0
-    },
-    {
-      "word": "drift (v)",
-      "meaning": "/drɪft/",
-      "example": "to be pushed along very slowly: trôi dạt.",
-      "count": 0
-    },
-    {
-      "word": "drift (n)",
-      "meaning": "/drɪft/",
-      "example": "a gradual change in opinion: sự thay đổi.",
-      "count": 0
-    },
-    {
-      "word": "crawl (n)",
-      "meaning": "/krɔːl/",
-      "example": "to move along the ground on your hands: bò.",
-      "count": 0
-    },
-    {
-      "word": "strike (n)",
-      "meaning": "/straɪk/",
-      "example": "a period of time when people refuse to work: đình công.",
-      "count": 0
-    },
-    {
-      "word": "fire (v) /faɪər/",
-      "meaning": "to make someone leave their job, sometimes as a punishment: sa thải.",
-      "example": "She was fired for refusing to comply with safety regulations.",
-      "count": 0
-    },
-    {
-      "word": "headhunt (v) /ˈhedhʌnt/",
-      "meaning": "to try to persuade someone to leave their job and go to work for another company: tuyển dụng đặc biệt.",
-      "example": "He was headhunted by a large electronics company.",
-      "count": 0
-    },
-    {
-      "word": "leave (n) /liːv/",
-      "meaning": "a period of time away from your job: thời gian nghỉ việc.",
-      "example": "Tony had been granted leave, was home for several weeks.",
+      "meaning": "to dismiss someone from their job",
+      "example": "He was fired for repeated absences.",
+      "translation": "sa thải",
       "count": 0
     },
     {
       "word": "marketing (n) /ˈmɑːrkɪtɪŋ/",
-      "meaning": "the ways in which a company encourages people to buy its products: tiếp thị.",
-      "example": "The firm’s new director of marketing.",
+      "meaning": "the strategies used to promote and sell products or services",
+      "example": "She works in digital marketing to help boost online sales.",
+      "translation": "tiếp thị",
       "count": 0
     },
     {
-      "word": "multinational (n) /ˌmʌltiˈnæʃənl/",
-      "meaning": "a large company that has offices or factories in several countries: công ty đa quốc gia.",
-      "example": "My uncle works for a large multinational corporation.",
+      "word": "multinational (n) /ˌmʌltɪˈnæʃənəl/",
+      "meaning": "a corporation with operations in several countries",
+      "example": "He works for a multinational based in three continents.",
+      "translation": "công ty đa quốc gia",
       "count": 0
     },
     {
-      "word": "multinational (adj) /ˌmʌltiˈnæʃənl/",
-      "meaning": "having offices, shops, or factories in several countries: đa quốc gia.",
-      "example": "My uncle works for a large multinational corporation.",
+      "word": "multinational (adj) /ˌmʌltɪˈnæʃənəl/",
+      "meaning": "operating in or involving many nations",
+      "example": "They launched a multinational project across Asia and Europe.",
+      "translation": "thuộc về công ty đa quốc gia",
       "count": 0
     },
     {
-      "word": "private sector (n) /ˈpraɪvət ˈsektər/",
-      "meaning": "all the businesses, industries that are not owned or managed by the government: khu vực tư nhân.",
-      "example": "There is less job security in the private sector.",
+      "word": "private sector (n) /ˈpraɪvət ˈsɛktər/",
+      "meaning": "part of the economy run by private individuals or companies",
+      "example": "Jobs in the private sector often offer higher salaries.",
+      "translation": "khối tư nhân",
       "count": 0
     },
     {
-      "word": "promotion (n) /prəˈmoʊʃn/",
-      "meaning": "a move to a higher level in a company or sport: sự thăng tiến.",
-      "example": "The government’s planning to introduce a ban on the promotion of tobacco.",
+      "word": "promotion (n) /prəˈmoʊʃən/",
+      "meaning": "an advancement to a higher position in a company",
+      "example": "She was thrilled to receive a promotion after one year.",
+      "translation": "sự thăng tiến",
       "count": 0
     },
     {
-      "word": "promotion (n) /prəˈmoʊʃn/",
-      "meaning": "the activity of encouraging something to happen: sự quảng cáo.",
-      "example": "The government’s planning to introduce a ban on the promotion of tobacco.",
+      "word": "promotion (n) /prəˈmoʊʃən/",
+      "meaning": "the process of advertising something to increase sales",
+      "example": "The store offered a special promotion for the holidays.",
+      "translation": "sự quảng cáo",
       "count": 0
     },
     {
-      "word": "prospects (n phr) /ˈprɒspekts/",
-      "meaning": "the possibility that something will happen: triển vọng.",
-      "example": "Employment in the technology sector are especially good right now.",
+      "word": "prospects (n phr) /ˈprɒspɛkts/",
+      "meaning": "the chances or likelihood of something happening",
+      "example": "Her prospects for a new job are looking good.",
+      "translation": "triển vọng",
       "count": 0
     },
     {
-      "word": "public sector (n) /ˈpʌblɪk ˈsektər/",
-      "meaning": "the industries controlled by the government: khu vực công.",
-      "example": "The member of Parliament has worked elsewhere in public sector.",
-      "count": 0
-    },
-    {
-      "word": "recruit (v) /rɪˈkruːt/",
-      "meaning": "to get someone to work in a company: tuyển dụng.",
-      "example": "The firm recruited volunteers to help.",
+      "word": "public sector (n) /ˈpʌblɪk ˈsɛktər/",
+      "meaning": "government-controlled services and industries",
+      "example": "He has spent his whole career in the public sector.",
+      "translation": "khu vực nhà nước",
       "count": 0
     },
     {
       "word": "recruit (n) /rɪˈkruːt/",
-      "meaning": "a new person to help you do something: nhân viên mới.",
-      "example": "The club has recruited volunteers to help.",
+      "meaning": "a person who has recently joined a group or organization",
+      "example": "The manager assigned a mentor to help the new recruit.",
+      "translation": "lính mới",
+      "count": 0
+    },
+    {
+      "word": "recruit (v) /rɪˈkruːt/",
+      "meaning": "to find and hire people for a job or organization",
+      "example": "The company is recruiting engineers for the new branch.",
+      "translation": "tuyển dụng",
       "count": 0
     },
     {
       "word": "redundant (adj) /rɪˈdʌndənt/",
-      "meaning": "if someone is redundant, they are told they must leave their job: dư thừa.",
-      "example": "Redundant workers were dismissed without warning.",
+      "meaning": "no longer needed for a job and dismissed from it",
+      "example": "Many workers were made redundant due to automation.",
+      "translation": "bị sa thải",
       "count": 0
     },
     {
       "word": "sack (v) /sæk/",
-      "meaning": "to tell someone to leave their job: sa thải.",
-      "example": "He was sacked after repeatedly arriving late to work.",
+      "meaning": "to fire someone from their job",
+      "example": "He got sacked for repeatedly showing up late.",
+      "translation": "sa thải",
       "count": 0
     },
     {
       "word": "strike (n) /straɪk/",
-      "meaning": "a period of time when people refuse to work: cuộc đình công.",
-      "example": "Training was held during a strike on 12th August.",
+      "meaning": "a protest in which workers stop working temporarily",
+      "example": "The teachers went on strike to demand better pay.",
+      "translation": "đình công",
       "count": 0
     },
     {
       "word": "strike (v) /straɪk/",
-      "meaning": "to refuse to work for a period of time: đình công.",
-      "example": "Pilots were striking for a 6% salary increase.",
+      "meaning": "to stop working as a form of protest",
+      "example": "They decided to strike after failed negotiations.",
+      "translation": "đình công",
       "count": 0
     },
+    {
+      "word": "union (n) /ˈjuːnjən/",
+      "meaning": "a group formed to protect workers' rights and interests",
+      "example": "The union negotiated a better health plan for employees.",
+      "translation": "công đoàn",
+      "count": 0
+    },
+    {
+      "word": "accelerate (v) /əkˈsɛləˌreɪt/",
+      "meaning": "to move or make something move faster",
+      "example": "The company plans to accelerate the product launch.",
+      "translation": "tăng tốc",
+      "count": 0
+    },
+    {
+      "word": "approach (v) /əˈproʊʧ/",
+      "meaning": "to move closer in distance or time",
+      "example": "As we approached the station, it started to rain.",
+      "translation": "tiến gần",
+      "count": 0
+    },
+    {
+      "word": "approach (v) /əˈproʊʧ/",
+      "meaning": "to contact or speak to someone about something",
+      "example": "She approached her boss with the proposal.",
+      "translation": "tiếp cận",
+      "count": 0
+    },
+    {
+      "word": "approach (n) /əˈproʊʧ/",
+      "meaning": "a method or way of doing something",
+      "example": "They used a new approach to solve the issue.",
+      "translation": "cách tiếp cận",
+      "count": 0
+    },
+    {
+      "word": "ascend (v) /əˈsɛnd/",
+      "meaning": "to go upward, especially towards a higher place",
+      "example": "We slowly ascended the steep mountain trail.",
+      "translation": "đi lên",
+      "count": 0
+    },
+    {
+      "word": "bounce (v) /baʊns/",
+      "meaning": "to spring back after hitting a surface",
+      "example": "The ball bounced high off the floor.",
+      "translation": "nảy",
+      "count": 0
+    },
+    {
+      "word": "bounce (n) /baʊns/",
+      "meaning": "the act of rebounding off a surface",
+      "example": "The bounce of the basketball surprised the players.",
+      "translation": "sự nảy",
+      "count": 0
+    },
+    {
+      "word": "clamber (v) /ˈklæmbər/",
+      "meaning": "to climb up with difficulty using hands and feet",
+      "example": "They clambered over the rocks to reach the cave.",
+      "translation": "leo",
+      "count": 0
+    },
+    {
+      "word": "clench (v) /klɛnʧ/",
+      "meaning": "to close tightly due to anger or tension",
+      "example": "He clenched his fists in frustration.",
+      "translation": "nghiến",
+      "count": 0
+    },
+    {
+      "word": "clutch (v) /klʌʧ/",
+      "meaning": "to hold onto something tightly due to fear or anxiety",
+      "example": "She clutched her bag nervously on the crowded train.",
+      "translation": "giữ chặt",
+      "count": 0
+    },
+    {
+      "word": "crawl (v) /krɔːl/",
+      "meaning": "to move slowly along the ground using hands and knees",
+      "example": "The baby crawled across the carpet to reach the toy.",
+      "translation": "bò",
+      "count": 0
+    },
+    {
+      "word": "creep (v) /kriːp/",
+      "meaning": "to move slowly and quietly, often to avoid being noticed",
+      "example": "She crept downstairs so she wouldn't wake anyone.",
+      "translation": "trườn",
+      "count": 0
+    },
+    {
+      "word": "dash (v) /dæʃ/",
+      "meaning": "to run quickly and suddenly",
+      "example": "He dashed into the room with exciting news.",
+      "translation": "lao tới",
+      "count": 0
+    },
+    {
+      "word": "descend (v) /dɪˈsɛnd/",
+      "meaning": "to go downward from a higher position",
+      "example": "The hikers began to descend the steep slope.",
+      "translation": "xuống",
+      "count": 0
+    },
+    {
+      "word": "drift (v) /drɪft/",
+      "meaning": "to move slowly without control, especially by wind or water",
+      "example": "The boat drifted gently down the river.",
+      "translation": "trôi dạt",
+      "count": 0
+    },
+    {
+      "word": "drift (n) /drɪft/",
+      "meaning": "a slow and gradual movement or change",
+      "example": "There's been a drift in public opinion over time.",
+      "translation": "sự thay đổi",
+      "count": 0
+    },
+    {
+      "word": "crawl (n) /krɔːl/",
+      "meaning": "a slow movement using hands and knees",
+      "example": "He moved at a crawl through the traffic jam.",
+      "translation": "bò",
+      "count": 0
+    },
+    {
+      "word": "strike (n) /straɪk/",
+      "meaning": "an organized stoppage of work by employees",
+      "example": "Workers went on strike over low wages.",
+      "translation": "đình công",
+      "count": 0
+    },
+    {
+      "word": "fire (v) /faɪər/",
+      "meaning": "to remove someone from their job as a penalty",
+      "example": "She was fired for violating company policies.",
+      "translation": "sa thải",
+      "count": 0
+    },
+    {
+      "word": "headhunt (v) /ˈhedhʌnt/",
+      "meaning": "to approach someone with a job offer from another company",
+      "example": "He was headhunted by a major tech firm last year.",
+      "translation": "tuyển dụng đặc biệt",
+      "count": 0
+    },
+    {
+      "word": "leave (n) /liːv/",
+      "meaning": "time off from work for personal or official reasons",
+      "example": "She took maternity leave for three months.",
+      "translation": "thời gian nghỉ việc",
+      "count": 0
+    },
+    {
+      "word": "marketing (n) /ˈmɑːrkɪtɪŋ/",
+      "meaning": "activities aimed at promoting and selling products or services",
+      "example": "He’s responsible for managing the marketing team.",
+      "translation": "tiếp thị",
+      "count": 0
+    },
+    {
+      "word": "multinational (n) /ˌmʌltiˈnæʃənl/",
+      "meaning": "a large company operating in many countries",
+      "example": "She joined a multinational with offices in over 40 countries.",
+      "translation": "công ty đa quốc gia",
+      "count": 0
+    },
+    {
+      "word": "multinational (adj) /ˌmʌltiˈnæʃənl/",
+      "meaning": "having business activities in several countries",
+      "example": "The multinational company opened a branch in Vietnam.",
+      "translation": "đa quốc gia",
+      "count": 0
+    },
+    {
+      "word": "private sector (n) /ˈpraɪvət ˈsektər/",
+      "meaning": "businesses owned and managed independently of the government",
+      "example": "Many job opportunities exist in the private sector.",
+      "translation": "khu vực tư nhân",
+      "count": 0
+    },
+    {
+      "word": "promotion (n) /prəˈmoʊʃn/",
+      "meaning": "a move to a higher position at work",
+      "example": "She received a promotion to team leader last month.",
+      "translation": "sự thăng tiến",
+      "count": 0
+    },
+    {
+      "word": "promotion (n) /prəˈmoʊʃn/",
+      "meaning": "efforts to increase awareness or sales of something",
+      "example": "The promotion of the product was handled through social media.",
+      "translation": "sự quảng cáo",
+      "count": 0
+    },
+    {
+      "word": "prospects (n phr) /ˈprɒspekts/",
+      "meaning": "future opportunities or chances for success",
+      "example": "She moved abroad to improve her career prospects.",
+      "translation": "triển vọng",
+      "count": 0
+    },
+    {
+      "word": "public sector (n) /ˈpʌblɪk ˈsektər/",
+      "meaning": "industries and services controlled by the government",
+      "example": "He works in the public sector as a school teacher.",
+      "translation": "khu vực công",
+      "count": 0
+    },
+    {
+      "word": "recruit (v) /rɪˈkruːt/",
+      "meaning": "to hire new people to join a company or group",
+      "example": "The organization is recruiting staff for a new office.",
+      "translation": "tuyển dụng",
+      "count": 0
+    },
+    {
+      "word": "recruit (n) /rɪˈkruːt/",
+      "meaning": "a person who has recently joined an organization",
+      "example": "The recruit completed training before joining the team.",
+      "translation": "nhân viên mới",
+      "count": 0
+    },
+    {
+      "word": "redundant (adj) /rɪˈdʌndənt/",
+      "meaning": "dismissed from a job due to no longer being needed",
+      "example": "He became redundant when the company restructured.",
+      "translation": "dư thừa",
+      "count": 0
+    },
+    {
+      "word": "sack (v) /sæk/",
+      "meaning": "to dismiss someone from their job",
+      "example": "They sacked the employee after repeated misconduct.",
+      "translation": "sa thải",
+      "count": 0
+    },
+    {
+      "word": "strike (n) /straɪk/",
+      "meaning": "a work stoppage as a form of protest",
+      "example": "The strike lasted for several days across the region.",
+      "translation": "cuộc đình công",
+      "count": 0
+    },
+    {
+      "word": "strike (v) /straɪk/",
+      "meaning": "to stop working temporarily to protest",
+      "example": "Workers decided to strike after failed negotiations.",
+      "translation": "đình công",
+      "count": 0
+    },    
     {
       "word": "union (n) /ˈjuːnjən/",
       "meaning": "an organisation that represents the workers: công đoàn.",
