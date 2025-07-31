@@ -114,7 +114,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               style={{ color: '#6b7280', fontSize: '0.8rem' }}
             >
               <p>⭐ Tap any button (e.g., Next) to enable speech.</p>
-              <p>⭐ On Mobile, only one voice may be available.</p>
               <p>
                 ⭐ No personal login or data is stored on any server. Your
                 progress (stickers, rewards) is saved locally in your browser on
