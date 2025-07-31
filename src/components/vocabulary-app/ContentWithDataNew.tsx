@@ -1,9 +1,16 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
 import AddWordModal from './AddWordModal';
 import MedalCabinet from '@/components/MedalCabinet';
 import StickerHistory from '@/components/StickerHistory';
+import { ChevronDown } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleTrigger,
+  CollapsibleContent
+} from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 interface ContentWithDataNewProps {
   displayWord: VocabularyWord;
@@ -52,6 +59,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleOpenEditWordModal,
   playCurrentWord
 }) => {
+  const [open, setOpen] = useState(false);
   const editingWordData = useMemo(
     () => (
       isEditMode && wordToEdit
@@ -87,8 +95,16 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       />
 
       {/* Achievements and learning days */}
-      <MedalCabinet />
-      <StickerHistory />
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <CollapsibleTrigger className="flex items-center gap-2 mt-4 mb-2">
+          <span className="font-semibold">Streaks</span>
+          <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="space-y-4">
+          <MedalCabinet />
+          <StickerHistory />
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
