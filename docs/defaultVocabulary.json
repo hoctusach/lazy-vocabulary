@@ -21614,1066 +21614,1243 @@
       "count": 0
     },
     {
-    "word": "hand",
-    "meaning": "handle, /ˈhændl/: xử lý. handler, /ˈhændlə(r)/: người điều khiển. handling, /ˈhændlɪŋ/: cách xử lý. handout, /ˈhændaʊt/: tài liệu phát ra. handover, /ˈhændəʊvə(r)/: sự bàn giao. handful, /ˈhændfʊl/: một nắm tay. handmade, /ˌhændˈmeɪd/: đồ do tay làm. underhand, /ˌʌndəˈhænd/: lén lút.",
-    "example": "She handled the problem well. The dog handler gave commands. Proper handling is important. Please take a handout. The manager completed the handover. He gave me a handful of nuts. These are handmade crafts. That was an underhand tactic.",
-    "count": 0
+      "word": "hand",
+      "meaning": "handle (verb) /ˈhændl/; handler (noun) /ˈhændlə(r)/; handling (noun) /ˈhændlɪŋ/; handout (noun) /ˈhændaʊt/; handover (noun) /ˈhændəʊvə(r)/; handful (noun) /ˈhændfʊl/; handmade (adj) /ˌhændˈmeɪd/; underhand (adj) /ˌʌndəˈhænd/",
+      "example": "She handled multiple tasks without complaints; The handler kept the animal calm throughout the event; Safe handling of chemicals is required in this lab; Each participant received a handout at the start; The handover to the new manager was smooth; He grabbed a handful of sand; These necklaces are all handmade by local artisans; Their underhand tactics were eventually exposed",
+      "translation": "xử lý; người điều khiển; cách xử lý; tài liệu phát ra; sự bàn giao; một nắm tay; đồ do tay làm; lén lút",
+      "count": 0
     },
     {
-    "word": "hard",
-    "meaning": "handy, /ˈhændi/: có ích, tiện tay. hardship, /ˈhɑːdʃɪp/: sự gian khổ. hardness, /ˈhɑːdnəs/: độ cứng. hardy, /ˈhɑːdi/: chịu khó, bền.",
-    "example": "This tool is handy. They endured great hardship. The material’s hardness is tested. These plants are hardy.",
-    "count": 0
+      "word": "hard",
+      "meaning": "handy (adj) /ˈhændi/; hardship (noun) /ˈhɑːdʃɪp/; hardness (noun) /ˈhɑːdnəs/; hardy (adj) /ˈhɑːdi/",
+      "example": "This screwdriver is very handy for minor repairs; They overcame years of hardship together; Test the hardness of the metal before using it; These flowers are hardy and survive the cold",
+      "translation": "có ích, tiện tay; sự gian khổ; độ cứng; chịu khó, bền",
+      "count": 0
     },
     {
-    "word": "hear",
-    "meaning": "overhear, /ˌəʊvəˈhɪə(r)/: nghe lỏm. hearing, /ˈhɪərɪŋ/: thính giác. hearsay, /ˈhɪəseɪ/: tin đồn.",
-    "example": "I overheard them arguing. Her hearing is excellent. Don’t trust hearsay.",
-    "count": 0
+      "word": "hear",
+      "meaning": "overhear (verb) /ˌəʊvəˈhɪə(r)/; hearing (noun) /ˈhɪərɪŋ/; hearsay (noun) /ˈhɪəseɪ/",
+      "example": "He overheard them planning a surprise; Her hearing was tested at the clinic; Don’t make decisions based on hearsay",
+      "translation": "nghe lỏm; thính giác; tin đồn",
+      "count": 0
     },
     {
-    "word": "high",
-    "meaning": "heighten, /ˈhaɪtn/: làm cao thêm. highbrow, /ˈhaɪbraʊ/: xa rời thực tế. highly, /ˈhaɪli/: ở mức độ cao. highlight, /ˈhaɪlaɪt/: làm nổi bật. height, /haɪt/: chiều cao. heights, /haɪts/: đỉnh cao.",
-    "example": "Tensions heightened overnight. It’s a highbrow film. She’s highly respected. The report highlights key points. What’s your height? He’s afraid of heights.",
-    "count": 0
+      "word": "high",
+      "meaning": "heighten (verb) /ˈhaɪtn/; highbrow (adj) /ˈhaɪbraʊ/; highly (adv) /ˈhaɪli/; highlight (verb) /ˈhaɪlaɪt/; height (noun) /haɪt/; heights (noun) /haɪts/",
+      "example": "Security measures were heightened during the event; The gallery displays highbrow works of art; She is highly regarded by her colleagues; The report highlights recent achievements; The tower’s height makes it visible for miles; Many people are afraid of heights",
+      "translation": "làm cao thêm; xa rời thực tế; ở mức độ cao; làm nổi bật; chiều cao; đỉnh cao",
+      "count": 0
     },
     {
-    "word": "history",
-    "meaning": "historian, /hɪˈstɔːriən/: nhà sử học. historic, /hɪˈstɒrɪk/: mang tính lịch sử. historical(ly), /hɪˈstɒrɪkl(i)/: (một cách) thuộc lịch sử.",
-    "example": "The historian gave a lecture. It was a historic event. Historically, this site is significant.",
-    "count": 0
+      "word": "history",
+      "meaning": "historian (noun) /hɪˈstɔːriən/; historic (adj) /hɪˈstɒrɪk/; historical(ly) (adj/adv) /hɪˈstɒrɪkl(i)/",
+      "example": "A historian studied ancient artifacts; It was a historic match for the team; Historically, the region has faced many challenges",
+      "translation": "nhà sử học; mang tính lịch sử; (một cách) thuộc lịch sử",
+      "count": 0
     },
     {
-    "word": "house",
-    "meaning": "housing, /ˈhaʊzɪŋ/: nhà ở. household(er), /ˈhaʊshəʊld(ə)/: hộ gia đình. houseful, /ˈhaʊsfʊl/: đầy một nhà.",
-    "example": "Affordable housing is a concern. The householder paid taxes. We had a houseful of guests.",
-    "count": 0
+      "word": "house",
+      "meaning": "housing (noun) /ˈhaʊzɪŋ/; household(er) (noun) /ˈhaʊshəʊld(ə)/; houseful (noun) /ˈhaʊsfʊl/",
+      "example": "Affordable housing is needed in cities; The householder welcomed the inspectors; There was a houseful of relatives for the holiday",
+      "translation": "nhà ở; hộ gia đình; đầy một nhà",
+      "count": 0
     },
     {
-    "word": "human",
-    "meaning": "humanise, /ˈhjuːmənaɪz/: nhân hóa. humanity, /hjuːˈmænəti/: nhân loại. humanism, /ˈhjuːmənɪzəm/: chủ nghĩa nhân đạo. humanist, /ˈhjuːmənɪst/: người theo chủ nghĩa nhân đạo. humanities, /hjuːˈmænətiz/: các môn nhân văn. humanitarian, /hjuːˌmænɪˈteəriən/: người theo chủ nghĩa nhân đạo. humane, /hjuːˈmeɪn/: nhân văn. humanly, /ˈhjuːmənli/: từ góc độ con người.",
-    "example": "They tried to humanise the system. We must protect humanity. She promotes humanism. He’s a humanist. She teaches the humanities. The humanitarian helped refugees. It’s the humane thing to do. Humanly speaking, it’s impossible.",
-    "count": 0
+      "word": "human",
+      "meaning": "humanise (verb) /ˈhjuːmənaɪz/; humanity (noun) /hjuːˈmænəti/; humanism (noun) /ˈhjuːmənɪzəm/; humanist (noun) /ˈhjuːmənɪst/; humanities (noun) /hjuːˈmænətiz/; humanitarian (noun) /hjuːˌmænɪˈteəriən/; humane (adj) /hjuːˈmeɪn/; humanly (adv) /ˈhjuːmənli/",
+      "example": "Leaders try to humanise workplace policies; Humanity has achieved remarkable progress; She is an expert in humanism; The humanist advocated for equal rights; He teaches the humanities at university; A humanitarian worked tirelessly during the crisis; The organization takes a humane approach; It’s not humanly possible to finish so soon",
+      "translation": "nhân hóa; nhân loại; chủ nghĩa nhân đạo; người theo chủ nghĩa nhân đạo; các môn nhân văn; người nhân đạo; nhân văn; từ góc độ con người",
+      "count": 0
     },
     {
-    "word": "ideal",
-    "meaning": "idealise, /aɪˈdɪəlaɪz/: lý tưởng hóa. idealism, /ˈaɪdiəlɪzəm/: chủ nghĩa lý tưởng. idealisation, /ˌaɪdɪələˈzeɪʃn/: sự lý tưởng hóa. idealist, /ˈaɪdiəlɪst/: người theo chủ nghĩa lý tưởng. idealistic, /ˌaɪdiəˈlɪstɪk/: duy tâm. idealised, /ˈaɪdiəlaɪzd/: được lý tưởng hóa. ideally, /aɪˈdɪəli/: một cách lý tưởng.",
-    "example": "He tends to idealise relationships. She believes in idealism. Their idealisation of youth is common. He’s a romantic idealist. That view is idealistic. The story is idealised. Ideally, we should leave at noon.",
-    "count": 0
+      "word": "ideal",
+      "meaning": "idealise (verb) /aɪˈdɪəlaɪz/; idealism (noun) /ˈaɪdiəlɪzəm/; idealisation (noun) /ˌaɪdɪələˈzeɪʃn/; idealist (noun) /ˈaɪdiəlɪst/; idealistic (adj) /ˌaɪdiəˈlɪstɪk/; idealised (adj) /ˈaɪdiəlaɪzd/; ideally (adv) /aɪˈdɪəli/",
+      "example": "Don’t idealise the past; Her idealism inspired those around her; The novel is a romantic idealisation of youth; He’s an idealist at heart; She offered an idealistic perspective; The movie portrayed an idealised version of history; Ideally, meetings should be short",
+      "translation": "lý tưởng hóa; chủ nghĩa lý tưởng; sự lý tưởng hóa; người theo chủ nghĩa lý tưởng; duy tâm; được lý tưởng hóa; một cách lý tưởng",
+      "count": 0
     },
     {
-    "word": "illusion",
-    "meaning": "disillusion, /ˌdɪsɪˈluːʒn/: sự vỡ mộng. disillusionment, /ˌdɪsɪˈluːʒnmənt/: sự làm vỡ mộng. disillusioned, /ˌdɪsɪˈluːʒnd/: bị vỡ mộng. illusory, /ɪˈluːsəri/: ảo tưởng, viển vông.",
-    "example": "He felt disillusioned by politics. Disillusionment followed quickly. She became disillusioned. Their hopes proved illusory.",
-    "count": 0
+      "word": "illusion",
+      "meaning": "disillusion (verb/noun) /ˌdɪsɪˈluːʒn/; disillusionment (noun) /ˌdɪsɪˈluːʒnmənt/; disillusioned (adj) /ˌdɪsɪˈluːʒnd/; illusory (adj) /ɪˈluːsəri/",
+      "example": "Travel can disillusion people about stereotypes; His disillusionment became clear after the meeting; She grew disillusioned with politics; The promise of easy money proved illusory",
+      "translation": "sự vỡ mộng; sự làm vỡ mộng; bị vỡ mộng; ảo tưởng, viển vông",
+      "count": 0
     },
     {
-    "word": "imagine",
-    "meaning": "imagination, /ɪˌmædʒɪˈneɪʃn/: trí tưởng tượng. imaginings, /ɪˈmædʒɪnɪŋz/: những hình dung. imaginative(ly), /ɪˈmædʒɪnətɪv(li)/: (một cách) giàu trí tưởng tượng. (un)imaginative(ly), /(ʌn)ɪˈmædʒɪnətɪv(li)/: (một cách) (không) giàu trí tưởng tượng.",
-    "example": "Children have great imagination. Her imaginings were vivid. He’s very imaginative. The design was unimaginatively done.",
-    "count": 0
+      "word": "imagine",
+      "meaning": "imagination (noun) /ɪˌmædʒɪˈneɪʃn/; imaginings (noun) /ɪˈmædʒɪnɪŋz/; imaginative(ly) (adj/adv) /ɪˈmædʒɪnətɪv(li)/; (un)imaginative(ly) (adj/adv) /(ʌn)ɪˈmædʒɪnətɪv(li)/",
+      "example": "Children’s imagination knows no bounds; Her imaginings inspired her artwork; He solved the problem imaginatively; The story was written unimaginatively",
+      "translation": "trí tưởng tượng; những hình dung; (một cách) giàu trí tưởng tượng; (một cách) (không) giàu trí tưởng tượng",
+      "count": 0
     },
     {
-    "word": "imitate",
-    "meaning": "imitation, /ˌɪmɪˈteɪʃn/: sự bắt chước. imitator, /ˈɪmɪteɪtə(r)/: kẻ bắt chước. imitative, /ˈɪmɪtətɪv/: giả, có tính bắt chước. inimitable, /ɪˈnɪmɪtəbl/: không thể bắt chước được.",
-    "example": "That was only an imitation. He is a clever imitator. Her style is imitative. His performance is inimitable.",
-    "count": 0
+      "word": "imitate",
+      "meaning": "imitation (noun) /ˌɪmɪˈteɪʃn/; imitator (noun) /ˈɪmɪteɪtə(r)/; imitative (adj) /ˈɪmɪtətɪv/; inimitable (adj) /ɪˈnɪmɪtəbl/",
+      "example": "This purse is only an imitation; The comedian was a skilled imitator; Her work is imitative of modern trends; His performance was inimitable",
+      "translation": "sự bắt chước; kẻ bắt chước; có tính bắt chước; không thể bắt chước được",
+      "count": 0
     },
     {
-    "word": "imply",
-    "meaning": "implicate, /ˈɪmplɪkeɪt/: lôi kéo, dính líu. implication, /ˌɪmplɪˈkeɪʃn/: sự liên can. implicit(ly), /ɪmˈplɪsɪt(li)/: (một cách) ngầm định.",
-    "example": "He was implicated in the crime. The implication is serious. She trusted him implicitly.",
-    "count": 0
+      "word": "imply",
+      "meaning": "implicate (verb) /ˈɪmplɪkeɪt/; implication (noun) /ˌɪmplɪˈkeɪʃn/; implicit(ly) (adj/adv) /ɪmˈplɪsɪt(li)/",
+      "example": "The investigation implicated several people; The implication was never stated openly; She agreed implicitly to the terms",
+      "translation": "lôi kéo, dính líu; sự liên can; (một cách) ngầm định",
+      "count": 0
     },
     {
-    "word": "impress",
-    "meaning": "impression, /ɪmˈpreʃn/: ấn tượng. (un)impressiveness, /(ʌn)ɪmˈpresɪvnəs/: sự (không) ấn tượng. impressionist, /ɪmˈpreʃənɪst/: người theo trường phái ấn tượng. impressionable, /ɪmˈpreʃənəbl/: dễ bị ảnh hưởng. impressionistic, /ˌɪmpreʃəˈnɪstɪk/: thuộc trường phái ấn tượng. (un)impressive(ly), /(ʌn)ɪmˈpresɪvli/: (một cách) (không) gây ấn tượng.",
-    "example": "He made a strong impression. The show lacked impressiveness. She is an impressionist painter. Teens are often impressionable. The painting was impressionistic. He performed impressively.",
-    "count": 0
+      "word": "impress",
+      "meaning": "impression (noun) /ɪmˈpreʃn/; (un)impressiveness (noun) /(ʌn)ɪmˈpresɪvnəs/; impressionist (noun) /ɪmˈpreʃənɪst/; impressionable (adj) /ɪmˈpreʃənəbl/; impressionistic (adj) /ˌɪmpreʃəˈnɪstɪk/; (un)impressive(ly) (adj/adv) /(ʌn)ɪmˈpresɪvli/",
+      "example": "The teacher left a lasting impression; The design lacked impressiveness; She is a well-known impressionist; Young students can be impressionable; The review was impressionistic rather than factual; He performed impressively on stage",
+      "translation": "ấn tượng; sự (không) ấn tượng; người theo trường phái ấn tượng; dễ bị ảnh hưởng; thuộc trường phái ấn tượng; (một cách) (không) gây ấn tượng",
+      "count": 0
     },
     {
-    "word": "improve",
-    "meaning": "improvement, /ɪmˈpruːvmənt/: sự cải thiện. improvable, /ɪmˈpruːvəbl/: có thể cải thiện. improved, /ɪmˈpruːvd/: được cải thiện.",
-    "example": "There’s been great improvement. The system is improvable. His skills have improved.",
-    "count": 0
+      "word": "improve",
+      "meaning": "improvement (noun) /ɪmˈpruːvmənt/; improvable (adj) /ɪmˈpruːvəbl/; improved (adj) /ɪmˈpruːvd/",
+      "example": "She made steady improvement throughout the year; The process is improvable with feedback; This is an improved version of the software",
+      "translation": "sự cải thiện; có thể cải thiện; được cải thiện",
+      "count": 0
     },
     {
-    "word": "incident",
-    "meaning": "incidence, /ˈɪnsɪdəns/: tần suất, tỉ lệ mắc phải.",
-    "example": "The incidence of flu increases in winter.",
-    "count": 0
+      "word": "incident",
+      "meaning": "incidence (noun) /ˈɪnsɪdəns/",
+      "example": "There has been a high incidence of theft in this area",
+      "translation": "tần suất, tỉ lệ mắc phải",
+      "count": 0
     },
     {
-    "word": "coincide",
-    "meaning": "coincidence, /kəʊˈɪnsɪdəns/: sự trùng hợp. coincidental(ly), /kəʊˌɪnsɪˈdentl(i)/: (một cách) ngẫu nhiên.",
-    "example": "It was pure coincidence. They met coincidentally at the airport.",
-    "count": 0
+      "word": "coincide",
+      "meaning": "coincidence (noun) /kəʊˈɪnsɪdəns/; coincidental(ly) (adj/adv) /kəʊˌɪnsɪˈdentl(i)/",
+      "example": "Their arrival was pure coincidence; They met coincidentally at a café",
+      "translation": "sự trùng hợp; (một cách) ngẫu nhiên",
+      "count": 0
     },
     {
-    "word": "indicate",
-    "meaning": "indication, /ˌɪndɪˈkeɪʃn/: sự biểu thị. indicator, /ˈɪndɪkeɪtə(r)/: tín hiệu. indicative, /ɪnˈdɪkətɪv/: chỉ ra.",
-    "example": "There’s no clear indication of fraud. The fuel gauge is an indicator. The results are indicative of progress.",
-    "count": 0
+      "word": "indicate",
+      "meaning": "indication (noun) /ˌɪndɪˈkeɪʃn/; indicator (noun) /ˈɪndɪkeɪtə(r)/; indicative (adj) /ɪnˈdɪkətɪv/",
+      "example": "A rash can be an indication of illness; The indicator showed a full battery; The growth is indicative of recovery",
+      "translation": "sự biểu thị; tín hiệu; chỉ ra",
+      "count": 0
     },
     {
-    "word": "individual",
-    "meaning": "individualise, /ˌɪndɪˈvɪdʒuəlaɪz/: cá nhân hóa. individualism, /ɪnˈdɪvɪdʒuəlɪzəm/: chủ nghĩa cá nhân. individuality, /ˌɪndɪˌvɪdʒuˈæləti/: cá tính. individualist, /ɪnˈdɪvɪdʒuəlɪst/: người theo chủ nghĩa cá nhân. individualistic, /ˌɪndɪˌvɪdʒuəˈlɪstɪk/: mang tính cá nhân.",
-    "example": "The teacher individualises lessons. She supports individualism. His individuality stood out. He is an individualist. She has an individualistic style.",
-    "count": 0
+      "word": "individual",
+      "meaning": "individualise (verb) /ˌɪndɪˈvɪdʒuəlaɪz/; individualism (noun) /ɪnˈdɪvɪdʒuəlɪzəm/; individuality (noun) /ˌɪndɪˌvɪdʒuˈæləti/; individualist (noun) /ɪnˈdɪvɪdʒuəlɪst/; individualistic (adj) /ˌɪndɪˌvɪdʒuəˈlɪstɪk/",
+      "example": "Teachers try to individualise assignments; Her belief in individualism shaped her philosophy; His individuality makes him stand out; She is known as an individualist in the workplace; The design is very individualistic",
+      "translation": "cá nhân hóa; chủ nghĩa cá nhân; cá tính; người theo chủ nghĩa cá nhân; mang tính cá nhân",
+      "count": 0
     },
     {
-    "word": "influence",
-    "meaning": "influential, /ˌɪnfluˈenʃl/: có ảnh hưởng lớn.",
-    "example": "He is an influential speaker.",
-    "count": 0
+      "word": "influence",
+      "meaning": "influential (adj) /ˌɪnfluˈenʃl/",
+      "example": "She has become an influential leader in her field",
+      "translation": "có ảnh hưởng lớn",
+      "count": 0
     },
     {
-    "word": "inhabit",
-    "meaning": "inhabitant, /ɪnˈhæbɪtənt/: cư dân. habitat, /ˈhæbɪtæt/: môi trường sống. habitation, /ˌhæbɪˈteɪʃn/: nơi ở. (un)inhabitable, /ʌnˈhæbɪtəbl/: (không) thể ở được.",
-    "example": "The city has millions of inhabitants. This area is a natural habitat. The building is uninhabitable.",
-    "count": 0
+      "word": "inhabit",
+      "meaning": "inhabitant (noun) /ɪnˈhæbɪtənt/; habitat (noun) /ˈhæbɪtæt/; habitation (noun) /ˌhæbɪˈteɪʃn/; (un)inhabitable (adj) /ʌnˈhæbɪtəbl/",
+      "example": "The island is home to many inhabitants; The panda’s habitat is shrinking; The building has been unfit for habitation for years; This desert is uninhabitable",
+      "translation": "cư dân; môi trường sống; nơi ở; (không) thể ở được",
+      "count": 0
     },
     {
-    "word": "inherit",
-    "meaning": "inheritance, /ɪnˈherɪtəns/: sự thừa kế. heritage, /ˈherɪtɪdʒ/: di sản. hereditary, /həˈredɪtəri/: truyền từ đời này sang đời khác.",
-    "example": "She received a large inheritance. The temple is part of cultural heritage. It’s a hereditary disease.",
-    "count": 0
+      "word": "inherit",
+      "meaning": "inheritance (noun) /ɪnˈherɪtəns/; heritage (noun) /ˈherɪtɪdʒ/; hereditary (adj) /həˈredɪtəri/",
+      "example": "He received a large inheritance; Vietnamese water puppetry is a unique heritage; The disorder is hereditary",
+      "translation": "sự thừa kế; di sản; truyền từ đời này sang đời khác",
+      "count": 0
     },
     {
-    "word": "insist",
-    "meaning": "insistence, /ɪnˈsɪstəns/: sự khăng khăng. insistent, /ɪnˈsɪstənt/: khăng khăng.",
-    "example": "Her insistence on details was exhausting. He was very insistent.",
-    "count": 0
+      "word": "insist",
+      "meaning": "insistence (noun) /ɪnˈsɪstəns/; insistent (adj) /ɪnˈsɪstənt/",
+      "example": "Their insistence led to a review of the policy; She was insistent that we stay longer",
+      "translation": "sự khăng khăng; khăng khăng",
+      "count": 0
     },
     {
-    "word": "instinct",
-    "meaning": "instinctive(ly), /ɪnˈstɪŋktɪv(li)/: (một cách) theo bản năng.",
-    "example": "She responded instinctively to danger.",
-    "count": 0
+      "word": "instinct",
+      "meaning": "instinctive(ly) (adj/adv) /ɪnˈstɪŋktɪv(li)/",
+      "example": "He instinctively shielded his eyes from the light",
+      "translation": "một cách theo bản năng",
+      "count": 0
     },
     {
-    "word": "institute",
-    "meaning": "institutionalise, /ˌɪnstɪˈtjuːʃənəlaɪz/: thể chế hóa. institution, /ˌɪnstɪˈtjuːʃn/: tổ chức. institutional, /ˌɪnstɪˈtjuːʃənl/: thuộc tổ chức. institutionalised, /ˌɪnstɪˈtjuːʃnəlaɪzd/: được thể chế hóa.",
-    "example": "They want to institutionalise the reform. She works at a large institution. It’s an institutional decision. That practice is now institutionalised.",
-    "count": 0
+      "word": "institute",
+      "meaning": "institutionalise (verb) /ˌɪnstɪˈtjuːʃənəlaɪz/; institution (noun) /ˌɪnstɪˈtjuːʃn/; institutional (adj) /ˌɪnstɪˈtjuːʃənl/; institutionalised (adj) /ˌɪnstɪˈtjuːʃnəlaɪzd/",
+      "example": "The company decided to institutionalise regular training; He works for a respected institution; They face institutional barriers to change; This custom is now institutionalised in the law",
+      "translation": "thể chế hóa; tổ chức; thuộc tổ chức; được thể chế hóa",
+      "count": 0
     },
     {
-    "word": "intend",
-    "meaning": "intention, /ɪnˈtenʃn/: ý định. (un)intended, /(ʌn)ɪnˈtendɪd/: (không) cố ý. (un)intentional(ly), /(ʌn)ɪnˈtenʃən(ə)li/: (một cách) (không) có chủ đích.",
-    "example": "His intention was clear. It was an unintended consequence. She acted intentionally.",
-    "count": 0
+      "word": "intend",
+      "meaning": "intention (noun) /ɪnˈtenʃn/; (un)intended (adj) /(ʌn)ɪnˈtendɪd/; (un)intentional(ly) (adj/adv) /(ʌn)ɪnˈtenʃən(ə)li/",
+      "example": "He announced his intention to retire; The side effects were unintended; She acted intentionally to avoid confusion",
+      "translation": "ý định; (không) cố ý; (một cách) (không) có chủ đích",
+      "count": 0
     },
     {
-    "word": "intimate",
-    "meaning": "intimacy, /ˈɪntɪməsi/: sự thân mật. intimately, /ˈɪntɪmətli/: một cách thân mật.",
-    "example": "There was an intimacy between them. They spoke intimately.",
-    "count": 0
+      "word": "intimate",
+      "meaning": "intimacy (noun) /ˈɪntɪməsi/; intimately (adv) /ˈɪntɪmətli/",
+      "example": "There is great intimacy in their friendship; They know each other intimately",
+      "translation": "sự thân mật; một cách thân mật",
+      "count": 0
     },
     {
-    "word": "job",
-    "meaning": "jobbing, /ˈdʒɒbɪŋ/: làm việc vặt. jobless, /ˈdʒɒbləs/: thất nghiệp.",
-    "example": "He found jobbing work easily. Many people are jobless this year.",
-    "count": 0
-    },            
+      "word": "job",
+      "meaning": "jobbing (adj) /ˈdʒɒbɪŋ/; jobless (adj) /ˈdʒɒbləs/",
+      "example": "He took up jobbing tasks to cover expenses; The factory closure left many families jobless",
+      "translation": "làm việc vặt; thất nghiệp",
+      "count": 0
+    },
+    {
+      "word": "electric",
+      "meaning": "electrify (v) /ɪˈlektrɪfaɪ/; electrician (n) /ɪˌlekˈtrɪʃn/; electricity (n) /ɪˌlekˈtrɪsəti/; electrified (adj) /ɪˈlektrɪfaɪd/; electrifying (adj) /ɪˈlektrɪfaɪɪŋ/; electrical (adj) /ɪˈlektrɪkl/",
+      "example": "They plan to electrify the entire village soon; The electrician finished wiring the new house; A sudden surge of electricity caused the lights to flicker; The fence was fully electrified for safety; The performance had an electrifying energy; An electrical fault caused the outage",
+      "translation": "làm nhiễm điện; thợ điện; điện; đã nhiễm điện; đầy hứng khởi; (thuộc) điện",
+      "count": 0
+    },
     {
-    "word": "electric",
-    "meaning": "electrify, /ɪˈlektrɪfaɪ/: làm nhiễm điện. electrician, /ɪˌlekˈtrɪʃn/: thợ điện. electricity, /ɪˌlekˈtrɪsəti/: điện. electrified, /ɪˈlektrɪfaɪd/: đã nhiễm điện. electrifying, /ɪˈlektrɪfaɪɪŋ/: nhiễm điện. electrical(ly), /ɪˈlektrɪkl(i)/: (về) điện.",
-    "example": "The wires were electrified. Call an electrician for this job. Electricity went out. The crowd was electrified by the speech. It was an electrifying moment. That’s an electrical failure.",
-    "count": 0
+      "word": "elude",
+      "meaning": "elusiveness (n) /ɪˈluːsɪvnəs/; elusive (adj) /ɪˈluːsɪv/",
+      "example": "The elusiveness of the suspect frustrated investigators; She gave him an elusive answer and left the room",
+      "translation": "tính lảng tránh; khó nắm bắt",
+      "count": 0
     },
     {
-    "word": "elude",
-    "meaning": "elusiveness, /ɪˈluːsɪvnəs/: tính lảng tránh. elusive(ly), /ɪˈluːsɪv(li)/: một cách khó nắm bắt.",
-    "example": "The criminal’s elusiveness frustrated the police. She smiled elusively.",
-    "count": 0
+      "word": "employ",
+      "meaning": "employment (n) /ɪmˈplɔɪmənt/; unemployment (n) /ˌʌnɪmˈplɔɪmənt/; underemployment (n) /ˌʌndərɪmˈplɔɪmənt/; employer (n) /ɪmˈplɔɪə(r)/; employee (n) /ˌemplɔɪˈiː/; employed (adj) /ɪmˈplɔɪd/; unemployed (adj) /ˌʌnɪmˈplɔɪd/; employable (adj) /ɪmˈplɔɪəbl/; unemployable (adj) /ˌʌnɪmˈplɔɪəbl/",
+      "example": "She searched for stable employment in the city; Rising unemployment has become a concern for local leaders; Underemployment remains an issue in many rural areas; The employer interviewed several candidates for the role; Each employee received new training; She felt more employed after accepting a second job; He has been unemployed for months; With her skills, she is highly employable; Chronic illness can make someone unemployable",
+      "translation": "việc làm; thất nghiệp; thiếu việc; người sử dụng lao động; nhân viên; có việc; thất nghiệp; có thể tuyển dụng; không thể tuyển dụng",
+      "count": 0
     },
     {
-    "word": "employ",
-    "meaning": "(un)employment, /(ˌʌn)ɪmˈplɔɪmənt/: (tình trạng) thất nghiệp. underemployment, /ˌʌndərɪmˈplɔɪmənt/: tình trạng thiếu việc. employer, /ɪmˈplɔɪə(r)/: người sử dụng lao động. employee, /ˌemplɔɪˈiː/: người lao động. (un)employed, /(ʌn)ɪmˈplɔɪd/: (không) có việc. unemployed, /ˌʌnɪmˈplɔɪd/: thất nghiệp. (un)employable, /(ˌʌn)ɪmˈplɔɪəbl/: (không) có thể tuyển dụng.",
-    "example": "Unemployment rose last year. Many face underemployment. The employer posted a new job. The employee was promoted. He is currently unemployed. They are unemployable.",
-    "count": 0
+      "word": "end",
+      "meaning": "endure (v) /ɪnˈdjʊə(r)/; endurance (n) /ɪnˈdjʊərəns/; endurable (adj) /ɪnˈdjʊərəbl/; unendurable (adj) /ʌnˈendɪrəbəl/; unending (adj) /ʌnˈendɪŋ/; ending (n) /ˈendɪŋ/; endless (adj) /ˈendləs/; endlessly (adv) /ˈendləsli/",
+      "example": "They must endure harsh conditions to succeed; Endurance is required to complete a marathon; The pain was barely endurable for him; Such noise is simply unendurable at night; The unending rain flooded the village; The movie’s ending surprised everyone; He stared at the endless rows of books; She talked endlessly about her plans",
+      "translation": "chịu đựng; sức bền; có thể chịu đựng; không thể chịu đựng được; không có hồi kết; sự kết thúc; vô tận; một cách vô tận",
+      "count": 0
     },
     {
-    "word": "end",
-    "meaning": "endure, /ɪnˈdjʊə(r)/: chịu đựng. endurance, /ɪnˈdjʊərəns/: sức bền. (un)endurable, /(ʌn)ɪnˈdjʊərəbl/: (không) chịu đựng được. unending, /ʌnˈendɪŋ/: lâu dài. ending, /ˈendɪŋ/: sự kết thúc. endless(ly), /ˈendləs(li)/: (một cách) bất tận.",
-    "example": "She had to endure pain. His endurance is impressive. The noise was unendurable. They faced unending challenges. The ending was sad. The rain fell endlessly.",
-    "count": 0
+      "word": "envy",
+      "meaning": "enviable (adj) /ˈenviəbl/; unenviable (adj) /ʌnˈenviəbl/; enviably (adv) /ˈenviəbli/; unenviably (adv) /ʌnˈenviəbli/; envious (adj) /ˈenviəs/; enviously (adv) /ˈenviəsli/",
+      "example": "He has an enviable reputation in his field; The position was unenviable due to heavy stress; She lived enviably close to the beach; The job was unenviably complicated; She was envious of her friend’s success; He watched enviously as the winner took the prize",
+      "translation": "đáng ghen tị; không đáng ghen tị; một cách đáng ghen tị; một cách không đáng ghen tị; ghen tị; một cách ghen tị",
+      "count": 0
     },
     {
-    "word": "envy",
-    "meaning": "(un)enviable, /(ʌn)ˈenviəbl/: (không) đáng ghen tị. (un)enviably, /(ʌn)ˈenviəbli/: (một cách) (không) đáng ghen tị. envious(ly), /ˈenviəs(li)/: (một cách) ghen tị.",
-    "example": "She has an enviable position. It’s enviably close to the beach. He looked at me enviously.",
-    "count": 0
+      "word": "erode",
+      "meaning": "erosion (n) /ɪˈrəʊʒn/",
+      "example": "Erosion gradually wore away the old stone bridge",
+      "translation": "sự xói mòn",
+      "count": 0
     },
     {
-    "word": "erode",
-    "meaning": "erosion, /ɪˈrəʊʒn/: sự xói mòn.",
-    "example": "Soil erosion is a serious problem.",
-    "count": 0
+      "word": "erupt",
+      "meaning": "eruption (n) /ɪˈrʌpʃn/",
+      "example": "The sudden eruption startled everyone nearby",
+      "translation": "sự phun trào",
+      "count": 0
     },
     {
-    "word": "erupt",
-    "meaning": "eruption, /ɪˈrʌpʃn/: sự phun trào.",
-    "example": "The volcano's eruption was massive.",
-    "count": 0
+      "word": "event",
+      "meaning": "eventuality (n) /ɪˌventʃuˈæləti/; eventful (adj) /ɪˈventfl/; uneventful (adj) /ʌnɪˈventfl/; eventual (adj) /ɪˈventʃuəl/; eventually (adv) /ɪˈventʃuəli/",
+      "example": "The company planned for every possible eventuality; It was an eventful year in technology; Their trip was uneventful and relaxing; The eventual results were announced; Eventually, everyone agreed on a solution",
+      "translation": "tình huống có thể xảy ra; nhiều sự kiện; không có nhiều sự kiện; cuối cùng; cuối cùng",
+      "count": 0
     },
     {
-    "word": "event",
-    "meaning": "eventuality, /ɪˌventʃuˈæləti/: tình huống có thể xảy ra. (un)eventful, /(ʌn)ɪˈventfl/: (không) có nhiều sự kiện. eventual(ly), /ɪˈventʃuəli/: rốt cuộc.",
-    "example": "We prepared for every eventuality. It was an uneventful trip. Eventually, she succeeded.",
-    "count": 0
+      "word": "evolve",
+      "meaning": "evolution (n) /ˌiːvəˈluːʃn/; evolutionary (adj) /ˌiːvəˈluːʃənəri/; evolving (adj) /ɪˈvɒlvɪŋ/",
+      "example": "Evolution has shaped life on Earth; This is an evolutionary adaptation in birds; The company is an evolving leader in AI",
+      "translation": "sự tiến hóa; (thuộc) tiến hóa; đang tiến hóa",
+      "count": 0
     },
     {
-    "word": "evolve",
-    "meaning": "evolution, /ˌiːvəˈluːʃn/: sự tiến hóa. evolutionary, /ˌiːvəˈluːʃənəri/: thuộc tiến hóa. evolving, /ɪˈvɒlvɪŋ/: đang tiến hóa.",
-    "example": "Evolution is a natural process. This is an evolutionary step. Language is constantly evolving.",
-    "count": 0
+      "word": "example",
+      "meaning": "exemplify (v) /ɪɡˈzemplɪfaɪ/; exemplification (n) /ɪɡˌzemplɪfɪˈkeɪʃn/; exemplary (adj) /ɪɡˈzempləri/",
+      "example": "Her actions exemplify dedication to her team; The case was cited as an exemplification of success; He set an exemplary standard for his peers",
+      "translation": "minh họa; sự minh họa; mẫu mực",
+      "count": 0
     },
     {
-    "word": "example",
-    "meaning": "exemplify, /ɪɡˈzemplɪfaɪ/: minh họa. exemplification, /ɪɡˌzemplɪfɪˈkeɪʃn/: sự minh họa. exemplary, /ɪɡˈzempləri/: mẫu mực.",
-    "example": "She exemplifies dedication. His action is an exemplification. He received an award for exemplary conduct.",
-    "count": 0
+      "word": "exclaim",
+      "meaning": "exclamation (n) /ˌekskləˈmeɪʃn/; exclamatory (adj) /eksˈklæmətri/",
+      "example": "Her exclamation drew everyone’s attention; He used an exclamatory tone in his reply",
+      "translation": "câu cảm thán; mang tính cảm thán",
+      "count": 0
     },
     {
-    "word": "exclaim",
-    "meaning": "exclamation, /ˌekskləˈmeɪʃn/: câu cảm thán. exclamatory, /eksˈklæmətri/: có tính cảm thán.",
-    "example": "He let out an exclamation. She gave an exclamatory shout.",
-    "count": 0
+      "word": "expect",
+      "meaning": "expectation (n) /ˌekspekˈteɪʃn/; expectancy (n) /ɪkˈspektənsi/; expectant (adj) /ɪkˈspektənt/; expectantly (adv) /ɪkˈspektəntli/; expected (adj) /ɪkˈspektɪd/; unexpected (adj) /ʌnɪkˈspektɪd/; expectedly (adv) /ɪkˈspektɪdli/; unexpectedly (adv) /ʌnɪkˈspektɪdli/",
+      "example": "Their expectation was to finish early; There was a sense of expectancy in the air; She gave him an expectant look; He waited expectantly for the results; The expected outcome was positive; The unexpected delay disrupted plans; The event ended expectedly well; She left unexpectedly without a word",
+      "translation": "sự mong đợi; sự chờ đợi; mong chờ; một cách mong chờ; được mong đợi; không ngờ tới; một cách mong đợi; một cách bất ngờ",
+      "count": 0
     },
     {
-    "word": "expect",
-    "meaning": "expectation, /ˌekspekˈteɪʃn/: sự mong đợi. expectancy, /ɪkˈspektənsi/: (một cách) đầy mong đợi. expectant(ly), /ɪkˈspektənt(li)/: (một cách) mong chờ. (un)expected(ly), /(ʌn)ɪkˈspektɪd(li)/: (một cách) (không) ngờ tới.",
-    "example": "The results met our expectations. The atmosphere was full of expectancy. She looked at me expectantly. The call came unexpectedly.",
-    "count": 0
+      "word": "explain",
+      "meaning": "explanation (n) /ˌekspləˈneɪʃn/; explanatory (adj) /ɪkˈsplænətri/; unexplained (adj) /ˌʌnɪkˈspleɪnd/; explicable (adj) /ˈeksplɪkəbl/; inexplicable (adj) /ɪnˈeksplɪkəbl/; inexplicably (adv) /ˌɪnɪkˈsplɪkəbli/",
+      "example": "She gave a thorough explanation in class; The diagram had several explanatory notes; The illness remains unexplained; The reason is fully explicable now; His absence is inexplicable; The lights flickered inexplicably all evening",
+      "translation": "sự giải thích; mang tính giải thích; không rõ nguyên nhân; có thể giải thích; không thể giải thích; một cách không thể giải thích",
+      "count": 0
     },
     {
-    "word": "explain",
-    "meaning": "explanation, /ˌekspləˈneɪʃn/: sự giải thích. explanatory, /ɪkˈsplænətri/: mang tính giải thích. unexplained, /ˌʌnɪkˈspleɪnd/: không rõ nguyên nhân. (in)explicable, /(ɪn)ˈeksplɪkəbl/: (không) thể giải thích được. inexplicably, /ˌɪnɪkˈsplɪkəbli/: một cách không thể giải thích được.",
-    "example": "She gave a clear explanation. Read the explanatory notes. The illness remains unexplained. His reaction was inexplicable. She left inexplicably.",
-    "count": 0
+      "word": "express",
+      "meaning": "expression (n) /ɪkˈspreʃn/; expressiveness (n) /ɪkˈspreʃɪvnəs/; expressionism (n) /ɪkˈspreʃənɪzəm/; expressionist (n) /ɪkˈspreʃənɪst/; expressive (adj) /ɪkˈspresɪv/; expressionless (adj) /ɪkˈspreʃnləs/; expressionless (n) /ɪkˈspreʃnləsnəs/; expressively (adv) /ɪkˈspresɪvli/",
+      "example": "Her expression changed as she listened; His face showed real expressiveness; She studied expressionism in college; The artist is a well-known expressionist; His voice was expressive during the performance; He sat with an expressionless gaze; The cold expressionlessness unsettled her; She nodded expressively",
+      "translation": "sự biểu lộ; tính diễn cảm; chủ nghĩa biểu hiện; người theo chủ nghĩa biểu hiện; có tính biểu cảm; vô cảm; sự vô cảm; một cách biểu cảm",
+      "count": 0
     },
     {
-    "word": "express",
-    "meaning": "expression, /ɪkˈspreʃn/: sự biểu lộ. expressiveness, /ɪkˈspreʃɪvnəs/: tính diễn cảm. expressionism, /ɪkˈspreʃənɪzəm/: chủ nghĩa biểu hiện. expressionist, /ɪkˈspreʃənɪst/: người theo chủ nghĩa biểu hiện. expressive(ly), /ɪkˈspresɪv(li)/: (một cách) biểu cảm. expressionless(ness), /ɪkˈspreʃnləs(nəs)/: (một cách) vô cảm.",
-    "example": "Her expression changed suddenly. His eyes were full of expressiveness. She studied expressionism. He’s an expressionist painter. He smiled expressively. His face remained expressionless.",
-    "count": 0
+      "word": "extend",
+      "meaning": "extension (n) /ɪkˈstenʃn/; extent (n) /ɪkˈstent/; extended (adj) /ɪkˈstendɪd/; unextended (adj) /ʌnɪkˈstendɪd/; extensible (adj) /ɪkˈstensəbl/; inextensible (adj) /ɪnɪkˈstensəbl/",
+      "example": "They built an extension on their home; The extent of the changes surprised many; They enjoyed an extended holiday abroad; The warranty is unextended for older models; This cable is fully extensible; The material proved inextensible under stress",
+      "translation": "sự mở rộng; mức độ; được mở rộng; không được mở rộng; có thể kéo dài; không thể kéo dài",
+      "count": 0
     },
     {
-    "word": "extend",
-    "meaning": "extension, /ɪkˈstenʃn/: sự mở rộng. extent, /ɪkˈstent/: mức độ. (un)extended, /(ʌn)ɪkˈstendɪd/: (không) được mở rộng. (in)extensible, /(ɪn)ɪkˈstensəbl/: (không) có thể bao quát.",
-    "example": "They built an extension to the house. To a large extent, I agree. It’s an extended warranty. The rope is inextensible.",
-    "count": 0
+      "word": "extinct",
+      "meaning": "extinction (n) /ɪkˈstɪŋkʃn/",
+      "example": "Many endangered species face extinction if trends continue",
+      "translation": "sự tuyệt chủng",
+      "count": 0
     },
     {
-    "word": "extinct",
-    "meaning": "extinction, /ɪkˈstɪŋkʃn/: sự tuyệt chủng.",
-    "example": "Many species face extinction.",
-    "count": 0
+      "word": "familiar",
+      "meaning": "familiarise (v) /fəˈmɪliəraɪz/; familiarity (n) /fəˌmɪliˈærəti/; unfamiliarity (n) /ʌnfəˌmɪliˈærəti/; unfamiliar (adj) /ˌʌnfəˈmɪliə(r)/; familiarly (adv) /fəˈmɪliəli/",
+      "example": "He tried to familiarise himself with the software; Her familiarity with the city made navigation easy; His unfamiliarity with local customs was clear; The area felt unfamiliar after so many years; She spoke familiarly to the group",
+      "translation": "làm cho quen; sự quen thuộc; sự không quen thuộc; không quen thuộc; một cách thân mật",
+      "count": 0
     },
     {
-    "word": "familiar",
-    "meaning": "familiarise, /fəˈmɪliəraɪz/: làm cho quen thuộc. (un)familiarity, /(ʌn)fəˌmɪliˈærəti/: (sự) (không) quen thuộc. unfamiliar, /ˌʌnfəˈmɪliə(r)/: không quen thuộc. familiarly, /fəˈmɪliəli/: một cách thân thuộc.",
-    "example": "You should familiarise yourself with the rules. His unfamiliarity was obvious. This is unfamiliar territory. She spoke familiarly.",
-    "count": 0
+      "word": "favour",
+      "meaning": "favouritism (n) /ˈfeɪvərɪtɪzəm/; favourite (n) /ˈfeɪvərɪt/; favourable (adj) /ˈfeɪvərəbl/; unfavourable (adj) /ʌnˈfeɪvərəbl/; favourably (adv) /ˈfeɪvərəbli/; unfavourably (adv) /ʌnˈfeɪvərəbli/",
+      "example": "He was accused of favouritism at work; She is my favourite colleague; The weather was favourable for hiking; The results were unfavourable to our plan; The news was received favourably; The proposal was unfavourably reviewed by management",
+      "translation": "sự thiên vị; người yêu thích; có thiện chí; không thuận lợi; một cách thuận lợi; một cách không thuận lợi",
+      "count": 0
     },
     {
-    "word": "favour",
-    "meaning": "favouritism, /ˈfeɪvərɪtɪzəm/: sự thiên vị. favourite, /ˈfeɪvərɪt/: yêu thích. (un)favourable, /(ʌn)ˈfeɪvərəbl/: (không) có thiện chí. (un)favourably, /(ʌn)ˈfeɪvərəbli/: (một cách) (không) thuận lợi.",
-    "example": "He was accused of favouritism. She is my favourite teacher. The outcome was favourable. They were unfavourably compared.",
-    "count": 0
+      "word": "finite",
+      "meaning": "infinity (n) /ɪnˈfɪnəti/; infinitive (n) /ɪnˈfɪnətɪv/; infinite (adj) /ˈɪnfɪnət/; infinitely (adv) /ˈɪnfɪnətli/; infinitesimal (adj) /ˌɪnfɪnɪˈtesɪml/; infinitesimally (adv) /ˌɪnfɪnɪˈtesɪməli/",
+      "example": "Space is sometimes described as reaching infinity; Use the infinitive form in this sentence; The resources are not infinite; Her patience is infinitely greater than mine; The error margin was infinitesimal; Their chances decreased infinitesimally over time",
+      "translation": "vô cực; động từ nguyên mẫu; vô hạn; một cách vô hạn; cực nhỏ; một cách cực nhỏ",
+      "count": 0
     },
     {
-    "word": "finite",
-    "meaning": "infinity, /ɪnˈfɪnəti/: vô cực. infinitive, /ɪnˈfɪnətɪv/: nguyên thể. infinite(ly), /ˈɪnfɪnət(li)/: (một cách) vô hạn. infinitesimal(ly), /ˌɪnfɪnɪˈtesɪml(i)/: (một cách) vi phân.",
-    "example": "The universe is not infinite. Infinity is a complex idea. Use the infinitive form. Infinitely more efficient. The difference was infinitesimal.",
-    "count": 0
+      "word": "flexible",
+      "meaning": "flexibility (n) /ˌfleksəˈbɪləti/; inflexibility (n) /ɪnˌfleksəˈbɪləti/; inflexible (adj) /ɪnˈfleksəbl/",
+      "example": "Flexibility in approach can be an advantage; His inflexibility caused problems in negotiations; The rules were too inflexible for exceptions",
+      "translation": "tính linh hoạt; tính cứng nhắc; cứng nhắc",
+      "count": 0
     },
     {
-    "word": "flexible",
-    "meaning": "(in)flexibility, /(ɪn)ˌfleksəˈbɪləti/: (tính) (không) linh hoạt. inflexible, /ɪnˈfleksəbl/: cứng nhắc.",
-    "example": "Flexibility is key in this job. The plan was inflexible.",
-    "count": 0
-    },      
+      "word": "character",
+      "meaning": "characterise (v) /ˈkærəktəraɪz/; characterisation (n) /ˌkærəktəraɪˈzeɪʃn/; characteristic (adj) /ˌkærəktəˈrɪstɪk/; uncharacteristic (adj) /ʌnˌkærəktəˈrɪstɪk/; characterless (adj) /ˈkærəktələs/",
+      "example": "We can characterise the novel as suspenseful; Her characterisation of the role impressed critics; That response was characteristic of him; His lateness was uncharacteristic; The building looked characterless after renovations",
+      "translation": "mô tả; sự mô tả; đặc trưng; không đặc trưng; không có bản sắc",
+      "count": 0
+    },
     {
-    "word": "character",
-    "meaning": "characterise, /ˈkærəktəraɪz/: mô tả như là. characterisation, /ˌkærəktəraɪˈzeɪʃn/: sự mô tả như là. (un)characteristic, /(ʌn)ˌkærəktəˈrɪstɪk/: (không) đặc trưng. characterless, /ˈkærəktələs/: không có bản sắc.",
-    "example": "The author characterises him as a hero. Her characterisation was accurate. That behavior is uncharacteristic. The new building feels characterless.",
-    "count": 0
+      "word": "charity",
+      "meaning": "charitableness (n) /ˈtʃærətəblnəs/; charitable (adj) /ˈtʃærətəbl/; uncharitable (adj) /ʌnˈtʃærətəbl/; charitably (adv) /ˈtʃærətəbli/; uncharitably (adv) /ʌnˈtʃærətəbli/",
+      "example": "Her charitableness was widely respected; They ran a charitable event for children; His remarks were uncharitable towards his rivals; She donated charitably each year; He commented uncharitably about the error",
+      "translation": "lòng nhân ái; có lòng nhân ái; không có lòng nhân ái; một cách nhân ái; một cách không nhân ái",
+      "count": 0
     },
     {
-    "word": "charity",
-    "meaning": "charitableness, /ˈtʃærətəblnəs/: lòng nhân ái. (un)charitable(ly), /(ʌn)ˈtʃærətəbl(i)/: (không) khoan dung.",
-    "example": "Her charitableness touched many lives. He spoke uncharitably in anger.",
-    "count": 0
+      "word": "choose",
+      "meaning": "chose (v) /tʃəʊz/; chosen (adj) /ˈtʃəʊzn/; choice (n) /tʃɔɪs/; choosy (adj) /ˈtʃuːzi/",
+      "example": "He chose to move abroad for work; She is the chosen leader of the team; The choice was difficult to make; He is quite choosy about his food",
+      "translation": "đã chọn; được chọn; sự lựa chọn; kén chọn",
+      "count": 0
     },
     {
-    "word": "choose",
-    "meaning": "chose, /tʃəʊz/: quá khứ choose. chosen, /ˈtʃəʊzn/: được chọn. choice, /tʃɔɪs/: sự lựa chọn. choosy, /ˈtʃuːzi/: kén chọn.",
-    "example": "He chose wisely. She is the chosen candidate. You have a choice. She’s very choosy about clothes.",
-    "count": 0
+      "word": "class",
+      "meaning": "outclass (v) /ˌaʊtˈklɑːs/; declassify (v) /ˈdiːˈklæsɪfaɪ/; classify (v) /ˈklæsɪfaɪ/; classics (n) /ˈklæsɪks/; classifieds (n) /ˈklæsɪfaɪdz/; classification (n) /ˌklæsɪfɪˈkeɪʃn/; classlessness (n) /ˈklɑːsləsnəs/; classmate (n) /ˈklɑːsmeɪt/; classroom (n) /ˈklɑːsruːm/; classwork (n) /ˈklɑːswɜːk/; classy (adj) /ˈklɑːsi/",
+      "example": "She managed to outclass all her competitors; The report was declassified last year; They classify animals by species; He loves reading the classics; He found a job in the classifieds; The process of classification took months; They promoted classlessness in society; Her classmate helped her with the project; The classroom was filled with laughter; His classwork was always complete; That’s a classy restaurant downtown",
+      "translation": "vượt trội; giải mật; phân loại; tác phẩm kinh điển; mục rao vặt; sự phân loại; không giai cấp; bạn cùng lớp; phòng học; bài học trên lớp; sang trọng",
+      "count": 0
     },
     {
-    "word": "class",
-    "meaning": "outclass, /ˌaʊtˈklɑːs/: vượt trội. (de)classify, /ˈklæsɪfaɪ/: phân loại. classics, /ˈklæsɪks/: văn học Hy Lạp cổ. classifieds, /ˈklæsɪfaɪdz/: mục rao vặt. classification, /ˌklæsɪfɪˈkeɪʃn/: sự phân loại. classlessness, /ˈklɑːsləsnəs/: không giai cấp. classmate, /ˈklɑːsmeɪt/: bạn cùng lớp. classroom, /ˈklɑːsruːm/: phòng học. classwork, /ˈklɑːswɜːk/: bài học trên lớp. classy, /ˈklɑːsi/: ưu tú.",
-    "example": "She outclassed all the runners. They classified the documents. I love reading the classics. He searched the classifieds. We studied animal classification. The movement promoted classlessness. My classmate is helpful. The classroom was quiet. His classwork is excellent. That's a classy dress.",
-    "count": 0
+      "word": "collect",
+      "meaning": "collect (v) /kəˈlekt/; collector (n) /kəˈlektə(r)/; collection (n) /kəˈlekʃn/; collectable (adj) /kəˈlektəbl/; collected (adj) /kəˈlektɪd/; collective (adj) /kəˈlektɪv/; collectively (adv) /kəˈlektɪvli/",
+      "example": "He began to collect coins as a child; The collector displayed rare paintings; The museum’s collection grew every year; These coins are highly collectable; The collected data was analyzed; It was a collective effort by the team; The changes were made collectively",
+      "translation": "thu thập; người sưu tầm; bộ sưu tập; có thể sưu tầm; được thu thập; tập thể; một cách tập thể",
+      "count": 0
     },
     {
-    "word": "collect",
-    "meaning": "collect(v), /kəˈlekt/: thu thập. collector, /kəˈlektə(r)/: người sưu tầm. collection, /kəˈlekʃn/: bộ sưu tập. collectable, /kəˈlektəbl/: có thể thu thập được. collected, /kəˈlektɪd/: được thu thập. collective(ly), /kəˈlektɪv(li)/: (một cách) tập thể.",
-    "example": "He collects stamps. The art collector visited. This is a rare collection. These items are collectable. All data was collected. We acted collectively.",
-    "count": 0
+      "word": "come",
+      "meaning": "overcome (v) /ˌəʊvəˈkʌm/; comeback (n) /ˈkʌmbæk/; newcomer (n) /ˈnjuːˌkʌmə(r)/; outcome (n) /ˈaʊtkʌm/; income (n) /ˈɪnkʌm/; coming (adj) /ˈkʌmɪŋ/; oncoming (adj) /ˈɒnkʌmɪŋ/; incoming (adj) /ˈɪnkʌmɪŋ/",
+      "example": "He worked hard to overcome the setback; The band staged an impressive comeback; The newcomer was warmly welcomed; The outcome was better than expected; Her income increased after the promotion; The coming weeks will be busy; Watch for oncoming traffic; The incoming message was urgent",
+      "translation": "vượt qua; sự trở lại; người mới đến; kết quả; thu nhập; sắp tới; đang đến; mới đến",
+      "count": 0
     },
     {
-    "word": "come",
-    "meaning": "overcome, /ˌəʊvəˈkʌm/: vượt qua. comeback, /ˈkʌmbæk/: sự trở lại. newcomer, /ˈnjuːˌkʌmə(r)/: người mới. outcome, /ˈaʊtkʌm/: kết quả. income, /ˈɪnkʌm/: thu nhập. coming, /ˈkʌmɪŋ/: sắp tới. oncoming, /ˈɒnkʌmɪŋ/: đang đến gần. incoming, /ˈɪnkʌmɪŋ/: mới đến.",
-    "example": "He overcame great odds. The singer made a comeback. The newcomer was nervous. The outcome was expected. My income has increased. The coming days are busy. An oncoming car appeared. The incoming mail was sorted.",
-    "count": 0
+      "word": "compete",
+      "meaning": "competition (n) /ˌkɒmpəˈtɪʃn/; competitor (n) /kəmˈpetɪtə(r)/; competitiveness (n) /kəmˈpetətɪvnəs/; competitive (adj) /kəmˈpetətɪv/; uncompetitive (adj) /ʌnˈkɒmpətɪtɪv/; competitively (adv) /kəmˈpetətɪvli/; uncompetitively (adv) /ʌnˈkɒmpətɪtɪvli/",
+      "example": "She entered the annual competition with excitement; Every competitor trained for months; The company’s competitiveness led to growth; They offered competitive salaries to attract talent; The price is uncompetitive in the market; She sold her products competitively; They priced uncompetitively and lost customers",
+      "translation": "cuộc thi; đối thủ; tính cạnh tranh; cạnh tranh; không cạnh tranh; một cách cạnh tranh; một cách không cạnh tranh",
+      "count": 0
     },
     {
-    "word": "compete",
-    "meaning": "competition, /ˌkɒmpəˈtɪʃn/: cuộc thi. competitor, /kəmˈpetɪtə(r)/: đối thủ. competitiveness, /kəmˈpetətɪvnəs/: tính cạnh tranh. (un)competitive(ly), /(ʌn)kəmˈpetətɪv(li)/: (một cách) (không) cạnh tranh.",
-    "example": "The competition was fierce. He’s a strong competitor. They promote competitiveness. She priced it competitively. It’s uncompetitively expensive.",
-    "count": 0
+      "word": "concept",
+      "meaning": "conceptualise (v) /kənˈseptʃuəlaɪz/; concept (n) /ˈkɒnsept/; conception (n) /kənˈsepʃn/; conceivable (adj) /kənˈsiːvəbl/; inconceivable (adj) /ɪnkənˈsiːvəbl/; conceivably (adv) /kənˈsiːvəbli/; inconceivably (adv) /ɪnkənˈsiːvəbli/",
+      "example": "He tried to conceptualise the process; The concept was easy to grasp; Her conception of the plan was innovative; That’s a conceivable solution; The alternative is inconceivable to most; It could conceivably happen; The system failed inconceivably fast",
+      "translation": "khái niệm hóa; khái niệm; quan niệm; có thể tưởng tượng; không thể tưởng tượng; một cách có thể tưởng tượng; một cách không thể tưởng tượng",
+      "count": 0
     },
     {
-    "word": "concept",
-    "meaning": "conceptualise, /kənˈseptʃuəlaɪz/: khái niệm hóa. concept, /ˈkɒnsept/: khái niệm. conception, /kənˈsepʃn/: quan niệm. (in)conceivable, /(ɪn)kənˈsiːvəbl/: (không) có thể tưởng tượng. (in)conceivably, /(ɪn)kənˈsiːvəbli/: (một cách) (không) tưởng tượng được.",
-    "example": "He struggled to conceptualise freedom. It’s a difficult concept. Her conception differs. It’s inconceivable! They may conceivably win.",
-    "count": 0
+      "word": "confuse",
+      "meaning": "confusion (n) /kənˈfjuːʒn/; confused (adj) /kənˈfjuːzd/; confusing (adj) /kənˈfjuːzɪŋ/; confusingly (adv) /kənˈfjuːzɪŋli/",
+      "example": "The instructions led to confusion among students; He looked confused during the test; The map is confusing to visitors; The information was presented confusingly",
+      "translation": "sự nhầm lẫn; bối rối; gây nhầm lẫn; một cách gây nhầm lẫn",
+      "count": 0
     },
     {
-    "word": "confuse",
-    "meaning": "confusion, /kənˈfjuːʒn/: sự nhầm lẫn. confused, /kənˈfjuːzd/: bối rối. confusing(ly), /kənˈfjuːzɪŋ(li)/: (một cách) gây nhầm lẫn.",
-    "example": "There was a lot of confusion. She looked confused. The instructions were confusingly worded.",
-    "count": 0
+      "word": "connect",
+      "meaning": "disconnect (v) /ˌdɪskəˈnekt/; reconnect (v) /ˌriːkəˈnekt/; interconnect (v) /ˌɪntəkəˈnekt/; interconnection (n) /ˌɪntəkəˈnekʃn/; connection (n) /kəˈnekʃn/; disconnection (n) /ˌdɪskəˈnekʃn/; reconnection (n) /ˌriːkəˈnekʃn/; connector (n) /kəˈnektə(r)/",
+      "example": "He needed to disconnect the power before repairs; The technician will reconnect the lines tomorrow; The devices interconnect seamlessly; The interconnection was tested; The internet connection dropped; A sudden disconnection ended the call; The reconnection was successful; The cable uses a standard connector",
+      "translation": "ngắt kết nối; kết nối lại; kết nối lẫn nhau; sự liên kết; kết nối; ngắt kết nối; kết nối lại; đầu nối",
+      "count": 0
     },
     {
-    "word": "connect",
-    "meaning": "disconnect, /ˌdɪskəˈnekt/: ngắt kết nối. reconnect, /ˌriːkəˈnekt/: kết nối lại. interconnect, /ˌɪntəkəˈnekt/: kết nối lẫn nhau. interconnection, /ˌɪntəkəˈnekʃn/: sự liên kết. (dis/re)connection, /ˌdɪskəˈnekʃn/: (ngắt/tái) kết nối. (inter)connector, /ˌɪntəˈnek.tə(r)/: đầu nối.",
-    "example": "He disconnected the cable. We need to reconnect. The systems are interconnected. Their interconnection was solid. Reboot after disconnection. Use the connector carefully.",
-    "count": 0
+      "word": "conserve",
+      "meaning": "conservation (n) /ˌkɒnsəˈveɪʃn/; conservationist (n) /ˌkɒnsəˈveɪʃənɪst/; conservative (adj) /kənˈsɜːvətɪv/; conservatively (adv) /kənˈsɜːvətɪvli/",
+      "example": "Wildlife conservation is crucial for biodiversity; The conservationist spoke at the event; He dressed in a conservative manner; The estimate was conservatively low",
+      "translation": "sự bảo tồn; nhà bảo tồn; bảo thủ; một cách bảo thủ",
+      "count": 0
     },
     {
-    "word": "conserve",
-    "meaning": "conservation, /ˌkɒnsəˈveɪʃn/: sự bảo tồn. conservationist, /ˌkɒnsəˈveɪʃənɪst/: nhà bảo tồn. conservative(ly), /kənˈsɜːvətɪv(li)/: (một cách) bảo thủ.",
-    "example": "We support wildlife conservation. The conservationist gave a talk. He dressed conservatively.",
-    "count": 0
+      "word": "consider",
+      "meaning": "consideration (n) /kənˌsɪdəˈreɪʃn/; considered (adj) /kənˈsɪdəd/; considering (prep) /kənˈsɪdərɪŋ/; considerable (adj) /kənˈsɪdərəbl/; inconsiderable (adj) /ɪnkənˈsɪdərəbl/; considerably (adv) /kənˈsɪdərəbli/",
+      "example": "Your consideration is appreciated; She gave a considered reply; Considering the rain, we stayed home; There was a considerable delay; The change was inconsiderable; Prices rose considerably last year",
+      "translation": "sự cân nhắc; được xem là; xét đến; đáng kể; không đáng kể; một cách đáng kể",
+      "count": 0
     },
     {
-    "word": "consider",
-    "meaning": "consideration, /kənˌsɪdəˈreɪʃn/: sự cân nhắc. considered, /kənˈsɪdəd/: được xem là. considering, /kənˈsɪdərɪŋ/: đang xem xét. (in)considerable, /(ɪn)kənˈsɪdərəbl/: (không) đáng kể. considerably, /kənˈsɪdərəbli/: (một cách) đáng kể.",
-    "example": "We appreciate your consideration. She is a considered expert. Considering the weather, we stayed in. The loss was considerable. Prices dropped considerably.",
-    "count": 0
+      "word": "content",
+      "meaning": "content (n) /ˈkɒntent/; discontent (n) /dɪsˈkɒntent/; contented (adj) /kənˈtentɪd/; discontented (adj) /dɪsˈkɒntentɪd/",
+      "example": "The book’s content was engaging; The decision led to discontent; She felt contented after the meal; Many were discontented with the changes",
+      "translation": "nội dung; bất mãn; hài lòng; không hài lòng",
+      "count": 0
     },
     {
-    "word": "content",
-    "meaning": "(dis)content, /ˈkɒntent/: (không) thỏa mãn. (dis)contented, /ˌdɪskənˈtentɪd/: (không) hài lòng.",
-    "example": "He seemed content. Many workers felt discontent. She was discontented with her job.",
-    "count": 0
+      "word": "continue",
+      "meaning": "discontinue (v) /ˌdɪskənˈtɪnjuː/; continuation (n) /kənˌtɪnjuˈeɪʃn/; continuity (n) /ˌkɒntɪˈnjuːəti/; continual (adj) /kənˈtɪnjuəl/; continuous (adj) /kənˈtɪnjuəs/; continually (adv) /kənˈtɪnjuəli/; continuously (adv) /kənˈtɪnjuəsli/",
+      "example": "They decided to discontinue the service; The continuation of the series was popular; The film lacked continuity; There were continual interruptions; Continuous rain delayed the match; He checked his phone continually; The machine operated continuously",
+      "translation": "ngừng lại; sự tiếp tục; tính liên tục; liên tục; liên tục; một cách liên tục; một cách liên tục",
+      "count": 0
     },
     {
-    "word": "continue",
-    "meaning": "discontinue, /ˌdɪskənˈtɪnjuː/: ngừng lại. continuation, /kənˌtɪnjuˈeɪʃn/: sự tiếp tục. continuity, /ˌkɒntɪˈnjuːəti/: tính liên tục. continual(ly), /kənˈtɪnjuəl(i)/: (một cách) liên tiếp. continuous(ly), /kənˈtɪnjuəs(li)/: (một cách) liên tục.",
-    "example": "They will discontinue the service. The continuation of talks is vital. We need continuity in leadership. He faced continual interruptions. It rained continuously.",
-    "count": 0
+      "word": "convert",
+      "meaning": "conversion (n) /kənˈvɜːʃn/; convertible (adj) /kənˈvɜːtəbl/",
+      "example": "Their conversion to a new system took months; The couch is convertible into a bed",
+      "translation": "sự chuyển đổi; có thể chuyển đổi",
+      "count": 0
     },
     {
-    "word": "convert",
-    "meaning": "conversion, /kənˈvɜːʃn/: sự thay đổi. convertible, /kənˈvɜːtəbl/: có thể chuyển đổi.",
-    "example": "Their conversion to solar energy was fast. This sofa is convertible to a bed.",
-    "count": 0
+      "word": "convince",
+      "meaning": "conviction (n) /kənˈvɪkʃn/; convinced (adj) /kənˈvɪnst/; unconvinced (adj) /ʌnkənˈvɪnst/; convincing (adj) /kənˈvɪnsɪŋ/; unconvincing (adj) /ʌnkənˈvɪnsɪŋ/; convincingly (adv) /kənˈvɪnsɪŋli/; unconvincingly (adv) /ʌnkənˈvɪnsɪŋli/",
+      "example": "Her conviction was clear during the speech; She appeared convinced by the evidence; He seemed unconvinced by the proposal; The argument was convincing; The excuse was unconvincing; She answered convincingly; He spoke unconvincingly about the reasons",
+      "translation": "sự tin chắc; bị thuyết phục; không bị thuyết phục; có sức thuyết phục; không có sức thuyết phục; một cách thuyết phục; một cách không thuyết phục",
+      "count": 0
     },
     {
-    "word": "convince",
-    "meaning": "conviction, /kənˈvɪkʃn/: sức thuyết phục. (un)convinced, /(ʌn)kənˈvɪnst/: (không) bị thuyết phục. (un)convincing(ly), /(ʌn)kənˈvɪnsɪŋ(li)/: (một cách) (không) thuyết phục.",
-    "example": "She spoke with conviction. I'm not convinced. He argued unconvincingly.",
-    "count": 0
-    },      
+      "word": "crime",
+      "meaning": "decriminalise (v) /ˈkrɪmɪnəlaɪz/; criminal (n) /ˈkrɪmɪnl/; criminality (n) /ˌkrɪmɪˈnæləti/; criminally (adv) /ˈkrɪmɪnəli/",
+      "example": "The country chose to decriminalise certain offenses; The criminal was quickly arrested; Criminality is on the rise in the region; The law was broken criminally",
+      "translation": "không hình sự hóa; tội phạm; sự phạm tội; một cách phạm pháp",
+      "count": 0
+    },
     {
-    "word": "crime",
-    "meaning": "(de)criminalise, /ˈkrɪmɪnəlaɪz/: (không) hình sự hóa. criminal, /ˈkrɪmɪnl/: kẻ tội phạm. criminality, /ˌkrɪmɪˈnæləti/: sự phạm tội. criminally, /ˈkrɪmɪnəli/: một cách sai trái.",
-    "example": "Some countries have decriminalised certain drugs. The criminal was caught. Criminality is on the rise. He acted criminally.",
-    "count": 0
+      "word": "decide",
+      "meaning": "decision (n) /dɪˈsɪʒn/; decider (n) /dɪˈsaɪdə(r)/; decisiveness (n) /dɪˈsaɪsɪvnəs/; decisive (adj) /dɪˈsaɪsɪv/; indecisive (adj) /ɪndɪˈsaɪsɪv/; decisively (adv) /dɪˈsaɪsɪvli/",
+      "example": "She made a quick decision; The game’s decider was tense; Decisiveness is vital for leaders; His action was decisive; He was indecisive about the offer; She acted decisively in the crisis",
+      "translation": "quyết định; trận quyết định; sự quyết đoán; quyết đoán; thiếu quyết đoán; một cách quyết đoán",
+      "count": 0
     },
     {
-    "word": "decide",
-    "meaning": "decision, /dɪˈsɪʒn/: quyết định. decider, /dɪˈsaɪdə(r)/: vòng quyết đấu. decisiveness, /dɪˈsaɪsɪvnəs/: sự quyết đoán. (in)decisive(ly), /(ɪn)dɪˈsaɪsɪv(li)/: (không) quyết đoán.",
-    "example": "She made a quick decision. The final match was a decider. Decisiveness is key in business. He spoke decisively.",
-    "count": 0
+      "word": "declare",
+      "meaning": "declaration (n) /ˌdekləˈreɪʃn/; declared (adj) /dɪˈkleəd/; undeclared (adj) /ʌndɪˈkleəd/",
+      "example": "The minister made a formal declaration; It was a declared conflict; He held an undeclared amount of money",
+      "translation": "tuyên bố; được công bố; không công bố",
+      "count": 0
     },
     {
-    "word": "declare",
-    "meaning": "declaration, /ˌdekləˈreɪʃn/: lời tuyên bố. (un)declared, /(ʌn)dɪˈkleəd/: (không) công khai.",
-    "example": "They issued a declaration of independence. It was an undeclared war.",
-    "count": 0
+      "word": "deep",
+      "meaning": "deepen (v) /ˈdiːpən/; depth (n) /depθ/; deeply (adv) /ˈdiːpli/",
+      "example": "The discussion helped deepen their understanding; The lake’s depth surprised divers; She was deeply grateful for the help",
+      "translation": "làm sâu thêm; độ sâu; một cách sâu sắc",
+      "count": 0
     },
     {
-    "word": "deep",
-    "meaning": "deepen, /ˈdiːpən/: đào sâu. depth, /depθ/: độ sâu. deeply, /ˈdiːpli/: sâu sắc.",
-    "example": "This course will deepen your knowledge. The lake has great depth. She was deeply moved.",
-    "count": 0
+      "word": "define",
+      "meaning": "definition (n) /ˌdefɪˈnɪʃn/; defined (adj) /dɪˈfaɪnd/; definitive (adj) /dɪˈfɪnətɪv/; definitely (adv) /ˈdefɪnətli/; indefinite (adj) /ɪnˈdefɪnət/; indefinitely (adv) /ɪnˈdefɪnətli/",
+      "example": "He gave a precise definition in class; The project’s scope was clearly defined; The committee issued a definitive statement; The event will definitely happen; The deadline is indefinite for now; The plans were postponed indefinitely",
+      "translation": "định nghĩa; được xác định; dứt khoát; một cách chắc chắn; không xác định; một cách không xác định",
+      "count": 0
     },
     {
-    "word": "define",
-    "meaning": "definition, /ˌdefɪˈnɪʃn/: định nghĩa. defined, /dɪˈfaɪnd/: được xác định. definitive(ly), /dɪˈfɪnətɪv(li)/: (một cách) chắc chắn. (in)definite(ly), /(ɪn)ˈdefɪnət(li)/: (không) rõ ràng.",
-    "example": "Give a clear definition. The borders are clearly defined. That’s the definitive answer. We postponed it indefinitely.",
-    "count": 0
+      "word": "dense",
+      "meaning": "density (n) /ˈdensəti/; independence (n) /ˌɪndɪˈpendəns/; dependence (n) /dɪˈpendəns/; dependent (adj) /dɪˈpendənt/; independent (adj) /ˌɪndɪˈpendənt/; dependently (adv) /dɪˈpendəntli/; independently (adv) /ˌɪndɪˈpendəntli/",
+      "example": "The population density is high in the city; They celebrated their independence; His dependence on others decreased; She is still dependent on her parents; He became fully independent after college; They lived dependently for years; She solved the issue independently",
+      "translation": "mật độ; độc lập; sự phụ thuộc; phụ thuộc; độc lập; một cách phụ thuộc; một cách độc lập",
+      "count": 0
     },
     {
-    "word": "dense",
-    "meaning": "density, /ˈdensəti/: mật độ. (in)dependence, /(ɪn)dɪˈpendəns/: (không) phụ thuộc. (in)dependent(ly), /(ɪn)dɪˈpendənt(li)/: (một cách) (không) phụ thuộc.",
-    "example": "The fog’s density was high. They value independence. Children become independent. He lives independently.",
-    "count": 0
+      "word": "derive",
+      "meaning": "derivation (n) /ˌderɪˈveɪʃn/; derivative (n/adj) /dɪˈrɪvətɪv/",
+      "example": "The derivation of the word is Latin; That formula is a derivative of the original",
+      "translation": "nguồn gốc; bắt nguồn từ",
+      "count": 0
     },
     {
-    "word": "derive",
-    "meaning": "derivation, /ˌderɪˈveɪʃn/: nguồn gốc. derivative, /dɪˈrɪvətɪv/: bắt nguồn từ.",
-    "example": "The word is of Latin derivation. This idea is a derivative of his work.",
-    "count": 0
+      "word": "desire",
+      "meaning": "desirable (adj) /dɪˈzaɪərəbl/; undesirable (adj) /ʌndɪˈzaɪərəbl/; desire (n) /dɪˈzaɪə(r)/; desired (adj) /dɪˈzaɪəd/; desirably (adv) /dɪˈzaɪərəbli/; undesirably (adv) /ʌndɪˈzaɪərəbli/",
+      "example": "The property is in a desirable area; The job conditions were undesirable; She felt a strong desire to travel; The desired outcome was achieved; He was desirably qualified; The weather turned undesirably hot",
+      "translation": "đáng ao ước; không đáng ao ước; mong muốn; được mong muốn; một cách mong muốn; một cách không mong muốn",
+      "count": 0
     },
     {
-    "word": "desire",
-    "meaning": "(un)desirable, /(ʌn)dɪˈzaɪərəbl/: (không) đáng ao ước. desire, /dɪˈzaɪə(r)/: ham muốn. desired, /dɪˈzaɪəd/: mong muốn. (un)desirably, /(ʌn)dɪˈzaɪərəbli/: (một cách) (không) đáng ao ước.",
-    "example": "This is a desirable area. She expressed her desire. The desired effect was achieved. It is undesirably hot.",
-    "count": 0
+      "word": "destroy",
+      "meaning": "destroyer (n) /dɪˈstrɔɪə(r)/; destruction (n) /dɪˈstrʌkʃn/; indestructible (adj) /ˌɪndɪˈstrʌktəbl/; destructive (adj) /dɪˈstrʌktɪv/; destructively (adv) /dɪˈstrʌktɪvli/",
+      "example": "The destroyer sailed into port; The fire caused great destruction; The safe was indestructible; The criticism was destructive; He acted destructively during the argument",
+      "translation": "tàu khu trục; sự phá hủy; không thể phá hủy; phá hoại; một cách phá hoại",
+      "count": 0
     },
     {
-    "word": "destroy",
-    "meaning": "destroyer, /dɪˈstrɔɪə(r)/: kẻ phá hoại. destruction, /dɪˈstrʌkʃn/: sự tàn phá. indestructible, /ˌɪndɪˈstrʌktəbl/: không thể phá hủy. destructive(ly), /dɪˈstrʌktɪv(li)/: (một cách) hủy diệt.",
-    "example": "The destroyer arrived at dawn. War causes destruction. The box is indestructible. He shouted destructively.",
-    "count": 0
+      "word": "distant",
+      "meaning": "equidistant (adj) /ˌekwɪˈdɪstənt/; distantly (adv) /ˈdɪstəntli/",
+      "example": "The houses are equidistant from the main road; She smiled distantly at her friend",
+      "translation": "cách đều nhau; một cách xa cách",
+      "count": 0
     },
     {
-    "word": "distant",
-    "meaning": "(equi)distant(ly), /ˈdɪstənt(li)/: (cách đều) nhau. equidistant, /ˌekwɪˈdɪstənt/: cách đều nhau. distantly, /ˈdɪstəntli/: xa.",
-    "example": "The houses are equidistant. He stood distantly from the group.",
-    "count": 0
+      "word": "do",
+      "meaning": "overdo (v) /ˌəʊvəˈduː/; outdo (v) /ˌaʊtˈduː/; redo (v) /ˌriːˈduː/; undo (v) /ʌnˈduː/; did (v) /dɪd/; done (adj) /dʌn/; doing (n) /ˈduːɪŋ/; doings (n) /ˈduːɪŋz/",
+      "example": "Be careful not to overdo the exercise; She managed to outdo her competitors; Please redo the calculations; He tried to undo the knot; He did his best to help; The work is done for the day; What are you doing now? Strange doings were reported",
+      "translation": "làm quá sức; làm giỏi hơn; làm lại; hoàn tác; đã làm; đã xong; hành động; hành vi",
+      "count": 0
     },
     {
-    "word": "do",
-    "meaning": "overdo, /ˌəʊvəˈduː/: làm quá sức. outdo, /ˌaʊtˈduː/: làm giỏi hơn. redo, /ˌriːˈduː/: làm lại. undo, /ʌnˈduː/: hoàn tác. (over/out/re/un)did, /dɪd/: (quá khứ) làm. (over/out/re/un)done, /dʌn/: (quá khứ phân từ) làm xong. doing, /ˈduːɪŋ/: hành động. doings, /ˈduːɪŋz/: hành vi.",
-    "example": "Don’t overdo the spices. She outdid everyone. You need to redo the form. He tried to undo the mistake. It’s already done. Strange doings occurred.",
-    "count": 0
+      "word": "dominate",
+      "meaning": "domineer (v) /ˌdɒmɪˈnɪə(r)/; domination (n) /ˌdɒmɪˈneɪʃn/; dominance (n) /ˈdɒmɪnəns/; predominant (adj) /prɪˈdɒmɪnənt/; dominant (adj) /ˈdɒmɪnənt/; dominating (adj) /ˈdɒmɪneɪtɪŋ/; predominantly (adv) /prɪˈdɒmɪnəntli/",
+      "example": "He tends to domineer in meetings; The team’s domination was evident; Their dominance in the market continues; The predominant color was blue; She has a dominant personality; His presence was dominating; The staff was predominantly young",
+      "translation": "áp đặt; sự thống trị; sự trội hơn; vượt trội; thống trị; có tính thống trị; chủ yếu",
+      "count": 0
     },
     {
-    "word": "dominate",
-    "meaning": "domineer, /ˌdɒmɪˈnɪə(r)/: độc đoán. domination, /ˌdɒmɪˈneɪʃn/: sự thống trị. (pre)dominance, /ˈpridɒmɪnəns/: sự trội hơn. dominant, /ˈdɒmɪnənt/: vượt trội. dominating, /ˈdɒmɪneɪtɪŋ/: thống trị. predominantly, /prɪˈdɒmɪnəntli/: chủ yếu.",
-    "example": "He tends to domineer over others. Their domination of the market is clear. English has global dominance. She has a dominant personality. A dominating figure. The team was predominantly local.",
-    "count": 0
+      "word": "doubt",
+      "meaning": "doubter (n) /ˈdaʊtə(r)/; doubtful (adj) /ˈdaʊtfl/; undoubted (adj) /ʌnˈdaʊtɪd/; doubtfully (adv) /ˈdaʊtfl(i)/; undoubtedly (adv) /ʌnˈdaʊtɪdli/",
+      "example": "He is a doubter by nature; The plan is doubtful at best; She is an undoubted talent; He answered doubtfully; She is undoubtedly skilled",
+      "translation": "người nghi ngờ; đáng ngờ; không nghi ngờ; một cách nghi ngờ; một cách không nghi ngờ",
+      "count": 0
     },
     {
-    "word": "doubt",
-    "meaning": "doubter, /ˈdaʊtə(r)/: người hay nghi ngờ. doubtful(ly), /ˈdaʊtfl(i)/: (một cách) nghi ngờ. undoubted(ly), /ʌnˈdaʊtɪd(li)/: (một cách) chắc chắn.",
-    "example": "He’s a doubter of all theories. That’s doubtfully useful. She is undoubtedly talented.",
-    "count": 0
+      "word": "draw",
+      "meaning": "withdraw (v) /wɪðˈdrɔː/; withdrew (v) /wɪðˈdruː/; drawn (adj) /drɔːn/; withdrawal (n) /wɪðˈdrɔːəl/; drawing (n) /ˈdrɔːɪŋ/; overdraft (n) /ˈəʊvədrɑːft/; overdrawn (adj) /ˌəʊvəˈdrɔːn/; withdrawable (adj) /wɪðˈdrɔːəbl/",
+      "example": "She plans to withdraw from the contest; He withdrew his name from the list; The curtains were drawn at dusk; The withdrawal of troops took weeks; Her drawing was praised; He paid off his overdraft; The account is overdrawn; The funds are withdrawable at any time",
+      "translation": "rút lui; đã rút lui; được kéo; sự rút lui; bản vẽ; thấu chi; bị quá hạn; có thể rút",
+      "count": 0
     },
     {
-    "word": "draw",
-    "meaning": "withdraw, /wɪðˈdrɔː/: rút lui. withdrew, /wɪðˈdruː/: rút (quá khứ). drawn, /drɔːn/: rút (phân từ). withdrawal, /wɪðˈdrɔːəl/: sự rút lui. drawing, /ˈdrɔːɪŋ/: bản vẽ. overdraft, /ˈəʊvədrɑːft/: thấu chi. overdrawn, /ˌəʊvəˈdrɔːn/: quá hạn. withdrawable, /wɪðˈdrɔːəbl/: có thể rút.",
-    "example": "He decided to withdraw. She withdrew from the race. All money was drawn. The withdrawal was quiet. That’s a great drawing. I have an overdraft. His account is overdrawn. This deposit is withdrawable.",
-    "count": 0
+      "word": "duty",
+      "meaning": "dutiful (adj) /ˈdjuːtɪfl/; dutifully (adv) /ˈdjuːtɪfli/",
+      "example": "He was always dutiful in his tasks; She listened dutifully to instructions",
+      "translation": "có trách nhiệm; một cách có trách nhiệm",
+      "count": 0
     },
     {
-    "word": "duty",
-    "meaning": "dutiful(ly), /ˈdjuːtɪfl(i)/: (một cách) vâng lời.",
-    "example": "She served dutifully.",
-    "count": 0
+      "word": "ecology",
+      "meaning": "ecologist (n) /ɪˈkɒlədʒɪst/; ecological (adj) /ˌiːkəˈlɒdʒɪkl/; ecologically (adv) /ˌiːkəˈlɒdʒɪkli/",
+      "example": "The ecologist studied rare plants; They made an ecological assessment; The system was designed ecologically",
+      "translation": "nhà sinh thái học; thuộc sinh thái; một cách sinh thái",
+      "count": 0
     },
     {
-    "word": "ecology",
-    "meaning": "ecologist, /ɪˈkɒlədʒɪst/: nhà sinh thái học. ecological(ly), /ˌiːkəˈlɒdʒɪkl(i)/: (thuộc) sinh thái.",
-    "example": "The ecologist gave a lecture. We must consider ecological impacts.",
-    "count": 0
+      "word": "edit",
+      "meaning": "edition (n) /ɪˈdɪʃn/; editor (n) /ˈedɪtə(r)/; editorship (n) /ˈedɪtəʃɪp/; edited (adj) /ˈedɪtɪd/; unedited (adj) /ʌnˈedɪtɪd/; editorial (adj) /ˌedɪˈtɔːriəl/; editorially (adv) /ˌedɪˈtɔːriəli/",
+      "example": "She read the latest edition; The editor revised the article; He held the editorship for years; The edited film was released; The footage is unedited; The editorial policy was strict; The article was editorially approved",
+      "translation": "phiên bản; biên tập viên; công việc biên tập; đã chỉnh sửa; chưa chỉnh sửa; thuộc biên tập; một cách biên tập",
+      "count": 0
     },
     {
-    "word": "edit",
-    "meaning": "edition, /ɪˈdɪʃn/: ấn bản. editor, /ˈedɪtə(r)/: biên tập viên. editorship, /ˈedɪtəʃɪp/: công tác biên tập. (un)edited, /(ʌn)ˈedɪtɪd/: (không) được biên tập. editorial(ly), /ˌedɪˈtɔːriəli/: (một cách) biên tập.",
-    "example": "I read the latest edition. She is the editor. He took over the editorship. The footage is unedited. It was editorially approved.",
-    "count": 0
+      "word": "effect",
+      "meaning": "effectiveness (n) /ɪˈfektɪvnəs/; ineffectiveness (n) /ɪnɪˈfektɪvnəs/; effectual (adj) /ɪˈfektʃuəl/; ineffectual (adj) /ɪnɪˈfektʃuəl/; effective (adj) /ɪˈfektɪv/; ineffective (adj) /ɪnɪˈfektɪv/; effectively (adv) /ɪˈfektɪvli/; ineffectively (adv) /ɪnɪˈfektɪvli/",
+      "example": "We measured the treatment’s effectiveness; The plan’s ineffectiveness was clear; This is an effectual remedy; The method was ineffectual for most; The new system is effective; The old tools were ineffective; She responded effectively; The work was done ineffectively",
+      "translation": "sự hiệu quả; không hiệu quả; có hiệu lực; không hiệu lực; hiệu quả; không hiệu quả; một cách hiệu quả; một cách không hiệu quả",
+      "count": 0
     },
     {
-    "word": "effect",
-    "meaning": "(in)effectiveness, /(ɪn)ɪˈfektɪvnəs/: (sự) (không) hiệu quả. (in)effectual(ly), /(ɪn)ɪˈfektʃuəl(li)/: (một cách) (không) hiệu lực. (in)effective(ly), /(ɪn)ɪˈfektɪv(li)/: (một cách) (không) hiệu quả.",
-    "example": "The treatment’s effectiveness is clear. His efforts were ineffectual. She works effectively.",
-    "count": 0
-    },      
+      "word": "relate",
+      "meaning": "relation (n) /rɪˈleɪʃn/; relationship (n) /rɪˈleɪʃnʃɪp/; related (adj) /rɪˈleɪtɪd/; unrelated (adj) /ʌnˈreɪtɪd/; relative (adj) /ˈrelətɪv/; relatively (adv) /ˈrelətɪvli/",
+      "example": "They had a strong relation to each other; Their relationship lasted years; The topics are closely related; The issues are unrelated; She is a relative of mine; The task is relatively simple",
+      "translation": "mối quan hệ; mối quan hệ; có liên quan; không liên quan; tương đối; một cách tương đối",
+      "count": 0
+    },
     {
-    "word": "relate",
-    "meaning": "relation, /rɪˈleɪʃn/: mối tương quan. relationship, /rɪˈleɪʃnʃɪp/: mối quan hệ. (un)related, /(ʌn)ˈreɪtɪd/: (không) có liên quan. relative(ly), /ˈrelətɪv(li)/: (một cách) tương đối.",
-    "example": "They have a close relationship. Those events are unrelated. The change is relatively minor.",
-    "count": 0
+      "word": "relax",
+      "meaning": "relaxation (n) /ˌriːlækˈseɪʃn/; relaxing (adj) /rɪˈlæksɪŋ/",
+      "example": "Music helps with relaxation after work; The vacation was very relaxing",
+      "translation": "sự thư giãn; thư giãn",
+      "count": 0
     },
     {
-    "word": "relax",
-    "meaning": "relaxation, /ˌriːlækˈseɪʃn/: sự thư giãn. relaxing, /rɪˈlæksɪŋ/: có tính thư giãn.",
-    "example": "Take time for relaxation. The music is very relaxing.",
-    "count": 0
+      "word": "repair",
+      "meaning": "repairman (n) /rɪˈpeəmæn/; repairer (n) /rɪˈpeərə/; reparation (n) /ˌrepəˈreɪʃn/; repair (n) /rɪˈpeə/; irreparable (adj) /ɪˈrepərəbl/; irreparably (adv) /ɪˈrepərəbli/",
+      "example": "The repairman fixed the leak; She hired a skilled repairer; The damages needed reparation; The repair was completed on time; The vase was irreparable; The damage was irreparably done",
+      "translation": "thợ sửa chữa; người sửa chữa; sự sửa chữa; sự sửa chữa; không thể sửa; một cách không thể sửa",
+      "count": 0
     },
     {
-    "word": "repair",
-    "meaning": "repairman/men, /rɪˈpeəmən/: thợ sửa máy móc. repairer, /rɪˈpeərə/: người sửa chữa. reparation, /ˌrepəˈreɪʃn/: sự sửa chữa. repair, /rɪˈpeə/: việc sửa chữa. irreparable, /ɪˈrepərəbl/: không thể sửa chữa. irreparably, /ɪˈrepərəbli/: một cách không thể sửa.",
-    "example": "The repairman fixed the leak. She is a skilled repairer. The damages required reparation. This repair was costly. The loss is irreparable. The damage was irreparably done.",
-    "count": 0
+      "word": "reside",
+      "meaning": "residence (n) /ˈrezɪdns/; resident (n) /ˈrezɪdənt/; residing (adj) /rɪˈzaɪdɪŋ/; residential (adj) /ˌrezɪˈdenʃl/; residentially (adv) /ˌrezɪˈdenʃəli/",
+      "example": "His residence was easy to find; The residents gathered for a meeting; She is currently residing in Paris; The area is mostly residential; The area is residentially zoned",
+      "translation": "nhà ở; cư dân; cư trú; thuộc nhà ở; một cách thuộc về nhà ở",
+      "count": 0
     },
     {
-    "word": "reside",
-    "meaning": "residence, /ˈrezɪdns/: nhà ở. resident, /ˈrezɪdənt/: cư dân. residing, /rɪˈzaɪdɪŋ/: cư trú. residential(ly), /ˌrezɪˈdenʃl(i)/: thuộc về, ở tại.",
-    "example": "His residence is near the park. The residents complained. He is currently residing in Tokyo. It's a residential area.",
-    "count": 0
+      "word": "resolve",
+      "meaning": "resolution (n) /ˌrezəˈluːʃn/; irresolution (n) /ˌɪrˌrezəˈluːʃn/; resolved (adj) /rɪˈzɒlvd/; unresolved (adj) /ʌnˈrɪˈzɒlvd/; resolute (adj) /ˈrezəluːt/; irresolute (adj) /ɪˈrezəluːt/; resolutely (adv) /ˈrezəluːtli/",
+      "example": "Their resolution was passed unanimously; His irresolution led to delays; She remained resolved to finish; The conflict remained unresolved; He gave a resolute answer; Her response was irresolute; She acted resolutely under pressure",
+      "translation": "sự giải quyết; thiếu quyết đoán; được giải quyết; chưa được giải quyết; kiên quyết; thiếu kiên quyết; một cách kiên quyết",
+      "count": 0
     },
     {
-    "word": "resolve",
-    "meaning": "(ir)resolution, /(ˌɪr)ˌrezəˈluːʃn/: (sự) (thiếu) kiên quyết. (un)resolved, /(ˌʌn)rɪˈzɒlvd/: (chưa) được giải quyết. (ir)resolute(ly), /(ˌɪr)ˈrezəluːt(li)/: (một cách) (thiếu) kiên quyết.",
-    "example": "The resolution was unanimous. The conflict remains unresolved. She spoke resolutely.",
-    "count": 0
+      "word": "respond",
+      "meaning": "response (n) /rɪˈspɒns/; respondent (n) /rɪˈspɒndənt/; responsive (adj) /rɪˈspɒnsɪv/; unresponsive (adj) /ˌʌnˈspɒnsɪv/; responsively (adv) /rɪˈspɒnsɪvli/; unresponsively (adv) /ˌʌnˈspɒnsɪvli/",
+      "example": "His response was immediate; The respondent filled the survey; She is highly responsive to feedback; The device is unresponsive; He nodded responsively; She answered unresponsively",
+      "translation": "phản hồi; người trả lời; đáp ứng; không đáp ứng; một cách đáp ứng; một cách không đáp ứng",
+      "count": 0
     },
     {
-    "word": "respond",
-    "meaning": "response, /rɪˈspɒns/: phản hồi. respondent, /rɪˈspɒndənt/: người trả lời. (un)responsive(ly), /(ˌʌn)rɪˈspɒnsɪv(li)/: (thiếu) nhiệt tình, phản hồi.",
-    "example": "His response was quick. The respondent answered all questions. The system is unresponsive. She responded responsively.",
-    "count": 0
+      "word": "rest",
+      "meaning": "restlessness (n) /ˈrestləsnəs/; unrest (n) /ʌnˈrest/; restive (adj) /ˈrestɪv/; restful (adj) /ˈrestfl/; restful (adv) /ˈrestfli/; restless (adj) /ˈrestləs/; restlessly (adv) /ˈrestləsli/",
+      "example": "He suffered from restlessness at night; Political unrest spread quickly; The child grew restive during the trip; The park was restful and quiet; She sat restfully in the shade; The night was restless; She slept restlessly",
+      "translation": "sự bồn chồn; bất ổn; bồn chồn; yên tĩnh; một cách yên tĩnh; không yên; một cách không yên",
+      "count": 0
     },
     {
-    "word": "rest",
-    "meaning": "restlessness, /ˈrestləsnəs/: sự bồn chồn. unrest, /ʌnˈrest/: tình trạng không yên. restive, /ˈrestɪv/: bồn chồn, ngang bướng. restful(ly), /ˈrestfl(i)/: (một cách) yên tĩnh. restless(ly), /ˈrestləsli/: (một cách) không yên.",
-    "example": "He felt restlessness before the exam. Political unrest spread. The child was restive. The lake was restful. She slept restlessly.",
-    "count": 0
+      "word": "result",
+      "meaning": "resultant (adj) /rɪˈzʌltənt/; resulting (adj) /rɪˈzʌltɪŋ/",
+      "example": "The resultant loss was significant; The resulting confusion delayed the project",
+      "translation": "như kết quả; xảy ra do",
+      "count": 0
     },
     {
-    "word": "result",
-    "meaning": "resultant, /rɪˈzʌltənt/: như kết quả. resulting, /rɪˈzʌltɪŋ/: như kết quả của cái gì.",
-    "example": "The resultant damage was severe. The traffic jam was resulting from the accident.",
-    "count": 0
+      "word": "revolt",
+      "meaning": "revolutionise (v) /ˌrevəˈluːʃənaɪz/; revolution (n) /ˌrevəˈluːʃn/; revolutionary (adj) /ˌrevəˈluːʃənəri/; revolting (adj) /rɪˈvəʊltɪŋ/",
+      "example": "The invention will revolutionise the industry; The revolution led to reforms; She had a revolutionary approach; The smell was revolting",
+      "translation": "cách mạng hóa; cách mạng; mang tính cách mạng; gây phản cảm",
+      "count": 0
     },
     {
-    "word": "revolt",
-    "meaning": "revolutionise, /ˌrevəˈluːʃənaɪz/: cách mạng hóa. revolution, /ˌrevəˈluːʃn/: cuộc cách mạng. revolutionary, /ˌrevəˈluːʃənəri/: có tính cách mạng. revolting, /rɪˈvəʊltɪŋ/: gây phản cảm.",
-    "example": "Technology revolutionised our lives. The revolution changed history. He’s a revolutionary leader. The dish looked revolting.",
-    "count": 0
+      "word": "rhythm",
+      "meaning": "rhythmic (adj) /ˈrɪðmɪk/; rhythmical (adj) /ˈrɪðmɪkəl/; rhythmically (adv) /ˈrɪðmɪkli/",
+      "example": "The drummer’s rhythmic beats energized the crowd; The movement was rhythmical and smooth; She danced rhythmically",
+      "translation": "có nhịp điệu; mang tính nhịp điệu; một cách nhịp nhàng",
+      "count": 0
     },
     {
-    "word": "rhythm",
-    "meaning": "rhythmic(al)(ly), /ˈrɪðmɪk(ə)li/: nhịp nhàng, một cách nhịp nhàng.",
-    "example": "The song has a rhythmic beat. She danced rhythmically.",
-    "count": 0
+      "word": "rigid",
+      "meaning": "rigidity (n) /rɪˈdʒɪdəti/; rigidly (adv) /ˈrɪdʒɪdli/",
+      "example": "The rigidity of the rule surprised many; He adhered rigidly to the plan",
+      "translation": "sự cứng nhắc; một cách cứng nhắc",
+      "count": 0
     },
     {
-    "word": "rigid",
-    "meaning": "rigidity, /rɪˈdʒɪdəti/: sự cứng, sự khắt khe. rigidly, /ˈrɪdʒɪdli/: một cách cứng nhắc.",
-    "example": "The rigidity of the structure is impressive. He rigidly followed the rules.",
-    "count": 0
+      "word": "risk",
+      "meaning": "risky (adj) /ˈrɪski/",
+      "example": "That was a risky investment for the company",
+      "translation": "mạo hiểm",
+      "count": 0
     },
     {
-    "word": "risk",
-    "meaning": "risky, /ˈrɪski/: mạo hiểm.",
-    "example": "That's a risky investment.",
-    "count": 0
+      "word": "surround",
+      "meaning": "surroundings (noun) /səˈraʊndɪŋz/; roundabout (noun) /ˈraʊndəbaʊt/; surrounding (adj) /səˈraʊndɪŋ/; roundly (adv) /ˈraʊndli/",
+      "example": "She enjoyed the peaceful surroundings near the lake; At the roundabout, take the second exit; The surrounding area is known for its vineyards; He was roundly praised for his honesty",
+      "translation": "vùng xung quanh; vòng xuyến; bao quanh; một cách thẳng thắn",
+      "count": 0
     },
     {
-    "word": "surround",
-    "meaning": "surroundings, /səˈraʊndɪŋz/: vùng xung quanh. roundabout, /ˈraʊndəbaʊt/: vòng tròn. surrounding, /səˈraʊndɪŋ/: bao quanh. roundly, /ˈraʊndli/: thẳng thắn, tròn trịa.",
-    "example": "She was unfamiliar with her surroundings. Take the next roundabout. The mountain was surrounded by fog. He was roundly criticized.",
-    "count": 0
+      "word": "sane",
+      "meaning": "sanity (noun) /ˈsænəti/; insanity (noun) /ɪnˈsænəti/; insane (adj) /ɪnˈseɪn/; insanely (adv) /ɪnˈseɪnli/",
+      "example": "She managed to keep her sanity despite the stress; Years of isolation led to his insanity; That was an insane risk to take; The mountain trail was insanely difficult to climb",
+      "translation": "sự tỉnh táo; sự điên loạn; điên rồ; một cách điên rồ",
+      "count": 0
     },
     {
-    "word": "sane",
-    "meaning": "(in)sanity, /(ɪn)ˈsænəti/: (mất) trạng thái tỉnh táo. insane(ly), /ɪnˈseɪn(li)/: (một cách) điên rồ.",
-    "example": "He questioned her sanity. The idea is insanely expensive.",
-    "count": 0
+      "word": "satisfy",
+      "meaning": "satisfactory (adj) /ˌsætɪsˈfæktəri/; unsatisfactory (adj) /ˌʌnˌsætɪsˈfæktəri/; satisfied (adj) /ˈsætɪsfaɪd/; dissatisfied (adj) /dɪsˈsætɪsfaɪd/; satisfying (adj) /ˈsætɪsfaɪɪŋ/; unsatisfying (adj) /ʌnˈsætɪsfaɪɪŋ/; satisfaction (noun) /ˌsætɪsˈfækʃn/",
+      "example": "The results were satisfactory for everyone; The answer was unsatisfactory to the manager; She felt satisfied with her progress; Many customers were dissatisfied after the update; Completing the project was satisfying; The explanation was unsatisfying; He expressed satisfaction at the outcome",
+      "translation": "đủ tốt; không đủ tốt; hài lòng; không hài lòng; thỏa mãn; không thỏa mãn; sự hài lòng",
+      "count": 0
     },
     {
-    "word": "satisfy",
-    "meaning": "(un)satisfactory, /(ʌn)ˌsætɪsˈfæktəri/: (không) hài lòng. (dis)satisfied, /(ˌdɪs)ˈsætɪsfaɪd/: (không) hài lòng. (un)satisfying(ly), /(ʌn)ˈsætɪsfaɪɪŋli/: (một cách) (không) thỏa mãn. satisfaction, /ˌsætɪsˈfækʃn/: sự hài lòng.",
-    "example": "The result was unsatisfactory. She felt dissatisfied with the service. He smiled satisfyingly. Her satisfaction was evident.",
-    "count": 0
+      "word": "say",
+      "meaning": "gainsay (verb) /ˌɡeɪnˈseɪ/; saying (noun) /ˈseɪɪŋ/; unsaid (adj) /ʌnˈsed/",
+      "example": "No one could gainsay her achievements; There's a saying that honesty is the best policy; Much was left unsaid between them",
+      "translation": "phản đối; câu nói; chưa được nói ra",
+      "count": 0
     },
     {
-    "word": "say",
-    "meaning": "gainsay, /ˌɡeɪnˈseɪ/: chối cãi. saying, /ˈseɪɪŋ/: ngạn ngữ. unsaid, /ʌnˈsed/: không nói ra.",
-    "example": "No one dared to gainsay him. That’s a wise saying. Some things are better left unsaid.",
-    "count": 0
+      "word": "seem",
+      "meaning": "seeming (adj) /ˈsiːmɪŋ/; seemingly (adv) /ˈsiːmɪŋli/",
+      "example": "His seeming confidence impressed the panel; She was seemingly unaffected by the criticism",
+      "translation": "có vẻ; một cách có vẻ",
+      "count": 0
     },
     {
-    "word": "seem",
-    "meaning": "seeming(ly), /ˈsiːmɪŋ(li)/: (có vẻ) như, có vẻ.",
-    "example": "She was seemingly unaware of the danger.",
-    "count": 0
+      "word": "select",
+      "meaning": "deselect (verb) /ˌdiːsɪˈlekt/; selection (noun) /sɪˈlekʃn/; selective (adj) /sɪˈlektɪv/; selectively (adv) /sɪˈlektɪvli/",
+      "example": "You may deselect unwanted options in the menu; The selection of candidates was fair; She is very selective about her reading; He listens selectively to advice",
+      "translation": "bỏ chọn; sự lựa chọn; có chọn lọc; một cách chọn lọc",
+      "count": 0
     },
     {
-    "word": "select",
-    "meaning": "deselect, /ˌdiːsɪˈlekt/: bỏ chọn. selection, /sɪˈlekʃn/: sự lựa chọn. selective(ly), /sɪˈlektɪv(li)/: (một cách) chọn lọc.",
-    "example": "You can deselect the item. The selection process was rigorous. She listened selectively.",
-    "count": 0
+      "word": "self",
+      "meaning": "selfishness (noun) /ˈselfɪʃnəs/; unselfishness (noun) /ʌnˈselfɪʃnəs/; selfishly (adv) /ˈselfɪʃli/; unselfishly (adv) /ʌnˈselfɪʃli/; selfless (adj) /ˈselfləs/; selflessly (adv) /ˈselfləsli/",
+      "example": "His selfishness caused problems in the group; Her unselfishness inspired her friends; He acted selfishly during negotiations; She shared her time unselfishly; The nurse was known for her selfless dedication; Volunteers worked selflessly to help others",
+      "translation": "sự ích kỷ; sự không ích kỷ; ích kỷ; không ích kỷ; vị tha; một cách vị tha",
+      "count": 0
     },
     {
-    "word": "self",
-    "meaning": "(un)selfishness, /ʌnˈselfɪʃnəs/: (sự) (không) ích kỷ. (un)selfishly, /ʌnˈselfɪʃli/: (một cách) (không) ích kỷ. selfless(ly), /ˈselfləsli/: (một cách) vị tha.",
-    "example": "Her unselfishness was inspiring. He acted unselfishly. They worked selflessly.",
-    "count": 0
+      "word": "sense",
+      "meaning": "desensitise (verb) /ˈdesəntaɪz/; sensitivity (noun) /sɛnsəˈtɪvəti/; insensitivity (noun) /ɪnˌsɛnsəˈtɪvəti/; hypersensitivity (noun) /ˌhaɪpəsensəˈtɪvəti/; sensibility (noun) /ˌsensəˈbɪləti/; senseless (adj) /ˈsensləs/; senselessness (noun) /ˈsensləsnəs/; sensuality (noun) /ˌsenʃuˈæləti/; sensuousness (noun) /ˈsenʃuəsnəs/; sensor (noun) /ˈsensər/; hypersensitive (adj) /ˌhaɪpəˈsensətɪv/; oversensitive (adj) /ˌəʊvəsensətɪv/; nonsense (noun) /ˈnɒnsens/; sensory (adj) /ˈsensəri/",
+      "example": "The treatment helped desensitise her to pain; Sensitivity to others is an important skill; His insensitivity upset many people; Some children have hypersensitivity to noise; Her artistic sensibility was remarkable; The comment was senseless in that context; The senselessness of the act shocked everyone; The novel explored themes of sensuality; The music's sensuousness was appreciated; The sensor activated the alarm; He is hypersensitive to criticism; She can be oversensitive about feedback; That statement is pure nonsense; The test measured sensory responses",
+      "translation": "làm giảm nhạy cảm; sự nhạy cảm; sự thiếu nhạy cảm; sự quá nhạy cảm; sự nhạy cảm; vô nghĩa; sự vô nghĩa; ham muốn nhục dục; sự kích thích giác quan; cảm biến; quá nhạy cảm; quá nhạy cảm; vô lý; thuộc giác quan",
+      "count": 0
     },
     {
-    "word": "sense (2)",
-    "meaning": "(de)sensitise, /ˈdesəntaɪz/: làm (mất) nhạy cảm. (in)sensitivity, /ˌɪnsensəˈtɪvəti/: (thiếu) nhạy cảm. hypersensitivity, /ˌhaɪpəsensəˈtɪvəti/: sự quá nhạy cảm. sensibility, /ˌsensəˈbɪləti/: trí giác, sự nhạy cảm. sense(less)(ness), /ˈsensləs(nəs)/: (sự) bất tỉnh, vô nghĩa. sensuality, /ˌsenʃuˈæləti/: ham muốn nhục dục. sensuousness, /ˈsenʃuəsnəs/: ham muốn nhục dục. sensor, /ˈsensər/: cảm biến. hypersensitive, /ˌhaɪpəˈsensətɪv/: quá nhạy cảm. oversensitive, /ˌəʊvəsensətɪv/: quá nhạy cảm. nonsense, /ˈnɒnsens/: vô nghĩa. sensory, /ˈsensəri/: (thuộc) cảm giác, xúc giác.",
-    "example": "The drug desensitised his pain. Her insensitivity upset him. He suffers from hypersensitivity. Her sensibility makes her a great artist. The joke was senseless. His sensuality was obvious. The poem had deep sensuousness. The sensor detected movement. She’s hypersensitive to criticism. Don’t be oversensitive. That’s complete nonsense. The painting evoked a strong sensory response.",
-    "count": 0
+      "word": "sense",
+      "meaning": "sensible (adj) /ˈsensəbl/; nonsensical (adj) /ˌnɒnˈsensɪkl/; sensibly (adv) /ˈsensəbli/; sensitive (adj) /ˈsensətɪv/; insensitive (adj) /ɪnˈsensətɪv/; sensitively (adv) /ˈsensətɪvli/; insensitively (adv) /ɪnˈsensətɪvli/; sensational (adj) /senˈseɪʃənl/; insensational (adj) /ɪnˈsɛnseɪʃənl/; sensationally (adv) /senˈseɪʃənəli/; insensationally (adv) /ɪnˈsɛnseɪʃənəli/; sensual (adj) /ˈsenʃuəl/; sensually (adv) /ˈsenʃuəli/; sensuous (adj) /ˈsenʃuəs/; sensuously (adv) /ˈsenʃuəsli/",
+      "example": "She made a sensible choice in the situation; His argument was nonsensical; She responded sensibly to the news; He is sensitive to criticism; He appeared insensitive to others' feelings; She replied sensitively to the question; He answered insensitively in the meeting; The story was sensational in the media; The event was considered insensational by critics; The play was sensationally received; The news was insensationally covered; The artwork has a sensual appeal; The fragrance was described sensually; The fabric felt sensuous; The music played sensuously in the background",
+      "translation": "khôn ngoan; vô lý; một cách hợp lý; nhạy cảm; không nhạy cảm; một cách nhạy cảm; một cách không nhạy cảm; gây xúc động; không gây xúc động; một cách gây xúc động; một cách không gây xúc động; gợi cảm; một cách gợi cảm; kích thích giác quan; một cách kích thích giác quan",
+      "count": 0
     },
     {
-    "word": "sense",
-    "meaning": "sensible, /ˈsensəbl/: nhạy bén, khôn ngoan. nonsensical(ly), /ˌnɒnˈsensɪkl(i)/: vô lý. sensibly, /ˈsensəbli/: một cách hợp lý. (in)sensitive(ly), /(ɪn)ˈsensətɪv(li)/: (một cách) (không) nhạy cảm. (in)sensational(ly), /(ɪn)senˈseɪʃənl(i)/: (một cách) (không) gây xúc động. sensual(ly), /ˈsenʃuəl(i)/: (một cách) nhục dục. sensuous(ly), /ˈsenʃuəsli/: (một cách) đầy kích thích giác quan.",
-    "example": "She made a sensible decision. That idea is nonsensical. He acted sensibly. He responded insensitively. The news was sensationally exaggerated. The perfume was described sensually. The music played sensuously.",
-    "count": 0
+      "word": "separate",
+      "meaning": "separation (noun) /ˌsepəˈreɪʃn/; separable (adj) /ˈseprəbl/; inseparable (adj) /ɪnˈseprəbl/; separated (adj) /ˈsepəreɪtɪd/; separately (adv) /ˈseprətli/",
+      "example": "Their separation lasted over a year; These two ideas are separable in theory; The twins have always been inseparable; The couple are now separated; The items were shipped separately",
+      "translation": "sự chia cách; có thể tách rời; không thể tách rời; đã ly thân; một cách riêng biệt",
+      "count": 0
     },
     {
-    "word": "separate",
-    "meaning": "separation, /ˌsepəˈreɪʃn/: sự ngăn cách, chia cắt. (in)separable, /(ɪn)ˈseprəbl/: (không) thể tách rời. separated, /ˈsepəreɪtɪd/: ly thân. separately, /ˈseprətli/: một cách tách biệt.",
-    "example": "The separation lasted months. The twins are inseparable. They are now separated. The items were packed separately.",
-    "count": 0
+      "word": "shelf",
+      "meaning": "shelve (verb) /ʃelv/; shelves (noun) /ʃelvz/; shelving (noun) /ˈʃelvɪŋ/",
+      "example": "She decided to shelve the proposal for now; The shelves were organized by color; The garage needed new shelving for tools",
+      "translation": "xếp lên kệ; giá sách; vật liệu làm kệ",
+      "count": 0
     },
     {
-    "word": "shelf",
-    "meaning": "shelve, /ʃelv/: xếp vào ngăn. shelves, /ʃelvz/: giá sách. shelving, /ˈʃelvɪŋ/: vật liệu làm kệ.",
-    "example": "Please shelve the books alphabetically. The shelves were full. We need new shelving for the pantry.",
-    "count": 0
+      "word": "signify",
+      "meaning": "significance (noun) /sɪɡˈnɪfɪkəns/; insignificance (noun) /ɪnˌsɪɡˈnɪfɪkəns/; significantly (adv) /sɪɡˈnɪfɪkəntli/; insignificantly (adv) /ɪnˌsɪɡˈnɪfɪkəntli/",
+      "example": "The change had great significance for the team; The issue was of utter insignificance; Profits increased significantly last year; The error insignificantly affected the results",
+      "translation": "sự quan trọng; sự không quan trọng; một cách đáng kể; một cách không đáng kể",
+      "count": 0
     },
     {
-    "word": "signify",
-    "meaning": "(in)significance, /(ɪn)ˌsɪɡnɪˈfɪkəns/: (sự) (không) quan trọng. (in)significantly, /(ɪn)sɪɡˈnɪfɪkəntli/: (một cách) (không) đáng kể.",
-    "example": "The discovery has great significance. The price increased significantly. His role is insignificant in the project. That error didn’t significantly affect results.",
-    "count": 0
+      "word": "slip",
+      "meaning": "slippage (noun) /ˈslɪpɪdʒ/; slippery (adj) /ˈslɪpəri/",
+      "example": "The project suffered from budget slippage; The path became slippery after the rain",
+      "translation": "sự trượt giá; trơn trượt",
+      "count": 0
     },
     {
-    "word": "slip",
-    "meaning": "slippage, /ˈslɪpɪdʒ/: sự trượt giá. slippery, /ˈslɪpəri/: trơn trượt.",
-    "example": "There was a slippage in profits. The road is slippery when wet.",
-    "count": 0
+      "word": "soft",
+      "meaning": "soften (verb) /ˈsɒfn/; softener (noun) /ˈsɒfənər/; softly (adv) /ˈsɒftli/",
+      "example": "Let the butter soften before mixing; Add fabric softener to the wash; She sang softly to the baby",
+      "translation": "làm mềm; chất làm mềm; một cách nhẹ nhàng",
+      "count": 0
     },
     {
-    "word": "soft",
-    "meaning": "soften, /ˈsɒfn/: làm dịu. softener, /ˈsɒfənər/: chất làm mềm. softly, /ˈsɒftli/: một cách dịu dàng.",
-    "example": "Let the butter soften. Add fabric softener. She spoke softly.",
-    "count": 0
+      "word": "solid",
+      "meaning": "solidify (verb) /səˈlɪdɪfaɪ/; solidity (noun) /səˈlɪdəti/",
+      "example": "Allow the solution to solidify overnight; The structure was praised for its solidity",
+      "translation": "làm cứng lại; sự vững chắc",
+      "count": 0
     },
     {
-    "word": "solid",
-    "meaning": "solidify, /səˈlɪdɪfaɪ/: làm cứng. solidity, /səˈlɪdəti/: sự vững chắc.",
-    "example": "Let the mixture solidify overnight. The wall has great solidity.",
-    "count": 0
+      "word": "space",
+      "meaning": "spacing (noun) /ˈspeɪsɪŋ/; spaciousness (noun) /ˈspeɪʃəsnəs/; spacious (adj) /ˈspeɪʃəs/; spaciously (adv) /ˈspeɪʃəsli/",
+      "example": "Adjust the spacing between paragraphs; The spaciousness of the hall impressed guests; Their new apartment is spacious; The room is spaciously decorated",
+      "translation": "sự giãn cách; sự rộng rãi; rộng rãi; một cách rộng rãi",
+      "count": 0
     },
     {
-    "word": "space",
-    "meaning": "spacing, /ˈspeɪsɪŋ/: sự giãn cách. spaciousness, /ˈspeɪʃəsnəs/: tính rộng rãi. spacious(ly), /ˈspeɪʃəsli/: (một cách) rộng rãi.",
-    "example": "Check the line spacing. I admire the spaciousness of the house. The room is spaciously designed.",
-    "count": 0
+      "word": "speak",
+      "meaning": "spoke (verb) /spəʊk/; speech (noun) /spiːtʃ/; speaker (noun) /ˈspiːkər/; spokesman (noun) /ˈspəʊksmən/; spokeswoman (noun) /ˈspəʊkswʊmən/; spokeswomen (noun) /ˈspəʊkswɪmɪn/; spokesperson (noun) /ˈspəʊkspɜːsn/",
+      "example": "He spoke on behalf of the committee; Her speech captivated the audience; The speaker addressed a large crowd; The company's spokesman issued a statement; The spokeswoman answered questions; The spokeswomen attended the conference; The spokesperson clarified the issue",
+      "translation": "nói; bài phát biểu; diễn giả; người phát ngôn (nam); người phát ngôn (nữ); các nữ phát ngôn viên; người phát ngôn",
+      "count": 0
     },
     {
-    "word": "speak",
-    "meaning": "spoke, /spəʊk/: nói (quá khứ). speech, /spiːtʃ/: bài diễn văn. speaker, /ˈspiːkər/: người nói. spokesmen, /ˈspəʊksmən/: phát ngôn viên (nam). spokeswoman, /ˈspəʊkswʊmən/: phát ngôn viên (nữ). spokeswomen, /ˈspəʊkswɪmɪn/: phát ngôn viên (nữ, số nhiều). spokesperson, /ˈspəʊkspɜːsn/: người phát ngôn.",
-    "example": "He spoke at the event. Her speech was inspiring. The speaker took questions. The company’s spokesman issued a statement. The spokeswoman denied the claims. Two spokeswomen were present. The spokesperson addressed the press.",
-    "count": 0
+      "word": "speak",
+      "meaning": "spokespeople (noun) /ˈspəʊksˌpiːpl/; outspokenness (noun) /ˌaʊtˈspəʊkənnəs/; spoken (adj) /ˈspəʊkən/; unspoken (adj) /ʌnˈspəʊkən/; speechless (adj) /ˈspiːtʃləs/; unspeakable (adj) /ʌnˈspiːkəbl/; unspeakably (adv) /ʌnˈspiːkəbli/; outspoken (adj) /ˌaʊtˈspəʊkən/; outspokenly (adv) /ˌaʊtˈspəʊkənli/",
+      "example": "The spokespeople gave interviews after the event; His outspokenness was admired by many; The agreement was spoken clearly; Some worries remained unspoken between them; She was speechless with surprise; The tragedy was unspeakable; The disaster was unspeakably tragic; She is known for her outspoken comments; He spoke out outspokenly about injustice",
+      "translation": "các phát ngôn viên; sự thẳng thắn; được nói ra; chưa được nói ra; không nói nên lời; không thể diễn tả; cực kỳ; thẳng thắn; một cách thẳng thắn",
+      "count": 0
     },
     {
-    "word": "speak (2)",
-    "meaning": "spokespeople, /ˈspəʊksˌpiːpl/: những phát ngôn viên. outspokenness, /ˌaʊtˈspəʊkənnəs/: thẳng thắn. (un)spoken, /ˌʌnˈspəʊkən/: (không) được nói ra. speechless, /ˈspiːtʃləs/: cạn lời. unspeakable, /ʌnˈspiːkəbl/: không thể diễn tả. unspeakably, /ʌnˈspiːkəbli/: cực kỳ. outspoken(ly), /ˌaʊtˈspəʊkən(li)/: (một cách) thẳng thắn.",
-    "example": "The spokespeople met the press. His outspokenness was admirable. The pain was unspoken. She was speechless with joy. That crime was unspeakable. He was unspeakably rude. She criticized them outspokenly.",
-    "count": 0
+      "word": "speed",
+      "meaning": "sped (verb) /sped/; speeding (noun) /ˈspiːdɪŋ/; speedy (adj) /ˈspiːdi/; speedily (adv) /ˈspiːdɪli/",
+      "example": "He sped away from the scene quickly; He was fined for speeding in the city; The team delivered a speedy response; The paperwork was processed speedily",
+      "translation": "đã chạy nhanh; lái xe quá tốc độ; nhanh chóng; một cách nhanh chóng",
+      "count": 0
     },
     {
-    "word": "speed",
-    "meaning": "sped, /sped/: sự chạy tốc độ. speeding, /ˈspiːdɪŋ/: lái xe quá tốc độ. speedy, /ˈspiːdi/: nhanh chóng. speedily, /ˈspiːdɪli/: một cách nhanh chóng.",
-    "example": "He sped down the highway. She was fined for speeding. We need a speedy solution. The issue was resolved speedily.",
-    "count": 0
+      "word": "sport",
+      "meaning": "sportsman (noun) /ˈspɔːtsmən/; sportswoman (noun) /ˈspɔːtsˌwʊmən/; sportsperson (noun) /ˈspɔːtspɜːsn/; sportsmanship (noun) /ˈspɔːtsmənʃɪp/; sports (noun) /spɔːts/; sporting (adj) /ˈspɔːtɪŋ/; sporty (adj) /ˈspɔːti/",
+      "example": "He is a renowned sportsman; She is a skilled sportswoman; The sportsperson broke the record; They showed good sportsmanship after losing; He is interested in many sports; The event had a sporting atmosphere; He wore a sporty jacket to the event",
+      "translation": "vận động viên nam; vận động viên nữ; vận động viên; tinh thần thể thao; các môn thể thao; (thuộc) thể thao; thích thể thao",
+      "count": 0
     },
     {
-    "word": "sport",
-    "meaning": "sportsman, /ˈspɔːtsmən/: vận động viên (nam). sportswoman, /ˈspɔːtsˌwʊmən/: vận động viên (nữ). sportsperson, /ˈspɔːtspɜːsn/: vận động viên. sportsmanship, /ˈspɔːtsmənʃɪp/: tinh thần thể thao. sports, /spɔːts/: các môn thể thao. sporting, /ˈspɔːtɪŋ/: (có) tính thể thao. sporty, /ˈspɔːti/: thích thể thao.",
-    "example": "He is a talented sportsman. She’s a famous sportswoman. That sportsperson won gold. They showed great sportsmanship. I enjoy watching sports. He took a sporting chance. She wears sporty outfits.",
-    "count": 0
+      "word": "stable",
+      "meaning": "stabilise (verb) /ˈsteɪbəlaɪz/; destabilise (verb) /ˌdiːˈsteɪbəlaɪz/; stability (noun) /stəˈbɪləti/; instability (noun) /ˌɪnstəˈbɪləti/; stabiliser (noun) /ˈsteɪbəlaɪzər/; stabilising (adj) /ˈsteɪbəlaɪzɪŋ/; destabilising (adj) /ˌdiːˈsteɪbəlaɪzɪŋ/",
+      "example": "The medicine helped stabilise her condition; The conflict could destabilise the region; Economic stability is crucial; Political instability threatens growth; The aircraft is equipped with a stabiliser; Meditation has a stabilising effect; The crisis was destabilising for the market",
+      "translation": "làm ổn định; làm mất ổn định; sự ổn định; sự bất ổn định; thiết bị ổn định; mang tính ổn định; mang tính gây bất ổn",
+      "count": 0
     },
     {
-    "word": "stable",
-    "meaning": "(de)stabilise, /ˈsteɪbəlaɪz/: làm (mất) ổn định. (in)stability, /(ɪn)stəˈbɪləti/: (không) ổn định. stabiliser, /ˈsteɪbəlaɪzə(r)/: thiết bị ổn định. (de)stabilising, /ˈsteɪbəlaɪzɪŋ/: có tính (mất) ổn định.",
-    "example": "The government aims to stabilise prices. There’s political instability in the region. The stabiliser kept the ship balanced. Those events were destabilising.",
-    "count": 0
+      "word": "stand",
+      "meaning": "withstand (verb) /wɪðˈstænd/; withstood (verb) /wɪðˈstʊd/; standing (noun) /ˈstændɪŋ/; upstanding (adj) /ʌpˈstændɪŋ/; outstanding (adj) /aʊtˈstændɪŋ/; notwithstanding (prep) /ˌnɒtwɪðˈstændɪŋ/",
+      "example": "These walls can withstand strong winds; She withstood criticism bravely; His standing in the community is high; He is known as an upstanding citizen; Her achievements are outstanding; Notwithstanding the rain, the game continued",
+      "translation": "chịu đựng; đã chịu đựng; vị thế; thẳng thắn; nổi bật; mặc dù",
+      "count": 0
     },
     {
-    "word": "stand",
-    "meaning": "withstand, /wɪðˈstænd/: chịu đựng. withstood, /wɪðˈstʊd/: đã chịu đựng. standing, /ˈstændɪŋ/: tư thế đứng, địa vị. upstanding, /ʌpˈstændɪŋ/: thẳng thắn, đáng kính. outstanding, /aʊtˈstændɪŋ/: nổi bật. notwithstanding, /ˌnɒtwɪðˈstændɪŋ/: tuy nhiên.",
-    "example": "These materials can withstand heat. She withstood all criticism. He has long-standing respect. He is an upstanding citizen. Her work is outstanding. Notwithstanding the delay, the work continued.",
-    "count": 0
+      "word": "state",
+      "meaning": "restate (verb) /ˌriːˈsteɪt/; overstate (verb) /ˌəʊvəˈsteɪt/; understate (verb) /ˌʌndəˈsteɪt/; statement (noun) /ˈsteɪtmənt/; understatement (noun) /ˌʌndəˈsteɪtmənt/; overstated (adj) /ˌəʊvəˈsteɪtɪd/; understated (adj) /ˌʌndəˈsteɪtɪd/",
+      "example": "She decided to restate her proposal to make it clearer; The article tends to overstate the problem; He tried to understate his involvement; The statement was released by the company this morning; Calling it a setback is an understatement given the losses; The benefits were overstated in the advertisement; The risks were understated in the report",
+      "translation": "nói lại; phóng đại; nói giảm; bản tuyên bố; cách nói giảm; bị phóng đại; bị giảm nhẹ",
+      "count": 0
     },
     {
-    "word": "state",
-    "meaning": "restate, /ˌriːˈsteɪt/: nhấn mạnh lại. overstate, /ˌəʊvəˈsteɪt/: phóng đại. understate, /ˌʌndəˈsteɪt/: nói giảm. statement, /ˈsteɪtmənt/: bản tuyên bố. understatement, /ˌʌndəˈsteɪtmənt/: nói nhẹ. overstated, /ˌəʊvəˈsteɪtɪd/: bị phóng đại. understated, /ˌʌndəˈsteɪtɪd/: bị giảm bớt.",
-    "example": "She restated her position clearly. He overstated the facts. She tends to understate problems. The statement was official. Saying it's cold is an understatement. The importance was overstated. The issue was understated in the report.",
-    "count": 0
-    },            
+      "word": "steady",
+      "meaning": "unsteady (adj) /ʌnˈstedi/; unsteadily (adv) /ʌnˈstedəli/; steadily (adv) /ˈstedəli/",
+      "example": "The unsteady ladder made him nervous; She walked unsteadily across the ice; He worked steadily throughout the night",
+      "translation": "không ổn định; một cách không ổn định; một cách đều đặn",
+      "count": 0
+    },
     {
-    "word": "steady",
-    "meaning": "unsteady, /ʌnˈstedi/: không ổn định, bất ổn. (un)steadily, /(ʌn)ˈstedəli/: một cách (không) ổn định, đều đặn.",
-    "example": "The ladder is unsteady. He walked unsteadily after the fall.",
-    "count": 0
+      "word": "stimulate",
+      "meaning": "stimulation (noun) /ˌstɪmjʊˈleɪʃn/; stimulant (noun) /ˈstɪmjələnt/; stimulus (noun) /ˈstɪmjələs/; stimuli (noun, plural) /ˈstɪmjʊlaɪ/; stimulating (adj) /ˈstɪmjəleɪtɪŋ/; stimulated (adj) /ˈstɪmjəleɪtɪd/",
+      "example": "Mental stimulation keeps the mind active; Caffeine is a popular stimulant; Praise can be a strong stimulus for improvement; The laboratory tested how various stimuli affect reaction; The conversation was stimulating and inspiring; She felt stimulated by the lively debate",
+      "translation": "sự kích thích; chất kích thích; tác nhân kích thích; các tác nhân kích thích; gây hứng khởi; được kích thích",
+      "count": 0
     },
     {
-    "word": "stimulate",
-    "meaning": "stimulation, /ˌstɪmjʊˈleɪʃn/: sự kích thích. stimulant, /ˈstɪmjələnt/: chất kích thích. stimulus, /ˈstɪmjələs/: sự kích thích. stimuli, /ˈstɪmjʊlaɪ/: các tác nhân kích thích. stimulating, /ˈstɪmjəleɪtɪŋ/: kích thích, thú vị. stimulated, /ˈstɪmjəleɪtɪd/: bị kích thích.",
-    "example": "Mental stimulation helps keep your brain sharp. Coffee is a common stimulant. Music acts as a stimulus. These lights are visual stimuli. The lecture was very stimulating. Her curiosity was stimulated by the mystery.",
-    "count": 0
+      "word": "strong",
+      "meaning": "strengthen (verb) /ˈstreŋθn/; strength (noun) /streŋθ/; stronghold (noun) /ˈstrɒŋhəʊld/; strongly (adv) /ˈstrɒŋli/",
+      "example": "They plan to strengthen the local economy; His physical strength is impressive; The fortress was a stronghold for the resistance; She strongly opposed the new policy",
+      "translation": "làm mạnh lên; sức mạnh; thành trì; một cách mạnh mẽ",
+      "count": 0
     },
     {
-    "word": "strong",
-    "meaning": "strengthen, /ˈstreŋθn/: gia cố, làm mạnh lên. strength, /streŋθ/: sức mạnh. stronghold, /ˈstrɒŋhəʊld/: thành trì. strongly, /ˈstrɒŋli/: một cách mạnh mẽ.",
-    "example": "They aim to strengthen the economy. She showed great strength. The castle was a stronghold of the rebels. I strongly disagree with that view.",
-    "count": 0
+      "word": "structure",
+      "meaning": "infrastructure (noun) /ˈɪnfrəstrʌktʃə/; structurally (adv) /ˈstrʌktʃərəli/; unstructured (adj) /ʌnˈstrʌktʃərd/",
+      "example": "The city invested heavily in infrastructure; Structurally, the bridge is very sound; The meeting was unstructured and lacked direction",
+      "translation": "cơ sở hạ tầng; về mặt cấu trúc; không có cấu trúc",
+      "count": 0
     },
     {
-    "word": "structure",
-    "meaning": "infrastructure, /ˈɪnfrəstrʌktʃə/: cơ sở hạ tầng. structural(ly), /ˈstrʌktʃər(ə)li/: (về) cấu trúc. (un)structured, /(ˌʌn)ˈstrʌktʃərd/: (không) có bố cục, cấu trúc rõ.",
-    "example": "The country needs better infrastructure. The problem is structural. The meeting was unstructured and confusing.",
-    "count": 0
+      "word": "substance",
+      "meaning": "substantiation (noun) /səbˌstænʃiˈeɪʃn/; substantiate (verb) /səbˈstænʃieɪt/; insubstantial (adj) /ˌɪnsəbˈstænʃl/; substantially (adv) /səbˈstænʃəli/",
+      "example": "The lawyer provided further substantiation for his claim; Please substantiate your answer with evidence; The argument was insubstantial and unconvincing; Costs have increased substantially this year",
+      "translation": "sự chứng minh; chứng minh; không đáng kể; một cách đáng kể",
+      "count": 0
     },
     {
-    "word": "substance",
-    "meaning": "substantiation, /səbˌstænʃiˈeɪʃn/: sự chứng minh. substantiate, /səbˈstænʃieɪt/: chứng minh. (in)substantial(ly), /(ˌɪn)səbˈstænʃl(i)/: (một cách) (không) đáng kể.",
-    "example": "The theory lacked substantiation. Can you substantiate your claim? The cost is insubstantial.",
-    "count": 0
+      "word": "suggest",
+      "meaning": "suggestion (noun) /səˈdʒestʃn/; suggested (adj) /səˈdʒestɪd/; suggestive (adj) /səˈdʒestɪv/; suggestibly (adv) /səˈdʒestəbl/",
+      "example": "He made a useful suggestion during the meeting; The changes were suggested by the committee; Her comments were suggestive of something hidden; Children are often suggestibly influenced by advertisements",
+      "translation": "sự đề xuất; được đề xuất; mang tính gợi ý; dễ bị ảnh hưởng",
+      "count": 0
     },
     {
-    "word": "suggest",
-    "meaning": "suggestion, /səˈdʒestʃn/: sự đề nghị. suggested, /səˈdʒestɪd/: được đề xuất. suggestive(ly), /səˈdʒestɪv(li)/: (một cách) mang tính đề nghị. suggestible, /səˈdʒestəbl/: dễ bị ảnh hưởng.",
-    "example": "She made a helpful suggestion. The solution suggested by the teacher was effective. He nodded suggestively. Children are highly suggestible.",
-    "count": 0
+      "word": "sympathy",
+      "meaning": "sympathise (verb) /ˈsɪmpəθaɪz/; sympathiser (noun) /ˈsɪmpəθaɪzər/; unsympathetic (adj) /ˌʌnsɪmpəˈθetɪk/; sympathetically (adv) /sɪmpəˈθetɪkli/",
+      "example": "I always try to sympathise with those in trouble; She is a well-known sympathiser of environmental causes; The judge seemed unsympathetic to his explanation; He listened sympathetically to her story",
+      "translation": "đồng cảm; người ủng hộ; không đồng cảm; một cách cảm thông",
+      "count": 0
     },
     {
-    "word": "sympathy",
-    "meaning": "sympathise, /ˈsɪmpəθaɪz/: thông cảm. sympathiser, /ˈsɪmpəθaɪzər/: người ủng hộ. (un)sympathetic, /ˌʌnsɪmpəˈθetɪk/: (không) đồng cảm. (un)sympathetically, /(ʌn)sɪmpəˈθetɪkli/: một cách (không) cảm thông.",
-    "example": "I sympathise with your loss. She’s a known political sympathiser. The teacher was unsympathetic. He listened sympathetically.",
-    "count": 0
+      "word": "talk",
+      "meaning": "talker (noun) /ˈtɔːkər/; talkie (noun) /ˈtɔːki/; talkback (noun) /ˈtɔːkbæk/; talkative (adj) /ˈtɔːkətɪv/",
+      "example": "He is not much of a talker in meetings; They watched a classic talkie on TV; The radio show encourages talkback from listeners; She is very talkative with friends",
+      "translation": "người nói; phim nói; phản hồi; nhiều chuyện",
+      "count": 0
     },
     {
-    "word": "talk",
-    "meaning": "talker, /ˈtɔːkər/: người nói. talkie, /ˈtɔːki/: phim nói. talkback, /ˈtɔːkbæk/: ý kiến đóng góp. talkative, /ˈtɔːkətɪv/: nói nhiều.",
-    "example": "He’s a good talker. They watched an old black-and-white talkie. The show features a talkback segment. She’s very talkative.",
-    "count": 0
+      "word": "tend",
+      "meaning": "tendency (noun) /ˈtendənsi/",
+      "example": "There is a tendency for people to check their phones frequently",
+      "translation": "xu hướng",
+      "count": 0
     },
     {
-    "word": "tend",
-    "meaning": "tendency, /ˈtendənsi/: xu hướng.",
-    "example": "There’s a growing tendency to work from home.",
-    "count": 0
+      "word": "terror",
+      "meaning": "terrorise (verb) /ˈterəraɪz/; terrify (verb) /ˈterəfaɪ/; terrorist (noun) /ˈterərɪst/; terrorism (noun) /ˈterərɪzəm/; terror (noun) /ˈterər/; terrible (adj) /ˈterəbl/; terrific (adj) /təˈrɪfɪk/; terrifying (adj) /ˈterəfaɪɪŋ/; terrified (adj) /ˈterəfaɪd/; terribly (adv) /ˈterəbli/",
+      "example": "The group tried to terrorise the population; Thunderstorms always terrify the dog; The terrorist was arrested at the airport; The country faces ongoing terrorism; She was filled with terror after the accident; The food tasted terrible; His work is terrific; It was a terrifying rollercoaster ride; He is terrified of heights; She was terribly late for the interview",
+      "translation": "khủng bố; làm khiếp sợ; kẻ khủng bố; chủ nghĩa khủng bố; nỗi kinh hoàng; tồi tệ; tuyệt vời; gây kinh hãi; sợ hãi; rất",
+      "count": 0
     },
     {
-    "word": "terror",
-    "meaning": "terrorise, /ˈterəraɪz/: khủng bố. terrify, /ˈterəfaɪ/: làm kinh hãi. terrorist, /ˈterərɪst/: kẻ khủng bố. terrorism, /ˈterərɪzəm/: chủ nghĩa khủng bố. terror, /ˈterər/: kinh hoàng. terrible, /ˈterəbl/: kinh khủng. terrific, /təˈrɪfɪk/: xuất sắc. terrifying, /ˈterəfaɪɪŋ/: kinh hoàng. terrified, /ˈterəfaɪd/: sợ hãi. terribly, /ˈterəbli/: rất, cực kỳ.",
-    "example": "They tried to terrorise the public. The loud noise terrified the child. The terrorist was caught. The country faces terrorism threats. She felt pure terror. That movie was terrible. His performance was terrific. It was a terrifying experience. I’m terrified of spiders. He was terribly late.",
-    "count": 0
+      "word": "think",
+      "meaning": "thought (noun) /θɔːt/; thinker (noun) /ˈθɪŋkər/; thinking (noun) /ˈθɪŋkɪŋ/; thoughtfulness (noun) /ˈθɔːtfəlnəs/; thoughtlessness (noun) /ˈθɔːtləsnəs/; unthinkable (adj) /ʌnˈθɪŋkəbl/; thoughtful (adj) /ˈθɔːtfl/; thoughtless (adj) /ˈθɔːtləs/; thoughtfully (adv) /ˈθɔːtfl(i)/; thoughtlessly (adv) /ˈθɔːtləsli/",
+      "example": "The idea came to him as a sudden thought; She is regarded as a deep thinker; His way of thinking is very logical; Her thoughtfulness cheered me up; His thoughtlessness upset the team; It was unthinkable to cancel the trip; That was a thoughtful gesture; It was a thoughtless mistake; He replied thoughtfully; She spoke thoughtlessly about the topic",
+      "translation": "ý nghĩ; nhà tư tưởng; sự suy nghĩ; sự chu đáo; sự vô tâm; không thể nghĩ tới; chu đáo; thiếu suy nghĩ; một cách chu đáo; một cách thiếu suy nghĩ",
+      "count": 0
     },
     {
-    "word": "think",
-    "meaning": "thought, /θɔːt/: suy nghĩ, tư duy. thinker, /ˈθɪŋkər/: nhà tư tưởng. thinking, /ˈθɪŋkɪŋ/: tư duy. thoughtfulness, /ˈθɔːtfəlnəs/: sự chu đáo. thoughtlessness, /ˈθɔːtləsnəs/: sự vô tâm. (un)thinkable, /ʌnˈθɪŋkəbl/: (không) thể tưởng tượng. thoughtful(ly), /ˈθɔːtfl(i)/: (một cách) chu đáo. thoughtless(ly), /ˈθɔːtləsli/: (một cách) vô tâm.",
-    "example": "He paused in thought. She’s a deep thinker. Creative thinking is valuable. Her thoughtfulness was appreciated. His thoughtlessness hurt her. That’s unthinkable! She acted thoughtfully. He spoke thoughtlessly.",
-    "count": 0
+      "word": "threat",
+      "meaning": "threaten (verb) /ˈθretn/; threatened (adj) /ˈθretənd/; threateningly (adv) /ˈθretnɪŋli/",
+      "example": "They threatened to reveal the secret; Several species are threatened by pollution; She looked at him threateningly",
+      "translation": "đe dọa; bị đe dọa; một cách đe dọa",
+      "count": 0
     },
     {
-    "word": "threat",
-    "meaning": "threaten, /ˈθretn/: đe dọa. threatened, /ˈθretənd/: bị đe dọa. threatening(ly), /ˈθretnɪŋli/: (một cách) đe dọa.",
-    "example": "He threatened to leave. The animals are threatened by extinction. She glared at him threateningly.",
-    "count": 0
+      "word": "time",
+      "meaning": "mistime (verb) /ˌmɪsˈtaɪm/; timer (noun) /ˈtaɪmər/; timing (noun) /ˈtaɪmɪŋ/; overtime (noun) /ˈəʊvətaɪm/; timetable (noun) /ˈtaɪmteɪbl/; timelessness (noun) /ˈtaɪmləsnəs/; untimely (adj) /ˈʌnˈtaɪmli/; timely (adj) /ˈtaɪmli/; timelessly (adv) /ˈtaɪmləsli/",
+      "example": "He mistimed his arrival and missed the meeting; Set the timer for ten minutes; Her timing was perfect in the race; He often works overtime to finish projects; The timetable was updated last week; The painting has a sense of timelessness; The actor's untimely death shocked fans; The response was timely and effective; The song remains timelessly popular",
+      "translation": "định thời gian sai; đồng hồ bấm giờ; thời gian; làm thêm giờ; thời gian biểu; sự vượt thời gian; không đúng lúc; đúng lúc; một cách vượt thời gian",
+      "count": 0
     },
     {
-    "word": "time",
-    "meaning": "mistime, /ˌmɪsˈtaɪm/: định thời gian không đúng lúc. timer, /ˈtaɪmər/: bộ hẹn giờ. timing, /ˈtaɪmɪŋ/: sự tính toán thời gian. overtime, /ˈəʊvətaɪm/: làm thêm giờ. timetable, /ˈtaɪmteɪbl/: thời gian biểu. timeless(ness), /ˈtaɪmləs(nəs)/: (sự) vượt thời gian. (un)timely, /ˈtaɪmli/: (không) đúng lúc. timeless(ly), /ˈtaɪmləsli/: một cách vượt thời gian.",
-    "example": "He mistimed the pass. Set the timer for 10 minutes. Her timing was perfect. I worked overtime last week. Check the class timetable. Her beauty is timeless. The rescue was timely. The book is timelessly relevant.",
-    "count": 0
+      "word": "transit",
+      "meaning": "transition (noun) /trænˈzɪʃn/; transitory (adj) /ˈtrænzətri/; transitional (adj) /trænˈzɪʃənl/; transitionally (adv) /trænˈzɪʃnəli/",
+      "example": "The team is going through a difficult transition; Temporary jobs are often transitory; There will be a transitional phase next year; Roles changed transitionally as the company grew",
+      "translation": "sự chuyển đổi; tạm thời; chuyển tiếp; một cách chuyển tiếp",
+      "count": 0
     },
     {
-    "word": "transit",
-    "meaning": "transition, /trænˈzɪʃn/: sự chuyển đổi. transitory, /ˈtrænzətri/: tạm thời. transitional, /trænˈzɪʃənl/: mang tính chuyển tiếp. transitionally, /trænˈzɪʃnəli/: quá độ, chuyển tiếp.",
-    "example": "The country is in a political transition. These feelings are transitory. A transitional period is expected. Things changed transitionally over time.",
-    "count": 0
+      "word": "type",
+      "meaning": "typeset (verb) /ˈtaɪpset/; typecast (verb) /ˈtaɪpkɑːst/; typify (verb) /ˈtɪpɪfaɪ/; typist (noun) /ˈtaɪpɪst/; typewriter (noun) /ˈtaɪpraɪtər/; typeface (noun) /ˈtaɪpfeɪs/; typesetting (noun) /ˈtaɪpsetɪŋ/; typesetter (noun) /ˈtaɪpsetər/; typewritten (adj) /ˈtaɪprɪtn/; typically (adv) /ˈtɪpɪkl(i)/",
+      "example": "He learned how to typeset newspaper pages; She was typecast as the villain in movies; The building typifies the style of the era; The typist finished the report quickly; My grandfather owned a typewriter; This typeface is easy to read; Typesetting has become digital today; The typesetter made several adjustments; The contract was typewritten and signed; She typically arrives early to meetings",
+      "translation": "sắp chữ; đóng khung; là điển hình; người đánh máy; máy đánh chữ; kiểu chữ; sự sắp chữ; thợ sắp chữ; được đánh máy; một cách điển hình",
+      "count": 0
     },
     {
-    "word": "type",
-    "meaning": "typeset, /ˈtaɪpset/: sắp chữ. typecast, /ˈtaɪpkɑːst/: đóng khung. typify, /ˈtɪpɪfaɪ/: điển hình. typist, /ˈtaɪpɪst/: người đánh máy. typewriter, /ˈtaɪpraɪtər/: máy đánh chữ. typeface, /ˈtaɪpfeɪs/: kiểu chữ. typesetting, /ˈtaɪpsetɪŋ/: sự sắp chữ. typesetter, /ˈtaɪpsetər/: thợ xếp chữ. typewritten, /ˈtaɪprɪtn/: được đánh máy. typical(ly), /ˈtɪpɪkl(i)/: (một cách) điển hình.",
-    "example": "He learned to typeset pages. She was typecast as the villain. That style typifies the 80s. The typist finished quickly. I used a typewriter in school. This font uses a modern typeface. Typesetting takes skill. The typesetter adjusted the layout. The document was typewritten. She answered typically sarcastically.",
-    "count": 0
+      "word": "up",
+      "meaning": "uppermost (adj) /ˈʌpəməʊst/; upright (adj) /ˈʌpraɪt/; upwards (adv) /ˈʌpwəd(z)/; upwardly (adv) /ˈʌpwədli/",
+      "example": "The uppermost shelf holds the rarely used items; Please keep your back upright; The balloon drifted upwards into the sky; Salaries have moved upwardly over the last year",
+      "translation": "cao nhất; thẳng đứng; lên trên; một cách tăng lên",
+      "count": 0
     },
     {
-    "word": "up",
-    "meaning": "uppermost, /ˈʌpəməʊst/: cao nhất. upright, /ˈʌpraɪt/: thẳng đứng, ngay ngắn. upward(s), /ˈʌpwəd(z)/: hướng lên trên. upwardly, /ˈʌpwədli/: hướng lên trên.",
-    "example": "That was the uppermost shelf. Stand upright for posture. Look upward. Prices moved upwardly this quarter.",
-    "count": 0
+      "word": "use",
+      "meaning": "abuse (verb) /əˈbjuːz/; misuse (verb) /ˌmɪsˈjuːz/; reuse (verb) /ˌriːˈjuːz/; overuse (verb) /ˌəʊvəˈjuːz/; user (noun) /ˈjuːzər/; usefulness (noun) /ˈjuːsfəlnəs/; usage (noun) /ˈjuːsɪdʒ/; uselessness (noun) /ˈjuːsləsnəs/; unused (adj) /ˌʌnˈjuːzd/; unusable (adj) /ˈjuːzəbl/; reusable (adj) /ˌriːˈjuːzəbl/; abused (adj) /əˈbjuːzd/; abusively (adv) /əˈbjuːsɪvli/; usefully (adv) /ˈjuːsfəli/",
+      "example": "Never abuse your authority at work; Don't misuse chemicals in the lab; It's smart to reuse shopping bags; Overuse of antibiotics can cause problems; The app has many regular users; The usefulness of this tool is obvious; Usage of the word has changed; The product’s uselessness became apparent; The coupon was left unused; The equipment is unusable after the accident; These bottles are reusable; The abused pet was rescued; He spoke abusively to the staff; She acted usefully during the crisis",
+      "translation": "lạm dụng; dùng sai; tái sử dụng; dùng quá mức; người dùng; tính hữu dụng; cách sử dụng; sự vô dụng; chưa dùng; không thể dùng; có thể tái sử dụng; bị lạm dụng; một cách lạm dụng; một cách hữu ích",
+      "count": 0
     },
     {
-    "word": "use",
-    "meaning": "abuse, /əˈbjuːz/: lạm dụng. misuse, /ˌmɪsˈjuːz/: sử dụng sai, lạm dụng. reuse, /ˌriːˈjuːz/: tái sử dụng. overuse, /ˌəʊvəˈjuːz/: sử dụng quá mức. (ab)user, /ə(b)ˈjuːzər/: (người) sử dụng. usefulness, /ˈjuːsfəlnəs/: tính hữu dụng. usage, /ˈjuːsɪdʒ/: cách sử dụng. uselessness, /ˈjuːsləsnəs/: sự vô dụng. (un)used, /ˌʌnˈjuːzd/: (chưa) được sử dụng. (un)usable, /ˈjuːzəbl/: (không) thể sử dụng. reusable, /ˌriːˈjuːzəbl/: có thể tái sử dụng. abused, /əˈbjuːzd/: bị lạm dụng. abusive(ly), /əˈbjuːsɪv(li)/: (một cách) lạm dụng. usefully, /ˈjuːsfəli/: một cách hữu dụng.",
-    "example": "He abused the system for personal gain. Misuse of funds led to legal action. We should reuse old containers. The overuse of antibiotics is dangerous. The app tracks each user’s time. This knife is known for its usefulness. Usage instructions are included. The tool’s uselessness made it obsolete. This coupon is unused. The material is unusable. These bags are reusable. The child was abused. He spoke abusively. She reacted usefully in the situation.",
-    "count": 0
+      "word": "value",
+      "meaning": "revalue (verb) /ˌriːˈvæljuː/; overvalue (verb) /ˌəʊvəˈvæljuː/; evaluate (verb) /ɪˈvæljueɪt/; evaluation (noun) /ˌɪvæljuˈeɪʃn/; overvaluation (noun) /ˌəʊvərˌvæljuˈeɪʃn/; valuer (noun) /ˈvæljuər/; valuables (noun, plural) /ˈvæljəblz/; invaluable (adj) /ɪnˈvæljuəbl/; valueless (adj) /ˈvæljuləs/",
+      "example": "The bank decided to revalue its currency; Investors often overvalue new technology; Managers need to evaluate employee performance; The evaluation will take two weeks; There is a risk of overvaluation in the housing market; A valuer was called to assess the property; Keep your valuables locked away; Her support was invaluable during the crisis; The broken phone is now valueless",
+      "translation": "định giá lại; đánh giá quá cao; đánh giá; sự đánh giá; sự định giá quá cao; người định giá; vật có giá trị; vô giá; không có giá trị",
+      "count": 0
     },
     {
-    "word": "value",
-    "meaning": "revalue, /ˌriːˈvæljuː/: đánh giá lại, nâng giá. overvalue, /ˌəʊvəˈvæljuː/: đánh giá quá cao. evaluate, /ɪˈvæljueɪt/: đánh giá. (re)evaluation, /ˌ(riː)ɪˌvæljuˈeɪʃn/: sự (tái) đánh giá. evaluation, /ˌɪvæljuˈeɪʃn/: sự đánh giá. overvaluation, /ˌəʊvərˌvæljuˈeɪʃn/: sự định giá quá cao. valuer, /ˈvæljuər/: người định giá. valuables, /ˈvæljəblz/: vật quý giá. (in)valuable, /ˌɪnˈvæljuəbl/: (vô) giá trị. valueless, /ˈvæljuləs/: không có tác dụng.",
-    "example": "The currency was revalued. He tends to overvalue his input. They evaluate the project yearly. A reevaluation is needed. The evaluation took two days. That’s an overvaluation of the house. The valuer arrived late. Keep your valuables in a safe. Her advice was invaluable. That item is valueless now.",
-    "count": 0
+      "word": "weigh",
+      "meaning": "weight (noun) /weɪt/; weightlifter (noun) /ˈweɪtlɪftər/; weightlifting (noun) /ˈweɪtlɪftɪŋ/; weightiness (noun) /ˈweɪtinəs/; overweight (adj) /ˌəʊvəˈweɪt/; underweight (adj) /ˌʌndəˈweɪt/; weighted (adj) /ˈweɪtɪd/; weightlessness (noun) /ˈweɪtləsnəs/; weighty (adj) /ˈweɪti/",
+      "example": "He checks his weight every morning; The weightlifter broke a world record; Weightlifting requires strong muscles; Her words carried weightiness in the discussion; Doctors advise patients who are overweight to exercise; She is slightly underweight for her age; The dice were weighted for fairness; Astronauts experience weightlessness in space; It was a weighty issue for the board",
+      "translation": "cân nặng; vận động viên cử tạ; môn cử tạ; sự quan trọng; thừa cân; thiếu cân; có trọng lượng; trạng thái không trọng lượng; nghiêm trọng",
+      "count": 0
     },
     {
-    "word": "weigh",
-    "meaning": "weight, /weɪt/: cân nặng. weightlifter, /ˈweɪtlɪftər/: vận động viên cử tạ. weightlifting, /ˈweɪtlɪftɪŋ/: môn cử tạ. weightiness, /ˈweɪtinəs/: tính quan trọng. overweight, /ˌəʊvəˈweɪt/: béo phì. underweight, /ˌʌndəˈweɪt/: nhẹ cân. (un)weighted, /ˈweɪtɪd/: (không) được cân. weightless(ness), /ˈweɪtləs(nəs)/: (sự) không trọng lượng. weighty, /ˈweɪti/: nặng, nghiêm trọng.",
-    "example": "He gained a lot of weight. The weightlifter won gold. Weightlifting is his passion. Her words had great weightiness. He became overweight after the holidays. She is slightly underweight. The dice are weighted. The astronaut floated in weightlessness. That’s a weighty matter.",
-    "count": 0
+      "word": "wild",
+      "meaning": "wilderness (noun) /ˈwɪldənəs/; wildlife (noun) /ˈwaɪldlaɪf/; wildness (noun) /ˈwaɪldnəs/; wildly (adv) /ˈwaɪldli/",
+      "example": "They camped in the wilderness for a week; The reserve protects local wildlife; The wildness of the party surprised everyone; He laughed wildly at the joke",
+      "translation": "vùng hoang dã; động vật hoang dã; sự hoang dã; một cách điên cuồng",
+      "count": 0
     },
     {
-    "word": "wild",
-    "meaning": "wilderness, /ˈwɪldənəs/: vùng hoang dã. wildlife, /ˈwaɪldlaɪf/: động vật hoang dã. wildness, /ˈwaɪldnəs/: tính chất hoang dã. wildly, /ˈwaɪldli/: điên dại, hoang dã.",
-    "example": "They explored the wilderness. The park protects wildlife. The wildness of the storm was shocking. He danced wildly.",
-    "count": 0
+      "word": "wise",
+      "meaning": "wisdom (noun) /ˈwɪzdəm/; wisely (adv) /ˈwaɪzli/; unwisely (adv) /ʌnˈwaɪzli/",
+      "example": "He is admired for his wisdom; She wisely chose to save her money; He spent his money unwisely on unnecessary things",
+      "translation": "sự khôn ngoan; một cách khôn ngoan; một cách không khôn ngoan",
+      "count": 0
     },
     {
-    "word": "wise",
-    "meaning": "wisdom, /ˈwɪzdəm/: trí khôn, sự thông thái. (un)wise(ly), /ˈ(wɪz)(li)/: (một cách) (không) khôn ngoan.",
-    "example": "He is full of wisdom. She acted unwisely in that situation.",
-    "count": 0
+      "word": "reword",
+      "meaning": "reword (verb) /ˌriːˈwɜːd/; wording (noun) /ˈwɜːdɪŋ/; wordplay (noun) /ˈwɜːdpleɪ/; wordy (adj) /ˈwɜːdi/; worded (adj) /ˈwɜːdɪd/; wordlessly (adv) /ˈwɜːdləsli/",
+      "example": "Please reword the introduction for clarity; The legal wording was complicated; His jokes rely on clever wordplay; The essay was too wordy and repetitive; The message was carefully worded; She watched the scene wordlessly",
+      "translation": "diễn đạt lại; cách diễn đạt; chơi chữ; dài dòng; được soạn thảo; một cách không nói nên lời",
+      "count": 0
     },
     {
-    "word": "reword",
-    "meaning": "reword, /ˌriːˈwɜːd/: diễn đạt lại, soạn lại. (re)wording, /ˌriːˈwɜːdɪŋ/: cách dùng từ (soạn lại từ). wordplay, /ˈwɜːdpleɪ/: chơi chữ. wordy, /ˈwɜːdi/: dài dòng. (re)worded, /ˌriːˈwɜːdɪd/: được diễn đạt (lại). wordless(ly), /ˈwɜːdləs(li)/: (một cách) không thể diễn tả bằng lời.",
-    "example": "She reworded the sentence for clarity. The legal document needs careful rewording. The comedian is known for clever wordplay. His explanation was too wordy. The statement was reworded formally. He stared wordlessly at the scene.",
-    "count": 0
+      "word": "work",
+      "meaning": "rework (verb) /ˌriːˈwɜːk/; overwork (verb) /ˌəʊvəˈwɜːk/; worker (noun) /ˈwɜːkər/; works (noun, plural) /wɜːks/; workplace (noun) /ˈwɜːkpleɪs/; working (noun) /ˈwɜːkɪŋ/; unworkable (adj) /ʌnˈwɜːkəbl/",
+      "example": "We need to rework the draft before submitting; She often overworks herself at her job; The worker finished his shift; His collected works are published worldwide; The workplace must meet safety standards; The working of this device is simple; The proposal is unworkable in practice",
+      "translation": "làm lại; làm việc quá sức; công nhân; tác phẩm; nơi làm việc; hoạt động; không khả thi",
+      "count": 0
     },
     {
-    "word": "work",
-    "meaning": "rework, /ˌriːˈwɜːk/: làm lại. overwork, /ˌəʊvəˈwɜːk/: làm việc quá sức. worker, /ˈwɜːkər/: công nhân. works, /wɜːks/: tác phẩm. workplace, /ˈwɜːkpleɪs/: nơi làm việc. working, /ˈwɜːkɪŋ/: (thuộc) công việc. (un)workable, /ʌnˈwɜːkəbl/: (không) thể thực hiện.",
-    "example": "We need to rework the design. She often overworks herself. The workers went on strike. His collected works are famous. Safety is important in the workplace. They discussed the working hours. That plan is unworkable.",
-    "count": 0
+      "word": "worth",
+      "meaning": "worthlessness (noun) /ˈwɜːθləsnəs/; worthy (adj) /ˈwɜːði/; worthless (adj) /ˈwɜːθləs/; worthwhile (adj) /ˌwɜːθˈwaɪl/",
+      "example": "She struggled with feelings of worthlessness; He is a worthy opponent in chess; The device became worthless after it broke; The project was worthwhile despite challenges",
+      "translation": "sự vô giá trị; xứng đáng; vô giá trị; đáng giá",
+      "count": 0
     },
     {
-    "word": "worth",
-    "meaning": "worthlessness, /ˈwɜːθləsnəs/: sự vô dụng. worthy, /ˈwɜːði/: xứng đáng. worthless, /ˈwɜːθləs/: vô giá trị. worthwhile, /ˌwɜːθˈwaɪl/: đáng giá.",
-    "example": "She felt a deep sense of worthlessness. He is a worthy opponent. That item is worthless now. Helping others is always worthwhile.",
-    "count": 0
+      "word": "write",
+      "meaning": "rewrite (verb) /ˌriːˈraɪt/; wrote (verb, past) /rəʊt/; written (adj) /ˈrɪtn/; writings (noun, plural) /ˈraɪtɪŋz/; writer (noun) /ˈraɪtər/; unwritten (adj) /ʌnˈrɪtn/",
+      "example": "She had to rewrite the report after feedback; He wrote a letter to his friend; The instructions were clearly written; His writings inspire many readers; She became a successful writer; Some rules are unwritten but understood",
+      "translation": "viết lại; đã viết; được viết; bài viết; nhà văn; không được viết ra",
+      "count": 0
     },
     {
-    "word": "write",
-    "meaning": "rewrite, /ˌriːˈraɪt/: viết lại. (re)wrote, /ˌ(riː)ˈrəʊt/: (đã) viết lại. (re)written, /ˌ(riː)ˈrɪtn/: (đã) được viết lại. writing(s), /ˈraɪtɪŋ(z)/: sự viết/bài viết. writer, /ˈraɪtər/: tác giả, nhà văn. unwritten, /ʌnˈrɪtn/: bất thành văn.",
-    "example": "He had to rewrite the essay. She rewrote the ending. The script was rewritten for clarity. His writings are inspiring. She is a well-known writer. It’s an unwritten rule.",
-    "count": 0
+      "word": "young",
+      "meaning": "youngster (noun) /ˈjʌŋstər/; youth (noun) /juːθ/; youthful (adj) /ˈjuːθfl/",
+      "example": "The youngster excelled in school; He spent his youth traveling the world; Her style is very youthful",
+      "translation": "người trẻ; tuổi trẻ; trẻ trung",
+      "count": 0
     },
     {
-    "word": "young",
-    "meaning": "youngster, /ˈjʌŋstər/: đứa con, người trẻ. youth, /juːθ/: thanh xuân, tuổi trẻ. youthful, /ˈjuːθfl/: trẻ trung.",
-    "example": "The youngster was eager to learn. She remembered her youth fondly. He has a youthful spirit.",
-    "count": 0
+      "word": "zeal",
+      "meaning": "zealot (noun) /ˈzelət/; zealously (adv) /ˈzeləsli/",
+      "example": "A zealot will defend their beliefs passionately; She worked zealously to complete the project",
+      "translation": "người cuồng tín; một cách sốt sắng",
+      "count": 0
     },
     {
-    "word": "zeal",
-    "meaning": "zealot, /ˈzelət/: người cuồng tín, người quá khích. zealous(ly), /ˈzeləs(li)/: (một cách) sốt sắng, đầy nhiệt huyết.",
-    "example": "The zealot refused to compromise. She supported the cause zealously.",
-    "count": 0
-    },            
+      "word": "avoid",
+      "meaning": "avoidance (noun) /əˈvɔɪdəns/; unavoidable (adj) /əˈvɔɪdəbl/; unavoidably (adv) /ˌʌnəˈvɔɪdəbli/",
+      "example": "His avoidance of responsibility was obvious; Delays were unavoidable due to the storm; The flight was unavoidably canceled by weather",
+      "translation": "sự tránh né; không thể tránh; một cách không thể tránh",
+      "count": 0
+    },
     {
-    "word": "avoid",
-    "meaning": "avoidance, /əˈvɔɪdəns/: sự tránh. (un)avoidable, /əˈvɔɪdəbl/: (không thể) tránh khỏi. (un)avoidably, /ˌʌnəˈvɔɪdəbli/: (một cách không thể) tránh khỏi.",
-    "example": "His avoidance of the issue was clear. The damage was unavoidable. The crash was unavoidably caused by the fog.",
-    "count": 0
+      "word": "awe",
+      "meaning": "awfulness (noun) /ˈɔːflnəs/; awesomeness (noun) /ˈɔːsəmnəs/; awestruck (adj) /ˈɔːstrʌk/; awfully (adv) /ˈɔːfəli/; awesomely (adv) /ˈɔːsəmli/",
+      "example": "The awfulness of the scene was shocking; The team's awesomeness impressed everyone; She stood awestruck at the mountain view; The room was awfully quiet; The band played awesomely at the concert",
+      "translation": "sự kinh khủng; sự tuyệt vời; kinh ngạc; một cách kinh khủng; một cách tuyệt vời",
+      "count": 0
     },
     {
-    "word": "awe",
-    "meaning": "awfulness, /ˈɔːflnəs/: sự khủng khiếp. awesomeness, /ˈɔːsəmnəs/: sự tuyệt vời. awestruck, /ˈɔːstrʌk/: kinh ngạc. awfully(ly), /ˈɔːf(ə)li/: (một cách) kinh khủng. awesome(ly), /ˈɔːs(ə)mli/: (một cách) tuyệt vời.",
-    "example": "The awfulness of the event shocked everyone. Her awesomeness was undeniable. He was awestruck by the view. It was awfully noisy. She danced awesomely.",
-    "count": 0
+      "word": "believe",
+      "meaning": "disbelieve (verb) /ˌdɪsbɪˈliːv/; belief (noun) /bɪˈliːf/; believer (noun) /bɪˈliːvər/; unbelievable (adj) /ˌʌnbɪˈliːvəbl/; disbelievingly (adv) /ˌdɪsbɪˈliːvɪŋli/",
+      "example": "She disbelieves in ghosts; His belief in justice is strong; He is a true believer in equal rights; The story sounded unbelievable; She looked at him disbelievingly",
+      "translation": "không tin; niềm tin; người tin tưởng; không thể tin được; một cách không tin",
+      "count": 0
     },
     {
-    "word": "believe",
-    "meaning": "disbelieve, /ˌdɪsbɪˈliːv/: không tin. belief, /bɪˈliːf/: niềm tin. believer, /bɪˈliːvər/: người tin tưởng. (un)believable, /ˌʌnbɪˈliːvəbl/: (không) thể tin được. disbelieving(ly), /ˌdɪsbɪˈliːvɪŋ(li)/: (một cách) không tin.",
-    "example": "I disbelieve that rumor. He has a strong belief in honesty. She’s a true believer. That’s unbelievable! He looked at me disbelievingly.",
-    "count": 0
+      "word": "benefit",
+      "meaning": "beneficiary (noun) /ˌbenɪˈfɪʃəri/; beneficial (adj) /ˌbenɪˈfɪʃl/; beneficially (adv) /ˌbenɪˈfɪʃəli/",
+      "example": "The beneficiary received the payment after the settlement; A balanced diet is beneficial to long-term health; The new policy was applied beneficially in rural areas",
+      "translation": "người hưởng lợi; có lợi; một cách có lợi",
+      "count": 0
     },
     {
-    "word": "benefit",
-    "meaning": "beneficiary, /ˌbenɪˈfɪʃəri/: người hưởng lợi. beneficial(ly), /ˌbenɪˈfɪʃəl(li)/: (một cách) có lợi.",
-    "example": "She’s the main beneficiary of the will. The program worked beneficially for all.",
-    "count": 0
+      "word": "brief",
+      "meaning": "debriefing (noun) /ˈbriːfɪŋ/; brevity (noun) /ˈbrevəti/; briefs (noun) /briːfs/; briefly (adv) /ˈbriːfli/",
+      "example": "The debriefing covered every detail of the operation; The presentation was praised for its brevity; He packed several briefs for the trip; She spoke briefly at the meeting",
+      "translation": "cuộc thẩm vấn; sự ngắn gọn; quần lót nam; một cách ngắn gọn",
+      "count": 0
     },
     {
-    "word": "brief",
-    "meaning": "(de)briefing, /ˈbriːfɪŋ/: cuộc phỏng vấn, thẩm vấn. brevity, /ˈbrevəti/: sự ngắn gọn. briefs, /briːfs/: quần lót nam. briefly, /ˈbriːfli/: một cách vắn tắt.",
-    "example": "The debriefing took an hour. The letter was praised for its brevity. He packed several briefs. She explained briefly.",
-    "count": 0
+      "word": "brilliant",
+      "meaning": "brilliance (noun) /ˈbrɪljəns/; brilliantly (adv) /ˈbrɪljəntli/",
+      "example": "Her brilliance shone through in the challenging interview; He solved the puzzle brilliantly under pressure",
+      "translation": "sự tài giỏi; một cách xuất sắc",
+      "count": 0
     },
     {
-    "word": "brilliant",
-    "meaning": "brilliance, /ˈbrɪljəns/: sự tài giỏi. brilliantly, /ˈbrɪljəntli/: một cách giỏi giang.",
-    "example": "Her brilliance impressed everyone. He played brilliantly.",
-    "count": 0
+      "word": "broad",
+      "meaning": "broaden (verb) /ˈbrɔːdn/; breadth (noun) /bredθ/; broadly (adv) /ˈbrɔːdli/",
+      "example": "Travelling helps broaden your perspective; The river had impressive breadth after the storm; The proposal was broadly supported across teams",
+      "translation": "mở rộng; chiều rộng; một cách rộng rãi",
+      "count": 0
     },
     {
-    "word": "broad",
-    "meaning": "broaden, /ˈbrɔːdn/: mở rộng. breadth, /bredθ/: chiều rộng. broadly, /ˈbrɔːdli/: một cách rộng rãi.",
-    "example": "Travel broadens the mind. The table has a great breadth. He smiled broadly.",
-    "count": 0
+      "word": "capable",
+      "meaning": "capability (noun) /ˌkeɪpəˈbɪləti/; incapable (adj) /ɪnˈkeɪpəbl/",
+      "example": "The company has the capability to expand globally; He is incapable of dishonesty",
+      "translation": "khả năng; không có khả năng",
+      "count": 0
     },
     {
-    "word": "capable",
-    "meaning": "capability, /ˌkeɪpəˈbɪləti/: khả năng. incapable, /ɪnˈkeɪpəbl/: không có khả năng.",
-    "example": "She has great capability. He is incapable of lying.",
-    "count": 0
+      "word": "cause",
+      "meaning": "causation (noun) /kɔːˈzeɪʃn/; causal (adj) /ˈkɔːzl/; causative (adj) /ˈkɔːzətɪv/",
+      "example": "The investigation focused on the causation of the fire; There is a causal relationship between diet and health; Poor hygiene is a causative factor in disease",
+      "translation": "nguyên nhân; thuộc về nhân quả; là nguyên nhân gây ra",
+      "count": 0
     },
     {
-    "word": "cause",
-    "meaning": "causation, /kɔːˈzeɪʃn/: nguyên nhân. causal, /ˈkɔːzl/: thuộc quan hệ nhân quả. causative, /ˈkɔːzətɪv/: là nguyên nhân gây ra.",
-    "example": "The causation of the accident is unclear. There is a causal link between stress and illness. Smoking is a causative factor of cancer.",
-    "count": 0
+      "word": "change",
+      "meaning": "exchange (noun) /ɪksˈtʃeɪndʒ/; changeover (noun) /ˈtʃeɪndʒəʊvə/; unchanging (adj) /ʌnˈtʃeɪndʒɪŋ/; changeable (adj) /ˈtʃeɪndʒəbl/; interchangeable (adj) /ˌɪntəˈtʃeɪndʒəbl/",
+      "example": "Currency exchange is required when traveling abroad; The factory completed the changeover in record time; His attitude toward his friends remained unchanging; The schedule is changeable depending on demand; These two parts are completely interchangeable",
+      "translation": "sự trao đổi; sự chuyển đổi; không thay đổi; có thể thay đổi; có thể thay thế cho nhau",
+      "count": 0
     },
     {
-    "word": "change",
-    "meaning": "exchange, /ɪksˈtʃeɪndʒ/: trao đổi. changeover, /ˈtʃeɪndʒəʊvə(r)/: chuyển biến. (un)changing, /ˌʌnˈtʃeɪndʒɪŋ/: (không) thay đổi. (un)changeable, /ˌʌnˈtʃeɪndʒəbl/: (không) dễ thay đổi. interchangeable, /ˌɪntəˈtʃeɪndʒəbl/: có tính thay thế lẫn nhau.",
-    "example": "They discussed a cultural exchange. The changeover was seamless. His mood is unchanging. The weather is changeable. These parts are interchangeable.",
-    "count": 0
-    },      
+      "word": "approve",
+      "meaning": "disapprove (verb) /ˌdɪsəˈpruːv/; approval (noun) /əˈpruːvəl/; disapproval (noun) /ˌdɪsəˈpruːvəl/; approved (adj) /əˈpruːvd/; disapproved (adj) /ˌdɪsəˈpruːvd/; approvingly (adv) /əˈpruːvɪŋli/; disapprovingly (adv) /ˌdɪsəˈpruːvɪŋli/",
+      "example": "Her parents disapprove of the decision; The project received final approval yesterday; His actions were met with disapproval; The policy is now officially approved; Their request was disapproved after review; She nodded approvingly at the suggestion; He looked disapprovingly at the messy room",
+      "translation": "không tán thành; sự phê duyệt; sự không đồng tình; được thông qua; bị bác bỏ; một cách tán thành; một cách không tán thành",
+      "count": 0
+    },
     {
-    "word": "approve",
-    "meaning": "disapprove, /ˌdɪsəˈpruːv/: không ủng hộ, không thông qua. (dis)approval, /ˌdɪsəˈpruːvəl/: sự (không) ủng hộ, thông qua. (dis)approved, /ˌdɪsəˈpruːvd/: (không) được thông qua. (dis)approving(ly), /ˌdɪsəˈpruːvɪŋ(li)/: (một cách) (không) tán thành.",
-    "example": "She disapproved of his decision. The plan received official approval. The application was disapproved. He looked at them disapprovingly.",
-    "count": 0
+      "word": "architect",
+      "meaning": "architecture (noun) /ˈɑːkɪtektʃə/; architecturally (adv) /ˌɑːkɪˈtektʃərəli/",
+      "example": "The museum is an example of modern architecture; The district is architecturally unique compared to others",
+      "translation": "kiến trúc; về mặt kiến trúc",
+      "count": 0
     },
     {
-    "word": "architect",
-    "meaning": "architecture, /ˈɑːkɪtektʃə(r)/: kiến trúc. architectural(ly), /ˌɑːkɪˈtek.tʃər(ə)li/: (thuộc) kiến trúc.",
-    "example": "The building is famous for its modern architecture. The city is architecturally diverse.",
-    "count": 0
+      "word": "argue",
+      "meaning": "argument (noun) /ˈɑːɡjumənt/; argumentative (adj) /ˌɑːɡjumənˈtetɪv/; arguable (adj) /ˈɑːɡjuəbl/; unarguable (adj) /ʌnˈɑːɡjuəbl/; arguably (adv) /ˈɑːɡjuəbli/",
+      "example": "Their argument lasted into the night; He has an argumentative nature at meetings; That claim is only arguable with more evidence; The outcome is unarguable based on the data; She is arguably the most experienced candidate",
+      "translation": "sự tranh luận; thích tranh cãi; có thể tranh cãi; không thể tranh cãi; có thể cho là",
+      "count": 0
     },
     {
-    "word": "argue",
-    "meaning": "argument, /ˈɑːɡjumənt/: lập luận, lý lẽ. argumentative(ly), /ˌɑːɡjumənˈtetɪv(li)/: (một cách) thích tranh luận. (un)arguable, /ˈɑːɡjuəbl/: (không thể) bàn cãi. arguably, /ˈɑːɡjuəbli/: có thể cho là.",
-    "example": "They had a strong argument. He answered argumentatively. That’s an unarguable fact. Arguably, she’s the best in the team.",
-    "count": 0
+      "word": "arrange",
+      "meaning": "rearrange (verb) /ˌriːəˈreɪndʒ/; arrangement (noun) /əˈreɪndʒmənt/; rearrangement (noun) /ˌriːəˈreɪndʒmənt/; arranged (adj) /əˈreɪndʒd/",
+      "example": "They plan to rearrange the furniture next week; The travel arrangement included all meals; The rearrangement made the process more efficient; Everything was arranged before the event",
+      "translation": "sắp xếp lại; sự sắp xếp; sự sắp xếp lại; đã được sắp xếp",
+      "count": 0
     },
     {
-    "word": "arrange",
-    "meaning": "rearrange, /ˌriːəˈreɪndʒ/: sắp xếp lại. (re)arrangement, /ˌ(riː)əˈreɪndʒmənt/: sự sắp xếp (lại). arranged, /əˈreɪndʒd/: được sắp xếp.",
-    "example": "Let’s rearrange the meeting. The rearrangement was necessary. Everything was neatly arranged.",
-    "count": 0
+      "word": "art",
+      "meaning": "arts (noun) /ɑːts/; artfulness (noun) /ˈɑːtfəlnəs/; artificiality (noun) /ˌɑːtɪˌfɪʃiˈæləti/; artist (noun) /ˈɑːtɪst/; artistic (adj) /ɑːˈtɪstɪk/; artistically (adv) /ɑːˈtɪstɪkli/; artificial (adj) /ˌɑːtɪˈfɪʃl/; artificially (adv) /ˌɑːtɪˈfɪʃəli/; artful (adj) /ˈɑːtfəl/; artfully (adv) /ˈɑːtfəli/; artless (adj) /ˈɑːtləs/; artlessly (adv) /ˈɑːtləsli/",
+      "example": "She has always enjoyed the arts; The magician performed with great artfulness; The artificiality of the product was obvious; The artist displayed new work last month; His approach is artistic and innovative; The room was decorated artistically; The flower looked artificial in the bouquet; The cake was artificially sweetened; It was an artful maneuver during negotiations; She responded artfully in conversation; The answer was charmingly artless; He admitted his mistake artlessly",
+      "translation": "nghệ thuật; sự khéo léo; tính chất nhân tạo; nghệ sĩ; thuộc về nghệ thuật; một cách nghệ thuật; nhân tạo; một cách nhân tạo; khéo léo; một cách khéo léo; ngây thơ; một cách ngây thơ",
+      "count": 0
     },
     {
-    "word": "art",
-    "meaning": "arts, /ɑːts/: nghệ thuật. artfulness, /ˈɑːtfəlnəs/: sự tinh ranh, khéo léo. artificiality, /ˌɑːtɪˌfɪʃiˈæləti/: tính nhân tạo, giả tạo. artist, /ˈɑːtɪst/: nghệ sĩ. artistic(ally), /ɑːˈtɪstɪk(li)/: (một cách) nghệ thuật. artificial(ly), /ˌɑːtɪˈfɪʃl(i)/: (một cách) giả tạo. artful(ly), /ˈɑːtfəl(i)/: (một cách) tinh vi. artless(ly), /ˈɑːtləs(li)/: (một cách) chân thật.",
-    "example": "She studied the arts. His artfulness was impressive. The flower looked artificial. The artist displayed new work. She decorated the room artistically. It was artificially sweetened. He answered artfully. She sang artlessly.",
-    "count": 0
+      "word": "assess",
+      "meaning": "reassess (verb) /ˌriːəˈses/; assessment (noun) /əˈsesmənt/; reassessment (noun) /ˌriːəˈsesmənt/; assessor (noun) /əˈsesər/; assessed (adj) /əˈsest/",
+      "example": "The school will reassess the program next year; The assessment was completed in May; The reassessment revealed new priorities; The assessor visited the site on Friday; The house was assessed for taxes",
+      "translation": "đánh giá lại; sự đánh giá; sự đánh giá lại; người đánh giá; đã được đánh giá",
+      "count": 0
     },
     {
-    "word": "assess",
-    "meaning": "reassess, /ˌriːəˈses/: đánh giá lại. (re)assessment, /ˌ(riː)əˈsesmənt/: đánh giá (lại). assessor, /əˈsesər/: người đánh giá. assessed, /əˈsest/: bị đánh thuế.",
-    "example": "We need to reassess our priorities. The assessment was thorough. The assessor arrived on time. Property was assessed last year.",
-    "count": 0
+      "word": "associate",
+      "meaning": "dissociate (verb) /dɪˈsəʊʃieɪt/; association (noun) /əˌsəʊsiˈeɪʃn/; associate (noun) /əˈsəʊʃiət/; associated (adj) /əˈsəʊsieɪtɪd/",
+      "example": "She tried to dissociate herself from the incident; The association organized the conference; He’s a senior associate at the firm; The risks are associated with poor planning",
+      "translation": "tách rời; hiệp hội; cộng sự; có liên quan",
+      "count": 0
     },
     {
-    "word": "associate",
-    "meaning": "dissociate, /dɪˈsəʊʃieɪt/: phân tách. association, /əˌsəʊsiˈeɪʃn/: sự liên kết. associate, /əˈsəʊʃiət/: người cộng tác. associated, /əˈsəʊsieɪtɪd/: có liên hệ.",
-    "example": "He tried to dissociate himself from the scandal. The event is organized by a student association. She’s a business associate. The risks are associated with smoking.",
-    "count": 0
+      "word": "assume",
+      "meaning": "assumption (noun) /əˈsʌmpʃn/; assuming (conj) /əˈsjuːmɪŋ/; unassuming (adj) /ˌʌnəˈsjuːmɪŋ/; assumed (adj) /əˈsjuːmd/",
+      "example": "That is a dangerous assumption to make; Assuming the weather stays clear, we’ll go hiking; His unassuming attitude made him well-liked; She used an assumed name in the story",
+      "translation": "giả định; giả sử; khiêm tốn; giả tạo",
+      "count": 0
     },
     {
-    "word": "assume",
-    "meaning": "assumption, /əˈsʌmpʃn/: giả định. assuming, /əˈsjuːmɪŋ/: giả sử. unassuming, /ˌʌnəˈsjuːmɪŋ/: khiêm tốn. assumed, /əˈsjuːmd/: giả, sai sự thật.",
-    "example": "That’s a risky assumption. Assuming he’s right, we’ll win. He is very unassuming. She used an assumed name.",
-    "count": 0
+      "word": "attach",
+      "meaning": "reattach (verb) /ˌriːəˈtætʃ/; attachment (noun) /əˈtætʃmənt/; unattached (adj) /ʌnəˈtætʃt/",
+      "example": "She had to reattach the loose part before the meeting; The email contained an important attachment for review; He remained unattached throughout the project, working independently",
+      "translation": "đính kèm lại; tệp đính kèm; không gắn bó",
+      "count": 0
     },
     {
-    "word": "attach",
-    "meaning": "reattach, /ˌriːəˈtætʃ/: đính kèm lại. attachment, /əˈtætʃmənt/: sự đính kèm. (un)attached, /ʌnəˈtætʃt/: (không) đính kèm.",
-    "example": "Please reattach the document. The email had an attachment. He arrived unattached.",
-    "count": 0
+      "word": "available",
+      "meaning": "availability (noun) /əˌveɪləˈbɪləti/; unavailability (noun) /ʌnəˌveɪləˈbɪləti/",
+      "example": "The availability of resources was confirmed early; Internet unavailability caused a delay in the online training",
+      "translation": "sự sẵn có; sự không sẵn có",
+      "count": 0
     },
     {
-    "word": "available",
-    "meaning": "(un)availability, /əˌveɪləˈbɪləti/: sự (không) sẵn sàng.",
-    "example": "Check the availability of the room. Internet unavailability affected our work.",
-    "count": 0
-    },      
-    {      
-    "word": "access",
-    "meaning": "accessibility, /ˌæk.ses.əˈbɪl.ə.ti/: khả năng tiếp cận. (in)accessible, /ˌɪn.əkˈses.ə.bəl/: (không) có thể tiếp cận được.",
-    "example": "The accessibility of this website is excellent for visually impaired users. This island is inaccessible during the monsoon season.",
-    "count": 0
+      "word": "access",
+      "meaning": "accessibility (noun) /ˌæk.ses.əˈbɪl.ə.ti/; accessible (adj) /əkˈsesəbl/; inaccessible (adj) /ˌɪn.əkˈses.ə.bəl/",
+      "example": "The accessibility of public spaces has improved; The library is accessible to all students; This document is inaccessible without proper clearance",
+      "translation": "khả năng tiếp cận; có thể tiếp cận; không thể tiếp cận",
+      "count": 0
     },
     {
-    "word": "act",
-    "meaning": "enact, /ɪˈnækt/: ban hành, đóng vai. react, /riˈækt/: phản ứng. counteract, /ˌkaʊntərˈækt/: chống lại. interact, /ˌɪntərˈækt/: tương tác. transact, /trænˈzækt/: giao dịch. overact, /ˌəʊvərˈækt/: diễn quá cường điệu. overreact, /ˌəʊvəriˈækt/: phản ứng quá mức. (de/re)activate, /(ˌdiː/ˌriː)ˈæktɪveɪt/: (ngừng) kích hoạt. acting, /ˈæktɪŋ/: quyền, tạm thời. actor, /ˈæktər/: diễn viên. actress, /ˈæktrəs/: nữ diễn viên. action, /ˈækʃən/: hành động. (in)activity, /ˌɪn.ækˈtɪv.ə.ti/: sự (thiếu) hoạt động. radioactivity, /ˌreɪ.di.əʊ.ækˈtɪv.ə.ti/: phóng xạ. transaction, /trænˈzækʃən/: sự giao dịch. activist, /ˈæktɪvɪst/: nhà hoạt động. activism, /ˈæktɪvɪzəm/: chủ nghĩa tích cực. interaction, /ˌɪntərˈækʃən/: sự tương tác. (over)reaction, /ˌəʊvəriˈækʃən/: sự phản ứng (quá). overacting, /ˌəʊvərˈæktɪŋ/: diễn cường điệu. reactionary, /riˈækʃənəri/: phản động. reactor, /riˈæktər/: lò phản ứng hạt nhân. transactional, /trænˈzækʃənl/: liên quan tới giao dịch. active, /ˈæktɪv/: chủ động, tích cực. hyperactive, /ˌhaɪ.pərˈæk.tɪv/: hiếu động thái quá. radioactive, /ˌreɪ.di.əʊˈæk.tɪv/: phóng xạ. overactive, /ˌəʊvərˈæktɪv/: hoạt động quá mức. (in)active(ly), /(ˌɪn)ˈæk.tɪv(li)/: một cách (không) tích cực.",
-    "example": "They enacted new environmental laws. She reacted quickly to the danger. This drug counteracts allergic reactions. Children interact well through games. We transact business via online banking. He tends to overact in every scene. Please don’t overreact to criticism. The alarm was deactivated remotely. The acting director approved the plan. The actor received a standing ovation. The actress accepted the award. Take action before it's too late. Inactivity leads to poor health. We measured radioactivity in the soil. The transaction went smoothly. She’s a human rights activist. Youth activism is growing globally. Their interaction was respectful. His overreaction was unnecessary. He was overacting again. The bill was blocked by reactionary forces. The reactor was shut down. The report is highly transactional. Stay active to stay healthy. That child is hyperactive. This is a radioactive zone. His glands are overactive. She actively supported the cause.",
-    "count": 0
+      "word": "act",
+      "meaning": "enact (verb) /ɪˈnækt/; react (verb) /riˈækt/; counteract (verb) /ˌkaʊntərˈækt/; interact (verb) /ˌɪntərˈækt/; transact (verb) /trænˈzækt/; overact (verb) /ˌəʊvərˈækt/; overreact (verb) /ˌəʊvəriˈækt/; deactivate (verb) /diːˈæktɪveɪt/; reactivate (verb) /riˈæktɪveɪt/; acting (adj) /ˈæktɪŋ/; actor (noun) /ˈæktər/; actress (noun) /ˈæktrəs/; action (noun) /ˈækʃən/; inactivity (noun) /ˌɪn.ækˈtɪv.ə.ti/; radioactivity (noun) /ˌreɪ.di.əʊ.ækˈtɪv.ə.ti/; transaction (noun) /trænˈzækʃən/; activist (noun) /ˈæktɪvɪst/; activism (noun) /ˈæktɪvɪzəm/; interaction (noun) /ˌɪntərˈækʃən/; overreaction (noun) /ˌəʊvəriˈækʃən/; overacting (noun) /ˌəʊvərˈæktɪŋ/; reactionary (adj) /riˈækʃənəri/; reactor (noun) /riˈæktər/; transactional (adj) /trænˈzækʃənl/; active (adj) /ˈæktɪv/; hyperactive (adj) /ˌhaɪ.pərˈæk.tɪv/; radioactive (adj) /ˌreɪ.di.əʊˈæk.tɪv/; overactive (adj) /ˌəʊvərˈæktɪv/; actively (adv) /ˈæk.tɪvli/; inactively (adv) /ˈɪn.æk.tɪvli/",
+      "example": "The new policy was enacted last year; She reacted calmly to the unexpected news; The antidote can counteract the poison’s effect; Students often interact with each other in group projects; They transact business primarily online; He tends to overact in dramatic roles; Please don’t overreact to minor setbacks; The device was deactivated after use; The security system can be reactivated remotely; The acting manager called an emergency meeting; The actor received critical acclaim; The actress starred in a popular series; Decisive action is needed in an emergency; Prolonged inactivity can affect your health; The team measured radioactivity in soil samples; The transaction was completed successfully; The activist organized several events; Environmental activism has grown rapidly; Positive interaction improves team morale; His overreaction surprised everyone; Overacting can ruin a performance; The policy attracted criticism from reactionary groups; The reactor was safely shut down; The new software uses transactional emails; She remains active despite her age; The child is extremely hyperactive; Radioactive waste must be stored carefully; His glands are overactive; He contributed actively to the discussion; The engine ran inactively for months",
+      "translation": "ban hành; phản ứng; chống lại; tương tác; giao dịch; diễn quá mức; phản ứng thái quá; tắt; kích hoạt lại; tạm quyền; nam diễn viên; nữ diễn viên; hành động; sự không hoạt động; chất phóng xạ; giao dịch; nhà hoạt động; chủ nghĩa hoạt động; sự tương tác; sự phản ứng thái quá; sự diễn quá mức; phản động; lò phản ứng; mang tính giao dịch; năng động; hiếu động; phóng xạ; hoạt động quá mức; một cách năng động; một cách không hoạt động",
+      "count": 0
     },
     {
-    "word": "adapt",
-    "meaning": "adaptation, /ˌædæpˈteɪʃən/: sự thích nghi. adaptor, /əˈdæptər/: bộ chuyển đổi. adaptable, /əˈdæptəbl/: có thể thích nghi.",
-    "example": "The adaptation of the novel was successful. You’ll need an adaptor for your charger. She's very adaptable to change.",
-    "count": 0
+      "word": "adapt",
+      "meaning": "adaptation (noun) /ˌædæpˈteɪʃən/; adaptor (noun) /əˈdæptər/; adaptable (adj) /əˈdæptəbl/",
+      "example": "The adaptation of the story became a successful play; He bought a new adaptor for his laptop; She is highly adaptable to new working environments",
+      "translation": "sự thích nghi; bộ chuyển đổi; có thể thích nghi",
+      "count": 0
     },
     {
-    "word": "add",
-    "meaning": "addendum, /əˈdendəm/: phụ lục. addenda, /əˈdendə/: phụ lục (số nhiều). additive, /ˈædətɪv/: chất phụ gia. additional(ly), /əˈdɪʃənl/: thêm vào, ngoài ra.",
-    "example": "An addendum was added to the report. Please check the two addenda. This product contains no additives. Additionally, we provide free support.",
-    "count": 0
+      "word": "add",
+      "meaning": "addendum (noun) /əˈdendəm/; addenda (noun) /əˈdendə/; additive (noun) /ˈædətɪv/; additional (adj) /əˈdɪʃənl/; additionally (adv) /əˈdɪʃənli/",
+      "example": "An addendum was issued with the latest update; The report contains several addenda; This product is free from harmful additives; Additional resources were provided for the project; Additionally, he offered his support",
+      "translation": "phụ lục; các phụ lục; chất phụ gia; bổ sung; ngoài ra",
+      "count": 0
     },
     {
-    "word": "adequate",
-    "meaning": "(in)adequacy, /ˌɪnˈædɪkwəsi/: sự (không) thỏa đáng. inadequate, /ɪnˈædɪkwət/: không thỏa đáng. (in)adequately, /(ˌɪn)ˈædɪkwətli/: (không) đầy đủ.",
-    "example": "There’s a question of the adequacy of funds. The facilities are inadequate. The job was inadequately done.",
-    "count": 0
+      "word": "adequate",
+      "meaning": "adequacy (noun) /ˈædɪkwəsi/; inadequacy (noun) /ɪnˈædɪkwəsi/; inadequate (adj) /ɪnˈædɪkwət/; adequately (adv) /ˈædɪkwətli/; inadequately (adv) /ɪnˈædɪkwətli/",
+      "example": "There are concerns about the adequacy of the data; His lack of experience revealed his inadequacy; The current staff is inadequate for the workload; The machine operates adequately in most conditions; The work was inadequately supervised",
+      "translation": "sự đầy đủ; sự thiếu hụt; không đủ; một cách đầy đủ; một cách không đầy đủ",
+      "count": 0
     },
     {
-    "word": "adjust",
-    "meaning": "readjust, /ˌriː.əˈdʒʌst/: điều chỉnh lại. adjustment, /əˈdʒʌstmənt/: sự điều chỉnh. adjustable, /əˈdʒʌstəbl/: có thể điều chỉnh.",
-    "example": "He had to readjust to a new routine. The adjustment took weeks. This chair is fully adjustable.",
-    "count": 0
+      "word": "adjust",
+      "meaning": "readjust (verb) /ˌriː.əˈdʒʌst/; adjustment (noun) /əˈdʒʌstmənt/; adjustable (adj) /əˈdʒʌstəbl/",
+      "example": "He had to readjust after moving to a new city; The adjustment improved the results; This seat is fully adjustable for comfort",
+      "translation": "điều chỉnh lại; sự điều chỉnh; có thể điều chỉnh",
+      "count": 0
     },
     {
-    "word": "admire",
-    "meaning": "admiration, /ˌædməˈreɪʃən/: sự ngưỡng mộ. admirer, /ədˈmaɪərər/: người ngưỡng mộ. admirable, /ˈædmərəbl/: đáng ngưỡng mộ. admirably, /ˈædmərəbli/: một cách đáng ngưỡng mộ. admiring(ly), /ədˈmaɪərɪŋ(li)/: (một cách) ngưỡng mộ.",
-    "example": "His bravery won admiration. She has a secret admirer. That was an admirable act. She admirably handled the crisis. He looked at her admiringly.",
-    "count": 0
+      "word": "admire",
+      "meaning": "admiration (noun) /ˌædməˈreɪʃən/; admirer (noun) /ədˈmaɪərər/; admirable (adj) /ˈædmərəbl/; admirably (adv) /ˈædmərəbli/; admiringly (adv) /ədˈmaɪərɪŋli/",
+      "example": "He earned admiration for his honesty; She discovered a secret admirer at work; His admirable efforts were noticed; She solved the problem admirably; He looked at her admiringly after the performance",
+      "translation": "sự ngưỡng mộ; người ngưỡng mộ; đáng ngưỡng mộ; một cách đáng ngưỡng mộ; một cách ngưỡng mộ",
+      "count": 0
     },
     {
-    "word": "aggression",
-    "meaning": "aggressiveness, /əˈɡresɪvnəs/: tính hung hăng. aggressor, /əˈɡresər/: kẻ tấn công. aggressive(ly), /əˈɡresɪv(li)/: (một cách) hung hăng.",
-    "example": "His aggressiveness caused conflict. The aggressor started the war. He spoke aggressively to the team.",
-    "count": 0
+      "word": "aggression",
+      "meaning": "aggressiveness (noun) /əˈɡresɪvnəs/; aggressor (noun) /əˈɡresər/; aggressive (adj) /əˈɡresɪv/; aggressively (adv) /əˈɡresɪvli/",
+      "example": "His aggressiveness worried the team; The aggressor was quickly apprehended; She has an aggressive negotiation style; He drove aggressively through traffic",
+      "translation": "tính hung hăng; kẻ tấn công; hung hăng; một cách hung hăng",
+      "count": 0
     },
     {
-    "word": "alter",
-    "meaning": "alteration, /ˌɔːltəˈreɪʃən/: sự thay đổi. alterable, /ˈɔːltərəbl/: có thể thay đổi. unaltered, /ʌnˈɔːltəd/: không thay đổi. alternate, /ˈɔːltərnət/: luân phiên. alternative, /ɔːlˈtɜːnətɪv/: thay thế.",
-    "example": "We made a slight alteration. The plan is alterable. His view remained unaltered. We take alternate routes. There's no alternative choice.",
-    "count": 0
+      "word": "alter",
+      "meaning": "alteration (noun) /ˌɔːltəˈreɪʃən/; alterable (adj) /ˈɔːltərəbl/; unaltered (adj) /ʌnˈɔːltəd/; alternate (adj) /ˈɔːltərnət/; alternative (noun) /ɔːlˈtɜːnətɪv/",
+      "example": "There was a minor alteration to the design; The contract terms are alterable upon request; The results remained unaltered after testing; The schedule follows alternate days; We discussed an alternative to the current plan",
+      "translation": "sự thay đổi; có thể thay đổi; không thay đổi; luân phiên; phương án thay thế",
+      "count": 0
     },
     {
-    "word": "analyse",
-    "meaning": "analysis, /əˈnæləsɪs/: sự phân tích. analyst, /ˈænəlɪst/: nhà phân tích. analytical(ly), /ˌænəˈlɪtɪkl/: (một cách) phân tích.",
-    "example": "We conducted a data analysis. The analyst predicted a downturn. She approached the issue analytically.",
-    "count": 0
+      "word": "analyse",
+      "meaning": "analysis (noun) /əˈnæləsɪs/; analyst (noun) /ˈænəlɪst/; analytical (adj) /ˌænəˈlɪtɪkl/",
+      "example": "We performed a detailed analysis of the results; The analyst predicted a positive trend; She has a highly analytical mind",
+      "translation": "sự phân tích; nhà phân tích; (thuộc) phân tích",
+      "count": 0
     },
     {
-    "word": "antique",
-    "meaning": "antiquity, /ænˈtɪkwəti/: thời cổ đại. antiquated, /ˈæntɪkweɪtɪd/: lỗi thời.",
-    "example": "The museum houses items from antiquity. That method is antiquated.",
-    "count": 0
+      "word": "antique",
+      "meaning": "antiquity (noun) /ænˈtɪkwəti/; antiquated (adj) /ˈæntɪkweɪtɪd/",
+      "example": "The gallery displays artifacts from antiquity; That equipment is considered antiquated now",
+      "translation": "thời cổ đại; lỗi thời",
+      "count": 0
     },
     {
-    "word": "appear",
-    "meaning": "disappear, /ˌdɪsəˈpɪər/: biến mất. reappear, /ˌriːəˈpɪə(r)/: xuất hiện lại. (dis/re)appearance, /ˌdɪs/ˌriːəˈpɪərəns/: sự (biến/hiện) ra. apparition, /ˌæpəˈrɪʃn/: ma quỷ hiện ra. apparent(ly), /əˈpærənt(li)/: rõ ràng.",
-    "example": "The bird suddenly disappeared. He may reappear later. Her disappearance is suspicious. They claimed to see an apparition. Apparently, it’s going to rain.",
-    "count": 0
+      "word": "appear",
+      "meaning": "disappear (verb) /ˌdɪsəˈpɪər/; reappear (verb) /ˌriːəˈpɪə(r)/; disappearance (noun) /ˌdɪsəˈpɪərəns/; reappearance (noun) /ˌriːəˈpɪərəns/; apparition (noun) /ˌæpəˈrɪʃn/; apparent (adj) /əˈpærənt/; apparently (adv) /əˈpærəntli/",
+      "example": "The painting seemed to disappear under new light; He may reappear in the next episode; Her disappearance was reported immediately; His reappearance surprised everyone; They claimed to see an apparition in the hallway; The cause of the issue is not apparent; Apparently, the results were misreported",
+      "translation": "biến mất; xuất hiện lại; sự biến mất; sự xuất hiện lại; bóng ma; rõ ràng; có vẻ như",
+      "count": 0
     },
     {
-    "word": "apply",
-    "meaning": "reapply, /ˌriːəˈplaɪ/: nộp lại. misapply, /ˌmɪsəˈplaɪ/: áp dụng sai. applicant, /ˈæplɪkənt/: người nộp đơn. application, /ˌæplɪˈkeɪʃn/: đơn xin. (in)applicability, /ˌɪnˌæplɪkəˈbɪləti/: (không) thể áp dụng. (in)applicable, /ˌɪnˈæplɪkəbl/: (không) thể áp dụng. (mis)applied, /ˌmɪsəˈplaɪd/: (áp dụng sai).",
-    "example": "You can reapply next year. They misapplied the method. The applicant was successful. Your application is under review. That rule has limited applicability. It’s not applicable in this case. He misapplied the principle.",
-    "count": 0
+      "word": "apply",
+      "meaning": "reapply (verb) /ˌriːəˈplaɪ/; misapply (verb) /ˌmɪsəˈplaɪ/; applicant (noun) /ˈæplɪkənt/; application (noun) /ˌæplɪˈkeɪʃn/; applicability (noun) /ˌæplɪkəˈbɪləti/; inapplicability (noun) /ˌɪnˌæplɪkəˈbɪləti/; applicable (adj) /ˈæplɪkəbl/; inapplicable (adj) /ɪnˈæplɪkəbl/; applied (adj) /əˈplaɪd/; misapplied (adj) /ˌmɪsəˈplaɪd/",
+      "example": "She will reapply for the position next year; The funds were misapplied by the manager; Each applicant must complete the form; The application deadline is Friday; This concept has broad applicability; Its inapplicability was soon clear; The rule is applicable in most cases; That standard is inapplicable here; This is an applied field of study; The method was misapplied in practice",
+      "translation": "nộp lại; áp dụng sai; người nộp đơn; đơn xin; khả năng áp dụng; không thể áp dụng; có thể áp dụng; không thể áp dụng; (thuộc) ứng dụng; bị áp dụng sai",
+      "count": 0
     },
     {
-    "word": "appreciate",
-    "meaning": "appreciation, /əˌpriːʃiˈeɪʃn/: sự cảm kích. appreciable, /əˈpriːʃəbl/: đáng kể. appreciably, /əˈpriːʃəbli/: một cách đáng kể. (un)appreciative(ly), /ʌnəˈpriːʃətɪv(li)/: (một cách không) biết ơn.",
-    "example": "He showed deep appreciation. The cost is appreciable. Profits increased appreciably. She nodded appreciatively.",
-    "count": 0
-    }             
+      "word": "appreciate",
+      "meaning": "appreciation (noun) /əˌpriːʃiˈeɪʃn/; appreciable (adj) /əˈpriːʃəbl/; appreciably (adv) /əˈpriːʃəbli/; appreciative (adj) /əˈpriːʃətɪv/; unappreciative (adj) /ʌnəˈpriːʃətɪv/; appreciatively (adv) /əˈpriːʃətɪvli/; unappreciatively (adv) /ʌnəˈpriːʃətɪvli/",
+      "example": "His work earned widespread appreciation; The price increase was appreciable; The company grew appreciably last year; The team was very appreciative of her help; He was unappreciative of their support; She smiled appreciatively at the gift; He listened unappreciatively to the feedback",
+      "translation": "sự cảm kích; đáng kể; một cách đáng kể; biết ơn; không biết ơn; một cách biết ơn; một cách không biết ơn",
+      "count": 0
+    }   
   ]
 }
