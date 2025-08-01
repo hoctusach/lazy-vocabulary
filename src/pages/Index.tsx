@@ -13,9 +13,7 @@ const Index = () => {
           Master vocabulary with passive learning!
         </h2>
         <p className="slogan-note">
-          Don’t memorize. Just skim, get it,
-          <br />
-          and read examples out loud if you can!
+          Just skim the word and speak it—let it stick naturally!
         </p>
         {/* Removed "Are you new?" section */}
       </header>
