@@ -51,22 +51,36 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const nextCategoryLabel = getCategoryLabel(safeNextCategory);
   const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
 
+  const trackEvent = (name: string, label: string, value?: number) => {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', name, {
+        event_category: 'interaction',
+        event_label: label,
+        ...(typeof value === 'number' ? { value } : {})
+      });
+    }
+  };
+
   const handleToggleMute = () => {
     onToggleMute();
+    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
     toast(isMuted ? 'Audio unmuted' : 'Audio muted');
   };
 
   const handleTogglePause = () => {
     onTogglePause();
+    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
     toast(isPaused ? 'Playback resumed' : 'Playback paused');
   };
 
   const handleNextWord = () => {
     onNextWord();
+    trackEvent('next_word', 'Next Word');
   };
 
   const handleSwitchCategory = () => {
     onSwitchCategory();
+    trackEvent('switch_category', nextCategoryLabel);
     toast(`Switched to ${nextCategoryMessageLabel}`);
   };
 
@@ -76,10 +90,12 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       return;
     }
     onCycleVoice();
+    trackEvent('cycle_voice', selectedVoiceName);
   };
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
+    trackEvent('speech_rate_change', `${r}x`, r);
     unifiedSpeechController.stop();
     if (!isMuted && !isPaused) {
       playCurrentWord();

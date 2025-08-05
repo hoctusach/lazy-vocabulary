@@ -68,6 +68,42 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
   const { main, annotations } = parseWordAnnotations(word);
+  const nextCategoryLabel = getCategoryLabel(nextCategory);
+
+  const trackEvent = (name: string, label: string, value?: number) => {
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', name, {
+        event_category: 'interaction',
+        event_label: label,
+        ...(typeof value === 'number' ? { value } : {})
+      });
+    }
+  };
+
+  const handleMuteClick = () => {
+    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
+    onToggleMute();
+  };
+
+  const handlePauseClick = () => {
+    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
+    onTogglePause();
+  };
+
+  const handleNextClick = () => {
+    trackEvent('next_word', 'Next');
+    onNextWord();
+  };
+
+  const handleSwitchCategoryClick = () => {
+    trackEvent('switch_category', nextCategoryLabel);
+    onSwitchCategory();
+  };
+
+  const handleCycleVoiceClick = () => {
+    trackEvent('cycle_voice', nextVoiceLabel);
+    onCycleVoice();
+  };
 
   return (
     <Card 
@@ -131,7 +167,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onToggleMute}
+              onClick={handleMuteClick}
               className={cn(
                 "h-6 text-xs px-1.5",
                 isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
@@ -144,7 +180,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onTogglePause}
+              onClick={handlePauseClick}
               className={cn(
                 "h-6 text-xs px-1.5",
                 isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
@@ -157,7 +193,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onNextWord}
+              onClick={handleNextClick}
               className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
             >
               <SkipForward size={12} className="mr-1" />
@@ -167,7 +203,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onSwitchCategory}
+              onClick={handleSwitchCategoryClick}
               className="h-6 text-xs px-1.5 text-green-700"
             >
               <RefreshCw size={10} className="mr-1" />
@@ -178,7 +214,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={onCycleVoice}
+              onClick={handleCycleVoiceClick}
               className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
             >
               {nextVoiceLabel}

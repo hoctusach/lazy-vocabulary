@@ -15,6 +15,13 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
 
   const handleChange = (v: number) => {
     onChange(v);
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      window.gtag('event', 'speech_rate_change', {
+        event_category: 'interaction',
+        event_label: `${v}x`,
+        value: v
+      });
+    }
     setOpen(false); // close popup after selecting rate
   };
 
