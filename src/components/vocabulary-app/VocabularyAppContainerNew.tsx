@@ -12,7 +12,11 @@ import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
-const VocabularyAppContainerNew: React.FC = () => {
+interface VocabularyAppContainerNewProps {
+  isAudioEnabled?: boolean;
+}
+
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isAudioEnabled = false }) => {
   // Use stable state management
   const {
     currentWord,
@@ -32,7 +36,7 @@ const VocabularyAppContainerNew: React.FC = () => {
     userInteractionState,
     nextCategory,
     handleInteractionUpdate
-  } = useStableVocabularyState();
+  } = useStableVocabularyState(isAudioEnabled);
 
   // Optimized auto-play with reduced re-renders
   useOptimizedAutoPlay({

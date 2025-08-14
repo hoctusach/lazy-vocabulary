@@ -13,7 +13,7 @@ import { saveLastWord } from '@/utils/lastWordStorage';
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
  */
-export const useUnifiedVocabularyController = () => {
+export const useUnifiedVocabularyController = (isAudioEnabled: boolean = false) => {
   console.log('[UNIFIED-CONTROLLER] Initializing controller');
 
   // Core state management
@@ -46,7 +46,7 @@ export const useUnifiedVocabularyController = () => {
   const {
     speechState,
     playCurrentWord
-  } = useSpeechIntegration(currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef);
+  } = useSpeechIntegration(currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef, isAudioEnabled);
 
   // Word navigation with proper state management
   const {
@@ -76,7 +76,7 @@ export const useUnifiedVocabularyController = () => {
     const nextWord = wordList[nextIndex];
     if (nextWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
-      if (!isMuted && !isPaused) {
+      if (!isMuted && !isPaused && isAudioEnabled) {
         unifiedSpeechController.speak(nextWord, selectedVoiceName);
       }
     }
@@ -91,7 +91,8 @@ export const useUnifiedVocabularyController = () => {
     isMuted,
     isPaused,
     selectedVoiceName,
-    clearAutoAdvanceTimer
+    clearAutoAdvanceTimer,
+    isAudioEnabled
   ]);
 
   // Control actions with simplified parameters

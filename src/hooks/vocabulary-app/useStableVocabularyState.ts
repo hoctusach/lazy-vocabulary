@@ -3,7 +3,7 @@ import { useState, useCallback, useMemo, useRef } from 'react';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
 import { vocabularyService } from '@/services/vocabularyService';
 
-export const useStableVocabularyState = () => {
+export const useStableVocabularyState = (isAudioEnabled: boolean = false) => {
   const [userInteractionState, setUserInteractionState] = useState({
     hasInitialized: false,
     interactionCount: 0,
@@ -11,7 +11,7 @@ export const useStableVocabularyState = () => {
   });
 
   // Use stable reference for the unified controller
-  const controllerState = useUnifiedVocabularyController();
+  const controllerState = useUnifiedVocabularyController(isAudioEnabled);
   
   // Memoize computed values to prevent recalculation
   const nextVoiceLabel = useMemo(() => {

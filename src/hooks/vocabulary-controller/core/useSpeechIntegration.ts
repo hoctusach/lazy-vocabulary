@@ -10,6 +10,7 @@ interface SpeechIntegrationProps {
   isPaused: boolean;
   isMuted: boolean;
   isTransitioningRef: React.MutableRefObject<boolean>;
+  isAudioEnabled?: boolean;
 }
 
 export const useSpeechIntegration = (
@@ -17,7 +18,8 @@ export const useSpeechIntegration = (
   selectedVoiceName: string,
   isPaused: boolean,
   isMuted: boolean,
-  isTransitioningRef: React.MutableRefObject<boolean>
+  isTransitioningRef: React.MutableRefObject<boolean>,
+  isAudioEnabled: boolean = false
 ) => {
   const [speechState, setSpeechState] = useState({
     isActive: false,
@@ -26,12 +28,13 @@ export const useSpeechIntegration = (
   });
 
   const playCurrentWord = useCallback(async () => {
-    if (!currentWord || isPaused || isMuted || isTransitioningRef.current) {
+    if (!currentWord || isPaused || isMuted || isTransitioningRef.current || !isAudioEnabled) {
       console.log('[SPEECH-INTEGRATION] Cannot play word:', { 
         hasWord: !!currentWord, 
         isPaused, 
         isMuted, 
-        isTransitioning: isTransitioningRef.current 
+        isTransitioning: isTransitioningRef.current,
+        isAudioEnabled 
       });
       return;
     }
@@ -46,7 +49,7 @@ export const useSpeechIntegration = (
     } finally {
       setSpeechState(prev => ({ ...prev, isActive: false, phase: 'idle' }));
     }
-  }, [currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef]);
+  }, [currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef, isAudioEnabled]);
 
   // Effect to trigger speech when dependencies change
   useEffect(() => {
@@ -55,8 +58,8 @@ export const useSpeechIntegration = (
       return;
     }
 
-    if (isMuted || isPaused) {
-      console.log('[SPEECH-INTEGRATION] Speech is muted or paused, skipping speech');
+    if (isMuted || isPaused || !isAudioEnabled) {
+      console.log('[SPEECH-INTEGRATION] Speech is muted, paused, or audio disabled, skipping speech');
       return;
     }
 
