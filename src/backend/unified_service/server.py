@@ -23,15 +23,7 @@ class LazyVocabularyHandler(BaseHTTPRequestHandler):
         query = parse_qs(urlparse(self.path).query)
         
         try:
-            if path == '/api/vocabulary/categories':
-                result = controller.get_categories()
-            elif path.startswith('/api/vocabulary/categories/') and path.endswith('/words'):
-                category_id = path.split('/')[-2]
-                result = controller.get_words_by_category(category_id)
-            elif path == '/api/vocabulary/search':
-                query_param = query.get('q', [''])[0]
-                result = controller.search_vocabulary(query_param)
-            elif path.startswith('/api/learning/daily-list/'):
+            if path.startswith('/api/learning/daily-list/'):
                 user_id = path.split('/')[-1]
                 size = int(query.get('size', ['20'])[0])
                 result = controller.get_daily_learning_list(user_id, size)
@@ -56,10 +48,6 @@ class LazyVocabularyHandler(BaseHTTPRequestHandler):
                 result = controller.register_user(data)
             elif path == '/api/users/login':
                 result = controller.login_user(data)
-            elif path == '/api/vocabulary/categories':
-                result = controller.create_category(data)
-            elif path == '/api/vocabulary/words':
-                result = controller.add_vocabulary_word(data)
             elif path == '/api/learning/review':
                 result = controller.record_review_event(data)
             else:
@@ -88,15 +76,11 @@ def run_server(port=8000):
     server = HTTPServer(('localhost', port), LazyVocabularyHandler)
     print(f"Backend server running on http://localhost:{port}")
     print("Available endpoints:")
-    print("  GET  /api/vocabulary/categories")
-    print("  POST /api/vocabulary/categories")
-    print("  GET  /api/vocabulary/categories/{id}/words")
-    print("  POST /api/vocabulary/words")
-    print("  GET  /api/vocabulary/search?q={query}")
     print("  POST /api/users/register")
     print("  POST /api/users/login")
     print("  GET  /api/learning/daily-list/{user_id}")
     print("  POST /api/learning/review")
+    print("\nNote: Vocabulary endpoints removed - vocabulary data handled by local JSON files")
     server.serve_forever()
 
 if __name__ == "__main__":

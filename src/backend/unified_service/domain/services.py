@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import hashlib
 import math
 
-from domain.entities import User, UserSession, VocabularyWord, UserProgress, ReviewEvent
-from domain.repositories import UserRepository, SessionRepository, VocabularyRepository, UserProgressRepository
+from domain.entities import User, UserSession, UserProgress, ReviewEvent
+from domain.repositories import UserRepository, SessionRepository, UserProgressRepository
 from domain.value_objects import generate_id
 
 
@@ -77,30 +77,7 @@ class UserRegistrationService:
         return hashlib.sha256(password.encode()).hexdigest()
 
 
-class VocabularySearchService:
-    """Domain service for vocabulary search functionality."""
-    
-    def __init__(self, vocab_repo: VocabularyRepository):
-        self.vocab_repo = vocab_repo
-    
-    def search_vocabulary(self, query: str) -> List[VocabularyWord]:
-        """Search vocabulary words by query."""
-        if not query or not query.strip():
-            return []
-        
-        # Get all words and filter by query
-        all_words = self.vocab_repo.find_all()
-        query_lower = query.lower().strip()
-        
-        matching_words = []
-        for word in all_words:
-            if (query_lower in word.word_text.lower() or
-                query_lower in word.meaning.lower() or
-                (word.example and query_lower in word.example.lower()) or
-                (word.translation and query_lower in word.translation.lower())):
-                matching_words.append(word)
-        
-        return matching_words
+
 
 
 class SRSAlgorithmService:
@@ -134,30 +111,17 @@ class SRSAlgorithmService:
 class DailyListGenerationService:
     """Domain service for generating daily learning lists."""
     
-    def __init__(self, progress_repo: UserProgressRepository, vocab_repo: VocabularyRepository):
+    def __init__(self, progress_repo: UserProgressRepository):
         self.progress_repo = progress_repo
-        self.vocab_repo = vocab_repo
     
-    def generate_daily_list(self, user_id: str, list_size: int = 20) -> List[VocabularyWord]:
-        """Generate daily learning list for user."""
+    def generate_daily_list(self, user_id: str, list_size: int = 20) -> List[str]:
+        """Generate daily learning list for user - returns word IDs only."""
         # Get words due for review
         due_progress = self.progress_repo.find_due_for_review(user_id, datetime.now())
         due_word_ids = [p.word_id for p in due_progress]
         
-        # Get due words
-        all_words = self.vocab_repo.find_all()
-        due_words = [w for w in all_words if w.word_id in due_word_ids]
-        
-        # If we need more words, add new ones
-        if len(due_words) < list_size:
-            user_progress = self.progress_repo.find_by_user_id(user_id)
-            learned_word_ids = {p.word_id for p in user_progress}
-            
-            new_words = [w for w in all_words if w.word_id not in learned_word_ids]
-            needed_new_words = list_size - len(due_words)
-            due_words.extend(new_words[:needed_new_words])
-        
-        return due_words[:list_size]
+        # Return only word IDs - vocabulary data will come from local JSON
+        return due_word_ids[:list_size]
 
 
 class MigrationOrchestrationService:

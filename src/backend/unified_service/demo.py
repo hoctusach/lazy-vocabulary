@@ -70,83 +70,42 @@ def demo_user_management(service):
 
 
 def demo_vocabulary_management(service):
-    """Demo vocabulary management functionality."""
-    print_section("VOCABULARY MANAGEMENT DEMO")
-    
-    # Get existing categories (initialized by factory)
-    print("1. Getting existing categories...")
-    categories = service.get_categories()
-    print_result("Get Categories", {"success": True, "data": categories})
-    
-    # Create a new category
-    print("2. Creating new category...")
-    new_category = service.create_category("Business English", "Vocabulary for business contexts")
-    print_result("Create Business Category", new_category)
-    
-    # Add vocabulary words to existing category
-    print("3. Adding vocabulary words...")
-    if categories:
-        phrasal_verbs_category = next((cat for cat in categories if cat["name"] == "phrasal verbs"), None)
-        if phrasal_verbs_category:
-            word1 = service.add_vocabulary_word(
-                "turn up", "to arrive; to appear", phrasal_verbs_category["category_id"],
-                "He turned up late to the meeting.", "aparecer"
-            )
-            print_result("Add 'turn up'", word1)
-    
-    # Add word to new category
-    if new_category.get("success"):
-        business_category_id = new_category["data"]["category_id"]
-        word2 = service.add_vocabulary_word(
-            "stakeholder", "a person with an interest in a business", business_category_id,
-            "We need to consider all stakeholders.", "parte interesada"
-        )
-        print_result("Add 'stakeholder'", word2)
-    
-    # Get words by category
-    print("4. Getting words by category...")
-    if phrasal_verbs_category:
-        phrasal_words = service.get_words_by_category(phrasal_verbs_category["category_id"])
-        print_result("Get Phrasal Verbs", {"success": True, "data": phrasal_words})
-    
-    # Search vocabulary
-    print("5. Searching vocabulary...")
-    search_results = service.search_vocabulary("break")
-    print_result("Search 'break'", {"success": True, "data": search_results})
-    
-    return categories
+    """Demo vocabulary management functionality - SKIPPED (using local JSON)."""
+    print_section("VOCABULARY MANAGEMENT DEMO - SKIPPED")
+    print("Vocabulary management is now handled by local JSON files.")
+    print("The backend no longer manages vocabulary data directly.")
+    return []
 
 
 def demo_learning_progress(service, users, categories):
     """Demo learning progress functionality."""
     print_section("LEARNING PROGRESS DEMO")
     
-    if not users[0].get("success") or not categories:
-        print("Skipping learning progress demo - missing users or categories")
+    if not users[0].get("success"):
+        print("Skipping learning progress demo - missing users")
         return
     
     alice_id = users[0]["data"]["user_id"]
     
-    # Get daily learning list (initially empty progress)
+    # Get daily learning list (returns word IDs only)
     print("1. Getting daily learning list...")
     daily_list = service.get_daily_learning_list(alice_id, 5)
-    print_result("Daily Learning List", {"success": True, "data": daily_list})
+    print_result("Daily Learning List (Word IDs)", {"success": True, "data": daily_list})
     
-    # Record review events
+    # Record review events with sample word IDs
     print("2. Recording review events...")
-    if daily_list:
-        for i, word in enumerate(daily_list[:3]):  # Review first 3 words
-            word_id = word["word_id"]
-            accuracy = i % 2 == 0  # Alternate correct/incorrect
-            response_time = 2000 + (i * 500)  # Varying response times
-            
-            review_result = service.record_review_event(alice_id, word_id, accuracy, response_time)
-            print_result(f"Review '{word['word_text']}' ({'correct' if accuracy else 'incorrect'})", review_result)
+    sample_word_ids = ["word-1", "word-2", "word-3"]
+    for i, word_id in enumerate(sample_word_ids):
+        accuracy = i % 2 == 0  # Alternate correct/incorrect
+        response_time = 2000 + (i * 500)  # Varying response times
+        
+        review_result = service.record_review_event(alice_id, word_id, accuracy, response_time)
+        print_result(f"Review '{word_id}' ({'correct' if accuracy else 'incorrect'})", review_result)
     
     # Get updated daily learning list
     print("3. Getting updated daily learning list...")
     updated_list = service.get_daily_learning_list(alice_id, 5)
-    print_result("Updated Daily List", {"success": True, "data": updated_list})
+    print_result("Updated Daily List (Word IDs)", {"success": True, "data": updated_list})
 
 
 def demo_data_migration(service, users):
@@ -230,12 +189,12 @@ def demo_events(service):
 def main():
     """Run the comprehensive demo."""
     print("LAZY VOCABULARY UNIFIED BACKEND SERVICE DEMO")
-    print("This demo showcases all functionality from the five original units:")
+    print("This demo showcases functionality from four backend units:")
     print("• User Management Unit")
-    print("• Vocabulary Service Unit") 
     print("• Learning Progress Unit")
     print("• Data Migration Unit")
     print("• Analytics Unit")
+    print("\nNote: Vocabulary Service Unit removed - vocabulary handled by local JSON files")
     
     # Initialize service
     factory = get_service_factory()
@@ -243,7 +202,7 @@ def main():
     
     # Run demos
     users = demo_user_management(service)
-    categories = demo_vocabulary_management(service)
+    categories = demo_vocabulary_management(service)  # Now skipped
     demo_learning_progress(service, users, categories)
     demo_data_migration(service, users)
     demo_analytics(service)
@@ -251,7 +210,8 @@ def main():
     
     print_section("DEMO COMPLETED")
     print("All functionality demonstrated successfully!")
-    print("The unified service consolidates all five backend units into one cohesive system.")
+    print("The unified service consolidates four backend units into one cohesive system.")
+    print("Vocabulary data is now handled by local JSON files instead of the backend service.")
     print("\nNext steps:")
     print("• Integrate with frontend application")
     print("• Replace in-memory storage with persistent databases")

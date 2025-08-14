@@ -5,11 +5,11 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from domain.entities import (
-    User, UserSession, VocabularyWord, Category, UserProgress, 
+    User, UserSession, UserProgress, 
     ReviewEvent, MigrationSession, UserActivityMetrics, VocabularyAnalytics
 )
 from domain.repositories import (
-    UserRepository, SessionRepository, VocabularyRepository, CategoryRepository,
+    UserRepository, SessionRepository,
     UserProgressRepository, ReviewEventRepository, MigrationSessionRepository, AnalyticsRepository
 )
 
@@ -65,62 +65,7 @@ class InMemorySessionRepository(SessionRepository):
             self.sessions[session_id].is_active = False
 
 
-class InMemoryVocabularyRepository(VocabularyRepository):
-    """In-memory implementation of VocabularyRepository."""
-    
-    def __init__(self):
-        self.words: Dict[str, VocabularyWord] = {}
-        self.category_index: Dict[str, List[str]] = {}  # category_id -> [word_ids]
-    
-    def save(self, word: VocabularyWord) -> None:
-        self.words[word.word_id] = word
-        if word.category_id not in self.category_index:
-            self.category_index[word.category_id] = []
-        if word.word_id not in self.category_index[word.category_id]:
-            self.category_index[word.category_id].append(word.word_id)
-    
-    def find_by_id(self, word_id: str) -> Optional[VocabularyWord]:
-        return self.words.get(word_id)
-    
-    def find_by_category(self, category_id: str) -> List[VocabularyWord]:
-        word_ids = self.category_index.get(category_id, [])
-        return [self.words[wid] for wid in word_ids if wid in self.words]
-    
-    def search(self, query: str) -> List[VocabularyWord]:
-        query_lower = query.lower()
-        results = []
-        for word in self.words.values():
-            if (query_lower in word.word_text.lower() or
-                query_lower in word.meaning.lower() or
-                (word.example and query_lower in word.example.lower()) or
-                (word.translation and query_lower in word.translation.lower())):
-                results.append(word)
-        return results
-    
-    def find_all(self) -> List[VocabularyWord]:
-        return list(self.words.values())
 
-
-class InMemoryCategoryRepository(CategoryRepository):
-    """In-memory implementation of CategoryRepository."""
-    
-    def __init__(self):
-        self.categories: Dict[str, Category] = {}
-        self.name_index: Dict[str, str] = {}  # name -> category_id
-    
-    def save(self, category: Category) -> None:
-        self.categories[category.category_id] = category
-        self.name_index[category.name] = category.category_id
-    
-    def find_by_id(self, category_id: str) -> Optional[Category]:
-        return self.categories.get(category_id)
-    
-    def find_by_name(self, name: str) -> Optional[Category]:
-        category_id = self.name_index.get(name)
-        return self.categories.get(category_id) if category_id else None
-    
-    def find_all(self) -> List[Category]:
-        return list(self.categories.values())
 
 
 class InMemoryUserProgressRepository(UserProgressRepository):

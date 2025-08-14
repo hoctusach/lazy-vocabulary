@@ -6,16 +6,16 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from domain.entities import (
-    User, UserSession, VocabularyWord, Category, UserProgress, 
+    User, UserSession, UserProgress, 
     ReviewEvent, MigrationSession, UserActivityMetrics, VocabularyAnalytics,
     MigrationStatus
 )
 from domain.repositories import (
-    UserRepository, SessionRepository, VocabularyRepository, CategoryRepository,
+    UserRepository, SessionRepository,
     UserProgressRepository, ReviewEventRepository, MigrationSessionRepository, AnalyticsRepository
 )
 from domain.services import (
-    AuthenticationService, UserRegistrationService, VocabularySearchService,
+    AuthenticationService, UserRegistrationService,
     SRSAlgorithmService, DailyListGenerationService, MigrationOrchestrationService
 )
 from domain.value_objects import generate_id
@@ -48,8 +48,6 @@ class LazyVocabularyService:
     def __init__(self,
                  user_repo: UserRepository,
                  session_repo: SessionRepository,
-                 vocab_repo: VocabularyRepository,
-                 category_repo: CategoryRepository,
                  progress_repo: UserProgressRepository,
                  review_repo: ReviewEventRepository,
                  migration_repo: MigrationSessionRepository,
@@ -59,8 +57,6 @@ class LazyVocabularyService:
         # Repositories
         self.user_repo = user_repo
         self.session_repo = session_repo
-        self.vocab_repo = vocab_repo
-        self.category_repo = category_repo
         self.progress_repo = progress_repo
         self.review_repo = review_repo
         self.migration_repo = migration_repo
@@ -72,9 +68,8 @@ class LazyVocabularyService:
         # Domain services
         self.auth_service = AuthenticationService(user_repo, session_repo)
         self.registration_service = UserRegistrationService(user_repo)
-        self.search_service = VocabularySearchService(vocab_repo)
         self.srs_service = SRSAlgorithmService()
-        self.daily_list_service = DailyListGenerationService(progress_repo, vocab_repo)
+        self.daily_list_service = DailyListGenerationService(progress_repo)
         self.migration_service = MigrationOrchestrationService(progress_repo)
     
     # User Management Methods
@@ -138,114 +133,7 @@ class LazyVocabularyService:
         """Validate user session."""
         return self.auth_service.validate_session(session_id)
     
-    # Vocabulary Management Methods
-    def create_category(self, name: str, description: str = "") -> Dict[str, Any]:
-        """Create a new vocabulary category."""
-        try:
-            category = Category(
-                category_id=generate_id(),
-                name=name,
-                description=description
-            )
-            self.category_repo.save(category)
-            
-            # Publish event
-            event = CategoryCreated(
-                event_id=generate_id(),
-                timestamp=datetime.now(),
-                event_type="CategoryCreated",
-                category_id=category.category_id,
-                category_name=category.name
-            )
-            self.event_publisher.publish(event)
-            
-            return {
-                "success": True,
-                "data": {
-                    "category_id": category.category_id,
-                    "name": category.name,
-                    "description": category.description
-                }
-            }
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def add_vocabulary_word(self, word_text: str, meaning: str, category_id: str,
-                           example: str = "", translation: str = "") -> Dict[str, Any]:
-        """Add a new vocabulary word."""
-        try:
-            word = VocabularyWord(
-                word_id=generate_id(),
-                word_text=word_text,
-                meaning=meaning,
-                category_id=category_id,
-                example=example if example else None,
-                translation=translation if translation else None
-            )
-            self.vocab_repo.save(word)
-            
-            # Publish event
-            event = VocabularyWordAdded(
-                event_id=generate_id(),
-                timestamp=datetime.now(),
-                event_type="VocabularyWordAdded",
-                word_id=word.word_id,
-                word_text=word.word_text,
-                category_id=word.category_id
-            )
-            self.event_publisher.publish(event)
-            
-            return {
-                "success": True,
-                "data": {
-                    "word_id": word.word_id,
-                    "word_text": word.word_text,
-                    "meaning": word.meaning,
-                    "category_id": word.category_id
-                }
-            }
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def get_categories(self) -> List[Dict[str, Any]]:
-        """Get all vocabulary categories."""
-        categories = self.category_repo.find_all()
-        return [
-            {
-                "category_id": cat.category_id,
-                "name": cat.name,
-                "description": cat.description
-            }
-            for cat in categories
-        ]
-    
-    def get_words_by_category(self, category_id: str) -> List[Dict[str, Any]]:
-        """Get vocabulary words by category."""
-        words = self.vocab_repo.find_by_category(category_id)
-        return [
-            {
-                "word_id": word.word_id,
-                "word_text": word.word_text,
-                "meaning": word.meaning,
-                "example": word.example,
-                "translation": word.translation
-            }
-            for word in words
-        ]
-    
-    def search_vocabulary(self, query: str) -> List[Dict[str, Any]]:
-        """Search vocabulary words."""
-        words = self.search_service.search_vocabulary(query)
-        return [
-            {
-                "word_id": word.word_id,
-                "word_text": word.word_text,
-                "meaning": word.meaning,
-                "example": word.example,
-                "translation": word.translation
-            }
-            for word in words
-        ]
+
     
     # Learning Progress Methods
     def record_review_event(self, user_id: str, word_id: str, 
@@ -302,19 +190,10 @@ class LazyVocabularyService:
         except Exception as e:
             return {"success": False, "error": str(e)}
     
-    def get_daily_learning_list(self, user_id: str, list_size: int = 20) -> List[Dict[str, Any]]:
-        """Generate daily learning list for user."""
-        words = self.daily_list_service.generate_daily_list(user_id, list_size)
-        return [
-            {
-                "word_id": word.word_id,
-                "word_text": word.word_text,
-                "meaning": word.meaning,
-                "example": word.example,
-                "translation": word.translation
-            }
-            for word in words
-        ]
+    def get_daily_learning_list(self, user_id: str, list_size: int = 20) -> List[str]:
+        """Generate daily learning list for user - returns word IDs only."""
+        word_ids = self.daily_list_service.generate_daily_list(user_id, list_size)
+        return word_ids
     
     # Data Migration Methods
     def start_migration(self, user_id: str, local_data: Dict[str, Any]) -> Dict[str, Any]:

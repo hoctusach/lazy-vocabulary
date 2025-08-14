@@ -51,62 +51,7 @@ class LazyVocabularyController:
         except Exception as e:
             return {"success": False, "error": str(e)}
     
-    # Vocabulary Management Endpoints
-    def create_category(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
-        """POST /api/vocabulary/categories"""
-        try:
-            name = request_data.get('name')
-            description = request_data.get('description', '')
-            
-            if not name:
-                return {"success": False, "error": "Category name is required"}
-            
-            return self.service.create_category(name, description)
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def get_categories(self) -> Dict[str, Any]:
-        """GET /api/vocabulary/categories"""
-        try:
-            categories = self.service.get_categories()
-            return {"success": True, "data": categories}
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def add_vocabulary_word(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
-        """POST /api/vocabulary/words"""
-        try:
-            word_text = request_data.get('word_text')
-            meaning = request_data.get('meaning')
-            category_id = request_data.get('category_id')
-            example = request_data.get('example', '')
-            translation = request_data.get('translation', '')
-            
-            if not all([word_text, meaning, category_id]):
-                return {"success": False, "error": "Missing required fields"}
-            
-            return self.service.add_vocabulary_word(word_text, meaning, category_id, example, translation)
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def get_words_by_category(self, category_id: str) -> Dict[str, Any]:
-        """GET /api/vocabulary/categories/{category_id}/words"""
-        try:
-            words = self.service.get_words_by_category(category_id)
-            return {"success": True, "data": words}
-        except Exception as e:
-            return {"success": False, "error": str(e)}
-    
-    def search_vocabulary(self, query: str) -> Dict[str, Any]:
-        """GET /api/vocabulary/search?q={query}"""
-        try:
-            if not query or not query.strip():
-                return {"success": False, "error": "Search query is required"}
-            
-            words = self.service.search_vocabulary(query)
-            return {"success": True, "data": words}
-        except Exception as e:
-            return {"success": False, "error": str(e)}
+
     
     # Learning Progress Endpoints
     def record_review_event(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -127,8 +72,8 @@ class LazyVocabularyController:
     def get_daily_learning_list(self, user_id: str, list_size: int = 20) -> Dict[str, Any]:
         """GET /api/learning/daily-list/{user_id}?size={list_size}"""
         try:
-            words = self.service.get_daily_learning_list(user_id, list_size)
-            return {"success": True, "data": words}
+            word_ids = self.service.get_daily_learning_list(user_id, list_size)
+            return {"success": True, "data": {"word_ids": word_ids}}
         except Exception as e:
             return {"success": False, "error": str(e)}
     

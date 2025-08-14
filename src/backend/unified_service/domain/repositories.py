@@ -7,7 +7,7 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 
 from domain.entities import (
-    User, UserSession, VocabularyWord, Category, UserProgress, 
+    User, UserSession, UserProgress, 
     ReviewEvent, MigrationSession, UserActivityMetrics, VocabularyAnalytics
 )
 
@@ -52,48 +52,7 @@ class SessionRepository(ABC):
         pass
 
 
-class VocabularyRepository(ABC):
-    """Repository interface for vocabulary management."""
-    
-    @abstractmethod
-    def save(self, word: VocabularyWord) -> None:
-        pass
-    
-    @abstractmethod
-    def find_by_id(self, word_id: str) -> Optional[VocabularyWord]:
-        pass
-    
-    @abstractmethod
-    def find_by_category(self, category_id: str) -> List[VocabularyWord]:
-        pass
-    
-    @abstractmethod
-    def search(self, query: str) -> List[VocabularyWord]:
-        pass
-    
-    @abstractmethod
-    def find_all(self) -> List[VocabularyWord]:
-        pass
 
-
-class CategoryRepository(ABC):
-    """Repository interface for category management."""
-    
-    @abstractmethod
-    def save(self, category: Category) -> None:
-        pass
-    
-    @abstractmethod
-    def find_by_id(self, category_id: str) -> Optional[Category]:
-        pass
-    
-    @abstractmethod
-    def find_by_name(self, name: str) -> Optional[Category]:
-        pass
-    
-    @abstractmethod
-    def find_all(self) -> List[Category]:
-        pass
 
 
 class UserProgressRepository(ABC):

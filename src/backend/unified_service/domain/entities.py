@@ -37,26 +37,7 @@ class UserSession:
     is_active: bool = True
 
 
-@dataclass
-class VocabularyWord:
-    """Vocabulary word entity from vocabulary service unit."""
-    word_id: str
-    word_text: str
-    meaning: str
-    category_id: str
-    example: Optional[str] = None
-    translation: Optional[str] = None
-    audio_url: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.now)
 
-
-@dataclass
-class Category:
-    """Category entity from vocabulary service unit."""
-    category_id: str
-    name: str
-    description: Optional[str] = None
-    created_at: datetime = field(default_factory=datetime.now)
 
 
 @dataclass

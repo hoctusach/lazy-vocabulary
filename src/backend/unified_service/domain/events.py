@@ -39,20 +39,7 @@ class SessionExpired(DomainEvent):
     user_id: str
 
 
-# Vocabulary Service Events
-@dataclass
-class VocabularyWordAdded(DomainEvent):
-    """Event published when a vocabulary word is added."""
-    word_id: str
-    word_text: str
-    category_id: str
 
-
-@dataclass
-class CategoryCreated(DomainEvent):
-    """Event published when a category is created."""
-    category_id: str
-    category_name: str
 
 
 # Learning Progress Events
