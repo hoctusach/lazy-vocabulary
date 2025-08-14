@@ -12,7 +12,11 @@ import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
-const VocabularyAppContainerNew: React.FC = () => {
+interface VocabularyAppContainerNewProps {
+  isActive?: boolean;
+}
+
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true }) => {
   // Use stable state management
   const {
     currentWord,
@@ -43,7 +47,8 @@ const VocabularyAppContainerNew: React.FC = () => {
     isMuted,
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
-    playCurrentWord
+    playCurrentWord,
+    isActive
   });
 
   // Modal state management

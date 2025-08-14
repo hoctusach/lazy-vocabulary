@@ -1,6 +1,6 @@
 
 import React from 'react';
-import VocabularyApp from '@/components/VocabularyApp';
+import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 import VoiceDebugPanel from '@/components/VoiceDebugPanel';
 import DebugPanel from '@/components/DebugPanel';
 
@@ -19,7 +19,7 @@ const Index = () => {
       </header>
       
       <main className="container mx-auto px-2">
-        <VocabularyApp />
+        <VocabularyAppWithLearning />
       </main>
       
       <footer className="mt-6 text-center text-sm text-muted-foreground">
