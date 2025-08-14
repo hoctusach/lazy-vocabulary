@@ -1,230 +1,168 @@
-# Unified Lazy Vocabulary Backend Service
-
-A consolidated Domain-Driven Design implementation that combines all functionality from the five original backend units into one cohesive service.
+# User Management Unit
 
 ## Overview
+The User Management Unit handles user authentication, account creation, and multi-device session management for the Lazy Vocabulary application. It implements Domain-Driven Design principles with a clean architecture.
 
-This unified service consolidates the following original units:
-- **User Management Unit**: Authentication, registration, session management
-- **Vocabulary Service Unit**: Vocabulary CRUD, categories, search
-- **Learning Progress Unit**: SRS algorithm, progress tracking, daily lists
-- **Data Migration Unit**: Local data import, migration workflows
-- **Analytics Unit**: Usage metrics, vocabulary analytics
+## Features
+- ✅ User registration with email and nickname
+- ✅ User authentication and login
+- ✅ Multi-device session management
+- ✅ JWT token-based authentication
+- ✅ Session validation and logout
+- ✅ In-memory repositories for local testing
+- 🔄 AWS Cognito integration (requires credentials)
 
 ## Architecture
 
 ### Domain Layer
-- **Entities**: User, UserSession, VocabularyWord, Category, UserProgress, ReviewEvent, MigrationSession, UserActivityMetrics, VocabularyAnalytics
-- **Value Objects**: UserId, Email, Nickname, WordText, Meaning, SRSData, etc.
-- **Domain Events**: UserRegistered, VocabularyWordAdded, ReviewEventRecorded, etc.
-- **Domain Services**: AuthenticationService, VocabularySearchService, SRSAlgorithmService, etc.
-- **Repository Interfaces**: UserRepository, VocabularyRepository, etc.
+- **Entities**: User, UserSession
+- **Value Objects**: Email, Nickname, UserId, SessionId, DeviceInfo
+- **Domain Events**: UserRegistered, UserLoggedIn, SessionExpired
+- **Domain Services**: UserRegistrationService, SessionManagementService
+- **Repositories**: UserRepository, SessionRepository (interfaces)
 
 ### Application Layer
-- **LazyVocabularyService**: Unified application service orchestrating all functionality
-- **EventPublisher**: Domain event publishing mechanism
+- **AuthenticationService**: Handles login, logout, session validation
+- **UserRegistrationApplicationService**: Handles user registration
 
 ### Infrastructure Layer
-- **In-Memory Repositories**: Complete implementations for all domain entities
-- **Service Factory**: Dependency injection and initialization
+- **InMemoryUserRepository**: In-memory user storage for testing
+- **InMemorySessionRepository**: In-memory session storage for testing
 
 ### API Layer
-- **LazyVocabularyController**: Unified REST API controller
-- **APIResponse**: Standardized response helpers
-
-## Features
-
-### User Management
-- ✅ User registration with email validation
-- ✅ Authentication with session management
-- ✅ Multi-device session support
-- ✅ Session validation
-
-### Vocabulary Management
-- ✅ Category creation and management
-- ✅ Vocabulary word CRUD operations
-- ✅ Full-text search across words, meanings, examples
-- ✅ Category-based word retrieval
-
-### Learning Progress
-- ✅ Spaced Repetition System (SRS) algorithm
-- ✅ Review event recording
-- ✅ Progress tracking per user/word
-- ✅ Daily learning list generation
-
-### Data Migration
-- ✅ Local data import and merging
-- ✅ Conflict resolution with timestamps
-- ✅ Migration session tracking
-- ✅ Idempotent migration process
-
-### Analytics
-- ✅ User activity metrics
-- ✅ Vocabulary usage analytics
-- ✅ Review accuracy tracking
-- ✅ Aggregated privacy-compliant data
-
-### Event-Driven Architecture
-- ✅ Domain event publishing
-- ✅ Event-driven integration points
-- ✅ Comprehensive event logging
-
-## Usage
-
-### Basic Setup
-
-```python
-from service_factory import get_service_factory
-
-# Initialize the service
-factory = get_service_factory()
-service = factory.get_service()
-controller = factory.get_controller()
-```
-
-### User Management
-
-```python
-# Register user
-result = service.register_user("user@example.com", "Username", "password")
-
-# Login
-session = service.login_user("user@example.com", "password", "web")
-
-# Validate session
-is_valid = service.validate_session(session_id)
-```
-
-### Vocabulary Management
-
-```python
-# Create category
-category = service.create_category("Business English", "Business vocabulary")
-
-# Add vocabulary word
-word = service.add_vocabulary_word(
-    "stakeholder", "person with interest in business", 
-    category_id, "Consider all stakeholders", "parte interesada"
-)
-
-# Search vocabulary
-results = service.search_vocabulary("business")
-```
-
-### Learning Progress
-
-```python
-# Get daily learning list
-daily_words = service.get_daily_learning_list(user_id, 20)
-
-# Record review event
-result = service.record_review_event(user_id, word_id, True, 2500)
-```
-
-### Data Migration
-
-```python
-# Import local data
-local_data = {"progress": {...}, "settings": {...}}
-result = service.start_migration(user_id, local_data)
-```
+- **AuthController**: REST API endpoints for authentication
+- **Models**: Request/response data models
 
 ## API Endpoints
 
-### User Management
-- `POST /api/users/register` - Register new user
-- `POST /api/users/login` - User login
-- `GET /api/users/validate/{session_id}` - Validate session
+### POST /api/auth/register
+Register a new user.
+```json
+{
+  "email": "user@example.com",
+  "nickname": "UserName",
+  "password": "password123"
+}
+```
 
-### Vocabulary Management
-- `POST /api/vocabulary/categories` - Create category
-- `GET /api/vocabulary/categories` - Get all categories
-- `POST /api/vocabulary/words` - Add vocabulary word
-- `GET /api/vocabulary/categories/{id}/words` - Get words by category
-- `GET /api/vocabulary/search?q={query}` - Search vocabulary
+### POST /api/auth/login
+Authenticate user and create session.
+```json
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "device_type": "web",
+  "user_agent": "Browser",
+  "ip_address": "127.0.0.1"
+}
+```
 
-### Learning Progress
-- `POST /api/learning/review` - Record review event
-- `GET /api/learning/daily-list/{user_id}` - Get daily learning list
+### POST /api/auth/validate
+Validate user session.
+```json
+{
+  "token": "jwt_token_here"
+}
+```
 
-### Data Migration
-- `POST /api/migration/start` - Start data migration
+### POST /api/auth/logout
+Logout user and invalidate session.
+```json
+{
+  "session_id": "session_uuid_here"
+}
+```
 
-### Analytics
-- `GET /api/analytics/user-activity` - Get user activity metrics
-- `GET /api/analytics/vocabulary` - Get vocabulary analytics
+### GET /health
+Health check endpoint.
 
-## Running the Demo
+## Quick Start
+
+### 1. Test Core Functionality
+```bash
+cd src/backend/user_management_unit
+python simple_demo.py
+```
+
+### 2. Start API Server
+```bash
+python start_server.py
+```
+The server will start on `http://localhost:8001`
+
+### 3. Test API Endpoints
+Use curl, Postman, or any HTTP client to test the endpoints:
 
 ```bash
-# From the unified_service directory
-python demo.py
+# Register user
+curl -X POST http://localhost:8001/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","nickname":"TestUser","password":"pass123"}'
+
+# Login
+curl -X POST http://localhost:8001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"pass123","device_type":"web"}'
 ```
 
-The demo showcases:
-- User registration and authentication
-- Vocabulary and category management
-- Learning progress tracking
-- Data migration workflow
-- Analytics data collection
-- Domain event publishing
+## Dependencies
+- `fastapi`: Web framework
+- `uvicorn`: ASGI server
+- `pyjwt`: JWT token handling
+- `python-multipart`: Form data support
 
-## Sample Data
+## Configuration
+- JWT Secret: Configurable via `UserManagementServiceFactory`
+- Token Expiration: 24 hours (configurable)
+- Server Port: 8001 (configurable in server.py)
 
-The service initializes with sample data including:
-- 6 vocabulary categories (phrasal verbs, idioms, etc.)
-- 11+ vocabulary words with examples and translations
-- Complete category-word relationships
+## Multi-Device Support
+The system supports multiple active sessions per user:
+- Each login creates a new session
+- Sessions are tracked independently
+- Users can be logged in on multiple devices simultaneously
+- Session invalidation is per-device
+
+## Security Features
+- Email format validation
+- Nickname length validation (3-50 characters)
+- UUID-based user and session IDs
+- JWT token expiration
+- Session-based authentication
+- Input validation and error handling
+
+## Future Enhancements
+- AWS Cognito integration for production authentication
+- Password reset functionality
+- Session cleanup scheduler
+- Rate limiting
+- Audit logging
+- Email verification
+
+## Testing
+Run the simple demo to verify core functionality:
+```bash
+python simple_demo.py
+```
+
+Expected output shows successful:
+- User creation and validation
+- Duplicate email prevention
+- Session management
+- Multi-device sessions
+- Value object validation
 
 ## Integration with Frontend
+The API is designed to integrate with the existing Lazy Vocabulary frontend:
+1. Replace local authentication with API calls
+2. Store JWT tokens in browser storage
+3. Include tokens in API requests for other services
+4. Handle session expiration and renewal
 
-The unified service is designed to integrate with the existing React frontend:
-
-1. **Replace local storage**: Frontend can call API endpoints instead of local storage
-2. **Maintain compatibility**: API responses match existing frontend data structures
-3. **Progressive migration**: Can be integrated incrementally without breaking changes
-4. **Event-driven updates**: Domain events can trigger real-time UI updates
-
-## Next Steps for Production
-
-1. **Persistent Storage**: Replace in-memory repositories with PostgreSQL/DynamoDB
-2. **Authentication**: Integrate with AWS Cognito or similar
-3. **API Framework**: Add FastAPI/Flask for HTTP endpoints
-4. **Caching**: Add Redis for performance optimization
-5. **Event Streaming**: Use AWS EventBridge for event processing
-6. **Monitoring**: Add CloudWatch/logging integration
-7. **Security**: Add rate limiting, input validation, HTTPS
-8. **Deployment**: Containerize and deploy to AWS Lambda/ECS
-
-## File Structure
-
-```
-unified_service/
-├── domain/
-│   ├── entities.py          # All domain entities
-│   ├── value_objects.py     # Value objects with validation
-│   ├── events.py           # Domain events
-│   ├── repositories.py     # Repository interfaces
-│   └── services.py         # Domain services
-├── application/
-│   └── unified_service.py  # Main application service
-├── infrastructure/
-│   └── in_memory_repositories.py  # Repository implementations
-├── api/
-│   └── controllers.py      # REST API controllers
-├── service_factory.py      # Dependency injection
-├── demo.py                # Comprehensive demo
-└── README.md              # This file
-```
-
-## Benefits of Unified Architecture
-
-1. **Simplified Deployment**: Single service instead of five separate units
-2. **Reduced Complexity**: Fewer inter-service communication points
-3. **Better Performance**: No network overhead between units
-4. **Easier Testing**: All functionality in one place
-5. **Consistent Data Model**: Shared entities and value objects
-6. **Event-Driven Integration**: Clean separation of concerns through events
-7. **MVP-Appropriate**: Right-sized architecture for current needs
-
-This unified service maintains all the benefits of Domain-Driven Design while providing a more practical architecture for the Lazy Vocabulary MVP.
+## AWS Cognito Integration
+To enable AWS Cognito (requires AWS credentials):
+1. Set up AWS Cognito User Pool
+2. Configure AWS credentials
+3. Implement CognitoUserRepository
+4. Update service factory configuration
+5. Deploy to AWS Lambda with API Gateway

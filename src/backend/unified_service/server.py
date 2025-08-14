@@ -1,87 +1,69 @@
-"""
-Minimal HTTP server for the unified Lazy Vocabulary backend service.
-"""
-import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
-from service_factory import get_service_factory
+"""FastAPI server for User Management unit."""
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict, Any
+import uvicorn
 
-# Global controller instance
-controller = get_service_factory().get_controller()
+from service_factory import UserManagementServiceFactory
 
-class LazyVocabularyHandler(BaseHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-    
-    def do_OPTIONS(self):
-        self.send_cors_headers()
-        self.end_headers()
-    
-    def do_GET(self):
-        self.send_cors_headers()
-        path = urlparse(self.path).path
-        query = parse_qs(urlparse(self.path).query)
-        
-        try:
-            if path.startswith('/api/learning/daily-list/'):
-                user_id = path.split('/')[-1]
-                size = int(query.get('size', ['20'])[0])
-                result = controller.get_daily_learning_list(user_id, size)
-            else:
-                self.send_error(404, "Not Found")
-                return
-            
-            self.send_json_response(result)
-        except Exception as e:
-            self.send_json_response({"success": False, "error": str(e)})
-    
-    def do_POST(self):
-        self.send_cors_headers()
-        path = urlparse(self.path).path
-        
-        try:
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            data = json.loads(post_data.decode('utf-8'))
-            
-            if path == '/api/users/register':
-                result = controller.register_user(data)
-            elif path == '/api/users/login':
-                result = controller.login_user(data)
-            elif path == '/api/learning/review':
-                result = controller.record_review_event(data)
-            else:
-                self.send_error(404, "Not Found")
-                return
-            
-            self.send_json_response(result)
-        except Exception as e:
-            self.send_json_response({"success": False, "error": str(e)})
-    
-    def send_cors_headers(self):
-        self.send_response(200)
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-        self.send_header('Content-Type', 'application/json')
-    
-    def send_json_response(self, data):
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')
-        self.end_headers()
-        self.wfile.write(json.dumps(data, default=str).encode('utf-8'))
 
-def run_server(port=8000):
-    server = HTTPServer(('localhost', port), LazyVocabularyHandler)
-    print(f"Backend server running on http://localhost:{port}")
-    print("Available endpoints:")
-    print("  POST /api/users/register")
-    print("  POST /api/users/login")
-    print("  GET  /api/learning/daily-list/{user_id}")
-    print("  POST /api/learning/review")
-    print("\nNote: Vocabulary endpoints removed - vocabulary data handled by local JSON files")
-    server.serve_forever()
+app = FastAPI(title="User Management API", version="1.0.0")
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Initialize service factory
+service_factory = UserManagementServiceFactory()
+auth_controller = service_factory.get_auth_controller()
+
+
+@app.post("/api/auth/register")
+async def register(request: Dict[str, Any]):
+    """Register new user."""
+    result = auth_controller.register(request)
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result["data"]
+
+
+@app.post("/api/auth/login")
+async def login(request: Dict[str, Any]):
+    """User login."""
+    result = auth_controller.login(request)
+    if not result["success"]:
+        raise HTTPException(status_code=401, detail=result["error"])
+    return result["data"]
+
+
+@app.post("/api/auth/validate")
+async def validate_session(request: Dict[str, Any]):
+    """Validate user session."""
+    result = auth_controller.validate_session(request)
+    if not result["success"]:
+        raise HTTPException(status_code=401, detail=result["error"])
+    return result["data"]
+
+
+@app.post("/api/auth/logout")
+async def logout(request: Dict[str, Any]):
+    """User logout."""
+    result = auth_controller.logout(request)
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return {"message": result["message"]}
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "user-management"}
+
 
 if __name__ == "__main__":
-    run_server()
+    uvicorn.run(app, host="0.0.0.0", port=8001)

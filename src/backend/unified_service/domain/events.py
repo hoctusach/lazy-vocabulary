@@ -1,100 +1,28 @@
-"""
-Unified domain events for the Lazy Vocabulary backend service.
-Consolidates events from all five original units.
-"""
-from dataclasses import dataclass
+"""Domain events for User Management."""
 from datetime import datetime
-from typing import Dict, Any
+from dataclasses import dataclass
+
+from domain.value_objects import UserId, SessionId, Email, Nickname, DeviceInfo
 
 
-@dataclass
-class DomainEvent:
-    """Base domain event."""
-    event_id: str
-    timestamp: datetime
-    event_type: str
+@dataclass(frozen=True)
+class UserRegistered:
+    user_id: UserId
+    email: Email
+    nickname: Nickname
+    occurred_at: datetime
 
 
-# User Management Events
-@dataclass
-class UserRegistered(DomainEvent):
-    """Event published when a user registers."""
-    user_id: str
-    email: str
-    nickname: str
+@dataclass(frozen=True)
+class UserLoggedIn:
+    user_id: UserId
+    session_id: SessionId
+    device_info: DeviceInfo
+    occurred_at: datetime
 
 
-@dataclass
-class UserLoggedIn(DomainEvent):
-    """Event published when a user logs in."""
-    user_id: str
-    session_id: str
-    device_info: str
-
-
-@dataclass
-class SessionExpired(DomainEvent):
-    """Event published when a session expires."""
-    session_id: str
-    user_id: str
-
-
-
-
-
-# Learning Progress Events
-@dataclass
-class ReviewEventRecorded(DomainEvent):
-    """Event published when a review event is recorded."""
-    user_id: str
-    word_id: str
-    response_accuracy: bool
-    response_time_ms: int
-
-
-@dataclass
-class ProgressUpdated(DomainEvent):
-    """Event published when user progress is updated."""
-    user_id: str
-    word_id: str
-    next_review_date: datetime
-    interval_days: int
-
-
-# Data Migration Events
-@dataclass
-class LocalDataDetected(DomainEvent):
-    """Event published when local data is detected."""
-    user_id: str
-    data_size: int
-
-
-@dataclass
-class MigrationStarted(DomainEvent):
-    """Event published when migration starts."""
-    session_id: str
-    user_id: str
-
-
-@dataclass
-class MigrationCompleted(DomainEvent):
-    """Event published when migration completes."""
-    session_id: str
-    user_id: str
-    migrated_items: int
-
-
-# Analytics Events
-@dataclass
-class UserActivityRecorded(DomainEvent):
-    """Event published when user activity is recorded."""
-    user_id: str
-    activity_type: str
-
-
-@dataclass
-class VocabularyAnalyticsUpdated(DomainEvent):
-    """Event published when vocabulary analytics are updated."""
-    word_id: str
-    total_reviews: int
-    accuracy_rate: float
+@dataclass(frozen=True)
+class SessionExpired:
+    user_id: UserId
+    session_id: SessionId
+    occurred_at: datetime

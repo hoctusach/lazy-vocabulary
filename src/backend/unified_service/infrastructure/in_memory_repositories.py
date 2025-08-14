@@ -1,192 +1,72 @@
-"""
-In-memory repository implementations for the unified Lazy Vocabulary backend service.
-"""
-from typing import List, Optional, Dict, Any
-from datetime import datetime
+"""In-memory repository implementations for testing."""
+from typing import Dict, List, Optional
+from datetime import datetime, timedelta
 
-from domain.entities import (
-    User, UserSession, UserProgress, 
-    ReviewEvent, MigrationSession, UserActivityMetrics, VocabularyAnalytics
-)
-from domain.repositories import (
-    UserRepository, SessionRepository,
-    UserProgressRepository, ReviewEventRepository, MigrationSessionRepository, AnalyticsRepository
-)
+from domain.entities import User, UserSession
+from domain.value_objects import UserId, SessionId, Email
+from domain.repositories import UserRepository, SessionRepository
 
 
 class InMemoryUserRepository(UserRepository):
-    """In-memory implementation of UserRepository."""
-    
     def __init__(self):
-        self.users: Dict[str, User] = {}
-        self.email_index: Dict[str, str] = {}  # email -> user_id
+        self._users: Dict[str, User] = {}
+        self._email_index: Dict[str, str] = {}  # email -> user_id
+    
+    def find_by_email(self, email: Email) -> Optional[User]:
+        user_id = self._email_index.get(email.value)
+        return self._users.get(user_id) if user_id else None
+    
+    def find_by_id(self, user_id: UserId) -> Optional[User]:
+        return self._users.get(user_id.value)
     
     def save(self, user: User) -> None:
-        self.users[user.user_id] = user
-        self.email_index[user.email] = user.user_id
+        self._users[user.user_id.value] = user
+        self._email_index[user.email.value] = user.user_id.value
     
-    def find_by_id(self, user_id: str) -> Optional[User]:
-        return self.users.get(user_id)
-    
-    def find_by_email(self, email: str) -> Optional[User]:
-        user_id = self.email_index.get(email)
-        return self.users.get(user_id) if user_id else None
-    
-    def exists_by_email(self, email: str) -> bool:
-        return email in self.email_index
+    def exists_by_email(self, email: Email) -> bool:
+        return email.value in self._email_index
 
 
 class InMemorySessionRepository(SessionRepository):
-    """In-memory implementation of SessionRepository."""
-    
     def __init__(self):
-        self.sessions: Dict[str, UserSession] = {}
-        self.user_sessions: Dict[str, List[str]] = {}  # user_id -> [session_ids]
+        self._sessions: Dict[str, UserSession] = {}
+        self._user_sessions: Dict[str, List[str]] = {}  # user_id -> [session_ids]
+    
+    def find_by_session_id(self, session_id: SessionId) -> Optional[UserSession]:
+        return self._sessions.get(session_id.value)
+    
+    def find_active_by_user_id(self, user_id: UserId) -> List[UserSession]:
+        session_ids = self._user_sessions.get(user_id.value, [])
+        sessions = []
+        for session_id in session_ids:
+            session = self._sessions.get(session_id)
+            if session and session.is_active:
+                sessions.append(session)
+        return sessions
     
     def save(self, session: UserSession) -> None:
-        self.sessions[session.session_id] = session
-        if session.user_id not in self.user_sessions:
-            self.user_sessions[session.user_id] = []
-        if session.session_id not in self.user_sessions[session.user_id]:
-            self.user_sessions[session.user_id].append(session.session_id)
-    
-    def find_by_id(self, session_id: str) -> Optional[UserSession]:
-        return self.sessions.get(session_id)
-    
-    def find_active_by_user_id(self, user_id: str) -> List[UserSession]:
-        session_ids = self.user_sessions.get(user_id, [])
-        return [
-            self.sessions[sid] for sid in session_ids 
-            if sid in self.sessions and self.sessions[sid].is_active
-        ]
-    
-    def expire_session(self, session_id: str) -> None:
-        if session_id in self.sessions:
-            self.sessions[session_id].is_active = False
-
-
-
-
-
-class InMemoryUserProgressRepository(UserProgressRepository):
-    """In-memory implementation of UserProgressRepository."""
-    
-    def __init__(self):
-        self.progress: Dict[str, UserProgress] = {}
-        self.user_progress: Dict[str, List[str]] = {}  # user_id -> [progress_ids]
-        self.user_word_index: Dict[str, str] = {}  # f"{user_id}:{word_id}" -> progress_id
-    
-    def save(self, progress: UserProgress) -> None:
-        self.progress[progress.progress_id] = progress
+        self._sessions[session.session_id.value] = session
         
-        # Update user index
-        if progress.user_id not in self.user_progress:
-            self.user_progress[progress.user_id] = []
-        if progress.progress_id not in self.user_progress[progress.user_id]:
-            self.user_progress[progress.user_id].append(progress.progress_id)
+        # Update user sessions index
+        user_id = session.user_id.value
+        if user_id not in self._user_sessions:
+            self._user_sessions[user_id] = []
         
-        # Update user-word index
-        key = f"{progress.user_id}:{progress.word_id}"
-        self.user_word_index[key] = progress.progress_id
+        if session.session_id.value not in self._user_sessions[user_id]:
+            self._user_sessions[user_id].append(session.session_id.value)
     
-    def find_by_user_and_word(self, user_id: str, word_id: str) -> Optional[UserProgress]:
-        key = f"{user_id}:{word_id}"
-        progress_id = self.user_word_index.get(key)
-        return self.progress.get(progress_id) if progress_id else None
-    
-    def find_by_user_id(self, user_id: str) -> List[UserProgress]:
-        progress_ids = self.user_progress.get(user_id, [])
-        return [self.progress[pid] for pid in progress_ids if pid in self.progress]
-    
-    def find_due_for_review(self, user_id: str, date: datetime) -> List[UserProgress]:
-        user_progress_list = self.find_by_user_id(user_id)
-        return [p for p in user_progress_list if p.next_review_date <= date]
-
-
-class InMemoryReviewEventRepository(ReviewEventRepository):
-    """In-memory implementation of ReviewEventRepository."""
-    
-    def __init__(self):
-        self.events: Dict[str, ReviewEvent] = {}
-        self.user_events: Dict[str, List[str]] = {}  # user_id -> [event_ids]
-        self.word_events: Dict[str, List[str]] = {}  # word_id -> [event_ids]
-    
-    def save(self, event: ReviewEvent) -> None:
-        self.events[event.event_id] = event
+    def delete_expired(self) -> None:
+        """Remove sessions older than 24 hours."""
+        cutoff_time = datetime.utcnow() - timedelta(hours=24)
+        expired_sessions = []
         
-        # Update user index
-        if event.user_id not in self.user_events:
-            self.user_events[event.user_id] = []
-        self.user_events[event.user_id].append(event.event_id)
+        for session_id, session in self._sessions.items():
+            if session.last_accessed_at < cutoff_time:
+                expired_sessions.append(session_id)
         
-        # Update word index
-        if event.word_id not in self.word_events:
-            self.word_events[event.word_id] = []
-        self.word_events[event.word_id].append(event.event_id)
-    
-    def find_by_user_id(self, user_id: str) -> List[ReviewEvent]:
-        event_ids = self.user_events.get(user_id, [])
-        return [self.events[eid] for eid in event_ids if eid in self.events]
-    
-    def find_by_word_id(self, word_id: str) -> List[ReviewEvent]:
-        event_ids = self.word_events.get(word_id, [])
-        return [self.events[eid] for eid in event_ids if eid in self.events]
-    
-    def find_by_date_range(self, start_date: datetime, end_date: datetime) -> List[ReviewEvent]:
-        return [
-            event for event in self.events.values()
-            if start_date <= event.timestamp <= end_date
-        ]
-
-
-class InMemoryMigrationSessionRepository(MigrationSessionRepository):
-    """In-memory implementation of MigrationSessionRepository."""
-    
-    def __init__(self):
-        self.sessions: Dict[str, MigrationSession] = {}
-        self.user_sessions: Dict[str, List[str]] = {}  # user_id -> [session_ids]
-    
-    def save(self, session: MigrationSession) -> None:
-        self.sessions[session.session_id] = session
-        if session.user_id not in self.user_sessions:
-            self.user_sessions[session.user_id] = []
-        if session.session_id not in self.user_sessions[session.user_id]:
-            self.user_sessions[session.user_id].append(session.session_id)
-    
-    def find_by_id(self, session_id: str) -> Optional[MigrationSession]:
-        return self.sessions.get(session_id)
-    
-    def find_by_user_id(self, user_id: str) -> List[MigrationSession]:
-        session_ids = self.user_sessions.get(user_id, [])
-        return [self.sessions[sid] for sid in session_ids if sid in self.sessions]
-
-
-class InMemoryAnalyticsRepository(AnalyticsRepository):
-    """In-memory implementation of AnalyticsRepository."""
-    
-    def __init__(self):
-        self.user_activity_metrics: Dict[str, UserActivityMetrics] = {}
-        self.vocabulary_analytics: Dict[str, VocabularyAnalytics] = {}
-        self.date_index: Dict[str, str] = {}  # date_str -> metrics_id
-        self.word_analytics_index: Dict[str, str] = {}  # word_id -> analytics_id
-    
-    def save_user_activity_metrics(self, metrics: UserActivityMetrics) -> None:
-        self.user_activity_metrics[metrics.metrics_id] = metrics
-        date_str = metrics.date.strftime('%Y-%m-%d')
-        self.date_index[date_str] = metrics.metrics_id
-    
-    def save_vocabulary_analytics(self, analytics: VocabularyAnalytics) -> None:
-        self.vocabulary_analytics[analytics.analytics_id] = analytics
-        self.word_analytics_index[analytics.word_id] = analytics.analytics_id
-    
-    def find_user_activity_by_date(self, date: datetime) -> Optional[UserActivityMetrics]:
-        date_str = date.strftime('%Y-%m-%d')
-        metrics_id = self.date_index.get(date_str)
-        return self.user_activity_metrics.get(metrics_id) if metrics_id else None
-    
-    def find_vocabulary_analytics_by_word(self, word_id: str) -> Optional[VocabularyAnalytics]:
-        analytics_id = self.word_analytics_index.get(word_id)
-        return self.vocabulary_analytics.get(analytics_id) if analytics_id else None
-    
-    def find_all_vocabulary_analytics(self) -> List[VocabularyAnalytics]:
-        return list(self.vocabulary_analytics.values())
+        for session_id in expired_sessions:
+            session = self._sessions.pop(session_id, None)
+            if session:
+                user_sessions = self._user_sessions.get(session.user_id.value, [])
+                if session_id in user_sessions:
+                    user_sessions.remove(session_id)
