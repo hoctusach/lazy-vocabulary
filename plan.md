@@ -1,34 +1,58 @@
-# Implementation Plan for Analytics Unit
+# Backend Refactoring Plan
 
-## Step 2.3: Python Implementation Plan
+## Objective
+Consolidate five separate backend units into one unified backend service for the Lazy Vocabulary application.
 
-### Phase 1: Domain Layer Implementation
-- [x] Create domain entities (UserActivityMetrics, VocabularyAnalytics)
-- [x] Create value objects (TimePeriod, UserActivityData, ReviewMetrics, AccuracyMetrics)
-- [x] Create domain services (AnalyticsQueryService)
-- [x] Create repository interfaces
+## Current State Analysis
+- ✅ Five backend units implemented with DDD architecture
+- ✅ Frontend React app with local storage-based vocabulary service
+- ✅ Comprehensive user stories and domain models defined
+- ❌ Backend units not integrated with frontend
+- ❌ Complex multi-unit architecture for simple MVP needs
 
-### Phase 2: Application Layer Implementation
-- [x] Create application services (VocabularyAnalyticsService, UserActivityAnalyticsService)
-- [x] Create event processing capabilities
+## Refactoring Steps
 
-### Phase 3: Infrastructure Layer Implementation
-- [x] Create in-memory repository implementations
-- [x] Create in-memory analytics storage
+### Step 1: Create Unified Backend Structure
+- [x] Create new unified backend directory structure
+- [x] Consolidate domain models from all units
+- [x] Merge value objects and entities
+- [x] Combine repository interfaces
 
-### Phase 4: API Layer Implementation
-- [x] Create simple REST API controllers
-- [x] Create request/response models (integrated in controller)
+### Step 2: Implement Core Services
+- [x] Create unified service layer combining all unit functionalities
+- [x] Implement user management (auth, sessions)
+- [x] Implement vocabulary management (CRUD, search)
+- [x] Implement progress tracking (SRS, reviews)
+- [x] Implement data migration capabilities
+- [x] Implement basic analytics
 
-### Phase 5: Demo Script
-- [x] Create demo script to test the implementation
-- [x] Test vocabulary analytics
-- [x] Test user activity tracking
-- [x] Test analytics queries
+### Step 3: Create API Layer
+- [x] Design unified REST API endpoints
+- [x] Implement controllers for all functionalities
+- [x] Add request/response models
+- [x] Include error handling and validation
 
-### Phase 6: Integration
-- [x] Ensure backend integrates with current application structure
-- [x] Verify all components work together
-- [x] Create integration example with Learning Progress Unit
+### Step 4: Infrastructure Layer
+- [x] Implement in-memory repositories for demo
+- [x] Create service factory for dependency injection
+- [x] Add event publishing mechanism
+- [x] Include demo scripts
 
-**Note**: Implementation will use in-memory storage as specified and focus on core functionality for demo purposes.
+### Step 5: Integration and Testing
+- [x] Create comprehensive demo script
+- [x] Test all functionalities work together
+- [x] Verify integration points
+- [x] Document API usage
+
+## Success Criteria
+- [x] Single backend service handles all user stories
+- [x] Maintains all existing functionality
+- [x] Simplified architecture suitable for MVP
+- [x] Working demo script demonstrates all features
+- [x] Clear integration path with frontend
+
+## Notes
+- Keep existing frontend unchanged for now
+- Focus on backend consolidation only
+- Maintain DDD principles but in single bounded context
+- Prepare for future frontend integration
