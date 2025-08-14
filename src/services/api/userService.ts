@@ -49,6 +49,18 @@ class UserService {
   }
 
   async login(email: string, password: string): Promise<ApiResponse<Session>> {
+    // Admin bypass for development
+    if (email === 'admin' && password === 'admin') {
+      console.log('[AUTH] Using admin bypass');
+      const adminSession: Session = {
+        session_id: 'admin-session-' + Date.now(),
+        user_id: 'admin-user',
+        token: 'admin-token-' + Date.now(),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours
+      };
+      return { success: true, data: adminSession };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
@@ -84,6 +96,19 @@ class UserService {
   }
 
   async validateSession(token: string): Promise<ApiResponse<{ valid: boolean; user_id?: string; session_id?: string }>> {
+    // Admin bypass for development
+    if (token.startsWith('admin-token-')) {
+      console.log('[AUTH] Validating admin session');
+      return { 
+        success: true, 
+        data: {
+          valid: true,
+          user_id: 'admin-user',
+          session_id: 'admin-session'
+        }
+      };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/validate`, {
         method: 'POST',
@@ -111,6 +136,12 @@ class UserService {
   }
 
   async logout(sessionId: string): Promise<ApiResponse<any>> {
+    // Skip AWS logout for admin users
+    if (sessionId.startsWith('admin-session-')) {
+      console.log('[AUTH] Skipping AWS logout for admin user');
+      return { success: true };
+    }
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',

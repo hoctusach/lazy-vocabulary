@@ -54,6 +54,16 @@ export function useUserAuth() {
     localStorage.setItem('lazy-vocab-session', JSON.stringify(session));
   };
 
+  const loginWithSession = (session: Session) => {
+    // For admin bypass, create a user object
+    const adminUser: User = {
+      user_id: session.user_id,
+      email: session.user_id === 'admin-user' ? 'admin@localhost' : 'unknown@localhost',
+      nickname: session.user_id === 'admin-user' ? 'Admin' : 'User'
+    };
+    login(adminUser, session);
+  };
+
   const logout = async () => {
     if (currentSession) {
       try {
@@ -73,6 +83,7 @@ export function useUserAuth() {
     currentSession,
     isLoading,
     login,
+    loginWithSession,
     logout,
     isLoggedIn: !!currentUser
   };

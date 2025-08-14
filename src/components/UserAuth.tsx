@@ -39,8 +39,8 @@ export default function UserAuth({ onUserLogin, currentUser, onLogout }: UserAut
       // Create user object (backend only returns session)
       const user: User = { 
         user_id: result.data.user_id, 
-        email, 
-        nickname: email.split('@')[0] 
+        email: result.data.user_id === 'admin-user' ? 'admin@localhost' : email, 
+        nickname: result.data.user_id === 'admin-user' ? 'Admin' : email.split('@')[0] 
       };
       
       // Session persistence is handled by the onUserLogin callback
@@ -153,6 +153,9 @@ export default function UserAuth({ onUserLogin, currentUser, onLogout }: UserAut
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
               />
+            </div>
+            <div className="text-xs text-muted-foreground text-center mb-2">
+              💡 For testing: use admin/admin
             </div>
             <Button onClick={handleLogin} disabled={loading} className="w-full">
               {loading ? 'Logging in...' : 'Login'}

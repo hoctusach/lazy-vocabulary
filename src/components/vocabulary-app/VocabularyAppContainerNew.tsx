@@ -17,6 +17,7 @@ interface VocabularyAppContainerNewProps {
   isAudioEnabled?: boolean;
 }
 
+<<<<<<< HEAD
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isAudioEnabled = false }) => {
 =======
   isActive?: boolean;
@@ -24,6 +25,9 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true }) => {
 >>>>>>> 6af81353 (learning progress)
+=======
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, isAudioEnabled = true }) => {
+>>>>>>> 780336be (Remove __pycache__ files from tracking)
   // Use stable state management
   const {
     currentWord,
