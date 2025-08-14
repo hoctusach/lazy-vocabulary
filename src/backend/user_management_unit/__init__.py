@@ -1,0 +1,1 @@
+# User Management Unit - Handles authentication and session management
