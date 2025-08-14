@@ -13,10 +13,17 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 interface VocabularyAppContainerNewProps {
+<<<<<<< HEAD
   isAudioEnabled?: boolean;
 }
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isAudioEnabled = false }) => {
+=======
+  isActive?: boolean;
+}
+
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true }) => {
+>>>>>>> 6af81353 (learning progress)
   // Use stable state management
   const {
     currentWord,
@@ -47,7 +54,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
     isMuted,
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
-    playCurrentWord
+    playCurrentWord,
+    isActive
   });
 
   // Modal state management

@@ -1,0 +1,137 @@
+import React, { useEffect, useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
+import { LearningProgressPanel } from './LearningProgressPanel';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { vocabularyService } from '@/services/vocabularyService';
+import { VocabularyWord } from '@/types/vocabulary';
+import ToastProvider from './vocabulary-app/ToastProvider';
+
+const VocabularyAppWithLearning: React.FC = () => {
+  const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
+  const [activeTab, setActiveTab] = useState('learning');
+
+  const {
+    dailySelection,
+    progressStats,
+    generateDailyWords,
+    markWordAsPlayed,
+    refreshStats,
+    getDueReviewWords
+  } = useLearningProgress(allWords);
+
+  // Load vocabulary data
+  useEffect(() => {
+    console.log("VocabularyAppWithLearning - loading vocabulary data");
+    vocabularyService.loadDefaultVocabulary();
+    
+    // Get all words from all categories
+    const allWordsFromService: VocabularyWord[] = [];
+    vocabularyService.getAllSheetNames().forEach(sheetName => {
+      vocabularyService.switchSheet(sheetName);
+      const words = vocabularyService.getWordList();
+      allWordsFromService.push(...words);
+    });
+    
+    setAllWords(allWordsFromService);
+  }, []);
+
+  // Track when words are played (integrate with existing word navigation)
+  useEffect(() => {
+    const handleWordChange = () => {
+      const currentWord = vocabularyService.getCurrentWord();
+      if (currentWord) {
+        markWordAsPlayed(currentWord.word);
+      }
+    };
+
+    // Listen for word changes
+    vocabularyService.addVocabularyChangeListener(handleWordChange);
+    
+    return () => {
+      vocabularyService.removeVocabularyChangeListener(handleWordChange);
+    };
+  }, [markWordAsPlayed]);
+
+  return (
+    <>
+      <ToastProvider />
+      <div className="w-full max-w-6xl mx-auto p-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="learning">Learning Progress</TabsTrigger>
+            <TabsTrigger value="practice">Practice Mode</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="learning" className="space-y-4">
+            <LearningProgressPanel
+              dailySelection={dailySelection}
+              progressStats={progressStats}
+              onGenerateDaily={generateDailyWords}
+              onRefresh={refreshStats}
+            />
+            
+            {dailySelection && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Today's Words</h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {dailySelection.newWords.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-green-600">New Words ({dailySelection.newWords.length})</h4>
+                      <div className="space-y-1 max-h-60 overflow-y-auto">
+                        {dailySelection.newWords.map((word, index) => (
+                          <div key={index} className="text-sm p-2 bg-green-50 rounded border">
+                            <div className="font-medium">{word.word}</div>
+                            <div className="text-xs text-gray-600">{word.category}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {dailySelection.reviewWords.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-blue-600">Review Words ({dailySelection.reviewWords.length})</h4>
+                      <div className="space-y-1 max-h-60 overflow-y-auto">
+                        {dailySelection.reviewWords.map((word, index) => (
+                          <div key={index} className="text-sm p-2 bg-blue-50 rounded border">
+                            <div className="font-medium">{word.word}</div>
+                            <div className="text-xs text-gray-600">
+                              {word.category} • Review #{word.reviewCount}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {progressStats.due > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
+                      <div className="space-y-1 max-h-60 overflow-y-auto">
+                        {getDueReviewWords().map((word, index) => (
+                          <div key={index} className="text-sm p-2 bg-red-50 rounded border">
+                            <div className="font-medium">{word.word}</div>
+                            <div className="text-xs text-gray-600">
+                              {word.category} • Review #{word.reviewCount}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="practice" className="space-y-4">
+            <VocabularyAppContainerNew isActive={activeTab === 'practice'} />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </>
+  );
+};
+
+export default VocabularyAppWithLearning;
