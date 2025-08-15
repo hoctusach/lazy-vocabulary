@@ -14,7 +14,7 @@ interface LearningProgressPanelProps {
     due: number;
     retired: number;
   };
-  onGenerateDaily: (severity: SeverityLevel) => void;
+  onGenerateDaily: (severity: SeverityLevel) => Promise<void>;
   onRefresh: () => void;
 }
 
@@ -116,21 +116,21 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => onGenerateDaily('light')}
+              onClick={async () => await onGenerateDaily('light')}
             >
               Light (15-25)
             </Button>
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => onGenerateDaily('moderate')}
+              onClick={async () => await onGenerateDaily('moderate')}
             >
               Moderate (30-50)
             </Button>
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => onGenerateDaily('intense')}
+              onClick={async () => await onGenerateDaily('intense')}
             >
               Intense (50-100)
             </Button>

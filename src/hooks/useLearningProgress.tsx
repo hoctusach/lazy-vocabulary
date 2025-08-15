@@ -14,29 +14,29 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     retired: 0
   });
 
-  const refreshStats = useCallback(() => {
-    const stats = learningProgressService.getProgressStats();
+  const refreshStats = useCallback(async () => {
+    const stats = await learningProgressService.getProgressStats(allWords);
     setProgressStats(stats);
-  }, []);
+  }, [allWords]);
 
-  const generateDailyWords = useCallback((severity: SeverityLevel = 'moderate') => {
+  const generateDailyWords = useCallback(async (severity: SeverityLevel = 'moderate') => {
     if (allWords.length === 0) return;
     
     // Force regeneration when user clicks the buttons
-    const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
+    const selection = await learningProgressService.forceGenerateDailySelection(allWords, severity);
     setDailySelection(selection);
-    refreshStats();
+    await refreshStats();
   }, [allWords, refreshStats]);
 
-  const markWordAsPlayed = useCallback((word: string) => {
-    learningProgressService.updateWordProgress(word);
-    const progress = learningProgressService.getWordProgress(word);
+  const markWordAsPlayed = useCallback(async (word: string) => {
+    await learningProgressService.updateWordProgress(word);
+    const progress = await learningProgressService.getWordProgress(word);
     setCurrentWordProgress(progress);
     refreshStats();
   }, [refreshStats]);
 
-  const getWordProgress = useCallback((word: string) => {
-    return learningProgressService.getWordProgress(word);
+  const getWordProgress = useCallback(async (word: string) => {
+    return await learningProgressService.getWordProgress(word);
   }, []);
 
   const loadTodaySelection = useCallback(() => {
@@ -51,16 +51,16 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     }
   }, [allWords, loadTodaySelection, refreshStats]);
 
-  const getDueReviewWords = useCallback(() => {
-    return learningProgressService.getDueReviewWords();
+  const getDueReviewWords = useCallback(async () => {
+    return await learningProgressService.getDueReviewWords();
   }, []);
 
-  const getRetiredWords = useCallback(() => {
-    return learningProgressService.getRetiredWords();
+  const getRetiredWords = useCallback(async () => {
+    return await learningProgressService.getRetiredWords();
   }, []);
 
-  const retireCurrentWord = useCallback((word: string) => {
-    learningProgressService.retireWord(word);
+  const retireCurrentWord = useCallback(async (word: string) => {
+    await learningProgressService.retireWord(word);
     refreshStats();
   }, [refreshStats]);
 

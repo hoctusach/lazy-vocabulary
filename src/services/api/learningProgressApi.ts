@@ -18,15 +18,14 @@ export interface BackendReviewEvent {
 }
 
 export class LearningProgressApi {
-  private baseUrl = 'http://localhost:8000/api/progress'; // Backend URL
-  private userId = 'Admin'; // Default user for demo
+  private baseUrl = 'http://localhost:8003/api/learning'; // Backend URL
+  private userId = 'admin-user'; // Default user for demo
 
   async generateDailyList(severity: 'light' | 'moderate' | 'intense'): Promise<BackendDailyListResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/${this.userId}/daily-list`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ severity })
+      const response = await fetch(`${this.baseUrl}/daily-selection/${this.userId}?severity=${severity}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       });
       
       if (!response.ok) {
@@ -43,10 +42,10 @@ export class LearningProgressApi {
 
   async recordReviewEvents(sessionId: string, events: BackendReviewEvent[]): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}/${this.userId}/review-events`, {
+      await fetch(`${this.baseUrl}/progress/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, events })
+        body: JSON.stringify({ user_id: this.userId, word: events[0]?.word_id || 'unknown' })
       });
     } catch (error) {
       console.warn('Failed to record review events:', error);
@@ -55,7 +54,7 @@ export class LearningProgressApi {
 
   async getUserStatistics(): Promise<BackendStatsResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/${this.userId}/statistics`);
+      const response = await fetch(`${this.baseUrl}/progress/${this.userId}/stats`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       return await response.json();
     } catch (error) {

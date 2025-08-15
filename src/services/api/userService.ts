@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8001';
+const API_BASE_URL = 'http://localhost:8003';
 
 export interface User {
   user_id: string;
@@ -22,7 +22,7 @@ export interface ApiResponse<T> {
 class UserService {
   async register(email: string, nickname: string, password: string): Promise<ApiResponse<User>> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, nickname, password })
@@ -62,7 +62,7 @@ class UserService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -110,7 +110,7 @@ class UserService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/validate`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/validate-session?token=${encodeURIComponent(token)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token })
@@ -143,7 +143,7 @@ class UserService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      const response = await fetch(`${API_BASE_URL}/api/users/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId })

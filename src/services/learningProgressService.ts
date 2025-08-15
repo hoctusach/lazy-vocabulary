@@ -1,6 +1,9 @@
 import { LearningProgress, DailySelection, SeverityLevel, CategoryWeights } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
+const API_BASE_URL = 'http://localhost:8003';
+const CURRENT_USER_ID = 'admin-user'; // For POC, use fixed user ID
+
 const LEARNING_PROGRESS_KEY = 'learningProgress';
 const DAILY_SELECTION_KEY = 'dailySelection';
 const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
@@ -55,7 +58,24 @@ export class LearningProgressService {
     }
   }
 
-  private getLearningProgress(): Map<string, LearningProgress> {
+  private async getLearningProgress(): Promise<Map<string, LearningProgress>> {
+    try {
+      // Try to get from backend first
+      const response = await fetch(`${API_BASE_URL}/api/learning/progress/${CURRENT_USER_ID}`);
+      if (response.ok) {
+        const data = await response.json();
+        const progressMap = new Map<string, LearningProgress>();
+        Object.entries(data).forEach(([key, value]) => {
+          const progress = this.migrateProgressData(value as LearningProgress);
+          progressMap.set(key, progress);
+        });
+        return progressMap;
+      }
+    } catch (error) {
+      console.warn('Backend unavailable, using localStorage:', error);
+    }
+    
+    // Fallback to localStorage
     const stored = localStorage.getItem(LEARNING_PROGRESS_KEY);
     const progressMap = new Map<string, LearningProgress>();
     
@@ -87,8 +107,27 @@ export class LearningProgressService {
     };
   }
 
-  private saveLearningProgress(progressMap: Map<string, LearningProgress>): void {
+  private async saveLearningProgress(progressMap: Map<string, LearningProgress>): Promise<void> {
     const data = Object.fromEntries(progressMap);
+    
+    try {
+      // Try to save to backend first
+      const response = await fetch(`${API_BASE_URL}/api/learning/progress/${CURRENT_USER_ID}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        // Also save to localStorage as backup
+        localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(data));
+        return;
+      }
+    } catch (error) {
+      console.warn('Backend save failed, using localStorage:', error);
+    }
+    
+    // Fallback to localStorage only
     localStorage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(data));
   }
 
@@ -107,8 +146,8 @@ export class LearningProgressService {
     };
   }
 
-  updateWordProgress(wordKey: string): void {
-    const progressMap = this.getLearningProgress();
+  async updateWordProgress(wordKey: string): Promise<void> {
+    const progressMap = await this.getLearningProgress();
     const progress = progressMap.get(wordKey);
     
     if (progress) {
@@ -120,12 +159,12 @@ export class LearningProgressService {
       progress.status = 'due';
       
       progressMap.set(wordKey, progress);
-      this.saveLearningProgress(progressMap);
+      await this.saveLearningProgress(progressMap);
     }
   }
 
-  retireWord(wordKey: string): void {
-    const progressMap = this.getLearningProgress();
+  async retireWord(wordKey: string): Promise<void> {
+    const progressMap = await this.getLearningProgress();
     const progress = progressMap.get(wordKey);
     
     if (progress) {
@@ -135,12 +174,12 @@ export class LearningProgressService {
       progress.nextReviewDate = this.addDays(today, 100);
       
       progressMap.set(wordKey, progress);
-      this.saveLearningProgress(progressMap);
+      await this.saveLearningProgress(progressMap);
     }
   }
 
-  updateWordStatuses(): void {
-    const progressMap = this.getLearningProgress();
+  async updateWordStatuses(): Promise<void> {
+    const progressMap = await this.getLearningProgress();
     const today = this.getToday();
     let hasChanges = false;
 
@@ -153,14 +192,14 @@ export class LearningProgressService {
     });
 
     if (hasChanges) {
-      this.saveLearningProgress(progressMap);
+      await this.saveLearningProgress(progressMap);
     }
   }
 
-  generateDailySelection(
+  async generateDailySelection(
     allWords: VocabularyWord[], 
     severity: SeverityLevel = 'moderate'
-  ): DailySelection {
+  ): Promise<DailySelection> {
     const today = this.getToday();
     const lastSelectionDate = localStorage.getItem(LAST_SELECTION_DATE_KEY);
     
@@ -172,17 +211,17 @@ export class LearningProgressService {
       }
     }
 
-    return this.forceGenerateDailySelection(allWords, severity);
+    return await this.forceGenerateDailySelection(allWords, severity);
   }
 
-  forceGenerateDailySelection(
+  async forceGenerateDailySelection(
     allWords: VocabularyWord[], 
     severity: SeverityLevel = 'moderate'
-  ): DailySelection {
+  ): Promise<DailySelection> {
     const today = this.getToday();
 
     this.updateWordStatuses();
-    const progressMap = this.getLearningProgress();
+    const progressMap = await this.getLearningProgress();
     
     // Initialize progress for new words
     allWords.forEach(word => {
@@ -190,7 +229,7 @@ export class LearningProgressService {
         progressMap.set(word.word, this.initializeWord(word));
       }
     });
-    this.saveLearningProgress(progressMap);
+    await this.saveLearningProgress(progressMap);
 
     // Adjust target count based on available words
     const maxPossibleCount = allWords.length;
@@ -299,31 +338,35 @@ export class LearningProgressService {
     return null;
   }
 
-  getWordProgress(wordKey: string): LearningProgress | null {
-    const progressMap = this.getLearningProgress();
+  async getWordProgress(wordKey: string): Promise<LearningProgress | null> {
+    const progressMap = await this.getLearningProgress();
     return progressMap.get(wordKey) || null;
   }
 
-  getProgressStats() {
-    const progressMap = this.getLearningProgress();
+  async getProgressStats(allWords: VocabularyWord[] = []) {
+    // Total should be from local vocabulary word list
+    const totalWordsCount = allWords.length;
+    
+    // Other counts from backend/localStorage progress data
+    const progressMap = await this.getLearningProgress();
     const all = Array.from(progressMap.values());
     
     return {
-      total: all.length,
+      total: totalWordsCount, // From local vocabulary list
       learned: all.filter(p => p.isLearned).length,
-      new: all.filter(p => !p.isLearned).length,
+      new: totalWordsCount - all.length, // Words not yet in progress = new words
       due: all.filter(p => p.status === 'due' && p.isLearned).length,
       retired: all.filter(p => p.status === 'retired').length
     };
   }
 
-  getDueReviewWords(): LearningProgress[] {
-    const progressMap = this.getLearningProgress();
+  async getDueReviewWords(): Promise<LearningProgress[]> {
+    const progressMap = await this.getLearningProgress();
     return Array.from(progressMap.values()).filter(p => p.status === 'due' && p.isLearned);
   }
 
-  getRetiredWords(): LearningProgress[] {
-    const progressMap = this.getLearningProgress();
+  async getRetiredWords(): Promise<LearningProgress[]> {
+    const progressMap = await this.getLearningProgress();
     return Array.from(progressMap.values())
       .filter(p => p.status === 'retired')
       .sort((a, b) => a.word.localeCompare(b.word)); // Sort alphabetically
