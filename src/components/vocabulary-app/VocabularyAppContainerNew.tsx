@@ -13,26 +13,12 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 interface VocabularyAppContainerNewProps {
-<<<<<<< HEAD
+  isActive?: boolean;
+  onRetireWord?: () => void;
   isAudioEnabled?: boolean;
 }
 
-<<<<<<< HEAD
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isAudioEnabled = false }) => {
-=======
-  isActive?: boolean;
-  onRetireWord?: () => void;
-}
-
-<<<<<<< HEAD
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true }) => {
->>>>>>> 6af81353 (learning progress)
-=======
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, isAudioEnabled = true }) => {
->>>>>>> 780336be (Remove __pycache__ files from tracking)
-=======
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord }) => {
->>>>>>> ed018440 (commit spaced repetition)
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord, isAudioEnabled = true }) => {
   // Use stable state management
   const {
     currentWord,
