@@ -216,7 +216,8 @@ describe('LearningProgressService', () => {
       const mockSelection = {
         newWords: [],
         reviewWords: [],
-        totalCount: 20
+        totalCount: 20,
+        severity: 'moderate'
       };
 
       localStorageMock.getItem.mockImplementation((key) => {

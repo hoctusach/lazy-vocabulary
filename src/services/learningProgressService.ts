@@ -230,7 +230,8 @@ export class LearningProgressService {
     const selection: DailySelection = {
       newWords: selectedNew,
       reviewWords: selectedReview,
-      totalCount: selectedNew.length + selectedReview.length
+      totalCount: selectedNew.length + selectedReview.length,
+      severity
     };
 
     // Cache the selection
