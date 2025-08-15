@@ -12,6 +12,7 @@ interface LearningProgressPanelProps {
     learned: number;
     new: number;
     due: number;
+    retired: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
   onRefresh: () => void;
@@ -39,14 +40,14 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Progress Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
             <div className="text-sm text-gray-600">Total Words</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-green-600">{progressStats.learned}</div>
-            <div className="text-sm text-gray-600">Learned</div>
+            <div className="text-sm text-gray-600">Learning</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
@@ -55,6 +56,10 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
           <div className="text-center">
             <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
             <div className="text-sm text-gray-600">Due Review</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-gray-600">{progressStats.retired}</div>
+            <div className="text-sm text-gray-600">Retired</div>
           </div>
         </div>
 
@@ -72,29 +77,29 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
           <div className="space-y-3">
             <h4 className="font-semibold">Today's Selection</h4>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="border-0">
                 Total: {dailySelection.totalCount}
               </Badge>
-              <Badge variant="outline" className="text-green-600">
+              <Badge variant="outline" className="text-green-600 border-0">
                 New: {dailySelection.newWords.length}
               </Badge>
-              <Badge variant="outline" className="text-blue-600">
+              <Badge variant="outline" className="text-blue-600 border-0">
                 Review: {dailySelection.reviewWords.length}
               </Badge>
             </div>
             
-            {/* Category breakdown for new words */}
-            {dailySelection.newWords.length > 0 && (
+            {/* Category breakdown for all words in today's selection */}
+            {(dailySelection.newWords.length > 0 || dailySelection.reviewWords.length > 0) && (
               <div className="text-sm">
-                <div className="font-medium mb-1">New words by category:</div>
+                <div className="font-medium mb-1">By Category:</div>
                 <div className="flex flex-wrap gap-1">
                   {Object.entries(
-                    dailySelection.newWords.reduce((acc, word) => {
+                    [...dailySelection.newWords, ...dailySelection.reviewWords].reduce((acc, word) => {
                       acc[word.category] = (acc[word.category] || 0) + 1;
                       return acc;
                     }, {} as Record<string, number>)
                   ).map(([category, count]) => (
-                    <Badge key={category} variant="outline" className="text-xs">
+                    <Badge key={category} variant="outline" className="text-xs border-0">
                       {category}: {count}
                     </Badge>
                   ))}

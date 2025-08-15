@@ -14,9 +14,10 @@ import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
 interface VocabularyAppContainerNewProps {
   isActive?: boolean;
+  onRetireWord?: () => void;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord }) => {
   // Use stable state management
   const {
     currentWord,
@@ -226,6 +227,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             handleOpenAddWordModal={handleOpenAddWordModal}
             handleOpenEditWordModal={handleOpenEditWordModal}
             playCurrentWord={playCurrentWord}
+            onRetireWord={onRetireWord}
           />
         </div>
       </VocabularyLayout>
@@ -265,6 +267,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
           wordToEdit={wordToEdit}
           handleOpenAddWordModal={handleOpenAddWordModal}
           handleOpenEditWordModal={handleOpenEditWordModal}
+          onRetireWord={onRetireWord}
         />
       </div>
     </VocabularyLayout>

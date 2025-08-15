@@ -23,6 +23,7 @@ interface VocabularyMainNewProps {
   onOpenEditModal: () => void;
   showWordCount?: boolean;
   playCurrentWord: () => void;
+  onRetireWord?: () => void;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -43,6 +44,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   onOpenEditModal,
   showWordCount = false,
   playCurrentWord,
+  onRetireWord,
 }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -88,6 +90,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         onOpenEditModal={onOpenEditModal}
         selectedVoiceName={selectedVoiceName}
         playCurrentWord={playCurrentWord}
+        onRetireWord={onRetireWord}
       />
       </div>
     </div>
