@@ -9,7 +9,7 @@ import ToastProvider from './vocabulary-app/ToastProvider';
 
 const VocabularyAppWithLearning: React.FC = () => {
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
-  const [activeTab, setActiveTab] = useState('learning');
+  const [activeTab, setActiveTab] = useState('practice');
 
   const {
     dailySelection,
@@ -17,7 +17,9 @@ const VocabularyAppWithLearning: React.FC = () => {
     generateDailyWords,
     markWordAsPlayed,
     refreshStats,
-    getDueReviewWords
+    getDueReviewWords,
+    getRetiredWords,
+    retireCurrentWord
   } = useLearningProgress(allWords);
 
   // Load vocabulary data
@@ -59,8 +61,8 @@ const VocabularyAppWithLearning: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto p-4">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="practice">Practice</TabsTrigger>
             <TabsTrigger value="learning">Learning Progress</TabsTrigger>
-            <TabsTrigger value="practice">Practice Mode</TabsTrigger>
           </TabsList>
           
           <TabsContent value="learning" className="space-y-4">
@@ -73,8 +75,8 @@ const VocabularyAppWithLearning: React.FC = () => {
             
             {dailySelection && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Today's Words</h3>
-                <div className="grid gap-4 md:grid-cols-3">
+                <h3 className="text-lg font-semibold">Word Summary</h3>
+                <div className="grid gap-4 md:grid-cols-4">
                   {dailySelection.newWords.length > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-medium text-green-600">New Words ({dailySelection.newWords.length})</h4>
@@ -120,13 +122,41 @@ const VocabularyAppWithLearning: React.FC = () => {
                       </div>
                     </div>
                   )}
+                  
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-gray-600">Retired ({progressStats.retired})</h4>
+                    <div className="space-y-1 max-h-60 overflow-y-auto">
+                      {progressStats.retired > 0 ? (
+                        getRetiredWords().map((word, index) => (
+                          <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
+                            <div className="font-medium text-gray-700">{word.word}</div>
+                            <div className="text-xs text-gray-500">
+                              {word.category} • Retired {word.retiredDate}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
+                          No retired words
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
           </TabsContent>
           
           <TabsContent value="practice" className="space-y-4">
-            <VocabularyAppContainerNew isActive={activeTab === 'practice'} />
+            <VocabularyAppContainerNew 
+              isActive={activeTab === 'practice'} 
+              onRetireWord={() => {
+                const currentWord = vocabularyService.getCurrentWord();
+                if (currentWord) {
+                  retireCurrentWord(currentWord.word);
+                }
+              }}
+            />
           </TabsContent>
         </Tabs>
       </div>

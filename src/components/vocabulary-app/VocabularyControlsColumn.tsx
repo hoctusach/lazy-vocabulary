@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker, Search } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker, Search, Archive } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { RetireWordDialog } from '@/components/RetireWordDialog';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -28,6 +29,7 @@ interface VocabularyControlsColumnProps {
   onOpenEditModal: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
+  onRetireWord?: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -43,7 +45,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenAddModal,
   onOpenEditModal,
   selectedVoiceName,
-  playCurrentWord
+  playCurrentWord,
+  onRetireWord
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -103,8 +106,16 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [isRetireDialogOpen, setIsRetireDialogOpen] = React.useState(false);
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
+  
+  const handleRetireClick = () => setIsRetireDialogOpen(true);
+  const handleRetireConfirm = () => {
+    if (onRetireWord) onRetireWord();
+    setIsRetireDialogOpen(false);
+    toast('Word retired for 100 days');
+  };
 
   return (
     <div className="flex flex-col gap-2 items-end">
@@ -184,7 +195,29 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       >
         <Search size={16} />
       </Button>
+      
+      {onRetireWord && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleRetireClick}
+          className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
+          title="Retire Word"
+          aria-label="Retire Word"
+          disabled={!currentWord}
+        >
+          <Archive size={16} />
+        </Button>
+      )}
+      
       <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
+      
+      <RetireWordDialog
+        isOpen={isRetireDialogOpen}
+        onClose={() => setIsRetireDialogOpen(false)}
+        onConfirm={handleRetireConfirm}
+        wordText={currentWord?.word || ''}
+      />
     </div>
   );
 };

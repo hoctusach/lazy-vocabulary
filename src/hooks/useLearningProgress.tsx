@@ -10,7 +10,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     total: 0,
     learned: 0,
     new: 0,
-    due: 0
+    due: 0,
+    retired: 0
   });
 
   const refreshStats = useCallback(() => {
@@ -21,7 +22,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const generateDailyWords = useCallback((severity: SeverityLevel = 'moderate') => {
     if (allWords.length === 0) return;
     
-    const selection = learningProgressService.generateDailySelection(allWords, severity);
+    // Force regeneration when user clicks the buttons
+    const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
     setDailySelection(selection);
     refreshStats();
   }, [allWords, refreshStats]);
@@ -53,6 +55,15 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     return learningProgressService.getDueReviewWords();
   }, []);
 
+  const getRetiredWords = useCallback(() => {
+    return learningProgressService.getRetiredWords();
+  }, []);
+
+  const retireCurrentWord = useCallback((word: string) => {
+    learningProgressService.retireWord(word);
+    refreshStats();
+  }, [refreshStats]);
+
   return {
     dailySelection,
     currentWordProgress,
@@ -62,6 +73,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getWordProgress,
     loadTodaySelection,
     refreshStats,
-    getDueReviewWords
+    getDueReviewWords,
+    getRetiredWords,
+    retireCurrentWord
   };
 };

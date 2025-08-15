@@ -62,11 +62,29 @@ export class LearningProgressService {
     if (stored) {
       const data = JSON.parse(stored);
       Object.entries(data).forEach(([key, value]) => {
-        progressMap.set(key, value as LearningProgress);
+        const progress = this.migrateProgressData(value as LearningProgress);
+        progressMap.set(key, progress);
       });
     }
     
     return progressMap;
+  }
+
+  private migrateProgressData(progress: LearningProgress): LearningProgress {
+    const DEFAULT_VALUES = {
+      status: 'new' as const,
+      retiredDate: undefined,
+      nextReviewDate: this.getToday(),
+      createdDate: this.getToday()
+    };
+
+    return {
+      ...progress,
+      status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
+      nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
+      createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
+      retiredDate: progress.retiredDate || DEFAULT_VALUES.retiredDate
+    };
   }
 
   private saveLearningProgress(progressMap: Map<string, LearningProgress>): void {
@@ -106,6 +124,21 @@ export class LearningProgressService {
     }
   }
 
+  retireWord(wordKey: string): void {
+    const progressMap = this.getLearningProgress();
+    const progress = progressMap.get(wordKey);
+    
+    if (progress) {
+      const today = this.getToday();
+      progress.status = 'retired';
+      progress.retiredDate = today;
+      progress.nextReviewDate = this.addDays(today, 100);
+      
+      progressMap.set(wordKey, progress);
+      this.saveLearningProgress(progressMap);
+    }
+  }
+
   updateWordStatuses(): void {
     const progressMap = this.getLearningProgress();
     const today = this.getToday();
@@ -139,6 +172,15 @@ export class LearningProgressService {
       }
     }
 
+    return this.forceGenerateDailySelection(allWords, severity);
+  }
+
+  forceGenerateDailySelection(
+    allWords: VocabularyWord[], 
+    severity: SeverityLevel = 'moderate'
+  ): DailySelection {
+    const today = this.getToday();
+
     this.updateWordStatuses();
     const progressMap = this.getLearningProgress();
     
@@ -158,8 +200,8 @@ export class LearningProgressService {
     const newCount = Math.round(totalCount * 0.4);
     const reviewCount = totalCount - newCount;
 
-    // Get available words
-    const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned);
+    // Get available words (exclude retired)
+    const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'retired');
     const dueWords = Array.from(progressMap.values()).filter(p => p.status === 'due');
 
     // Select words with fallback logic
@@ -270,13 +312,21 @@ export class LearningProgressService {
       total: all.length,
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
-      due: all.filter(p => p.status === 'due').length
+      due: all.filter(p => p.status === 'due' && p.isLearned).length,
+      retired: all.filter(p => p.status === 'retired').length
     };
   }
 
   getDueReviewWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
-    return Array.from(progressMap.values()).filter(p => p.status === 'due');
+    return Array.from(progressMap.values()).filter(p => p.status === 'due' && p.isLearned);
+  }
+
+  getRetiredWords(): LearningProgress[] {
+    const progressMap = this.getLearningProgress();
+    return Array.from(progressMap.values())
+      .filter(p => p.status === 'retired')
+      .sort((a, b) => a.word.localeCompare(b.word)); // Sort alphabetically
   }
 }
 

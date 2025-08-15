@@ -1,1 +1,0 @@
-"""Domain layer for User Management unit."""
