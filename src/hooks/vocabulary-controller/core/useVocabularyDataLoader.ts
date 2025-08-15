@@ -14,7 +14,8 @@ export const useVocabularyDataLoader = (
   setHasData: (hasData: boolean) => void,
   setCurrentIndex: (index: number) => void,
   selectedVoiceName: string,
-  clearAutoAdvanceTimer: () => void
+  clearAutoAdvanceTimer: () => void,
+  initialWords?: VocabularyWord[]
 ) => {
   // Persist selected voice whenever it changes
   useEffect(() => {
@@ -31,8 +32,15 @@ export const useVocabularyDataLoader = (
 
   // Load initial data
   useEffect(() => {
+    if (initialWords && initialWords.length > 0) {
+      setWordList(initialWords);
+      setHasData(true);
+      setCurrentIndex(0);
+      return;
+    }
+
     console.log('[DATA-LOADER] Loading initial vocabulary data');
-    
+
     const loadData = () => {
       try {
         const words = vocabularyService.getWordList();
@@ -69,10 +77,10 @@ export const useVocabularyDataLoader = (
     };
 
     vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
-    
+
     return () => {
       vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
       clearAutoAdvanceTimer(); // Clean up on unmount
     };
-  }, [setWordList, setHasData, setCurrentIndex, clearAutoAdvanceTimer]);
+  }, [initialWords, setWordList, setHasData, setCurrentIndex, clearAutoAdvanceTimer]);
 };

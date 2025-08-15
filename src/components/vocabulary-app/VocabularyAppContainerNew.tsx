@@ -11,13 +11,15 @@ import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPla
 import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
+import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
   isActive?: boolean;
   onRetireWord?: () => void;
+  initialWords?: VocabularyWord[];
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord, initialWords }) => {
   // Use stable state management
   const {
     currentWord,
@@ -37,7 +39,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
     userInteractionState,
     nextCategory,
     handleInteractionUpdate
-  } = useStableVocabularyState();
+  } = useStableVocabularyState(initialWords);
 
   // Optimized auto-play with reduced re-renders
   useOptimizedAutoPlay({

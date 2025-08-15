@@ -9,11 +9,12 @@ import { useWordNavigation } from './core/useWordNavigation';
 import { useVocabularyControls } from './core/useVocabularyControls';
 import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
 import { saveLastWord } from '@/utils/lastWordStorage';
+import { VocabularyWord } from '@/types/vocabulary';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
  */
-export const useUnifiedVocabularyController = () => {
+export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) => {
   console.log('[UNIFIED-CONTROLLER] Initializing controller');
 
   // Core state management
@@ -118,7 +119,8 @@ export const useUnifiedVocabularyController = () => {
     setHasData,
     setCurrentIndex,
     selectedVoiceName,
-    clearAutoAdvanceTimer
+    clearAutoAdvanceTimer,
+    initialWords
   );
 
   // Set up word completion callback with auto-advance
