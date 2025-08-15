@@ -15,6 +15,7 @@ export interface DailySelection {
   newWords: LearningProgress[];
   reviewWords: LearningProgress[];
   totalCount: number;
+  severity: SeverityLevel;
 }
 
 export type SeverityLevel = 'light' | 'moderate' | 'intense';

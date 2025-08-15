@@ -86,6 +86,9 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
               <Badge variant="outline" className="text-blue-600 border-0">
                 Review: {dailySelection.reviewWords.length}
               </Badge>
+              <Badge variant="outline" className="border-0">
+                Level: {dailySelection.severity}
+              </Badge>
             </div>
             
             {/* Category breakdown for all words in today's selection */}
