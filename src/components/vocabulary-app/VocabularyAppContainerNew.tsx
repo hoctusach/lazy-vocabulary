@@ -12,7 +12,12 @@ import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 
-const VocabularyAppContainerNew: React.FC = () => {
+interface VocabularyAppContainerNewProps {
+  isActive?: boolean;
+  onRetireWord?: () => void;
+}
+
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord }) => {
   // Use stable state management
   const {
     currentWord,
@@ -43,7 +48,8 @@ const VocabularyAppContainerNew: React.FC = () => {
     isMuted,
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
-    playCurrentWord
+    playCurrentWord,
+    isActive
   });
 
   // Modal state management
@@ -221,6 +227,7 @@ const VocabularyAppContainerNew: React.FC = () => {
             handleOpenAddWordModal={handleOpenAddWordModal}
             handleOpenEditWordModal={handleOpenEditWordModal}
             playCurrentWord={playCurrentWord}
+            onRetireWord={onRetireWord}
           />
         </div>
       </VocabularyLayout>
@@ -260,6 +267,7 @@ const VocabularyAppContainerNew: React.FC = () => {
           wordToEdit={wordToEdit}
           handleOpenAddWordModal={handleOpenAddWordModal}
           handleOpenEditWordModal={handleOpenEditWordModal}
+          onRetireWord={onRetireWord}
         />
       </div>
     </VocabularyLayout>

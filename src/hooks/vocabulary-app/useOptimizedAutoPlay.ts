@@ -12,6 +12,7 @@ interface UseOptimizedAutoPlayProps {
   isSpeaking: boolean;
   isAudioUnlocked: boolean;
   playCurrentWord: () => void;
+  isActive?: boolean;
 }
 
 export const useOptimizedAutoPlay = ({
@@ -22,7 +23,8 @@ export const useOptimizedAutoPlay = ({
   isMuted,
   isSpeaking,
   isAudioUnlocked,
-  playCurrentWord
+  playCurrentWord,
+  isActive = true
 }: UseOptimizedAutoPlayProps) => {
   const lastWordRef = useRef<string | null>(null);
   const playTimeoutRef = useRef<number | null>(null);
@@ -35,7 +37,7 @@ export const useOptimizedAutoPlay = ({
     }
 
     // Early exit conditions
-    if (!hasData || !currentWord || !hasInitialized || isPaused || isMuted || isSpeaking || !isAudioUnlocked) {
+    if (!hasData || !currentWord || !hasInitialized || isPaused || isMuted || isSpeaking || !isAudioUnlocked || !isActive) {
       return;
     }
 
