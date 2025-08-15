@@ -6,6 +6,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [currentWordProgress, setCurrentWordProgress] = useState<LearningProgress | null>(null);
+  const [todayWords, setTodayWords] = useState<VocabularyWord[]>([]);
   const [progressStats, setProgressStats] = useState({
     total: 0,
     learned: 0,
@@ -39,17 +40,26 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     return learningProgressService.getWordProgress(word);
   }, []);
 
-  const loadTodaySelection = useCallback(() => {
-    const selection = learningProgressService.getTodaySelection();
+  useEffect(() => {
+    if (allWords.length === 0) return;
+
+    let selection = learningProgressService.getTodaySelection();
+    if (!selection) {
+      selection = learningProgressService.forceGenerateDailySelection(allWords, 'moderate');
+    }
     setDailySelection(selection);
-  }, []);
+    refreshStats();
+  }, [allWords, refreshStats]);
 
   useEffect(() => {
-    if (allWords.length > 0) {
-      loadTodaySelection();
-      refreshStats();
-    }
-  }, [allWords, loadTodaySelection, refreshStats]);
+    if (!dailySelection) return;
+
+    const selectionWords = [...dailySelection.newWords, ...dailySelection.reviewWords]
+      .map(p => allWords.find(w => w.word === p.word && w.category === p.category))
+      .filter((w): w is VocabularyWord => Boolean(w));
+
+    setTodayWords(selectionWords);
+  }, [dailySelection, allWords]);
 
   const getDueReviewWords = useCallback(() => {
     return learningProgressService.getDueReviewWords();
@@ -71,10 +81,10 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     generateDailyWords,
     markWordAsPlayed,
     getWordProgress,
-    loadTodaySelection,
     refreshStats,
     getDueReviewWords,
     getRetiredWords,
-    retireCurrentWord
+    retireCurrentWord,
+    todayWords
   };
 };

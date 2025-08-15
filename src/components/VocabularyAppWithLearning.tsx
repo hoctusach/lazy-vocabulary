@@ -19,7 +19,8 @@ const VocabularyAppWithLearning: React.FC = () => {
     refreshStats,
     getDueReviewWords,
     getRetiredWords,
-    retireCurrentWord
+    retireCurrentWord,
+    todayWords
   } = useLearningProgress(allWords);
 
   // Load vocabulary data
@@ -148,8 +149,9 @@ const VocabularyAppWithLearning: React.FC = () => {
           </TabsContent>
           
           <TabsContent value="practice" className="space-y-4">
-            <VocabularyAppContainerNew 
-              isActive={activeTab === 'practice'} 
+            <VocabularyAppContainerNew
+              isActive={activeTab === 'practice'}
+              initialWords={todayWords}
               onRetireWord={() => {
                 const currentWord = vocabularyService.getCurrentWord();
                 if (currentWord) {

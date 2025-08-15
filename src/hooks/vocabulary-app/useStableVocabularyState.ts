@@ -1,9 +1,10 @@
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
 import { vocabularyService } from '@/services/vocabularyService';
+import { VocabularyWord } from '@/types/vocabulary';
 
-export const useStableVocabularyState = () => {
+export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
   const [userInteractionState, setUserInteractionState] = useState({
     hasInitialized: false,
     interactionCount: 0,
@@ -11,7 +12,7 @@ export const useStableVocabularyState = () => {
   });
 
   // Use stable reference for the unified controller
-  const controllerState = useUnifiedVocabularyController();
+  const controllerState = useUnifiedVocabularyController(initialWords);
   
   // Memoize computed values to prevent recalculation
   const nextVoiceLabel = useMemo(() => {
