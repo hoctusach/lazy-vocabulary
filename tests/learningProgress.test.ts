@@ -47,18 +47,18 @@ describe('LearningProgressService', () => {
       expect(totalCount).toBeLessThanOrEqual(mockWords.length);
       expect(totalCount).toBeGreaterThan(0);
       
-      // Check 40/60 ratio (±1 acceptable) when possible and when review words exist
-      if (totalCount >= 5 && reviewCount > 0) {
-        const expectedNew = Math.round(totalCount * 0.4);
-        const expectedReview = totalCount - expectedNew;
-        
-        expect(Math.abs(newCount - expectedNew)).toBeLessThanOrEqual(1);
-        expect(Math.abs(reviewCount - expectedReview)).toBeLessThanOrEqual(1);
-      } else {
-        // When no review words available, all should be new words
-        expect(newCount).toBe(totalCount);
-        expect(reviewCount).toBe(0);
-      }
+        // Check 10/90 ratio (±1 acceptable) when possible and when review words exist
+        if (totalCount >= 5 && reviewCount > 0) {
+          const expectedNew = Math.round(totalCount * 0.1);
+          const expectedReview = totalCount - expectedNew;
+
+          expect(Math.abs(newCount - expectedNew)).toBeLessThanOrEqual(1);
+          expect(Math.abs(reviewCount - expectedReview)).toBeLessThanOrEqual(1);
+        } else {
+          // When no review words available, all should be new words
+          expect(newCount).toBe(totalCount);
+          expect(reviewCount).toBe(0);
+        }
     });
 
     it('should handle fallback when no review words available (TC002)', () => {
@@ -182,9 +182,8 @@ describe('LearningProgressService', () => {
 
       const selection = service.forceGenerateDailySelection(allWords, 'light');
 
-      expect(selection.reviewWords.map(w => w.word)).toEqual(['due1', 'due2', 'due3']);
-      expect(selection.reviewWords.find(w => w.word === 'due4')).toBeUndefined();
-      expect(selection.newWords.length).toBe(2);
+      expect(selection.reviewWords.map(w => w.word)).toEqual(['due1', 'due2', 'due3', 'due4']);
+      expect(selection.newWords.length).toBe(1);
       expect(selection.totalCount).toBe(5);
     });
 

@@ -260,8 +260,8 @@ export class LearningProgressService {
       .filter(p => p.isLearned && p.nextReviewDate <= today)
       .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
 
-    // Determine how many review words to include (60% of total)
-    const targetReviewCount = Math.round(totalCount * 0.6);
+    // Determine how many review words to include (90% review / 10% new split)
+    const targetReviewCount = Math.round(totalCount * 0.9);
     const selectedReview = dueWords.slice(0, targetReviewCount);
 
     // Fill remaining slots with new words while keeping total count
