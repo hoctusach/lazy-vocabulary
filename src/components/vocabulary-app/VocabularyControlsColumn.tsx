@@ -12,7 +12,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { RetireWordDialog } from '@/components/RetireWordDialog';
+import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -92,14 +92,14 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [isRetireDialogOpen, setIsRetireDialogOpen] = React.useState(false);
+  const [isMarkDialogOpen, setIsMarkDialogOpen] = React.useState(false);
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
-  
-  const handleRetireClick = () => setIsRetireDialogOpen(true);
-  const handleRetireConfirm = () => {
+
+  const handleMarkClick = () => setIsMarkDialogOpen(true);
+  const handleMarkConfirm = () => {
     if (onMarkWordLearned) onMarkWordLearned();
-    setIsRetireDialogOpen(false);
+    setIsMarkDialogOpen(false);
     toast('Word learned for 100 days');
   };
 
@@ -175,7 +175,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleRetireClick}
+          onClick={handleMarkClick}
           className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
           title="Mark as Learned"
           aria-label="Mark as Learned"
@@ -187,10 +187,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       
       <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
       
-      <RetireWordDialog
-        isOpen={isRetireDialogOpen}
-        onClose={() => setIsRetireDialogOpen(false)}
-        onConfirm={handleRetireConfirm}
+      <MarkAsLearnedDialog
+        isOpen={isMarkDialogOpen}
+        onClose={() => setIsMarkDialogOpen(false)}
+        onConfirm={handleMarkConfirm}
         wordText={currentWord?.word || ''}
       />
     </div>

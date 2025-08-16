@@ -10,14 +10,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-interface RetireWordDialogProps {
+interface MarkAsLearnedDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   wordText: string;
 }
 
-export const RetireWordDialog: React.FC<RetireWordDialogProps> = ({
+export const MarkAsLearnedDialog: React.FC<MarkAsLearnedDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
