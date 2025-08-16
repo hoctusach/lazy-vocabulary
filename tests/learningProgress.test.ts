@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
 import { VocabularyWord } from '@/types/vocabulary';
 import { LearningProgress } from '@/types/learning';
+import { EXPOSURE_DELAYS } from '@/services/timingCalculator';
 
 // Mock localStorage
 const localStorageMock = {
@@ -194,6 +195,33 @@ describe('LearningProgressService', () => {
       expect(updatedProgress.status).toBe('due');
       expect(updatedProgress.lastPlayedDate).toBeTruthy();
       expect(updatedProgress.nextReviewDate).toBeTruthy();
+    });
+
+    it('should reset daily exposures and calculate next allowed time', () => {
+      const word = mockWords[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString();
+      const progress = {
+        ...service.initializeWord(word),
+        exposuresToday: 2,
+        lastExposureTime: yesterday,
+        nextAllowedTime: yesterday
+      };
+
+      localStorageMock.getItem.mockReturnValue(JSON.stringify({
+        [word.word]: progress
+      }));
+
+      service.updateWordProgress(word.word);
+
+      const lastCall = localStorageMock.setItem.mock.calls.at(-1);
+      const savedData = JSON.parse(lastCall[1]);
+      const updatedProgress = savedData[word.word];
+
+      expect(updatedProgress.exposuresToday).toBe(1);
+
+      const expectedNext = new Date(updatedProgress.lastExposureTime);
+      expectedNext.setMinutes(expectedNext.getMinutes() + EXPOSURE_DELAYS[1]);
+      expect(updatedProgress.nextAllowedTime).toBe(expectedNext.toISOString());
     });
 
     it('should calculate correct next review dates (TC006)', () => {
