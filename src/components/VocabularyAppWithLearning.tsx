@@ -11,8 +11,10 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { saveTodayLastWord } from '@/utils/lastWordStorage';
+import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 
 const VocabularyAppWithLearning: React.FC = () => {
+  useDailyUsageTracker('default');
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
