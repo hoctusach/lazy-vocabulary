@@ -55,8 +55,11 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   useEffect(() => {
     if (!dailySelection) return;
 
+    const dueProgress = learningProgressService.getDueReviewWords();
+    const reviewWords = [...dueProgress, ...dailySelection.reviewWords];
+
     const words = buildTodaysWords(
-      dailySelection.reviewWords,
+      reviewWords,
       dailySelection.newWords,
       allWords,
       'ALL'
@@ -68,11 +71,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const getDueReviewWords = useCallback(() => {
     return learningProgressService.getDueReviewWords();
   }, []);
-
-  const getDueReviewWordList = useCallback((): VocabularyWord[] => {
-    const dueProgress = learningProgressService.getDueReviewWords();
-    return buildTodaysWords(dueProgress, [], allWords, 'ALL');
-  }, [allWords]);
 
   const getLearnedWords = useCallback(() => {
     return learningProgressService.getLearnedWords();
@@ -120,7 +118,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getWordProgress,
     refreshStats,
     getDueReviewWords,
-    getDueReviewWordList,
     getLearnedWords,
     markWordLearned,
     markWordAsNew,
