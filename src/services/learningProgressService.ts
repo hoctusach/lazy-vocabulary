@@ -132,16 +132,20 @@ export class LearningProgressService {
     }
   }
 
-  retireWord(wordKey: string): void {
+  /**
+   * Permanently marks a word as learned and removes it from the review cycle
+   */
+  markWordLearned(wordKey: string): void {
     const progressMap = this.getLearningProgress();
     const progress = progressMap.get(wordKey);
-    
+
     if (progress) {
       const today = this.getToday();
       progress.status = 'learned';
       progress.learnedDate = today;
+      // push review far into the future so it no longer appears in daily selections
       progress.nextReviewDate = this.addDays(today, 100);
-      
+
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
     }
@@ -312,7 +316,7 @@ export class LearningProgressService {
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
       due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
-      retired: all.filter(p => p.status === 'learned').length
+      learnedCompleted: all.filter(p => p.status === 'learned').length
     };
   }
 
@@ -322,7 +326,7 @@ export class LearningProgressService {
     return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
   }
 
-  getRetiredWords(): LearningProgress[] {
+  getLearnedWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
     return Array.from(progressMap.values())
       .filter(p => p.status === 'learned')
