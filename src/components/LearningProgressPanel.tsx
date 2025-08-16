@@ -50,28 +50,28 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         {/* Progress Stats */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{totalHours.toFixed(1)}</div>
-            <div className="text-sm text-gray-600">Hours Learned</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
-            <div className="text-sm text-gray-600">Total Words</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{progressStats.learned}</div>
-            <div className="text-sm text-gray-600">Learning</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
-            <div className="text-sm text-gray-600">New</div>
+            <div className="text-2xl font-bold text-gray-600">{progressStats.learnedCompleted}</div>
+            <div className="text-sm text-gray-600">Learned</div>
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-600">{progressStats.learnedCompleted}</div>
-            <div className="text-sm text-gray-600">Learned</div>
+            <div className="text-2xl font-bold text-green-600">{progressStats.learned}</div>
+            <div className="text-sm text-gray-600">Learning</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">{totalHours.toFixed(1)}</div>
+            <div className="text-sm text-gray-600">Hours Learned</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
+            <div className="text-sm text-gray-600">New</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
+            <div className="text-sm text-gray-600">Total</div>
           </div>
         </div>
 
