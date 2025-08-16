@@ -66,8 +66,16 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                   {progressStats.due}
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="max-w-xs text-center">
-                Reviews use a 2→4→7→12→20→35-day sequence within a 60-day master cycle.
+              <TooltipContent className="max-w-xs text-left">
+                <div className="space-y-1">
+                  <p className="font-bold">How DUE REVIEW work?</p>
+                  <p>
+                    Each correct review pushes the next one farther out, following a
+                    2→4→7→12→20→35-day sequence within a 60-day
+                    master cycle.
+                  </p>
+                  <p>Missed reviews reset the schedule, so stay consistent!</p>
+                </div>
               </TooltipContent>
             </Tooltip>
             <div className="text-sm text-gray-600">Due Review</div>

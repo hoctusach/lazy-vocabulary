@@ -49,7 +49,7 @@ describe('LearningProgressPanel', () => {
     const dueTrigger = (await screen.findAllByRole('button', { name: /due review count/i }))[0];
     await user.click(dueTrigger);
 
-    const tooltipTexts = await screen.findAllByText(/2→4→7→12→20→35-day sequence within a 60-day master cycle/i);
+    const tooltipTexts = await screen.findAllByText(/Each correct review pushes the next one farther out/i);
     expect(tooltipTexts.length).toBeGreaterThan(0);
   });
 });
