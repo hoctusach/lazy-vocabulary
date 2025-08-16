@@ -217,13 +217,6 @@ export class SpeechExecutionCore {
 
   setMuted(muted: boolean): void {
     console.log(`[SPEECH-CORE] Setting muted: ${muted}`);
-    
-    if (muted && this.stateManager.getState().isActive) {
-      this.stopInternal();
-    } else if (muted) {
-      this.autoAdvanceTimer.clear();
-    }
-    
     this.stateManager.setMuted(muted);
   }
 

@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Hook for managing playback controls like mute and pause functionality
@@ -18,6 +19,7 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (savedSettings) {
         const { muted: savedMuted } = JSON.parse(savedSettings);
         setMuted(!!savedMuted);
+        unifiedSpeechController.setMuted(!!savedMuted);
       }
     } catch (error) {
       console.error('Error loading saved settings:', error);
@@ -43,34 +45,26 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
     console.log('Toggle mute called');
     setMuted(prev => {
       const newMuted = !prev;
-      
+      unifiedSpeechController.setMuted(newMuted);
+
       if (newMuted) {
-        // When muting, cancel any current speech
-        console.log('Audio muted, speech canceled');
-        cancelSpeech();
         toast.info("Audio playback muted");
       } else {
-        // When unmuting, don't cancel speech - this was a key issue
-        // Instead, restart playback of current word
-        console.log('Unmuted, playback will resume with current word');
-        
-        // Don't use setTimeout here - it causes race conditions
-        // Check paused state immediately and play if not paused
         if (!paused) {
           playCurrentWord();
           toast.success("Audio playback resumed");
         }
       }
-      
+
       return newMuted;
     });
-  }, [cancelSpeech, paused, playCurrentWord]);
+  }, [paused, playCurrentWord]);
   
   // Function to toggle pause with full speech handling
   const togglePause = useCallback(() => {
     setPaused(prev => {
       const newPaused = !prev;
-      
+
       if (newPaused) {
         // When pausing, cancel current speech
         cancelSpeech();
@@ -79,15 +73,13 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       } else {
         // When unpausing, play current word immediately
         console.log('Playback unpaused, will resume with current word');
-        if (!muted) {
-          playCurrentWord();
-          toast.success("Playback resumed");
-        }
+        playCurrentWord();
+        toast.success("Playback resumed");
       }
-      
+
       return newPaused;
     });
-  }, [cancelSpeech, muted, playCurrentWord]);
+  }, [cancelSpeech, playCurrentWord]);
   
   return {
     muted,
