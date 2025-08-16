@@ -9,7 +9,9 @@ export const unlockAudio = (): Promise<boolean> => {
       console.log("[ENGINE] Attempting audio unlock");
 
       const AudioCtx =
-        window.AudioContext || (window as any).webkitAudioContext;
+        window.AudioContext ||
+        (window as Window & { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
       if (AudioCtx) {
         try {
           if (!audioCtx) {
