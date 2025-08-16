@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, Archive } from 'lucide-react';
@@ -12,7 +11,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { RetireWordDialog } from '@/components/RetireWordDialog';
+import { MarkWordAsLearnedDialog } from '@/components/MarkWordAsLearnedDialog';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -26,7 +25,7 @@ interface VocabularyControlsColumnProps {
   onOpenEditModal: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onRetireWord?: () => void;
+  onMarkWordAsLearned?: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -41,11 +40,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenEditModal,
   selectedVoiceName,
   playCurrentWord,
-  onRetireWord
+  onMarkWordAsLearned
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
-  
+
   const trackEvent = (name: string, label: string, value?: number) => {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('event', name, {
@@ -92,15 +91,15 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [isRetireDialogOpen, setIsRetireDialogOpen] = React.useState(false);
+  const [isLearnedDialogOpen, setIsLearnedDialogOpen] = React.useState(false);
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
-  
-  const handleRetireClick = () => setIsRetireDialogOpen(true);
-  const handleRetireConfirm = () => {
-    if (onRetireWord) onRetireWord();
-    setIsRetireDialogOpen(false);
-    toast('Word retired for 100 days');
+
+  const handleMarkAsLearnedClick = () => setIsLearnedDialogOpen(true);
+  const handleMarkAsLearnedConfirm = () => {
+    if (onMarkWordAsLearned) onMarkWordAsLearned();
+    setIsLearnedDialogOpen(false);
+    toast('Word marked as learned');
   };
 
   return (
@@ -170,27 +169,27 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       >
         <Search size={16} />
       </Button>
-      
-      {onRetireWord && (
+
+      {onMarkWordAsLearned && (
         <Button
           variant="outline"
           size="sm"
-          onClick={handleRetireClick}
+          onClick={handleMarkAsLearnedClick}
           className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
-          title="Retire Word"
-          aria-label="Retire Word"
+          title="Mark as Learned"
+          aria-label="Mark as Learned"
           disabled={!currentWord}
         >
           <Archive size={16} />
         </Button>
       )}
-      
+
       <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
-      
-      <RetireWordDialog
-        isOpen={isRetireDialogOpen}
-        onClose={() => setIsRetireDialogOpen(false)}
-        onConfirm={handleRetireConfirm}
+
+      <MarkWordAsLearnedDialog
+        isOpen={isLearnedDialogOpen}
+        onClose={() => setIsLearnedDialogOpen(false)}
+        onConfirm={handleMarkAsLearnedConfirm}
         wordText={currentWord?.word || ''}
       />
     </div>

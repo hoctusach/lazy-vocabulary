@@ -10,14 +10,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-interface RetireWordDialogProps {
+interface MarkWordAsLearnedDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   wordText: string;
 }
 
-export const RetireWordDialog: React.FC<RetireWordDialogProps> = ({
+export const MarkWordAsLearnedDialog: React.FC<MarkWordAsLearnedDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -27,17 +27,17 @@ export const RetireWordDialog: React.FC<RetireWordDialogProps> = ({
     <AlertDialog open={isOpen} onOpenChange={onClose}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Retire Word</AlertDialogTitle>
+          <AlertDialogTitle>Mark Word as Learned</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to retire "{wordText}"? 
+            Are you sure you want to mark "{wordText}" as learned?
             <br /><br />
-            This word will be hidden from your daily practice and will automatically 
+            This word will be hidden from your daily practice and will automatically
             reappear after 100 days for review.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Retire Word</AlertDialogAction>
+          <AlertDialogAction onClick={onConfirm}>Mark as Learned</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
