@@ -152,7 +152,7 @@ const VocabularyAppWithLearning: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto p-4">
         <VocabularyAppContainerNew
           initialWords={todayWords}
-          onRetireWord={() => {
+          onMarkWordLearned={() => {
             const currentWord = vocabularyService.getCurrentWord();
             if (currentWord) {
               retireCurrentWord(currentWord.word);

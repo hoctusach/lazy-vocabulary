@@ -26,7 +26,7 @@ interface VocabularyControlsColumnProps {
   onOpenEditModal: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onRetireWord?: () => void;
+  onMarkWordLearned?: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -41,7 +41,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenEditModal,
   selectedVoiceName,
   playCurrentWord,
-  onRetireWord
+  onMarkWordLearned
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -98,7 +98,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   
   const handleRetireClick = () => setIsRetireDialogOpen(true);
   const handleRetireConfirm = () => {
-    if (onRetireWord) onRetireWord();
+    if (onMarkWordLearned) onMarkWordLearned();
     setIsRetireDialogOpen(false);
     toast('Word retired for 100 days');
   };
@@ -171,7 +171,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Search size={16} />
       </Button>
       
-      {onRetireWord && (
+      {onMarkWordLearned && (
         <Button
           variant="outline"
           size="sm"
