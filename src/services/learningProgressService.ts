@@ -134,7 +134,7 @@ export class LearningProgressService {
     
     if (progress) {
       const today = this.getToday();
-      progress.status = 'retired';
+      progress.status = 'learned';
       progress.learnedDate = today;
       progress.nextReviewDate = this.addDays(today, 100);
       
@@ -149,7 +149,7 @@ export class LearningProgressService {
     let hasChanges = false;
 
     progressMap.forEach((progress, key) => {
-      if (progress.status === 'retired') return;
+      if (progress.status === 'learned') return;
 
       if (progress.isLearned) {
         if (progress.nextReviewDate <= today && progress.status !== 'due') {
@@ -210,7 +210,7 @@ export class LearningProgressService {
     const totalCount = Math.min(idealCount, maxPossibleCount);
 
     // Get available words
-    const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'retired');
+    const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'learned');
     const dueWords = Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
 
     // Always include all due review words
@@ -308,7 +308,7 @@ export class LearningProgressService {
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
       due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
-      learnedCompleted: all.filter(p => p.status === 'retired').length
+      retired: all.filter(p => p.status === 'learned').length
     };
   }
 
@@ -321,7 +321,7 @@ export class LearningProgressService {
   getRetiredWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
     return Array.from(progressMap.values())
-      .filter(p => p.status === 'retired')
+      .filter(p => p.status === 'learned')
       .sort((a, b) => a.word.localeCompare(b.word)); // Sort alphabetically
   }
 }

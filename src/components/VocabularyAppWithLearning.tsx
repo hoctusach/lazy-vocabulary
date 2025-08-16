@@ -121,7 +121,7 @@ const VocabularyAppWithLearning: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Retired ({progressStats.learnedCompleted})</h4>
+                <h4 className="font-medium text-gray-600">Learned ({progressStats.retired})</h4>
                 <div className="space-y-1 max-h-60 overflow-y-auto">
                   {progressStats.learnedCompleted > 0 ? (
                     getRetiredWords().map((word, index) => (
