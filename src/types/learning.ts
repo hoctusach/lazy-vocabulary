@@ -5,6 +5,9 @@ export interface LearningProgress {
   isLearned: boolean;
   reviewCount: number;
   lastPlayedDate: string;
+  exposuresToday: number;
+  lastExposureTime: string;
+  nextAllowedTime: string;
   status: 'due' | 'not_due' | 'new' | 'retired';
   nextReviewDate: string;
   createdDate: string;
