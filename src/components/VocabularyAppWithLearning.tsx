@@ -20,7 +20,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     markWordAsPlayed,
     getDueReviewWords,
     getLearnedWords,
-    markCurrentWordLearned,
+    markWordLearned,
     todayWords
   } = useLearningProgress(allWords);
 
@@ -57,6 +57,8 @@ const VocabularyAppWithLearning: React.FC = () => {
       vocabularyService.removeVocabularyChangeListener(handleWordChange);
     };
   }, [markWordAsPlayed]);
+
+  const learnedWords = getLearnedWords();
 
   const learningSection = (
     <div className="space-y-4 mt-4">
@@ -122,10 +124,10 @@ const VocabularyAppWithLearning: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Learned ({progressStats.learnedCompleted})</h4>
+                <h4 className="font-medium text-gray-600">Learned ({learnedWords.length})</h4>
                 <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {progressStats.learnedCompleted > 0 ? (
-                    getLearnedWords().map((word, index) => (
+                  {learnedWords.length > 0 ? (
+                    learnedWords.map((word, index) => (
                       <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
                         <div className="font-medium text-gray-700">{word.word}</div>
                         <div className="text-xs text-gray-500">
@@ -156,7 +158,7 @@ const VocabularyAppWithLearning: React.FC = () => {
           onMarkWordLearned={() => {
             const currentWord = vocabularyService.getCurrentWord();
             if (currentWord) {
-              markCurrentWordLearned(currentWord.word);
+              markWordLearned(currentWord.word);
             }
           }}
           additionalContent={learningSection}
