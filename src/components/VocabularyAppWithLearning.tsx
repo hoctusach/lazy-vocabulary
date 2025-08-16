@@ -23,8 +23,6 @@ const VocabularyAppWithLearning: React.FC = () => {
     todayWords
   } = useLearningProgress(allWords);
 
-  const dueReviewWords = getDueReviewWords();
-
   // Load vocabulary data
   useEffect(() => {
     console.log("VocabularyAppWithLearning - loading vocabulary data");
@@ -72,7 +70,6 @@ const VocabularyAppWithLearning: React.FC = () => {
             <LearningProgressPanel
               dailySelection={dailySelection}
               progressStats={progressStats}
-              dueReviewWords={dueReviewWords}
               onGenerateDaily={generateDailyWords}
               onRefresh={refreshStats}
             />
@@ -95,11 +92,27 @@ const VocabularyAppWithLearning: React.FC = () => {
                     </div>
                   )}
                   
+                  {dailySelection.reviewWords.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-blue-600">Review Words ({dailySelection.reviewWords.length})</h4>
+                      <div className="space-y-1 max-h-60 overflow-y-auto">
+                        {dailySelection.reviewWords.map((word, index) => (
+                          <div key={index} className="text-sm p-2 bg-blue-50 rounded border">
+                            <div className="font-medium">{word.word}</div>
+                            <div className="text-xs text-gray-600">
+                              {word.category} • Review #{word.reviewCount}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {progressStats.due > 0 && (
                     <div className="space-y-2">
                       <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
                       <div className="space-y-1 max-h-60 overflow-y-auto">
-                        {dueReviewWords.map((word, index) => (
+                        {getDueReviewWords().map((word, index) => (
                           <div key={index} className="text-sm p-2 bg-red-50 rounded border">
                             <div className="font-medium">{word.word}</div>
                             <div className="text-xs text-gray-600">
