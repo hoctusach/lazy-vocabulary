@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
 import { VocabularyWord } from '@/types/vocabulary';
 import { LearningProgress } from '@/types/learning';
+import { EXPOSURE_DELAYS } from '@/services/timingCalculator';
 
 // Mock localStorage
 const localStorageMock = {
@@ -135,12 +136,12 @@ describe('LearningProgressService', () => {
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
       const progressData: Record<string, LearningProgress> = {
-        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
-        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
-        new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new4: { word: 'new4', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today }
+        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new4: { word: 'new4', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today }
       };
 
       localStorageMock.getItem.mockImplementation((key) => {
@@ -196,6 +197,33 @@ describe('LearningProgressService', () => {
       expect(updatedProgress.nextReviewDate).toBeTruthy();
     });
 
+    it('should reset daily exposures and calculate next allowed time', () => {
+      const word = mockWords[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString();
+      const progress = {
+        ...service.initializeWord(word),
+        exposuresToday: 2,
+        lastExposureTime: yesterday,
+        nextAllowedTime: yesterday
+      };
+
+      localStorageMock.getItem.mockReturnValue(JSON.stringify({
+        [word.word]: progress
+      }));
+
+      service.updateWordProgress(word.word);
+
+      const lastCall = localStorageMock.setItem.mock.calls.at(-1);
+      const savedData = JSON.parse(lastCall[1]);
+      const updatedProgress = savedData[word.word];
+
+      expect(updatedProgress.exposuresToday).toBe(1);
+
+      const expectedNext = new Date(updatedProgress.lastExposureTime);
+      expectedNext.setMinutes(expectedNext.getMinutes() + EXPOSURE_DELAYS[1]);
+      expect(updatedProgress.nextAllowedTime).toBe(expectedNext.toISOString());
+    });
+
     it('should calculate correct next review dates (TC006)', () => {
       const today = new Date().toISOString().split('T')[0];
       
@@ -225,11 +253,11 @@ describe('LearningProgressService', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const mockProgress = {
-        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today },
-        'word2': { isLearned: false, status: 'new', nextReviewDate: today },
-        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday },
-        'word4': { isLearned: false, status: 'new', nextReviewDate: today },
-      };
+        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word2': { isLearned: false, status: 'new', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word4': { isLearned: false, status: 'new', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+      } as Record<string, LearningProgress>;
 
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
       
@@ -252,6 +280,9 @@ describe('LearningProgressService', () => {
           isLearned: true,
           reviewCount: 1,
           lastPlayedDate: '',
+          exposuresToday: 0,
+          lastExposureTime: '',
+          nextAllowedTime: '',
           status: 'not_due',
           nextReviewDate: today,
           createdDate: today
@@ -262,6 +293,9 @@ describe('LearningProgressService', () => {
           isLearned: true,
           reviewCount: 1,
           lastPlayedDate: '',
+          exposuresToday: 0,
+          lastExposureTime: '',
+          nextAllowedTime: '',
           status: 'not_due',
           nextReviewDate: tomorrow,
           createdDate: today

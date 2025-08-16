@@ -1,6 +1,7 @@
 import { LearningProgress, DailySelection, SeverityLevel, CategoryWeights } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { getLocalDateISO } from '@/utils/date';
+import { TimingCalculator } from './timingCalculator';
 
 const LEARNING_PROGRESS_KEY = 'learningProgress';
 const DAILY_SELECTION_KEY = 'dailySelection';
@@ -8,6 +9,8 @@ const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
 
 export class LearningProgressService {
   private static instance: LearningProgressService;
+
+  private timingCalculator = new TimingCalculator();
   
   private readonly severityConfig = {
     light: { min: 15, max: 25 },
@@ -59,15 +62,29 @@ export class LearningProgressService {
   private getLearningProgress(): Map<string, LearningProgress> {
     const stored = localStorage.getItem(LEARNING_PROGRESS_KEY);
     const progressMap = new Map<string, LearningProgress>();
-    
+    let needsSave = false;
+
     if (stored) {
       const data = JSON.parse(stored);
       Object.entries(data).forEach(([key, value]) => {
         const progress = this.migrateProgressData(value as LearningProgress);
+
+        if (progress.lastExposureTime) {
+          const lastDate = getLocalDateISO(new Date(progress.lastExposureTime));
+          if (lastDate !== this.getToday() && progress.exposuresToday !== 0) {
+            progress.exposuresToday = 0;
+            needsSave = true;
+          }
+        }
+
         progressMap.set(key, progress);
       });
+
+      if (needsSave) {
+        this.saveLearningProgress(progressMap);
+      }
     }
-    
+
     return progressMap;
   }
 
@@ -76,7 +93,10 @@ export class LearningProgressService {
       status: 'new' as const,
       retiredDate: undefined,
       nextReviewDate: this.getToday(),
-      createdDate: this.getToday()
+      createdDate: this.getToday(),
+      exposuresToday: 0,
+      lastExposureTime: '',
+      nextAllowedTime: new Date().toISOString()
     };
 
     return {
@@ -84,7 +104,10 @@ export class LearningProgressService {
       status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
       nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
-      retiredDate: progress.retiredDate || DEFAULT_VALUES.retiredDate
+      retiredDate: progress.retiredDate || DEFAULT_VALUES.retiredDate,
+      exposuresToday: progress.exposuresToday ?? DEFAULT_VALUES.exposuresToday,
+      lastExposureTime: progress.lastExposureTime || DEFAULT_VALUES.lastExposureTime,
+      nextAllowedTime: progress.nextAllowedTime || DEFAULT_VALUES.nextAllowedTime
     };
   }
 
@@ -95,6 +118,7 @@ export class LearningProgressService {
 
   initializeWord(word: VocabularyWord): LearningProgress {
     const today = this.getToday();
+    const now = new Date().toISOString();
     return {
       word: word.word,
       type: word.category || 'unknown',
@@ -102,6 +126,9 @@ export class LearningProgressService {
       isLearned: false,
       reviewCount: 0,
       lastPlayedDate: '',
+      exposuresToday: 0,
+      lastExposureTime: '',
+      nextAllowedTime: now,
       status: 'new',
       nextReviewDate: today,
       createdDate: today
@@ -114,6 +141,14 @@ export class LearningProgressService {
     
     if (progress) {
       const today = this.getToday();
+      const now = new Date().toISOString();
+      const lastDate = progress.lastExposureTime ? getLocalDateISO(new Date(progress.lastExposureTime)) : null;
+      if (lastDate !== today) {
+        progress.exposuresToday = 0;
+      }
+      progress.exposuresToday += 1;
+      progress.lastExposureTime = now;
+      progress.nextAllowedTime = this.timingCalculator.calculateNextAllowedTime(progress.exposuresToday, now);
       progress.lastPlayedDate = today;
       progress.isLearned = true;
       progress.reviewCount += 1;
