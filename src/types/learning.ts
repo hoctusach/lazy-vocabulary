@@ -9,6 +9,8 @@ export interface LearningProgress {
   nextReviewDate: string;
   createdDate: string;
   learnedDate?: string;
+  exposuresToday?: number;
+  lastExposureTime?: string;
   nextAllowedTime?: string;
 }
 
