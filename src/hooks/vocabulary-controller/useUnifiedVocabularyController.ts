@@ -8,7 +8,7 @@ import { useSpeechIntegration } from './core/useSpeechIntegration';
 import { useWordNavigation } from './core/useWordNavigation';
 import { useVocabularyControls } from './core/useVocabularyControls';
 import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
-import { saveLastWord } from '@/utils/lastWordStorage';
+import { saveLastWord, saveTodayLastWord } from '@/utils/lastWordStorage';
 import { VocabularyWord } from '@/types/vocabulary';
 
 /**
@@ -77,6 +77,7 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
     const nextWord = wordList[nextIndex];
     if (nextWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
+      saveTodayLastWord(nextWord.word, nextWord.category);
       if (!isMuted && !isPaused) {
         unifiedSpeechController.speak(nextWord, selectedVoiceName);
       }
@@ -159,8 +160,9 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
   useEffect(() => {
     if (currentWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
+      saveTodayLastWord(currentWord.word, currentWord.category);
     }
-  }, [currentWord?.word]);
+  }, [currentWord?.word, currentWord?.category]);
 
   // Cleanup on unmount
   useEffect(() => {

@@ -7,6 +7,7 @@ import { useVocabularyDataLoader } from '@/hooks/vocabulary-controller/core/useV
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
+import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 vi.mock('@/services/vocabularyService', () => ({
   vocabularyService: {
@@ -24,7 +25,7 @@ vi.mock('@/services/learningProgressService', () => ({
   }
 }));
 
-vi.mock('@/utils/lastWordStorage', () => ({ getLastWord: vi.fn() }));
+vi.mock('@/utils/lastWordStorage', () => ({ getTodayLastWord: vi.fn() }));
 vi.mock('@/utils/text/findFuzzyIndex', () => ({ findFuzzyIndex: vi.fn() }));
 
 const localStorageMock = {
@@ -35,11 +36,14 @@ const localStorageMock = {
 };
 Object.defineProperty(global, 'localStorage', { value: localStorageMock });
 
+const getTodayLastWordMock = getTodayLastWord as unknown as vi.Mock;
+
 describe('useVocabularyDataLoader nextAllowedTime handling', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
     localStorageMock.getItem.mockReturnValue(null);
+    getTodayLastWordMock.mockReturnValue(undefined);
   });
 
   afterEach(() => {
@@ -77,6 +81,40 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
 
     expect(setWordList).toHaveBeenCalled();
     expect(setHasData).toHaveBeenCalledWith(true);
+    expect(setCurrentIndex).toHaveBeenCalledWith(1);
+  });
+
+  it('resumes from saved last word for today', () => {
+    const words: VocabularyWord[] = [
+      { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
+      { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
+    ];
+    vocabularyService.getWordList.mockReturnValue(words);
+    vocabularyService.getCurrentSheetName.mockReturnValue('c');
+
+    const now = new Date('2024-01-01T10:00:00Z').getTime();
+    vi.setSystemTime(now);
+
+    learningProgressService.getTodaySelection.mockReturnValue({
+      newWords: [
+        { word: 'a', category: 'c', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: '', createdDate: '', nextAllowedTime: new Date(now - 60000).toISOString() },
+        { word: 'b', category: 'c', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: '', createdDate: '', nextAllowedTime: new Date(now - 60000).toISOString() }
+      ],
+      reviewWords: [],
+      totalCount: 2,
+      severity: 'light'
+    });
+
+    getTodayLastWordMock.mockReturnValue({ word: 'b', category: 'c' });
+
+    const setWordList = vi.fn();
+    const setHasData = vi.fn();
+    const setCurrentIndex = vi.fn();
+
+    renderHook(() =>
+      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 'v', vi.fn())
+    );
+
     expect(setCurrentIndex).toHaveBeenCalledWith(1);
   });
 

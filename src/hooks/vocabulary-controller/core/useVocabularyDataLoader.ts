@@ -4,6 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
 import { BUTTON_STATES_KEY, PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
+import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 /**
  * Data loading and persistence
@@ -81,7 +82,19 @@ export const useVocabularyDataLoader = (
         setHasData(todayWords.length > 0);
 
         if (todayWords.length > 0) {
+          const saved = getTodayLastWord();
           const now = Date.now();
+
+          if (saved) {
+            const savedIndex = todayWords.findIndex(w =>
+              w.word === saved.word && w.category === saved.category
+            );
+            if (savedIndex >= 0) {
+              setCurrentIndex(savedIndex);
+              return;
+            }
+          }
+
           const dueIndex = todayWords.findIndex(w => {
             if (!w.nextAllowedTime) return true;
             return Date.parse(w.nextAllowedTime) <= now;
