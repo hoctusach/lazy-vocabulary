@@ -84,7 +84,10 @@ export class LearningProgressService {
       status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
       nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
-      learnedDate: progress.learnedDate || DEFAULT_VALUES.learnedDate
+      learnedDate:
+        (progress as any).learnedDate ||
+        (progress as any).retiredDate ||
+        DEFAULT_VALUES.learnedDate
     };
   }
 
