@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { saveTodayLastWord } from '@/utils/lastWordStorage';
+import { buildTodaysWords } from '@/utils/todayWords';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 
 const VocabularyAppWithLearning: React.FC = () => {
@@ -26,7 +27,6 @@ const VocabularyAppWithLearning: React.FC = () => {
     generateDailyWords,
     markWordAsPlayed,
     getDueReviewWords,
-    getDueReviewWordList,
     getLearnedWords,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
@@ -85,7 +85,8 @@ const VocabularyAppWithLearning: React.FC = () => {
   };
 
   const handlePlayDueReviews = (startIndex = 0) => {
-    const dueWords = getDueReviewWordList();
+    const dueProgress = getDueReviewWords();
+    const dueWords = buildTodaysWords(dueProgress, [], allWords, 'ALL');
     if (dueWords.length === 0) return;
     const startWord = dueWords[startIndex];
     if (startWord) {
