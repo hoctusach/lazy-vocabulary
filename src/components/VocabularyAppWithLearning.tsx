@@ -93,7 +93,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             <ChevronDown className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')} />
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-3">
               {dailySelection.newWords.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-medium text-green-600">Today's New ({dailySelection.newWords.length})</h4>
@@ -102,22 +102,6 @@ const VocabularyAppWithLearning: React.FC = () => {
                       <div key={index} className="text-sm p-2 bg-green-50 rounded border">
                         <div className="font-medium">{word.word}</div>
                         <div className="text-xs text-gray-600">{word.category}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {dailySelection.reviewWords.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-blue-600">Review Words ({dailySelection.reviewWords.length})</h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {dailySelection.reviewWords.map((word, index) => (
-                      <div key={index} className="text-sm p-2 bg-blue-50 rounded border">
-                        <div className="font-medium">{word.word}</div>
-                        <div className="text-xs text-gray-600">
-                          {word.category} • Review #{word.reviewCount}
-                        </div>
                       </div>
                     ))}
                   </div>
