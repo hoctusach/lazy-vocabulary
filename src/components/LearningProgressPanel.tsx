@@ -87,13 +87,13 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <h4 className="font-semibold">Today's Selection</h4>
             <div className="flex flex-wrap gap-2">
               <Badge variant="secondary" className="border-0">
-                Total: {dailySelection.totalCount}
+                Total: {dailySelection.newWords.length + progressStats.due}
               </Badge>
               <Badge variant="outline" className="text-green-600 border-0">
                 New: {dailySelection.newWords.length}
               </Badge>
               <Badge variant="outline" className="text-blue-600 border-0">
-                Review: {dailySelection.reviewWords.length}
+                Review: {progressStats.due}
               </Badge>
               <Badge variant="outline" className="border-0">
                 Level: {dailySelection.severity}
