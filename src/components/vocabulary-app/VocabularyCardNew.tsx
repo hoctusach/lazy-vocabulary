@@ -1,7 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel } from '@/utils/categoryLabels';
 import WordCountDisplay from './WordCountDisplay';
@@ -13,18 +11,8 @@ interface VocabularyCardNewProps {
   example: string;
   translation?: string;
   backgroundColor: string;
-  isMuted: boolean;
-  isPaused: boolean;
-  onToggleMute: () => void;
-  onTogglePause: () => void;
-  onCycleVoice: () => void;
-  onSwitchCategory: () => void;
-  onNextWord: () => void;
-  currentCategory: string;
-  nextCategory: string;
   isSpeaking: boolean;
   category: string;
-  selectedVoiceName: string;
   showWordCount?: boolean;
 }
 
@@ -34,22 +22,11 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   example,
   translation,
   backgroundColor,
-  isMuted,
-  isPaused,
-  onToggleMute,
-  onTogglePause,
-  onCycleVoice,
-  onSwitchCategory,
-  onNextWord,
-  currentCategory,
-  nextCategory,
   isSpeaking,
   category,
-  selectedVoiceName,
   showWordCount = false
 }) => {
   const categoryLabel = getCategoryLabel(category);
-  const nextCategoryLabel = getCategoryLabel(nextCategory);
 
   const currentWordObj = { word, meaning, example, translation, category };
   const { main, annotations } = parseWordAnnotations(word);

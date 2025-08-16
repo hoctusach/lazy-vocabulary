@@ -2,8 +2,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
-import { getCategoryLabel } from '@/utils/categoryLabels';
+import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
@@ -18,16 +17,17 @@ interface VocabularyCardProps {
   onToggleMute: () => void;
   onTogglePause: () => void;
   onCycleVoice: () => void;
-  onSwitchCategory: () => void;
   onNextWord: () => void;
-  currentCategory: string;
-  nextCategory: string;
   isSpeaking?: boolean;
   displayTime?: number;
   category?: string;
   selectedVoice: VoiceSelection;
   nextVoiceLabel: string;
   searchPreview?: boolean;
+  // Optional legacy props kept for backward compatibility
+  onSwitchCategory?: () => void;
+  currentCategory?: string;
+  nextCategory?: string;
 }
 
 const VocabularyCard: React.FC<VocabularyCardProps> = ({
@@ -41,10 +41,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   onToggleMute,
   onTogglePause,
   onCycleVoice,
-  onSwitchCategory,
   onNextWord,
-  currentCategory,
-  nextCategory,
   isSpeaking = false,
   category,
   selectedVoice,
@@ -68,7 +65,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const wordType = wordParts.length > 1 ? `(${wordParts[1]})` : '';
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
   const { main, annotations } = parseWordAnnotations(word);
-  const nextCategoryLabel = getCategoryLabel(nextCategory);
 
   const trackEvent = (name: string, label: string, value?: number) => {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
@@ -93,11 +89,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const handleNextClick = () => {
     trackEvent('next_word', 'Next');
     onNextWord();
-  };
-
-  const handleSwitchCategoryClick = () => {
-    trackEvent('switch_category', nextCategoryLabel);
-    onSwitchCategory();
   };
 
   const handleCycleVoiceClick = () => {
@@ -198,16 +189,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             >
               <SkipForward size={12} className="mr-1" />
               Next
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleSwitchCategoryClick}
-              className="h-6 text-xs px-1.5 text-green-700"
-            >
-              <RefreshCw size={10} className="mr-1" />
-              {/* Removed dynamic category label */}
             </Button>
 
             {/* Single voice toggle button */}

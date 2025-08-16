@@ -1,7 +1,6 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
-import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
 
 export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
@@ -22,13 +21,6 @@ export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
     return controllerState.allVoices[nextIndex].name;
   }, [controllerState.selectedVoiceName, controllerState.allVoices]);
 
-  const nextCategory = useMemo(() => {
-    const sheets = vocabularyService.getAllSheetNames();
-    const currentIndex = sheets.indexOf(controllerState.currentCategory);
-    const nextIndex = (currentIndex + 1) % sheets.length;
-    return sheets[nextIndex] || 'Next';
-  }, [controllerState.currentCategory]);
-
   // Stable callback for user interaction updates
   const handleInteractionUpdate = useCallback((newState: typeof userInteractionState) => {
     setUserInteractionState(prev => {
@@ -45,7 +37,6 @@ export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
     ...controllerState,
     userInteractionState,
     nextVoiceLabel,
-    nextCategory,
     handleInteractionUpdate
   };
 };

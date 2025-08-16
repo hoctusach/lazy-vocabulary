@@ -15,9 +15,6 @@ interface ContentWithDataNewProps {
   toggleMute: () => void;
   handleTogglePause: () => void;
   handleCycleVoice: () => void;
-  handleSwitchCategory: () => void;
-  currentCategory: string;
-  nextCategory: string | null;
   isSpeaking: boolean;
   handleManualNext: () => void;
   displayTime: number;
@@ -40,9 +37,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   toggleMute,
   handleTogglePause,
   handleCycleVoice,
-  handleSwitchCategory,
-  currentCategory,
-  nextCategory,
   isSpeaking,
   handleManualNext,
   displayTime,
@@ -63,11 +57,11 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         ? {
             ...wordToEdit,
             translation: wordToEdit.translation || '',
-            category: wordToEdit.category || currentCategory
+            category: wordToEdit.category || displayWord.category
           }
         : undefined
     ),
-    [isEditMode, wordToEdit, currentCategory]
+    [isEditMode, wordToEdit, displayWord.category]
   );
   const [open, setOpen] = useState(false);
   return (
@@ -80,13 +74,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         toggleMute={toggleMute}
         handleTogglePause={handleTogglePause}
         handleCycleVoice={handleCycleVoice}
-        handleSwitchCategory={handleSwitchCategory}
-        currentCategory={currentCategory}
-        nextCategory={nextCategory}
         isSoundPlaying={isSpeaking}
         handleManualNext={handleManualNext}
         displayTime={displayTime}
-      selectedVoiceName={selectedVoiceName}
+        selectedVoiceName={selectedVoiceName}
       onOpenAddModal={handleOpenAddWordModal}
       onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       playCurrentWord={playCurrentWord}

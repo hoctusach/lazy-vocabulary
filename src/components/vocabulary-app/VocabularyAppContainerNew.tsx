@@ -34,10 +34,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
     togglePause,
     toggleMute,
     toggleVoice,
-    switchCategory,
     playCurrentWord,
     userInteractionState,
-    nextCategory,
     handleInteractionUpdate
   } = useStableVocabularyState(initialWords);
 
@@ -110,18 +108,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             meaning="Please upload a vocabulary file to get started"
             example=""
             backgroundColor="#F0F8FF"
-            isMuted={isMuted}
-            isPaused={isPaused}
-            onToggleMute={toggleMute}
-            onTogglePause={togglePause}
-            onCycleVoice={toggleVoice}
-            onSwitchCategory={switchCategory}
-            onNextWord={goToNextAndSpeak}
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
             isSpeaking={false}
             category="No Data"
-            selectedVoiceName={selectedVoiceName}
           />
         </div>
         </VocabularyLayout>
@@ -144,18 +132,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             meaning="Try switching to another category"
             example=""
             backgroundColor="#F0F8FF"
-            isMuted={isMuted}
-            isPaused={isPaused}
-            onToggleMute={toggleMute}
-            onTogglePause={togglePause}
-            onCycleVoice={toggleVoice}
-            onSwitchCategory={switchCategory}
-            onNextWord={goToNextAndSpeak}
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
             isSpeaking={false}
             category={currentCategory}
-            selectedVoiceName={selectedVoiceName}
           />
         </div>
         </VocabularyLayout>
@@ -176,21 +154,11 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
         <VocabularyCardNew
           word="Loading vocabulary..."
           meaning="Please wait while we load your vocabulary data"
-            example=""
-            backgroundColor="#F0F8FF"
-            isMuted={isMuted}
-            isPaused={isPaused}
-            onToggleMute={toggleMute}
-            onTogglePause={togglePause}
-            onCycleVoice={toggleVoice}
-            onSwitchCategory={switchCategory}
-            onNextWord={goToNextAndSpeak}
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
-            isSpeaking={false}
-            category="Loading"
-            selectedVoiceName={selectedVoiceName}
-          />
+          example=""
+          backgroundColor="#F0F8FF"
+          isSpeaking={false}
+          category="Loading"
+        />
         </div>
       </VocabularyLayout>
       </DebugInfoContext.Provider>
@@ -214,9 +182,6 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             toggleMute={toggleMute}
             handleTogglePause={togglePause}
             handleCycleVoice={toggleVoice}
-            handleSwitchCategory={switchCategory}
-            currentCategory={currentCategory}
-            nextCategory={nextCategory}
             isSpeaking={isSpeaking}
             handleManualNext={goToNextAndSpeak}
             displayTime={5000}
@@ -255,9 +220,6 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
           toggleMute={toggleMute}
           handleTogglePause={togglePause}
           handleCycleVoice={toggleVoice}
-          handleSwitchCategory={switchCategory}
-          currentCategory={currentCategory}
-          nextCategory={nextCategory}
           isSpeaking={isSpeaking}
           handleManualNext={goToNextAndSpeak}
           displayTime={5000}
