@@ -20,7 +20,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     markWordAsPlayed,
     getDueReviewWords,
     getLearnedWords,
-    markWordLearned,
+    markWordLearned: markCurrentWordLearned,
     todayWords
   } = useLearningProgress(allWords);
 
@@ -155,11 +155,8 @@ const VocabularyAppWithLearning: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto p-4">
         <VocabularyAppContainerNew
           initialWords={todayWords}
-          onMarkWordLearned={() => {
-            const currentWord = vocabularyService.getCurrentWord();
-            if (currentWord) {
-              markWordLearned(currentWord.word);
-            }
+          onMarkWordLearned={(word) => {
+            markCurrentWordLearned(word);
           }}
           additionalContent={learningSection}
         />

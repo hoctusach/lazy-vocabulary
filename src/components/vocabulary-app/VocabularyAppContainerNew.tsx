@@ -14,7 +14,7 @@ import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  onMarkWordLearned?: () => void;
+  onMarkWordLearned?: (word: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
 }

@@ -26,7 +26,7 @@ interface VocabularyControlsColumnProps {
   onOpenEditModal: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onMarkWordLearned?: () => void;
+  onMarkWordLearned?: (word: string) => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -93,12 +93,16 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
+  const [wordToMark, setWordToMark] = React.useState('');
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
 
-  const handleMarkAsLearnedClick = () => setIsMarkAsLearnedDialogOpen(true);
+  const handleMarkAsLearnedClick = () => {
+    setWordToMark(currentWord?.word || '');
+    setIsMarkAsLearnedDialogOpen(true);
+  };
   const handleMarkAsLearnedConfirm = () => {
-    if (onMarkWordLearned) onMarkWordLearned();
+    if (onMarkWordLearned && wordToMark) onMarkWordLearned(wordToMark);
     setIsMarkAsLearnedDialogOpen(false);
     toast('Word marked as learned.');
   };
@@ -191,7 +195,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         isOpen={isMarkAsLearnedDialogOpen}
         onClose={() => setIsMarkAsLearnedDialogOpen(false)}
         onConfirm={handleMarkAsLearnedConfirm}
-        wordText={currentWord?.word || ''}
+        word={wordToMark}
       />
     </div>
   );
