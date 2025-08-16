@@ -130,6 +130,25 @@ describe('LearningProgressService', () => {
       expect(intenseSelection.totalCount).toBeLessThanOrEqual(100);
     });
 
+    it('defaults to light severity when none is provided', () => {
+      const manyWords: VocabularyWord[] = [];
+      for (let i = 0; i < 120; i++) {
+        manyWords.push({
+          word: `word-${i}`,
+          meaning: 'test meaning',
+          example: 'test example',
+          category: 'topic vocab',
+          count: 1
+        });
+      }
+
+      const selection = service.generateDailySelection(manyWords);
+
+      expect(selection.severity).toBe('light');
+      expect(selection.totalCount).toBeGreaterThanOrEqual(15);
+      expect(selection.totalCount).toBeLessThanOrEqual(25);
+    });
+
     it('should include all due words when below target and fill with new words', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];

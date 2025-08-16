@@ -39,7 +39,7 @@ describe('useLearningProgress due reviews', () => {
     reviewWords: [],
     newWords: [newProgress],
     totalCount: 1,
-    severity: 'moderate'
+    severity: 'light'
   };
 
   beforeEach(() => {
