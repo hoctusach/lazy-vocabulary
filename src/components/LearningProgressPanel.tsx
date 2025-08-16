@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DailySelection, SeverityLevel } from '@/types/learning';
@@ -18,14 +17,12 @@ interface LearningProgressPanelProps {
     retired: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
-  onRefresh: () => void;
 }
 
 export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   dailySelection,
   progressStats,
-  onGenerateDaily,
-  onRefresh
+  onGenerateDaily
 }) => {
   const learnedPercentage = progressStats.total > 0
     ? (progressStats.learned / progressStats.total) * 100
@@ -38,12 +35,9 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CollapsibleTrigger className="flex items-center gap-2">
-              <CardTitle>Daily Learning Progress</CardTitle>
+              <CardTitle className="text-lg">Daily Learning Progress</CardTitle>
               <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
             </CollapsibleTrigger>
-            <Button variant="outline" size="sm" onClick={onRefresh}>
-              Refresh
-            </Button>
           </div>
         </CardHeader>
         <CollapsibleContent>

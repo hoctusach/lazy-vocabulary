@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
@@ -18,7 +18,6 @@ const VocabularyAppWithLearning: React.FC = () => {
     progressStats,
     generateDailyWords,
     markWordAsPlayed,
-    refreshStats,
     getDueReviewWords,
     getRetiredWords,
     retireCurrentWord,
@@ -42,17 +41,18 @@ const VocabularyAppWithLearning: React.FC = () => {
   }, []);
 
   // Track when words are played (integrate with existing word navigation)
+  const previousWordRef = useRef<VocabularyWord | null>(null);
   useEffect(() => {
+    previousWordRef.current = vocabularyService.getCurrentWord();
+
     const handleWordChange = () => {
-      const currentWord = vocabularyService.getCurrentWord();
-      if (currentWord) {
-        markWordAsPlayed(currentWord.word);
+      if (previousWordRef.current) {
+        markWordAsPlayed(previousWordRef.current.word);
       }
+      previousWordRef.current = vocabularyService.getCurrentWord();
     };
 
-    // Listen for word changes
     vocabularyService.addVocabularyChangeListener(handleWordChange);
-    
     return () => {
       vocabularyService.removeVocabularyChangeListener(handleWordChange);
     };
@@ -64,7 +64,6 @@ const VocabularyAppWithLearning: React.FC = () => {
         dailySelection={dailySelection}
         progressStats={progressStats}
         onGenerateDaily={generateDailyWords}
-        onRefresh={refreshStats}
       />
 
       {dailySelection && (
