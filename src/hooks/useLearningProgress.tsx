@@ -10,10 +10,10 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [todayWords, setTodayWords] = useState<VocabularyWord[]>([]);
   const [progressStats, setProgressStats] = useState({
     total: 0,
-    learned: 0,
+    learning: 0,
     new: 0,
     due: 0,
-    retired: 0
+    learned: 0
   });
 
   const refreshStats = useCallback(() => {
@@ -23,7 +23,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
 
   const generateDailyWords = useCallback((severity: SeverityLevel = 'moderate') => {
     if (allWords.length === 0) return;
-    
+
     // Force regeneration when user clicks the buttons
     const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
     setDailySelection(selection);
@@ -69,12 +69,12 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     return learningProgressService.getDueReviewWords();
   }, []);
 
-  const getRetiredWords = useCallback(() => {
-    return learningProgressService.getRetiredWords();
+  const getLearnedWords = useCallback(() => {
+    return learningProgressService.getLearnedWords();
   }, []);
 
-  const retireCurrentWord = useCallback((word: string) => {
-    learningProgressService.retireWord(word);
+  const markCurrentWordAsLearned = useCallback((word: string) => {
+    learningProgressService.markWordAsLearned(word);
     refreshStats();
   }, [refreshStats]);
 
@@ -87,8 +87,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getWordProgress,
     refreshStats,
     getDueReviewWords,
-    getRetiredWords,
-    retireCurrentWord,
+    getLearnedWords,
+    markCurrentWordAsLearned,
     todayWords
   };
 };

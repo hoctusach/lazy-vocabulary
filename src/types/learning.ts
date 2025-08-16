@@ -5,10 +5,10 @@ export interface LearningProgress {
   isLearned: boolean;
   reviewCount: number;
   lastPlayedDate: string;
-  status: 'due' | 'not_due' | 'new' | 'retired';
+  status: 'due' | 'not_due' | 'new' | 'learned';
   nextReviewDate: string;
   createdDate: string;
-  retiredDate?: string;
+  learnedDate?: string;
 }
 
 export interface DailySelection {

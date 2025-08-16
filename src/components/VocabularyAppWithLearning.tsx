@@ -19,8 +19,8 @@ const VocabularyAppWithLearning: React.FC = () => {
     generateDailyWords,
     markWordAsPlayed,
     getDueReviewWords,
-    getRetiredWords,
-    retireCurrentWord,
+    getLearnedWords,
+    markCurrentWordAsLearned,
     todayWords
   } = useLearningProgress(allWords);
 
@@ -121,20 +121,20 @@ const VocabularyAppWithLearning: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Retired ({progressStats.retired})</h4>
+                <h4 className="font-medium text-gray-600">Learned ({progressStats.learned})</h4>
                 <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {progressStats.retired > 0 ? (
-                    getRetiredWords().map((word, index) => (
+                  {progressStats.learned > 0 ? (
+                    getLearnedWords().map((word, index) => (
                       <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
                         <div className="font-medium text-gray-700">{word.word}</div>
                         <div className="text-xs text-gray-500">
-                          {word.category} • Retired {word.retiredDate}
+                          {word.category} • Learned {word.learnedDate}
                         </div>
                       </div>
                     ))
                   ) : (
                     <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
-                      No retired words
+                      No learned words
                     </div>
                   )}
                 </div>
@@ -152,10 +152,10 @@ const VocabularyAppWithLearning: React.FC = () => {
       <div className="w-full max-w-6xl mx-auto p-4">
         <VocabularyAppContainerNew
           initialWords={todayWords}
-          onRetireWord={() => {
+          onMarkWordAsLearned={() => {
             const currentWord = vocabularyService.getCurrentWord();
             if (currentWord) {
-              retireCurrentWord(currentWord.word);
+              markCurrentWordAsLearned(currentWord.word);
             }
           }}
           additionalContent={learningSection}
