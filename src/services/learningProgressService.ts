@@ -146,10 +146,18 @@ export class LearningProgressService {
     let hasChanges = false;
 
     progressMap.forEach((progress, key) => {
-      if (progress.nextReviewDate <= today && progress.status !== 'due') {
-        progress.status = 'due';
-        progressMap.set(key, progress);
-        hasChanges = true;
+      if (progress.status === 'retired') return;
+
+      if (progress.isLearned) {
+        if (progress.nextReviewDate < today && progress.status !== 'due') {
+          progress.status = 'due';
+          progressMap.set(key, progress);
+          hasChanges = true;
+        } else if (progress.nextReviewDate >= today && progress.status !== 'not_due') {
+          progress.status = 'not_due';
+          progressMap.set(key, progress);
+          hasChanges = true;
+        }
       }
     });
 
@@ -197,36 +205,17 @@ export class LearningProgressService {
     const maxPossibleCount = allWords.length;
     const idealCount = this.getRandomCount(severity);
     const totalCount = Math.min(idealCount, maxPossibleCount);
-    
-    const newCount = Math.round(totalCount * 0.4);
-    const reviewCount = totalCount - newCount;
 
-    // Get available words (exclude retired)
+    // Get available words
     const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'retired');
-    const dueWords = Array.from(progressMap.values()).filter(p => p.status === 'due');
+    const dueWords = Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate < today);
 
-    // Select words with fallback logic
-    let selectedNew = this.selectNewWordsByCategory(newWords, Math.min(newCount, newWords.length));
-    let selectedReview = this.shuffleArray(dueWords).slice(0, Math.min(reviewCount, dueWords.length));
+    // Always include all due review words
+    const selectedReview = dueWords;
 
-    // Fallback logic - fill remaining slots
-    const remainingSlots = totalCount - selectedNew.length - selectedReview.length;
-    if (remainingSlots > 0) {
-      const availableNew = newWords.filter(w => !selectedNew.includes(w));
-      const availableReview = dueWords.filter(w => !selectedReview.includes(w));
-      const allAvailable = [...availableNew, ...availableReview];
-      
-      const shuffledAvailable = this.shuffleArray(allAvailable);
-      const additional = shuffledAvailable.slice(0, remainingSlots);
-      
-      additional.forEach(word => {
-        if (availableNew.includes(word)) {
-          selectedNew.push(word);
-        } else {
-          selectedReview.push(word);
-        }
-      });
-    }
+    // Fill remaining slots with new words
+    const remainingSlots = Math.max(totalCount - selectedReview.length, 0);
+    const selectedNew = this.selectNewWordsByCategory(newWords, Math.min(remainingSlots, newWords.length));
 
     const selection: DailySelection = {
       newWords: selectedNew,
@@ -309,19 +298,21 @@ export class LearningProgressService {
   getProgressStats() {
     const progressMap = this.getLearningProgress();
     const all = Array.from(progressMap.values());
-    
+    const today = this.getToday();
+
     return {
       total: all.length,
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
-      due: all.filter(p => p.status === 'due' && p.isLearned).length,
+      due: all.filter(p => p.isLearned && p.nextReviewDate < today).length,
       retired: all.filter(p => p.status === 'retired').length
     };
   }
 
   getDueReviewWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
-    return Array.from(progressMap.values()).filter(p => p.status === 'due' && p.isLearned);
+    const today = this.getToday();
+    return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate < today);
   }
 
   getRetiredWords(): LearningProgress[] {
