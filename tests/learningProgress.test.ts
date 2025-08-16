@@ -225,9 +225,9 @@ describe('LearningProgressService', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const mockProgress = {
-        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today },
+        'word1': { isLearned: true, status: 'due', nextReviewDate: today },
         'word2': { isLearned: false, status: 'new', nextReviewDate: today },
-        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday },
+        'word3': { isLearned: true, status: 'due', nextReviewDate: yesterday },
         'word4': { isLearned: false, status: 'new', nextReviewDate: today },
       };
 
@@ -268,9 +268,13 @@ describe('LearningProgressService', () => {
         }
       };
 
+      let store = JSON.stringify(progressData);
       localStorageMock.getItem.mockImplementation((key) => {
-        if (key === 'learningProgress') return JSON.stringify(progressData);
+        if (key === 'learningProgress') return store;
         return null;
+      });
+      localStorageMock.setItem.mockImplementation((key, value) => {
+        if (key === 'learningProgress') store = value;
       });
 
       const dueWords = service.getDueReviewWords();
