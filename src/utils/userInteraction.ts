@@ -3,7 +3,7 @@ let userInteracted = false;
 export const loadUserInteractionState = () => {
   try {
     userInteracted = localStorage.getItem('speechUnlocked') === 'true';
-  } catch {}
+  } catch { /* ignore */ }
   return userInteracted;
 };
 
@@ -11,14 +11,14 @@ export const markUserInteraction = () => {
   userInteracted = true;
   try {
     localStorage.setItem('speechUnlocked', 'true');
-  } catch {}
+  } catch { /* ignore */ }
 };
 
 export const resetUserInteraction = () => {
   userInteracted = false;
   try {
     localStorage.setItem('speechUnlocked', 'false');
-  } catch {}
+  } catch { /* ignore */ }
 };
 
 export const hasUserInteracted = () => userInteracted;

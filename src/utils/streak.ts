@@ -28,7 +28,7 @@ export function loadStreakDays(): string[] {
   if (filtered.length !== streakDays.length) {
     try {
       localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(filtered));
-    } catch {}
+    } catch { /* ignore */ }
   }
 
   if (filtered.length > 0) {
@@ -48,7 +48,7 @@ export function loadStreakDays(): string[] {
     }
     try {
       localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(filtered));
-    } catch {}
+    } catch { /* ignore */ }
   }
 
   return filtered;
@@ -60,7 +60,7 @@ export function addStreakDay(date: string): void {
     current.push(date);
     try {
       localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify(current));
-    } catch {}
+    } catch { /* ignore */ }
     handleStreakMilestone(current);
   }
 }
@@ -78,17 +78,17 @@ function handleStreakMilestone(days: string[]): void {
     const badges = JSON.parse(localStorage.getItem(BADGES_KEY) || '{}');
     badges[`${count}_day_streak`] = true;
     localStorage.setItem(BADGES_KEY, JSON.stringify(badges));
-  } catch {}
+  } catch { /* ignore */ }
 
   try {
     const used = JSON.parse(localStorage.getItem(USED_STREAK_DAYS_KEY) || '[]');
     const updated = Array.from(new Set(used.concat(days)));
     localStorage.setItem(USED_STREAK_DAYS_KEY, JSON.stringify(updated));
-  } catch {}
+  } catch { /* ignore */ }
 
   try {
     localStorage.setItem(STREAK_DAYS_KEY, JSON.stringify([]));
-  } catch {}
+  } catch { /* ignore */ }
 
   try {
     const redeem: Record<string, string[]> = JSON.parse(
@@ -105,7 +105,7 @@ function handleStreakMilestone(days: string[]): void {
     }
     redeem[`${count}_day_streak`] = days;
     localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
-  } catch {}
+  } catch { /* ignore */ }
 }
 
 export function redeemBadge(badgeKey: string): void {
@@ -115,5 +115,5 @@ export function redeemBadge(badgeKey: string): void {
       delete redeem[badgeKey];
       localStorage.setItem(REDEEMABLE_STREAKS_KEY, JSON.stringify(redeem));
     }
-  } catch {}
+  } catch { /* ignore */ }
 }
