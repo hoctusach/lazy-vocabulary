@@ -11,13 +11,13 @@ describe('buildTodaysWords', () => {
   ];
 
   const newWords: LearningProgress[] = [
-    { word: 'a', category: 'cat1', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: '', createdDate: '' },
-    { word: 'b', category: 'cat2', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: '', createdDate: '' },
+    { word: 'a', category: 'cat1', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: '', createdDate: '' },
+    { word: 'b', category: 'cat2', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: '', createdDate: '' },
   ];
 
   const reviewWords: LearningProgress[] = [
-    { word: 'a', category: 'cat1', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: '', createdDate: '' },
-    { word: 'c', category: 'cat1', isLearned: true, reviewCount: 2, lastPlayedDate: '', status: 'due', nextReviewDate: '', createdDate: '' },
+    { word: 'a', category: 'cat1', isLearned: true, reviewCount: 1, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: '', createdDate: '' },
+    { word: 'c', category: 'cat1', isLearned: true, reviewCount: 2, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: '', createdDate: '' },
   ];
 
   it('creates a de-duplicated union of new and review words', () => {
