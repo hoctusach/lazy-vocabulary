@@ -1,10 +1,9 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
+import { learningProgressService } from '@/services/learningProgressService';
 import { BUTTON_STATES_KEY, PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
-import { getLastWord } from '@/utils/lastWordStorage';
-import { findFuzzyIndex } from '@/utils/text/findFuzzyIndex';
 
 /**
  * Data loading and persistence
@@ -17,6 +16,14 @@ export const useVocabularyDataLoader = (
   clearAutoAdvanceTimer: () => void,
   initialWords?: VocabularyWord[]
 ) => {
+  const startTimerRef = useRef<number | null>(null);
+
+  const clearStartTimer = () => {
+    if (startTimerRef.current !== null) {
+      clearTimeout(startTimerRef.current);
+      startTimerRef.current = null;
+    }
+  };
   // Persist selected voice whenever it changes
   useEffect(() => {
     try {
@@ -42,24 +49,58 @@ export const useVocabularyDataLoader = (
     console.log('[DATA-LOADER] Loading initial vocabulary data');
 
     const loadData = () => {
+      clearStartTimer();
       try {
-        const words = vocabularyService.getWordList();
-        console.log(`[DATA-LOADER] Loaded ${words.length} words`);
+        const allWords = vocabularyService.getWordList();
+        console.log(`[DATA-LOADER] Loaded ${allWords.length} words`);
 
-        setWordList(words);
-        setHasData(words.length > 0);
+        const selection =
+          learningProgressService.getTodaySelection() ||
+          learningProgressService.forceGenerateDailySelection(allWords, 'moderate');
 
-        if (words.length > 0) {
-          const category = vocabularyService.getCurrentSheetName();
-          const savedWord = getLastWord(category);
-          let startIndex = 0;
-          if (savedWord) {
-            const idx = findFuzzyIndex(words.map(w => w.word), savedWord);
-            if (idx >= 0) {
-              startIndex = idx;
+        let todayWords: VocabularyWord[] = [];
+        if (selection) {
+          const progressList = [...selection.newWords, ...selection.reviewWords];
+          const map = new Map<string, VocabularyWord>();
+          progressList.forEach(p => {
+            const w = allWords.find(
+              word => word.word === p.word && word.category === p.category
+            );
+            if (w) {
+              map.set(`${w.word}__${w.category}`, {
+                ...w,
+                nextAllowedTime: p.nextAllowedTime
+              });
+            }
+          });
+          todayWords = Array.from(map.values());
+        }
+
+        setWordList(todayWords);
+        setHasData(todayWords.length > 0);
+
+        if (todayWords.length > 0) {
+          const now = Date.now();
+          const dueIndex = todayWords.findIndex(w => {
+            if (!w.nextAllowedTime) return true;
+            return Date.parse(w.nextAllowedTime) <= now;
+          });
+
+          if (dueIndex >= 0) {
+            setCurrentIndex(dueIndex);
+          } else {
+            setCurrentIndex(0);
+            const nextTimes = todayWords
+              .map(w => w.nextAllowedTime ? Date.parse(w.nextAllowedTime) : Infinity)
+              .filter(t => !isNaN(t) && t !== Infinity);
+            if (nextTimes.length > 0) {
+              const earliest = Math.min(...nextTimes);
+              const delay = Math.max(0, earliest - now);
+              startTimerRef.current = window.setTimeout(() => {
+                loadData();
+              }, delay);
             }
           }
-          setCurrentIndex(startIndex);
         }
       } catch (error) {
         console.error('[DATA-LOADER] Error loading vocabulary data:', error);
@@ -81,6 +122,7 @@ export const useVocabularyDataLoader = (
     return () => {
       vocabularyService.removeVocabularyChangeListener(handleVocabularyChange);
       clearAutoAdvanceTimer(); // Clean up on unmount
+      clearStartTimer();
     };
   }, [initialWords, setWordList, setHasData, setCurrentIndex, clearAutoAdvanceTimer]);
 };

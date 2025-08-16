@@ -7,6 +7,7 @@ export interface VocabularyWord {
   translation?: string;
   count: number | string; // This allows both number and string types
   category?: string; // Making category optional to support existing default vocabulary data
+  nextAllowedTime?: string;
 }
 
 // Interface for editing or adding words where category is required

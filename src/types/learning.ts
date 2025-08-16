@@ -9,6 +9,7 @@ export interface LearningProgress {
   nextReviewDate: string;
   createdDate: string;
   learnedDate?: string;
+  nextAllowedTime?: string;
 }
 
 export interface DailySelection {

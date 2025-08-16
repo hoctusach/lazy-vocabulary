@@ -76,7 +76,8 @@ export class LearningProgressService {
       status: 'new' as const,
       learnedDate: undefined,
       nextReviewDate: this.getToday(),
-      createdDate: this.getToday()
+      createdDate: this.getToday(),
+      nextAllowedTime: new Date().toISOString()
     };
 
     return {
@@ -84,6 +85,7 @@ export class LearningProgressService {
       status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
       nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
+      nextAllowedTime: progress.nextAllowedTime || DEFAULT_VALUES.nextAllowedTime,
       learnedDate:
         (progress as any).learnedDate ||
         (progress as any).retiredDate ||
@@ -107,7 +109,8 @@ export class LearningProgressService {
       lastPlayedDate: '',
       status: 'new',
       nextReviewDate: today,
-      createdDate: today
+      createdDate: today,
+      nextAllowedTime: new Date().toISOString()
     };
   }
 
@@ -122,6 +125,7 @@ export class LearningProgressService {
       progress.reviewCount += 1;
       progress.nextReviewDate = this.calculateNextReviewDate(progress.reviewCount);
       progress.status = 'due';
+      progress.nextAllowedTime = new Date().toISOString();
       
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
