@@ -25,7 +25,7 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const { currentIndex, currentWord, advanceToNext, goToPrevious, goToWord } = useSimpleWordNavigation(wordList);
   
   // Word playback
-  const { playWord, stopPlayback, isSpeaking } = useSimpleWordPlayback(
+  const { playWord, isSpeaking } = useSimpleWordPlayback(
     selectedVoice,
     findVoice,
     advanceToNext,
@@ -47,8 +47,8 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // Auto-play effect - plays word when it changes (but respects pause state)
   useEffect(() => {
     console.log(`[SIMPLE-VOCABULARY] Word changed effect - word: ${currentWord?.word}, muted: ${muted}, paused: ${paused}`);
-    
-    if (currentWord && !muted && !paused) {
+
+    if (currentWord && !paused) {
       console.log(`[SIMPLE-VOCABULARY] Auto-playing word: ${currentWord.word}`);
       playWord(currentWord);
     } else if (currentWord && paused) {
@@ -59,50 +59,40 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   // Handle pause state changes with immediate effect
   useEffect(() => {
     console.log(`[SIMPLE-VOCABULARY] Pause state changed - paused: ${paused}, muted: ${muted}`);
-    
+
     if (paused) {
       console.log('[SIMPLE-VOCABULARY] ✓ Pausing speech controller immediately');
       unifiedSpeechController.pause();
-    } else if (!muted) {
+    } else {
       console.log('[SIMPLE-VOCABULARY] ✓ Resuming from pause');
-      
+
       // Resume the controller
       unifiedSpeechController.resume();
-      
+
       // Play current word immediately after resume
       if (currentWord) {
         console.log('[SIMPLE-VOCABULARY] Playing current word after resume');
         // Small delay to ensure resume is processed
         setTimeout(() => {
-          if (!paused && !muted && currentWord) {
+          if (!paused && currentWord) {
             playWord(currentWord);
           }
         }, 100);
       }
     }
-  }, [paused, muted, currentWord, playWord]);
+  }, [paused, currentWord, playWord, muted]);
 
-  // Handle mute state changes
-  useEffect(() => {
-    if (muted) {
-      console.log(`[SIMPLE-VOCABULARY] ✓ Muted - stopping speech`);
-      stopPlayback();
-    } else if (!paused && currentWord) {
-      console.log(`[SIMPLE-VOCABULARY] ✓ Unmuted - playing current word`);
-      setTimeout(() => {
-        if (!muted && !paused && currentWord) {
-          playWord(currentWord);
-        }
-      }, 50);
-    }
-  }, [muted, paused, currentWord, playWord, stopPlayback]);
 
   // Control functions
   const toggleMute = useCallback(() => {
     const newMuted = !muted;
     console.log(`[SIMPLE-VOCABULARY] ✓ Toggling mute: ${newMuted}`);
     setMuted(newMuted);
-  }, [muted]);
+    unifiedSpeechController.setMuted(newMuted);
+    if (!newMuted && !paused && currentWord) {
+      playWord(currentWord);
+    }
+  }, [muted, paused, currentWord, playWord]);
 
   const togglePause = useCallback(() => {
     const newPaused = !paused;
@@ -115,13 +105,13 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   }, [paused]);
 
   const playCurrentWord = useCallback(() => {
-    if (currentWord && !muted && !paused) {
+    if (currentWord && !paused) {
       console.log(`[SIMPLE-VOCABULARY] ✓ Manually playing current word: ${currentWord.word}`);
       playWord(currentWord);
     } else {
-      console.log(`[SIMPLE-VOCABULARY] ✗ Cannot play current word - muted: ${muted}, paused: ${paused}, hasWord: ${!!currentWord}`);
+      console.log(`[SIMPLE-VOCABULARY] ✗ Cannot play current word - paused: ${paused}, hasWord: ${!!currentWord}, muted: ${muted}`);
     }
-  }, [currentWord, muted, paused, playWord]);
+  }, [currentWord, paused, playWord, muted]);
 
   const goToNext = useCallback(() => {
     console.log('[SIMPLE-VOCABULARY] ✓ Manual next word requested');

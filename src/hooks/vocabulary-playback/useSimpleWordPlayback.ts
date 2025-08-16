@@ -30,8 +30,8 @@ export const useSimpleWordPlayback = (
     }
 
     // Check local conditions
-    if (muted || paused) {
-      console.log(`[WORD-PLAYBACK-${playbackId}] Skipping - muted: ${muted}, paused: ${paused}`);
+    if (paused) {
+      console.log(`[WORD-PLAYBACK-${playbackId}] Skipping - paused: ${paused}`);
       return;
     }
 
@@ -58,13 +58,15 @@ export const useSimpleWordPlayback = (
       if (!speechText || speechText.length === 0) {
         console.log(`[WORD-PLAYBACK-${playbackId}] No content to speak`);
         playingRef.current = false;
-        if (!paused && !muted) {
+        if (!paused) {
           goToNextWord();
         }
         return;
       }
 
       console.log(`[WORD-PLAYBACK-${playbackId}] Starting speech`);
+
+      unifiedSpeechController.setMuted(muted);
 
       const success = await speak(speechText, {
         voice,
@@ -73,18 +75,18 @@ export const useSimpleWordPlayback = (
           console.log(`[WORD-PLAYBACK-${playbackId}] Speech completed, checking auto-advance`);
           playingRef.current = false;
 
-          if (!paused && !muted && !unifiedSpeechController.isPaused()) {
+          if (!paused && !unifiedSpeechController.isPaused()) {
             console.log(`[WORD-PLAYBACK-${playbackId}] Auto-advancing to next word`);
             goToNextWord();
           } else {
-            console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, muted: ${muted}, controllerPaused: ${unifiedSpeechController.isPaused()}`);
+            console.log(`[WORD-PLAYBACK-${playbackId}] Not auto-advancing - paused: ${paused}, controllerPaused: ${unifiedSpeechController.isPaused()}, muted: ${muted}`);
           }
         },
         onError: () => {
           console.log(`[WORD-PLAYBACK-${playbackId}] Speech error, advancing anyway`);
           playingRef.current = false;
 
-          if (!paused && !muted && !unifiedSpeechController.isPaused()) {
+          if (!paused && !unifiedSpeechController.isPaused()) {
             goToNextWord();
           }
         }
@@ -93,7 +95,7 @@ export const useSimpleWordPlayback = (
       if (!success) {
         console.log(`[WORD-PLAYBACK-${playbackId}] Speech failed to start, advancing`);
         playingRef.current = false;
-        if (!paused && !muted && !unifiedSpeechController.isPaused()) {
+        if (!paused && !unifiedSpeechController.isPaused()) {
           goToNextWord();
         }
       }
@@ -101,8 +103,8 @@ export const useSimpleWordPlayback = (
     } catch (error) {
       console.error(`[WORD-PLAYBACK-${playbackId}] Exception:`, error);
       playingRef.current = false;
-      
-      if (!paused && !muted && !unifiedSpeechController.isPaused()) {
+
+      if (!paused && !unifiedSpeechController.isPaused()) {
         goToNextWord();
       }
     }

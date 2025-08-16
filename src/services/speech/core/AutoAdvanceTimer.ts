@@ -16,7 +16,7 @@ export class AutoAdvanceTimer {
     this.wordCompleteCallback = callback;
   }
 
-  schedule(delay: number, isPaused: boolean, isMuted: boolean): void {
+  schedule(delay: number, isPaused: boolean, _isMuted: boolean): void {
     const now = Date.now();
     
     // Prevent rapid rescheduling
@@ -29,7 +29,7 @@ export class AutoAdvanceTimer {
     if (now - this.lastClearTime < this.MIN_SCHEDULE_INTERVAL) {
       console.log('[AUTO-ADVANCE] Scheduling too soon after clear, allowing with delay');
       // Allow scheduling but with a small additional delay
-      setTimeout(() => this.schedule(delay, isPaused, isMuted), 100);
+      setTimeout(() => this.schedule(delay, isPaused, _isMuted), 100);
       return;
     }
 
@@ -40,8 +40,8 @@ export class AutoAdvanceTimer {
 
     this.lastScheduleTime = now;
 
-    if (isPaused || isMuted) {
-      console.log('[AUTO-ADVANCE] Not scheduling - paused or muted');
+    if (isPaused) {
+      console.log('[AUTO-ADVANCE] Not scheduling - paused');
       return;
     }
 
@@ -59,8 +59,8 @@ export class AutoAdvanceTimer {
     
     this.timer = window.setTimeout(() => {
       console.log('[AUTO-ADVANCE] Auto-advancing to next word');
-      
-      if (this.wordCompleteCallback && !isPaused && !isMuted) {
+
+      if (this.wordCompleteCallback && !isPaused) {
         try {
           this.wordCompleteCallback();
         } catch (error) {

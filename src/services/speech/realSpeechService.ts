@@ -107,7 +107,7 @@ class RealSpeechService {
       // Configure speech settings
       utterance.rate = getSpeechRate();
       utterance.pitch = 1.0;
-      utterance.volume = 1.0;
+      utterance.volume = options.muted ? 0 : 1;
 
       // Set up event handlers
       utterance.onstart = () => {

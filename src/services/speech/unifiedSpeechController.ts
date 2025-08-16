@@ -19,15 +19,6 @@ class UnifiedSpeechController {
     voiceName: string
   ): Promise<boolean> {
     return new Promise(resolve => {
-      if (this.isMutedState) {
-        console.log('Speech is muted, skipping to next word');
-        if (this.wordCompleteCallback) {
-          this.wordCompleteCallback();
-        }
-        resolve(false);
-        return;
-      }
-
       this.queue.push({ word, voiceName, resolve });
       this.processQueue();
     });
@@ -58,6 +49,7 @@ class UnifiedSpeechController {
 
     realSpeechService.speak(text, {
       voiceName,
+      muted: this.isMutedState,
       onStart: () => {
         console.log('Word speech started:', word.word);
       },
@@ -110,9 +102,6 @@ class UnifiedSpeechController {
   }
 
   canSpeak(): SpeechGuardResult {
-    if (this.isMutedState) {
-      return { canPlay: false, reason: 'muted' };
-    }
     if (this.isPaused()) {
       return { canPlay: false, reason: 'paused' };
     }
@@ -136,9 +125,6 @@ class UnifiedSpeechController {
   setMuted(muted: boolean): void {
     console.log('Setting muted state:', muted);
     this.isMutedState = muted;
-    if (muted && this.isCurrentlyActive()) {
-      this.stop();
-    }
   }
 
   setWordCompleteCallback(callback: (() => void) | null): void {
