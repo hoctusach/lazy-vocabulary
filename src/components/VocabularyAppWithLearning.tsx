@@ -5,9 +5,13 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
 import ToastProvider from './vocabulary-app/ToastProvider';
+import { ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 const VocabularyAppWithLearning: React.FC = () => {
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
   const {
     dailySelection,
@@ -64,76 +68,81 @@ const VocabularyAppWithLearning: React.FC = () => {
       />
 
       {dailySelection && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Word Summary</h3>
-          <div className="grid gap-4 md:grid-cols-4">
-            {dailySelection.newWords.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium text-green-600">New Words ({dailySelection.newWords.length})</h4>
-                <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {dailySelection.newWords.map((word, index) => (
-                    <div key={index} className="text-sm p-2 bg-green-50 rounded border">
-                      <div className="font-medium">{word.word}</div>
-                      <div className="text-xs text-gray-600">{word.category}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {dailySelection.reviewWords.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium text-blue-600">Review Words ({dailySelection.reviewWords.length})</h4>
-                <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {dailySelection.reviewWords.map((word, index) => (
-                    <div key={index} className="text-sm p-2 bg-blue-50 rounded border">
-                      <div className="font-medium">{word.word}</div>
-                      <div className="text-xs text-gray-600">
-                        {word.category} • Review #{word.reviewCount}
+        <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
+          <CollapsibleTrigger className="flex items-center gap-2">
+            <h3 className="text-lg font-semibold">Word Summary</h3>
+            <ChevronDown className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-4">
+              {dailySelection.newWords.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-green-600">New Words ({dailySelection.newWords.length})</h4>
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {dailySelection.newWords.map((word, index) => (
+                      <div key={index} className="text-sm p-2 bg-green-50 rounded border">
+                        <div className="font-medium">{word.word}</div>
+                        <div className="text-xs text-gray-600">{word.category}</div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {progressStats.due > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
-                <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {getDueReviewWords().map((word, index) => (
-                    <div key={index} className="text-sm p-2 bg-red-50 rounded border">
-                      <div className="font-medium">{word.word}</div>
-                      <div className="text-xs text-gray-600">
-                        {word.category} • Review #{word.reviewCount}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <h4 className="font-medium text-gray-600">Retired ({progressStats.retired})</h4>
-              <div className="space-y-1 max-h-60 overflow-y-auto">
-                {progressStats.retired > 0 ? (
-                  getRetiredWords().map((word, index) => (
-                    <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
-                      <div className="font-medium text-gray-700">{word.word}</div>
-                      <div className="text-xs text-gray-500">
-                        {word.category} • Retired {word.retiredDate}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
-                    No retired words
+                    ))}
                   </div>
-                )}
+                </div>
+              )}
+
+              {dailySelection.reviewWords.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-blue-600">Review Words ({dailySelection.reviewWords.length})</h4>
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {dailySelection.reviewWords.map((word, index) => (
+                      <div key={index} className="text-sm p-2 bg-blue-50 rounded border">
+                        <div className="font-medium">{word.word}</div>
+                        <div className="text-xs text-gray-600">
+                          {word.category} • Review #{word.reviewCount}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {progressStats.due > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {getDueReviewWords().map((word, index) => (
+                      <div key={index} className="text-sm p-2 bg-red-50 rounded border">
+                        <div className="font-medium">{word.word}</div>
+                        <div className="text-xs text-gray-600">
+                          {word.category} • Review #{word.reviewCount}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <h4 className="font-medium text-gray-600">Retired ({progressStats.retired})</h4>
+                <div className="space-y-1 max-h-60 overflow-y-auto">
+                  {progressStats.retired > 0 ? (
+                    getRetiredWords().map((word, index) => (
+                      <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
+                        <div className="font-medium text-gray-700">{word.word}</div>
+                        <div className="text-xs text-gray-500">
+                          {word.category} • Retired {word.retiredDate}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
+                      No retired words
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
     </div>
   );
