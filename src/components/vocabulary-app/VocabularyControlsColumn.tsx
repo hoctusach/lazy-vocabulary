@@ -100,7 +100,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const handleRetireConfirm = () => {
     if (onRetireWord) onRetireWord();
     setIsRetireDialogOpen(false);
-    toast('Word retired for 100 days');
+    toast('Word learned for 100 days');
   };
 
   return (
@@ -177,8 +177,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           size="sm"
           onClick={handleRetireClick}
           className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
-          title="Retire Word"
-          aria-label="Retire Word"
+          title="Mark as Learned"
+          aria-label="Mark as Learned"
           disabled={!currentWord}
         >
           <Archive size={16} />

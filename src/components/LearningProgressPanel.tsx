@@ -63,7 +63,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-600">{progressStats.retired}</div>
-            <div className="text-sm text-gray-600">Retired</div>
+            <div className="text-sm text-gray-600">Learned</div>
           </div>
         </div>
 
