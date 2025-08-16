@@ -24,16 +24,17 @@ beforeAll(async () => {
     removeEventListener: () => {},
     speak: () => {},
   };
-  vi.spyOn(window.HTMLMediaElement.prototype, 'play').mockImplementation(() => Promise.resolve());
 });
 
-describe('VocabularyControlsColumn mark as learned', () => {
-  it('uses word captured when dialog opened', async () => {
-    const firstWord: VocabularyWord = { word: 'apple', meaning: '', example: '', category: 'test' };
-    const secondWord: VocabularyWord = { word: 'banana', meaning: '', example: '', category: 'test' };
-    const onMark = vi.fn();
+describe('VocabularyControlsColumn mark as learned sound', () => {
+  it('plays a sound when marking a word as learned', async () => {
+    const word: VocabularyWord = { word: 'apple', meaning: '', example: '', category: 'test' };
+    const playMock = vi.fn().mockResolvedValue(undefined);
+    const playSpy = vi
+      .spyOn(window.HTMLMediaElement.prototype, 'play')
+      .mockImplementation(playMock);
 
-    const { rerender } = render(
+    render(
       <VocabularyControlsColumn
         isMuted={false}
         isPaused={false}
@@ -41,41 +42,21 @@ describe('VocabularyControlsColumn mark as learned', () => {
         onTogglePause={() => {}}
         onNextWord={() => {}}
         onCycleVoice={() => {}}
-        currentWord={firstWord}
+        currentWord={word}
         onOpenAddModal={() => {}}
         onOpenEditModal={() => {}}
         selectedVoiceName="Test"
         playCurrentWord={() => {}}
-        onMarkWordLearned={onMark}
+        onMarkWordLearned={() => {}}
       />
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Mark as Learned' }));
-
-    // Simulate service advancing to a new word while dialog is open
-    rerender(
-      <VocabularyControlsColumn
-        isMuted={false}
-        isPaused={false}
-        onToggleMute={() => {}}
-        onTogglePause={() => {}}
-        onNextWord={() => {}}
-        onCycleVoice={() => {}}
-        currentWord={secondWord}
-        onOpenAddModal={() => {}}
-        onOpenEditModal={() => {}}
-        selectedVoiceName="Test"
-        playCurrentWord={() => {}}
-        onMarkWordLearned={onMark}
-      />
-    );
-
-    // Confirm dialog displays original word
     const dialog = screen.getByRole('alertdialog');
-    expect(within(dialog).getByText(/apple/)).toBeInTheDocument();
-
     await userEvent.click(within(dialog).getByRole('button', { name: 'Mark as Learned' }));
-    expect(onMark).toHaveBeenCalledWith('apple');
+
+    expect(playMock).toHaveBeenCalled();
+    playSpy.mockRestore();
   });
 });
 
