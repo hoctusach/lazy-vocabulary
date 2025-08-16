@@ -8,6 +8,7 @@ import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useLearnerHours } from '@/hooks/useLearnerHours';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 
 interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
@@ -33,6 +34,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
     : 0;
   const [open, setOpen] = useState(false);
   const { totalHours } = useLearnerHours(learnerId);
+  const [dueTooltipOpen, setDueTooltipOpen] = useState(false);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="w-full">
@@ -54,7 +56,20 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Learned</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
+            <Tooltip open={dueTooltipOpen} onOpenChange={setDueTooltipOpen}>
+              <TooltipTrigger asChild>
+                <button
+                  aria-label="Due review count"
+                  onClick={() => setDueTooltipOpen(!dueTooltipOpen)}
+                  className="text-2xl font-bold text-red-600 focus:outline-none"
+                >
+                  {progressStats.due}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs text-center">
+                Reviews use a 2→4→7→12→20→35-day sequence within a 60-day master cycle.
+              </TooltipContent>
+            </Tooltip>
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
