@@ -148,7 +148,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             )}
           </TabsContent>
           
-          <TabsContent value="practice" className="space-y-4">
+          <TabsContent value="practice" className="space-y-4" forceMount>
             <VocabularyAppContainerNew
               isActive={activeTab === 'practice'}
               initialWords={todayWords}
