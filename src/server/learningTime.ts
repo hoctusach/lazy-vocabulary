@@ -90,6 +90,19 @@ export default async function handler(req: Req, res: Res) {
 
   if (req.method === 'GET') {
     const url = new URL(req.url || '', 'http://localhost');
+    const { pathname } = url;
+    if (pathname.startsWith('/api/learning-time/total/')) {
+      const learnerId = decodeURIComponent(pathname.split('/').pop() || '');
+      const db = await loadDb();
+      const record = db[learnerId] || {};
+      const totalMs = Object.values(record).reduce((sum, ms) => sum + ms, 0);
+      const totalHours = totalMs / (1000 * 60 * 60);
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ totalHours }));
+      return;
+    }
+
     const learnerId = url.searchParams.get('learnerId');
     const db = await loadDb();
     const record = learnerId ? db[learnerId] || {} : {};

@@ -31,6 +31,19 @@ export function useLearnerHours(learnerId: string) {
 
   useEffect(() => {
     load();
+    const fetchTotal = async () => {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) return;
+      try {
+        const res = await fetch(`/api/learning-time/total/${encodeURIComponent(learnerId)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (typeof data.totalHours === 'number') {
+            setTotalHours(data.totalHours);
+          }
+        }
+      } catch { /* ignore */ }
+    };
+    void fetchTotal();
     const handler = (e: StorageEvent) => {
       if (e.key === getStorageKey(learnerId)) {
         load();
