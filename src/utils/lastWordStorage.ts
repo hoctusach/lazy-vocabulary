@@ -39,21 +39,25 @@ export const saveLastWord = (category: string, word: string): void => {
 
 interface TodayLastWordRecord {
   date: string;
+  index: number;
   word: string;
   category?: string;
 }
 
-export const getTodayLastWord = (): { word: string; category?: string } | undefined => {
+export const getTodayLastWord = (): TodayLastWordRecord | undefined => {
   if (typeof localStorage === 'undefined') return undefined;
   try {
     const stored = localStorage.getItem(LAST_TODAY_WORD_KEY);
     if (!stored) return undefined;
     const data = JSON.parse(stored) as TodayLastWordRecord;
-    if (data.date === getLocalDateISO()) {
-      return { word: data.word, category: data.category };
+    if (
+      data.date === getLocalDateISO() &&
+      typeof data.index === 'number'
+    ) {
+      return data;
     }
   } catch (error) {
-    console.error('Error reading today\'s last word from localStorage:', error);
+    console.error("Error reading today's last word from localStorage:", error);
   }
   try {
     localStorage.removeItem(LAST_TODAY_WORD_KEY);
@@ -61,16 +65,21 @@ export const getTodayLastWord = (): { word: string; category?: string } | undefi
   return undefined;
 };
 
-export const saveTodayLastWord = (word: string, category?: string): void => {
+export const saveTodayLastWord = (
+  index: number,
+  word: string,
+  category?: string
+): void => {
   if (typeof localStorage === 'undefined') return;
   try {
     const record: TodayLastWordRecord = {
       date: getLocalDateISO(),
+      index,
       word,
       category
     };
     localStorage.setItem(LAST_TODAY_WORD_KEY, JSON.stringify(record));
   } catch (error) {
-    console.error('Error saving today\'s last word to localStorage:', error);
+    console.error("Error saving today's last word to localStorage:", error);
   }
 };

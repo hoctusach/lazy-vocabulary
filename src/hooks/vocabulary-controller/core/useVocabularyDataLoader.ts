@@ -85,14 +85,14 @@ export const useVocabularyDataLoader = (
           const saved = getTodayLastWord();
           const now = Date.now();
 
-          if (saved) {
-            const savedIndex = todayWords.findIndex(w =>
-              w.word === saved.word && w.category === saved.category
-            );
-            if (savedIndex >= 0) {
-              setCurrentIndex(savedIndex);
-              return;
-            }
+          if (
+            saved &&
+            typeof saved.index === 'number' &&
+            saved.index >= 0 &&
+            saved.index < todayWords.length
+          ) {
+            setCurrentIndex(saved.index);
+            return;
           }
 
           const dueIndex = todayWords.findIndex(w => {
@@ -105,7 +105,9 @@ export const useVocabularyDataLoader = (
           } else {
             setCurrentIndex(0);
             const nextTimes = todayWords
-              .map(w => w.nextAllowedTime ? Date.parse(w.nextAllowedTime) : Infinity)
+              .map(w =>
+                w.nextAllowedTime ? Date.parse(w.nextAllowedTime) : Infinity
+              )
               .filter(t => !isNaN(t) && t !== Infinity);
             if (nextTimes.length > 0) {
               const earliest = Math.min(...nextTimes);

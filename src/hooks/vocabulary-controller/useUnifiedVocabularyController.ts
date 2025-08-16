@@ -77,7 +77,7 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
     const nextWord = wordList[nextIndex];
     if (nextWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
-      saveTodayLastWord(nextWord.word, nextWord.category);
+      saveTodayLastWord(nextIndex, nextWord.word, nextWord.category);
       if (!isMuted && !isPaused) {
         unifiedSpeechController.speak(nextWord, selectedVoiceName);
       }
@@ -160,9 +160,9 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
   useEffect(() => {
     if (currentWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
-      saveTodayLastWord(currentWord.word, currentWord.category);
+      saveTodayLastWord(currentIndex, currentWord.word, currentWord.category);
     }
-  }, [currentWord?.word, currentWord?.category]);
+  }, [currentWord?.word, currentWord?.category, currentIndex]);
 
   // Cleanup on unmount
   useEffect(() => {
