@@ -6,13 +6,14 @@ import { VocabularyWord } from '@/types/vocabulary';
  * optionally filtered by category. The original lists are not mutated.
  */
 export function buildTodaysWords(
-  newWords: LearningProgress[],
   reviewWords: LearningProgress[],
+  newWords: LearningProgress[],
   allWords: VocabularyWord[],
   category: string
 ): VocabularyWord[] {
   const map = new Map<string, VocabularyWord>();
-  const combined = [...newWords, ...reviewWords];
+  // Combine review words before new words to prioritize due items
+  const combined = [...reviewWords, ...newWords];
 
   combined.forEach(p => {
     const word = allWords.find(w => w.word === p.word && w.category === p.category);

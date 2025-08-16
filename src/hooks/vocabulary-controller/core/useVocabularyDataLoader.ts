@@ -60,7 +60,8 @@ export const useVocabularyDataLoader = (
 
         let todayWords: VocabularyWord[] = [];
         if (selection) {
-          const progressList = [...selection.newWords, ...selection.reviewWords];
+          // Review words should come before new words so playback prioritizes due items
+          const progressList = [...selection.reviewWords, ...selection.newWords];
           const map = new Map<string, VocabularyWord>();
           progressList.forEach(p => {
             const w = allWords.find(

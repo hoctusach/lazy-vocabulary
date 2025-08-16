@@ -21,12 +21,17 @@ describe('buildTodaysWords', () => {
   ];
 
   it('creates a de-duplicated union of new and review words', () => {
-    const result = buildTodaysWords(newWords, reviewWords, allWords, 'ALL');
+    const result = buildTodaysWords(reviewWords, newWords, allWords, 'ALL');
     expect(result.map(w => w.word).sort()).toEqual(['a', 'b', 'c']);
   });
 
   it('filters by category when provided', () => {
-    const result = buildTodaysWords(newWords, reviewWords, allWords, 'cat1');
+    const result = buildTodaysWords(reviewWords, newWords, allWords, 'cat1');
     expect(result.map(w => w.word).sort()).toEqual(['a', 'c']);
+  });
+
+  it('keeps review words before new words in the combined list', () => {
+    const result = buildTodaysWords(reviewWords, newWords, allWords, 'ALL');
+    expect(result.map(w => w.word)).toEqual(['a', 'c', 'b']);
   });
 });

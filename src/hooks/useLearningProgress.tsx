@@ -56,8 +56,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     if (!dailySelection) return;
 
     const words = buildTodaysWords(
-      dailySelection.newWords,
       dailySelection.reviewWords,
+      dailySelection.newWords,
       allWords,
       'ALL'
     );

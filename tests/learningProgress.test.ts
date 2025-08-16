@@ -187,6 +187,36 @@ describe('LearningProgressService', () => {
       expect(selection.newWords.length).toBe(2);
       expect(selection.totalCount).toBe(5);
     });
+
+    it('orders review words by earliest nextReviewDate', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const day = 86400000;
+
+      const progressData: Record<string, LearningProgress> = {
+        w1: { word: 'w1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 3 * day).toISOString().split('T')[0], createdDate: today },
+        w2: { word: 'w2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 1 * day).toISOString().split('T')[0], createdDate: today },
+        w3: { word: 'w3', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 2 * day).toISOString().split('T')[0], createdDate: today }
+      };
+
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'learningProgress') return JSON.stringify(progressData);
+        return null;
+      });
+
+      vi.spyOn(service as unknown as { getRandomCount: () => number }, 'getRandomCount').mockReturnValue(5);
+
+      const allWords: VocabularyWord[] = [
+        { word: 'w1', meaning: 'm', example: 'e', category: 'topic vocab', count: 1 },
+        { word: 'w2', meaning: 'm', example: 'e', category: 'topic vocab', count: 1 },
+        { word: 'w3', meaning: 'm', example: 'e', category: 'topic vocab', count: 1 },
+        { word: 'n1', meaning: 'm', example: 'e', category: 'topic vocab', count: 1 },
+        { word: 'n2', meaning: 'm', example: 'e', category: 'topic vocab', count: 1 }
+      ];
+
+      const selection = service.forceGenerateDailySelection(allWords, 'light');
+
+      expect(selection.reviewWords.map(w => w.word)).toEqual(['w1', 'w3', 'w2']);
+    });
   });
 
   describe('Word Progress Tracking', () => {
