@@ -74,7 +74,7 @@ export class LearningProgressService {
   private migrateProgressData(progress: LearningProgress): LearningProgress {
     const DEFAULT_VALUES = {
       status: 'new' as const,
-      retiredDate: undefined,
+      learnedDate: undefined,
       nextReviewDate: this.getToday(),
       createdDate: this.getToday()
     };
@@ -84,7 +84,10 @@ export class LearningProgressService {
       status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
       nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
-      retiredDate: progress.retiredDate || DEFAULT_VALUES.retiredDate
+      learnedDate:
+        (progress as any).learnedDate ||
+        (progress as any).retiredDate ||
+        DEFAULT_VALUES.learnedDate
     };
   }
 
@@ -132,7 +135,7 @@ export class LearningProgressService {
     if (progress) {
       const today = this.getToday();
       progress.status = 'retired';
-      progress.retiredDate = today;
+      progress.learnedDate = today;
       progress.nextReviewDate = this.addDays(today, 100);
       
       progressMap.set(wordKey, progress);
