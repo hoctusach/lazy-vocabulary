@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
+import { saveTodayLastWord } from '@/utils/lastWordStorage';
 
 const VocabularyAppWithLearning: React.FC = () => {
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
@@ -23,6 +24,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     generateDailyWords,
     markWordAsPlayed,
     getDueReviewWords,
+    getDueReviewWordList,
     getLearnedWords,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
@@ -65,6 +67,12 @@ const VocabularyAppWithLearning: React.FC = () => {
 
   const learnedWords = getLearnedWords();
 
+  const [wordListToPlay, setWordListToPlay] = useState<VocabularyWord[]>(todayWords);
+
+  useEffect(() => {
+    setWordListToPlay(todayWords);
+  }, [todayWords]);
+
   const handleMarkAsNew = () => {
     if (wordToReset) {
       markWordAsNew(wordToReset);
@@ -72,6 +80,16 @@ const VocabularyAppWithLearning: React.FC = () => {
     }
     setIsMarkAsNewDialogOpen(false);
     setWordToReset(null);
+  };
+
+  const handlePlayDueReviews = (startIndex = 0) => {
+    const dueWords = getDueReviewWordList();
+    if (dueWords.length === 0) return;
+    const startWord = dueWords[startIndex];
+    if (startWord) {
+      saveTodayLastWord(startWord.word, startWord.category);
+    }
+    setWordListToPlay(dueWords);
   };
 
   const learningSection = (
@@ -124,9 +142,19 @@ const VocabularyAppWithLearning: React.FC = () => {
               {progressStats.due > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
+                  <button
+                    className="text-sm px-2 py-1 bg-red-100 text-red-700 rounded border hover:bg-red-200"
+                    onClick={() => handlePlayDueReviews()}
+                  >
+                    Play Due Reviews
+                  </button>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {getDueReviewWords().map((word, index) => (
-                      <div key={index} className="text-sm p-2 bg-red-50 rounded border">
+                      <div
+                        key={index}
+                        className="text-sm p-2 bg-red-50 rounded border cursor-pointer hover:bg-red-100"
+                        onClick={() => handlePlayDueReviews(index)}
+                      >
                         <div className="font-medium">{word.word}</div>
                         <div className="text-xs text-gray-600">
                           {word.category} • Review #{word.reviewCount}
@@ -183,7 +211,7 @@ const VocabularyAppWithLearning: React.FC = () => {
       <ToastProvider />
       <div className="w-full max-w-6xl mx-auto p-4">
         <VocabularyAppContainerNew
-          initialWords={todayWords}
+          initialWords={wordListToPlay}
           onMarkWordLearned={(word) => {
             markCurrentWordLearned(word);
           }}
