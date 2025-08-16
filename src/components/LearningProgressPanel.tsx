@@ -12,10 +12,10 @@ interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
   progressStats: {
     total: number;
-    learned: number;
+    learning: number;
     new: number;
     due: number;
-    retired: number;
+    learned: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
 }
@@ -50,7 +50,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Total Words</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{progressStats.learned}</div>
+            <div className="text-2xl font-bold text-green-600">{progressStats.learning}</div>
             <div className="text-sm text-gray-600">Learning</div>
           </div>
           <div className="text-center">
@@ -62,8 +62,8 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-600">{progressStats.retired}</div>
-            <div className="text-sm text-gray-600">Retired</div>
+            <div className="text-2xl font-bold text-gray-600">{progressStats.learned}</div>
+            <div className="text-sm text-gray-600">Learned</div>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                 Level: {dailySelection.severity}
               </Badge>
             </div>
-            
+
             {/* Category breakdown for all words in today's selection */}
             {(dailySelection.newWords.length > 0 || dailySelection.reviewWords.length > 0) && (
               <div className="text-sm">
@@ -120,22 +120,22 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         <div className="space-y-3">
           <h4 className="font-semibold">Generate New Daily Selection</h4>
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => onGenerateDaily('light')}
             >
               Light (15-25)
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => onGenerateDaily('moderate')}
             >
               Moderate (30-50)
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => onGenerateDaily('intense')}
             >

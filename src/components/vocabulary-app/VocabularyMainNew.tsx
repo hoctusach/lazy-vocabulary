@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyCardNew from './VocabularyCardNew';
@@ -20,7 +19,7 @@ interface VocabularyMainNewProps {
   onOpenEditModal: () => void;
   showWordCount?: boolean;
   playCurrentWord: () => void;
-  onRetireWord?: () => void;
+  onMarkWordAsLearned?: () => void;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -38,7 +37,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   onOpenEditModal,
   showWordCount = false,
   playCurrentWord,
-  onRetireWord,
+  onMarkWordAsLearned,
   }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -57,7 +56,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             showWordCount={showWordCount}
           />
         </div>
-      
+
       {/* Controls column - positioned on the right side */}
         <div className="flex-none flex flex-col justify-start items-end">
           <VocabularyControlsColumn
@@ -72,7 +71,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             onOpenEditModal={onOpenEditModal}
             selectedVoiceName={selectedVoiceName}
             playCurrentWord={playCurrentWord}
-            onRetireWord={onRetireWord}
+            onMarkWordAsLearned={onMarkWordAsLearned}
           />
         </div>
       </div>
