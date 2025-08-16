@@ -1,5 +1,6 @@
 import { LearningProgress, DailySelection, SeverityLevel, CategoryWeights } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
+import { getLocalDateISO } from '@/utils/date';
 
 const LEARNING_PROGRESS_KEY = 'learningProgress';
 const DAILY_SELECTION_KEY = 'dailySelection';
@@ -31,13 +32,13 @@ export class LearningProgressService {
   }
 
   private getToday(): string {
-    return new Date().toISOString().split('T')[0];
+    return getLocalDateISO();
   }
 
   private addDays(date: string, days: number): string {
     const d = new Date(date);
     d.setDate(d.getDate() + days);
-    return d.toISOString().split('T')[0];
+    return getLocalDateISO(d);
   }
 
   private getRandomCount(severity: SeverityLevel): number {
