@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, Archive } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, CheckCircle } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
@@ -92,15 +92,15 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [isMarkDialogOpen, setIsMarkDialogOpen] = React.useState(false);
+  const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
   const openSearch = () => setIsSearchOpen(true);
   const closeSearch = () => setIsSearchOpen(false);
 
-  const handleMarkClick = () => setIsMarkDialogOpen(true);
-  const handleMarkConfirm = () => {
+  const handleMarkAsLearnedClick = () => setIsMarkAsLearnedDialogOpen(true);
+  const handleMarkAsLearnedConfirm = () => {
     if (onMarkWordLearned) onMarkWordLearned();
-    setIsMarkDialogOpen(false);
-    toast('Word learned for 100 days');
+    setIsMarkAsLearnedDialogOpen(false);
+    toast('Word marked as learned.');
   };
 
   return (
@@ -175,22 +175,22 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={handleMarkClick}
+          onClick={handleMarkAsLearnedClick}
           className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
           title="Mark as Learned"
           aria-label="Mark as Learned"
           disabled={!currentWord}
         >
-          <Archive size={16} />
+          <CheckCircle size={16} />
         </Button>
       )}
       
       <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
       
       <MarkAsLearnedDialog
-        isOpen={isMarkDialogOpen}
-        onClose={() => setIsMarkDialogOpen(false)}
-        onConfirm={handleMarkConfirm}
+        isOpen={isMarkAsLearnedDialogOpen}
+        onClose={() => setIsMarkAsLearnedDialogOpen(false)}
+        onConfirm={handleMarkAsLearnedConfirm}
         wordText={currentWord?.word || ''}
       />
     </div>
