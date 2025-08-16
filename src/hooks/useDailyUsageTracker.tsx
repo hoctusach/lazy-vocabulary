@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { addStreakDay } from '@/utils/streak';
+import { learningTimeService } from '@/services/learningTimeService';
 
 const STICKERS_KEY = 'stickers';
 const MINUTES_15 = 15 * 60 * 1000;
@@ -12,8 +13,8 @@ function getTodayKey() {
   return `dailyTime_${formatDate(new Date())}`;
 }
 
-export const useDailyUsageTracker = () => {
-  const sessionStart = useRef<number | null>(null);
+export const useDailyUsageTracker = (learnerId: string) => {
+  const sessionActive = useRef<boolean>(false);
   // Tracks accumulated time for the current day across all sessions
   const dailyTotal = useRef<number>(0);
 
@@ -42,22 +43,23 @@ export const useDailyUsageTracker = () => {
     }
   };
 
-  const startSession = () => {
-    if (sessionStart.current === null) {
-      sessionStart.current = Date.now();
+  const startSession = useCallback(() => {
+    if (!sessionActive.current) {
+      sessionActive.current = true;
+      learningTimeService.startSession(learnerId);
     }
-  };
+  }, [learnerId]);
 
-  const stopSession = () => {
-    if (sessionStart.current === null) return;
-    const duration = Date.now() - sessionStart.current;
-    sessionStart.current = null;
+  const stopSession = useCallback(() => {
+    if (!sessionActive.current) return;
+    sessionActive.current = false;
+    const duration = learningTimeService.stopSession(learnerId);
 
     // Accumulate today's total usage time
     dailyTotal.current += duration;
     saveDailyTotal();
     awardStickerIfNeeded();
-  };
+  }, [learnerId]);
 
   useEffect(() => {
     loadDailyTotal();
@@ -80,7 +82,7 @@ export const useDailyUsageTracker = () => {
       window.removeEventListener('beforeunload', stopSession);
       document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, []);
+  }, [startSession, stopSession]);
 };
 
 export { formatDate };
