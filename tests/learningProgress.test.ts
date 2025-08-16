@@ -135,12 +135,12 @@ describe('LearningProgressService', () => {
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
       const progressData: Record<string, LearningProgress> = {
-        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
-        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
-        new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new4: { word: 'new4', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
-        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today }
+        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new4: { word: 'new4', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '', status: 'new', nextReviewDate: today, createdDate: today }
       };
 
       localStorageMock.getItem.mockImplementation((key) => {
@@ -225,11 +225,11 @@ describe('LearningProgressService', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const mockProgress = {
-        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today },
-        'word2': { isLearned: false, status: 'new', nextReviewDate: today },
-        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday },
-        'word4': { isLearned: false, status: 'new', nextReviewDate: today },
-      };
+        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word2': { isLearned: false, status: 'new', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+        'word4': { isLearned: false, status: 'new', nextReviewDate: today, exposuresToday: 0, lastExposureTime: '', nextAllowedTime: '' },
+      } as Record<string, LearningProgress>;
 
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
       
@@ -252,6 +252,9 @@ describe('LearningProgressService', () => {
           isLearned: true,
           reviewCount: 1,
           lastPlayedDate: '',
+          exposuresToday: 0,
+          lastExposureTime: '',
+          nextAllowedTime: '',
           status: 'not_due',
           nextReviewDate: today,
           createdDate: today
@@ -262,6 +265,9 @@ describe('LearningProgressService', () => {
           isLearned: true,
           reviewCount: 1,
           lastPlayedDate: '',
+          exposuresToday: 0,
+          lastExposureTime: '',
+          nextAllowedTime: '',
           status: 'not_due',
           nextReviewDate: tomorrow,
           createdDate: today
