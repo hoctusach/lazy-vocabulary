@@ -8,7 +8,7 @@ export interface LearningProgress {
   status: 'due' | 'not_due' | 'new' | 'retired';
   nextReviewDate: string;
   createdDate: string;
-  retiredDate?: string;
+  learnedDate?: string;
 }
 
 export interface DailySelection {
