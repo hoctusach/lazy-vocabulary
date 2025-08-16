@@ -105,7 +105,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       severity: 'light'
     });
 
-    getTodayLastWordMock.mockReturnValue({ word: 'b', category: 'c' });
+    getTodayLastWordMock.mockReturnValue({ index: 1, word: 'b', category: 'c', date: '2024-01-01' });
 
     const setWordList = vi.fn();
     const setHasData = vi.fn();
