@@ -12,7 +12,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { RetireWordDialog } from '@/components/RetireWordDialog';
+import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -187,7 +187,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       
       <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
       
-      <RetireWordDialog
+      <MarkAsLearnedDialog
         isOpen={isRetireDialogOpen}
         onClose={() => setIsRetireDialogOpen(false)}
         onConfirm={handleRetireConfirm}
