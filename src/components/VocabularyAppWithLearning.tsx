@@ -111,7 +111,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             <div className="grid gap-4 md:grid-cols-4">
               {dailySelection.newWords.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium text-green-600">Today's New Words ({dailySelection.newWords.length})</h4>
+                  <h4 className="font-medium text-green-600">Today's New ({dailySelection.newWords.length})</h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {dailySelection.newWords.map((word, index) => (
                       <div key={index} className="text-sm p-2 bg-green-50 rounded border">
@@ -141,7 +141,7 @@ const VocabularyAppWithLearning: React.FC = () => {
 
               {progressStats.due > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium text-red-600">Due Review Words ({progressStats.due})</h4>
+                  <h4 className="font-medium text-red-600">Today's Due Review ({progressStats.due})</h4>
                   <button
                     className="text-sm px-2 py-1 bg-red-100 text-red-700 rounded border hover:bg-red-200"
                     onClick={() => handlePlayDueReviews()}
