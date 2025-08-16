@@ -149,11 +149,11 @@ export class LearningProgressService {
       if (progress.status === 'retired') return;
 
       if (progress.isLearned) {
-        if (progress.nextReviewDate < today && progress.status !== 'due') {
+        if (progress.nextReviewDate <= today && progress.status !== 'due') {
           progress.status = 'due';
           progressMap.set(key, progress);
           hasChanges = true;
-        } else if (progress.nextReviewDate >= today && progress.status !== 'not_due') {
+        } else if (progress.nextReviewDate > today && progress.status !== 'not_due') {
           progress.status = 'not_due';
           progressMap.set(key, progress);
           hasChanges = true;
@@ -208,7 +208,7 @@ export class LearningProgressService {
 
     // Get available words
     const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'retired');
-    const dueWords = Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate < today);
+    const dueWords = Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
 
     // Always include all due review words
     const selectedReview = dueWords;
@@ -304,7 +304,7 @@ export class LearningProgressService {
       total: all.length,
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
-      due: all.filter(p => p.isLearned && p.nextReviewDate < today).length,
+      due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
       retired: all.filter(p => p.status === 'retired').length
     };
   }
@@ -312,7 +312,7 @@ export class LearningProgressService {
   getDueReviewWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
     const today = this.getToday();
-    return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate < today);
+    return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
   }
 
   getRetiredWords(): LearningProgress[] {

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
 import { VocabularyWord } from '@/types/vocabulary';
+import { LearningProgress } from '@/types/learning';
 
 // Mock localStorage
 const localStorageMock = {
@@ -133,7 +134,7 @@ describe('LearningProgressService', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
-      const progressData: Record<string, any> = {
+      const progressData: Record<string, LearningProgress> = {
         due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
         due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
         new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
@@ -147,7 +148,7 @@ describe('LearningProgressService', () => {
         return null;
       });
 
-      vi.spyOn(service as any, 'getRandomCount').mockReturnValue(5);
+      vi.spyOn(service as unknown as { getRandomCount: () => number }, 'getRandomCount').mockReturnValue(5);
 
       const allWords: VocabularyWord[] = Object.keys(progressData).map(word => ({ word, meaning: 'm', example: 'e', category: 'topic vocab', count: 1 }));
 
@@ -237,7 +238,43 @@ describe('LearningProgressService', () => {
       expect(stats.total).toBe(4);
       expect(stats.learned).toBe(2);
       expect(stats.new).toBe(2);
-      expect(stats.due).toBe(1);
+      expect(stats.due).toBe(2);
+    });
+
+    it('should include words with next review date today in due list', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
+      const progressData: Record<string, LearningProgress> = {
+        todayWord: {
+          word: 'todayWord',
+          category: 'topic vocab',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'not_due',
+          nextReviewDate: today,
+          createdDate: today
+        },
+        futureWord: {
+          word: 'futureWord',
+          category: 'topic vocab',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'not_due',
+          nextReviewDate: tomorrow,
+          createdDate: today
+        }
+      };
+
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'learningProgress') return JSON.stringify(progressData);
+        return null;
+      });
+
+      const dueWords = service.getDueReviewWords();
+      expect(dueWords.map(w => w.word)).toEqual(['todayWord']);
     });
   });
 
