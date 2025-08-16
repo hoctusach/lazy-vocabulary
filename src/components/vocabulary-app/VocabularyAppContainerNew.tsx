@@ -14,12 +14,12 @@ import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  isActive?: boolean;
   onRetireWord?: () => void;
   initialWords?: VocabularyWord[];
+  additionalContent?: React.ReactNode;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ isActive = true, onRetireWord, initialWords }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onRetireWord, initialWords, additionalContent }) => {
   // Use stable state management
   const {
     currentWord,
@@ -48,8 +48,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
     isMuted,
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
-    playCurrentWord,
-    isActive
+    playCurrentWord
   });
 
   // Modal state management
@@ -91,27 +90,25 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
     currentWord: debugData
   }), [isMuted, selectedVoiceName, isPaused, debugData]);
 
-  let content: React.ReactNode;
-
   if (!hasData && !vocabularyService.hasData()) {
     return (
       <DebugInfoContext.Provider value={debugInfo}>
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-        <div className="space-y-4">
-          <UserInteractionManager
-            currentWord={currentWord}
-            playCurrentWord={playCurrentWord}
-            onInteractionUpdate={handleInteractionUpdate}
-          />
-          <VocabularyCardNew
-            word="No vocabulary data"
-            meaning="Please upload a vocabulary file to get started"
-            example=""
-            backgroundColor="#F0F8FF"
-            isSpeaking={false}
-            category="No Data"
-          />
-        </div>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+          <div className="space-y-4">
+            <UserInteractionManager
+              currentWord={currentWord}
+              playCurrentWord={playCurrentWord}
+              onInteractionUpdate={handleInteractionUpdate}
+            />
+            <VocabularyCardNew
+              word="No vocabulary data"
+              meaning="Please upload a vocabulary file to get started"
+              example=""
+              backgroundColor="#F0F8FF"
+              isSpeaking={false}
+              category="No Data"
+            />
+          </div>
         </VocabularyLayout>
       </DebugInfoContext.Provider>
     );
@@ -120,22 +117,22 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
   if (!hasData) {
     return (
       <DebugInfoContext.Provider value={debugInfo}>
-      <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-        <div className="space-y-4">
-          <UserInteractionManager
-            currentWord={currentWord}
-            playCurrentWord={playCurrentWord}
-            onInteractionUpdate={handleInteractionUpdate}
-          />
-          <VocabularyCardNew
-            word={`No words in "${currentCategory}" category`}
-            meaning="Try switching to another category"
-            example=""
-            backgroundColor="#F0F8FF"
-            isSpeaking={false}
-            category={currentCategory}
-          />
-        </div>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+          <div className="space-y-4">
+            <UserInteractionManager
+              currentWord={currentWord}
+              playCurrentWord={playCurrentWord}
+              onInteractionUpdate={handleInteractionUpdate}
+            />
+            <VocabularyCardNew
+              word={`No words in "${currentCategory}" category`}
+              meaning="Try switching to another category"
+              example=""
+              backgroundColor="#F0F8FF"
+              isSpeaking={false}
+              category={currentCategory}
+            />
+          </div>
         </VocabularyLayout>
       </DebugInfoContext.Provider>
     );
@@ -144,27 +141,29 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
   if (!currentWord) {
     return (
       <DebugInfoContext.Provider value={debugInfo}>
-      <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
-        <div className="space-y-4">
-          <UserInteractionManager
-            currentWord={currentWord}
-            playCurrentWord={playCurrentWord}
-            onInteractionUpdate={handleInteractionUpdate}
-          />
-        <VocabularyCardNew
-          word="Loading vocabulary..."
-          meaning="Please wait while we load your vocabulary data"
-          example=""
-          backgroundColor="#F0F8FF"
-          isSpeaking={false}
-          category="Loading"
-        />
-        </div>
-      </VocabularyLayout>
+        <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
+          <div className="space-y-4">
+            <UserInteractionManager
+              currentWord={currentWord}
+              playCurrentWord={playCurrentWord}
+              onInteractionUpdate={handleInteractionUpdate}
+            />
+            <VocabularyCardNew
+              word="Loading vocabulary..."
+              meaning="Please wait while we load your vocabulary data"
+              example=""
+              backgroundColor="#F0F8FF"
+              isSpeaking={false}
+              category="Loading"
+            />
+          </div>
+        </VocabularyLayout>
       </DebugInfoContext.Provider>
-      );
-  } else {
-    content = (
+    );
+  }
+
+  return (
+    <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
         <div className="space-y-4">
           <UserInteractionManager
@@ -173,7 +172,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             onInteractionUpdate={handleInteractionUpdate}
           />
 
-        <ErrorDisplay jsonLoadError={false} />
+          <ErrorDisplay jsonLoadError={false} />
 
           <ContentWithDataNew
             displayWord={currentWord}
@@ -193,48 +192,11 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ i
             wordToEdit={wordToEdit}
             handleOpenAddWordModal={handleOpenAddWordModal}
             handleOpenEditWordModal={handleOpenEditWordModal}
-            playCurrentWord={playCurrentWord}
             onRetireWord={onRetireWord}
+            additionalContent={additionalContent}
           />
         </div>
       </VocabularyLayout>
-    );
-  }
-
-  return (
-    <DebugInfoContext.Provider value={debugInfo}>
-    <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-      <div className="space-y-4">
-        <UserInteractionManager
-          currentWord={currentWord}
-          playCurrentWord={playCurrentWord}
-          onInteractionUpdate={handleInteractionUpdate}
-        />
-        
-        <ErrorDisplay jsonLoadError={false} />
-        
-        <ContentWithDataNew
-          displayWord={currentWord}
-          muted={isMuted}
-          paused={isPaused}
-          toggleMute={toggleMute}
-          handleTogglePause={togglePause}
-          handleCycleVoice={toggleVoice}
-          isSpeaking={isSpeaking}
-          handleManualNext={goToNextAndSpeak}
-          displayTime={5000}
-          selectedVoiceName={selectedVoiceName}
-          isAddWordModalOpen={isAddWordModalOpen}
-          handleCloseModal={handleCloseModal}
-          handleSaveWord={handleSaveWord}
-          isEditMode={isEditMode}
-          wordToEdit={wordToEdit}
-          handleOpenAddWordModal={handleOpenAddWordModal}
-          handleOpenEditWordModal={handleOpenEditWordModal}
-          onRetireWord={onRetireWord}
-        />
-      </div>
-    </VocabularyLayout>
     </DebugInfoContext.Provider>
   );
 };

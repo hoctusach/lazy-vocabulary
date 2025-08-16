@@ -28,6 +28,7 @@ interface ContentWithDataNewProps {
   handleOpenEditWordModal: (word: VocabularyWord) => void;
   playCurrentWord: () => void;
   onRetireWord?: () => void;
+  additionalContent?: React.ReactNode;
 }
 
 const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
@@ -49,7 +50,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleOpenAddWordModal,
   handleOpenEditWordModal,
   playCurrentWord,
-  onRetireWord
+  onRetireWord,
+  additionalContent
 }) => {
   const editingWordData = useMemo(
     () => (
@@ -83,6 +85,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       playCurrentWord={playCurrentWord}
       onRetireWord={onRetireWord}
       />
+
+      {additionalContent}
 
       {/* Achievements and learning days */}
       <Collapsible open={open} onOpenChange={setOpen}>
