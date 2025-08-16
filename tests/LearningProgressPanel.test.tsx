@@ -18,7 +18,7 @@ describe('LearningProgressPanel', () => {
       />
     );
 
-    fireEvent.click(screen.getByText('Daily Learning Progress'));
+    fireEvent.click(screen.getByRole('heading', { name: 'Learning Progress' }));
     const learnedLabel = screen.getByText('Learned');
     expect(learnedLabel.previousElementSibling?.textContent).toBe('4');
   });

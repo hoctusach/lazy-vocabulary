@@ -93,7 +93,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             <div className="grid gap-4 md:grid-cols-4">
               {dailySelection.newWords.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium text-green-600">New Words ({dailySelection.newWords.length})</h4>
+                  <h4 className="font-medium text-green-600">Today's New Words ({dailySelection.newWords.length})</h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {dailySelection.newWords.map((word, index) => (
                       <div key={index} className="text-sm p-2 bg-green-50 rounded border">

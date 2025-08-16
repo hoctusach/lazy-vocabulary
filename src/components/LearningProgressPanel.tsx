@@ -40,7 +40,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         <CardHeader>
           <div className="flex items-center justify-between">
             <CollapsibleTrigger className="flex items-center gap-2">
-              <CardTitle className="text-lg">Daily Learning Progress</CardTitle>
+              <CardTitle className="text-lg">Learning Progress</CardTitle>
               <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
             </CollapsibleTrigger>
           </div>
