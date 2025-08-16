@@ -17,7 +17,7 @@ const App = () => {
   useEffect(() => {
     loadStreakDays();
   }, []);
-  useDailyUsageTracker();
+  useDailyUsageTracker('default');
   useSessionTracker();
   return (
     <QueryClientProvider client={queryClient}>

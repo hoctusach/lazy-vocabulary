@@ -26,7 +26,7 @@ describe('sticker history persistence', () => {
 
     for (let i = 0; i < 5; i++) {
       vi.setSystemTime(new Date(start.getTime() + i * 24 * 60 * 60 * 1000));
-      const { unmount } = renderHook(() => useDailyUsageTracker());
+      const { unmount } = renderHook(() => useDailyUsageTracker('learner1'));
       await advanceSession(16 * 60 * 1000);
       act(() => window.dispatchEvent(new Event('beforeunload')));
       unmount();

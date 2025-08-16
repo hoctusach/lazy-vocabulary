@@ -64,6 +64,7 @@ const VocabularyAppWithLearning: React.FC = () => {
         dailySelection={dailySelection}
         progressStats={progressStats}
         onGenerateDaily={generateDailyWords}
+        learnerId="default"
       />
 
       {dailySelection && (

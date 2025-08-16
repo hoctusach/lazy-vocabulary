@@ -23,7 +23,7 @@ describe('useDailyUsageTracker', () => {
   });
 
   it('records time and awards sticker after 15 minutes', async () => {
-    renderHook(() => useDailyUsageTracker());
+    renderHook(() => useDailyUsageTracker('learner1'));
     await advanceSession(16 * 60 * 1000);
 
     act(() => {
@@ -41,11 +41,11 @@ describe('useDailyUsageTracker', () => {
     const today = formatDate(new Date());
     const key = `dailyTime_${today}`;
 
-    renderHook(() => useDailyUsageTracker());
+    renderHook(() => useDailyUsageTracker('learner1'));
     await advanceSession(5 * 60 * 1000);
     act(() => window.dispatchEvent(new Event('beforeunload')));
 
-    renderHook(() => useDailyUsageTracker());
+    renderHook(() => useDailyUsageTracker('learner1'));
     await advanceSession(10 * 60 * 1000);
     act(() => window.dispatchEvent(new Event('beforeunload')));
 

@@ -7,6 +7,7 @@ import { DailySelection, SeverityLevel } from '@/types/learning';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { useLearnerHours } from '@/hooks/useLearnerHours';
 
 interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
@@ -18,17 +19,20 @@ interface LearningProgressPanelProps {
     retired: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
+  learnerId: string;
 }
 
 export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   dailySelection,
   progressStats,
-  onGenerateDaily
+  onGenerateDaily,
+  learnerId
 }) => {
   const learnedPercentage = progressStats.total > 0
     ? (progressStats.learned / progressStats.total) * 100
     : 0;
   const [open, setOpen] = useState(false);
+  const { totalHours } = useLearnerHours(learnerId);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="w-full">
@@ -44,7 +48,11 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         <CollapsibleContent>
           <CardContent className="space-y-4">
         {/* Progress Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">{totalHours.toFixed(1)}</div>
+            <div className="text-sm text-gray-600">Hours Learned</div>
+          </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
             <div className="text-sm text-gray-600">Total Words</div>
