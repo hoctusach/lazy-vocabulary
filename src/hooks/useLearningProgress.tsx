@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { learningProgressService } from '@/services/learningProgressService';
 import { DailySelection, SeverityLevel, LearningProgress } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
+import { buildTodaysWords } from '@/utils/todayWords';
 
 export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [currentWordProgress, setCurrentWordProgress] = useState<LearningProgress | null>(null);
   const [todayWords, setTodayWords] = useState<VocabularyWord[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [progressStats, setProgressStats] = useState({
     total: 0,
     learned: 0,
@@ -54,12 +56,15 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   useEffect(() => {
     if (!dailySelection) return;
 
-    const selectionWords = [...dailySelection.newWords, ...dailySelection.reviewWords]
-      .map(p => allWords.find(w => w.word === p.word && w.category === p.category))
-      .filter((w): w is VocabularyWord => Boolean(w));
+    const words = buildTodaysWords(
+      dailySelection.newWords,
+      dailySelection.reviewWords,
+      allWords,
+      selectedCategory
+    );
 
-    setTodayWords(selectionWords);
-  }, [dailySelection, allWords]);
+    setTodayWords(words);
+  }, [dailySelection, allWords, selectedCategory]);
 
   const getDueReviewWords = useCallback(() => {
     return learningProgressService.getDueReviewWords();
@@ -85,6 +90,17 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getDueReviewWords,
     getRetiredWords,
     retireCurrentWord,
-    todayWords
+    todayWords,
+    selectedCategory,
+    setSelectedCategory,
+    getTodayWords: (category: string) =>
+      dailySelection
+        ? buildTodaysWords(
+            dailySelection.newWords,
+            dailySelection.reviewWords,
+            allWords,
+            category
+          )
+        : []
   };
 };

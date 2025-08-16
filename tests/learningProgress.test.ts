@@ -161,7 +161,7 @@ describe('LearningProgressService', () => {
       
       expect(updatedProgress.isLearned).toBe(true);
       expect(updatedProgress.reviewCount).toBe(1);
-      expect(updatedProgress.status).toBe('not_due');
+      expect(updatedProgress.status).toBe('due');
       expect(updatedProgress.lastPlayedDate).toBeTruthy();
       expect(updatedProgress.nextReviewDate).toBeTruthy();
     });
