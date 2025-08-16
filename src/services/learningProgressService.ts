@@ -219,19 +219,22 @@ export class LearningProgressService {
 
     // Get available words
     const newWords = Array.from(progressMap.values()).filter(p => !p.isLearned && p.status !== 'learned');
-    const dueWords = Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
+    const dueWords = Array.from(progressMap.values())
+      .filter(p => p.isLearned && p.nextReviewDate <= today)
+      .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
 
-    // Always include all due review words
-    const selectedReview = dueWords;
+    // Determine how many review words to include (60% of total)
+    const targetReviewCount = Math.round(totalCount * 0.6);
+    const selectedReview = dueWords.slice(0, targetReviewCount);
 
-    // Fill remaining slots with new words
+    // Fill remaining slots with new words while keeping total count
     const remainingSlots = Math.max(totalCount - selectedReview.length, 0);
     const selectedNew = this.selectNewWordsByCategory(newWords, Math.min(remainingSlots, newWords.length));
 
     const selection: DailySelection = {
       newWords: selectedNew,
       reviewWords: selectedReview,
-      totalCount: selectedNew.length + selectedReview.length,
+      totalCount,
       severity
     };
 
@@ -323,7 +326,9 @@ export class LearningProgressService {
   getDueReviewWords(): LearningProgress[] {
     const progressMap = this.getLearningProgress();
     const today = this.getToday();
-    return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
+    return Array.from(progressMap.values())
+      .filter(p => p.isLearned && p.nextReviewDate <= today)
+      .sort((a, b) => a.nextReviewDate.localeCompare(b.nextReviewDate));
   }
 
   getLearnedWords(): LearningProgress[] {

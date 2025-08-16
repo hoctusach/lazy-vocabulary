@@ -130,7 +130,7 @@ describe('LearningProgressService', () => {
       expect(intenseSelection.totalCount).toBeLessThanOrEqual(100);
     });
 
-    it('should include all due words and fill with new words', () => {
+    it('should include all due words when below target and fill with new words', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
 
@@ -156,6 +156,35 @@ describe('LearningProgressService', () => {
 
       expect(selection.reviewWords.map(w => w.word).sort()).toEqual(['due1', 'due2']);
       expect(selection.newWords.length).toBe(3);
+      expect(selection.totalCount).toBe(5);
+    });
+
+    it('should limit review words to target percentage when many are due', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const day = 86400000;
+      const progressData: Record<string, LearningProgress> = {
+        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 4 * day).toISOString().split('T')[0], createdDate: today },
+        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 3 * day).toISOString().split('T')[0], createdDate: today },
+        due3: { word: 'due3', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 2 * day).toISOString().split('T')[0], createdDate: today },
+        due4: { word: 'due4', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: new Date(Date.now() - 1 * day).toISOString().split('T')[0], createdDate: today },
+        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today }
+      };
+
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'learningProgress') return JSON.stringify(progressData);
+        return null;
+      });
+
+      vi.spyOn(service as unknown as { getRandomCount: () => number }, 'getRandomCount').mockReturnValue(5);
+
+      const allWords: VocabularyWord[] = Object.keys(progressData).map(word => ({ word, meaning: 'm', example: 'e', category: 'topic vocab', count: 1 }));
+
+      const selection = service.forceGenerateDailySelection(allWords, 'light');
+
+      expect(selection.reviewWords.map(w => w.word)).toEqual(['due1', 'due2', 'due3']);
+      expect(selection.reviewWords.find(w => w.word === 'due4')).toBeUndefined();
+      expect(selection.newWords.length).toBe(2);
       expect(selection.totalCount).toBe(5);
     });
   });
@@ -279,6 +308,51 @@ describe('LearningProgressService', () => {
 
       const dueWords = service.getDueReviewWords();
       expect(dueWords.map(w => w.word)).toEqual(['todayWord']);
+    });
+
+    it('should return due words sorted by next review date', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const day = 86400000;
+      const progressData: Record<string, LearningProgress> = {
+        word2: {
+          word: 'word2',
+          category: 'topic vocab',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'due',
+          nextReviewDate: new Date(Date.now() - 1 * day).toISOString().split('T')[0],
+          createdDate: today
+        },
+        word1: {
+          word: 'word1',
+          category: 'topic vocab',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'due',
+          nextReviewDate: new Date(Date.now() - 3 * day).toISOString().split('T')[0],
+          createdDate: today
+        },
+        word3: {
+          word: 'word3',
+          category: 'topic vocab',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'due',
+          nextReviewDate: new Date(Date.now() - 2 * day).toISOString().split('T')[0],
+          createdDate: today
+        }
+      };
+
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'learningProgress') return JSON.stringify(progressData);
+        return null;
+      });
+
+      const dueWords = service.getDueReviewWords();
+      expect(dueWords.map(w => w.word)).toEqual(['word1', 'word3', 'word2']);
     });
   });
 
