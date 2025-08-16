@@ -148,6 +148,24 @@ export class LearningProgressService {
 
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
+
+      // remove from today's cached selection if present
+      const cached = localStorage.getItem(DAILY_SELECTION_KEY);
+      if (cached) {
+        const selection: DailySelection = JSON.parse(cached);
+        const match = (p: LearningProgress) =>
+          p.word === progress.word && p.category === progress.category;
+
+        const reviewWords = selection.reviewWords.filter(p => !match(p));
+        const newWords = selection.newWords.filter(p => !match(p));
+        const updated: DailySelection = {
+          ...selection,
+          reviewWords,
+          newWords,
+          totalCount: reviewWords.length + newWords.length
+        };
+        localStorage.setItem(DAILY_SELECTION_KEY, JSON.stringify(updated));
+      }
     }
   }
 

@@ -80,8 +80,31 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
 
   const markWordLearned = useCallback((word: string) => {
     learningProgressService.markWordLearned(word);
+
+    setDailySelection(prev => {
+      if (!prev) return prev;
+
+      const found = [...prev.reviewWords, ...prev.newWords].find(p => p.word === word);
+      const match = (p: LearningProgress) =>
+        p.word === word && (!found || p.category === found.category);
+      const reviewWords = prev.reviewWords.filter(p => !match(p));
+      const newWords = prev.newWords.filter(p => !match(p));
+      const updated: DailySelection = {
+        ...prev,
+        reviewWords,
+        newWords,
+        totalCount: reviewWords.length + newWords.length
+      };
+
+      setTodayWords(
+        buildTodaysWords(updated.reviewWords, updated.newWords, allWords, 'ALL')
+      );
+
+      return updated;
+    });
+
     refreshStats();
-  }, [refreshStats]);
+  }, [allWords, refreshStats]);
 
   const markWordAsNew = useCallback((word: string) => {
     learningProgressService.markWordAsNew(word);
