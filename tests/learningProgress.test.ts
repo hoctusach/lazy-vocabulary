@@ -224,21 +224,25 @@ describe('LearningProgressService', () => {
     it('should calculate progress stats correctly', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+      const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+
       const mockProgress = {
         'word1': { isLearned: true, status: 'not_due', nextReviewDate: today },
         'word2': { isLearned: false, status: 'new', nextReviewDate: today },
         'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday },
         'word4': { isLearned: false, status: 'new', nextReviewDate: today },
+        'word5': { isLearned: true, status: 'learned', nextReviewDate: tomorrow },
       };
 
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
-      
+
       const stats = service.getProgressStats();
-      
-      expect(stats.total).toBe(4);
-      expect(stats.learned).toBe(2);
+
+      expect(stats.total).toBe(5);
+      expect(stats.learned).toBe(3);
       expect(stats.new).toBe(2);
       expect(stats.due).toBe(2);
+      expect(stats.learnedCompleted).toBe(1);
     });
 
     it('should include words with next review date today in due list', () => {
