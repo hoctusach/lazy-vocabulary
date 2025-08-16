@@ -308,7 +308,7 @@ export class LearningProgressService {
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
       due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
-      retired: all.filter(p => p.status === 'retired').length
+      learnedCompleted: all.filter(p => p.status === 'retired').length
     };
   }
 

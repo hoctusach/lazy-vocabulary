@@ -15,7 +15,7 @@ interface LearningProgressPanelProps {
     learned: number;
     new: number;
     due: number;
-    retired: number;
+    learnedCompleted: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
 }
@@ -62,8 +62,8 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-600">{progressStats.retired}</div>
-            <div className="text-sm text-gray-600">Retired</div>
+            <div className="text-2xl font-bold text-gray-600">{progressStats.learnedCompleted}</div>
+            <div className="text-sm text-gray-600">Learned</div>
           </div>
         </div>
 

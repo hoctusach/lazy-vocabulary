@@ -13,7 +13,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     learned: 0,
     new: 0,
     due: 0,
-    retired: 0
+    learnedCompleted: 0
   });
 
   const refreshStats = useCallback(() => {
