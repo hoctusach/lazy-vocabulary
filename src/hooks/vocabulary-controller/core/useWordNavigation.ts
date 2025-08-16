@@ -57,7 +57,9 @@ export const useWordNavigation = (
       if (nextWord) {
         saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
         // Speak the new word immediately
-        setTimeout(() => playCurrentWord(), 10);
+        if (typeof playCurrentWord === 'function') {
+          setTimeout(() => playCurrentWord(), 10);
+        }
       }
 
     } catch (error) {

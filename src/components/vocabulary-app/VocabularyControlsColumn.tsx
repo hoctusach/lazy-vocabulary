@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward, Speaker, Search, Archive } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, Archive } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
@@ -10,7 +10,6 @@ import EditWordButton from './EditWordButton';
 import WordSearchModal from './WordSearchModal';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
-import { getCategoryLabel, getCategoryMessageLabel } from '@/utils/categoryLabels';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { RetireWordDialog } from '@/components/RetireWordDialog';
@@ -21,9 +20,7 @@ interface VocabularyControlsColumnProps {
   onToggleMute: () => void;
   onTogglePause: () => void;
   onNextWord: () => void;
-  onSwitchCategory: () => void;
   onCycleVoice: () => void;
-  nextCategory: string;
   currentWord: VocabularyWord | null;
   onOpenAddModal: () => void;
   onOpenEditModal: () => void;
@@ -38,9 +35,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onToggleMute,
   onTogglePause,
   onNextWord,
-  onSwitchCategory,
   onCycleVoice,
-  nextCategory,
   currentWord,
   onOpenAddModal,
   onOpenEditModal,
@@ -50,10 +45,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
-  const safeNextCategory = nextCategory || 'Next';
-  const nextCategoryLabel = getCategoryLabel(safeNextCategory);
-  const nextCategoryMessageLabel = getCategoryMessageLabel(safeNextCategory);
-
+  
   const trackEvent = (name: string, label: string, value?: number) => {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
       window.gtag('event', name, {
@@ -79,12 +71,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const handleNextWord = () => {
     onNextWord();
     trackEvent('next_word', 'Next Word');
-  };
-
-  const handleSwitchCategory = () => {
-    onSwitchCategory();
-    trackEvent('switch_category', nextCategoryLabel);
-    toast(`Switched to ${nextCategoryMessageLabel}`);
   };
 
   const handleCycleVoice = () => {
@@ -156,17 +142,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         aria-label="Next Word"
       >
         <SkipForward size={16} />
-      </Button>
-
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleSwitchCategory}
-        className="h-8 w-8 p-0 text-green-700"
-        title={`Switch to ${nextCategoryLabel}`}
-        aria-label={`Switch to ${nextCategoryLabel}`}
-      >
-        <RefreshCw size={16} />
       </Button>
 
       <Button

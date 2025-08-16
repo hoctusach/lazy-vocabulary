@@ -8,7 +8,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [currentWordProgress, setCurrentWordProgress] = useState<LearningProgress | null>(null);
   const [todayWords, setTodayWords] = useState<VocabularyWord[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [progressStats, setProgressStats] = useState({
     total: 0,
     learned: 0,
@@ -60,11 +59,11 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
       dailySelection.newWords,
       dailySelection.reviewWords,
       allWords,
-      selectedCategory
+      'ALL'
     );
 
     setTodayWords(words);
-  }, [dailySelection, allWords, selectedCategory]);
+  }, [dailySelection, allWords]);
 
   const getDueReviewWords = useCallback(() => {
     return learningProgressService.getDueReviewWords();
@@ -90,17 +89,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getDueReviewWords,
     getRetiredWords,
     retireCurrentWord,
-    todayWords,
-    selectedCategory,
-    setSelectedCategory,
-    getTodayWords: (category: string) =>
-      dailySelection
-        ? buildTodaysWords(
-            dailySelection.newWords,
-            dailySelection.reviewWords,
-            allWords,
-            category
-          )
-        : []
+    todayWords
   };
 };
