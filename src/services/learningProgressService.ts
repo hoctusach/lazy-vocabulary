@@ -296,23 +296,23 @@ export class LearningProgressService {
   }
 
   getProgressStats() {
-    this.updateWordStatuses();
     const progressMap = this.getLearningProgress();
     const all = Array.from(progressMap.values());
+    const today = this.getToday();
 
     return {
       total: all.length,
       learned: all.filter(p => p.isLearned).length,
       new: all.filter(p => !p.isLearned).length,
-      due: all.filter(p => p.status === 'due').length,
+      due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
       retired: all.filter(p => p.status === 'retired').length
     };
   }
 
   getDueReviewWords(): LearningProgress[] {
-    this.updateWordStatuses();
     const progressMap = this.getLearningProgress();
-    return Array.from(progressMap.values()).filter(p => p.status === 'due');
+    const today = this.getToday();
+    return Array.from(progressMap.values()).filter(p => p.isLearned && p.nextReviewDate <= today);
   }
 
   getRetiredWords(): LearningProgress[] {
