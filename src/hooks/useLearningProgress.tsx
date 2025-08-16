@@ -69,12 +69,12 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     return learningProgressService.getDueReviewWords();
   }, []);
 
-  const getRetiredWords = useCallback(() => {
-    return learningProgressService.getRetiredWords();
+  const getLearnedWords = useCallback(() => {
+    return learningProgressService.getLearnedWords();
   }, []);
 
-  const retireCurrentWord = useCallback((word: string) => {
-    learningProgressService.retireWord(word);
+  const markCurrentWordLearned = useCallback((word: string) => {
+    learningProgressService.markWordLearned(word);
     refreshStats();
   }, [refreshStats]);
 
@@ -87,8 +87,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getWordProgress,
     refreshStats,
     getDueReviewWords,
-    getRetiredWords,
-    retireCurrentWord,
+    getLearnedWords,
+    markCurrentWordLearned,
     todayWords
   };
 };

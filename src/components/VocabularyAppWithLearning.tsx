@@ -19,8 +19,8 @@ const VocabularyAppWithLearning: React.FC = () => {
     generateDailyWords,
     markWordAsPlayed,
     getDueReviewWords,
-    getRetiredWords: getLearnedWords,
-    retireCurrentWord: markCurrentWordLearned,
+    getLearnedWords,
+    markCurrentWordLearned,
     todayWords
   } = useLearningProgress(allWords);
 
@@ -122,10 +122,10 @@ const VocabularyAppWithLearning: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Learned ({progressStats.retired})</h4>
+                <h4 className="font-medium text-gray-600">Learned ({progressStats.learnedCompleted})</h4>
                 <div className="space-y-1 max-h-60 overflow-y-auto">
                   {progressStats.learnedCompleted > 0 ? (
-                    getRetiredWords().map((word, index) => (
+                    getLearnedWords().map((word, index) => (
                       <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
                         <div className="font-medium text-gray-700">{word.word}</div>
                         <div className="text-xs text-gray-500">
