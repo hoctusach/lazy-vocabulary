@@ -57,7 +57,7 @@ export const useVocabularyDataLoader = (
 
         const selection =
           learningProgressService.getTodaySelection() ||
-          learningProgressService.forceGenerateDailySelection(allWords, 'moderate');
+          learningProgressService.forceGenerateDailySelection(allWords, 'light');
 
         let todayWords: VocabularyWord[] = [];
         if (selection) {

@@ -13,7 +13,7 @@ Integrates enhanced learning progress functionality with app lifecycle and provi
 **Acceptance Criteria:**
 - Detect app cold start (first load of the day)
 - Generate daily list if none exists for current date
-- Use existing severity preference or default to 'moderate'
+ - Use existing severity preference or default to 'light'
 - Initialize playback queue with generated list
 
 ### US4.2: Date Change Detection

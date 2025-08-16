@@ -215,8 +215,8 @@ export class LearningProgressService {
   }
 
   generateDailySelection(
-    allWords: VocabularyWord[], 
-    severity: SeverityLevel = 'moderate'
+    allWords: VocabularyWord[],
+    severity: SeverityLevel = 'light'
   ): DailySelection {
     const today = this.getToday();
     const lastSelectionDate = localStorage.getItem(LAST_SELECTION_DATE_KEY);
@@ -233,8 +233,8 @@ export class LearningProgressService {
   }
 
   forceGenerateDailySelection(
-    allWords: VocabularyWord[], 
-    severity: SeverityLevel = 'moderate'
+    allWords: VocabularyWord[],
+    severity: SeverityLevel = 'light'
   ): DailySelection {
     const today = this.getToday();
 

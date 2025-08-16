@@ -21,7 +21,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     setProgressStats(stats);
   }, []);
 
-  const generateDailyWords = useCallback((severity: SeverityLevel = 'moderate') => {
+  const generateDailyWords = useCallback((severity: SeverityLevel = 'light') => {
     if (allWords.length === 0) return;
     
     // Force regeneration when user clicks the buttons
@@ -46,7 +46,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
 
     let selection = learningProgressService.getTodaySelection();
     if (!selection) {
-      selection = learningProgressService.forceGenerateDailySelection(allWords, 'moderate');
+      selection = learningProgressService.forceGenerateDailySelection(allWords, 'light');
     }
     setDailySelection(selection);
     refreshStats();
