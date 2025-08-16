@@ -128,6 +128,35 @@ describe('LearningProgressService', () => {
       expect(intenseSelection.totalCount).toBeGreaterThanOrEqual(50);
       expect(intenseSelection.totalCount).toBeLessThanOrEqual(100);
     });
+
+    it('should include all due words and fill with new words', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
+      const progressData: Record<string, any> = {
+        due1: { word: 'due1', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        due2: { word: 'due2', category: 'topic vocab', isLearned: true, reviewCount: 1, lastPlayedDate: '', status: 'due', nextReviewDate: yesterday, createdDate: yesterday },
+        new3: { word: 'new3', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new4: { word: 'new4', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new5: { word: 'new5', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today },
+        new6: { word: 'new6', category: 'topic vocab', isLearned: false, reviewCount: 0, lastPlayedDate: '', status: 'new', nextReviewDate: today, createdDate: today }
+      };
+
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'learningProgress') return JSON.stringify(progressData);
+        return null;
+      });
+
+      vi.spyOn(service as any, 'getRandomCount').mockReturnValue(5);
+
+      const allWords: VocabularyWord[] = Object.keys(progressData).map(word => ({ word, meaning: 'm', example: 'e', category: 'topic vocab', count: 1 }));
+
+      const selection = service.forceGenerateDailySelection(allWords, 'light');
+
+      expect(selection.reviewWords.map(w => w.word).sort()).toEqual(['due1', 'due2']);
+      expect(selection.newWords.length).toBe(3);
+      expect(selection.totalCount).toBe(5);
+    });
   });
 
   describe('Word Progress Tracking', () => {
@@ -192,11 +221,13 @@ describe('LearningProgressService', () => {
 
   describe('Statistics', () => {
     it('should calculate progress stats correctly', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const mockProgress = {
-        'word1': { isLearned: true, status: 'not_due' },
-        'word2': { isLearned: false, status: 'new' },
-        'word3': { isLearned: true, status: 'due' },
-        'word4': { isLearned: false, status: 'new' },
+        'word1': { isLearned: true, status: 'not_due', nextReviewDate: today },
+        'word2': { isLearned: false, status: 'new', nextReviewDate: today },
+        'word3': { isLearned: true, status: 'not_due', nextReviewDate: yesterday },
+        'word4': { isLearned: false, status: 'new', nextReviewDate: today },
       };
 
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
