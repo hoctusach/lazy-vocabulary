@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DailySelection, SeverityLevel } from '@/types/learning';
+import { ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
@@ -24,21 +27,27 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   onGenerateDaily,
   onRefresh
 }) => {
-  const learnedPercentage = progressStats.total > 0 
-    ? (progressStats.learned / progressStats.total) * 100 
+  const learnedPercentage = progressStats.total > 0
+    ? (progressStats.learned / progressStats.total) * 100
     : 0;
+  const [open, setOpen] = useState(false);
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          Daily Learning Progress
-          <Button variant="outline" size="sm" onClick={onRefresh}>
-            Refresh
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <Collapsible open={open} onOpenChange={setOpen} className="w-full">
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CollapsibleTrigger className="flex items-center gap-2">
+              <CardTitle>Daily Learning Progress</CardTitle>
+              <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
+            </CollapsibleTrigger>
+            <Button variant="outline" size="sm" onClick={onRefresh}>
+              Refresh
+            </Button>
+          </div>
+        </CardHeader>
+        <CollapsibleContent>
+          <CardContent className="space-y-4">
         {/* Progress Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
@@ -139,7 +148,9 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 };
