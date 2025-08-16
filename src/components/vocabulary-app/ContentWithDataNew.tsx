@@ -27,7 +27,7 @@ interface ContentWithDataNewProps {
   handleOpenAddWordModal: () => void;
   handleOpenEditWordModal: (word: VocabularyWord) => void;
   playCurrentWord: () => void;
-  onMarkWordLearned?: () => void;
+  onMarkWordLearned?: (word: string) => void;
   additionalContent?: React.ReactNode;
 }
 

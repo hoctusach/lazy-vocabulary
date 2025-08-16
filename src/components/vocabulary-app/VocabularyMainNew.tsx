@@ -20,7 +20,7 @@ interface VocabularyMainNewProps {
   onOpenEditModal: () => void;
   showWordCount?: boolean;
   playCurrentWord: () => void;
-  onMarkWordLearned?: () => void;
+  onMarkWordLearned?: (word: string) => void;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({

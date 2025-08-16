@@ -14,14 +14,14 @@ interface MarkAsLearnedDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  wordText: string;
+  word: string;
 }
 
 export const MarkAsLearnedDialog: React.FC<MarkAsLearnedDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  wordText
+  word
 }) => {
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
@@ -29,7 +29,7 @@ export const MarkAsLearnedDialog: React.FC<MarkAsLearnedDialogProps> = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Mark as Learned</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to mark "{wordText}" as learned?
+            Are you sure you want to mark "{word}" as learned?
             <br /><br />
             This word will be hidden from your daily practice and will automatically
             reappear after 100 days for review.
