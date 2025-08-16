@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { DailySelection, SeverityLevel } from '@/types/learning';
-import { VocabularyWord } from '@/types/vocabulary';
 
 interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
@@ -15,7 +14,6 @@ interface LearningProgressPanelProps {
     due: number;
     retired: number;
   };
-  dueReviewWords: VocabularyWord[];
   onGenerateDaily: (severity: SeverityLevel) => void;
   onRefresh: () => void;
 }
@@ -23,7 +21,6 @@ interface LearningProgressPanelProps {
 export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   dailySelection,
   progressStats,
-  dueReviewWords,
   onGenerateDaily,
   onRefresh
 }) => {
@@ -86,18 +83,21 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
               <Badge variant="outline" className="text-green-600 border-0">
                 New: {dailySelection.newWords.length}
               </Badge>
+              <Badge variant="outline" className="text-blue-600 border-0">
+                Review: {dailySelection.reviewWords.length}
+              </Badge>
               <Badge variant="outline" className="border-0">
                 Level: {dailySelection.severity}
               </Badge>
             </div>
-
+            
             {/* Category breakdown for all words in today's selection */}
-            {(dailySelection.newWords.length > 0 || dueReviewWords.length > 0) && (
+            {(dailySelection.newWords.length > 0 || dailySelection.reviewWords.length > 0) && (
               <div className="text-sm">
                 <div className="font-medium mb-1">By Category:</div>
                 <div className="flex flex-wrap gap-1">
                   {Object.entries(
-                    [...dailySelection.newWords, ...dueReviewWords].reduce((acc, word) => {
+                    [...dailySelection.newWords, ...dailySelection.reviewWords].reduce((acc, word) => {
                       acc[word.category] = (acc[word.category] || 0) + 1;
                       return acc;
                     }, {} as Record<string, number>)
