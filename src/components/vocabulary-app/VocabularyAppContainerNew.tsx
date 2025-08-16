@@ -14,12 +14,12 @@ import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  onRetireWord?: () => void;
+  onMarkWordLearned?: () => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onRetireWord, initialWords, additionalContent }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, initialWords, additionalContent }) => {
   // Use stable state management
   const {
     currentWord,
@@ -192,7 +192,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
             wordToEdit={wordToEdit}
             handleOpenAddWordModal={handleOpenAddWordModal}
             handleOpenEditWordModal={handleOpenEditWordModal}
-            onRetireWord={onRetireWord}
+            onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
           />
         </div>

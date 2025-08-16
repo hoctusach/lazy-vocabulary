@@ -27,7 +27,7 @@ interface ContentWithDataNewProps {
   handleOpenAddWordModal: () => void;
   handleOpenEditWordModal: (word: VocabularyWord) => void;
   playCurrentWord: () => void;
-  onRetireWord?: () => void;
+  onMarkWordLearned?: () => void;
   additionalContent?: React.ReactNode;
 }
 
@@ -50,7 +50,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleOpenAddWordModal,
   handleOpenEditWordModal,
   playCurrentWord,
-  onRetireWord,
+  onMarkWordLearned,
   additionalContent
 }) => {
   const editingWordData = useMemo(
@@ -83,7 +83,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       onOpenAddModal={handleOpenAddWordModal}
       onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
       playCurrentWord={playCurrentWord}
-      onRetireWord={onRetireWord}
+      onMarkWordLearned={onMarkWordLearned}
       />
 
       {additionalContent}
