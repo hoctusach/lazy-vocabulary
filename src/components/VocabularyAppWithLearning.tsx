@@ -5,13 +5,17 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
 import ToastProvider from './vocabulary-app/ToastProvider';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, RotateCcw } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import { MarkAsNewDialog } from './MarkAsNewDialog';
 
 const VocabularyAppWithLearning: React.FC = () => {
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
+  const [wordToReset, setWordToReset] = useState<string | null>(null);
 
   const {
     dailySelection,
@@ -21,6 +25,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     getDueReviewWords,
     getLearnedWords,
     markWordLearned: markCurrentWordLearned,
+    markWordAsNew,
     todayWords
   } = useLearningProgress(allWords);
 
@@ -59,6 +64,15 @@ const VocabularyAppWithLearning: React.FC = () => {
   }, [markWordAsPlayed]);
 
   const learnedWords = getLearnedWords();
+
+  const handleMarkAsNew = () => {
+    if (wordToReset) {
+      markWordAsNew(wordToReset);
+      toast.success('Word reset to new.');
+    }
+    setIsMarkAsNewDialogOpen(false);
+    setWordToReset(null);
+  };
 
   const learningSection = (
     <div className="space-y-4 mt-4">
@@ -128,11 +142,26 @@ const VocabularyAppWithLearning: React.FC = () => {
                 <div className="space-y-1 max-h-60 overflow-y-auto">
                   {learnedWords.length > 0 ? (
                     learnedWords.map((word, index) => (
-                      <div key={index} className="text-sm p-2 bg-gray-50 rounded border opacity-75">
-                        <div className="font-medium text-gray-700">{word.word}</div>
-                        <div className="text-xs text-gray-500">
-                          {word.category} • Learned {word.learnedDate}
+                      <div
+                        key={index}
+                        className="text-sm p-2 bg-gray-50 rounded border opacity-75 flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-700">{word.word}</div>
+                          <div className="text-xs text-gray-500">
+                            {word.category} • Learned {word.learnedDate}
+                          </div>
                         </div>
+                        <button
+                          aria-label="Mark as New"
+                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            setWordToReset(word.word);
+                            setIsMarkAsNewDialogOpen(true);
+                          }}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </button>
                       </div>
                     ))
                   ) : (
@@ -161,6 +190,12 @@ const VocabularyAppWithLearning: React.FC = () => {
           additionalContent={learningSection}
         />
       </div>
+      <MarkAsNewDialog
+        isOpen={isMarkAsNewDialogOpen}
+        onClose={() => setIsMarkAsNewDialogOpen(false)}
+        onConfirm={handleMarkAsNew}
+        word={wordToReset || ''}
+      />
     </>
   );
 };

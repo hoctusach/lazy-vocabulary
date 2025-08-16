@@ -78,6 +78,11 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     refreshStats();
   }, [refreshStats]);
 
+  const markWordAsNew = useCallback((word: string) => {
+    learningProgressService.markWordAsNew(word);
+    refreshStats();
+  }, [refreshStats]);
+
   return {
     dailySelection,
     currentWordProgress,
@@ -89,6 +94,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     getDueReviewWords,
     getLearnedWords,
     markWordLearned,
+    markWordAsNew,
     todayWords
   };
 };

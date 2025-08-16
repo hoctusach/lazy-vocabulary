@@ -87,8 +87,8 @@ export class LearningProgressService {
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
       nextAllowedTime: progress.nextAllowedTime || DEFAULT_VALUES.nextAllowedTime,
       learnedDate:
-        (progress as any).learnedDate ||
-        (progress as any).retiredDate ||
+        (progress as Partial<LearningProgress> & { retiredDate?: string }).learnedDate ||
+        (progress as Partial<LearningProgress> & { retiredDate?: string }).retiredDate ||
         DEFAULT_VALUES.learnedDate
     };
   }
@@ -145,6 +145,25 @@ export class LearningProgressService {
       progress.learnedDate = today;
       // push review far into the future so it no longer appears in daily selections
       progress.nextReviewDate = this.addDays(today, 100);
+
+      progressMap.set(wordKey, progress);
+      this.saveLearningProgress(progressMap);
+    }
+  }
+
+  markWordAsNew(wordKey: string): void {
+    const progressMap = this.getLearningProgress();
+    const progress = progressMap.get(wordKey);
+
+    if (progress) {
+      const today = this.getToday();
+      progress.isLearned = false;
+      progress.reviewCount = 0;
+      progress.status = 'new';
+      progress.learnedDate = undefined;
+      progress.nextReviewDate = today;
+      progress.nextAllowedTime = new Date().toISOString();
+      progress.lastPlayedDate = '';
 
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
