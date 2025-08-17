@@ -26,12 +26,11 @@ export const useSpeechIntegration = (
   });
 
   const playCurrentWord = useCallback(async () => {
-    if (!currentWord || isPaused || isMuted || isTransitioningRef.current) {
-      console.log('[SPEECH-INTEGRATION] Cannot play word:', { 
-        hasWord: !!currentWord, 
-        isPaused, 
-        isMuted, 
-        isTransitioning: isTransitioningRef.current 
+    if (!currentWord || isPaused || isTransitioningRef.current) {
+      console.log('[SPEECH-INTEGRATION] Cannot play word:', {
+        hasWord: !!currentWord,
+        isPaused,
+        isTransitioning: isTransitioningRef.current
       });
       return;
     }
@@ -46,7 +45,7 @@ export const useSpeechIntegration = (
     } finally {
       setSpeechState(prev => ({ ...prev, isActive: false, phase: 'idle' }));
     }
-  }, [currentWord, selectedVoiceName, isPaused, isMuted, isTransitioningRef]);
+  }, [currentWord, selectedVoiceName, isPaused, isTransitioningRef]);
 
   // Effect to trigger speech when dependencies change
   useEffect(() => {
@@ -55,8 +54,8 @@ export const useSpeechIntegration = (
       return;
     }
 
-    if (isMuted || isPaused) {
-      console.log('[SPEECH-INTEGRATION] Speech is muted or paused, skipping speech');
+    if (isPaused) {
+      console.log('[SPEECH-INTEGRATION] Speech is paused, skipping speech');
       return;
     }
 
