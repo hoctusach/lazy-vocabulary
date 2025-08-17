@@ -35,8 +35,8 @@ export const useTimerManagement = (isPaused: boolean, isMuted: boolean) => {
       return;
     }
 
-    if (isPaused || isMuted) {
-      console.log('[TIMER-MANAGER] Not scheduling - paused or muted');
+    if (isPaused) {
+      console.log('[TIMER-MANAGER] Not scheduling - paused');
       return;
     }
 
@@ -51,7 +51,7 @@ export const useTimerManagement = (isPaused: boolean, isMuted: boolean) => {
       isScheduling.current = false;
       
       // Double-check conditions before executing
-      if (!isPaused && !isMuted) {
+      if (!isPaused) {
         try {
           callback();
         } catch (error) {
@@ -61,7 +61,7 @@ export const useTimerManagement = (isPaused: boolean, isMuted: boolean) => {
         console.log('[TIMER-MANAGER] Skipping auto-advance - conditions changed');
       }
     }, delay);
-  }, [isPaused, isMuted, clearAutoAdvanceTimer]);
+  }, [isPaused, clearAutoAdvanceTimer]);
 
   return {
     clearAutoAdvanceTimer,
