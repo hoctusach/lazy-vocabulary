@@ -76,7 +76,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
     const setCurrentIndex = vi.fn();
 
     renderHook(() =>
-      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 'v', vi.fn())
+      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
 
     expect(setWordList).toHaveBeenCalled();
@@ -112,7 +112,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
     const setCurrentIndex = vi.fn();
 
     renderHook(() =>
-      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 'v', vi.fn())
+      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
 
     expect(setCurrentIndex).toHaveBeenCalledWith(1);
@@ -146,7 +146,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
     const setTimeoutSpy = vi.spyOn(window, 'setTimeout');
 
     renderHook(() =>
-      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 'v', vi.fn())
+      useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
 
     expect(setCurrentIndex).toHaveBeenCalledWith(0);
