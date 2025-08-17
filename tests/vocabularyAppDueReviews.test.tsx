@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 
@@ -13,9 +13,20 @@ import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 const initialWordsSpy = vi.fn();
 
 vi.mock('@/components/vocabulary-app/VocabularyAppContainerNew', () => ({
-  default: ({ initialWords }: { initialWords?: VocabularyWord[] }) => {
+  default: ({
+    initialWords,
+    additionalContent
+  }: {
+    initialWords?: VocabularyWord[];
+    additionalContent?: React.ReactNode;
+  }) => {
     initialWordsSpy(initialWords);
-    return <div data-testid="container" />;
+    return (
+      <div>
+        <div data-testid="container" />
+        {additionalContent}
+      </div>
+    );
   }
 }));
 
@@ -31,7 +42,7 @@ vi.mock('@/hooks/useLearningProgress', () => ({
           reviewCount: 1,
           lastPlayedDate: '',
           status: 'due',
-          nextReviewDate: '',
+          nextReviewDate: '2024-01-01',
           createdDate: ''
         }
       ],
@@ -41,7 +52,14 @@ vi.mock('@/hooks/useLearningProgress', () => ({
     progressStats: { total: 0, learned: 0, new: 0, due: 1, learnedCompleted: 0 },
     generateDailyWords: vi.fn(),
     markWordAsPlayed: vi.fn(),
-    getDueReviewWords: () => [{ word: 'apple', category: 'fruit', reviewCount: 1 }],
+    getDueReviewWords: () => [
+      {
+        word: 'apple',
+        category: 'fruit',
+        reviewCount: 1,
+        nextReviewDate: '2024-01-01'
+      }
+    ],
     getLearnedWords: () => [],
     markWordLearned: vi.fn(),
     markWordAsNew: vi.fn(),
@@ -86,5 +104,16 @@ describe('VocabularyAppWithLearning due reviews', () => {
     const words = initialWordsSpy.mock.calls[0][0] as VocabularyWord[];
     expect(words.map(w => w.word)).toContain('apple');
     expect(screen.queryByText('Play Due Reviews')).not.toBeInTheDocument();
+  });
+
+  it('renders next review date for due items', () => {
+    render(<VocabularyAppWithLearning />);
+    const summaryButton = screen.getAllByRole('button', {
+      name: /Word Summary/i
+    })[0];
+    fireEvent.click(summaryButton);
+    expect(
+      screen.getByText('Next review: 2024-01-01')
+    ).toBeInTheDocument();
   });
 });
