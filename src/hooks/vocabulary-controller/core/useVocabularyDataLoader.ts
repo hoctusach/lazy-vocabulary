@@ -13,11 +13,17 @@ export const useVocabularyDataLoader = (
   setWordList: (words: VocabularyWord[]) => void,
   setHasData: (hasData: boolean) => void,
   setCurrentIndex: (index: number) => void,
+  currentIndex: number,
   selectedVoiceName: string,
   clearAutoAdvanceTimer: () => void,
   initialWords?: VocabularyWord[]
 ) => {
   const startTimerRef = useRef<number | null>(null);
+  const prevIndexRef = useRef(0);
+
+  useEffect(() => {
+    prevIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   const clearStartTimer = () => {
     if (startTimerRef.current !== null) {
@@ -41,9 +47,27 @@ export const useVocabularyDataLoader = (
   // Load initial data
   useEffect(() => {
     if (initialWords && initialWords.length > 0) {
-      setWordList(initialWords);
+      const prevIndex = prevIndexRef.current;
+      setWordList(prevList => {
+        const prevWord = prevList[prevIndex];
+        const newList = initialWords;
+        let newIndex = prevIndex;
+        if (prevWord) {
+          const foundIndex = newList.findIndex(
+            w => w.word === prevWord.word && w.category === prevWord.category
+          );
+          if (foundIndex >= 0) {
+            newIndex = foundIndex;
+          } else {
+            newIndex = Math.min(prevIndex, newList.length - 1);
+          }
+        } else {
+          newIndex = Math.min(prevIndex, newList.length - 1);
+        }
+        setCurrentIndex(newIndex);
+        return newList;
+      });
       setHasData(true);
-      setCurrentIndex(0);
       return;
     }
 

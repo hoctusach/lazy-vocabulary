@@ -118,6 +118,7 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
     setWordList,
     setHasData,
     setCurrentIndex,
+    currentIndex,
     selectedVoiceName,
     clearAutoAdvanceTimer,
     initialWords
