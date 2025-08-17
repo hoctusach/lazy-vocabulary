@@ -78,7 +78,7 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
     if (nextWord) {
       saveLastWord(vocabularyService.getCurrentSheetName(), nextWord.word);
       saveTodayLastWord(nextIndex, nextWord.word, nextWord.category);
-      if (!isMuted && !isPaused) {
+      if (!isPaused) {
         unifiedSpeechController.speak(nextWord, selectedVoiceName);
       }
     }
@@ -90,7 +90,6 @@ export const useUnifiedVocabularyController = (initialWords?: VocabularyWord[]) 
     currentIndex,
     wordList.length,
     setCurrentIndex,
-    isMuted,
     isPaused,
     selectedVoiceName,
     clearAutoAdvanceTimer
