@@ -7,8 +7,8 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { learningProgressService } from '@/services/learningProgressService';
 
 describe('useLearningProgress', () => {
-  it('provides learnedCompleted stat from service', () => {
-    const mockStats = { total: 1, learned: 1, new: 0, due: 0, learnedCompleted: 1 };
+  it('provides learned stat from service', () => {
+    const mockStats = { total: 1, learning: 0, new: 0, due: 0, learned: 1 };
     const spy = vi.spyOn(learningProgressService, 'getProgressStats').mockReturnValue(mockStats);
 
     const { result } = renderHook(() => useLearningProgress([]));
@@ -17,7 +17,7 @@ describe('useLearningProgress', () => {
       result.current.refreshStats();
     });
 
-    expect(result.current.progressStats.learnedCompleted).toBe(1);
+    expect(result.current.progressStats.learned).toBe(1);
     spy.mockRestore();
   });
 });

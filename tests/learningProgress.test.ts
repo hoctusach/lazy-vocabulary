@@ -298,7 +298,7 @@ describe('LearningProgressService', () => {
   });
 
   describe('Statistics', () => {
-    it('should calculate progress stats correctly', () => {
+    it('excludes learned words from learning count and balances totals', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -316,10 +316,11 @@ describe('LearningProgressService', () => {
       const stats = service.getProgressStats();
 
       expect(stats.total).toBe(5);
-      expect(stats.learned).toBe(3);
+      expect(stats.learning).toBe(2);
+      expect(stats.learned).toBe(1);
       expect(stats.new).toBe(2);
       expect(stats.due).toBe(2);
-      expect(stats.learnedCompleted).toBe(1);
+      expect(stats.learning + stats.learned + stats.new).toBe(stats.total);
     });
 
     it('should include words with next review date today in due list', () => {

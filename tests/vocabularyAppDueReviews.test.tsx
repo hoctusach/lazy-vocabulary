@@ -49,7 +49,7 @@ vi.mock('@/hooks/useLearningProgress', () => ({
       totalCount: 1,
       severity: 'light'
     },
-    progressStats: { total: 0, learned: 0, new: 0, due: 1, learnedCompleted: 0 },
+    progressStats: { total: 0, learning: 0, new: 0, due: 1, learned: 0 },
     generateDailyWords: vi.fn(),
     markWordAsPlayed: vi.fn(),
     getDueReviewWords: () => [
