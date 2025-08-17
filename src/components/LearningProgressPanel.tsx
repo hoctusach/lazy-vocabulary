@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { DailySelection, SeverityLevel } from '@/types/learning';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useLearnerHours } from '@/hooks/useLearnerHours';
@@ -34,7 +34,6 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
     : 0;
   const [open, setOpen] = useState(false);
   const { totalHours } = useLearnerHours(learnerId);
-  const [dueTooltipOpen, setDueTooltipOpen] = useState(false);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen} className="w-full">
@@ -56,28 +55,31 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Learned</div>
           </div>
           <div className="text-center">
-            <Tooltip open={dueTooltipOpen} onOpenChange={setDueTooltipOpen}>
-              <TooltipTrigger asChild>
-                <button
-                  aria-label="Due review count"
-                  onClick={() => setDueTooltipOpen(!dueTooltipOpen)}
-                  className="text-2xl font-bold text-red-600 focus:outline-none"
-                >
-                  {progressStats.due}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs text-left">
-                <div className="space-y-1">
-                  <p className="font-bold">How DUE REVIEW work?</p>
-                  <p>
-                    Each correct review pushes the next one farther out, following a
-                    2→4→7→12→20→35-day sequence within a 60-day
-                    master cycle.
-                  </p>
-                  <p>Missed reviews reset the schedule, so stay consistent!</p>
-                </div>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center justify-center gap-1">
+              <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    aria-label="How DUE REVIEW work?"
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                  >
+                    <Info className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs text-left">
+                  <div className="space-y-1">
+                    <p className="font-bold">How DUE REVIEW work?</p>
+                    <p>It goes with the Spaced Repetition Principle.</p>
+                    <p>
+                      Each correct review pushes the next one farther out: 2 → 3 → 5 → 7 → 10 → 14 → 21 → 28 → 35 days. After that, mastered items return every 60 days.
+                    </p>
+                    <p>
+                      Tip: Open the app DAILY and clear “Due Reviews” to keep routine and memories strong.
+                    </p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </div>
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
