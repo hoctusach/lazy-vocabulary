@@ -24,7 +24,6 @@ const VocabularyAppWithLearning: React.FC = () => {
     progressStats,
     generateDailyWords,
     markWordAsPlayed,
-    getDueReviewWords,
     getLearnedWords,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
@@ -108,11 +107,13 @@ const VocabularyAppWithLearning: React.FC = () => {
                 </div>
               )}
 
-              {progressStats.due > 0 && (
+              {dailySelection.reviewWords.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="font-medium text-red-600">Today's Due Review ({progressStats.due})</h4>
+                  <h4 className="font-medium text-red-600">
+                    Today's Due Review ({dailySelection.reviewWords.length})
+                  </h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {getDueReviewWords().map((word, index) => (
+                    {dailySelection.reviewWords.map((word, index) => (
                       <div
                         key={index}
                         className="text-sm p-2 bg-red-50 rounded border"
