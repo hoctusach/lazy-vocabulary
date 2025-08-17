@@ -14,10 +14,10 @@ interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
   progressStats: {
     total: number;
-    learned: number;
+    learning: number;
     new: number;
     due: number;
-    learnedCompleted: number;
+    learned: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void;
   learnerId: string;
@@ -30,7 +30,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   learnerId
 }) => {
   const learnedPercentage = progressStats.total > 0
-    ? (progressStats.learned / progressStats.total) * 100
+    ? ((progressStats.learning + progressStats.learned) / progressStats.total) * 100
     : 0;
   const [open, setOpen] = useState(false);
   const { totalHours } = useLearnerHours(learnerId);
@@ -52,7 +52,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         {/* Progress Stats */}
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-600">{progressStats.learnedCompleted}</div>
+            <div className="text-2xl font-bold text-gray-600">{progressStats.learned}</div>
             <div className="text-sm text-gray-600">Learned</div>
           </div>
           <div className="text-center">
@@ -81,7 +81,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{progressStats.learned}</div>
+            <div className="text-2xl font-bold text-green-600">{progressStats.learning}</div>
             <div className="text-sm text-gray-600">Learning</div>
           </div>
           <div className="text-center">

@@ -10,10 +10,10 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [todayWords, setTodayWords] = useState<VocabularyWord[]>([]);
   const [progressStats, setProgressStats] = useState({
     total: 0,
-    learned: 0,
+    learning: 0,
     new: 0,
     due: 0,
-    learnedCompleted: 0
+    learned: 0
   });
 
   const refreshStats = useCallback(() => {

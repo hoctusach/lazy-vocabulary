@@ -8,8 +8,8 @@ import { LearningProgressPanel } from '@/components/LearningProgressPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 describe('LearningProgressPanel', () => {
-  it('renders learnedCompleted stat', () => {
-    const progressStats = { total: 10, learned: 5, new: 3, due: 2, learnedCompleted: 4 };
+  it('renders learned stat', () => {
+    const progressStats = { total: 10, learning: 5, new: 3, due: 2, learned: 4 };
 
     render(
       <TooltipProvider>
@@ -29,7 +29,7 @@ describe('LearningProgressPanel', () => {
   });
 
   it('shows review schedule tooltip when interacting with due review count', async () => {
-    const progressStats = { total: 10, learned: 5, new: 3, due: 2, learnedCompleted: 4 };
+    const progressStats = { total: 10, learning: 5, new: 3, due: 2, learned: 4 };
     const user = userEvent.setup();
 
     render(

@@ -353,10 +353,10 @@ export class LearningProgressService {
 
     return {
       total: all.length,
-      learned: all.filter(p => p.isLearned).length,
+      learning: all.filter(p => p.isLearned && p.status !== 'learned').length,
       new: all.filter(p => !p.isLearned).length,
       due: all.filter(p => p.isLearned && p.nextReviewDate <= today).length,
-      learnedCompleted: all.filter(p => p.status === 'learned').length
+      learned: all.filter(p => p.status === 'learned').length
     };
   }
 

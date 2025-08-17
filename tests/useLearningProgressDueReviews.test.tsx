@@ -46,10 +46,10 @@ describe('useLearningProgress due reviews', () => {
     localStorage.clear();
     vi.spyOn(learningProgressService, 'getProgressStats').mockReturnValue({
       total: 0,
-      learned: 0,
+      learning: 0,
       new: 0,
       due: 0,
-      learnedCompleted: 0
+      learned: 0
     });
     vi.spyOn(learningProgressService, 'getTodaySelection').mockReturnValue(selection);
     vi.spyOn(learningProgressService, 'forceGenerateDailySelection').mockReturnValue(selection);
