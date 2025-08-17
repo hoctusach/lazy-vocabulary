@@ -44,8 +44,8 @@ export const useAutoPlay = (
       autoPlayTimeoutRef.current = null;
     }
 
-    // Only proceed if we have a word and conditions are right
-    if (!currentWord || muted || paused) {
+    // Only proceed if we have a word and we're not paused
+    if (!currentWord || paused) {
       return;
     }
 
@@ -73,7 +73,7 @@ export const useAutoPlay = (
       if (!hasUserInteracted()) {
         return;
       }
-      if (!muted && !paused && !speechController.isActive()) {
+      if (!paused && !speechController.isActive()) {
         console.log(`[AUTO-PLAY] Executing auto-play for: ${currentWord.word}`);
         playCurrentWord();
       } else {
