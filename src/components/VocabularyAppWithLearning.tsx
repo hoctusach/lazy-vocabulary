@@ -121,6 +121,9 @@ const VocabularyAppWithLearning: React.FC = () => {
                         <div className="text-xs text-gray-600">
                           {word.category} • Review #{word.reviewCount}
                         </div>
+                        <div className="text-xs text-gray-500">
+                          Next review: {word.nextReviewDate}
+                        </div>
                       </div>
                     ))}
                   </div>
