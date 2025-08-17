@@ -21,7 +21,23 @@ vi.mock('@/components/vocabulary-app/VocabularyAppContainerNew', () => ({
 
 vi.mock('@/hooks/useLearningProgress', () => ({
   useLearningProgress: () => ({
-    dailySelection: { newWords: [], reviewWords: [] },
+    dailySelection: {
+      newWords: [],
+      reviewWords: [
+        {
+          word: 'apple',
+          category: 'fruit',
+          isLearned: true,
+          reviewCount: 1,
+          lastPlayedDate: '',
+          status: 'due',
+          nextReviewDate: '',
+          createdDate: ''
+        }
+      ],
+      totalCount: 1,
+      severity: 'light'
+    },
     progressStats: { total: 0, learned: 0, new: 0, due: 1, learnedCompleted: 0 },
     generateDailyWords: vi.fn(),
     markWordAsPlayed: vi.fn(),

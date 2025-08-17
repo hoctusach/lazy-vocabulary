@@ -55,11 +55,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   useEffect(() => {
     if (!dailySelection) return;
 
-    const dueProgress = learningProgressService.getDueReviewWords();
-    const reviewWords = [...dueProgress, ...dailySelection.reviewWords];
-
     const words = buildTodaysWords(
-      reviewWords,
+      dailySelection.reviewWords,
       dailySelection.newWords,
       allWords,
       'ALL'

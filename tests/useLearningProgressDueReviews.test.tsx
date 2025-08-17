@@ -36,9 +36,9 @@ describe('useLearningProgress due reviews', () => {
   };
 
   const selection: DailySelection = {
-    reviewWords: [],
+    reviewWords: [dueProgress],
     newWords: [newProgress],
-    totalCount: 1,
+    totalCount: 2,
     severity: 'light'
   };
 
@@ -53,7 +53,6 @@ describe('useLearningProgress due reviews', () => {
     });
     vi.spyOn(learningProgressService, 'getTodaySelection').mockReturnValue(selection);
     vi.spyOn(learningProgressService, 'forceGenerateDailySelection').mockReturnValue(selection);
-    vi.spyOn(learningProgressService, 'getDueReviewWords').mockReturnValue([dueProgress]);
   });
 
   afterEach(() => {
