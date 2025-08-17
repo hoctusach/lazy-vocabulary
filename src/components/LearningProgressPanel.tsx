@@ -8,7 +8,8 @@ import { ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useLearnerHours } from '@/hooks/useLearnerHours';
-import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 interface LearningProgressPanelProps {
   dailySelection: DailySelection | null;
@@ -36,9 +37,10 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   const { totalHours } = useLearnerHours(learnerId);
 
   return (
-    <Collapsible open={open} onOpenChange={setOpen} className="w-full">
-      <Card className="w-full">
-        <CardHeader>
+    <TooltipProvider delayDuration={0}>
+      <Collapsible open={open} onOpenChange={setOpen} className="w-full">
+        <Card className="w-full">
+          <CardHeader>
           <div className="flex items-center justify-between">
             <CollapsibleTrigger className="flex items-center gap-2">
               <CardTitle className="text-lg">Learning Progress</CardTitle>
@@ -57,16 +59,18 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
           <div className="text-center">
             <div className="flex items-center justify-center gap-1">
               <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     aria-label="How DUE REVIEW work?"
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                    className="h-10 w-10 text-gray-500 hover:text-gray-700"
                   >
                     <Info className="h-4 w-4" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs text-left">
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="max-w-xs text-left">
                   <div className="space-y-1">
                     <p className="font-bold">How DUE REVIEW work?</p>
                     <p>It goes with the Spaced Repetition Principle.</p>
@@ -77,8 +81,8 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                       Tip: Open the app DAILY and clear “Due Reviews” to keep routine and memories strong.
                     </p>
                   </div>
-                </TooltipContent>
-              </Tooltip>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="text-sm text-gray-600">Due Review</div>
           </div>
@@ -176,9 +180,10 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             </Button>
           </div>
         </div>
-          </CardContent>
+        </CardContent>
         </CollapsibleContent>
       </Card>
-    </Collapsible>
+      </Collapsible>
+    </TooltipProvider>
   );
 };
