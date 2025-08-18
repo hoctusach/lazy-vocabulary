@@ -252,6 +252,11 @@ class RealSpeechService {
   setMuted(muted: boolean): void {
     if (this.currentUtterance) {
       this.currentUtterance.volume = muted ? 0 : 1;
+
+      if (window.speechSynthesis?.speaking) {
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      }
     }
   }
 
