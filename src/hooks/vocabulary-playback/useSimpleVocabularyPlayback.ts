@@ -54,7 +54,8 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     } else if (currentWord && paused) {
       console.log(`[SIMPLE-VOCABULARY] Word ready but paused: ${currentWord.word}`);
     }
-  }, [currentWord, muted, paused, playWord]);
+    // deliberately exclude `muted` so mute toggles don't retrigger playback
+  }, [currentWord, paused, playWord]);
 
   // Handle pause state changes with immediate effect
   useEffect(() => {
@@ -89,10 +90,7 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     console.log(`[SIMPLE-VOCABULARY] ✓ Toggling mute: ${newMuted}`);
     setMuted(newMuted);
     unifiedSpeechController.setMuted(newMuted);
-    if (!newMuted && !paused && currentWord) {
-      playWord(currentWord);
-    }
-  }, [muted, paused, currentWord, playWord]);
+  }, [muted]);
 
   const togglePause = useCallback(() => {
     const newPaused = !paused;
