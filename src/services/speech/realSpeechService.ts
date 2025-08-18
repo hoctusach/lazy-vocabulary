@@ -249,6 +249,12 @@ class RealSpeechService {
     }
   }
 
+  setMuted(muted: boolean): void {
+    if (this.currentUtterance) {
+      this.currentUtterance.volume = muted ? 0 : 1;
+    }
+  }
+
   isCurrentlyActive(): boolean {
     return this.isActive && window.speechSynthesis?.speaking;
   }

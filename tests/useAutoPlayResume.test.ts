@@ -43,19 +43,12 @@ describe('useAutoPlay resume', () => {
     expect(play).toHaveBeenCalledTimes(1);
   });
 
-  it('replays current word when unmuted', () => {
+  it('continues auto-play when muted', () => {
     const play = vi.fn();
-    const { rerender } = renderHook(({currentWord, muted, paused}) =>
+    renderHook(({currentWord, muted, paused}) =>
       useAutoPlay(currentWord, muted, paused, play),
       { initialProps: { currentWord: word, muted: true, paused: false } }
     );
-
-    vi.advanceTimersByTime(500);
-    expect(play).not.toHaveBeenCalled();
-
-    act(() => {
-      rerender({ currentWord: word, muted: false, paused: false });
-    });
 
     vi.advanceTimersByTime(500);
     expect(play).toHaveBeenCalledTimes(1);

@@ -28,7 +28,7 @@ export const useAudioEffect = (
       return;
     }
     
-    // Skip playback when muted or paused
+    // Skip playback when paused
     if (isPaused) {
       console.log('[APP] App is paused, not speaking');
       return;
@@ -64,20 +64,11 @@ export const useAudioEffect = (
     const speechDelayTimeout = setTimeout(() => {
       const playWordAudio = async () => {
         try {
-          // Only set playing state if not muted
-          if (!mute) {
-            setIsSoundPlaying(true);
-          }
+          // Set playing state even when muted so timers continue
+          setIsSoundPlaying(true);
           
           // First, ensure previous speech is stopped
           stopSpeaking();
-          
-          // Don't actually speak if muted
-          if (mute) {
-            console.log('[APP] Muted, not speaking audio');
-            wordChangeProcessingRef.current = false;
-            return;
-          }
           
           console.log('[APP] ⚡ Speaking word:', currentWord.word);
           
@@ -90,12 +81,12 @@ export const useAudioEffect = (
           
           try {
             // Speak the text and wait for completion
-            await speak(fullText, voiceRegion, pauseRequestedRef);
+            await speak(fullText, voiceRegion, pauseRequestedRef, { muted: mute });
             
             console.log('[APP] ✅ Speech completed for:', currentWord.word);
             
-            // Only auto-advance if not paused or muted
-            if (!isPaused && !mute && !(pauseRequestedRef?.current)) {
+            // Only auto-advance if not paused
+            if (!isPaused && !(pauseRequestedRef?.current)) {
               // Clear any existing timer first
               clearAutoAdvanceTimer();
               
@@ -106,7 +97,7 @@ export const useAudioEffect = (
               console.log(`[APP] Setting auto-advance timer for ${pauseBeforeNextWord}ms`);
               autoAdvanceTimerRef.current = window.setTimeout(() => {
                 // Final check before advancing to prevent race conditions
-                if (!isPaused && !mute && !(pauseRequestedRef?.current)) {
+                if (!isPaused && !(pauseRequestedRef?.current)) {
                   handleManualNext();
                 } else {
                   console.log('[APP] Auto-advance canceled due to state change');

@@ -10,16 +10,17 @@ interface SequenceOptions {
   onSequenceComplete?: () => void;
   onError?: (error: Error, index: number) => void;
   pauseRequestedRef?: React.MutableRefObject<boolean>;
+  muted?: boolean;
 }
 
 /**
  * Speaks an array of text chunks sequentially, handling errors for each chunk
  */
 export async function speakChunksInSequence(
-  chunks: string[], 
+  chunks: string[],
   options: SequenceOptions
 ): Promise<ChunkResult[]> {
-  const { langCode, voice, onChunkComplete, onSequenceComplete, onError, pauseRequestedRef } = options;
+  const { langCode, voice, onChunkComplete, onSequenceComplete, onError, pauseRequestedRef, muted } = options;
   const results: ChunkResult[] = [];
   
   for (let i = 0; i < chunks.length; i++) {
@@ -46,7 +47,7 @@ export async function speakChunksInSequence(
       
       chunkUtterance.rate = getSpeechRate();
       chunkUtterance.pitch = getSpeechPitch();
-      chunkUtterance.volume = getSpeechVolume();
+      chunkUtterance.volume = muted ? 0 : getSpeechVolume();
       
       // Speak this chunk and await its completion
       await new Promise<void>((resolve, reject) => {

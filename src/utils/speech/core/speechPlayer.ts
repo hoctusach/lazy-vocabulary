@@ -9,19 +9,18 @@ import {
   loadVoices
 } from './speechPlayerUtils';
 
+interface SpeakOptions {
+  muted?: boolean;
+}
+
 export const speak = (
   text: string,
   voice: SpeechSynthesisVoice | null,
-  pauseRequestedRef?: React.MutableRefObject<boolean>
+  pauseRequestedRef?: React.MutableRefObject<boolean>,
+  options?: SpeakOptions
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const run = async () => {
-      if (isMutedFromLocalStorage()) {
-        console.log('Speech is muted, resolving immediately');
-        resolve('skipped');
-        return;
-      }
-
       if (!window.speechSynthesis) {
         console.error('Speech synthesis not supported');
         reject(new Error('Speech synthesis not supported'));
@@ -29,6 +28,7 @@ export const speak = (
       }
 
       try {
+        const muted = options?.muted ?? isMutedFromLocalStorage();
         // Ensure we're not trying to speak multiple things at once
         await ensureSpeechEngineReady();
         stopSpeaking();
@@ -45,7 +45,8 @@ export const speak = (
       await new Promise(resolve => setTimeout(resolve, 300)); 
 
       const utterance = new SpeechSynthesisUtterance(processedText);
-      
+      utterance.volume = muted ? 0 : 1;
+
       let voices = loadVoices();
       const handleSetVoiceAndSpeak = async () => {
         try {
@@ -55,6 +56,7 @@ export const speak = (
             text,
             processedText,
             pauseRequestedRef,
+            muted,
             onComplete: () => {
               console.log('Speech completed, resolving promise');
               resolve('completed');
