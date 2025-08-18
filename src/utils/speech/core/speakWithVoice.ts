@@ -15,6 +15,7 @@ interface SpeakWithVoiceParams {
   onComplete: () => void;
   onError: (e: Error) => void;
   pauseRequestedRef?: React.MutableRefObject<boolean>;
+  muted?: boolean;
 }
 
 export async function speakWithVoice({
@@ -24,7 +25,8 @@ export async function speakWithVoice({
   processedText,
   onComplete,
   onError,
-  pauseRequestedRef
+  pauseRequestedRef,
+  muted
 }: SpeakWithVoiceParams) {
   console.log('[VOICE] Starting speakWithVoice for:', text.substring(0, 30));
   
@@ -81,6 +83,7 @@ export async function speakWithVoice({
     const results = await speakChunksInSequence(textChunks, {
       langCode,
       voice,
+      muted,
       pauseRequestedRef,
       onChunkComplete: (index, total) => {
         console.log(`[VOICE] Completed chunk ${index + 1}/${total}`);

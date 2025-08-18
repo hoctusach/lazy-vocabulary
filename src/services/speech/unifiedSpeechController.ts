@@ -125,6 +125,7 @@ class UnifiedSpeechController {
   setMuted(muted: boolean): void {
     console.log('Setting muted state:', muted);
     this.isMutedState = muted;
+    realSpeechService.setMuted(muted);
   }
 
   setWordCompleteCallback(callback: (() => void) | null): void {

@@ -68,9 +68,5 @@ export const useAudioPlayback = (
   );
   
   // Mute effect
-  useAudioMuteEffect(
-    mute,
-    stopSpeaking,
-    setIsSoundPlaying
-  );
+  useAudioMuteEffect(mute);
 };
