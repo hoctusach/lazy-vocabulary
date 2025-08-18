@@ -252,10 +252,15 @@ class RealSpeechService {
   setMuted(muted: boolean): void {
     if (this.currentUtterance) {
       this.currentUtterance.volume = muted ? 0 : 1;
-
+      // Force the speech engine to apply the new volume immediately by
+      // briefly pausing and resuming. The resume is deferred to the next
+      // task to ensure the volume change takes effect before speaking
+      // continues.
       if (window.speechSynthesis?.speaking) {
         window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
+        setTimeout(() => {
+          window.speechSynthesis.resume();
+        }, 0);
       }
     }
   }
