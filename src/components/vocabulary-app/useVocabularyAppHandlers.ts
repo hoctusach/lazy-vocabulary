@@ -34,13 +34,14 @@ export function useVocabularyAppHandlers({
     const wasMuted = isMuted;
     handleToggleMute();
 
-    if (wasMuted && currentWord) {
+    if (!wasMuted) {
+      resetLastSpokenWord();
+      speakCurrentWord(true);
+    } else if (currentWord) {
       setTimeout(() => {
         resetLastSpokenWord();
         speakCurrentWord(true);
       }, 800);
-    } else if (!wasMuted) {
-      resetLastSpokenWord();
     }
   }, [isMuted, currentWord, handleToggleMute, resetLastSpokenWord, speakCurrentWord, clearAllTimeouts]);
 

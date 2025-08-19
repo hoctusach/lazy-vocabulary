@@ -90,7 +90,12 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     console.log(`[SIMPLE-VOCABULARY] ✓ Toggling mute: ${newMuted}`);
     setMuted(newMuted);
     unifiedSpeechController.setMuted(newMuted);
-  }, [muted]);
+
+    if (newMuted && currentWord) {
+      console.log('[SIMPLE-VOCABULARY] Restarting current word while muted');
+      playWord(currentWord);
+    }
+  }, [muted, currentWord, playWord]);
 
   const togglePause = useCallback(() => {
     const newPaused = !paused;
