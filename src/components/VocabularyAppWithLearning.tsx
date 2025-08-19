@@ -32,18 +32,24 @@ const VocabularyAppWithLearning: React.FC = () => {
 
   // Load vocabulary data
   useEffect(() => {
-    console.log("VocabularyAppWithLearning - loading vocabulary data");
-    vocabularyService.loadDefaultVocabulary();
-    
-    // Get all words from all categories
-    const allWordsFromService: VocabularyWord[] = [];
-    vocabularyService.getAllSheetNames().forEach(sheetName => {
-      vocabularyService.switchSheet(sheetName);
-      const words = vocabularyService.getWordList();
-      allWordsFromService.push(...words);
-    });
-    
-    setAllWords(allWordsFromService);
+    const load = async () => {
+      console.log("VocabularyAppWithLearning - loading vocabulary data");
+      if (!vocabularyService.hasData()) {
+        await vocabularyService.loadDefaultVocabulary();
+      }
+
+      // Get all words from all categories
+      const allWordsFromService: VocabularyWord[] = [];
+      vocabularyService.getAllSheetNames().forEach(sheetName => {
+        vocabularyService.switchSheet(sheetName);
+        const words = vocabularyService.getWordList();
+        allWordsFromService.push(...words);
+      });
+
+      setAllWords(allWordsFromService);
+    };
+
+    load();
   }, []);
 
   // Track when words are played (integrate with existing word navigation)

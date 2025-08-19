@@ -5,10 +5,14 @@ import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 
 const VocabularyApp = () => {
-  // Force reload of default vocabulary when app loads
   useEffect(() => {
-    console.log("VocabularyApp - forcing reload of default vocabulary");
-    vocabularyService.loadDefaultVocabulary();
+    const load = async () => {
+      if (!vocabularyService.hasData()) {
+        console.log("VocabularyApp - loading default vocabulary");
+        await vocabularyService.loadDefaultVocabulary();
+      }
+    };
+    load();
   }, []);
   
   return (
