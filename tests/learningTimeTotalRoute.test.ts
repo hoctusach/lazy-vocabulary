@@ -1,9 +1,8 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import handler from '@/server/learningTime';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'learning-time.json');
 
 interface Req {
   method: string;
@@ -20,18 +19,18 @@ interface Res {
 }
 
 describe('learning time total route', () => {
-  beforeEach(async () => {
-    const data = {
-      learner1: {
+  beforeEach(() => {
+    localStorage.setItem(
+      'learningTime_learner1',
+      JSON.stringify({
         '2024-01-01': 60 * 60 * 1000,
         '2024-01-02': 30 * 60 * 1000,
-      },
-    };
-    await fs.writeFile(DB_PATH, JSON.stringify(data));
+      })
+    );
   });
 
-  afterEach(async () => {
-    await fs.unlink(DB_PATH).catch(() => {});
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('returns cumulative hours for learner', async () => {

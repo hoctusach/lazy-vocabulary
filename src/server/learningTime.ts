@@ -1,29 +1,28 @@
 import { lovableCors } from './corsMiddleware';
-import { promises as fs } from 'fs';
-import path from 'path';
-
-// Simple JSON file storage for learning time records
-const DB_PATH = path.join(process.cwd(), 'learning-time.json');
 
 interface LearningTimeRecord {
   [date: string]: number;
 }
 
-interface DbData {
-  [learnerId: string]: LearningTimeRecord;
+function getStorageKey(learnerId: string) {
+  return `learningTime_${learnerId}`;
 }
 
-async function loadDb(): Promise<DbData> {
+function loadRecord(learnerId: string): LearningTimeRecord {
   try {
-    const text = await fs.readFile(DB_PATH, 'utf-8');
-    return JSON.parse(text) as DbData;
-  } catch { /* ignore */
+    const data = localStorage.getItem(getStorageKey(learnerId));
+    return data ? JSON.parse(data) : {};
+  } catch {
     return {};
   }
 }
 
-async function saveDb(data: DbData) {
-  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
+function saveRecord(learnerId: string, record: LearningTimeRecord) {
+  try {
+    localStorage.setItem(getStorageKey(learnerId), JSON.stringify(record));
+  } catch {
+    // ignore write errors
+  }
 }
 
 interface Req {
@@ -67,21 +66,20 @@ export default async function handler(req: Req, res: Res) {
   if (req.method === 'POST') {
     try {
       const body = await parseBody(req);
-      const { learnerId, duration, date } = body;
+      const { learnerId, duration, date } = body as Record<string, any>;
       if (!learnerId || typeof duration !== 'number') {
         res.statusCode = 400;
         res.end('Invalid payload');
         return;
       }
-      const day = date || new Date().toISOString().split('T')[0];
-      const db = await loadDb();
-      db[learnerId] = db[learnerId] || {};
-      db[learnerId][day] = (db[learnerId][day] || 0) + duration;
-      await saveDb(db);
+      const day = (date as string) || new Date().toISOString().split('T')[0];
+      const record = loadRecord(learnerId);
+      record[day] = (record[day] || 0) + duration;
+      saveRecord(learnerId, record);
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ total: db[learnerId][day] }));
-    } catch { /* ignore */
+      res.end(JSON.stringify({ total: record[day] }));
+    } catch {
       res.statusCode = 400;
       res.end('Invalid payload');
     }
@@ -93,8 +91,7 @@ export default async function handler(req: Req, res: Res) {
     const { pathname } = url;
     if (pathname.startsWith('/api/learning-time/total/')) {
       const learnerId = decodeURIComponent(pathname.split('/').pop() || '');
-      const db = await loadDb();
-      const record = db[learnerId] || {};
+      const record = loadRecord(learnerId);
       const totalMs = Object.values(record).reduce((sum, ms) => sum + ms, 0);
       const totalHours = totalMs / (1000 * 60 * 60);
       res.statusCode = 200;
@@ -104,8 +101,7 @@ export default async function handler(req: Req, res: Res) {
     }
 
     const learnerId = url.searchParams.get('learnerId');
-    const db = await loadDb();
-    const record = learnerId ? db[learnerId] || {} : {};
+    const record = learnerId ? loadRecord(learnerId) : {};
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(record));
