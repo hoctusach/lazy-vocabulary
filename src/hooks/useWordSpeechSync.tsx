@@ -88,12 +88,6 @@ export const useWordSpeechSync = (
     speechLockRef.current = true;
 
     try {
-      if (isMuted) {
-        console.log("Speech is muted, not actually speaking");
-        setWordFullySpoken(true);
-        speechLockRef.current = false;
-        return;
-      }
       isSpeakingRef.current = true;
       try {
         localStorage.setItem('currentDisplayedWord', wordToSpeak.word);
@@ -103,8 +97,8 @@ export const useWordSpeechSync = (
         meaning: wordToSpeak.meaning,
         example: wordToSpeak.example
       });
-      if ((isPaused && !forceSpeak) || isMuted) {
-        console.log("App was paused/muted while preparing, aborting");
+      if (isPaused && !forceSpeak) {
+        console.log("App was paused while preparing, aborting");
         isSpeakingRef.current = false;
         speechLockRef.current = false;
         return;

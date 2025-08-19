@@ -29,8 +29,8 @@ export const useSpeechPlayback = () => {
   // Function to speak text, returns a Promise
   const speakText = useCallback((text: string): Promise<string> => {
     return new Promise((resolve, reject) => {
-      if (isMuted || !text) {
-        console.log("Speech is muted or text is empty");
+      if (!text) {
+        console.log("Text is empty");
         resolve('');
         return;
       }
@@ -48,11 +48,7 @@ export const useSpeechPlayback = () => {
         console.log("Speech already in progress, queuing request");
         // Resolve after a delay to allow current speech to finish
         setTimeout(() => {
-          if (!isMuted) {
-            speakText(text).then(resolve).catch(reject);
-          } else {
-            resolve('');
-          }
+          speakText(text).then(resolve).catch(reject);
         }, 800);
         return;
       }
@@ -80,7 +76,7 @@ export const useSpeechPlayback = () => {
             'US';
 
           // Fix the Promise type issue by explicitly handling the return value from speak()
-          speak(text, voiceRegion, pauseRequestedRef)
+          speak(text, voiceRegion, pauseRequestedRef, { muted: isMuted })
             .then((result) => {
               console.log('Speech synthesis completed:', result);
               retryAttemptsRef.current = 0; // Reset retry counter on success

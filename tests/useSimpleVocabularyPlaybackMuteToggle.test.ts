@@ -44,7 +44,7 @@ describe('useSimpleVocabularyPlayback mute toggling', () => {
     setMutedMock.mockClear();
   });
 
-  it('continues through words while muted and does not replay on unmute', () => {
+  it('restarts current word on mute and resumes without extra audio on unmute', () => {
     const words: VocabularyWord[] = [
       { word: 'alpha', meaning: '', example: '', category: 'c' },
       { word: 'beta', meaning: '', example: '', category: 'c' }
@@ -53,22 +53,25 @@ describe('useSimpleVocabularyPlayback mute toggling', () => {
     const { result } = renderHook(() => useSimpleVocabularyPlayback(words));
 
     expect(playWordMock).toHaveBeenCalledTimes(1);
+    expect(playWordMock.mock.calls[0][0].word).toBe('alpha');
 
     act(() => {
       result.current.toggleMute();
     });
     expect(setMutedMock).toHaveBeenLastCalledWith(true);
-    expect(playWordMock).toHaveBeenCalledTimes(1);
+    expect(playWordMock).toHaveBeenCalledTimes(2);
+    expect(playWordMock.mock.calls[1][0].word).toBe('alpha');
 
     act(() => {
       result.current.goToNext();
     });
-    expect(playWordMock).toHaveBeenCalledTimes(2);
+    expect(playWordMock).toHaveBeenCalledTimes(3);
+    expect(playWordMock.mock.calls[2][0].word).toBe('beta');
 
     act(() => {
       result.current.toggleMute();
     });
     expect(setMutedMock).toHaveBeenLastCalledWith(false);
-    expect(playWordMock).toHaveBeenCalledTimes(2);
+    expect(playWordMock).toHaveBeenCalledTimes(3);
   });
 });
