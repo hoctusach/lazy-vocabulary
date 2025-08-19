@@ -275,25 +275,35 @@ describe('LearningProgressService', () => {
 
     it('should calculate correct next review dates (TC006)', () => {
       const today = new Date().toISOString().split('T')[0];
-      
-      // Test review count 1 -> +1 day
-      const progress1 = service.initializeWord(mockWords[0]);
-      progress1.reviewCount = 1;
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
-        [mockWords[0].word]: progress1
-      }));
-      
+      const addDays = (days: number) => {
+        const d = new Date(today);
+        d.setDate(d.getDate() + days);
+        return d.toISOString().split('T')[0];
+      };
+
+      const p1 = service.initializeWord(mockWords[0]);
+      p1.reviewCount = 1; // -> review #2 = +2 days
+      const p2 = service.initializeWord(mockWords[1]);
+      p2.reviewCount = 2; // -> review #3 = +3 days
+      const p3 = service.initializeWord(mockWords[2]);
+      p3.reviewCount = 10; // -> review #11 = +60 days
+
+      localStorageMock.getItem
+        .mockReturnValueOnce(JSON.stringify({ [mockWords[0].word]: p1 }))
+        .mockReturnValueOnce(JSON.stringify({ [mockWords[1].word]: p2 }))
+        .mockReturnValueOnce(JSON.stringify({ [mockWords[2].word]: p3 }));
+
       service.updateWordProgress(mockWords[0].word);
-      
-      const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
-      const updated = savedData[mockWords[0].word];
-      
-      // Should be tomorrow
-      const expectedDate = new Date(today);
-      expectedDate.setDate(expectedDate.getDate() + 2); // +1 day for count 2
-      const expected = expectedDate.toISOString().split('T')[0];
-      
-      expect(updated.nextReviewDate).toBe(expected);
+      service.updateWordProgress(mockWords[1].word);
+      service.updateWordProgress(mockWords[2].word);
+
+      const saved1 = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
+      const saved2 = JSON.parse(localStorageMock.setItem.mock.calls[1][1]);
+      const saved3 = JSON.parse(localStorageMock.setItem.mock.calls[2][1]);
+
+      expect(saved1[mockWords[0].word].nextReviewDate).toBe(addDays(2));
+      expect(saved2[mockWords[1].word].nextReviewDate).toBe(addDays(3));
+      expect(saved3[mockWords[2].word].nextReviewDate).toBe(addDays(60));
     });
   });
 
