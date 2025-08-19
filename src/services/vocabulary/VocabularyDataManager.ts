@@ -1,78 +1,69 @@
 
-import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyStorage } from "../vocabularyStorage";
 import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularyImporter } from "./VocabularyImporter";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
-
-// Type for vocabulary change listeners
-type VocabularyChangeListener = () => void;
-
 export class VocabularyDataManager {
-  private data: SheetData;
-  private storage: VocabularyStorage;
-  private dataProcessor: VocabularyDataProcessor;
-  private importer: VocabularyImporter;
-  private vocabularyChangeListeners: VocabularyChangeListener[] = [];
-  
   constructor() {
     this.storage = new VocabularyStorage();
     this.data = this.storage.loadData();
     this.dataProcessor = new VocabularyDataProcessor();
     this.importer = new VocabularyImporter(this.storage);
+    this.vocabularyChangeListeners = [];
   }
-  
-  getData(): SheetData {
+
+  getData() {
     return this.data;
   }
-  
-  setData(data: SheetData): void {
+
+  setData(data) {
     this.data = data;
   }
-  
+
   // Method to get complete word list for useVocabularyContainerState
-  getWordList(sheetName: string): VocabularyWord[] {
+  getWordList(sheetName) {
     if (this.data[sheetName]) {
       return [...this.data[sheetName]];
     }
     return [];
   }
-  
+
   // Method to add a vocabulary change listener
-  addVocabularyChangeListener(listener: VocabularyChangeListener): void {
+  addVocabularyChangeListener(listener) {
     this.vocabularyChangeListeners.push(listener);
   }
-  
+
   // Method to remove a vocabulary change listener
-  removeVocabularyChangeListener(listener: VocabularyChangeListener): void {
+  removeVocabularyChangeListener(listener) {
     this.vocabularyChangeListeners = this.vocabularyChangeListeners.filter(l => l !== listener);
   }
-  
+
   // Method to notify all listeners about vocabulary change
-  notifyVocabularyChange(): void {
+  notifyVocabularyChange() {
     this.vocabularyChangeListeners.forEach(listener => listener());
   }
-  
-  getTotalWordCount(): number {
+
+  getTotalWordCount() {
     let count = 0;
     for (const sheetName in this.data) {
       count += this.data[sheetName]?.length || 0;
     }
     return count;
   }
-  
-  saveData(): boolean {
+
+  saveData() {
     return this.storage.saveData(this.data);
   }
-  
-  hasData(): boolean {
+
+  hasData() {
     return Object.values(this.data).some(sheet => sheet && sheet.length > 0);
   }
-  
-  mergeImportedData(importedData: SheetData): void {
+
+  mergeImportedData(importedData) {
     this.importer.mergeImportedData(importedData, this.data);
   }
-async loadDefaultVocabulary(): Promise<boolean> {
+
+async loadDefaultVocabulary() {
   try {
     console.log("Loading default vocabulary data");
     try {
@@ -101,24 +92,25 @@ async loadDefaultVocabulary(): Promise<boolean> {
       return false;
     }
   }
-  
-  mergeCustomWords(customData: SheetData, sheetOptions: string[]): void {
+}
+
+  mergeCustomWords(customData, sheetOptions) {
     console.log("Merging custom words with existing data");
-    
+
     // Add each custom category to sheetOptions if it doesn't exist already
     for (const category in customData) {
       if (!sheetOptions.includes(category)) {
-        (sheetOptions as string[]).push(category);
+        sheetOptions.push(category);
         console.log(`Added new category: ${category}`);
       }
     }
-    
+
     // Use the importer to merge words
     this.importer.mergeImportedData(customData, this.data);
-    
+
     // Save the updated data to storage
     this.storage.saveData(this.data);
-    
+
     // Notify listeners about vocabulary change
     this.notifyVocabularyChange();
   }
