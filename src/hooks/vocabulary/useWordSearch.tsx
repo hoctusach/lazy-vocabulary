@@ -1,10 +1,18 @@
 
 import { useState } from 'react';
-import { validateVocabularyWord, validateMeaning, validateExample, RateLimiter } from '@/utils/security/inputValidation';
-import { isValidUrl } from '@/utils/security/contentSecurity';
+import { validateVocabularyWord, validateMeaning, validateExample } from '@/utils/security/inputValidation';
 
-// Rate limiter for API calls
-const searchRateLimiter = new RateLimiter(5, 60000); // 5 searches per minute
+// Simple offline dictionary for basic definitions/examples
+const OFFLINE_DICTIONARY: Record<string, { meaning: string; example: string }> = {
+  hello: {
+    meaning: 'used as a greeting when meeting someone',
+    example: 'She said hello and waved.',
+  },
+  world: {
+    meaning: 'the earth, together with all of its countries and peoples',
+    example: 'The world is round.',
+  },
+};
 
 interface UseWordSearchProps {
   word: string;
@@ -22,95 +30,40 @@ export const useWordSearch = ({ word, setMeaning, setExample }: UseWordSearchPro
       return;
     }
     
-    // Rate limiting check
-    if (!searchRateLimiter.isAllowed('dictionary-search')) {
-      setSearchError('Too many search requests. Please wait a moment before trying again.');
-      return;
-    }
-    
     // Validate word before searching
     const wordValidation = validateVocabularyWord(word.trim());
     if (!wordValidation.isValid) {
       setSearchError('Invalid word format for search');
       return;
     }
-    
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     try {
       setIsSearching(true);
       setSearchError('');
-      
-      // URL-encode the term for multi-word phrases
-      const term = encodeURIComponent(wordValidation.sanitizedValue!);
-      
-      // Validate URL before making request
-      const apiUrl = `https://api.dictionaryapi.dev/api/v2/entries/en/${term}`;
-      if (!isValidUrl(apiUrl)) {
-        throw new Error('Invalid API URL');
-      }
-      
-      // Primary dictionary API call with timeout
-      const controller = new AbortController();
-      timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(apiUrl, {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
+
+      const term = wordValidation.sanitizedValue!.toLowerCase();
+      const entry = OFFLINE_DICTIONARY[term];
+
+      if (entry) {
+        const definitionValidation = validateMeaning(entry.meaning);
+        if (definitionValidation.isValid) {
+          setMeaning(definitionValidation.sanitizedValue!);
+        } else {
+          setMeaning(entry.meaning);
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch definition');
-      }
-      
-      const data = await response.json();
-      let definitionFound = false;
-      let exampleFound = false;
-      
-      if (data && data[0] && data[0].meanings && data[0].meanings[0]) {
-        // Get first definition
-        const firstDefinition = data[0].meanings[0].definitions[0];
-        
-        if (firstDefinition && firstDefinition.definition) {
-          // Validate and sanitize the definition
-          const definitionValidation = validateMeaning(firstDefinition.definition);
-          if (definitionValidation.isValid) {
-            setMeaning(definitionValidation.sanitizedValue!);
-            definitionFound = true;
-          }
-          
-          // Check for example
-          if (firstDefinition.example) {
-            const exampleValidation = validateExample(firstDefinition.example);
-            if (exampleValidation.isValid) {
-              setExample(exampleValidation.sanitizedValue!);
-              exampleFound = true;
-            }
-          }
+
+        const exampleValidation = validateExample(entry.example);
+        if (exampleValidation.isValid) {
+          setExample(exampleValidation.sanitizedValue!);
+        } else {
+          setExample(entry.example);
         }
-      }
-      
-      if (!definitionFound) {
-        setMeaning('No definition found.');
-        setSearchError('No definition found. Please try another word or enter manually.');
-      }
-      
-      if (!exampleFound) {
-        setExample('No example found. Please enter manually.');
-      }
-      
-    } catch (error) {
-      console.error('Dictionary API error:', error);
-      if (error instanceof Error && error.name === 'AbortError') {
-        setSearchError('Search request timed out. Please try again.');
       } else {
-        setSearchError('Search failed. Please try again or enter details manually.');
+        setMeaning('No definition found.');
+        setExample('No example found. Please enter manually.');
+        setSearchError('Word not found in offline dictionary. Please enter details manually.');
       }
     } finally {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
       setIsSearching(false);
     }
   };
