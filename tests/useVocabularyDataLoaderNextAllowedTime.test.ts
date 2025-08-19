@@ -11,10 +11,12 @@ import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 vi.mock('@/services/vocabularyService', () => ({
   vocabularyService: {
-    getWordList: vi.fn(),
+    getAllWords: vi.fn(),
     getCurrentSheetName: vi.fn(),
     addVocabularyChangeListener: vi.fn(),
-    removeVocabularyChangeListener: vi.fn()
+    removeVocabularyChangeListener: vi.fn(),
+    loadDefaultVocabulary: vi.fn(),
+    hasData: vi.fn().mockReturnValue(true)
   }
 }));
 
@@ -55,7 +57,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
     ];
-    vocabularyService.getWordList.mockReturnValue(words);
+    vocabularyService.getAllWords.mockReturnValue(words);
     vocabularyService.getCurrentSheetName.mockReturnValue('c');
 
     const now = new Date('2024-01-01T10:00:00Z').getTime();
@@ -89,7 +91,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
     ];
-    vocabularyService.getWordList.mockReturnValue(words);
+    vocabularyService.getAllWords.mockReturnValue(words);
     vocabularyService.getCurrentSheetName.mockReturnValue('c');
 
     const now = new Date('2024-01-01T10:00:00Z').getTime();
@@ -123,7 +125,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
     ];
-    vocabularyService.getWordList.mockReturnValue(words);
+    vocabularyService.getAllWords.mockReturnValue(words);
     vocabularyService.getCurrentSheetName.mockReturnValue('c');
 
     const now = new Date('2024-01-01T10:00:00Z').getTime();

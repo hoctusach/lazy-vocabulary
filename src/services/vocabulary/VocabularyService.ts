@@ -38,6 +38,11 @@ export class VocabularyService {
     const currentSheet = this.sheetOperations.getCurrentSheetName();
     return this.dataManager.getWordList(currentSheet);
   }
+
+  // NEW: Method to get all words across every sheet
+  getAllWords(): VocabularyWord[] {
+    return this.sheetOptions.flatMap(sheet => this.dataManager.getWordList(sheet));
+  }
   
   // FIXED: Method to add a vocabulary change listener
   addVocabularyChangeListener(listener: VocabularyChangeListener): void {
