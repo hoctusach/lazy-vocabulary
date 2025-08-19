@@ -42,7 +42,7 @@ describe('realSpeechService mute control', () => {
     expect(window.speechSynthesis.resume).toHaveBeenCalledTimes(1);
   });
 
-  it('cancels and restarts speech when muting mid-utterance', () => {
+  it('cancels speech when muting mid-utterance', () => {
     const fakeUtterance = { volume: 1 } as unknown as SpeechSynthesisUtterance;
     (realSpeechService as any).currentUtterance = fakeUtterance;
     (window.speechSynthesis as any).speaking = true;
@@ -51,6 +51,6 @@ describe('realSpeechService mute control', () => {
 
     expect(fakeUtterance.volume).toBe(0);
     expect(window.speechSynthesis.cancel).toHaveBeenCalledTimes(1);
-    expect(window.speechSynthesis.speak).toHaveBeenCalledWith(fakeUtterance);
+    expect(window.speechSynthesis.speak).not.toHaveBeenCalled();
   });
 });
