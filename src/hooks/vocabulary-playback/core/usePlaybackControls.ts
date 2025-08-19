@@ -45,13 +45,14 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
     console.log('Toggle mute called');
     setMuted(prev => {
       const newMuted = !prev;
-      unifiedSpeechController.setMuted(newMuted);
 
       if (newMuted) {
         cancelSpeech();
+        unifiedSpeechController.setMuted(true);
         playCurrentWord();
         toast.info("Audio playback muted");
       } else {
+        unifiedSpeechController.setMuted(false);
         if (!paused) {
           playCurrentWord();
           toast.success("Audio playback resumed");
