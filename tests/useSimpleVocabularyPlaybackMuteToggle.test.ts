@@ -23,24 +23,28 @@ vi.mock('../src/services/speech/unifiedSpeechController', () => ({
 
 vi.mock('../src/hooks/vocabulary-playback/useSimpleWordPlayback', () => {
   const playWordMock = vi.fn();
+  const cancelSpeechMock = vi.fn();
   return {
     useSimpleWordPlayback: () => ({
       playWord: playWordMock,
+      stopPlayback: cancelSpeechMock,
       isSpeaking: false
     }),
-    playWordMock
+    playWordMock,
+    cancelSpeechMock
   };
 });
 
 import { useSimpleVocabularyPlayback } from '../src/hooks/vocabulary-playback/useSimpleVocabularyPlayback';
 import { unifiedSpeechController } from '../src/services/speech/unifiedSpeechController';
-import { playWordMock } from '../src/hooks/vocabulary-playback/useSimpleWordPlayback';
+import { playWordMock, cancelSpeechMock } from '../src/hooks/vocabulary-playback/useSimpleWordPlayback';
 
 describe('useSimpleVocabularyPlayback mute toggling', () => {
   const setMutedMock = vi.mocked(unifiedSpeechController.setMuted);
 
   beforeEach(() => {
     playWordMock.mockClear();
+    cancelSpeechMock.mockClear();
     setMutedMock.mockClear();
   });
 
@@ -58,11 +62,14 @@ describe('useSimpleVocabularyPlayback mute toggling', () => {
     act(() => {
       result.current.toggleMute();
     });
+    expect(cancelSpeechMock).toHaveBeenCalledTimes(1);
     expect(setMutedMock).toHaveBeenLastCalledWith(true);
     expect(playWordMock).toHaveBeenCalledTimes(2);
     expect(playWordMock.mock.calls[1][0].word).toBe('alpha');
-    const muteOrder = setMutedMock.mock.invocationCallOrder.at(-1)!;
-    const playOrder = playWordMock.mock.invocationCallOrder.at(-1)!;
+    const cancelOrder = cancelSpeechMock.mock.invocationCallOrder[0];
+    const muteOrder = setMutedMock.mock.invocationCallOrder[0];
+    const playOrder = playWordMock.mock.invocationCallOrder[1];
+    expect(cancelOrder).toBeLessThan(muteOrder);
     expect(muteOrder).toBeLessThan(playOrder);
 
     act(() => {
@@ -76,5 +83,6 @@ describe('useSimpleVocabularyPlayback mute toggling', () => {
     });
     expect(setMutedMock).toHaveBeenLastCalledWith(false);
     expect(playWordMock).toHaveBeenCalledTimes(3);
+    expect(cancelSpeechMock).toHaveBeenCalledTimes(1);
   });
 });
