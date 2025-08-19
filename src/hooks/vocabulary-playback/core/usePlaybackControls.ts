@@ -48,6 +48,8 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       unifiedSpeechController.setMuted(newMuted);
 
       if (newMuted) {
+        cancelSpeech();
+        playCurrentWord();
         toast.info("Audio playback muted");
       } else {
         if (!paused) {
@@ -58,7 +60,7 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
 
       return newMuted;
     });
-  }, [paused, playCurrentWord]);
+  }, [paused, playCurrentWord, cancelSpeech]);
   
   // Function to toggle pause with full speech handling
   const togglePause = useCallback(() => {
