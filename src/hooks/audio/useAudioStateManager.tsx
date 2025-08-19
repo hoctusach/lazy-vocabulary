@@ -1,6 +1,6 @@
 
 import { useRef, useCallback } from 'react';
-import { VocabularyWord } from '@/types/vocabulary';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 export const useAudioStateManager = () => {
   // Audio playback state and refs
@@ -12,6 +12,7 @@ export const useAudioStateManager = () => {
   // Clear the auto-advance timer
   const clearAutoAdvanceTimer = useCallback(() => {
     if (autoAdvanceTimerRef.current) {
+      unifiedSpeechController.unregisterTimer(autoAdvanceTimerRef.current);
       window.clearTimeout(autoAdvanceTimerRef.current);
       autoAdvanceTimerRef.current = null;
       console.log('[APP] Auto-advance timer cleared');

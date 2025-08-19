@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
-import { realSpeechService } from '@/services/speech/realSpeechService';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 export const useAudioMuteEffect = (mute: boolean) => {
   // Effect specifically for mute changes
@@ -17,7 +17,6 @@ export const useAudioMuteEffect = (mute: boolean) => {
       // Ignore localStorage errors
     }
 
-    // Adjust volume on any active speech without cancelling playback
-    realSpeechService.setMuted(mute);
+    unifiedSpeechController.setMuted(mute);
   }, [mute]);
 };
