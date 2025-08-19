@@ -30,12 +30,36 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     refreshStats();
   }, [allWords, refreshStats]);
 
-  const markWordAsPlayed = useCallback((word: string) => {
-    learningProgressService.updateWordProgress(word);
-    const progress = learningProgressService.getWordProgress(word);
-    setCurrentWordProgress(progress);
-    refreshStats();
-  }, [refreshStats]);
+  const markWordAsPlayed = useCallback(
+    (word: string) => {
+      learningProgressService.updateWordProgress(word);
+      const progress = learningProgressService.getWordProgress(word);
+      setCurrentWordProgress(progress);
+
+      setDailySelection(prev => {
+        if (!prev || !progress) return prev;
+
+        const match = (p: LearningProgress) =>
+          p.word === progress.word && p.category === progress.category;
+        const reviewWords = prev.reviewWords.map(p => (match(p) ? progress : p));
+        const newWords = prev.newWords.map(p => (match(p) ? progress : p));
+        const updated: DailySelection = {
+          ...prev,
+          reviewWords,
+          newWords
+        };
+
+        setTodayWords(
+          buildTodaysWords(updated.reviewWords, updated.newWords, allWords, 'ALL')
+        );
+
+        return updated;
+      });
+
+      refreshStats();
+    },
+    [allWords, refreshStats]
+  );
 
   const getWordProgress = useCallback((word: string) => {
     return learningProgressService.getWordProgress(word);
