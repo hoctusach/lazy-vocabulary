@@ -25,7 +25,7 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
   const { currentIndex, currentWord, advanceToNext, goToPrevious, goToWord } = useSimpleWordNavigation(wordList);
   
   // Word playback
-  const { playWord, isSpeaking } = useSimpleWordPlayback(
+  const { playWord, stopPlayback: cancelSpeech, isSpeaking } = useSimpleWordPlayback(
     selectedVoice,
     findVoice,
     advanceToNext,
@@ -89,13 +89,19 @@ export const useSimpleVocabularyPlayback = (wordList: VocabularyWord[]) => {
     const newMuted = !muted;
     console.log(`[SIMPLE-VOCABULARY] ✓ Toggling mute: ${newMuted}`);
     setMuted(newMuted);
-    unifiedSpeechController.setMuted(newMuted);
 
-    if (newMuted && currentWord) {
-      console.log('[SIMPLE-VOCABULARY] Restarting current word while muted');
-      playWord(currentWord);
+    if (newMuted) {
+      cancelSpeech();
+      unifiedSpeechController.setMuted(true);
+
+      if (currentWord) {
+        console.log('[SIMPLE-VOCABULARY] Restarting current word while muted');
+        playWord(currentWord);
+      }
+    } else {
+      unifiedSpeechController.setMuted(false);
     }
-  }, [muted, currentWord, playWord]);
+  }, [muted, currentWord, playWord, cancelSpeech]);
 
   const togglePause = useCallback(() => {
     const newPaused = !paused;
