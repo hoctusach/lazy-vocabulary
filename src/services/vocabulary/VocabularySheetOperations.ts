@@ -13,22 +13,23 @@ export class VocabularySheetOperations {
     this.sheetOptions = sheetOptions;
     this.wordNavigation = new WordNavigation(dataManager.getData(), this.sheetOptions);
     
-    // Set default sheet to "phrasal verbs" instead of "All words"
-    let initialSheet = "phrasal verbs";
-    
-    // Get initial sheet name from localStorage if available
+    // Try to restore last used sheet from localStorage
+    let restoredSheet: string | null = null;
     try {
       const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
       if (storedStates) {
         const parsedStates = JSON.parse(storedStates);
         if (parsedStates.currentCategory && this.sheetOptions.includes(parsedStates.currentCategory)) {
-          initialSheet = parsedStates.currentCategory;
-          console.log(`Restored sheet name from localStorage: ${initialSheet}`);
+          restoredSheet = parsedStates.currentCategory;
+          console.log(`Restored sheet name from localStorage: ${restoredSheet}`);
         }
       }
     } catch (error) {
       console.error("Error reading sheet name from localStorage:", error);
     }
+
+    // Use restored sheet if available, otherwise fall back to first sheet option
+    const initialSheet = restoredSheet ?? this.sheetOptions[0];
     
     this.wordNavigation.setCurrentSheetName(initialSheet);
     this.wordNavigation.shuffleCurrentSheet();
