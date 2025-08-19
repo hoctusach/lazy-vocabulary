@@ -256,7 +256,6 @@ class RealSpeechService {
       if (window.speechSynthesis?.speaking) {
         if (muted) {
           window.speechSynthesis.cancel();
-          window.speechSynthesis.speak(this.currentUtterance);
         } else {
           window.speechSynthesis.pause();
           setTimeout(() => {
