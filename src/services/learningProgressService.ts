@@ -1,6 +1,7 @@
 import { LearningProgress, DailySelection, SeverityLevel, CategoryWeights } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { getLocalDateISO } from '@/utils/date';
+import { calculateNextAllowedTime } from './timingCalculator';
 
 const LEARNING_PROGRESS_KEY = 'learningProgress';
 const DAILY_SELECTION_KEY = 'dailySelection';
@@ -56,32 +57,59 @@ export class LearningProgressService {
   private getLearningProgress(): Map<string, LearningProgress> {
     const stored = localStorage.getItem(LEARNING_PROGRESS_KEY);
     const progressMap = new Map<string, LearningProgress>();
-    
+    let hasChanges = false;
+
     if (stored) {
       const data = JSON.parse(stored);
       Object.entries(data).forEach(([key, value]) => {
         const progress = this.migrateProgressData(value as LearningProgress);
         progressMap.set(key, progress);
+        const original = value as LearningProgress;
+        if (
+          progress.exposuresToday !== original.exposuresToday ||
+          progress.lastExposureTime !== original.lastExposureTime ||
+          progress.nextAllowedTime !== original.nextAllowedTime
+        ) {
+          hasChanges = true;
+        }
       });
     }
-    
+
+    if (hasChanges) {
+      this.saveLearningProgress(progressMap);
+    }
+
     return progressMap;
   }
 
   private migrateProgressData(progress: LearningProgress): LearningProgress {
+    const today = this.getToday();
     const DEFAULT_VALUES = {
       status: 'new' as const,
       learnedDate: undefined,
-      nextReviewDate: this.getToday(),
-      createdDate: this.getToday(),
+      nextReviewDate: today,
+      createdDate: today,
+      exposuresToday: 0,
+      lastExposureTime: '',
       nextAllowedTime: new Date().toISOString()
     };
+
+    let lastExposureTime = progress.lastExposureTime || DEFAULT_VALUES.lastExposureTime;
+    let exposuresToday = progress.exposuresToday ?? DEFAULT_VALUES.exposuresToday;
+    if (lastExposureTime) {
+      const lastDate = lastExposureTime.split('T')[0];
+      if (lastDate !== today) {
+        exposuresToday = 0;
+      }
+    }
 
     return {
       ...progress,
       status: progress.status || (progress.isLearned ? 'due' : DEFAULT_VALUES.status),
       nextReviewDate: progress.nextReviewDate || DEFAULT_VALUES.nextReviewDate,
       createdDate: progress.createdDate || DEFAULT_VALUES.createdDate,
+      exposuresToday,
+      lastExposureTime,
       nextAllowedTime: progress.nextAllowedTime || DEFAULT_VALUES.nextAllowedTime,
       learnedDate:
         (progress as Partial<LearningProgress> & { retiredDate?: string }).learnedDate ||
@@ -107,6 +135,8 @@ export class LearningProgressService {
       status: 'new',
       nextReviewDate: today,
       createdDate: today,
+      exposuresToday: 0,
+      lastExposureTime: '',
       nextAllowedTime: new Date().toISOString()
     };
   }
@@ -114,16 +144,26 @@ export class LearningProgressService {
   updateWordProgress(wordKey: string): void {
     const progressMap = this.getLearningProgress();
     const progress = progressMap.get(wordKey);
-    
+
     if (progress) {
       const today = this.getToday();
+      const nowIso = new Date().toISOString();
+
+      // Reset daily exposure count if last exposure was on a different day
+      if (progress.lastExposureTime && progress.lastExposureTime.split('T')[0] !== today) {
+        progress.exposuresToday = 0;
+      }
+
+      progress.exposuresToday = (progress.exposuresToday || 0) + 1;
+      progress.lastExposureTime = nowIso;
+      progress.nextAllowedTime = calculateNextAllowedTime(progress.exposuresToday, nowIso);
+
       progress.lastPlayedDate = today;
       progress.isLearned = true;
       progress.reviewCount += 1;
       progress.nextReviewDate = this.calculateNextReviewDate(progress.reviewCount);
       progress.status = 'due';
-      progress.nextAllowedTime = new Date().toISOString();
-      
+
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
     }

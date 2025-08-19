@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
 import { VocabularyWord } from '@/types/vocabulary';
 import { LearningProgress } from '@/types/learning';
+import { calculateNextAllowedTime } from '@/services/timingCalculator';
 
 // Mock localStorage
 const localStorageMock = {
@@ -304,6 +305,62 @@ describe('LearningProgressService', () => {
       expect(saved1[mockWords[0].word].nextReviewDate).toBe(addDays(2));
       expect(saved2[mockWords[1].word].nextReviewDate).toBe(addDays(3));
       expect(saved3[mockWords[2].word].nextReviewDate).toBe(addDays(60));
+    });
+
+    it('should track exposures and next allowed time', () => {
+      vi.useFakeTimers();
+      const baseTime = new Date('2024-01-01T10:00:00Z');
+      vi.setSystemTime(baseTime);
+
+      const word = mockWords[0];
+      const progress = service.initializeWord(word);
+
+      const store: Record<string, string> = {
+        learningProgress: JSON.stringify({ [word.word]: progress })
+      };
+
+      localStorageMock.getItem.mockImplementation((key: string) => store[key] || null);
+      localStorageMock.setItem.mockImplementation((key: string, value: string) => {
+        store[key] = value;
+      });
+
+      service.updateWordProgress(word.word);
+
+      let saved = JSON.parse(store.learningProgress);
+      let updated = saved[word.word];
+      expect(updated.exposuresToday).toBe(1);
+      expect(updated.lastExposureTime).toBe(baseTime.toISOString());
+      expect(updated.nextAllowedTime).toBe(
+        calculateNextAllowedTime(1, baseTime.toISOString())
+      );
+
+      const secondTime = new Date(baseTime.getTime() + 5 * 60000);
+      vi.setSystemTime(secondTime);
+
+      service.updateWordProgress(word.word);
+
+      saved = JSON.parse(store.learningProgress);
+      updated = saved[word.word];
+      expect(updated.exposuresToday).toBe(2);
+      expect(updated.lastExposureTime).toBe(secondTime.toISOString());
+      expect(updated.nextAllowedTime).toBe(
+        calculateNextAllowedTime(2, secondTime.toISOString())
+      );
+
+      const nextDay = new Date('2024-01-02T00:01:00Z');
+      vi.setSystemTime(nextDay);
+
+      service.updateWordProgress(word.word);
+
+      saved = JSON.parse(store.learningProgress);
+      updated = saved[word.word];
+      expect(updated.exposuresToday).toBe(1);
+      expect(updated.lastExposureTime).toBe(nextDay.toISOString());
+      expect(updated.nextAllowedTime).toBe(
+        calculateNextAllowedTime(1, nextDay.toISOString())
+      );
+
+      vi.useRealTimers();
     });
   });
 
