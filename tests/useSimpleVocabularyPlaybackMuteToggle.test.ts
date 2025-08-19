@@ -61,6 +61,9 @@ describe('useSimpleVocabularyPlayback mute toggling', () => {
     expect(setMutedMock).toHaveBeenLastCalledWith(true);
     expect(playWordMock).toHaveBeenCalledTimes(2);
     expect(playWordMock.mock.calls[1][0].word).toBe('alpha');
+    const muteOrder = setMutedMock.mock.invocationCallOrder.at(-1)!;
+    const playOrder = playWordMock.mock.invocationCallOrder.at(-1)!;
+    expect(muteOrder).toBeLessThan(playOrder);
 
     act(() => {
       result.current.goToNext();
