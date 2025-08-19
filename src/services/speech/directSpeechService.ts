@@ -1,5 +1,6 @@
 
 import { realSpeechService } from './realSpeechService';
+import { unifiedSpeechController } from './unifiedSpeechController';
 
 interface SpeechOptions {
   voiceName?: string;
@@ -12,7 +13,11 @@ interface SpeechOptions {
 
 class DirectSpeechService {
   async speak(text: string, options: SpeechOptions): Promise<boolean> {
-    return realSpeechService.speak(text, options);
+    const epoch = unifiedSpeechController.currentEpoch();
+    if (!unifiedSpeechController.canSpeak(epoch)) {
+      return false;
+    }
+    return realSpeechService.speak(text, { ...options, epoch });
   }
 
   stop(): void {

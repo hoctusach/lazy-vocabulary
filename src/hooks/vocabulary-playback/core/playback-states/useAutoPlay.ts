@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { speechController } from '@/utils/speech/core/speechController';
 import { hasUserInteracted } from '@/utils/userInteraction';
-import { toast } from 'sonner';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 /**
  * Hook for auto-playing the current word when it changes
@@ -41,11 +41,16 @@ export const useAutoPlay = (
     // Clear any pending auto-play
     if (autoPlayTimeoutRef.current) {
       clearTimeout(autoPlayTimeoutRef.current);
+      unifiedSpeechController.unregisterTimer(autoPlayTimeoutRef.current);
       autoPlayTimeoutRef.current = null;
     }
 
     // Only proceed if we have a word and we're not paused
     if (!currentWord || paused) {
+      return;
+    }
+
+    if (!unifiedSpeechController.canSpeak()) {
       return;
     }
 
@@ -67,23 +72,27 @@ export const useAutoPlay = (
     
     // Schedule auto-play with a delay to ensure state is settled
     autoPlayTimeoutRef.current = window.setTimeout(() => {
+      if (autoPlayTimeoutRef.current) {
+        unifiedSpeechController.unregisterTimer(autoPlayTimeoutRef.current);
+      }
       autoPlayTimeoutRef.current = null;
-      
-      // Double-check conditions before playing
+
       if (!hasUserInteracted()) {
         return;
       }
-      if (!paused && !speechController.isActive()) {
+      if (!paused && !speechController.isActive() && unifiedSpeechController.canSpeak()) {
         console.log(`[AUTO-PLAY] Executing auto-play for: ${currentWord.word}`);
         playCurrentWord();
       } else {
         console.log('[AUTO-PLAY] Conditions changed, skipping execution');
       }
     }, 400); // Longer delay to prevent race conditions
+    unifiedSpeechController.registerTimer(autoPlayTimeoutRef.current);
     
     return () => {
       if (autoPlayTimeoutRef.current) {
         clearTimeout(autoPlayTimeoutRef.current);
+        unifiedSpeechController.unregisterTimer(autoPlayTimeoutRef.current);
         autoPlayTimeoutRef.current = null;
       }
     };

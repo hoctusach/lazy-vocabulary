@@ -2,7 +2,8 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { speak, stopSpeaking, formatSpeechText } from '@/utils/speech';
+import { speak, formatSpeechText } from '@/utils/speech';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 export const useAudioEffect = (
   currentWord: VocabularyWord | null,
@@ -39,6 +40,10 @@ export const useAudioEffect = (
       console.log('[APP] Word change in progress, delaying');
       return;
     }
+
+    if (!unifiedSpeechController.canSpeak()) {
+      return;
+    }
     
     // Check if we're already speaking this word
     if (lastSpokenWordRef.current === currentWord.word && isSoundPlaying) {
@@ -61,7 +66,7 @@ export const useAudioEffect = (
     console.log(`[APP] Starting speech for ${currentWord.word} at ${new Date().toISOString()}`);
     
     // Small delay before speaking to ensure clean state
-    const speechDelayTimeout = setTimeout(() => {
+    const speechDelayTimeout = window.setTimeout(() => {
       const playWordAudio = async () => {
         try {
           // Set playing state even when muted so timers continue
@@ -80,29 +85,28 @@ export const useAudioEffect = (
           });
           
           try {
-            // Speak the text and wait for completion
+            if (!unifiedSpeechController.canSpeak()) {
+              return;
+            }
             await speak(fullText, voiceRegion, pauseRequestedRef, { muted: mute });
             
             console.log('[APP] ✅ Speech completed for:', currentWord.word);
             
             // Only auto-advance if not paused
-            if (!isPaused && !(pauseRequestedRef?.current)) {
-              // Clear any existing timer first
+            if (!isPaused && !(pauseRequestedRef?.current) && unifiedSpeechController.canSpeak()) {
               clearAutoAdvanceTimer();
-              
-              // Set auto-advance timer only after speech finishes
               const speechDuration = Date.now() - startTime;
               const pauseBeforeNextWord = Math.max(1500, Math.min(2500, speechDuration * 0.3));
-              
               console.log(`[APP] Setting auto-advance timer for ${pauseBeforeNextWord}ms`);
               autoAdvanceTimerRef.current = window.setTimeout(() => {
-                // Final check before advancing to prevent race conditions
-                if (!isPaused && !(pauseRequestedRef?.current)) {
+                unifiedSpeechController.unregisterTimer(autoAdvanceTimerRef.current!);
+                if (!isPaused && !(pauseRequestedRef?.current) && unifiedSpeechController.canSpeak()) {
                   handleManualNext();
                 } else {
                   console.log('[APP] Auto-advance canceled due to state change');
                 }
               }, pauseBeforeNextWord);
+              unifiedSpeechController.registerTimer(autoAdvanceTimerRef.current);
             }
           } catch (error) {
             console.error("[APP] Error in speech:", error);
@@ -121,10 +125,12 @@ export const useAudioEffect = (
       // Start audio playback
       playWordAudio();
     }, 150); // Short delay to ensure state is ready
+    unifiedSpeechController.registerTimer(speechDelayTimeout);
     
     // Cleanup function
     return () => {
       clearTimeout(speechDelayTimeout);
+      unifiedSpeechController.unregisterTimer(speechDelayTimeout);
     };
   }, [
     currentWord, 
