@@ -297,14 +297,42 @@ export class LearningProgressService {
 
     const selected: LearningProgress[] = [];
     const availableCategories = Array.from(wordsByCategory.keys());
-    
-    // Calculate quota per category
-    availableCategories.forEach(category => {
+
+    // Calculate quota per category with minimum of one when words exist
+    const categoryInfo = availableCategories.map(category => {
       const weight = this.categoryWeights[category as keyof CategoryWeights] || 0;
-      const quota = Math.round(targetCount * weight);
       const categoryWords = wordsByCategory.get(category) || [];
+      const quota = Math.min(
+        categoryWords.length,
+        Math.max(1, Math.round(targetCount * weight))
+      );
+      return { category, quota, weight, categoryWords };
+    });
+
+    // Adjust quotas if enforcing minimum causes over-allocation
+    let totalQuota = categoryInfo.reduce((sum, info) => sum + info.quota, 0);
+    if (totalQuota > targetCount) {
+      // Reduce from lowest-weight categories first while keeping at least one per category
+      const sorted = [...categoryInfo].sort((a, b) => a.weight - b.weight);
+      let excess = totalQuota - targetCount;
+      while (excess > 0) {
+        let adjusted = false;
+        for (const info of sorted) {
+          if (info.quota > 1) {
+            info.quota--;
+            excess--;
+            adjusted = true;
+            if (excess === 0) break;
+          }
+        }
+        if (!adjusted) break;
+      }
+    }
+
+    // Select words based on quotas
+    categoryInfo.forEach(({ category, quota, categoryWords }) => {
       const shuffled = this.shuffleArray(categoryWords);
-      selected.push(...shuffled.slice(0, Math.min(quota, shuffled.length)));
+      selected.push(...shuffled.slice(0, quota));
     });
 
     // If we don't have enough, fill from remaining words
@@ -314,7 +342,7 @@ export class LearningProgressService {
       selected.push(...shuffled.slice(0, Math.min(targetCount - selected.length, remaining.length)));
     }
 
-    return selected.slice(0, Math.min(targetCount, newWords.length));
+    return selected;
   }
 
   private shuffleArray<T>(array: T[]): T[] {
