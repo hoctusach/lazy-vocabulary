@@ -102,6 +102,13 @@ export const useVocabularyDataLoader = (
           todayWords = Array.from(map.values());
         }
 
+        if (todayWords.length === 0) {
+          console.log(
+            '[DATA-LOADER] No daily selection available, falling back to full list'
+          );
+          todayWords = allWords;
+        }
+
         setWordList(todayWords);
         setHasData(todayWords.length > 0);
 
