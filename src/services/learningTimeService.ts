@@ -6,8 +6,6 @@ function formatDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-const API_URL = '/api/learning-time';
-
 function getStorageKey(learnerId: string) {
   return `learningTime_${learnerId}`;
 }
@@ -30,47 +28,10 @@ function saveRecord(learnerId: string, record: LearningTimeRecord) {
 }
 
 const sessionStarts: Record<string, number | null> = {};
-const synced: Record<string, boolean> = {};
-
-async function sendSession(learnerId: string, date: string, duration: number) {
-  try {
-    await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ learnerId, date, duration }),
-    });
-  } catch { /* ignore */
-    // ignore network errors
-  }
-}
-
-async function syncWithServer(learnerId: string) {
-  try {
-    const res = await fetch(`${API_URL}?learnerId=${encodeURIComponent(learnerId)}`);
-    const remote: LearningTimeRecord = res.ok ? await res.json() : {};
-    const local = loadRecord(learnerId);
-    const merged: LearningTimeRecord = { ...remote, ...local };
-
-    for (const [date, ms] of Object.entries(local)) {
-      const remoteMs = remote[date] || 0;
-      if (ms > remoteMs) {
-        await sendSession(learnerId, date, ms - remoteMs);
-      }
-    }
-
-    saveRecord(learnerId, merged);
-  } catch { /* ignore */
-    // ignore sync errors
-  }
-}
 
 function startSession(learnerId: string) {
   if (sessionStarts[learnerId] == null) {
     sessionStarts[learnerId] = Date.now();
-  }
-  if (!synced[learnerId]) {
-    synced[learnerId] = true;
-    void syncWithServer(learnerId);
   }
 }
 
@@ -84,7 +45,6 @@ function stopSession(learnerId: string): number {
   const today = formatDate(new Date());
   record[today] = (record[today] || 0) + duration;
   saveRecord(learnerId, record);
-  void sendSession(learnerId, today, duration);
   return duration;
 }
 
@@ -98,7 +58,6 @@ export const learningTimeService = {
   startSession,
   stopSession,
   getTotalHours,
-  syncWithServer,
 };
 
 export default learningTimeService;
