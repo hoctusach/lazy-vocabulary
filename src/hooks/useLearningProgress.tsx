@@ -37,6 +37,12 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     refreshStats();
   }, [refreshStats]);
 
+  const markWordReviewed = useCallback((word: string) => {
+    if (window.confirm(`Mark "${word}" as reviewed?`)) {
+      markWordAsPlayed(word);
+    }
+  }, [markWordAsPlayed]);
+
   const getWordProgress = useCallback((word: string) => {
     return learningProgressService.getWordProgress(word);
   }, []);
@@ -108,6 +114,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     progressStats,
     generateDailyWords,
     markWordAsPlayed,
+    markWordReviewed,
     getWordProgress,
     refreshStats,
     getLearnedWords,
