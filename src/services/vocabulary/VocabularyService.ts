@@ -58,8 +58,8 @@ export class VocabularyService {
     return this.vocabularyOperations.processExcelFile(file);
   }
   
-  loadDefaultVocabulary(data?: SheetData): boolean {
-    const result = this.dataManager.loadDefaultVocabulary();
+  async loadDefaultVocabulary(data?: SheetData): Promise<boolean> {
+    const result = await this.dataManager.loadDefaultVocabulary();
     if (result) {
       this.sheetOperations.updateWordNavigation();
     }

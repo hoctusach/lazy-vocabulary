@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { stopSpeaking } from '@/utils/speech';
 
@@ -11,38 +11,37 @@ export const useVocabularySetup = (
 ) => {
   
   useEffect(() => {
-    // 1) Check if we already have data and set the flag
-    try {
-      const hasExistingData = vocabularyService.hasData();
-      setHasData(hasExistingData);
+    let isMounted = true;
 
-      // 2) On first mount with data, just show the very first word
-      if (hasExistingData && !initialLoadDoneRef.current) {
-        initialLoadDoneRef.current = true;
-        const firstWord =
-          vocabularyService.getCurrentWord() ||
-          vocabularyService.getNextWord();
-        setCurrentWord(firstWord);
-      }
-    } catch (error) {
-      console.error("Error checking vocabulary data:", error);
-      // Try to load default vocabulary as a fallback
+    const initialize = async () => {
       try {
-        vocabularyService.loadDefaultVocabulary();
-        setHasData(true);
-        
-        if (!initialLoadDoneRef.current) {
+        let hasExistingData = vocabularyService.hasData();
+
+        if (!hasExistingData) {
+          await vocabularyService.loadDefaultVocabulary();
+          hasExistingData = vocabularyService.hasData();
+        }
+
+        if (!isMounted) return;
+
+        setHasData(hasExistingData);
+
+        if (hasExistingData && !initialLoadDoneRef.current) {
           initialLoadDoneRef.current = true;
-          const firstWord = vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
+          const firstWord =
+            vocabularyService.getCurrentWord() || vocabularyService.getNextWord();
           setCurrentWord(firstWord);
         }
-      } catch (fallbackError) {
-        console.error("Failed to load default vocabulary:", fallbackError);
+      } catch (error) {
+        console.error("Error during vocabulary setup:", error);
       }
-    }
+    };
 
-    // 3) Cleanup: clear any pending timer and stop speech
+    initialize();
+
+    // Cleanup: clear any pending timer and stop speech
     return () => {
+      isMounted = false;
       clearTimer();
       stopSpeaking();
     };

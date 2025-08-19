@@ -72,16 +72,32 @@ export class VocabularyDataManager {
   mergeImportedData(importedData: SheetData): void {
     this.importer.mergeImportedData(importedData, this.data);
   }
-
-  loadDefaultVocabulary(): boolean {
+async loadDefaultVocabulary(): Promise<boolean> {
+  try {
+    console.log("Loading default vocabulary data");
     try {
-      console.log("Loading default vocabulary data");
+      const response = await fetch("/defaultVocabulary.json");
+      if (!response.ok) throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
+      const fetchedData = await response.json();
+      this.data = this.dataProcessor.processDataTypes(fetchedData);
+      this.storage.saveData(this.data);
+      this.notifyVocabularyChange();
+    } catch (error) {
+      console.warn("Failed to load from JSON file, using embedded default data:", error);
+      this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
+      this.storage.saveData(this.data);
+      this.notifyVocabularyChange();
+    }
+    return true;
+  } catch (error) {
+    console.error("Failed to load default vocabulary:", error);
+    try {
       this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
       this.storage.saveData(this.data);
       this.notifyVocabularyChange();
       return true;
-    } catch (error) {
-      console.error("Failed to load default vocabulary:", error);
+    } catch (fallbackError) {
+      console.error("Critical error: Failed to load any vocabulary data:", fallbackError);
       return false;
     }
   }
