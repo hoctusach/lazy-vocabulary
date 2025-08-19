@@ -73,10 +73,13 @@ export const useVocabularyDataLoader = (
 
     console.log('[DATA-LOADER] Loading initial vocabulary data');
 
-    const loadData = () => {
+    const loadData = async () => {
       clearStartTimer();
       try {
-        const allWords = vocabularyService.getWordList();
+        if (!vocabularyService.hasData()) {
+          await vocabularyService.loadDefaultVocabulary();
+        }
+        const allWords = vocabularyService.getAllWords();
         console.log(`[DATA-LOADER] Loaded ${allWords.length} words`);
 
         const selection =
@@ -155,13 +158,13 @@ export const useVocabularyDataLoader = (
       }
     };
 
-    loadData();
+    void loadData();
 
     // Subscribe to vocabulary changes
     const handleVocabularyChange = () => {
       console.log('[DATA-LOADER] Vocabulary data changed, reloading');
       clearAutoAdvanceTimer(); // Clear timer when data changes
-      loadData();
+      void loadData();
     };
 
     vocabularyService.addVocabularyChangeListener(handleVocabularyChange);
