@@ -48,12 +48,9 @@ export class LearningProgressService {
 
   private calculateNextReviewDate(reviewCount: number): string {
     const today = this.getToday();
-    switch (reviewCount) {
-      case 1: return this.addDays(today, 1);
-      case 2: return this.addDays(today, 2);
-      case 3: return this.addDays(today, 4);
-      default: return this.addDays(today, 7);
-    }
+    const intervals = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
+    const days = intervals[reviewCount - 1] ?? 60;
+    return this.addDays(today, days);
   }
 
   private getLearningProgress(): Map<string, LearningProgress> {
