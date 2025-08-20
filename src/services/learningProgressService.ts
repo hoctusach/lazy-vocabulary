@@ -123,9 +123,27 @@ export class LearningProgressService {
       progress.nextReviewDate = this.calculateNextReviewDate(progress.reviewCount);
       progress.status = 'due';
       progress.nextAllowedTime = new Date().toISOString();
-      
+
       progressMap.set(wordKey, progress);
       this.saveLearningProgress(progressMap);
+
+      // Update today's cached daily selection entry if it exists
+      const storage = localStorage as unknown as Record<string, string>;
+      const cached = storage[DAILY_SELECTION_KEY];
+      if (cached) {
+        const selection: DailySelection = JSON.parse(cached);
+        const updateEntry = (arr: LearningProgress[] = []) =>
+          arr.map(p =>
+            p.word === progress.word && p.category === progress.category ? progress : p
+          );
+
+        const updated: DailySelection = {
+          ...selection,
+          reviewWords: updateEntry(selection.reviewWords),
+          newWords: updateEntry(selection.newWords)
+        };
+        localStorage.setItem(DAILY_SELECTION_KEY, JSON.stringify(updated));
+      }
     }
   }
 
@@ -310,7 +328,7 @@ export class LearningProgressService {
     });
 
     // Adjust quotas if enforcing minimum causes over-allocation
-    let totalQuota = categoryInfo.reduce((sum, info) => sum + info.quota, 0);
+    const totalQuota = categoryInfo.reduce((sum, info) => sum + info.quota, 0);
     if (totalQuota > targetCount) {
       // Reduce from lowest-weight categories first while keeping at least one per category
       const sorted = [...categoryInfo].sort((a, b) => a.weight - b.weight);
