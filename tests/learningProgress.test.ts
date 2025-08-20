@@ -268,7 +268,7 @@ describe('LearningProgressService', () => {
       
       expect(updatedProgress.isLearned).toBe(true);
       expect(updatedProgress.reviewCount).toBe(1);
-      expect(updatedProgress.status).toBe('due');
+      expect(updatedProgress.status).toBe('not_due');
       expect(updatedProgress.lastPlayedDate).toBeTruthy();
       expect(updatedProgress.nextReviewDate).toBeTruthy();
     });
@@ -304,6 +304,31 @@ describe('LearningProgressService', () => {
       expect(saved1[mockWords[0].word].nextReviewDate).toBe(addDays(2));
       expect(saved2[mockWords[1].word].nextReviewDate).toBe(addDays(3));
       expect(saved3[mockWords[2].word].nextReviewDate).toBe(addDays(60));
+    });
+
+    it('removes freshly reviewed words from due list until next review date arrives', () => {
+      const word = mockWords[0];
+      const progress = service.initializeWord(word);
+
+      localStorageMock.getItem.mockReturnValueOnce(
+        JSON.stringify({ [word.word]: progress })
+      );
+
+      service.updateWordProgress(word.word);
+
+      const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
+      localStorageMock.getItem.mockImplementation(key => {
+        if (key === 'learningProgress') return JSON.stringify(savedData);
+        return null;
+      });
+
+      let dueWords = service.getDueReviewWords();
+      expect(dueWords).toHaveLength(0);
+
+      const today = new Date().toISOString().split('T')[0];
+      savedData[word.word].nextReviewDate = today;
+      dueWords = service.getDueReviewWords();
+      expect(dueWords.map(w => w.word)).toContain(word.word);
     });
   });
 

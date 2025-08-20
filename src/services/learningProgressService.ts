@@ -121,7 +121,8 @@ export class LearningProgressService {
       progress.isLearned = true;
       progress.reviewCount += 1;
       progress.nextReviewDate = this.calculateNextReviewDate(progress.reviewCount);
-      progress.status = 'due';
+      progress.status =
+        progress.nextReviewDate > today ? 'not_due' : 'due';
       progress.nextAllowedTime = new Date().toISOString();
       
       progressMap.set(wordKey, progress);
