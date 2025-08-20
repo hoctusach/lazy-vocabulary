@@ -20,6 +20,8 @@ vi.mock('@/components/vocabulary-app/VocabularyAppContainerNew', () => ({
   }: {
     initialWords?: VocabularyWord[];
     additionalContent?: React.ReactNode;
+    onMarkWordLearned?: (word: string) => void;
+    onMarkWordReviewed?: (word: string) => void;
   }) => {
     initialWordsSpy(initialWords);
     return (
@@ -77,6 +79,7 @@ vi.mock('@/hooks/useLearningProgress', () => {
           }
         }),
         markWordAsPlayed: vi.fn(),
+        markWordReviewed: vi.fn(),
         getLearnedWords: () => [],
         markWordLearned: vi.fn(),
         markWordAsNew: vi.fn(),

@@ -15,11 +15,12 @@ import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
   onMarkWordLearned?: (word: string) => void;
+  onMarkWordReviewed?: (word: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, initialWords, additionalContent }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, onMarkWordReviewed, initialWords, additionalContent }) => {
   // Use stable state management
   const {
     currentWord,
@@ -89,6 +90,14 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
     isPaused,
     currentWord: debugData
   }), [isMuted, selectedVoiceName, isPaused, debugData]);
+
+  const previousWordRef = React.useRef<VocabularyWord | null>(null);
+  React.useEffect(() => {
+    if (previousWordRef.current && currentWord && previousWordRef.current.word !== currentWord.word) {
+      onMarkWordReviewed?.(previousWordRef.current.word);
+    }
+    previousWordRef.current = currentWord;
+  }, [currentWord?.word, onMarkWordReviewed]);
 
   if (!hasData && !vocabularyService.hasData()) {
     return (
