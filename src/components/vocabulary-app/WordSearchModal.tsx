@@ -1,14 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { Badge } from '@/components/ui/badge';
 import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
+import { vocabularySearch } from '@/services/search/vocabularySearch';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -18,9 +19,6 @@ interface WordSearchModalProps {
 
 
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
-  const wordsRef = useRef<VocabularyWord[] | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [results, setResults] = useState<VocabularyWord[]>([]);
@@ -31,25 +29,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     gender: 'female',
     index: 0
   };
-
-  useEffect(() => {
-    if (isOpen && !wordsRef.current && !loading) {
-      setLoading(true);
-      import('@/utils/allWords')
-        .then(async mod => {
-          await mod.loadAllWords();
-          wordsRef.current = mod.allWords || [];
-          setLoading(false);
-          setLoadError('');
-        })
-        .catch(err => {
-          console.error(err);
-          setLoadError('Failed to load vocabulary');
-          setLoading(false);
-        });
-    }
-  }, [isOpen, loading]);
-
   useEffect(() => {
     if (isOpen) {
       setQuery(initialQuery);
@@ -82,11 +61,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     return () => clearTimeout(id);
   }, [query]);
 
-  useEffect(() => {
-    setQuery(initialQuery || '');
-    setDebouncedQuery(initialQuery || '');
-  }, [isOpen, initialQuery]);
-
   // Clear any selected word when the search query changes
   useEffect(() => {
     if (selectedWord) {
@@ -96,21 +70,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   }, [query]);
 
   useEffect(() => {
-    if (!wordsRef.current) return;
-
-    const normalized = debouncedQuery.trim().toLowerCase();
+    const normalized = debouncedQuery.trim();
     if (normalized === '') {
       setResults([]);
       setSelectedWord(null);
       return;
     }
 
-    const filtered = wordsRef.current.filter(w =>
-      w.word
-        .split(/\s+/)
-        .some(part => part.toLowerCase() === normalized)
-    );
-
+    const filtered = vocabularySearch(debouncedQuery);
     setResults(filtered);
     setSelectedWord(filtered[0] || null);
   }, [debouncedQuery]);
@@ -171,15 +138,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
         </div>
         {!selectedWord ? (
           <ScrollArea className="h-40 mt-3 border rounded-md">
-            {loading && !wordsRef.current && (
-              <div className="flex justify-center py-4" aria-label="loading">
-                <Loader className="h-4 w-4 animate-spin" />
-
-              </div>
-            )}
-            {loadError && (
-              <p className="p-2 text-sm text-destructive">{loadError}</p>
-            )}
             {results.map((item) => (
               <div
                 key={`${item.word}-${item.category}`}
@@ -196,12 +154,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                 )}
               </div>
             ))}
-            {results.length === 0 &&
-              debouncedQuery.trim() &&
-              !loading &&
-              !loadError && (
-                <p className="p-2 text-sm text-muted-foreground">No results</p>
-              )}
+            {results.length === 0 && debouncedQuery.trim() && (
+              <p className="p-2 text-sm text-muted-foreground">No results</p>
+            )}
           </ScrollArea>
         ) : (
           <div className="mt-3 space-y-2">
