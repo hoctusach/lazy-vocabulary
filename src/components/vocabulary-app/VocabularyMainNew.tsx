@@ -21,6 +21,7 @@ interface VocabularyMainNewProps {
   showWordCount?: boolean;
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
+  onOpenSearch?: (word?: string) => void;
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -39,6 +40,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   showWordCount = false,
   playCurrentWord,
   onMarkWordLearned,
+  onOpenSearch = () => {},
   }) => {
   const { backgroundColor } = useBackgroundColor();
 
@@ -73,6 +75,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             selectedVoiceName={selectedVoiceName}
             playCurrentWord={playCurrentWord}
             onMarkWordLearned={onMarkWordLearned}
+            onOpenSearch={onOpenSearch}
           />
         </div>
       </div>
