@@ -13,9 +13,10 @@ import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice
 interface WordSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialQuery?: string;
 }
 
-const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) => {
+const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery }) => {
   const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
@@ -74,9 +75,16 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
   }, [query]);
 
   useEffect(() => {
+    setQuery(initialQuery || '');
+    setDebouncedQuery(initialQuery || '');
+  }, [isOpen, initialQuery]);
+
+  // Clear any selected word when the search query changes
+  useEffect(() => {
     if (selectedWord) {
       setSelectedWord(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
@@ -96,6 +104,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
     );
 
     setResults(filtered);
+    setSelectedWord(filtered[0] || null);
   }, [debouncedQuery]);
 
   const handlePlay = () => {
