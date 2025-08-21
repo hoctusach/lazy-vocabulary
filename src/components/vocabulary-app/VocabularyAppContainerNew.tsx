@@ -17,9 +17,10 @@ interface VocabularyAppContainerNewProps {
   onMarkWordLearned?: (word: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
+  onOpenSearch: (word?: string) => void;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, initialWords, additionalContent }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, initialWords, additionalContent, onOpenSearch }) => {
   // Use stable state management
   const {
     currentWord,
@@ -194,6 +195,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
             handleOpenEditWordModal={handleOpenEditWordModal}
             onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
+            onOpenSearch={onOpenSearch}
           />
         </div>
       </VocabularyLayout>

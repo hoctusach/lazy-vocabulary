@@ -75,8 +75,8 @@ const VocabularyAppWithLearning: React.FC = () => {
 
   const learnedWords = getLearnedWords();
 
-  const openSearch = (word: string) => {
-    setSearchWord(word);
+  const openSearch = (word?: string) => {
+    setSearchWord(word || '');
     setIsSearchOpen(true);
   };
 
@@ -204,6 +204,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             markCurrentWordLearned(word);
           }}
           additionalContent={learningSection}
+          onOpenSearch={openSearch}
         />
       </div>
       <MarkAsNewDialog
