@@ -13,14 +13,15 @@ import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice
 interface WordSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialQuery?: string;
 }
 
-const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) => {
+const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
   const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [results, setResults] = useState<VocabularyWord[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
   const previewVoice: VoiceSelection = {
@@ -47,6 +48,13 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose }) =>
         });
     }
   }, [isOpen, loading]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setQuery(initialQuery);
+      setDebouncedQuery(initialQuery);
+    }
+  }, [isOpen, initialQuery]);
 
   const highlightMatch = (text: string) => {
     const normalized = query.trim().toLowerCase();
