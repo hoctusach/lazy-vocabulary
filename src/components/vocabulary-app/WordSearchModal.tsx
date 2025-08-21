@@ -16,6 +16,7 @@ interface WordSearchModalProps {
   initialQuery?: string;
 }
 
+
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
   const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
@@ -82,9 +83,16 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   }, [query]);
 
   useEffect(() => {
+    setQuery(initialQuery || '');
+    setDebouncedQuery(initialQuery || '');
+  }, [isOpen, initialQuery]);
+
+  // Clear any selected word when the search query changes
+  useEffect(() => {
     if (selectedWord) {
       setSelectedWord(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
   useEffect(() => {
@@ -104,6 +112,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     );
 
     setResults(filtered);
+    setSelectedWord(filtered[0] || null);
   }, [debouncedQuery]);
 
   const handlePlay = () => {
