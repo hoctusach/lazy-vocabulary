@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
+import WordSearchModal from './vocabulary-app/WordSearchModal';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker('default');
@@ -18,6 +19,8 @@ const VocabularyAppWithLearning: React.FC = () => {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchWord, setSearchWord] = useState('');
 
   const {
     dailySelection,
@@ -80,6 +83,12 @@ const VocabularyAppWithLearning: React.FC = () => {
     }
     setIsMarkAsNewDialogOpen(false);
     setWordToReset(null);
+  };
+
+  // Opens the global search modal, optionally pre-filling with a word
+  const openSearch = (word: string = '') => {
+    setSearchWord(word);
+    setIsSearchOpen(true);
   };
 
   const learningSection = (
@@ -188,6 +197,7 @@ const VocabularyAppWithLearning: React.FC = () => {
             markCurrentWordLearned(word);
           }}
           additionalContent={learningSection}
+          onOpenSearch={openSearch}
         />
       </div>
       <MarkAsNewDialog
@@ -196,6 +206,7 @@ const VocabularyAppWithLearning: React.FC = () => {
         onConfirm={handleMarkAsNew}
         word={wordToReset || ''}
       />
+      <WordSearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} searchWord={searchWord} />
     </>
   );
 };
