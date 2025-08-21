@@ -122,6 +122,12 @@ The controls panel includes a single **Change Voice** button. Clicking it cycles
 
 Any tags inside square brackets or pronunciations written between slashes/parentheses are shown next to the word in a smaller gray font. The main word text no longer includes these annotations.
 
+## Quick Search improvements
+
+Quick Search now normalizes both query text and vocabulary entries so searches
+ignore case and diacritics. Results are ranked to prioritize exact matches
+before partial or fuzzy matches.
+
 ## What technologies are used for this project?
 
 This project is built with:
