@@ -19,7 +19,7 @@ interface WordSearchModalProps {
 
 
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
-  const wordsRef = useRef<VocabularyWord[] | null>(null);
+  const searchRef = useRef<((q: string) => VocabularyWord[]) | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState(normalizeQuery(initialQuery));
@@ -35,12 +35,12 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   };
 
   useEffect(() => {
-    if (isOpen && !wordsRef.current && !loading) {
+    if (isOpen && !searchRef.current && !loading) {
       setLoading(true);
-      import('@/utils/allWords')
+      import('@/services/search/vocabularySearch')
         .then(async mod => {
-          await mod.loadAllWords();
-          wordsRef.current = mod.allWords || [];
+          await mod.loadVocabularyIndex();
+          searchRef.current = mod.searchVocabulary;
           setLoading(false);
           setLoadError('');
         })
@@ -99,7 +99,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   }, [query]);
 
   useEffect(() => {
-    if (!wordsRef.current) return;
+    if (!searchRef.current) return;
 
     const normalized = debouncedQuery.trim().toLowerCase();
     if (normalized === '') {
@@ -108,12 +108,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       return;
     }
 
-    const filtered = wordsRef.current.filter(w =>
-      w.word
-        .split(/\s+/)
-        .some(part => part.toLowerCase() === normalized)
-    );
-
+    const filtered = searchRef.current(debouncedQuery);
     setResults(filtered);
     setSelectedWord(filtered[0] || null);
   }, [debouncedQuery]);
