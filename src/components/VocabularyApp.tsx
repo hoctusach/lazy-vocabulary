@@ -4,6 +4,8 @@ import VocabularyAppContainerNew from "./vocabulary-app/VocabularyAppContainerNe
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
+import { normalizeQuery } from '@/utils/text/normalizeQuery';
+import { toast } from 'sonner';
 
 const VocabularyApp = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -20,7 +22,12 @@ const VocabularyApp = () => {
   }, []);
 
   const openSearch = (word?: string) => {
-    setSearchWord(word || '');
+    const normalized = normalizeQuery(word || '');
+    if (word && normalized === '') {
+      toast.warning('Please enter a valid search query.');
+      return;
+    }
+    setSearchWord(normalized);
     setIsSearchOpen(true);
   };
   

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
+import { normalizeQuery } from '@/utils/text/normalizeQuery';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -21,10 +22,11 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
-  const [query, setQuery] = useState(initialQuery);
-  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [query, setQuery] = useState(normalizeQuery(initialQuery));
+  const [debouncedQuery, setDebouncedQuery] = useState(normalizeQuery(initialQuery));
   const [results, setResults] = useState<VocabularyWord[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
+  const [validationMessage, setValidationMessage] = useState('');
   const previewVoice: VoiceSelection = {
     label: 'US',
     region: 'US',
@@ -52,8 +54,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
 
   useEffect(() => {
     if (isOpen) {
-      setQuery(initialQuery);
-      setDebouncedQuery(initialQuery);
+      const normalized = normalizeQuery(initialQuery);
+      setQuery(normalized);
+      setDebouncedQuery(normalized);
+      if (initialQuery.trim() && normalized === '') {
+        setValidationMessage('Please enter a valid search query.');
+      } else {
+        setValidationMessage('');
+      }
     }
   }, [isOpen, initialQuery]);
 
@@ -81,11 +89,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     const id = setTimeout(() => setDebouncedQuery(query), 200);
     return () => clearTimeout(id);
   }, [query]);
-
-  useEffect(() => {
-    setQuery(initialQuery || '');
-    setDebouncedQuery(initialQuery || '');
-  }, [isOpen, initialQuery]);
 
   // Clear any selected word when the search query changes
   useEffect(() => {
@@ -133,8 +136,16 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   };
 
   const handleInputChange = (value: string) => {
-    setQuery(value);
-    if (value.trim() === '') {
+    const normalized = normalizeQuery(value);
+    setQuery(normalized);
+    if (value.trim() && normalized === '') {
+      setValidationMessage('Please enter a valid search query.');
+      setResults([]);
+      setSelectedWord(null);
+      return;
+    }
+    setValidationMessage('');
+    if (normalized === '') {
       setResults([]);
       setSelectedWord(null);
     }
@@ -169,6 +180,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
             <Search className="h-4 w-4" />
           </Button>
         </div>
+        {validationMessage && (
+          <p className="mt-2 text-sm text-destructive">{validationMessage}</p>
+        )}
         {!selectedWord ? (
           <ScrollArea className="h-40 mt-3 border rounded-md">
             {loading && !wordsRef.current && (

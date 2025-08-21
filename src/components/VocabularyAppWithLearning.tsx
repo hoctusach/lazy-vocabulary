@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
+import { normalizeQuery } from '@/utils/text/normalizeQuery';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker('default');
@@ -76,7 +77,12 @@ const VocabularyAppWithLearning: React.FC = () => {
   const learnedWords = getLearnedWords();
 
   const openSearch = (word?: string) => {
-    setSearchWord(word || '');
+    const normalized = normalizeQuery(word || '');
+    if (word && normalized === '') {
+      toast.warning('Please enter a valid search query.');
+      return;
+    }
+    setSearchWord(normalized);
     setIsSearchOpen(true);
   };
 
