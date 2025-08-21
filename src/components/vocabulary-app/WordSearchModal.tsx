@@ -13,6 +13,7 @@ import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice
 interface WordSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
+  // Word to pre-populate the search field with
   searchWord?: string;
 }
 

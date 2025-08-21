@@ -85,6 +85,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     setWordToReset(null);
   };
 
+  // Opens the global search modal, optionally pre-filling with a word
   const openSearch = (word: string = '') => {
     setSearchWord(word);
     setIsSearchOpen(true);
