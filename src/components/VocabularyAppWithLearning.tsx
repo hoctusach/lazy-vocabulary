@@ -5,7 +5,8 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { vocabularyService } from '@/services/vocabularyService';
 import { VocabularyWord } from '@/types/vocabulary';
 import ToastProvider from './vocabulary-app/ToastProvider';
-import { ChevronDown, RotateCcw } from 'lucide-react';
+import { ChevronDown, RotateCcw, Eye } from 'lucide-react';
+import WordSearchModal from './vocabulary-app/WordSearchModal';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -18,6 +19,8 @@ const VocabularyAppWithLearning: React.FC = () => {
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<string | null>(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchWord, setSearchWord] = useState('');
 
   const {
     dailySelection,
@@ -72,6 +75,10 @@ const VocabularyAppWithLearning: React.FC = () => {
 
   const learnedWords = getLearnedWords();
 
+  const openSearch = (word: string) => {
+    setSearchWord(word);
+    setIsSearchOpen(true);
+  };
 
   const handleMarkAsNew = () => {
     if (wordToReset) {
@@ -152,16 +159,25 @@ const VocabularyAppWithLearning: React.FC = () => {
                             {word.category} • Learned {word.learnedDate}
                           </div>
                         </div>
-                        <button
-                          aria-label="Mark as New"
-                          className="text-gray-400 hover:text-gray-600"
-                          onClick={() => {
-                            setWordToReset(word.word);
-                            setIsMarkAsNewDialogOpen(true);
-                          }}
-                        >
-                          <RotateCcw className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            aria-label="View Word"
+                            className="text-gray-400 hover:text-gray-600"
+                            onClick={() => openSearch(word.word)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            aria-label="Mark as New"
+                            className="text-gray-400 hover:text-gray-600"
+                            onClick={() => {
+                              setWordToReset(word.word);
+                              setIsMarkAsNewDialogOpen(true);
+                            }}
+                          >
+                            <RotateCcw className="h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -195,6 +211,11 @@ const VocabularyAppWithLearning: React.FC = () => {
         onClose={() => setIsMarkAsNewDialogOpen(false)}
         onConfirm={handleMarkAsNew}
         word={wordToReset || ''}
+      />
+      <WordSearchModal
+        isOpen={isSearchOpen}
+        initialQuery={searchWord}
+        onClose={() => setIsSearchOpen(false)}
       />
     </>
   );
