@@ -20,6 +20,7 @@ interface WordSearchModalProps {
 
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
   const searchRef = useRef<((q: string) => VocabularyWord[]) | null>(null);
+  const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState(normalizeQuery(initialQuery));
@@ -43,6 +44,12 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
           searchRef.current = mod.searchVocabulary;
           setLoading(false);
           setLoadError('');
+          if (debouncedQuery.trim()) {
+            const filtered = mod.searchVocabulary(debouncedQuery);
+            wordsRef.current = filtered;
+            setResults(filtered);
+            setSelectedWord(filtered[0] || null);
+          }
         })
         .catch(err => {
           console.error(err);
@@ -50,7 +57,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
           setLoading(false);
         });
     }
-  }, [isOpen, loading]);
+  }, [isOpen, loading, debouncedQuery]);
 
   useEffect(() => {
     if (isOpen) {
@@ -109,6 +116,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     }
 
     const filtered = searchRef.current(debouncedQuery);
+    wordsRef.current = filtered;
     setResults(filtered);
     setSelectedWord(filtered[0] || null);
   }, [debouncedQuery]);
