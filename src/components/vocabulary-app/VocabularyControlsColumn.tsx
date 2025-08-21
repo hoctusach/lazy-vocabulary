@@ -7,7 +7,6 @@ import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
 import AddWordButton from './AddWordButton';
 import EditWordButton from './EditWordButton';
-import WordSearchModal from './WordSearchModal';
 import { VocabularyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
@@ -27,6 +26,7 @@ interface VocabularyControlsColumnProps {
   selectedVoiceName: string;
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
+  onOpenSearch: (word?: string) => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -41,7 +41,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onOpenEditModal,
   selectedVoiceName,
   playCurrentWord,
-  onMarkWordLearned
+  onMarkWordLearned,
+  onOpenSearch
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -91,15 +92,12 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     }
   };
 
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
   const [wordToMark, setWordToMark] = React.useState('');
   const learnedSoundRef = React.useRef<HTMLAudioElement | null>(null);
   React.useEffect(() => {
     learnedSoundRef.current = new Audio('/beep2.wav');
   }, []);
-  const openSearch = () => setIsSearchOpen(true);
-  const closeSearch = () => setIsSearchOpen(false);
 
   const handleMarkAsLearnedClick = () => {
     setWordToMark(currentWord?.word || '');
@@ -172,7 +170,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       <Button
         variant="outline"
         size="sm"
-        onClick={openSearch}
+        onClick={() => onOpenSearch()}
         className="h-8 w-8 p-0"
         title="Quick Search"
         aria-label="Quick Search"
@@ -193,8 +191,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           <CheckCircle size={16} />
         </Button>
       )}
-      
-      <WordSearchModal isOpen={isSearchOpen} onClose={closeSearch} />
       
       <MarkAsLearnedDialog
         isOpen={isMarkAsLearnedDialogOpen}
