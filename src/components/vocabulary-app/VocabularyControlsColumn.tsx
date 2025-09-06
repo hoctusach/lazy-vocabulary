@@ -12,6 +12,14 @@ import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
+import {
+  trackMute,
+  trackUnmute,
+  trackPlay,
+  trackPause,
+  trackNextWord,
+  trackCycleVoice
+} from '@/lib/analytics/events';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -47,31 +55,21 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
   
-  const trackEvent = (name: string, label: string, value?: number) => {
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', name, {
-        event_category: 'interaction',
-        event_label: label,
-        ...(typeof value === 'number' ? { value } : {})
-      });
-    }
-  };
-
   const handleToggleMute = () => {
     onToggleMute();
-    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
+    isMuted ? trackUnmute() : trackMute();
     toast(isMuted ? 'Audio unmuted' : 'Audio muted');
   };
 
   const handleTogglePause = () => {
     onTogglePause();
-    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
+    isPaused ? trackPlay() : trackPause();
     toast(isPaused ? 'Playback resumed' : 'Playback paused');
   };
 
   const handleNextWord = () => {
     onNextWord();
-    trackEvent('next_word', 'Next Word');
+    trackNextWord();
   };
 
   const handleCycleVoice = () => {
@@ -80,12 +78,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       return;
     }
     onCycleVoice();
-    trackEvent('cycle_voice', selectedVoiceName);
+    trackCycleVoice(selectedVoiceName);
   };
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
-    trackEvent('speech_rate_change', `${r}x`, r);
     unifiedSpeechController.stop();
     if (!isMuted && !isPaused) {
       playCurrentWord();

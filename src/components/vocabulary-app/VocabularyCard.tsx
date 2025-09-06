@@ -5,6 +5,15 @@ import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
+import {
+  trackWordView,
+  trackMute,
+  trackUnmute,
+  trackPlay,
+  trackPause,
+  trackNextWord,
+  trackCycleVoice
+} from '@/lib/analytics/events';
 
 interface VocabularyCardProps {
   word: string;
@@ -52,12 +61,13 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   useEffect(() => {
     if (word) {
       localStorage.setItem('currentDisplayedWord', word);
+      trackWordView(word, category);
     }
-    
+
     return () => {
       localStorage.removeItem('currentDisplayedWord');
     };
-  }, [word]);
+  }, [word, category]);
 
   // Parse word to separate types and phonetics
   const wordParts = word.split(/\s*\(([^)]+)\)/);
@@ -66,33 +76,23 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
   const { main, annotations } = parseWordAnnotations(word);
 
-  const trackEvent = (name: string, label: string, value?: number) => {
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', name, {
-        event_category: 'interaction',
-        event_label: label,
-        ...(typeof value === 'number' ? { value } : {})
-      });
-    }
-  };
-
   const handleMuteClick = () => {
-    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
+    isMuted ? trackUnmute() : trackMute();
     onToggleMute();
   };
 
   const handlePauseClick = () => {
-    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
+    isPaused ? trackPlay() : trackPause();
     onTogglePause();
   };
 
   const handleNextClick = () => {
-    trackEvent('next_word', 'Next');
+    trackNextWord();
     onNextWord();
   };
 
   const handleCycleVoiceClick = () => {
-    trackEvent('cycle_voice', nextVoiceLabel);
+    trackCycleVoice(nextVoiceLabel);
     onCycleVoice();
   };
 
