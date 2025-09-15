@@ -12,6 +12,7 @@ export function sanitizeDisplay(s: string) {
 
 export async function getNicknameByKey(key: string) {
   const supabase = getSupabaseClient();
+  if (!supabase) return null;
   const { data, error } = await supabase
     .from('nicknames')
     .select('id, name')
@@ -24,6 +25,9 @@ export async function getNicknameByKey(key: string) {
 export async function upsertNickname(display: string) {
   const supabase = getSupabaseClient();
   const key = normalizeNickname(display);
+  if (!supabase) {
+    return { id: key, name: display };
+  }
   const { data, error } = await supabase
     .from('nicknames')
     .upsert(

@@ -1,7 +1,11 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { getSupabaseClient as getDbSupabaseClient } from './db/supabase';
 
-export function getSupabaseClient(): SupabaseClient {
+export function getSupabaseClient(): SupabaseClient | null {
+  return getDbSupabaseClient();
+}
+
+export function requireSupabaseClient(): SupabaseClient {
   const client = getDbSupabaseClient();
   if (!client) {
     throw new Error(
