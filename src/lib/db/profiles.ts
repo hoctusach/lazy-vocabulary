@@ -1,8 +1,12 @@
-import { supabase } from './supabase';
+import { getSupabaseClient } from './supabase';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
 
-export async function ensureProfile(nickname: string): Promise<{ user_id: string; nickname: string }> {
+export async function ensureProfile(
+  nickname: string
+): Promise<{ user_id: string; nickname: string } | null> {
   if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
+  const supabase = getSupabaseClient();
+  if (!supabase) return null;
   const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
   if (sessionError) throw sessionError;
   let user = sessionData.session?.user;

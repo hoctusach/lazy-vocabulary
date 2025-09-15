@@ -1,7 +1,8 @@
-import { supabase } from './supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from './supabase';
 import type { UserPreferences } from '@/core/models';
 
-async function getUserId(): Promise<string> {
+async function getUserId(supabase: SupabaseClient): Promise<string> {
   const { data: sessionData, error } = await supabase.auth.getSession();
   if (error) throw error;
   let user = sessionData.session?.user;
@@ -22,7 +23,9 @@ const DEFAULT_PREFS: UserPreferences = {
 };
 
 export async function getPreferences(): Promise<UserPreferences> {
-  const user_id = await getUserId();
+  const supabase = getSupabaseClient();
+  if (!supabase) return DEFAULT_PREFS;
+  const user_id = await getUserId(supabase);
   const { data, error } = await supabase
     .from('user_preferences')
     .select('*')
@@ -46,7 +49,9 @@ export async function getPreferences(): Promise<UserPreferences> {
 }
 
 export async function savePreferences(p: Partial<UserPreferences>): Promise<void> {
-  const user_id = await getUserId();
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const user_id = await getUserId(supabase);
   const { data: existing } = await supabase
     .from('user_preferences')
     .select('*')
