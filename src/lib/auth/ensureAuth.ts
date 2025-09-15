@@ -1,7 +1,7 @@
-import { getSupabaseClient } from '../supabaseClient';
+import { requireSupabaseClient } from '../supabaseClient';
 
 export async function ensureAuth(): Promise<{ userId: string }> {
-  const supabase = getSupabaseClient();
+  const supabase = requireSupabaseClient();
 
   let { data: u } = await supabase.auth.getUser();
   if (u?.user?.id) return { userId: u.user.id };
