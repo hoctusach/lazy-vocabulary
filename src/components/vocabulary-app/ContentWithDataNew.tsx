@@ -1,11 +1,6 @@
-import React, { useState } from 'react';
-import { ReadonlyWord } from '@/types/vocabulary';
+import React, { useMemo } from 'react';
+import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
-import MedalCabinet from '@/components/MedalCabinet';
-import StickerHistory from '@/components/StickerHistory';
-import { ChevronDown } from 'lucide-react';
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
 
 interface ContentWithDataNewProps {
   displayWord: ReadonlyWord;
@@ -40,7 +35,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   onOpenSearch,
   additionalContent
 }) => {
-  const [open, setOpen] = useState(false);
   return (
     <>
       {/* Main vocabulary display */}
@@ -62,24 +56,11 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
 
       {additionalContent}
 
-      {/* Achievements and learning days */}
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="flex items-center gap-2 mt-4 mb-2">
-          <span className="font-semibold">Streaks</span>
-          <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-4">
-          <MedalCabinet />
-          <StickerHistory />
-        </CollapsibleContent>
-      </Collapsible>
-
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
         <p>
-          ⭐ No personal login or data is stored on any server. Your progress
-          (stickers, rewards) is saved locally in your browser on your device.
+          ⭐ No personal login or data is stored on any server. Your progress is saved locally in your browser on your device.
           Available voices depend on your browser and device—at first, try
           different browsers to find the best one for learning. Make sure you
           use the same device and browser to keep your progress.

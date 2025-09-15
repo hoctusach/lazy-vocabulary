@@ -1,14 +1,13 @@
 
 import { useCallback } from 'react';
 import { speak } from '@/utils/speech';
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 import { useVoiceManager } from '@/hooks/useVoiceManager';
 import { useVoiceSettings } from './useVoiceSettings';
 import { useSpeechState } from './useSpeechState';
 import { useSpeechError } from './useSpeechError';
 
 export const useSpeechPlayback = () => {
-  const { isMuted } = useVoiceSettings();
+  const { isMuted, voiceRegion } = useVoiceSettings();
   const { selectVoiceByRegion } = useVoiceManager();
   const {
     isSpeakingRef,
@@ -71,10 +70,6 @@ export const useSpeechPlayback = () => {
         
         // Make sure UI gets updated with new text before speaking
         setTimeout(() => {
-          const voiceRegion = localStorage.getItem(BUTTON_STATES_KEY) ?
-            JSON.parse(localStorage.getItem(BUTTON_STATES_KEY) || '{}').voiceRegion || 'US' :
-            'US';
-
           // Fix the Promise type issue by explicitly handling the return value from speak()
           speak(text, voiceRegion, pauseRequestedRef, { muted: isMuted })
             .then((result) => {

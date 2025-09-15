@@ -2,6 +2,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 /**
  * Hook for managing playback controls like mute and pause functionality
@@ -12,33 +13,30 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
   const [muted, setMuted] = useState(false);
   const [paused, setPaused] = useState(false);
   
-  // Load initial settings from localStorage
+  // Load initial settings
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      if (savedSettings) {
-        const { muted: savedMuted } = JSON.parse(savedSettings);
-        setMuted(!!savedMuted);
-        unifiedSpeechController.setMuted(!!savedMuted);
-      }
-    } catch (error) {
-      console.error('Error loading saved settings:', error);
-    }
+    getPreferences()
+      .then(p => {
+        setMuted(!!p.is_muted);
+        unifiedSpeechController.setMuted(!!p.is_muted);
+        setPaused(!p.is_playing);
+      })
+      .catch(err => console.error('Error loading playback prefs', err));
   }, []);
-  
-  // Save settings to localStorage when they change
+
+  // Save mute state
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      const settings = savedSettings ? JSON.parse(savedSettings) : {};
-      localStorage.setItem('vocabularySettings', JSON.stringify({
-        ...settings,
-        muted
-      }));
-    } catch (error) {
-      console.error('Error saving settings:', error);
-    }
+    savePreferences({ is_muted: muted }).catch(err =>
+      console.error('Error saving mute pref', err),
+    );
   }, [muted]);
+
+  // Save playing state
+  useEffect(() => {
+    savePreferences({ is_playing: !paused }).catch(err =>
+      console.error('Error saving play pref', err),
+    );
+  }, [paused]);
   
   // Function to toggle mute with improved behavior
   const toggleMute = useCallback(() => {

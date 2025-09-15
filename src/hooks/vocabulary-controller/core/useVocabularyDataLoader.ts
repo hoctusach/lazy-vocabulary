@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
-import { BUTTON_STATES_KEY, PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
+import { savePreferences } from '@/lib/db/preferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 /**
@@ -33,15 +33,9 @@ export const useVocabularyDataLoader = (
   };
   // Persist selected voice whenever it changes
   useEffect(() => {
-    try {
-      const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
-      const states = storedStates ? JSON.parse(storedStates) : {};
-      states.preferredVoiceName = selectedVoiceName;
-      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(states));
-      localStorage.setItem(PREFERRED_VOICE_KEY, selectedVoiceName);
-    } catch (error) {
-      console.error('Error saving voice to localStorage:', error);
-    }
+    savePreferences({ favorite_voice: selectedVoiceName }).catch(err =>
+      console.error('Error saving voice', err),
+    );
   }, [selectedVoiceName]);
 
   // Load initial data

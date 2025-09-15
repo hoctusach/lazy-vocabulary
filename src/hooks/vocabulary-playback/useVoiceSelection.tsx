@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
-import { PREFERRED_VOICE_KEY } from '@/utils/storageKeys';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 
 export type VoiceOption = {
@@ -35,22 +35,6 @@ export const useVoiceSelection = () => {
   
   // Load available voices when the component mounts
   useEffect(() => {
-    // Try to load saved preferences for voice
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      if (savedSettings) {
-        const { voiceIndex } = JSON.parse(savedSettings);
-        
-        if (typeof voiceIndex === 'number' && voiceIndex >= 0 && voiceIndex < VOICE_OPTIONS.length) {
-          setVoiceIndex(voiceIndex);
-          setSelectedVoice(VOICE_OPTIONS[voiceIndex]);
-          console.log(`Found saved voice preference: ${VOICE_OPTIONS[voiceIndex].label}`);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading saved voice settings:', error);
-    }
-    
     // Initialize voice loading
     const loadVoices = () => {
       const synth = window.speechSynthesis;
@@ -102,39 +86,24 @@ export const useVoiceSelection = () => {
         
         setVoices(voiceOptions);
 
-        try {
-          const storedName = localStorage.getItem(PREFERRED_VOICE_KEY);
-          const matched = storedName
-            ? voiceOptions.find(v => v.voice?.name === storedName)
-            : null;
-
-          if (matched) {
-            setVoiceIndex(matched.index);
-            setSelectedVoice({
-              label: matched.label,
-              region: matched.region,
-              gender: matched.gender,
-              index: matched.index
-            });
-            console.log(`Restored voice from localStorage: ${matched.voice?.name}`);
-          } else {
-            const savedSettings = localStorage.getItem('vocabularySettings');
-            if (savedSettings) {
-              const { voiceIndex } = JSON.parse(savedSettings);
-              if (
-                typeof voiceIndex === 'number' &&
-                voiceIndex >= 0 &&
-                voiceIndex < VOICE_OPTIONS.length
-              ) {
-                setVoiceIndex(voiceIndex);
-                setSelectedVoice(VOICE_OPTIONS[voiceIndex]);
-                console.log(`Restoring saved voice: ${VOICE_OPTIONS[voiceIndex].label}`);
-              }
+        getPreferences()
+          .then(p => {
+            const storedName = p.favorite_voice;
+            const matched = storedName
+              ? voiceOptions.find(v => v.voice?.name === storedName)
+              : null;
+            if (matched) {
+              setVoiceIndex(matched.index);
+              setSelectedVoice({
+                label: matched.label,
+                region: matched.region,
+                gender: matched.gender,
+                index: matched.index,
+              });
+              console.log(`Restored voice preference: ${matched.voice?.name}`);
             }
-          }
-        } catch (error) {
-          console.error('Error restoring voice preference:', error);
-        }
+          })
+          .catch(err => console.error('Error loading voice preference', err));
       }
     };
 
@@ -161,7 +130,9 @@ export const useVoiceSelection = () => {
   useEffect(() => {
     const voiceName = voices[voiceIndex]?.voice?.name;
     if (voiceName) {
-      localStorage.setItem(PREFERRED_VOICE_KEY, voiceName);
+      savePreferences({ favorite_voice: voiceName }).catch(err =>
+        console.error('Error saving voice preference', err),
+      );
     }
   }, [voiceIndex, voices]);
   
@@ -178,20 +149,11 @@ export const useVoiceSelection = () => {
     setVoiceIndex(nextVoice.index);
     setSelectedVoice(nextVoice);
 
-    // Save the preference
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      const settings = savedSettings ? JSON.parse(savedSettings) : {};
-      localStorage.setItem('vocabularySettings', JSON.stringify({
-        ...settings,
-        voiceIndex: nextVoice.index
-      }));
-      const voiceName = voices[nextVoice.index]?.voice?.name;
-      if (voiceName) {
-        localStorage.setItem(PREFERRED_VOICE_KEY, voiceName);
-      }
-    } catch (error) {
-      console.error('Error saving voice preference:', error);
+    const voiceName = voices[nextVoice.index]?.voice?.name;
+    if (voiceName) {
+      savePreferences({ favorite_voice: voiceName }).catch(err =>
+        console.error('Error saving voice preference', err),
+      );
     }
   };
   
