@@ -1,0 +1,27 @@
+import { supabase } from './supabase';
+import { canonNickname, isNicknameAllowed } from '@/core/nickname';
+
+export async function ensureProfile(nickname: string): Promise<{ user_id: string; nickname: string }> {
+  if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  if (sessionError) throw sessionError;
+  let user = sessionData.session?.user;
+  if (!user) {
+    const { data, error } = await supabase.auth.signInAnonymously();
+    if (error || !data.user) throw error || new Error('anonymous sign-in failed');
+    user = data.user;
+  }
+  const nickname_canon = canonNickname(nickname);
+  const { data: dupe } = await supabase
+    .from('profiles')
+    .select('user_id')
+    .eq('nickname_canon', nickname_canon)
+    .not('user_id', 'eq', user.id)
+    .maybeSingle();
+  if (dupe) throw { code: 'NICKNAME_TAKEN' };
+  const { error: upsertError } = await supabase
+    .from('profiles')
+    .upsert({ user_id: user.id, nickname, nickname_canon, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+  if (upsertError) throw upsertError;
+  return { user_id: user.id, nickname };
+}

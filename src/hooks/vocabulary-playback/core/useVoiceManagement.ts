@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 /**
  * Hook for managing voice selection and finding appropriate voices
@@ -25,23 +26,15 @@ export const useVoiceManagement = () => {
     { label: "AU", region: "AU" as const, gender: "female" as const, voice: null }
   ];
   
-  // Load initial voice settings from localStorage
+  // Load initial voice settings
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      if (savedSettings) {
-        const { voiceIndex: savedVoiceIndex } = JSON.parse(savedSettings);
-        
-        // Set voice index if valid
-        if (typeof savedVoiceIndex === 'number' && savedVoiceIndex >= 0 && 
-            savedVoiceIndex < allVoiceOptions.length) {
-          setVoiceIndex(savedVoiceIndex);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading saved voice settings:', error);
-    }
-    
+    getPreferences()
+      .then(p => {
+        const idx = allVoiceOptions.findIndex(v => v.label === p.favorite_voice);
+        if (idx >= 0) setVoiceIndex(idx);
+      })
+      .catch(err => console.error('Error loading voice preference', err));
+
     // Also try to preload voices
     const loadVoicesAndNotify = () => {
       const availableVoices = window.speechSynthesis.getVoices();
@@ -128,17 +121,10 @@ export const useVoiceManagement = () => {
         `Cycling voice from ${allVoiceOptions[prevIndex].label} to ${allVoiceOptions[nextIndex].label}`
       );
       
-      // Save to localStorage
-      try {
-        const savedSettings = localStorage.getItem('vocabularySettings');
-        const settings = savedSettings ? JSON.parse(savedSettings) : {};
-        localStorage.setItem('vocabularySettings', JSON.stringify({
-          ...settings,
-          voiceIndex: nextIndex
-        }));
-      } catch (error) {
-        console.error('Error saving voice preference:', error);
-      }
+      const voiceName = allVoiceOptions[nextIndex].label;
+      savePreferences({ favorite_voice: voiceName }).catch(err =>
+        console.error('Error saving voice preference', err),
+      );
       
       // Notify the user
       toast.success(`Voice changed to ${allVoiceOptions[nextIndex].label}`);

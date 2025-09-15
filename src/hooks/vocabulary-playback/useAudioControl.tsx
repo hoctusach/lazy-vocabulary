@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 export const useAudioControl = (wordList: VocabularyWord[]) => {
   // Audio state
@@ -8,32 +9,18 @@ export const useAudioControl = (wordList: VocabularyWord[]) => {
   const [paused, setPaused] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
-  // Load initial mute state from local storage
+  // Load initial mute state from DB
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem('vocabularySettings');
-      if (savedSettings) {
-        const { muted: savedMuted } = JSON.parse(savedSettings);
-        setMuted(!!savedMuted);
-      }
-    } catch (error) {
-      console.error('Error loading saved mute setting:', error);
-    }
+    getPreferences()
+      .then(p => setMuted(!!p.is_muted))
+      .catch(err => console.error('Error loading mute setting', err));
   }, []);
-  
-  // Save muted state to localStorage
+
+  // Persist muted state
   useEffect(() => {
-    try {
-      const settings = localStorage.getItem('vocabularySettings');
-      const parsedSettings = settings ? JSON.parse(settings) : {};
-      
-      localStorage.setItem('vocabularySettings', JSON.stringify({
-        ...parsedSettings,
-        muted
-      }));
-    } catch (error) {
-      console.error('Error saving mute setting:', error);
-    }
+    savePreferences({ is_muted: muted }).catch(err => {
+      console.error('Error saving mute setting', err);
+    });
   }, [muted]);
   
   // Function to cancel any speech

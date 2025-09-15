@@ -1,22 +1,12 @@
 
 import { useEffect } from 'react';
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { savePreferences } from '@/lib/db/preferences';
 
 export const useAudioMuteEffect = (mute: boolean) => {
   // Effect specifically for mute changes
   useEffect(() => {
-    // Store mute state in localStorage
-    try {
-      const buttonStates = JSON.parse(
-        localStorage.getItem(BUTTON_STATES_KEY) || '{}'
-      );
-      buttonStates.isMuted = mute;
-      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(buttonStates));
-    } catch (e) {
-      // Ignore localStorage errors
-    }
-
+    savePreferences({ is_muted: mute }).catch(() => {});
     unifiedSpeechController.setMuted(mute);
   }, [mute]);
 };
