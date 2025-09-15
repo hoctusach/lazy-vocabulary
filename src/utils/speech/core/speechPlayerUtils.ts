@@ -1,26 +1,18 @@
 
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+// Preferences handled server-side
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 
 // Store the current text being spoken for sync checking
 export function setCurrentTextBeingSpoken(processedText: string) {
   try {
-    localStorage.setItem('currentTextBeingSpoken', processedText);
+    // no-op persistence removed
   } catch (error) {
     console.error('Error saving current text to localStorage:', error);
   }
 }
 
 export function isMutedFromLocalStorage(): boolean {
-  try {
-    const storedStates = localStorage.getItem(BUTTON_STATES_KEY);
-    if (storedStates) {
-      const parsedStates = JSON.parse(storedStates);
-      return parsedStates.isMuted === true;
-    }
-  } catch (error) {
-    console.error('Error reading mute state from localStorage:', error);
-  }
+  // Prefer server-side preferences
   return false;
 }
 

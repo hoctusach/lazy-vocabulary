@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { BUTTON_STATES_KEY } from '@/utils/storageKeys';
+import { savePreferences } from '@/lib/db/preferences';
 
 export const useMuteToggle = (
   isMuted: boolean,
@@ -19,16 +19,9 @@ export const useMuteToggle = (
     setMute(!mute);
     handleToggleMute();
 
-    // Just update the muted state in localStorage
-    try {
-      const buttonStates = JSON.parse(
-        localStorage.getItem(BUTTON_STATES_KEY) || '{}'
-      );
-      buttonStates.isMuted = !mute;
-      localStorage.setItem(BUTTON_STATES_KEY, JSON.stringify(buttonStates));
-    } catch (error) {
-      console.error('Error updating mute state in localStorage:', error);
-    }
+    savePreferences({ is_muted: !mute }).catch(err =>
+      console.error('Error saving mute state', err),
+    );
   }, [mute, handleToggleMute]);
 
   return { mute, toggleMute };

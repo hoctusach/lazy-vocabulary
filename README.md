@@ -24,6 +24,21 @@ the project:
 npm install
 ```
 
+## Supabase Setup
+
+The app now stores learning progress and user preferences in Supabase.
+
+1. Create a [Supabase](https://supabase.com/) project.
+2. In **Project Settings → API** copy the **URL** and **anon key** and set them in your `.env`:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+```
+
+3. In **Authentication → Providers** enable **Anonymous** and ensure "Allow new users to sign up" is enabled.
+4. Run the SQL migration `supabase/sql/2025-01-local-to-db.sql` in the Supabase SQL editor (or your project's migration tooling).
+
 ## How can I edit this code?
 
 There are several ways of editing your application.
