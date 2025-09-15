@@ -10,16 +10,9 @@ export interface VocabularyWord {
   nextAllowedTime?: string;
 }
 
-// Interface for editing or adding words where category is required
-export interface EditableWord {
-  word: string;
-  meaning: string;
-  example: string;
-  translation?: string;
-  category: string; // Category is required for editable words
-  count?: number | string;
-}
+export type ReadonlyWord = Readonly<VocabularyWord>;
 
+// Interface for editing or adding words where category is required
 export interface SheetData {
   [key: string]: VocabularyWord[];
 }

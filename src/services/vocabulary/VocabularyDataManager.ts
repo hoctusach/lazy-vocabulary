@@ -51,10 +51,6 @@ export class VocabularyDataManager {
     return count;
   }
 
-  saveData() {
-    return this.storage.saveData(this.data);
-  }
-
   hasData() {
     return Object.values(this.data).some(sheet => sheet && sheet.length > 0);
   }
@@ -71,12 +67,10 @@ async loadDefaultVocabulary() {
       if (!response.ok) throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
       const fetchedData = await response.json();
       this.data = this.dataProcessor.processDataTypes(fetchedData);
-      this.storage.saveData(this.data);
       this.notifyVocabularyChange();
     } catch (error) {
       console.warn("Failed to load from JSON file, using embedded default data:", error);
       this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-      this.storage.saveData(this.data);
       this.notifyVocabularyChange();
     }
     return true;
@@ -84,7 +78,6 @@ async loadDefaultVocabulary() {
     console.error("Failed to load default vocabulary:", error);
     try {
       this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-      this.storage.saveData(this.data);
       this.notifyVocabularyChange();
       return true;
     } catch (fallbackError) {
@@ -94,24 +87,5 @@ async loadDefaultVocabulary() {
   }
 }
 
-  mergeCustomWords(customData, sheetOptions) {
-    console.log("Merging custom words with existing data");
-
-    // Add each custom category to sheetOptions if it doesn't exist already
-    for (const category in customData) {
-      if (!sheetOptions.includes(category)) {
-        sheetOptions.push(category);
-        console.log(`Added new category: ${category}`);
-      }
-    }
-
-    // Use the importer to merge words
-    this.importer.mergeImportedData(customData, this.data);
-
-    // Save the updated data to storage
-    this.storage.saveData(this.data);
-
-    // Notify listeners about vocabulary change
-    this.notifyVocabularyChange();
-  }
+  // custom word merging removed for read-only mode
 }

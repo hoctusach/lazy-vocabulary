@@ -5,9 +5,7 @@ import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, CheckCircl
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
-import AddWordButton from './AddWordButton';
-import EditWordButton from './EditWordButton';
-import { VocabularyWord } from '@/types/vocabulary';
+import { ReadonlyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
@@ -20,9 +18,7 @@ interface VocabularyControlsColumnProps {
   onTogglePause: () => void;
   onNextWord: () => void;
   onCycleVoice: () => void;
-  currentWord: VocabularyWord | null;
-  onOpenAddModal: () => void;
-  onOpenEditModal: () => void;
+  currentWord: ReadonlyWord | null;
   selectedVoiceName: string;
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
@@ -37,8 +33,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onNextWord,
   onCycleVoice,
   currentWord,
-  onOpenAddModal,
-  onOpenEditModal,
   selectedVoiceName,
   playCurrentWord,
   onMarkWordLearned,
@@ -164,9 +158,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       </Button>
 
       <SpeechRateControl rate={speechRate} onChange={handleRateChange} />
-
-      <EditWordButton onClick={onOpenEditModal} disabled={!currentWord} />
-      <AddWordButton onClick={onOpenAddModal} />
       <Button
         variant="outline"
         size="sm"

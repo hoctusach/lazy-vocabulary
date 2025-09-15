@@ -10,14 +10,28 @@ import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import NicknameGate from "./components/NicknameGate";
-import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
-import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
+// imports (keep these)
+import React, { useEffect } from 'react';
+import { QueryClient } from '@tanstack/react-query';
+import { useDailyUsageTracker } from './hooks/useDailyUsageTracker';
+import { clearLegacyCustomWordKeys } from './lib/cleanup/clearLegacyCustomWordKeys';
+import { clearLegacyStreakKeys } from './lib/cleanup/clearLegacyStreakKeys';
 
 const queryClient = new QueryClient();
 
 const App = () => {
+  // keep hours tracking
+  useDailyUsageTracker();
+
   useEffect(() => {
+    // one-time cleanups
+    clearLegacyCustomWordKeys();
     clearLegacyStreakKeys();
+  }, []);
+
+  // ...rest of App JSX
+};
+
     const nick = localStorage.getItem('lazyVoca.nickname');
     if (nick) {
       import('@/lib/sync/flushLocalToServer').then(m => m.flushLocalToServer(nick));

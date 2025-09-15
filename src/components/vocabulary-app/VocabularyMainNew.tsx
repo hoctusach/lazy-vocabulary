@@ -1,12 +1,12 @@
 
 import React from 'react';
-import { VocabularyWord } from '@/types/vocabulary';
+import { ReadonlyWord } from '@/types/vocabulary';
 import VocabularyCardNew from './VocabularyCardNew';
 import { useBackgroundColor } from './useBackgroundColor';
 import VocabularyControlsColumn from './VocabularyControlsColumn';
 
 interface VocabularyMainNewProps {
-  currentWord: VocabularyWord;
+  currentWord: ReadonlyWord;
   mute: boolean;
   isPaused: boolean;
   toggleMute: () => void;
@@ -16,8 +16,6 @@ interface VocabularyMainNewProps {
   isSoundPlaying: boolean;
   displayTime: number;
   selectedVoiceName: string;
-  onOpenAddModal: () => void;
-  onOpenEditModal: () => void;
   showWordCount?: boolean;
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
@@ -35,8 +33,6 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   isSoundPlaying,
   displayTime,
   selectedVoiceName,
-  onOpenAddModal,
-  onOpenEditModal,
   showWordCount = false,
   playCurrentWord,
   onMarkWordLearned,
@@ -70,8 +66,6 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             onNextWord={handleManualNext}
             onCycleVoice={handleCycleVoice}
             currentWord={currentWord}
-            onOpenAddModal={onOpenAddModal}
-            onOpenEditModal={onOpenEditModal}
             selectedVoiceName={selectedVoiceName}
             playCurrentWord={playCurrentWord}
             onMarkWordLearned={onMarkWordLearned}

@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
-import AddWordModal from './AddWordModal';
 
 interface ContentWithDataNewProps {
-  displayWord: VocabularyWord;
+  displayWord: ReadonlyWord;
   muted: boolean;
   paused: boolean;
   toggleMute: () => void;
@@ -14,13 +13,6 @@ interface ContentWithDataNewProps {
   handleManualNext: () => void;
   displayTime: number;
   selectedVoiceName: string;
-  isAddWordModalOpen: boolean;
-  handleCloseModal: () => void;
-  handleSaveWord: (wordData: { word: string; meaning: string; example: string; translation: string; category: string }) => void;
-  isEditMode: boolean;
-  wordToEdit: VocabularyWord | null;
-  handleOpenAddWordModal: () => void;
-  handleOpenEditWordModal: (word: VocabularyWord) => void;
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
@@ -38,30 +30,11 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   handleManualNext,
   displayTime,
   selectedVoiceName,
-  isAddWordModalOpen,
-  handleCloseModal,
-  handleSaveWord,
-  isEditMode,
-  wordToEdit,
-  handleOpenAddWordModal,
-  handleOpenEditWordModal,
   playCurrentWord,
   onMarkWordLearned,
   onOpenSearch,
   additionalContent
 }) => {
-  const editingWordData = useMemo(
-    () => (
-      isEditMode && wordToEdit
-        ? {
-            ...wordToEdit,
-            translation: wordToEdit.translation || '',
-            category: wordToEdit.category || displayWord.category
-          }
-        : undefined
-    ),
-    [isEditMode, wordToEdit, displayWord.category]
-  );
   return (
     <>
       {/* Main vocabulary display */}
@@ -76,8 +49,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         handleManualNext={handleManualNext}
         displayTime={displayTime}
         selectedVoiceName={selectedVoiceName}
-        onOpenAddModal={handleOpenAddWordModal}
-        onOpenEditModal={() => handleOpenEditWordModal(displayWord)}
         playCurrentWord={playCurrentWord}
         onMarkWordLearned={onMarkWordLearned}
         onOpenSearch={onOpenSearch}
@@ -98,14 +69,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
 
 
       
-      {/* Enhanced Word Modal (handles both add and edit) */}
-      <AddWordModal
-        isOpen={isAddWordModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSaveWord}
-        editMode={isEditMode}
-        wordToEdit={editingWordData}
-      />
     </>
   );
 };

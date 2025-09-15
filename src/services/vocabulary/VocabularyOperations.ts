@@ -61,7 +61,6 @@ export class VocabularyOperations {
       
       // Merge with existing data
       this.dataManager.mergeImportedData(importedData);
-      this.dataManager.saveData();
       this.sheetOperations.updateWordNavigation();
       
       console.log("Excel file processed successfully");
@@ -125,16 +124,5 @@ export class VocabularyOperations {
     return this.lastWordChangeTime;
   }
 
-  mergeCustomWords(customData: { [key: string]: VocabularyWord[] }): void {
-    console.log("Merging custom words with existing data");
-    
-    // Use the data manager to merge and save
-    this.dataManager.mergeImportedData(customData);
-    this.dataManager.saveData();
-    
-    // Update navigation
-    this.sheetOperations.updateWordNavigation();
-    
-    console.log("Custom words merged successfully");
-  }
+  // custom word merging removed for read-only mode
 }

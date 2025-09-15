@@ -5,10 +5,8 @@ import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
 import UserInteractionManager from "./UserInteractionManager";
-import { useWordModalState } from "@/hooks/vocabulary/useWordModalState";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
-import VocabularyWordManager from "./word-management/VocabularyWordManager";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -51,31 +49,6 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
     playCurrentWord
   });
-
-  // Modal state management
-  const {
-    isAddWordModalOpen,
-    isEditMode,
-    wordToEdit,
-    handleOpenAddWordModal,
-    handleOpenEditWordModal,
-    handleCloseModal
-  } = useWordModalState();
-
-  // Memoize word manager to prevent recreation
-  const wordManager = useMemo(() => {
-    return currentWord ? VocabularyWordManager({
-      currentWord,
-      currentCategory,
-      onWordSaved: handleCloseModal
-    }) : null;
-  }, [currentWord?.word, currentCategory, handleCloseModal]);
-
-  const handleSaveWord = React.useCallback((wordData: { word: string; meaning: string; example: string; translation: string; category: string }) => {
-    if (wordManager) {
-      wordManager.handleSaveWord(wordData, isEditMode, wordToEdit);
-    }
-  }, [wordManager, isEditMode, wordToEdit]);
 
   // Memoize debug data
   const debugData = useMemo(() => {
@@ -186,13 +159,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
             handleManualNext={goToNextAndSpeak}
             displayTime={5000}
             selectedVoiceName={selectedVoiceName}
-            isAddWordModalOpen={isAddWordModalOpen}
-            handleCloseModal={handleCloseModal}
-            handleSaveWord={handleSaveWord}
-            isEditMode={isEditMode}
-            wordToEdit={wordToEdit}
-            handleOpenAddWordModal={handleOpenAddWordModal}
-            handleOpenEditWordModal={handleOpenEditWordModal}
+            playCurrentWord={playCurrentWord}
             onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
             onOpenSearch={onOpenSearch}
