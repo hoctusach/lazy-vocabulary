@@ -13,11 +13,12 @@ import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { normalizeQuery } from '@/utils/text/normalizeQuery';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
-  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(true);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<string | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -96,7 +97,8 @@ const VocabularyAppWithLearning: React.FC = () => {
   };
 
   const learningSection = (
-    <div className="space-y-4 mt-4">
+    <TooltipProvider>
+      <div className="space-y-4 mt-4">
       <LearningProgressPanel
         dailySelection={dailySelection}
         progressStats={progressStats}
@@ -106,10 +108,20 @@ const VocabularyAppWithLearning: React.FC = () => {
 
       {dailySelection && (
         <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
-          <CollapsibleTrigger className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold">Word Summary</h3>
-            <ChevronDown className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')} />
-          </CollapsibleTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CollapsibleTrigger className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold">Word Summary</h3>
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  Tap to show or hide details
+                </span>
+                <ChevronDown
+                  className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')}
+                />
+              </CollapsibleTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
+          </Tooltip>
           <CollapsibleContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-3">
               {dailySelection.newWords.length > 0 && (
@@ -197,7 +209,8 @@ const VocabularyAppWithLearning: React.FC = () => {
           </CollapsibleContent>
         </Collapsible>
       )}
-    </div>
+      </div>
+    </TooltipProvider>
   );
 
   return (
