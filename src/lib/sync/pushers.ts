@@ -7,7 +7,17 @@ export async function upsertResume(name: string, rows: Array<{category: string; 
   return supabase.from('resume_state').upsert(payload, { onConflict: 'name,category' });
 }
 
-export async function upsertProgress(name: string, rows: Array<{word_key: string; category?: string|null; status?: number|null; review_count?: number; next_review_at?: string|null}>) {
+export async function upsertProgress(
+  name: string,
+  rows: Array<{
+    word_key: string;
+    category?: string | null;
+    status?: number | string | null;
+    review_count?: number;
+    next_review_at?: string | null;
+    learned_at?: string | null;
+  }>
+) {
   const supabase = getSupabaseClient();
   const payload = rows.map(r => ({ name, ...r, updated_at: new Date().toISOString() }));
   return supabase.from('learning_progress').upsert(payload, { onConflict: 'name,word_key' });

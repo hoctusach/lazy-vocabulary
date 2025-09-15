@@ -54,6 +54,14 @@ create table if not exists public.word_counts (
 
 -- Indexing (cheap but helpful)
 create index if not exists idx_progress_name_updated on public.learning_progress(name, updated_at desc);
+-- Ensure the column exists for learned timestamp
+alter table if exists public.learning_progress
+  add column if not exists learned_at timestamptz;
+
+-- Fast query path for learned words per user (partial index)
+create index if not exists idx_lp_name_learned_at
+  on public.learning_progress(name, learned_at desc)
+  where learned_at is not null;
 create index if not exists idx_time_name_day on public.learning_time(name, day);
 create index if not exists idx_selection_name_day on public.daily_selection(name, day);
 
