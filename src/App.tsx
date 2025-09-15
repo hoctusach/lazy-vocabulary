@@ -10,6 +10,7 @@ import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import { loadStreakDays } from "./utils/streak";
+import NicknameGate from "./components/NicknameGate";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
+        <NicknameGate />
       </TooltipProvider>
     </QueryClientProvider>
   );
