@@ -1,7 +1,8 @@
-import { supabase } from './supabase';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { getSupabaseClient } from './supabase';
 import type { LearnedWord } from '@/core/models';
 
-async function getUserId(): Promise<string> {
+async function getUserId(supabase: SupabaseClient): Promise<string> {
   const { data: sessionData, error } = await supabase.auth.getSession();
   if (error) throw error;
   let user = sessionData.session?.user;
@@ -14,7 +15,9 @@ async function getUserId(): Promise<string> {
 }
 
 export async function getLearned(): Promise<LearnedWord[]> {
-  const user_id = await getUserId();
+  const supabase = getSupabaseClient();
+  if (!supabase) return [];
+  const user_id = await getUserId(supabase);
   const { data, error } = await supabase
     .from('learned_words')
     .select('*')
@@ -24,7 +27,9 @@ export async function getLearned(): Promise<LearnedWord[]> {
 }
 
 export async function upsertLearned(wordId: string, inReview: boolean): Promise<void> {
-  const user_id = await getUserId();
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const user_id = await getUserId(supabase);
   const { error } = await supabase
     .from('learned_words')
     .upsert(
@@ -35,7 +40,9 @@ export async function upsertLearned(wordId: string, inReview: boolean): Promise<
 }
 
 export async function setReview(wordId: string, inReview: boolean): Promise<void> {
-  const user_id = await getUserId();
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+  const user_id = await getUserId(supabase);
   const { error } = await supabase
     .from('learned_words')
     .update({ in_review_queue: inReview, learned_at: new Date().toISOString() })
