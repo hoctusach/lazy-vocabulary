@@ -13,6 +13,7 @@ import NicknameGate from "./components/NicknameGate";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
+import { autoBackfillOnReload } from "@/lib/sync/autoBackfillOnReload";
 
 const queryClient = new QueryClient();
 
@@ -20,12 +21,7 @@ const App = () => {
   useEffect(() => {
     clearLegacyCustomWordKeys();
     clearLegacyStreakKeys();
-    const nick = localStorage.getItem("lazyVoca.nickname");
-    if (nick) {
-      import("@/lib/sync/flushLocalToServer").then((m) =>
-        m.flushLocalToServer(nick)
-      );
-    }
+    void autoBackfillOnReload();
   }, []);
   useSessionTracker();
   useDailyUsageTracker();
