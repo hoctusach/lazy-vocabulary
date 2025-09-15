@@ -17,6 +17,10 @@ const queryClient = new QueryClient();
 const App = () => {
   useEffect(() => {
     loadStreakDays();
+    const nick = localStorage.getItem('lazyVoca.nickname');
+    if (nick) {
+      import('@/lib/sync/flushLocalToServer').then(m => m.flushLocalToServer(nick));
+    }
   }, []);
   useSessionTracker();
   return (

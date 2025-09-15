@@ -48,6 +48,8 @@ export default function NicknameGate() {
 
     if (res.ok) {
       setNicknameLocal(nick);
+      const { flushLocalToServer } = await import('../lib/sync/flushLocalToServer');
+      flushLocalToServer(nick);
       setS(p => ({ ...p, show: false, pending: false }));
       return;
     }

@@ -1,10 +1,21 @@
 import { LearningProgress, DailySelection, SeverityLevel, CategoryWeights } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { getLocalDateISO } from '@/utils/date';
+import { debounce } from '@/lib/sync/debounce';
 
 const LEARNING_PROGRESS_KEY = 'learningProgress';
 const DAILY_SELECTION_KEY = 'dailySelection';
 const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
+
+const pushLearnedDebounced = debounce(
+  async (nick: string, word_key: string, review_count?: number) => {
+    const { upsertProgress } = await import('@/lib/sync/pushers');
+    await upsertProgress(nick, [
+      { word_key, status: 3, review_count, learned_at: new Date().toISOString() },
+    ]);
+  },
+  800,
+);
 
 export class LearningProgressService {
   private static instance: LearningProgressService;
@@ -182,6 +193,9 @@ export class LearningProgressService {
         };
         localStorage.setItem(DAILY_SELECTION_KEY, JSON.stringify(updated));
       }
+
+      const nick = localStorage.getItem('lazyVoca.nickname');
+      if (nick) pushLearnedDebounced(nick, wordKey, progress.reviewCount);
     }
   }
 
