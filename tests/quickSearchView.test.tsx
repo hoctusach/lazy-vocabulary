@@ -61,7 +61,6 @@ vi.mock('@/services/learningTimeService', () => ({
   learningTimeService: { startSession: vi.fn(), stopSession: vi.fn().mockReturnValue(0) }
 }));
 
-vi.mock('@/utils/streak', () => ({ addStreakDay: vi.fn() }));
 
 const searchMock = vi.fn();
 vi.mock('@/services/search/vocabularySearch', () => ({

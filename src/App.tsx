@@ -9,20 +9,22 @@ import NotFound from "./pages/NotFound";
 import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
-import { loadStreakDays } from "./utils/streak";
 import NicknameGate from "./components/NicknameGate";
+import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
+import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
 
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    loadStreakDays();
+    clearLegacyStreakKeys();
     const nick = localStorage.getItem('lazyVoca.nickname');
     if (nick) {
       import('@/lib/sync/flushLocalToServer').then(m => m.flushLocalToServer(nick));
     }
   }, []);
   useSessionTracker();
+  useDailyUsageTracker();
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

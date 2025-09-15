@@ -108,7 +108,6 @@ vi.mock('@/services/learningTimeService', () => ({
   }
 }));
 
-vi.mock('@/utils/streak', () => ({ addStreakDay: vi.fn() }));
 
 beforeEach(async () => {
   await import('@testing-library/jest-dom');
