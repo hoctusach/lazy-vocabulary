@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import { loadStreakDays } from "./utils/streak";
@@ -33,6 +34,9 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            {process.env.NODE_ENV !== 'production' && (
+              <Route path="/dev" element={<Dev />} />
+            )}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
