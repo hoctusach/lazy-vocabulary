@@ -15,7 +15,7 @@ import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { normalizeQuery } from '@/utils/text/normalizeQuery';
 
 const VocabularyAppWithLearning: React.FC = () => {
-  useDailyUsageTracker('default');
+  useDailyUsageTracker();
   const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
