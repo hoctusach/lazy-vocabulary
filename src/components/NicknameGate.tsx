@@ -44,7 +44,10 @@ export default function NicknameGate() {
       const chosen = existing ?? await upsertNickname(display);
 
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
-      try { (await import('../lib/sync/flushLocalToServer')).flushLocalToServer(chosen.name); } catch {}
+      try {
+        const mod = await import('../lib/sync/autoBackfillOnReload');
+        void mod.autoBackfillOnReload();
+      } catch {}
       try { (await import('../lib/storage/migrateLocalVocabToDb')).migrateLocalVocabToDb?.(); } catch {}
 
       setS({ ready: true, show: false, value: chosen.name, pending: false });
