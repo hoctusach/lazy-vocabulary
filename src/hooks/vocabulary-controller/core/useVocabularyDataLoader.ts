@@ -3,8 +3,9 @@ import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
-import { savePreferences } from '@/lib/db/preferences';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
+import type { SeverityLevel } from '@/types/learning';
 
 /**
  * Data loading and persistence
@@ -76,9 +77,20 @@ export const useVocabularyDataLoader = (
         const allWords = vocabularyService.getAllWords();
         console.log(`[DATA-LOADER] Loaded ${allWords.length} words`);
 
+        let severity: SeverityLevel = 'light';
+        try {
+          const prefs = await getPreferences();
+          severity = (prefs.daily_option as SeverityLevel) || 'light';
+          if (!prefs.daily_option) {
+            await savePreferences({ daily_option: 'light' });
+          }
+        } catch {
+          // ignore preference loading errors
+        }
+
         const selection =
           learningProgressService.getTodaySelection() ||
-          learningProgressService.forceGenerateDailySelection(allWords, 'light');
+          learningProgressService.forceGenerateDailySelection(allWords, severity);
 
         let todayWords: VocabularyWord[] = [];
         if (selection) {
