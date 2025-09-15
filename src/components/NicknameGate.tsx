@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '../lib/supabaseClient';
-import { getNicknameLocal, setNicknameLocal, validateNickname, NICKNAME_LS_KEY } from '../lib/nickname';
+import { getNicknameLocal, validateNickname, NICKNAME_LS_KEY } from '../lib/nickname';
+import { ensureAuth } from '../lib/auth/ensureAuth';
 
 type UIState = {
   ready: boolean;    // localStorage checked
@@ -10,14 +11,6 @@ type UIState = {
   pending: boolean;
   error?: string;
 };
-
-async function claimNicknameRemote(name: string): Promise<{ ok: true } | { ok: false; code: 'taken' | 'server'; message?: string }> {
-  const supabase = getSupabaseClient();
-  const { error, status } = await supabase.from('nicknames').insert([{ name }]);
-  if (!error) return { ok: true };
-  if ((error as any).code === '23505' || status === 409) return { ok: false, code: 'taken' };
-  return { ok: false, code: 'server', message: error.message };
-}
 
 export default function NicknameGate() {
   const [s, setS] = useState<UIState>({ ready: false, show: false, value: '', pending: false });
@@ -44,20 +37,26 @@ export default function NicknameGate() {
     if (localErr) { setS(p => ({ ...p, error: localErr })); return; }
 
     setS(p => ({ ...p, pending: true, error: undefined }));
-    const res = await claimNicknameRemote(nick);
-
-    if (res.ok) {
-      setNicknameLocal(nick);
-      const { flushLocalToServer } = await import('../lib/sync/flushLocalToServer');
-      flushLocalToServer(nick);
-      setS(p => ({ ...p, show: false, pending: false }));
+    const supabase = getSupabaseClient();
+    const { userId } = await ensureAuth();
+    const { error } = await supabase
+      .from('nicknames')
+      .upsert({ user_id: userId, name: nick }, { onConflict: 'user_id' });
+    if (error) {
+      // Friendly messages
+      const msg = (error.code === '42501' || /row-level security/i.test(error.message))
+        ? 'Sign-in failed or RLS blocked the insert. Please refresh and try again.'
+        : (error.code === '23505' ? 'This nickname is already taken. Try another.' : error.message);
+      setS(s => ({ ...s, pending: false, error: msg }));
       return;
     }
-    if (res.code === 'taken') {
-      setS(p => ({ ...p, pending: false, error: 'This nickname is already taken. Try another.' }));
-    } else {
-      setS(p => ({ ...p, pending: false, error: res.message ?? 'Could not save nickname. Please try again.' }));
-    }
+
+    // success: save locally and close
+    localStorage.setItem('lazyVoca.nickname', nick);
+    // Trigger optional background syncs if available
+    try { (await import('../lib/sync/flushLocalToServer')).flushLocalToServer(nick); } catch {}
+    try { (await import('../lib/storage/migrateLocalVocabToDb')).migrateLocalVocabToDb?.(); } catch {}
+    setS(p => ({ ...p, show: false, pending: false }));
   };
 
   return (
