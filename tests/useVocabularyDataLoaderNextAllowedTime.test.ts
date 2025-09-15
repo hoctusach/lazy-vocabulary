@@ -29,6 +29,16 @@ vi.mock('@/services/learningProgressService', () => ({
 
 vi.mock('@/utils/lastWordStorage', () => ({ getTodayLastWord: vi.fn() }));
 vi.mock('@/utils/text/findFuzzyIndex', () => ({ findFuzzyIndex: vi.fn() }));
+vi.mock('@/lib/db/preferences', () => ({
+  getPreferences: vi.fn().mockResolvedValue({
+    favorite_voice: null,
+    speech_rate: null,
+    is_muted: false,
+    is_playing: true,
+    daily_option: 'light'
+  }),
+  savePreferences: vi.fn().mockResolvedValue(undefined)
+}));
 
 const localStorageMock = {
   getItem: vi.fn(),

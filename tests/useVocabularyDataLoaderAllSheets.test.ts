@@ -8,6 +8,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 vi.mock('@/services/vocabularyService', () => ({
   vocabularyService: {
@@ -28,6 +29,16 @@ vi.mock('@/services/learningProgressService', () => ({
 
 vi.mock('@/utils/lastWordStorage', () => ({ getTodayLastWord: vi.fn() }));
 vi.mock('@/utils/text/findFuzzyIndex', () => ({ findFuzzyIndex: vi.fn() }));
+vi.mock('@/lib/db/preferences', () => ({
+  getPreferences: vi.fn().mockResolvedValue({
+    favorite_voice: null,
+    speech_rate: null,
+    is_muted: false,
+    is_playing: true,
+    daily_option: null
+  }),
+  savePreferences: vi.fn().mockResolvedValue(undefined)
+}));
 
 const localStorageMock = {
   getItem: vi.fn(),
@@ -64,6 +75,8 @@ describe('useVocabularyDataLoader all sheets', () => {
 
     await waitFor(() => {
       expect(vocabularyService.loadDefaultVocabulary).toHaveBeenCalled();
+      expect(getPreferences).toHaveBeenCalled();
+      expect(savePreferences).toHaveBeenCalledWith({ daily_option: 'light' });
       expect(learningProgressService.forceGenerateDailySelection).toHaveBeenCalledWith(words, 'light');
       expect(setWordList).toHaveBeenCalledWith(words);
     });

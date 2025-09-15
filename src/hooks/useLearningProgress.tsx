@@ -3,6 +3,7 @@ import { learningProgressService } from '@/services/learningProgressService';
 import { DailySelection, SeverityLevel, LearningProgress } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { buildTodaysWords } from '@/utils/todayWords';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
 
 export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
@@ -23,11 +24,12 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
 
   const generateDailyWords = useCallback((severity: SeverityLevel = 'light') => {
     if (allWords.length === 0) return;
-    
+
     // Force regeneration when user clicks the buttons
     const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
     setDailySelection(selection);
     refreshStats();
+    void savePreferences({ daily_option: severity });
   }, [allWords, refreshStats]);
 
   const markWordAsPlayed = useCallback(
@@ -68,12 +70,27 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   useEffect(() => {
     if (allWords.length === 0) return;
 
-    let selection = learningProgressService.getTodaySelection();
-    if (!selection) {
-      selection = learningProgressService.forceGenerateDailySelection(allWords, 'light');
-    }
-    setDailySelection(selection);
-    refreshStats();
+    const init = async () => {
+      let severity: SeverityLevel = 'light';
+      try {
+        const prefs = await getPreferences();
+        severity = (prefs.daily_option as SeverityLevel) || 'light';
+        if (!prefs.daily_option) {
+          await savePreferences({ daily_option: 'light' });
+        }
+      } catch {
+        // ignore preference loading errors
+      }
+
+      let selection = learningProgressService.getTodaySelection();
+      if (!selection) {
+        selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
+      }
+      setDailySelection(selection);
+      refreshStats();
+    };
+
+    void init();
   }, [allWords, refreshStats]);
 
   useEffect(() => {
