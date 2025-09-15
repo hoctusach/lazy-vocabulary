@@ -98,8 +98,4 @@ export class VocabularyService {
   getLastWordChangeTime(): number {
     return this.vocabularyOperations.getLastWordChangeTime();
   }
-  
-  mergeCustomWords(customData: SheetData): void {
-    this.vocabularyOperations.mergeCustomWords(customData);
-  }
 }

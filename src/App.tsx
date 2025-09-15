@@ -11,11 +11,13 @@ import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import { loadStreakDays } from "./utils/streak";
 import NicknameGate from "./components/NicknameGate";
+import { clearLegacyCustomWordKeys } from './lib/cleanup/clearLegacyCustomWordKeys';
 
 const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
+    clearLegacyCustomWordKeys();
     loadStreakDays();
     const nick = localStorage.getItem('lazyVoca.nickname');
     if (nick) {

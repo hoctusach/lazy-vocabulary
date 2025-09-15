@@ -10,5 +10,4 @@ export * from './useVocabularyFileHandler';
 export * from './useVocabularyManager';
 export * from './useVocabularySetup';
 export * from './useCategoryNavigation';
-export * from './useWordModalState';
 export * from './useSpeechControl';

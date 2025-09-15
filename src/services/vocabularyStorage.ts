@@ -55,40 +55,5 @@ export class VocabularyStorage {
     return this.validator.getDefaultData();
   }
 
-  /**
-   * Saves vocabulary data to local storage
-   */
-  saveData(data: SheetData): boolean {
-    try {
-      // Convert SheetData to the format expected by ensureDataTypes
-      const convertedData: Record<string, Array<Record<string, unknown>>> = {};
-      for (const [sheetName, words] of Object.entries(data)) {
-        convertedData[sheetName] = words.map(word => ({
-          word: word.word,
-          meaning: word.meaning,
-          example: word.example,
-          translation: word.translation,
-          count: word.count,
-          category: word.category
-        }));
-      }
-      
-      // Ensure correct types before saving
-      const processedData = this.validator.ensureDataTypes(convertedData);
-      const dataString = JSON.stringify(processedData);
-      
-      if (!this.validator.validateDataSize(dataString, this.config.MAX_STORAGE_SIZE)) {
-        throw new Error("Data size exceeds storage limit");
-      }
-      
-      // Save to both current session and last uploaded storage
-      localStorage.setItem(this.config.STORAGE_KEY, dataString);
-      localStorage.setItem(this.config.LAST_UPLOADED_KEY, dataString);
-      console.log("Saved vocabulary data to local storage", processedData);
-      return true;
-    } catch (e) {
-      console.error("Failed to save data to localStorage:", e);
-      return false;
-    }
-  }
+  // write methods removed for read-only mode
 }
