@@ -10,31 +10,21 @@ import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import NicknameGate from "./components/NicknameGate";
-// imports (keep these)
-import React, { useEffect } from 'react';
-import { QueryClient } from '@tanstack/react-query';
-import { useDailyUsageTracker } from './hooks/useDailyUsageTracker';
-import { clearLegacyCustomWordKeys } from './lib/cleanup/clearLegacyCustomWordKeys';
-import { clearLegacyStreakKeys } from './lib/cleanup/clearLegacyStreakKeys';
+import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
+import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
+import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // keep hours tracking
-  useDailyUsageTracker();
-
   useEffect(() => {
-    // one-time cleanups
     clearLegacyCustomWordKeys();
     clearLegacyStreakKeys();
-  }, []);
-
-  // ...rest of App JSX
-};
-
-    const nick = localStorage.getItem('lazyVoca.nickname');
+    const nick = localStorage.getItem("lazyVoca.nickname");
     if (nick) {
-      import('@/lib/sync/flushLocalToServer').then(m => m.flushLocalToServer(nick));
+      import("@/lib/sync/flushLocalToServer").then((m) =>
+        m.flushLocalToServer(nick)
+      );
     }
   }, []);
   useSessionTracker();
@@ -43,19 +33,21 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Helmet>
-        <title>Lazy Vocabulary – Master English Vocabulary with Passive Learning</title>
-        <meta
-          name="description"
-          content="Learn English vocabulary easily. Passive learning with audio, examples, and categorized words. Improve fluency by skimming and listening."
-        />
-        <link rel="canonical" href="https://your-domain.com/" />
+          <title>
+            Lazy Vocabulary – Master English Vocabulary with Passive Learning
+          </title>
+          <meta
+            name="description"
+            content="Learn English vocabulary easily. Passive learning with audio, examples, and categorized words. Improve fluency by skimming and listening."
+          />
+          <link rel="canonical" href="https://your-domain.com/" />
         </Helmet>
         <Toaster />
         <Sonner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            {process.env.NODE_ENV !== 'production' && (
+            {process.env.NODE_ENV !== "production" && (
               <Route path="/dev" element={<Dev />} />
             )}
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -69,3 +61,4 @@ const App = () => {
 };
 
 export default App;
+
