@@ -1,8 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
-
+import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
 export type VoiceOption = {
   label: string;
@@ -86,24 +84,20 @@ export const useVoiceSelection = () => {
         
         setVoices(voiceOptions);
 
-        getPreferences()
-          .then(p => {
-            const storedName = p.favorite_voice;
-            const matched = storedName
-              ? voiceOptions.find(v => v.voice?.name === storedName)
-              : null;
-            if (matched) {
-              setVoiceIndex(matched.index);
-              setSelectedVoice({
-                label: matched.label,
-                region: matched.region,
-                gender: matched.gender,
-                index: matched.index,
-              });
-              console.log(`Restored voice preference: ${matched.voice?.name}`);
-            }
-          })
-          .catch(err => console.error('Error loading voice preference', err));
+        const storedName = getFavoriteVoice();
+        const matched = storedName
+          ? voiceOptions.find(v => v.voice?.name === storedName)
+          : null;
+        if (matched) {
+          setVoiceIndex(matched.index);
+          setSelectedVoice({
+            label: matched.label,
+            region: matched.region,
+            gender: matched.gender,
+            index: matched.index,
+          });
+          console.log(`Restored voice preference: ${matched.voice?.name}`);
+        }
       }
     };
 
@@ -130,9 +124,7 @@ export const useVoiceSelection = () => {
   useEffect(() => {
     const voiceName = voices[voiceIndex]?.voice?.name;
     if (voiceName) {
-      savePreferences({ favorite_voice: voiceName }).catch(err =>
-        console.error('Error saving voice preference', err),
-      );
+      setFavoriteVoice(voiceName);
     }
   }, [voiceIndex, voices]);
   
@@ -151,9 +143,7 @@ export const useVoiceSelection = () => {
 
     const voiceName = voices[nextVoice.index]?.voice?.name;
     if (voiceName) {
-      savePreferences({ favorite_voice: voiceName }).catch(err =>
-        console.error('Error saving voice preference', err),
-      );
+      setFavoriteVoice(voiceName);
     }
   };
   

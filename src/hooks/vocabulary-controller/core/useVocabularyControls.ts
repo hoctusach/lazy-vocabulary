@@ -5,7 +5,7 @@ import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { toast } from 'sonner';
-import { savePreferences } from '@/lib/db/preferences';
+import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
 /**
  * Vocabulary control actions
@@ -54,7 +54,7 @@ export const useVocabularyControls = (
     const nextIndex = (currentIndex + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
-    savePreferences({ favorite_voice: nextVoice.name }).catch(console.error);
+    setFavoriteVoice(nextVoice.name);
     unifiedSpeechController.stop();
     toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
   }, [allVoices, selectedVoiceName, setSelectedVoiceName]);

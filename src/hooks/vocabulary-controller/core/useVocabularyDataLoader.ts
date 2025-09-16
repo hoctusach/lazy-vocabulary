@@ -1,9 +1,9 @@
-
 import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
 import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
 import type { SeverityLevel } from '@/types/learning';
 
@@ -34,9 +34,7 @@ export const useVocabularyDataLoader = (
   };
   // Persist selected voice whenever it changes
   useEffect(() => {
-    savePreferences({ favorite_voice: selectedVoiceName }).catch(err =>
-      console.error('Error saving voice', err),
-    );
+    setFavoriteVoice(selectedVoiceName);
   }, [selectedVoiceName]);
 
   // Load initial data
