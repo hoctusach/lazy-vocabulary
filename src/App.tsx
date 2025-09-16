@@ -14,6 +14,7 @@ import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
 import { autoBackfillOnReload } from "@/lib/sync/autoBackfillOnReload";
+import { bootstrapLearnedFromServerByKey } from "@/lib/progress/srsSyncByUserKey";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,9 @@ const App = () => {
     clearLegacyCustomWordKeys();
     clearLegacyStreakKeys();
     void autoBackfillOnReload();
+  }, []);
+  useEffect(() => {
+    void bootstrapLearnedFromServerByKey();
   }, []);
   useSessionTracker();
   useDailyUsageTracker();

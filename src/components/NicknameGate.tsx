@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import { sanitizeDisplay, normalizeNickname, getNicknameByKey, upsertNickname } from '@/services/nicknameService';
+import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 
 type UIState = {
   ready: boolean;    // localStorage checked
@@ -44,6 +45,7 @@ export default function NicknameGate() {
       const chosen = existing ?? await upsertNickname(display);
 
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
+      void ensureUserKey().catch(() => {});
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
         void mod.autoBackfillOnReload();
