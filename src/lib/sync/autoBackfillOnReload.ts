@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { ensureUserKey } from "@/lib/progress/srsSyncByUserKey";
 import { ensureSessionForNickname, getStoredPasscode } from "@/lib/auth";
 import { getSupabaseClient } from "../supabaseClient";
 
@@ -223,44 +224,52 @@ function extractLearningTime(): TimeRow[] {
   return rows;
 }
 
-async function upsertProgress(client: SupabaseClient, name: string, rows: ProgressRow[]) {
+async function upsertProgress(client: SupabaseClient, userKey: string, rows: ProgressRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row => stripNullish({ name, ...row }));
-  await client.from("learning_progress").upsert(payload, { onConflict: "name,word_key", defaultToNull: false });
+  const payload = rows.map(row => stripNullish({ user_unique_key: userKey, ...row }));
+  await client
+    .from("learning_progress")
+    .upsert(payload, { onConflict: "user_unique_key,word_key", defaultToNull: false });
 }
 
-async function upsertCounts(client: SupabaseClient, name: string, rows: CountRow[]) {
+async function upsertCounts(client: SupabaseClient, userKey: string, rows: CountRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row => stripNullish({ name, ...row }));
-  await client.from("word_counts").upsert(payload, { onConflict: "name,word_key", defaultToNull: false });
+  const payload = rows.map(row => stripNullish({ user_unique_key: userKey, ...row }));
+  await client
+    .from("word_counts")
+    .upsert(payload, { onConflict: "user_unique_key,word_key", defaultToNull: false });
 }
 
 async function upsertDailySelection(
   client: SupabaseClient,
-  name: string,
+  userKey: string,
   entry: { date: string; selection: unknown } | null
 ) {
   if (!entry) return;
-  const row = stripNullish({ name, date: entry.date, selection_json: entry.selection });
+  const row = stripNullish({ user_unique_key: userKey, date: entry.date, selection_json: entry.selection });
   if (!row.selection_json) return;
-  await client.from("daily_selection").upsert(row, { onConflict: "name,date", defaultToNull: false });
+  await client
+    .from("daily_selection")
+    .upsert(row, { onConflict: "user_unique_key,date", defaultToNull: false });
 }
 
 async function upsertResume(
   client: SupabaseClient,
-  name: string,
+  userKey: string,
   resume: { today?: unknown; byCategory?: unknown } | null
 ) {
   if (!resume) return;
-  const row = stripNullish({ name, today_json: resume.today, by_category_json: resume.byCategory });
+  const row = stripNullish({ user_unique_key: userKey, today_json: resume.today, by_category_json: resume.byCategory });
   if (Object.keys(row).length <= 1) return;
-  await client.from("resume_state").upsert(row, { onConflict: "name", defaultToNull: false });
+  await client.from("resume_state").upsert(row, { onConflict: "user_unique_key", defaultToNull: false });
 }
 
-async function upsertLearningTime(client: SupabaseClient, name: string, rows: TimeRow[]) {
+async function upsertLearningTime(client: SupabaseClient, userKey: string, rows: TimeRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row => ({ name, day_iso: row.dayISO, duration_ms: row.duration_ms }));
-  await client.from("learning_time").upsert(payload, { onConflict: "name,day_iso", defaultToNull: false });
+  const payload = rows.map(row => ({ user_unique_key: userKey, day_iso: row.dayISO, duration_ms: row.duration_ms }));
+  await client
+    .from("learning_time")
+    .upsert(payload, { onConflict: "user_unique_key,day_iso", defaultToNull: false });
 }
 
 export async function autoBackfillOnReload(): Promise<void> {
@@ -275,6 +284,9 @@ export async function autoBackfillOnReload(): Promise<void> {
   const session = await ensureSessionForNickname(nickname, passcode);
   if (!session) return;
 
+  const userKey = await ensureUserKey();
+  if (!userKey) return;
+
   const progress = extractLearningProgress();
   const counts = extractWordCounts();
   const dailySelection = extractDailySelection();
@@ -282,11 +294,11 @@ export async function autoBackfillOnReload(): Promise<void> {
   const learningTime = extractLearningTime();
 
   const tasks: Promise<unknown>[] = [
-    upsertProgress(client, nickname, progress),
-    upsertCounts(client, nickname, counts),
-    upsertDailySelection(client, nickname, dailySelection),
-    upsertResume(client, nickname, resumeState),
-    upsertLearningTime(client, nickname, learningTime)
+    upsertProgress(client, userKey, progress),
+    upsertCounts(client, userKey, counts),
+    upsertDailySelection(client, userKey, dailySelection),
+    upsertResume(client, userKey, resumeState),
+    upsertLearningTime(client, userKey, learningTime)
   ];
 
   try {
