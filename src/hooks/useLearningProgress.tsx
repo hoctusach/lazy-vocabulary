@@ -125,7 +125,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
       category = matched?.category;
     }
     const wordId = toWordId(word, category);
-    void markLearnedServerByKey(wordId, allWords.length).catch(() => {});
+    void markLearnedServerByKey(wordId).catch(() => {});
 
     setDailySelection(prev => {
       if (!prev) return prev;
