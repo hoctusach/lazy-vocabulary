@@ -7,6 +7,9 @@ export type ProgressSummary = {
   remaining_count: number;
 };
 
+// Hard-coded total number of vocabulary words used for progress calculations
+const TOTAL_WORDS = 3035;
+
 function lsGet(key: string) {
   try {
     return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
@@ -116,8 +119,7 @@ export async function ensureUserKey(): Promise<string | null> {
  * and stores the returned summary counts in localStorage['progressSummary'].
  */
 export async function markLearnedServerByKey(
-  wordId: string,
-  totalWords: number
+  wordId: string
 ): Promise<ProgressSummary | null> {
   const key = await ensureUserKey();
   if (!key) return null;
@@ -129,7 +131,7 @@ export async function markLearnedServerByKey(
     p_user_unique_key: key,
     p_word_id: wordId,
     p_marked_at: new Date().toISOString(),
-    p_total_words: Math.max(0, Math.floor(totalWords || 0)),
+    p_total_words: TOTAL_WORDS,
   });
 
   if (error) {
