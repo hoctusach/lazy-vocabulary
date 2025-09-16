@@ -1,3 +1,4 @@
+import { canonNickname } from '@/core/nickname';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export type ProgressSummary = {
@@ -5,6 +6,12 @@ export type ProgressSummary = {
   learned_count: number;
   learning_due_count: number;
   remaining_count: number;
+};
+
+type ProfileIdentityRow = {
+  user_unique_key: string | null;
+  nickname: string | null;
+  nickname_canon: string | null;
 };
 
 // Hard-coded total number of vocabulary words used for progress calculations
@@ -79,33 +86,52 @@ export async function ensureUserKey(): Promise<string | null> {
   // 1) Try read from profiles
   const { data: profile, error: profErr } = await sb
     .from('profiles')
-    .select('user_unique_key')
+    .select('user_unique_key, nickname, nickname_canon')
     .eq('user_id', userId)
-    .maybeSingle();
+    .maybeSingle<ProfileIdentityRow>();
 
   if (profErr) {
     console.warn('ensureUserKey:profiles select', profErr.message);
   }
 
-  let key: string | null = profile?.user_unique_key ?? null;
+  const profileKey = (profile?.user_unique_key ?? '').trim();
+  let key: string | null = profileKey.length ? profileKey : null;
 
   // 2) If missing, derive and upsert into profiles (onConflict: user_id)
   if (!key) {
-    const nick = lsGet('lazyVoca.nickname') || '';
-    const derivedFromNick = canon(nick);
-    // final fallback: compress user id (unique, no spaces)
-    const fallbackFromUid = userId.replace(/-/g, '');
-    const derived = derivedFromNick || fallbackFromUid;
+    const storedNick = (lsGet('lazyVoca.nickname') || '').trim();
+    const profileNick = (profile?.nickname ?? '').trim();
+    const profileCanon = (profile?.nickname_canon ?? '').trim();
+    const sanitizedUid = userId.replace(/-/g, '');
 
-    const { error: upErr } = await sb
+    const preferredNick = profileNick || storedNick;
+    const fallbackNickname =
+      preferredNick.length >= 3 ? preferredNick : `Learner-${sanitizedUid}`;
+    const fallbackCanon =
+      profileCanon.length >= 1
+        ? profileCanon
+        : canonNickname(preferredNick.length >= 3 ? preferredNick : fallbackNickname);
+
+    const { data: upserted, error: upErr } = await sb
       .from('profiles')
-      .upsert({ user_id: userId, user_unique_key: derived }, { onConflict: 'user_id' });
+      .upsert(
+        {
+          user_id: userId,
+          user_unique_key: sanitizedUid,
+          nickname: fallbackNickname,
+          nickname_canon: fallbackCanon,
+        },
+        { onConflict: 'user_id' }
+      )
+      .select('user_unique_key')
+      .maybeSingle<Pick<ProfileIdentityRow, 'user_unique_key'>>();
 
     if (upErr) {
       console.warn('ensureUserKey:profiles upsert', upErr.message);
       return null;
     }
-    key = derived;
+    const upsertedKey = (upserted?.user_unique_key ?? '').trim();
+    key = upsertedKey.length ? upsertedKey : sanitizedUid;
   }
 
   if (key) {
