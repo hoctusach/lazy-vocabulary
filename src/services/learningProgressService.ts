@@ -183,25 +183,41 @@ export class LearningProgressService {
     let learning = 0;
     let learned = 0;
     let due = 0;
+    let newCount = 0;
 
     for (const stored of Object.values(progressMap)) {
       if (!stored) continue;
 
-      const isLearnedEntry = this.isLearnedProgress(stored);
-
-      if (isLearnedEntry) {
+      if (this.isLearnedProgress(stored)) {
         learned += 1;
-      } else {
-        learning += 1;
+        if (this.isDue(stored)) {
+          due += 1;
+        }
+        continue;
       }
 
-      if (isLearnedEntry && this.isDue(stored)) {
-        due += 1;
+      const rawReviewCount =
+        typeof stored.reviewCount === 'number'
+          ? stored.reviewCount
+          : Number(stored.reviewCount ?? 0);
+      const reviewCount = Number.isNaN(rawReviewCount) ? 0 : rawReviewCount;
+      const lastPlayedDate = stored.lastPlayedDate ?? '';
+
+      if (
+        stored.status === 'new' ||
+        (reviewCount === 0 && !lastPlayedDate)
+      ) {
+        newCount += 1;
+      } else {
+        learning += 1;
       }
     }
 
     const total = TOTAL_WORDS;
-    const newCount = Math.max(0, total - learning - learned);
+    const accounted = learning + learned + newCount;
+    if (accounted < total) {
+      newCount += total - accounted;
+    }
 
     return {
       total,
