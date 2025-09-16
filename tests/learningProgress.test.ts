@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
+import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { VocabularyWord } from '@/types/vocabulary';
 import { LearningProgress } from '@/types/learning';
 
@@ -349,11 +350,14 @@ describe('LearningProgressService', () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
 
       const stats = service.getProgressStats();
+      const expectedLearning = 2;
+      const expectedLearned = 3;
+      const expectedNew = Math.max(0, TOTAL_WORDS - expectedLearning - expectedLearned);
 
-      expect(stats.total).toBe(5);
-      expect(stats.learning).toBe(2);
-      expect(stats.learned).toBe(1);
-      expect(stats.new).toBe(2);
+      expect(stats.total).toBe(TOTAL_WORDS);
+      expect(stats.learning).toBe(expectedLearning);
+      expect(stats.learned).toBe(expectedLearned);
+      expect(stats.new).toBe(expectedNew);
       expect(stats.due).toBe(2);
       expect(stats.learning + stats.learned + stats.new).toBe(stats.total);
     });
