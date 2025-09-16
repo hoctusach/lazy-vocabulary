@@ -9,7 +9,7 @@ import NotFound from "./pages/NotFound";
 import Dev from "./pages/Dev";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
-import NicknameGate from "./components/NicknameGate";
+import AuthGate from "./components/AuthGate";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
@@ -54,7 +54,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
-        <NicknameGate />
+        <AuthGate />
       </TooltipProvider>
     </QueryClientProvider>
   );

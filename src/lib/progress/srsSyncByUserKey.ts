@@ -1,4 +1,5 @@
 import { canonNickname } from '@/core/nickname';
+import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export type ProgressSummary = {
@@ -42,22 +43,6 @@ function canon(value: string) {
     .replace(/\s+/g, '');
 }
 
-export async function ensureAuth() {
-  const sb = getSupabaseClient();
-  if (!sb) return;
-
-  const { data, error } = await sb.auth.getUser();
-  if (error) {
-    console.warn('ensureAuth:getUser', error.message);
-  }
-  if (data?.user) return;
-
-  const { error: signInError } = await sb.auth.signInAnonymously();
-  if (signInError) {
-    throw signInError;
-  }
-}
-
 /**
  * Ensures and returns the current user's user_unique_key.
  * Source of truth: profiles.user_unique_key (NOT nicknames).
@@ -66,23 +51,22 @@ export async function ensureAuth() {
  * - Caches the key in localStorage['lazyVoca.userKey']
  */
 export async function ensureUserKey(): Promise<string | null> {
-  await ensureAuth();
   const sb = getSupabaseClient();
   if (!sb) return null;
+
+  const storedNickname = (lsGet('lazyVoca.nickname') ?? '').trim();
+  const storedPasscode = getStoredPasscode() ?? undefined;
+  const session = storedNickname
+    ? await ensureSessionForNickname(storedNickname, storedPasscode)
+    : await getActiveSession();
+  const userId = session?.user?.id;
+  if (!userId) return null;
 
   // cache hit
   const cached = lsGet('lazyVoca.userKey');
   if (cached) return cached;
 
   // who am I?
-  const { data: userData, error: userError } = await sb.auth.getUser();
-  if (userError) {
-    console.warn('ensureUserKey:getUser', userError.message);
-    return null;
-  }
-  const userId = userData?.user?.id;
-  if (!userId) return null;
-
   // 1) Try read from profiles
   const { data: profile, error: profErr } = await sb
     .from('profiles')
@@ -147,6 +131,9 @@ export async function ensureUserKey(): Promise<string | null> {
 export async function markLearnedServerByKey(
   wordId: string
 ): Promise<ProgressSummary | null> {
+  const session = await getActiveSession();
+  if (!session?.user?.id) return null;
+
   const key = await ensureUserKey();
   if (!key) return null;
 
@@ -177,6 +164,9 @@ export async function markLearnedServerByKey(
  * and idempotently upgrade local learningProgress so those words are marked learned.
  */
 export async function bootstrapLearnedFromServerByKey(): Promise<void> {
+  const session = await getActiveSession();
+  if (!session?.user?.id) return;
+
   const key = await ensureUserKey();
   if (!key) return;
 

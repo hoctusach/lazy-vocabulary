@@ -1,3 +1,4 @@
+import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
 import { getSupabaseClient } from './supabase';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
 
@@ -7,14 +8,11 @@ export async function ensureProfile(
   if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
   const supabase = getSupabaseClient();
   if (!supabase) return null;
-  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
-  if (sessionError) throw sessionError;
-  let user = sessionData.session?.user;
-  if (!user) {
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error || !data.user) throw error || new Error('anonymous sign-in failed');
-    user = data.user;
-  }
+  const storedPasscode = getStoredPasscode() ?? undefined;
+  const ensuredSession = await ensureSessionForNickname(nickname, storedPasscode);
+  const activeSession = ensuredSession ?? (await getActiveSession());
+  const user = activeSession?.user;
+  if (!user) throw new Error('Authentication required to update profile.');
   const nickname_canon = canonNickname(nickname);
   const { data: dupe } = await supabase
     .from('profiles')

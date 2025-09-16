@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureUserKey } from "@/lib/progress/srsSyncByUserKey";
+import { ensureSessionForNickname, getStoredPasscode } from "@/lib/auth";
 import { getSupabaseClient } from "../supabaseClient";
 
 type ProgressRow = {
@@ -223,36 +224,10 @@ function extractLearningTime(): TimeRow[] {
   return rows;
 }
 
-async function ensureAnonSession(client: SupabaseClient): Promise<boolean> {
-  try {
-    const { data } = await client.auth.getSession();
-    if (data?.session?.user) return true;
-  } catch {
-    // ignore and fall through to anonymous sign-in
-  }
-
-  try {
-    const { error, data } = await client.auth.signInAnonymously();
-    if (error) return false;
-    return Boolean(data?.user);
-  } catch {
-    return false;
-  }
-}
 
 async function upsertProgress(client: SupabaseClient, userKey: string, rows: ProgressRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row =>
-    stripNullish({
-      user_unique_key: userKey,
-      word_key: row.word_key,
-      category: row.category ?? null,
-      status: row.status ?? null,
-      review_count: row.review_count ?? null,
-      next_review_at: row.next_review_at ?? null,
-      learned_at: row.learned_at ?? null,
-    })
-  );
+  const payload = rows.map(row => stripNullish({ user_unique_key: userKey, ...row }));
   await client
     .from("learning_progress")
     .upsert(payload, { onConflict: "user_unique_key,word_key", defaultToNull: false });
@@ -260,14 +235,7 @@ async function upsertProgress(client: SupabaseClient, userKey: string, rows: Pro
 
 async function upsertCounts(client: SupabaseClient, userKey: string, rows: CountRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row =>
-    stripNullish({
-      user_unique_key: userKey,
-      word_key: row.word_key,
-      count: row.count,
-      last_shown_at: row.last_shown_at ?? null,
-    })
-  );
+  const payload = rows.map(row => stripNullish({ user_unique_key: userKey, ...row }));
   await client
     .from("word_counts")
     .upsert(payload, { onConflict: "user_unique_key,word_key", defaultToNull: false });
@@ -279,16 +247,11 @@ async function upsertDailySelection(
   entry: { date: string; selection: unknown } | null
 ) {
   if (!entry) return;
-  const dateValue = entry.date?.slice(0, 10) ?? null;
-  const row = stripNullish({
-    user_unique_key: userKey,
-    selection_date: dateValue,
-    selection_json: entry.selection,
-  });
-  if (!row.selection_json || !row.selection_date) return;
+  const row = stripNullish({ user_unique_key: userKey, date: entry.date, selection_json: entry.selection });
+  if (!row.selection_json) return;
   await client
     .from("daily_selection")
-    .upsert(row, { onConflict: "user_unique_key,selection_date", defaultToNull: false });
+    .upsert(row, { onConflict: "user_unique_key,date", defaultToNull: false });
 }
 
 async function upsertResume(
@@ -297,30 +260,17 @@ async function upsertResume(
   resume: { today?: unknown; byCategory?: unknown } | null
 ) {
   if (!resume) return;
-  const row = stripNullish({
-    user_unique_key: userKey,
-    category: "__aggregate__",
-    today_json: resume.today,
-    by_category_json: resume.byCategory,
-  });
-  if (Object.keys(row).length <= 2) return;
-  await client
-    .from("resume_state")
-    .upsert(row, { onConflict: "user_unique_key,category", defaultToNull: false });
+  const row = stripNullish({ user_unique_key: userKey, today_json: resume.today, by_category_json: resume.byCategory });
+  if (Object.keys(row).length <= 1) return;
+  await client.from("resume_state").upsert(row, { onConflict: "user_unique_key", defaultToNull: false });
 }
 
 async function upsertLearningTime(client: SupabaseClient, userKey: string, rows: TimeRow[]) {
   if (!rows.length) return;
-  const payload = rows.map(row => ({
-    user_unique_key: userKey,
-    day_iso: row.dayISO?.slice(0, 10),
-    duration_ms: Math.max(0, Math.floor(row.duration_ms)),
-  }));
-  const filtered = payload.filter(row => row.day_iso);
-  if (!filtered.length) return;
+  const payload = rows.map(row => ({ user_unique_key: userKey, day_iso: row.dayISO, duration_ms: row.duration_ms }));
   await client
     .from("learning_time")
-    .upsert(filtered, { onConflict: "user_unique_key,day_iso", defaultToNull: false });
+    .upsert(payload, { onConflict: "user_unique_key,day_iso", defaultToNull: false });
 }
 
 export async function autoBackfillOnReload(): Promise<void> {
@@ -331,8 +281,12 @@ export async function autoBackfillOnReload(): Promise<void> {
   const client = getSupabaseClient();
   if (!client) return;
 
-  const signedIn = await ensureAnonSession(client);
-  if (!signedIn) return;
+  const passcode = getStoredPasscode() ?? undefined;
+  const session = await ensureSessionForNickname(nickname, passcode);
+  if (!session) return;
+
+  const userKey = await ensureUserKey();
+  if (!userKey) return;
 
   const userKey = await ensureUserKey();
   if (!userKey) return;

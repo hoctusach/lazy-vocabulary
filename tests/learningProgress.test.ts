@@ -334,7 +334,7 @@ describe('LearningProgressService', () => {
   });
 
   describe('Statistics', () => {
-    it('excludes learned words from learning count and balances totals', () => {
+    it('classifies learned and new words correctly and balances totals', () => {
       const today = new Date().toISOString().split('T')[0];
       const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
       const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -350,7 +350,7 @@ describe('LearningProgressService', () => {
       localStorageMock.getItem.mockReturnValue(JSON.stringify(mockProgress));
 
       const stats = service.getProgressStats();
-      const expectedLearning = 2;
+      const expectedLearning = 0;
       const expectedLearned = 3;
       const expectedNew = Math.max(0, TOTAL_WORDS - expectedLearning - expectedLearned);
 
@@ -359,6 +359,33 @@ describe('LearningProgressService', () => {
       expect(stats.learned).toBe(expectedLearned);
       expect(stats.new).toBe(expectedNew);
       expect(stats.due).toBe(2);
+      expect(stats.learning + stats.learned + stats.new).toBe(stats.total);
+    });
+
+    it('treats words without review history as new instead of learning', () => {
+      const today = new Date().toISOString().split('T')[0];
+      const progressData: Record<string, Partial<LearningProgress>> = {
+        freshWord: {
+          word: 'freshWord',
+          status: 'not_due',
+          reviewCount: 0
+        },
+        activeWord: {
+          word: 'activeWord',
+          status: 'learning',
+          reviewCount: 2,
+          lastPlayedDate: today
+        }
+      };
+
+      localStorageMock.getItem.mockReturnValue(JSON.stringify(progressData));
+
+      const stats = service.getProgressStats();
+
+      expect(stats.learned).toBe(0);
+      expect(stats.learning).toBe(1);
+      expect(stats.new).toBe(TOTAL_WORDS - 1);
+      expect(stats.due).toBe(0);
       expect(stats.learning + stats.learned + stats.new).toBe(stats.total);
     });
 
