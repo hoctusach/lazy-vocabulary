@@ -1,18 +1,21 @@
 
 import { useState, useEffect } from 'react';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 export const usePauseState = () => {
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => setIsPaused(!p.is_playing))
       .catch(() => {});
   }, []);
 
   useEffect(() => {
-    savePreferences({ is_playing: !isPaused }).catch(err =>
+    saveLocalPreferences({ is_playing: !isPaused }).catch(err =>
       console.error('Error saving pause state', err),
     );
   }, [isPaused]);

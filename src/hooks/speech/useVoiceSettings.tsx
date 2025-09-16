@@ -1,6 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 interface VoiceSettings {
   isMuted: boolean;
@@ -12,7 +15,7 @@ export const useVoiceSettings = () => {
   const [voiceRegion, setVoiceRegion] = useState<'US' | 'UK' | 'AU'>('UK');
 
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => {
         setIsMuted(!!p.is_muted);
       })
@@ -21,7 +24,7 @@ export const useVoiceSettings = () => {
 
   // Update mute state in localStorage when it changes
   useEffect(() => {
-    savePreferences({ is_muted: isMuted }).catch(err =>
+    saveLocalPreferences({ is_muted: isMuted }).catch(err =>
       console.error('Error saving mute state', err),
     );
   }, [isMuted]);

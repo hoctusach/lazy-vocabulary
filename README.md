@@ -143,6 +143,8 @@ characters intact when preparing text for speech.
 
 The controls panel includes a single **Change Voice** button. Clicking it cycles through the voices available on the current device via `speechSynthesis.getVoices()`. The chosen voice name is stored in `localStorage` so it persists between sessions and is loaded on start.
 
+All audio preferences—voice selection, speech rate, mute/playback state—are saved to the browser's `localStorage` only. These settings never sync to Supabase, so each device keeps its own audio configuration.
+
 ## Word display
 
 Any tags inside square brackets or pronunciations written between slashes/parentheses are shown next to the word in a smaller gray font. The main word text no longer includes these annotations.

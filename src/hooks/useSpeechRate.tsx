@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 export const useSpeechRate = () => {
   const [speechRate, setSpeechRate] = useState<number>(DEFAULT_SPEECH_RATE);
 
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => {
         if (typeof p.speech_rate === 'number') {
           setSpeechRate(p.speech_rate);
@@ -16,7 +19,7 @@ export const useSpeechRate = () => {
   }, []);
 
   useEffect(() => {
-    savePreferences({ speech_rate: speechRate }).catch(err => {
+    saveLocalPreferences({ speech_rate: speechRate }).catch(err => {
       console.error('Error saving speech rate', err);
     });
   }, [speechRate]);

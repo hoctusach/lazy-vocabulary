@@ -2,7 +2,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 /**
  * Hook for managing playback controls like mute and pause functionality
@@ -15,7 +18,7 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
   
   // Load initial settings
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => {
         setMuted(!!p.is_muted);
         unifiedSpeechController.setMuted(!!p.is_muted);
@@ -26,14 +29,14 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
 
   // Save mute state
   useEffect(() => {
-    savePreferences({ is_muted: muted }).catch(err =>
+    saveLocalPreferences({ is_muted: muted }).catch(err =>
       console.error('Error saving mute pref', err),
     );
   }, [muted]);
 
   // Save playing state
   useEffect(() => {
-    savePreferences({ is_playing: !paused }).catch(err =>
+    saveLocalPreferences({ is_playing: !paused }).catch(err =>
       console.error('Error saving play pref', err),
     );
   }, [paused]);

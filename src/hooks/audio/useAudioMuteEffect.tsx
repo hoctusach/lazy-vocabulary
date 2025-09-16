@@ -1,12 +1,12 @@
 
 import { useEffect } from 'react';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { savePreferences } from '@/lib/db/preferences';
+import { saveLocalPreferences } from '@/lib/preferences/localPreferences';
 
 export const useAudioMuteEffect = (mute: boolean) => {
   // Effect specifically for mute changes
   useEffect(() => {
-    savePreferences({ is_muted: mute }).catch(() => {});
+    saveLocalPreferences({ is_muted: mute }).catch(() => {});
     unifiedSpeechController.setMuted(mute);
   }, [mute]);
 };

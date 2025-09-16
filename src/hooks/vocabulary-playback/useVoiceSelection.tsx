@@ -1,7 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 
 export type VoiceOption = {
@@ -86,7 +89,7 @@ export const useVoiceSelection = () => {
         
         setVoices(voiceOptions);
 
-        getPreferences()
+        getLocalPreferences()
           .then(p => {
             const storedName = p.favorite_voice;
             const matched = storedName
@@ -130,7 +133,7 @@ export const useVoiceSelection = () => {
   useEffect(() => {
     const voiceName = voices[voiceIndex]?.voice?.name;
     if (voiceName) {
-      savePreferences({ favorite_voice: voiceName }).catch(err =>
+      saveLocalPreferences({ favorite_voice: voiceName }).catch(err =>
         console.error('Error saving voice preference', err),
       );
     }
@@ -151,7 +154,7 @@ export const useVoiceSelection = () => {
 
     const voiceName = voices[nextVoice.index]?.voice?.name;
     if (voiceName) {
-      savePreferences({ favorite_voice: voiceName }).catch(err =>
+      saveLocalPreferences({ favorite_voice: voiceName }).catch(err =>
         console.error('Error saving voice preference', err),
       );
     }

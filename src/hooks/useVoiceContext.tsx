@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 export interface VoiceContext {
   allVoices: SpeechSynthesisVoice[];
   selectedVoiceName: string;
@@ -20,7 +23,7 @@ export const useVoiceContext = (): VoiceContext => {
         .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
       logAvailableVoices(voices);
       setAllVoices(voices);
-      getPreferences()
+      getLocalPreferences()
         .then(p => {
           const preferred = voices.find(v => v.name === p.favorite_voice);
           if (preferred) {
@@ -44,7 +47,7 @@ export const useVoiceContext = (): VoiceContext => {
 
   useEffect(() => {
     if (selectedVoiceName) {
-      savePreferences({ favorite_voice: selectedVoiceName }).catch(err =>
+      saveLocalPreferences({ favorite_voice: selectedVoiceName }).catch(err =>
         console.error('Error saving voice preference', err),
       );
     }
@@ -56,7 +59,7 @@ export const useVoiceContext = (): VoiceContext => {
     const nextIndex = (index + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
-    savePreferences({ favorite_voice: nextVoice.name }).catch(err =>
+    saveLocalPreferences({ favorite_voice: nextVoice.name }).catch(err =>
       console.error('Error saving voice preference', err),
     );
   };

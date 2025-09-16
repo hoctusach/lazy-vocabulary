@@ -1,6 +1,6 @@
 
 import { useState, useCallback, useEffect } from 'react';
-import { savePreferences } from '@/lib/db/preferences';
+import { saveLocalPreferences } from '@/lib/preferences/localPreferences';
 
 export const useMuteToggle = (
   isMuted: boolean,
@@ -19,7 +19,7 @@ export const useMuteToggle = (
     setMute(!mute);
     handleToggleMute();
 
-    savePreferences({ is_muted: !mute }).catch(err =>
+    saveLocalPreferences({ is_muted: !mute }).catch(err =>
       console.error('Error saving mute state', err),
     );
   }, [mute, handleToggleMute]);
