@@ -6,6 +6,7 @@ import type {
   SeverityLevel
 } from '@/types/learning';
 import { getLearned, upsertLearned, setReview } from '@/lib/db/learned';
+import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import {
   DAILY_SELECTION_KEY,
   LEARNING_PROGRESS_KEY
@@ -119,6 +120,31 @@ export class LearningProgressService {
     return timestamp <= today.getTime();
   }
 
+  private isLearnedProgress(stored?: StoredProgress): boolean {
+    if (!stored) return false;
+    if (stored.isLearned === true) return true;
+
+    const rawIsLearned = (stored as Record<string, unknown>).isLearned;
+    if (typeof rawIsLearned === 'string') {
+      const normalized = rawIsLearned.trim().toLowerCase();
+      if (normalized === 'true' || normalized === '1' || normalized === 'yes') {
+        return true;
+      }
+    }
+
+    const status = stored.status;
+    if (typeof status === 'string' && status.trim().toLowerCase() === 'learned') {
+      return true;
+    }
+
+    const rawStatus = (stored as Record<string, unknown>).status;
+    if (typeof rawStatus === 'number' && rawStatus >= 3) {
+      return true;
+    }
+
+    return false;
+  }
+
   private persistSelection(date: string, selection: DailySelection): void {
     const storage = this.getStorage();
     if (!storage) return;
@@ -152,9 +178,38 @@ export class LearningProgressService {
     await setReview(wordKey, false);
   }
 
-  // Placeholder implementations for compatibility
   getProgressStats() {
-    return { learnedCount: 0, dueCount: 0 };
+    const progressMap = this.loadProgressMap();
+    let learning = 0;
+    let learned = 0;
+    let due = 0;
+
+    for (const stored of Object.values(progressMap)) {
+      if (!stored) continue;
+
+      const isLearnedEntry = this.isLearnedProgress(stored);
+
+      if (isLearnedEntry) {
+        learned += 1;
+      } else {
+        learning += 1;
+      }
+
+      if (isLearnedEntry && this.isDue(stored)) {
+        due += 1;
+      }
+    }
+
+    const total = TOTAL_WORDS;
+    const newCount = Math.max(0, total - learning - learned);
+
+    return {
+      total,
+      learning,
+      new: newCount,
+      due,
+      learned
+    };
   }
 
   updateWordProgress(wordKey: string): void {
