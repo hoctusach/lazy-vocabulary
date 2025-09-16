@@ -14,7 +14,7 @@ type ProgressRow = {
 type CountRow = {
   word_key: string;
   count: number;
-  last_shown?: string;
+  last_shown_at?: string;
 };
 
 type TimeRow = {
@@ -133,7 +133,7 @@ function extractLearningProgress(): ProgressRow[] {
   }
 
   if (!rows.length) {
-    const counts = parseJSON<Record<string, { count?: number; lastShown?: string; last_shown?: string }>>(
+    const counts = parseJSON<Record<string, { count?: number; lastShown?: string; last_shown?: string; last_shown_at?: string }>>(
       getLS("vocabulary-word-counts")
     );
     if (counts && typeof counts === "object") {
@@ -145,7 +145,7 @@ function extractLearningProgress(): ProgressRow[] {
             word_key: wordKey,
             review_count: count,
             status: 3,
-            learned_at: coerceString(raw?.lastShown ?? raw?.last_shown) ?? nowISO
+            learned_at: coerceString(raw?.lastShown ?? raw?.last_shown ?? raw?.last_shown_at) ?? nowISO
           };
           rows.push(row);
         }
@@ -157,7 +157,7 @@ function extractLearningProgress(): ProgressRow[] {
 }
 
 function extractWordCounts(): CountRow[] {
-  const counts = parseJSON<Record<string, { count?: number; lastShown?: string; last_shown?: string }>>(
+  const counts = parseJSON<Record<string, { count?: number; lastShown?: string; last_shown?: string; last_shown_at?: string }>>(
     getLS("vocabulary-word-counts")
   );
   if (!counts || typeof counts !== "object") return [];
@@ -167,9 +167,9 @@ function extractWordCounts(): CountRow[] {
     if (!isNonEmptyString(wordKey)) continue;
     const count = coerceNumber(raw?.count) ?? 0;
     const safeCount = count < 0 ? 0 : Math.floor(count);
-    const lastShown = coerceString(raw?.lastShown ?? raw?.last_shown);
+    const lastShown = coerceString(raw?.lastShown ?? raw?.last_shown ?? raw?.last_shown_at);
     const row: CountRow = { word_key: wordKey, count: safeCount };
-    if (lastShown) row.last_shown = lastShown;
+    if (lastShown) row.last_shown_at = lastShown;
     rows.push(row);
   }
   return rows;
@@ -223,6 +223,7 @@ function extractLearningTime(): TimeRow[] {
   });
   return rows;
 }
+
 
 async function upsertProgress(client: SupabaseClient, userKey: string, rows: ProgressRow[]) {
   if (!rows.length) return;
@@ -283,6 +284,9 @@ export async function autoBackfillOnReload(): Promise<void> {
   const passcode = getStoredPasscode() ?? undefined;
   const session = await ensureSessionForNickname(nickname, passcode);
   if (!session) return;
+
+  const userKey = await ensureUserKey();
+  if (!userKey) return;
 
   const userKey = await ensureUserKey();
   if (!userKey) return;

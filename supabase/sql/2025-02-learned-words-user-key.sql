@@ -76,12 +76,15 @@ with check (
 create or replace function public.get_learned_words_by_key(p_user_unique_key text)
 returns setof text
 language sql
-security invoker
+security definer
 set search_path = public
 as $$
   select lw.word_id
     from public.learned_words lw
+    join public.profiles p
+      on p.user_unique_key = lw.user_unique_key
    where lw.user_unique_key = p_user_unique_key
+     and p.user_id = auth.uid()
    order by lw.word_id;
 $$;
 
