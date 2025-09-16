@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
+
 export interface VoiceContext {
   allVoices: SpeechSynthesisVoice[];
   selectedVoiceName: string;
@@ -20,18 +20,15 @@ export const useVoiceContext = (): VoiceContext => {
         .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
       logAvailableVoices(voices);
       setAllVoices(voices);
-      getPreferences()
-        .then(p => {
-          const preferred = voices.find(v => v.name === p.favorite_voice);
-          if (preferred) {
-            setSelectedVoiceName(preferred.name);
-          } else if (voices.length > 0) {
-            setSelectedVoiceName(voices[0].name);
-          }
-        })
-        .catch(() => {
-          if (voices.length > 0) setSelectedVoiceName(voices[0].name);
-        });
+      const favorite = getFavoriteVoice();
+      const preferred = favorite
+        ? voices.find(v => v.name === favorite)
+        : undefined;
+      if (preferred) {
+        setSelectedVoiceName(preferred.name);
+      } else if (voices.length > 0) {
+        setSelectedVoiceName(voices[0].name);
+      }
     };
 
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
@@ -44,9 +41,7 @@ export const useVoiceContext = (): VoiceContext => {
 
   useEffect(() => {
     if (selectedVoiceName) {
-      savePreferences({ favorite_voice: selectedVoiceName }).catch(err =>
-        console.error('Error saving voice preference', err),
-      );
+      setFavoriteVoice(selectedVoiceName);
     }
   }, [selectedVoiceName]);
 
@@ -56,9 +51,7 @@ export const useVoiceContext = (): VoiceContext => {
     const nextIndex = (index + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
     setSelectedVoiceName(nextVoice.name);
-    savePreferences({ favorite_voice: nextVoice.name }).catch(err =>
-      console.error('Error saving voice preference', err),
-    );
+    setFavoriteVoice(nextVoice.name);
   };
 
   return { allVoices, selectedVoiceName, setSelectedVoiceName, cycleVoice };

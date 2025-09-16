@@ -1,9 +1,8 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { VoiceSelection } from '../useVoiceSelection';
 import { toast } from 'sonner';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
 /**
  * Hook for managing voice selection and finding appropriate voices
@@ -28,12 +27,11 @@ export const useVoiceManagement = () => {
   
   // Load initial voice settings
   useEffect(() => {
-    getPreferences()
-      .then(p => {
-        const idx = allVoiceOptions.findIndex(v => v.label === p.favorite_voice);
-        if (idx >= 0) setVoiceIndex(idx);
-      })
-      .catch(err => console.error('Error loading voice preference', err));
+    const favorite = getFavoriteVoice();
+    if (favorite) {
+      const idx = allVoiceOptions.findIndex(v => v.label === favorite);
+      if (idx >= 0) setVoiceIndex(idx);
+    }
 
     // Also try to preload voices
     const loadVoicesAndNotify = () => {
@@ -122,9 +120,7 @@ export const useVoiceManagement = () => {
       );
       
       const voiceName = allVoiceOptions[nextIndex].label;
-      savePreferences({ favorite_voice: voiceName }).catch(err =>
-        console.error('Error saving voice preference', err),
-      );
+      setFavoriteVoice(voiceName);
       
       // Notify the user
       toast.success(`Voice changed to ${allVoiceOptions[nextIndex].label}`);
