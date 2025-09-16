@@ -1,16 +1,16 @@
-
 import { useState, useCallback, useEffect } from 'react';
-import { saveLocalPreferences } from '@/lib/preferences/localPreferences';
+import { getIsMuted, setIsMuted } from '@/utils/localPreferences';
 
 export const useMuteToggle = (
   isMuted: boolean,
   handleToggleMute: () => void
 ) => {
-  const [mute, setMute] = useState(isMuted);
+  const [mute, setMute] = useState(() => getIsMuted());
 
-  // Sync with parent mute state
+  // Sync with parent mute state and persist preference
   useEffect(() => {
     setMute(isMuted);
+    setIsMuted(isMuted);
   }, [isMuted]);
 
   // Toggle mute without restarting speech or clearing timers
@@ -18,10 +18,7 @@ export const useMuteToggle = (
     console.log('[APP] Toggling mute state from', mute, 'to', !mute);
     setMute(!mute);
     handleToggleMute();
-
-    saveLocalPreferences({ is_muted: !mute }).catch(err =>
-      console.error('Error saving mute state', err),
-    );
+    setIsMuted(!mute);
   }, [mute, handleToggleMute]);
 
   return { mute, toggleMute };

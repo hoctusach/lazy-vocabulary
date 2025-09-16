@@ -1,13 +1,9 @@
-
 import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
-import {
-  getPreferences as getRemotePreferences,
-  savePreferences as saveRemotePreferences,
-} from '@/lib/db/preferences';
-import { saveLocalPreferences } from '@/lib/preferences/localPreferences';
+import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
 import type { SeverityLevel } from '@/types/learning';
 
@@ -36,11 +32,10 @@ export const useVocabularyDataLoader = (
       startTimerRef.current = null;
     }
   };
+
   // Persist selected voice whenever it changes
   useEffect(() => {
-    saveLocalPreferences({ favorite_voice: selectedVoiceName }).catch(err =>
-      console.error('Error saving voice', err),
-    );
+    setFavoriteVoice(selectedVoiceName);
   }, [selectedVoiceName]);
 
   // Load initial data
@@ -83,10 +78,10 @@ export const useVocabularyDataLoader = (
 
         let severity: SeverityLevel = 'light';
         try {
-          const prefs = await getRemotePreferences();
+          const prefs = await getPreferences();
           severity = (prefs.daily_option as SeverityLevel) || 'light';
           if (!prefs.daily_option) {
-            await saveRemotePreferences({ daily_option: 'light' });
+            await savePreferences({ daily_option: 'light' });
           }
         } catch {
           // ignore preference loading errors

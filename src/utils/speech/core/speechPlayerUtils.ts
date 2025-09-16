@@ -1,6 +1,5 @@
-
-// Preferences handled server-side
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
+import { getIsMuted } from '@/utils/localPreferences';
 
 // Store the current text being spoken for sync checking
 export function setCurrentTextBeingSpoken(processedText: string) {
@@ -12,8 +11,7 @@ export function setCurrentTextBeingSpoken(processedText: string) {
 }
 
 export function isMutedFromLocalStorage(): boolean {
-  // Prefer server-side preferences
-  return false;
+  return getIsMuted();
 }
 
 export function loadVoices(): SpeechSynthesisVoice[] {

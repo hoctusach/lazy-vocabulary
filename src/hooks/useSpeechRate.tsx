@@ -1,28 +1,35 @@
-import { useEffect, useState } from 'react';
-import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  getLocalPreferences,
-  saveLocalPreferences,
-} from '@/lib/preferences/localPreferences';
+  getSpeechVoicePreference,
+  setSpeechVoicePreference,
+} from '@/utils/localPreferences';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
-export const useSpeechRate = () => {
-  const [speechRate, setSpeechRate] = useState<number>(DEFAULT_SPEECH_RATE);
+export const useSpeechVoiceEffect = (
+  handleVoiceChange: (voice: string) => void
+) => {
+  // Load stored preference
+  const [voice, setVoice] = useState(() => getSpeechVoicePreference());
 
+  // Apply saved voice on initial mount
   useEffect(() => {
-    getLocalPreferences()
-      .then(p => {
-        if (typeof p.speech_rate === 'number') {
-          setSpeechRate(p.speech_rate);
-        }
-      })
-      .catch(console.error);
+    const stored = getSpeechVoicePreference();
+    if (stored) unifiedSpeechController.setVoice(stored);
   }, []);
 
+  // Persist voice choice and update controller whenever it changes
   useEffect(() => {
-    saveLocalPreferences({ speech_rate: speechRate }).catch(err => {
-      console.error('Error saving speech rate', err);
-    });
-  }, [speechRate]);
+    setSpeechVoicePreference(voice);
+    unifiedSpeechController.setVoice(voice);
+  }, [voice]);
 
-  return { speechRate, setSpeechRate };
+  const handleChange = useCallback(
+    (newVoice: string) => {
+      setVoice(newVoice);
+      handleVoiceChange(newVoice);
+    },
+    [handleVoiceChange],
+  );
+
+  return { voice, handleChange };
 };

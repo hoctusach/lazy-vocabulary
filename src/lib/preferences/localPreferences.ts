@@ -1,68 +1,30 @@
-import type { UserPreferences } from '@/core/models';
+const FAVORITE_VOICE_KEY = 'lv_favorite_voice';
 
-const LOCAL_PREFERENCES_KEY = 'lazyVoca.audioPreferences';
-
-const DEFAULT_LOCAL_PREFERENCES: UserPreferences = {
-  favorite_voice: null,
-  speech_rate: null,
-  is_muted: false,
-  is_playing: false,
-  daily_option: null,
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const readFromStorage = (): Partial<UserPreferences> => {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = window.localStorage.getItem(LOCAL_PREFERENCES_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw);
-    if (!isRecord(parsed)) return {};
-    return parsed as Partial<UserPreferences>;
-  } catch (error) {
-    console.warn('[preferences] Failed to parse local preferences', error);
-    return {};
+export function getFavoriteVoice(): string | null {
+  if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+    return null;
   }
-};
 
-const writeToStorage = (prefs: UserPreferences) => {
-  if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(
-      LOCAL_PREFERENCES_KEY,
-      JSON.stringify(prefs)
-    );
+    return window.localStorage.getItem(FAVORITE_VOICE_KEY);
   } catch (error) {
-    console.warn('[preferences] Failed to persist local preferences', error);
+    console.error('Error reading favorite voice from localStorage', error);
+    return null;
   }
-};
+}
 
-export const getLocalPreferences = async (): Promise<UserPreferences> => ({
-  ...DEFAULT_LOCAL_PREFERENCES,
-  ...readFromStorage(),
-});
+export function setFavoriteVoice(name: string | null): void {
+  if (typeof window === 'undefined' || typeof window.localStorage === 'undefined') {
+    return;
+  }
 
-export const saveLocalPreferences = async (
-  update: Partial<UserPreferences>,
-): Promise<void> => {
-  const merged: UserPreferences = {
-    ...DEFAULT_LOCAL_PREFERENCES,
-    ...readFromStorage(),
-    ...update,
-  };
-
-  writeToStorage(merged);
-};
-
-export const clearLocalPreferences = async (): Promise<void> => {
-  if (typeof window === 'undefined') return;
   try {
-    window.localStorage.removeItem(LOCAL_PREFERENCES_KEY);
+    if (name) {
+      window.localStorage.setItem(FAVORITE_VOICE_KEY, name);
+    } else {
+      window.localStorage.removeItem(FAVORITE_VOICE_KEY);
+    }
   } catch (error) {
-    console.warn('[preferences] Failed to clear local preferences', error);
+    console.error('Error saving favorite voice to localStorage', error);
   }
-};
-
-export const LOCAL_AUDIO_PREFERENCES_KEY = LOCAL_PREFERENCES_KEY;
+}
