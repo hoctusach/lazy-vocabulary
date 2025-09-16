@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { ensureSessionForNickname, getStoredPasscode } from "@/lib/auth";
 import { getSupabaseClient } from "../supabaseClient";
 
 type ProgressRow = {
@@ -222,23 +223,6 @@ function extractLearningTime(): TimeRow[] {
   return rows;
 }
 
-async function ensureAnonSession(client: SupabaseClient): Promise<boolean> {
-  try {
-    const { data } = await client.auth.getSession();
-    if (data?.session?.user) return true;
-  } catch {
-    // ignore and fall through to anonymous sign-in
-  }
-
-  try {
-    const { error, data } = await client.auth.signInAnonymously();
-    if (error) return false;
-    return Boolean(data?.user);
-  } catch {
-    return false;
-  }
-}
-
 async function upsertProgress(client: SupabaseClient, name: string, rows: ProgressRow[]) {
   if (!rows.length) return;
   const payload = rows.map(row => stripNullish({ name, ...row }));
@@ -287,8 +271,9 @@ export async function autoBackfillOnReload(): Promise<void> {
   const client = getSupabaseClient();
   if (!client) return;
 
-  const signedIn = await ensureAnonSession(client);
-  if (!signedIn) return;
+  const passcode = getStoredPasscode() ?? undefined;
+  const session = await ensureSessionForNickname(nickname, passcode);
+  if (!session) return;
 
   const progress = extractLearningProgress();
   const counts = extractWordCounts();
