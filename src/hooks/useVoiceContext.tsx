@@ -20,6 +20,7 @@ export const useVoiceContext = (): VoiceContext => {
         .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
       logAvailableVoices(voices);
       setAllVoices(voices);
+
       const favorite = getFavoriteVoice();
       const preferred = favorite
         ? voices.find(v => v.name === favorite)

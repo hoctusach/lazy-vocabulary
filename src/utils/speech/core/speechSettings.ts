@@ -1,5 +1,8 @@
 import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
-import { getSpeechRate as getStoredSpeechRate, setSpeechRate as setStoredSpeechRate } from '@/lib/localPreferences';
+import {
+  getSpeechRate as getStoredSpeechRate,
+  setSpeechRate as setStoredSpeechRate,
+} from '@/lib/localPreferences';
 
 let cachedRate = getStoredSpeechRate() ?? DEFAULT_SPEECH_RATE;
 

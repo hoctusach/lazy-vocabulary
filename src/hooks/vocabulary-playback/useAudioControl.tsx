@@ -1,7 +1,10 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 export const useAudioControl = (wordList: VocabularyWord[]) => {
   // Audio state
@@ -11,14 +14,14 @@ export const useAudioControl = (wordList: VocabularyWord[]) => {
   
   // Load initial mute state from DB
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => setMuted(!!p.is_muted))
       .catch(err => console.error('Error loading mute setting', err));
   }, []);
 
   // Persist muted state
   useEffect(() => {
-    savePreferences({ is_muted: muted }).catch(err => {
+    saveLocalPreferences({ is_muted: muted }).catch(err => {
       console.error('Error saving mute setting', err);
     });
   }, [muted]);

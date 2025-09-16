@@ -7,7 +7,7 @@ export const useMuteToggle = (
 ) => {
   const [mute, setMute] = useState(() => getIsMuted());
 
-  // Sync with parent mute state
+  // Sync with parent mute state and persist preference
   useEffect(() => {
     setMute(isMuted);
     setIsMuted(isMuted);
@@ -18,7 +18,6 @@ export const useMuteToggle = (
     console.log('[APP] Toggling mute state from', mute, 'to', !mute);
     setMute(!mute);
     handleToggleMute();
-
     setIsMuted(!mute);
   }, [mute, handleToggleMute]);
 

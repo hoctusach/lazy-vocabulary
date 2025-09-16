@@ -2,7 +2,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import {
+  getLocalPreferences,
+  saveLocalPreferences,
+} from '@/lib/preferences/localPreferences';
 
 /**
  * Core vocabulary state management
@@ -18,7 +21,7 @@ export const useVocabularyState = () => {
   const [isMuted, setIsMuted] = useState<boolean>(false);
 
   useEffect(() => {
-    getPreferences()
+    getLocalPreferences()
       .then(p => {
         setIsPaused(!p.is_playing);
         setIsMuted(!!p.is_muted);
@@ -40,7 +43,9 @@ export const useVocabularyState = () => {
 
   // Persist control flags when they change
   useEffect(() => {
-    savePreferences({ is_playing: !isPaused, is_muted: isMuted }).catch(() => {});
+    saveLocalPreferences({ is_playing: !isPaused, is_muted: isMuted }).catch(
+      () => {},
+    );
   }, [isPaused, isMuted]);
 
   return {

@@ -32,6 +32,7 @@ export const useVocabularyDataLoader = (
       startTimerRef.current = null;
     }
   };
+
   // Persist selected voice whenever it changes
   useEffect(() => {
     setFavoriteVoice(selectedVoiceName);
