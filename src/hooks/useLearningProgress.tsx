@@ -4,6 +4,8 @@ import { DailySelection, SeverityLevel, LearningProgress } from '@/types/learnin
 import { VocabularyWord } from '@/types/vocabulary';
 import { buildTodaysWords } from '@/utils/todayWords';
 import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { toWordId } from '@/lib/words/ids';
+import { markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 
 export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
@@ -113,6 +115,18 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const markWordLearned = useCallback((word: string) => {
     learningProgressService.markWordLearned(word);
 
+    let category: string | undefined;
+    if (dailySelection) {
+      const entry = [...dailySelection.reviewWords, ...dailySelection.newWords].find(p => p.word === word);
+      category = entry?.category;
+    }
+    if (!category) {
+      const matched = allWords.find(w => w.word === word);
+      category = matched?.category;
+    }
+    const wordId = toWordId(word, category);
+    void markLearnedServerByKey(wordId, allWords.length).catch(() => {});
+
     setDailySelection(prev => {
       if (!prev) return prev;
 
@@ -136,7 +150,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     });
 
     refreshStats();
-  }, [allWords, refreshStats]);
+  }, [allWords, dailySelection, refreshStats]);
 
   const markWordAsNew = useCallback((word: string) => {
     learningProgressService.markWordAsNew(word);
