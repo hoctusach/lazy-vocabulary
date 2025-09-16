@@ -48,17 +48,23 @@ export async function ensureAuth() {
   }
 }
 
+/**
+ * Ensures and returns the current user's user_unique_key.
+ * Source of truth: profiles.user_unique_key (NOT nicknames).
+ * - Reads from localStorage cache if available
+ * - Otherwise tries profiles; if missing, derives from nickname (or user id) and upserts into profiles
+ * - Caches the key in localStorage['lazyVoca.userKey']
+ */
 export async function ensureUserKey(): Promise<string | null> {
   await ensureAuth();
   const sb = getSupabaseClient();
   if (!sb) return null;
 
-  const nick = lsGet('lazyVoca.nickname') || '';
-  if (!nick) return null;
-
+  // cache hit
   const cached = lsGet('lazyVoca.userKey');
   if (cached) return cached;
 
+  // who am I?
   const { data: userData, error: userError } = await sb.auth.getUser();
   if (userError) {
     console.warn('ensureUserKey:getUser', userError.message);
@@ -67,31 +73,36 @@ export async function ensureUserKey(): Promise<string | null> {
   const userId = userData?.user?.id;
   if (!userId) return null;
 
-  const { data, error } = await sb
-    .from('nicknames')
+  // 1) Try read from profiles
+  const { data: profile, error: profErr } = await sb
+    .from('profiles')
     .select('user_unique_key')
-    .eq('name', nick)
     .eq('user_id', userId)
-    .limit(1)
     .maybeSingle();
 
-  if (error) {
-    console.warn('ensureUserKey:select', error.message);
+  if (profErr) {
+    console.warn('ensureUserKey:profiles select', profErr.message);
   }
 
-  let key = data?.user_unique_key ?? null;
+  let key: string | null = profile?.user_unique_key ?? null;
+
+  // 2) If missing, derive and upsert into profiles (onConflict: user_id)
   if (!key) {
-    const derived = canon(nick);
-    const { error: updateError } = await sb
-      .from('nicknames')
-      .update({ user_unique_key: derived })
-      .eq('name', nick)
-      .eq('user_id', userId);
-    if (updateError) {
-      console.warn('ensureUserKey:update', updateError.message);
-    } else {
-      key = derived;
+    const nick = lsGet('lazyVoca.nickname') || '';
+    const derivedFromNick = canon(nick);
+    // final fallback: compress user id (unique, no spaces)
+    const fallbackFromUid = userId.replace(/-/g, '');
+    const derived = derivedFromNick || fallbackFromUid;
+
+    const { error: upErr } = await sb
+      .from('profiles')
+      .upsert({ user_id: userId, user_unique_key: derived }, { onConflict: 'user_id' });
+
+    if (upErr) {
+      console.warn('ensureUserKey:profiles upsert', upErr.message);
+      return null;
     }
+    key = derived;
   }
 
   if (key) {
@@ -100,7 +111,14 @@ export async function ensureUserKey(): Promise<string | null> {
   return key;
 }
 
-export async function markLearnedServerByKey(wordId: string, totalWords: number): Promise<ProgressSummary | null> {
+/**
+ * Called after marking a word learned locally. Also persists to server
+ * and stores the returned summary counts in localStorage['progressSummary'].
+ */
+export async function markLearnedServerByKey(
+  wordId: string,
+  totalWords: number
+): Promise<ProgressSummary | null> {
   const key = await ensureUserKey();
   if (!key) return null;
 
@@ -111,7 +129,7 @@ export async function markLearnedServerByKey(wordId: string, totalWords: number)
     p_user_unique_key: key,
     p_word_id: wordId,
     p_marked_at: new Date().toISOString(),
-    p_total_words: Math.max(0, Math.floor(totalWords || 0))
+    p_total_words: Math.max(0, Math.floor(totalWords || 0)),
   });
 
   if (error) {
@@ -126,6 +144,10 @@ export async function markLearnedServerByKey(wordId: string, totalWords: number)
   return data as ProgressSummary;
 }
 
+/**
+ * On app load (and device changes), read learned word ids from server for this user key
+ * and idempotently upgrade local learningProgress so those words are marked learned.
+ */
 export async function bootstrapLearnedFromServerByKey(): Promise<void> {
   const key = await ensureUserKey();
   if (!key) return;
@@ -158,7 +180,7 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
       ...current,
       status: Math.max(3, safeStatus),
       isLearned: true,
-      learned_at: current.learned_at || nowISO
+      learned_at: current.learned_at || nowISO,
     };
   }
 
