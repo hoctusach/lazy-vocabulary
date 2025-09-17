@@ -7,6 +7,8 @@ import { getPreferences, savePreferences } from '@/lib/db/preferences';
 import { toWordId } from '@/lib/words/ids';
 import { markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 
+type LearnedWordSummary = Partial<LearningProgress> & { word: string };
+
 export const useLearningProgress = (allWords: VocabularyWord[]) => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [currentWordProgress, setCurrentWordProgress] = useState<LearningProgress | null>(null);
@@ -18,6 +20,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     due: 0,
     learned: 0
   });
+  const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
 
   const refreshStats = useCallback(() => {
     const stats = learningProgressService.getProgressStats();
@@ -108,8 +111,35 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     setTodayWords(words);
   }, [dailySelection, allWords]);
 
-  const getLearnedWords = useCallback(() => {
-    return learningProgressService.getLearnedWords();
+  const refreshLearnedWords = useCallback(async () => {
+    try {
+      const words = await learningProgressService.getLearnedWords();
+      setLearnedWords(Array.isArray(words) ? words : []);
+    } catch (error) {
+      console.warn('[useLearningProgress] Failed to load learned words', error);
+      setLearnedWords([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    const loadLearnedWords = async () => {
+      try {
+        const words = await learningProgressService.getLearnedWords();
+        if (!isActive) return;
+        setLearnedWords(Array.isArray(words) ? words : []);
+      } catch (error) {
+        if (!isActive) return;
+        console.warn('[useLearningProgress] Failed to load learned words', error);
+        setLearnedWords([]);
+      }
+    };
+
+    void loadLearnedWords();
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   const markWordLearned = useCallback((word: string) => {
@@ -150,7 +180,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     });
 
     refreshStats();
-  }, [allWords, dailySelection, refreshStats]);
+    void refreshLearnedWords();
+  }, [allWords, dailySelection, refreshLearnedWords, refreshStats]);
 
   const markWordAsNew = useCallback((word: string) => {
     learningProgressService.markWordAsNew(word);
@@ -165,7 +196,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     markWordAsPlayed,
     getWordProgress,
     refreshStats,
-    getLearnedWords,
+    refreshLearnedWords,
+    learnedWords,
     markWordLearned,
     markWordAsNew,
     todayWords

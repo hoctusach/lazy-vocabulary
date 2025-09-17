@@ -25,7 +25,8 @@ vi.mock('@/hooks/useLearningProgress', () => ({
     progressStats: { total: 0, learning: 0, new: 0, due: 0, learned: 1 },
     generateDailyWords: vi.fn(),
     markWordAsPlayed: vi.fn(),
-    getLearnedWords: () => [
+    refreshLearnedWords: vi.fn(),
+    learnedWords: [
       {
         word: 'end up /ˈend ʌp/ [intransitive]',
         category: 'phrases',
