@@ -9,10 +9,9 @@ export type ProgressSummary = {
   remaining_count: number;
 };
 
-type ProfileIdentityRow = {
+type NicknameIdentityRow = {
   user_unique_key: string | null;
-  nickname: string | null;
-  nickname_canon: string | null;
+  name: string | null;
 };
 
 // Hard-coded total number of vocabulary words used for progress calculations
@@ -36,18 +35,11 @@ function lsSet(key: string, value: string) {
   }
 }
 
-function canon(value: string) {
-  return (value || '')
-    .normalize('NFKC')
-    .toLowerCase()
-    .replace(/\s+/g, '');
-}
-
 /**
  * Ensures and returns the current user's user_unique_key.
- * Source of truth: profiles.user_unique_key (NOT nicknames).
+ * Source of truth: nicknames.user_unique_key.
  * - Reads from localStorage cache if available
- * - Otherwise tries profiles; if missing, derives from nickname (or user id) and upserts into profiles
+ * - Otherwise tries nicknames; if missing, derives from nickname (or user id) and upserts into nicknames
  * - Caches the key in localStorage['lazyVoca.userKey']
  */
 export async function ensureUserKey(): Promise<string | null> {
@@ -67,55 +59,73 @@ export async function ensureUserKey(): Promise<string | null> {
   if (cached) return cached;
 
   // who am I?
-  // 1) Try read from profiles
-  const { data: profile, error: profErr } = await sb
-    .from('profiles')
-    .select('user_unique_key, nickname, nickname_canon')
+  // 1) Try read from nicknames
+  const { data: nicknameRow, error: nicknameError } = await sb
+    .from('nicknames')
+    .select('user_unique_key, name')
     .eq('user_id', userId)
-    .maybeSingle<ProfileIdentityRow>();
+    .maybeSingle<NicknameIdentityRow>();
 
-  if (profErr) {
-    console.warn('ensureUserKey:profiles select', profErr.message);
+  if (nicknameError) {
+    console.warn('ensureUserKey:nicknames select', nicknameError.message);
   }
 
-  const profileKey = (profile?.user_unique_key ?? '').trim();
-  let key: string | null = profileKey.length ? profileKey : null;
+  let key = (nicknameRow?.user_unique_key ?? '').trim();
 
-  // 2) If missing, derive and upsert into profiles (onConflict: user_id)
+  // 2) If missing, derive and upsert into nicknames (onConflict: user_id)
   if (!key) {
     const storedNick = (lsGet('lazyVoca.nickname') || '').trim();
-    const profileNick = (profile?.nickname ?? '').trim();
-    const profileCanon = (profile?.nickname_canon ?? '').trim();
+    const existingName = (nicknameRow?.name ?? '').trim();
     const sanitizedUid = userId.replace(/-/g, '');
 
-    const preferredNick = profileNick || storedNick;
-    const fallbackNickname =
-      preferredNick.length >= 3 ? preferredNick : `Learner-${sanitizedUid}`;
-    const fallbackCanon =
-      profileCanon.length >= 1
-        ? profileCanon
-        : canonNickname(preferredNick.length >= 3 ? preferredNick : fallbackNickname);
-
-    const { data: upserted, error: upErr } = await sb
-      .from('profiles')
-      .upsert(
-        {
-          user_id: userId,
-          user_unique_key: sanitizedUid,
-          nickname: fallbackNickname,
-          nickname_canon: fallbackCanon,
-        },
-        { onConflict: 'user_id' }
+    const preferredName = storedNick.length >= 3 ? storedNick : existingName;
+    const fallbackName = preferredName.length >= 3 ? preferredName : `Learner-${sanitizedUid}`;
+    const candidates = Array.from(
+      new Set(
+        [preferredName, fallbackName, `Learner-${sanitizedUid}`]
+          .map((value) => value.trim())
+          .filter((value) => value.length >= 3)
       )
-      .select('user_unique_key')
-      .maybeSingle<Pick<ProfileIdentityRow, 'user_unique_key'>>();
+    );
 
-    if (upErr) {
-      console.warn('ensureUserKey:profiles upsert', upErr.message);
-      return null;
+    for (const candidate of candidates) {
+      const { data: upserted, error: upErr } = await sb
+        .from('nicknames')
+        .upsert({ user_id: userId, name: candidate }, { onConflict: 'user_id' })
+        .select('user_unique_key')
+        .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
+
+      if (upErr) {
+        if (upErr.code === '23505') {
+          // nickname taken, try next candidate
+          continue;
+        }
+        console.warn('ensureUserKey:nicknames upsert', upErr.message);
+        return null;
+      }
+
+      const upsertedKey = (upserted?.user_unique_key ?? '').trim();
+      if (upsertedKey) {
+        key = upsertedKey;
+        break;
+      }
     }
-    const upsertedKey = (upserted?.user_unique_key ?? '').trim();
-    key = upsertedKey.length ? upsertedKey : sanitizedUid;
+
+    if (!key) {
+      const fallbackNickname = `Learner-${sanitizedUid}`;
+      const { data: upserted, error: finalErr } = await sb
+        .from('nicknames')
+        .upsert({ user_id: userId, name: fallbackNickname }, { onConflict: 'user_id' })
+        .select('user_unique_key')
+        .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
+
+      if (finalErr) {
+        console.warn('ensureUserKey:nicknames final upsert', finalErr.message);
+        return null;
+      }
+      const fallbackKey = (upserted?.user_unique_key ?? '').trim();
+      key = fallbackKey.length ? fallbackKey : canonNickname(fallbackNickname);
+    }
   }
 
   if (key) {
