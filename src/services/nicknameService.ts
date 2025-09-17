@@ -12,8 +12,8 @@ export function normalizeNickname(s: string) {
   return s.toLowerCase().replace(/\s+/g, '');
 }
 
-// Optional: block risky display chars (doesn't affect key)
-export function sanitizeDisplay(s: string) {
+// Optional: block risky nickname chars (doesn't affect key)
+export function sanitizeNickname(s: string) {
   return s.replace(/[<>"'`$(){}\[\];]/g, '').trim();
 }
 
@@ -29,11 +29,11 @@ export async function getNicknameByKey(key: string): Promise<NicknameRecord | nu
   return (data as NicknameRecord | null) ?? null;
 }
 
-export async function upsertNickname(display: string): Promise<NicknameRecord> {
+export async function upsertNickname(name: string): Promise<NicknameRecord> {
   const supabase = getSupabaseClient();
-  const key = normalizeNickname(display);
+  const key = normalizeNickname(name);
   if (!supabase) {
-    return { id: key, name: display, user_unique_key: key, passcode: null };
+    return { id: key, name, user_unique_key: key, passcode: null };
   }
   const {
     data: { user },
@@ -46,7 +46,7 @@ export async function upsertNickname(display: string): Promise<NicknameRecord> {
   const { data, error } = await supabase
     .from('nicknames')
     .upsert(
-      { name: display, user_unique_key: key, user_id: user.id },
+      { name, user_unique_key: key, user_id: user.id },
       { onConflict: 'user_unique_key' }
     )
     .select('id, name, user_unique_key, passcode')

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import {
-  sanitizeDisplay,
+  sanitizeNickname,
   normalizeNickname,
   getNicknameByKey,
   upsertNickname,
@@ -146,12 +146,12 @@ export default function AuthGate() {
 
     setS((p) => ({ ...p, pending: true, error: undefined, info: undefined }));
 
-    const display = sanitizeDisplay(nicknameInput);
-    const key = normalizeNickname(display);
+    const sanitizedName = sanitizeNickname(nicknameInput);
+    const key = normalizeNickname(sanitizedName);
 
     try {
       if (s.mode === 'signin') {
-        const verified = await verifyNicknamePasscode(display, passcodeInput);
+        const verified = await verifyNicknamePasscode(sanitizedName, passcodeInput);
         if (!verified) {
           setS((p) => ({
             ...p,
@@ -163,20 +163,20 @@ export default function AuthGate() {
           }));
           return;
         }
-        await signInWithPasscode(display, passcodeInput, { rememberPasscode: true });
+        await signInWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
       } else {
-        await registerNicknameWithPasscode(display, passcodeInput, { rememberPasscode: true });
+        await registerNicknameWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
       }
 
       const existing = await getNicknameByKey(key);
-      const chosen = existing ?? (await upsertNickname(display));
+      const chosen = existing ?? (await upsertNickname(sanitizedName));
 
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
       await ensureProfile(chosen.name);
       await ensureUserKey().catch(() => null);
       if (s.mode === 'create') {
         try {
-          await setNicknamePasscode(display, passcodeInput);
+          await setNicknamePasscode(sanitizedName, passcodeInput);
         } catch (rpcErr) {
           console.warn('auth:set_nickname_passcode', (rpcErr as Error).message);
         }
@@ -223,7 +223,7 @@ export default function AuthGate() {
       : 'Creating…'
     : s.mode === 'signin'
     ? 'Sign in'
-    : 'Create passcode';
+    : 'Create new profile';
 
   return (
     <div
