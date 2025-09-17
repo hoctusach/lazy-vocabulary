@@ -15,8 +15,8 @@ export async function getNicknameByKey(key: string) {
   if (!supabase) return null;
   const { data, error } = await supabase
     .from('nicknames')
-    .select('id, name')
-    .eq('user_unique_key', key)
+    .select('id, display_name, name_canonical')
+    .eq('name_canonical', key)
     .maybeSingle();
   if (error) throw error;
   return data ?? null;
@@ -26,15 +26,23 @@ export async function upsertNickname(display: string) {
   const supabase = getSupabaseClient();
   const key = normalizeNickname(display);
   if (!supabase) {
-    return { id: key, name: display };
+    return { id: key, display_name: display, name_canonical: key };
+  }
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+  if (userError) throw userError;
+  if (!user?.id) {
+    throw new Error('Authentication required to save nickname.');
   }
   const { data, error } = await supabase
     .from('nicknames')
     .upsert(
-      { name: display, user_unique_key: key },
-      { onConflict: 'user_unique_key' }
+      { display_name: display, name_canonical: key, user_id: user.id },
+      { onConflict: 'name_canonical' }
     )
-    .select('id, name')
+    .select('id, display_name, name_canonical')
     .single();
   if (error) throw error;
   return data!;
