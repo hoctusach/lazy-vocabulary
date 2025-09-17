@@ -13,11 +13,8 @@ import {
   upsertNickname,
 } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
-import {
-  PasscodeAuthError,
-  signInWithPasscode,
-  signUp,
-} from '@/lib/auth/passcodeAuth';
+import { registerNicknameWithPasscode, signInWithPasscode } from '@/lib/auth';
+import { requireSupabaseClient } from '@/lib/supabaseClient';
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
@@ -40,6 +37,26 @@ function validatePasscode(passcode: string): string | null {
   if (trimmed.length > 10) return 'Passcode must be at most 10 digits.';
   if (!/^\d+$/.test(trimmed)) return 'Passcode can only contain numbers.';
   return null;
+}
+
+async function verifyProfilePasscode(nickname: string, passcode: string): Promise<string | null> {
+  const supabase = requireSupabaseClient();
+  const { data, error } = await supabase.rpc('verify_profile_passcode', {
+    p_nickname: nickname,
+    p_passcode: passcode,
+  });
+  if (error) {
+    throw error;
+  }
+  return typeof data === 'string' && data.length ? data : null;
+}
+
+async function setProfilePasscode(passcode: string): Promise<void> {
+  const supabase = requireSupabaseClient();
+  const { error } = await supabase.rpc('set_profile_passcode', { p_passcode: passcode });
+  if (error) {
+    throw error;
+  }
 }
 
 export default function AuthGate() {
@@ -100,23 +117,46 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        await signInWithPasscode(display, passcodeInput);
+        const verified = await verifyProfilePasscode(display, passcodeInput);
+        if (!verified) {
+          setS((p) => ({
+            ...p,
+            pending: false,
+            mode: 'create',
+            info:
+              "We couldn't verify that passcode. Create one to secure your progress, or try signing in again.",
+            error: undefined,
+          }));
+          return;
+        }
+        await signInWithPasscode(display, passcodeInput, { rememberPasscode: true });
       } else {
-        await signUp(display, passcodeInput);
+        await registerNicknameWithPasscode(display, passcodeInput, { rememberPasscode: true });
       }
 
       const existing = await getNicknameByKey(key);
       const chosen = existing ?? (await upsertNickname(display));
 
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
-      void ensureUserKey().catch(() => {});
+      await ensureUserKey().catch(() => null);
+      if (s.mode === 'create') {
+        try {
+          await setProfilePasscode(passcodeInput);
+        } catch (rpcErr) {
+          console.warn('auth:set_profile_passcode', (rpcErr as Error).message);
+        }
+      }
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
         void mod.autoBackfillOnReload();
-      } catch {}
+      } catch {
+        // ignore backfill errors; this runs best-effort after sign-in
+      }
       try {
         (await import('../lib/storage/migrateLocalVocabToDb')).migrateLocalVocabToDb?.();
-      } catch {}
+      } catch {
+        // ignore migration errors; they will surface through other sync paths
+      }
 
       setS({
         ready: true,
@@ -127,30 +167,15 @@ export default function AuthGate() {
         mode: 'signin',
       });
     } catch (err: any) {
-      if (err instanceof PasscodeAuthError) {
-        if (err.code === 'ACCOUNT_NOT_FOUND') {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            mode: 'create',
-            info: 'No passcode found for this nickname. Create one to secure your progress.',
-            error: undefined,
-          }));
-          return;
-        }
-        const authMessage =
-          err.code === 'INVALID_PASSCODE'
-            ? 'That passcode is incorrect. Please try again.'
-            : err.message;
-        setS((p) => ({ ...p, pending: false, error: authMessage }));
-        return;
-      }
-
-      const code = err?.code;
+      const code = err?.code ?? err?.status;
+      const rawMessage = typeof err?.message === 'string' ? err.message : '';
+      const lowerMessage = rawMessage.toLowerCase();
       const message =
-        code === 'NICKNAME_TAKEN' || code === '23505'
+        code === 'NICKNAME_TAKEN' || code === '23505' || lowerMessage.includes('already registered')
           ? 'That nickname is already taken. Try another.'
-          : err?.message || 'Failed to save nickname';
+          : lowerMessage.includes('invalid login credentials')
+          ? 'That passcode is incorrect. Please try again.'
+          : rawMessage || 'Failed to save nickname';
       setS((p) => ({ ...p, pending: false, error: message }));
     }
   };
