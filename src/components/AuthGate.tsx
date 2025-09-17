@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  getNicknameLocal,
-  validateDisplayName,
-  NICKNAME_LS_KEY,
-} from '../lib/nickname';
+import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import {
   sanitizeDisplay,
   normalizeNickname,
@@ -13,7 +9,12 @@ import {
   upsertNickname,
 } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
-import { registerNicknameWithPasscode, signInWithPasscode } from '@/lib/auth';
+import {
+  registerNicknameWithPasscode,
+  signInWithPasscode,
+  getStoredPasscode,
+  PASSCODE_STORAGE_KEY,
+} from '@/lib/auth';
 import { requireSupabaseClient } from '@/lib/supabaseClient';
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
@@ -70,21 +71,40 @@ export default function AuthGate() {
   });
 
   useEffect(() => {
-    const existing = getNicknameLocal();
+    const existingNickname = getNicknameLocal();
+    const existingPasscode = getStoredPasscode();
+    const hasNickname = !!existingNickname;
+    const hasPasscode = !!existingPasscode;
+
     setS((prev) => ({
       ...prev,
       ready: true,
-      show: !existing,
+      show: !(hasNickname && hasPasscode),
       nickname: '',
       passcode: '',
       mode: 'signin',
     }));
 
+    function syncVisibility(opts?: { nickname?: string | null; passcode?: string | null }) {
+      const nicknamePresent =
+        opts && 'nickname' in opts ? !!opts.nickname : !!getNicknameLocal();
+      const passcodePresent =
+        opts && 'passcode' in opts ? !!opts.passcode : !!getStoredPasscode();
+      setS((p) => ({ ...p, show: !(nicknamePresent && passcodePresent) }));
+    }
+
     function onStorage(e: StorageEvent) {
-      if (e.key === NICKNAME_LS_KEY && e.newValue) {
-        setS((p) => ({ ...p, show: false }));
+      if (!e.key) {
+        syncVisibility();
+        return;
+      }
+      if (e.key === NICKNAME_LS_KEY) {
+        syncVisibility({ nickname: e.newValue });
+      } else if (e.key === PASSCODE_STORAGE_KEY) {
+        syncVisibility({ passcode: e.newValue });
       }
     }
+
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
   }, []);
