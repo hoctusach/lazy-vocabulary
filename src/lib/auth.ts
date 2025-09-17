@@ -3,7 +3,7 @@ import { canonNickname } from '@/core/nickname';
 import { getSupabaseClient, requireSupabaseClient } from './supabaseClient';
 
 const SESSION_STORAGE_KEY = 'lazyVoca.session';
-const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
+export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
 const AUTH_EMAIL_DOMAIN = 'app.local';
 const EXPIRATION_MARGIN_MS = 60_000;
 
