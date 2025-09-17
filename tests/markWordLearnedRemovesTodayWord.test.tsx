@@ -6,17 +6,21 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { learningProgressService } from '@/services/learningProgressService';
 import { VocabularyWord } from '@/types/vocabulary';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 
-vi.mock('@/lib/db/preferences', () => ({
-  getPreferences: vi.fn().mockResolvedValue({
+vi.mock('@/lib/progress/srsSyncByUserKey', () => ({
+  markLearnedServerByKey: vi.fn().mockResolvedValue(null)
+}));
+
+vi.mock('@/lib/preferences/localPreferences', () => ({
+  getLocalPreferences: vi.fn().mockResolvedValue({
     favorite_voice: null,
     speech_rate: null,
     is_muted: false,
     is_playing: true,
     daily_option: 'light'
   }),
-  savePreferences: vi.fn().mockResolvedValue(undefined)
+  saveLocalPreferences: vi.fn().mockResolvedValue(undefined)
 }));
 
 describe('markWordLearned', () => {
