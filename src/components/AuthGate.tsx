@@ -53,7 +53,7 @@ async function verifyNicknamePasscode(nickname: string, passcode: string): Promi
   const supabase = requireSupabaseClient();
   const { data, error } = await supabase.rpc('verify_nickname_passcode', {
     nickname,
-    passcode: toNumericPasscode(passcode),
+    passcode: toNumericPasscode(passcode), // 👈 ensure int8
   });
   if (error) {
     throw error;
@@ -67,7 +67,7 @@ async function setNicknamePasscode(nickname: string, passcode: string): Promise<
   const supabase = requireSupabaseClient();
   const { error } = await supabase.rpc('set_nickname_passcode', {
     nickname,
-    passcode: toNumericPasscode(passcode),
+    passcode: toNumericPasscode(passcode), // 👈 ensure int8
   });
   if (error) {
     throw error;
@@ -185,12 +185,12 @@ export default function AuthGate() {
         const mod = await import('../lib/sync/autoBackfillOnReload');
         void mod.autoBackfillOnReload();
       } catch {
-        // ignore backfill errors; this runs best-effort after sign-in
+        // ignore backfill errors
       }
       try {
         (await import('../lib/storage/migrateLocalVocabToDb')).migrateLocalVocabToDb?.();
       } catch {
-        // ignore migration errors; they will surface through other sync paths
+        // ignore migration errors
       }
 
       setS({
@@ -208,7 +208,8 @@ export default function AuthGate() {
       const message =
         code === 'NICKNAME_TAKEN' || code === '23505' || lowerMessage.includes('already registered')
           ? 'That nickname is already taken. Try another.'
-          : lowerMessage.includes('invalid login credentials')
+          : lowerMessage.includes('invalid login credentials') ||
+            lowerMessage.includes('incorrect passcode')
           ? 'That passcode is incorrect. Please try again.'
           : rawMessage || 'Failed to save nickname';
       setS((p) => ({ ...p, pending: false, error: message }));
