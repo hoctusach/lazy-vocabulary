@@ -9,6 +9,7 @@ import {
   upsertNickname,
 } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
+import { ensureProfile } from '@/lib/db/profiles';
 import {
   registerNicknameWithPasscode,
   signInWithPasscode,
@@ -158,6 +159,7 @@ export default function AuthGate() {
       const chosen = existing ?? (await upsertNickname(display));
 
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
+      await ensureProfile(chosen.name);
       await ensureUserKey().catch(() => null);
       if (s.mode === 'create') {
         try {
