@@ -20,7 +20,7 @@ interface LearningProgressPanelProps {
     due: number;
     learned: number;
   };
-  onGenerateDaily: (severity: SeverityLevel) => void;
+  onGenerateDaily: (severity: SeverityLevel) => void | Promise<void>;
   learnerId: string;
 }
 

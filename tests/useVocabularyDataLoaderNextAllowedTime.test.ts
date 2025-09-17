@@ -23,7 +23,8 @@ vi.mock('@/services/vocabularyService', () => ({
 vi.mock('@/services/learningProgressService', () => ({
   learningProgressService: {
     getTodaySelection: vi.fn(),
-    forceGenerateDailySelection: vi.fn()
+    forceGenerateDailySelection: vi.fn(),
+    syncServerDueWords: vi.fn().mockResolvedValue([])
   }
 }));
 

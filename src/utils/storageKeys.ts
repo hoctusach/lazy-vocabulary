@@ -6,3 +6,5 @@ export const TRANSLATION_LANG_KEY = 'translationLang';
 export const LEARNING_PROGRESS_KEY = 'learningProgress';
 export const DAILY_SELECTION_KEY = 'dailySelection';
 export const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
+export const TODAY_WORDS_KEY = 'todayWords';
+export const LAST_SYNC_DATE_KEY = 'lastSyncDate';

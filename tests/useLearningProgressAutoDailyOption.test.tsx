@@ -35,7 +35,8 @@ vi.mock('@/services/learningProgressService', () => ({
     getWordProgress: vi.fn(),
     getLearnedWords: vi.fn().mockReturnValue([]),
     markWordLearned: vi.fn(),
-    markWordAsNew: vi.fn()
+    markWordAsNew: vi.fn(),
+    syncServerDueWords: vi.fn().mockResolvedValue([])
   }
 }));
 
