@@ -29,10 +29,10 @@ const VocabularyAppWithLearning: React.FC = () => {
     progressStats,
     generateDailyWords,
     markWordAsPlayed,
-    getLearnedWords,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
-    todayWords
+    todayWords,
+    learnedWords
   } = useLearningProgress(allWords);
 
   // Load vocabulary data
@@ -75,7 +75,13 @@ const VocabularyAppWithLearning: React.FC = () => {
     };
   }, [markWordAsPlayed]);
 
-  const learnedWords = getLearnedWords();
+  const learnedWordsList = Array.isArray(learnedWords) ? learnedWords : [];
+
+  useEffect(() => {
+    if (dailySelection) {
+      setSummaryOpen(true);
+    }
+  }, [dailySelection]);
 
   const openSearch = (word?: string) => {
     const normalized = normalizeQuery(word || '');
@@ -163,10 +169,10 @@ const VocabularyAppWithLearning: React.FC = () => {
               )}
 
               <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Learned ({learnedWords.length})</h4>
+                <h4 className="font-medium text-gray-600">Learned ({learnedWordsList.length})</h4>
                 <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {learnedWords.length > 0 ? (
-                    learnedWords.map((word, index) => (
+                  {learnedWordsList.length > 0 ? (
+                    learnedWordsList.map((word, index) => (
                       <div
                         key={index}
                         className="text-sm p-2 bg-gray-50 rounded border opacity-75 flex items-center justify-between"

@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { VocabularyWord } from '@/types/vocabulary';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -30,6 +30,13 @@ vi.mock('@/components/vocabulary-app/VocabularyAppContainerNew', () => ({
     );
   }
 }));
+
+vi.mock('@/components/vocabulary-app/WordSearchModal', () => {
+  const React = require('react');
+  return {
+    default: ({ isOpen }: { isOpen: boolean }) => (isOpen ? <div role="dialog">Search</div> : null)
+  };
+});
 
 vi.mock('@/hooks/useLearningProgress', () => {
   const React = require('react');
@@ -77,7 +84,8 @@ vi.mock('@/hooks/useLearningProgress', () => {
           }
         }),
         markWordAsPlayed: vi.fn(),
-        getLearnedWords: () => [],
+        learnedWords: [],
+        refreshLearnedWords: vi.fn(),
         markWordLearned: vi.fn(),
         markWordAsNew: vi.fn(),
         todayWords: [
@@ -97,7 +105,8 @@ vi.mock('@/services/vocabularyService', () => ({
     getWordList: vi.fn().mockReturnValue([]),
     getCurrentWord: vi.fn().mockReturnValue(null),
     addVocabularyChangeListener: vi.fn(),
-    removeVocabularyChangeListener: vi.fn()
+    removeVocabularyChangeListener: vi.fn(),
+    hasData: vi.fn().mockReturnValue(true)
   }
 }));
 
@@ -146,7 +155,8 @@ describe('VocabularyAppWithLearning due reviews', () => {
     expect(
       screen.getByText("Today's Due Review (2)")
     ).toBeInTheDocument();
-    expect(screen.getByText('apple')).toBeInTheDocument();
+    const appleEntries = screen.getAllByText('apple');
+    expect(appleEntries.length).toBeGreaterThan(0);
     expect(screen.getByText('banana')).toBeInTheDocument();
 
     const lightButton = screen.getByRole('button', {
@@ -159,7 +169,13 @@ describe('VocabularyAppWithLearning due reviews', () => {
         screen.getByText("Today's Due Review (1)")
       ).toBeInTheDocument()
     );
-    expect(screen.getByText('apple')).toBeInTheDocument();
-    expect(screen.queryByText('banana')).not.toBeInTheDocument();
+    const remainingApples = screen.getAllByText('apple');
+    expect(remainingApples.length).toBeGreaterThan(0);
+    const dueReviewHeading = screen.getByText("Today's Due Review (1)");
+    const dueReviewSection = dueReviewHeading.closest('div');
+    expect(dueReviewSection).not.toBeNull();
+    if (dueReviewSection) {
+      expect(within(dueReviewSection).queryByText('banana')).not.toBeInTheDocument();
+    }
   });
 });
