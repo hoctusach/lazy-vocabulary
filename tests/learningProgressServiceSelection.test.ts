@@ -1,7 +1,8 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { LearningProgressService } from '@/services/learningProgressService';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearningProgress } from '@/types/learning';
+import * as learnedDb from '@/lib/db/learned';
 
 function createLocalStorageMock(): Storage {
   const store = new Map<string, string>();
@@ -39,6 +40,10 @@ describe('LearningProgressService daily selection persistence', () => {
     });
 
     service = LearningProgressService.getInstance();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('generates a daily selection and stores it under the current date key', () => {
@@ -99,5 +104,46 @@ describe('LearningProgressService daily selection persistence', () => {
   it('returns null when there is no cached selection for today', () => {
     localStorage.clear();
     expect(service.getTodaySelection()).toBeNull();
+  });
+
+  it('caches Supabase due words for the current day', async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const getLearnedSpy = vi
+      .spyOn(learnedDb, 'getLearned')
+      .mockResolvedValue([
+        { word_id: 'fruit::apple', in_review_queue: true },
+        { word_id: 'fruit::apple', in_review_queue: true },
+        { word_id: 'fruit::banana', in_review_queue: false }
+      ]);
+
+    const result = await service.syncServerDueWords();
+    expect(result).toEqual(['fruit::apple']);
+    expect(getLearnedSpy).toHaveBeenCalledTimes(1);
+
+    const storedWords = localStorage.getItem('todayWords');
+    expect(storedWords).toBe(JSON.stringify(['fruit::apple']));
+    expect(localStorage.getItem('lastSyncDate')).toBe(today);
+
+    getLearnedSpy.mockClear();
+    const secondResult = await service.syncServerDueWords();
+    expect(secondResult).toEqual(['fruit::apple']);
+    expect(getLearnedSpy).not.toHaveBeenCalled();
+  });
+
+  it('includes cached server due words in the review selection', async () => {
+    vi.spyOn(learnedDb, 'getLearned').mockResolvedValue([
+      { word_id: 'fruit::apple', in_review_queue: true }
+    ]);
+
+    await service.syncServerDueWords();
+
+    const words: VocabularyWord[] = [
+      { word: 'apple', meaning: '', example: '', category: 'fruit', count: 1 },
+      { word: 'banana', meaning: '', example: '', category: 'fruit', count: 1 }
+    ];
+
+    const selection = service.forceGenerateDailySelection(words, 'light');
+    expect(selection.reviewWords.map(w => w.word)).toContain('apple');
+    expect(selection.newWords.some(w => w.word === 'apple')).toBe(false);
   });
 });

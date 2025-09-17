@@ -87,6 +87,12 @@ export const useVocabularyDataLoader = (
           // ignore preference loading errors
         }
 
+        try {
+          await learningProgressService.syncServerDueWords();
+        } catch (error) {
+          console.warn('[DATA-LOADER] Failed to sync server due words', error);
+        }
+
         const selection =
           learningProgressService.getTodaySelection() ||
           learningProgressService.forceGenerateDailySelection(allWords, severity);

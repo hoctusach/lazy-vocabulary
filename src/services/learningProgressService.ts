@@ -7,9 +7,12 @@ import type {
 } from '@/types/learning';
 import { getLearned, upsertLearned } from '@/lib/db/learned';
 import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
+import { toWordId } from '@/lib/words/ids';
 import {
   DAILY_SELECTION_KEY,
-  LEARNING_PROGRESS_KEY
+  LAST_SYNC_DATE_KEY,
+  LEARNING_PROGRESS_KEY,
+  TODAY_WORDS_KEY
 } from '@/utils/storageKeys';
 
 const DEFAULT_SEVERITY_CONFIG: SeverityConfig = {
@@ -52,6 +55,96 @@ export class LearningProgressService {
 
   private getSelectionStorageKey(date: string): string {
     return `${DAILY_SELECTION_KEY}:${date}`;
+  }
+
+  private normaliseWordId(wordId: string | undefined | null): string {
+    if (typeof wordId !== 'string') return '';
+    return wordId.trim().toLowerCase();
+  }
+
+  private normaliseWordIdList(values: unknown[]): string[] {
+    const ids: string[] = [];
+    for (const value of values) {
+      if (typeof value === 'string') {
+        const normalised = this.normaliseWordId(value);
+        if (normalised) ids.push(normalised);
+        continue;
+      }
+
+      if (value && typeof value === 'object') {
+        const candidate = (value as { word_id?: unknown; id?: unknown }).word_id ??
+          (value as { id?: unknown }).id;
+        if (typeof candidate === 'string') {
+          const normalised = this.normaliseWordId(candidate);
+          if (normalised) ids.push(normalised);
+        }
+      }
+    }
+
+    return Array.from(new Set(ids));
+  }
+
+  private parseCachedWordIds(raw: string | null): string[] {
+    if (!raw) return [];
+
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        return this.normaliseWordIdList(parsed);
+      }
+
+      if (parsed && typeof parsed === 'object') {
+        const withIds = parsed as { dueWordIds?: unknown; words?: unknown };
+        if (Array.isArray(withIds.dueWordIds)) {
+          return this.normaliseWordIdList(withIds.dueWordIds);
+        }
+        if (Array.isArray(withIds.words)) {
+          return this.normaliseWordIdList(withIds.words);
+        }
+      }
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to parse cached due words', error);
+    }
+
+    return [];
+  }
+
+  private getCachedServerDueWordSet(date: string): Set<string> {
+    const storage = this.getStorage();
+    if (!storage) return new Set();
+
+    const lastSync = storage.getItem(LAST_SYNC_DATE_KEY);
+    if (!lastSync || lastSync !== date) {
+      return new Set();
+    }
+
+    const ids = this.parseCachedWordIds(storage.getItem(TODAY_WORDS_KEY));
+    return new Set(ids);
+  }
+
+  private persistServerDueWordIds(date: string, wordIds: string[]): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    try {
+      const unique = Array.from(new Set(wordIds.map(id => this.normaliseWordId(id)).filter(Boolean)));
+      storage.setItem(TODAY_WORDS_KEY, JSON.stringify(unique));
+      storage.setItem(LAST_SYNC_DATE_KEY, date);
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to persist server due words', error);
+    }
+  }
+
+  private isInReviewQueue(value: unknown): boolean {
+    if (value === true) return true;
+    if (typeof value === 'number') {
+      return Number.isFinite(value) && value > 0;
+    }
+    if (typeof value === 'string') {
+      const normalised = value.trim().toLowerCase();
+      return normalised === 'true' || normalised === '1' || normalised === 'yes';
+    }
+    return false;
   }
 
   private buildWordKey(word: string, category?: string): string {
@@ -495,6 +588,44 @@ export class LearningProgressService {
     return this.normaliseProgress(baseWord, resolved.entry);
   }
 
+  async syncServerDueWords(): Promise<string[]> {
+    const storage = this.getStorage();
+    if (!storage) return [];
+
+    const todayKey = this.getTodayKey();
+    const lastSync = storage.getItem(LAST_SYNC_DATE_KEY);
+    if (lastSync === todayKey) {
+      return Array.from(this.getCachedServerDueWordSet(todayKey));
+    }
+
+    try {
+      const rows = await getLearned();
+      const dueIds = new Set<string>();
+
+      for (const row of rows ?? []) {
+        if (!row || typeof row !== 'object') continue;
+
+        const inQueue = this.isInReviewQueue((row as { in_review_queue?: unknown }).in_review_queue);
+        if (!inQueue) continue;
+
+        const wordIdValue = (row as { word_id?: unknown }).word_id;
+        if (typeof wordIdValue !== 'string') continue;
+
+        const normalised = this.normaliseWordId(wordIdValue);
+        if (!normalised) continue;
+
+        dueIds.add(normalised);
+      }
+
+      const result = Array.from(dueIds);
+      this.persistServerDueWordIds(todayKey, result);
+      return result;
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to sync due words from Supabase', error);
+      return Array.from(this.getCachedServerDueWordSet(todayKey));
+    }
+  }
+
   forceGenerateDailySelection(
     words: VocabularyWord[],
     severity: SeverityLevel = 'light'
@@ -505,17 +636,24 @@ export class LearningProgressService {
     const config = this.severityConfig[severityKey];
     const todayKey = this.getTodayKey();
     const progressMap = this.loadProgressMap();
+    const serverDueSet = this.getCachedServerDueWordSet(todayKey);
 
     const reviewCandidates: LearningProgress[] = [];
     const newCandidates: LearningProgress[] = [];
 
     for (const word of words) {
       const stored = this.getStoredProgress(progressMap, word);
+      const wordId = this.normaliseWordId(toWordId(word.word, word.category));
+      const isServerDue = serverDueSet.has(wordId);
+
       if (stored) {
         const normalised = this.normaliseProgress(word, stored);
-        if (this.isDue(stored)) {
+        if (isServerDue || this.isDue(stored)) {
           normalised.status = 'due';
           reviewCandidates.push(normalised);
+          if (isServerDue) {
+            serverDueSet.delete(wordId);
+          }
           continue;
         }
 
@@ -523,6 +661,24 @@ export class LearningProgressService {
           normalised.status = 'new';
           newCandidates.push(normalised);
         }
+        continue;
+      }
+
+      if (isServerDue) {
+        const nowIso = new Date().toISOString();
+        const normalised = this.normaliseProgress(word, {
+          word: word.word,
+          category: word.category,
+          isLearned: true,
+          status: 'due',
+          reviewCount: 1,
+          nextReviewDate: todayKey,
+          lastPlayedDate: nowIso,
+          nextAllowedTime: nowIso
+        });
+        normalised.status = 'due';
+        reviewCandidates.push(normalised);
+        serverDueSet.delete(wordId);
         continue;
       }
 

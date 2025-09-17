@@ -26,6 +26,8 @@ vi.mock('@/lib/preferences/localPreferences', () => ({
 describe('markWordLearned', () => {
   beforeEach(() => {
     localStorage.clear();
+    vi.spyOn(learningProgressService, 'syncServerDueWords').mockResolvedValue([]);
+    vi.spyOn(learningProgressService, 'getLearnedWords').mockResolvedValue([]);
   });
 
   it('removes word from todayWords and cached daily selection', async () => {

@@ -65,6 +65,7 @@ describe('useLearningProgress due reviews', () => {
     });
     vi.spyOn(learningProgressService, 'getTodaySelection').mockReturnValue(selection);
     vi.spyOn(learningProgressService, 'forceGenerateDailySelection').mockReturnValue(selection);
+    vi.spyOn(learningProgressService, 'syncServerDueWords').mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -76,8 +77,8 @@ describe('useLearningProgress due reviews', () => {
     await act(() => Promise.resolve());
     expect(result.current.todayWords.map(w => w.word)).toContain('apple');
 
-    await act(() => {
-      result.current.generateDailyWords('light');
+    await act(async () => {
+      await result.current.generateDailyWords('light');
     });
     await act(() => Promise.resolve());
     expect(result.current.todayWords.map(w => w.word)).toContain('apple');

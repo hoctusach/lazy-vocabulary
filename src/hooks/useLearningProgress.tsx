@@ -27,15 +27,24 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     setProgressStats(stats);
   }, []);
 
-  const generateDailyWords = useCallback((severity: SeverityLevel = 'light') => {
-    if (allWords.length === 0) return;
+  const generateDailyWords = useCallback(
+    async (severity: SeverityLevel = 'light') => {
+      if (allWords.length === 0) return;
 
-    // Force regeneration when user clicks the buttons
-    const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
-    setDailySelection(selection);
-    refreshStats();
-    void saveLocalPreferences({ daily_option: severity });
-  }, [allWords, refreshStats]);
+      try {
+        await learningProgressService.syncServerDueWords();
+      } catch (error) {
+        console.warn('[useLearningProgress] Failed to sync server due words', error);
+      }
+
+      // Force regeneration when user clicks the buttons
+      const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
+      setDailySelection(selection);
+      refreshStats();
+      void saveLocalPreferences({ daily_option: severity });
+    },
+    [allWords, refreshStats]
+  );
 
   const markWordAsPlayed = useCallback(
     (word: string) => {
@@ -85,6 +94,12 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
         }
       } catch {
         // ignore preference loading errors
+      }
+
+      try {
+        await learningProgressService.syncServerDueWords();
+      } catch (error) {
+        console.warn('[useLearningProgress] Failed to sync server due words', error);
       }
 
       let selection = learningProgressService.getTodaySelection();
