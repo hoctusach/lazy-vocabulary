@@ -288,9 +288,6 @@ export async function autoBackfillOnReload(): Promise<void> {
   const userKey = await ensureUserKey();
   if (!userKey) return;
 
-  const userKey = await ensureUserKey();
-  if (!userKey) return;
-
   const progress = extractLearningProgress();
   const counts = extractWordCounts();
   const dailySelection = extractDailySelection();
