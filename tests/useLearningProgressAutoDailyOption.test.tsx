@@ -7,17 +7,17 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { DailySelection } from '@/types/learning';
 import { learningProgressService } from '@/services/learningProgressService';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 
-vi.mock('@/lib/db/preferences', () => ({
-  getPreferences: vi.fn().mockResolvedValue({
+vi.mock('@/lib/preferences/localPreferences', () => ({
+  getLocalPreferences: vi.fn().mockResolvedValue({
     favorite_voice: null,
     speech_rate: null,
     is_muted: false,
     is_playing: true,
     daily_option: null
   }),
-  savePreferences: vi.fn().mockResolvedValue(undefined)
+  saveLocalPreferences: vi.fn().mockResolvedValue(undefined)
 }));
 
 vi.mock('@/services/learningProgressService', () => ({
@@ -59,9 +59,9 @@ describe('useLearningProgress daily option default', () => {
     renderHook(() => useLearningProgress(words));
 
     await waitFor(() => {
-      expect(getPreferences).toHaveBeenCalled();
+      expect(getLocalPreferences).toHaveBeenCalled();
       expect(learningProgressService.forceGenerateDailySelection).toHaveBeenCalledWith(words, 'light');
-      expect(savePreferences).toHaveBeenCalledWith({ daily_option: 'light' });
+      expect(saveLocalPreferences).toHaveBeenCalledWith({ daily_option: 'light' });
     });
   });
 });

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { learningProgressService } from '@/services/learningProgressService';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
 import type { SeverityLevel } from '@/types/learning';
@@ -78,10 +78,10 @@ export const useVocabularyDataLoader = (
 
         let severity: SeverityLevel = 'light';
         try {
-          const prefs = await getPreferences();
+          const prefs = await getLocalPreferences();
           severity = (prefs.daily_option as SeverityLevel) || 'light';
           if (!prefs.daily_option) {
-            await savePreferences({ daily_option: 'light' });
+            await saveLocalPreferences({ daily_option: 'light' });
           }
         } catch {
           // ignore preference loading errors

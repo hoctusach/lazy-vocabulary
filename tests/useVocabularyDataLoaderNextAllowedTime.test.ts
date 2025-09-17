@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { renderHook } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { useVocabularyDataLoader } from '@/hooks/vocabulary-controller/core/useVocabularyDataLoader';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -29,15 +29,16 @@ vi.mock('@/services/learningProgressService', () => ({
 
 vi.mock('@/utils/lastWordStorage', () => ({ getTodayLastWord: vi.fn() }));
 vi.mock('@/utils/text/findFuzzyIndex', () => ({ findFuzzyIndex: vi.fn() }));
-vi.mock('@/lib/db/preferences', () => ({
-  getPreferences: vi.fn().mockResolvedValue({
+vi.mock('@/lib/preferences/localPreferences', () => ({
+  getLocalPreferences: vi.fn().mockResolvedValue({
     favorite_voice: null,
     speech_rate: null,
     is_muted: false,
     is_playing: true,
     daily_option: 'light'
   }),
-  savePreferences: vi.fn().mockResolvedValue(undefined)
+  saveLocalPreferences: vi.fn().mockResolvedValue(undefined),
+  setFavoriteVoice: vi.fn()
 }));
 
 const localStorageMock = {
@@ -62,7 +63,7 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
     vi.useRealTimers();
   });
 
-  it('starts at first due word', () => {
+  it('starts at first due word', async () => {
     const words: VocabularyWord[] = [
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
@@ -91,12 +92,16 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
 
+    await act(async () => {
+      await Promise.resolve();
+    });
+
     expect(setWordList).toHaveBeenCalled();
     expect(setHasData).toHaveBeenCalledWith(true);
     expect(setCurrentIndex).toHaveBeenCalledWith(1);
   });
 
-  it('resumes from saved last word for today', () => {
+  it('resumes from saved last word for today', async () => {
     const words: VocabularyWord[] = [
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
@@ -127,10 +132,14 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
       useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
 
+    await act(async () => {
+      await Promise.resolve();
+    });
+
     expect(setCurrentIndex).toHaveBeenCalledWith(1);
   });
 
-  it('schedules timer when no words are due', () => {
+  it('schedules timer when no words are due', async () => {
     const words: VocabularyWord[] = [
       { word: 'a', meaning: '', example: '', category: 'c', count: 1 },
       { word: 'b', meaning: '', example: '', category: 'c', count: 1 }
@@ -160,6 +169,10 @@ describe('useVocabularyDataLoader nextAllowedTime handling', () => {
     renderHook(() =>
       useVocabularyDataLoader(setWordList, setHasData, setCurrentIndex, 0, 'v', vi.fn())
     );
+
+    await act(async () => {
+      await Promise.resolve();
+    });
 
     expect(setCurrentIndex).toHaveBeenCalledWith(0);
     expect(setTimeoutSpy).toHaveBeenCalled();

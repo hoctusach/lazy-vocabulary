@@ -3,7 +3,7 @@ import { learningProgressService } from '@/services/learningProgressService';
 import { DailySelection, SeverityLevel, LearningProgress } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { buildTodaysWords } from '@/utils/todayWords';
-import { getPreferences, savePreferences } from '@/lib/db/preferences';
+import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 import { toWordId } from '@/lib/words/ids';
 import { markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 
@@ -34,7 +34,7 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     const selection = learningProgressService.forceGenerateDailySelection(allWords, severity);
     setDailySelection(selection);
     refreshStats();
-    void savePreferences({ daily_option: severity });
+    void saveLocalPreferences({ daily_option: severity });
   }, [allWords, refreshStats]);
 
   const markWordAsPlayed = useCallback(
@@ -78,10 +78,10 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     const init = async () => {
       let severity: SeverityLevel = 'light';
       try {
-        const prefs = await getPreferences();
+        const prefs = await getLocalPreferences();
         severity = (prefs.daily_option as SeverityLevel) || 'light';
         if (!prefs.daily_option) {
-          await savePreferences({ daily_option: 'light' });
+          await saveLocalPreferences({ daily_option: 'light' });
         }
       } catch {
         // ignore preference loading errors
