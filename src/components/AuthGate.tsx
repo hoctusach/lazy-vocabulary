@@ -171,8 +171,8 @@ export default function AuthGate() {
       const existing = await getNicknameByKey(key);
       const chosen = existing ?? (await upsertNickname(display));
 
-      localStorage.setItem(NICKNAME_LS_KEY, chosen.display_name);
-      await ensureProfile(chosen.display_name);
+      localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
+      await ensureProfile(chosen.name);
       await ensureUserKey().catch(() => null);
       if (s.mode === 'create') {
         try {
@@ -196,7 +196,7 @@ export default function AuthGate() {
       setS({
         ready: true,
         show: false,
-        nickname: chosen.display_name,
+        nickname: chosen.name,
         passcode: '',
         pending: false,
         mode: 'signin',
