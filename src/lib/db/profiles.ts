@@ -2,9 +2,14 @@ import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@
 import { getSupabaseClient } from './supabase';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
 
-export async function ensureProfile(
-  nickname: string
-): Promise<{ user_id: string; nickname: string } | null> {
+type NicknameProfile = {
+  id: string;
+  name: string;
+  user_unique_key: string;
+  passcode: number | null;
+};
+
+export async function ensureProfile(nickname: string): Promise<NicknameProfile | null> {
   if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
   const supabase = getSupabaseClient();
   if (!supabase) return null;
@@ -13,17 +18,41 @@ export async function ensureProfile(
   const activeSession = ensuredSession ?? (await getActiveSession());
   const user = activeSession?.user;
   if (!user) throw new Error('Authentication required to update profile.');
-  const nickname_canon = canonNickname(nickname);
-  const { data: dupe } = await supabase
-    .from('profiles')
+  const nicknameKey = canonNickname(nickname);
+
+  const { data: taken, error: takenError } = await supabase
+    .from('nicknames')
     .select('user_id')
-    .eq('nickname_canon', nickname_canon)
-    .not('user_id', 'eq', user.id)
-    .maybeSingle();
-  if (dupe) throw { code: 'NICKNAME_TAKEN' };
-  const { error: upsertError } = await supabase
-    .from('profiles')
-    .upsert({ user_id: user.id, nickname, nickname_canon, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
-  if (upsertError) throw upsertError;
-  return { user_id: user.id, nickname };
+    .eq('user_unique_key', nicknameKey)
+    .maybeSingle<{ user_id: string | null }>();
+
+  if (takenError && takenError.code !== 'PGRST116') {
+    throw takenError;
+  }
+
+  if (taken && taken.user_id && taken.user_id !== user.id) {
+    throw { code: 'NICKNAME_TAKEN' };
+  }
+
+  const { data, error: upsertError } = await supabase
+    .from('nicknames')
+    .upsert({ user_id: user.id, name: nickname }, { onConflict: 'user_id' })
+    .select('id, name, user_unique_key, passcode')
+    .maybeSingle<{ id: string | number; name: string; user_unique_key: string; passcode: number | null }>();
+
+  if (upsertError) {
+    if (upsertError.code === '23505') {
+      throw { code: 'NICKNAME_TAKEN' };
+    }
+    throw upsertError;
+  }
+
+  if (!data) return null;
+
+  return {
+    id: typeof data.id === 'string' ? data.id : String(data.id),
+    name: data.name,
+    user_unique_key: data.user_unique_key,
+    passcode: data.passcode ?? null,
+  };
 }
