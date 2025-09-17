@@ -246,8 +246,27 @@ export default function AuthGate() {
           background: '#fff',
           boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
           fontFamily: 'system-ui, sans-serif',
+          position: 'relative',
         }}
       >
+        <button
+          type="button"
+          onClick={() => setS((p) => ({ ...p, show: false }))}
+          style={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            border: 'none',
+            background: 'transparent',
+            fontSize: 20,
+            lineHeight: 1,
+            cursor: 'pointer',
+            color: '#666',
+          }}
+          aria-label="Close"
+        >
+          ×
+        </button>
         <h3 style={{ margin: 0 }}>Access your vocabulary</h3>
         <p style={{ marginTop: 6, color: '#555', fontSize: 14 }}>
           Enter your nickname and passcode to sync progress across devices. First time here? Create a passcode below.
