@@ -41,21 +41,34 @@ function validatePasscode(passcode: string): string | null {
   return null;
 }
 
-async function verifyProfilePasscode(nickname: string, passcode: string): Promise<string | null> {
+function toNumericPasscode(passcode: string): number {
+  const numeric = Number.parseInt(passcode, 10);
+  if (Number.isNaN(numeric)) {
+    throw new Error('Passcode must be numeric.');
+  }
+  return numeric;
+}
+
+async function verifyNicknamePasscode(nickname: string, passcode: string): Promise<string | null> {
   const supabase = requireSupabaseClient();
-  const { data, error } = await supabase.rpc('verify_profile_passcode', {
-    p_nickname: nickname,
-    p_passcode: passcode,
+  const { data, error } = await supabase.rpc('verify_nickname_passcode', {
+    nickname,
+    passcode: toNumericPasscode(passcode),
   });
   if (error) {
     throw error;
   }
-  return typeof data === 'string' && data.length ? data : null;
+  const row = Array.isArray(data) ? data[0] : null;
+  const key = row?.user_unique_key;
+  return typeof key === 'string' && key.length ? key : null;
 }
 
-async function setProfilePasscode(passcode: string): Promise<void> {
+async function setNicknamePasscode(nickname: string, passcode: string): Promise<void> {
   const supabase = requireSupabaseClient();
-  const { error } = await supabase.rpc('set_profile_passcode', { p_passcode: passcode });
+  const { error } = await supabase.rpc('set_nickname_passcode', {
+    nickname,
+    passcode: toNumericPasscode(passcode),
+  });
   if (error) {
     throw error;
   }
@@ -138,7 +151,7 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        const verified = await verifyProfilePasscode(display, passcodeInput);
+        const verified = await verifyNicknamePasscode(display, passcodeInput);
         if (!verified) {
           setS((p) => ({
             ...p,
@@ -163,9 +176,9 @@ export default function AuthGate() {
       await ensureUserKey().catch(() => null);
       if (s.mode === 'create') {
         try {
-          await setProfilePasscode(passcodeInput);
+          await setNicknamePasscode(display, passcodeInput);
         } catch (rpcErr) {
-          console.warn('auth:set_profile_passcode', (rpcErr as Error).message);
+          console.warn('auth:set_nickname_passcode', (rpcErr as Error).message);
         }
       }
       try {
