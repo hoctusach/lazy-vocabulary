@@ -5,7 +5,7 @@ import type {
   SeverityConfig,
   SeverityLevel
 } from '@/types/learning';
-import { getLearned, upsertLearned, setReview } from '@/lib/db/learned';
+import { getLearned, upsertLearned } from '@/lib/db/learned';
 import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import {
   DAILY_SELECTION_KEY,
@@ -17,6 +17,11 @@ const DEFAULT_SEVERITY_CONFIG: SeverityConfig = {
   moderate: { min: 30, max: 50 },
   intense: { min: 50, max: 100 }
 };
+
+const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
+const MASTER_INTERVAL_DAYS = 60;
+const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
+const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 
 type StoredProgress = Partial<LearningProgress> & {
   word?: string;
@@ -80,6 +85,165 @@ export class LearningProgressService {
     }
 
     return {};
+  }
+
+  private saveProgressMap(progressMap: Record<string, StoredProgress>): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    try {
+      storage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(progressMap));
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to persist learning progress', error);
+    }
+  }
+
+  private parseWordKey(wordKey: string): { word: string; category?: string } {
+    const trimmed = (wordKey ?? '').trim();
+    if (!trimmed) {
+      return { word: '' };
+    }
+
+    const parts = trimmed.split('::');
+    if (parts.length >= 2) {
+      const [word, ...categoryParts] = parts;
+      const category = categoryParts.join('::').trim();
+      return { word: word.trim(), category: category || undefined };
+    }
+
+    return { word: trimmed };
+  }
+
+  private resolveProgressEntry(
+    progressMap: Record<string, StoredProgress>,
+    wordKey: string
+  ): {
+    key?: string;
+    entry?: StoredProgress;
+    word: string;
+    category?: string;
+  } {
+    const parsed = this.parseWordKey(wordKey);
+    let word = parsed.word;
+    const category = parsed.category;
+    const candidates = new Set<string>();
+
+    const trimmedKey = (wordKey ?? '').trim();
+    if (trimmedKey) candidates.add(trimmedKey);
+
+    const builtKey = this.buildWordKey(parsed.word, parsed.category);
+    if (builtKey) candidates.add(builtKey);
+
+    if (parsed.word) candidates.add(parsed.word);
+
+    for (const candidate of candidates) {
+      if (!candidate) continue;
+      const entry = progressMap[candidate];
+      if (!entry) continue;
+      return {
+        key: candidate,
+        entry,
+        word: typeof entry.word === 'string' && entry.word.trim() ? entry.word : word,
+        category: entry.category ?? category
+      };
+    }
+
+    for (const [key, entry] of Object.entries(progressMap)) {
+      if (!entry) continue;
+      const storedWord = typeof entry.word === 'string' ? entry.word : '';
+      if (storedWord && (storedWord === parsed.word || storedWord === trimmedKey)) {
+        return {
+          key,
+          entry,
+          word: storedWord,
+          category: entry.category ?? category
+        };
+      }
+    }
+
+    if (!word && trimmedKey) {
+      word = trimmedKey;
+    }
+
+    return {
+      key: builtKey || trimmedKey || word,
+      word,
+      category
+    };
+  }
+
+  private coerceReviewCount(value: unknown): number {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  private calculateNextReviewDate(reviewCount: number, from: Date): string {
+    const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
+    const intervalDays =
+      reviewCount > REVIEW_INTERVALS_DAYS.length
+        ? MASTER_INTERVAL_DAYS
+        : REVIEW_INTERVALS_DAYS[index];
+    const next = new Date(from);
+    next.setDate(next.getDate() + intervalDays);
+    return next.toISOString().slice(0, 10);
+  }
+
+  private calculateNextAllowedTime(reviewCount: number, from: Date): string {
+    const index = Math.max(0, reviewCount - 1);
+    const delayMinutes =
+      index < EXPOSURE_DELAYS_MINUTES.length
+        ? EXPOSURE_DELAYS_MINUTES[index]
+        : MASTER_EXPOSURE_DELAY_MINUTES;
+    const next = new Date(from.getTime() + delayMinutes * 60_000);
+    return next.toISOString();
+  }
+
+  private determineStatus(
+    reviewCount: number,
+    nextReviewDate: string,
+    isLearned: boolean
+  ): LearningProgress['status'] {
+    if (!isLearned || reviewCount === 0) {
+      return 'new';
+    }
+
+    const due = this.isDue({ nextReviewDate } as StoredProgress);
+    if (due) {
+      return 'due';
+    }
+
+    if (reviewCount >= REVIEW_INTERVALS_DAYS.length + 1) {
+      return 'learned';
+    }
+
+    return 'not_due';
+  }
+
+  private assignProgressEntry(
+    progressMap: Record<string, StoredProgress>,
+    preferredKey: string | undefined,
+    progress: StoredProgress
+  ): void {
+    const key = (preferredKey ?? '').trim() || this.buildWordKey(progress.word ?? '', progress.category);
+    if (!key) return;
+
+    progressMap[key] = progress;
+
+    const { word, category } = progress;
+    if (!word) return;
+
+    for (const existingKey of Object.keys(progressMap)) {
+      if (existingKey === key) continue;
+      const entry = progressMap[existingKey];
+      if (!entry) continue;
+      if (entry.word !== word) continue;
+      if (category && entry.category && entry.category !== category) continue;
+      if (!category && entry.category) continue;
+      delete progressMap[existingKey];
+    }
   }
 
   private normaliseProgress(
@@ -172,10 +336,60 @@ export class LearningProgressService {
 
   async markWordLearned(wordKey: string): Promise<void> {
     await upsertLearned(wordKey, false);
+
+    const progressMap = this.loadProgressMap();
+    const resolved = this.resolveProgressEntry(progressMap, wordKey);
+    if (!resolved.word) return;
+
+    const now = new Date();
+    const todayKey = this.getTodayKey();
+    const learnedAt = now.toISOString();
+
+    const category = resolved.category ?? resolved.entry?.category;
+
+    const updated: StoredProgress = {
+      ...resolved.entry,
+      word: resolved.word,
+      category,
+      isLearned: true,
+      reviewCount: this.coerceReviewCount(resolved.entry?.reviewCount),
+      lastPlayedDate: resolved.entry?.lastPlayedDate ?? learnedAt,
+      status: 'learned',
+      nextReviewDate: '',
+      createdDate: resolved.entry?.createdDate ?? todayKey,
+      learnedDate: resolved.entry?.learnedDate ?? learnedAt,
+      nextAllowedTime: undefined
+    };
+
+    this.assignProgressEntry(progressMap, resolved.key, updated);
+    this.saveProgressMap(progressMap);
   }
 
-  async markWordAsNew(wordKey: string): Promise<void> {
-    await setReview(wordKey, false);
+  markWordAsNew(wordKey: string): void {
+    const progressMap = this.loadProgressMap();
+    const resolved = this.resolveProgressEntry(progressMap, wordKey);
+    if (!resolved.word) return;
+
+    const todayKey = this.getTodayKey();
+
+    const category = resolved.category ?? resolved.entry?.category;
+
+    const updated: StoredProgress = {
+      ...resolved.entry,
+      word: resolved.word,
+      category,
+      isLearned: false,
+      reviewCount: 0,
+      lastPlayedDate: '',
+      status: 'new',
+      nextReviewDate: '',
+      createdDate: resolved.entry?.createdDate ?? todayKey,
+      learnedDate: undefined,
+      nextAllowedTime: undefined
+    };
+
+    this.assignProgressEntry(progressMap, resolved.key, updated);
+    this.saveProgressMap(progressMap);
   }
 
   getProgressStats() {
@@ -229,11 +443,56 @@ export class LearningProgressService {
   }
 
   updateWordProgress(wordKey: string): void {
-    void upsertLearned(wordKey, true);
+    const progressMap = this.loadProgressMap();
+    const resolved = this.resolveProgressEntry(progressMap, wordKey);
+    if (!resolved.word) return;
+
+    const now = new Date();
+    const todayKey = this.getTodayKey();
+    const existing = resolved.entry;
+    const category = resolved.category ?? existing?.category;
+    const previousCount = this.coerceReviewCount(existing?.reviewCount);
+    const reviewCount = previousCount + 1;
+    const nextReviewDate = this.calculateNextReviewDate(reviewCount, now);
+    const nextAllowedTime = this.calculateNextAllowedTime(reviewCount, now);
+    const learnedDate =
+      typeof existing?.learnedDate === 'string' && existing.learnedDate.trim()
+        ? existing.learnedDate
+        : now.toISOString();
+    const isLearned = true;
+    const status = this.determineStatus(reviewCount, nextReviewDate, isLearned);
+
+    const updated: StoredProgress = {
+      ...existing,
+      word: resolved.word,
+      category,
+      isLearned,
+      reviewCount,
+      lastPlayedDate: now.toISOString(),
+      status,
+      nextReviewDate,
+      createdDate: existing?.createdDate ?? todayKey,
+      learnedDate,
+      nextAllowedTime
+    };
+
+    this.assignProgressEntry(progressMap, resolved.key, updated);
+    this.saveProgressMap(progressMap);
   }
 
-  getWordProgress(_wordKey: string) {
-    return undefined;
+  getWordProgress(wordKey: string): LearningProgress | undefined {
+    const progressMap = this.loadProgressMap();
+    const resolved = this.resolveProgressEntry(progressMap, wordKey);
+    if (!resolved.entry || !resolved.word) return undefined;
+
+    const baseWord: VocabularyWord = {
+      word: resolved.entry.word ?? resolved.word,
+      meaning: '',
+      example: '',
+      category: resolved.entry.category ?? resolved.category ?? 'general'
+    };
+
+    return this.normaliseProgress(baseWord, resolved.entry);
   }
 
   forceGenerateDailySelection(
