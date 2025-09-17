@@ -1,13 +1,21 @@
-import type { Session } from '@supabase/supabase-js';
 import { canonNickname } from '@/core/nickname';
-import { getSupabaseClient, requireSupabaseClient } from './supabaseClient';
+import { requireSupabaseClient } from './supabaseClient';
 
 const SESSION_STORAGE_KEY = 'lazyVoca.session';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
-const AUTH_EMAIL_DOMAIN = 'app.local';
-const EXPIRATION_MARGIN_MS = 60_000;
 
-const STORAGE_VERSION = 1 as const;
+const STORAGE_VERSION = 2 as const;
+
+export type Session = {
+  user_unique_key: string;
+  nickname: string;
+  authenticated_at: string;
+  user: {
+    id: string;
+    nickname: string;
+    email: string | null;
+  };
+};
 
 type StoredSessionPayload = {
   version: number;
@@ -83,147 +91,71 @@ export function clearStoredAuth(): void {
   rememberPasscode(null);
 }
 
-function isSessionValid(session: Session | null): session is Session {
-  if (!session) return false;
-  if (!session.expires_at) return true;
-  const expiresAtMs = session.expires_at * 1000;
-  return expiresAtMs - EXPIRATION_MARGIN_MS > Date.now();
-}
-
-function buildAuthEmail(nickname: string): string {
-  const canonical = canonNickname(nickname).replace(/[^a-z0-9._-]/gi, '');
-  const sanitized = canonical.length ? canonical : nickname.trim().toLowerCase().replace(/\s+/g, '');
-  if (!sanitized) {
-    throw new Error('Nickname is required for authentication.');
-  }
-  return `${sanitized}@${AUTH_EMAIL_DOMAIN}`;
-}
-
 function nicknameMatchesSession(nickname: string, session: Session | null): boolean {
-  if (!session?.user?.email) return false;
-  const suffix = `@${AUTH_EMAIL_DOMAIN}`;
-  const email = session.user.email.toLowerCase();
-  if (!email.endsWith(suffix)) return false;
-  const sessionNick = email.slice(0, -suffix.length);
-  return canonNickname(sessionNick) === canonNickname(nickname);
+  if (!session) return false;
+  return canonNickname(session.nickname) === canonNickname(nickname);
 }
 
-async function applySessionToClient(session: Session): Promise<Session> {
-  const supabase = getSupabaseClient();
-  if (!supabase || !session.access_token || !session.refresh_token) {
-    persistSession(session);
-    return session;
+function normalizePasscode(passcode: string): { trimmed: string; numeric: number } {
+  const trimmed = passcode.trim();
+  const numeric = Number(trimmed);
+  if (!trimmed || !Number.isFinite(numeric)) {
+    throw new Error('Passcode must be numeric.');
   }
-  try {
-    const { data, error } = await supabase.auth.setSession({
-      access_token: session.access_token,
-      refresh_token: session.refresh_token,
-    });
-    if (error) {
-      console.warn('auth:setSession', error.message);
-      persistSession(session);
-      return session;
-    }
-    const applied = data.session ?? session;
-    persistSession(applied);
-    return applied;
-  } catch (err) {
-    console.warn('auth:setSession', (err as Error).message);
-    persistSession(session);
-    return session;
-  }
+  return { trimmed, numeric };
 }
 
-async function refreshWithTokens(
-  refreshToken: string,
-  accessToken?: string
-): Promise<Session | null> {
-  const supabase = getSupabaseClient();
-  if (!supabase) return null;
-  try {
-    const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken, access_token: accessToken });
-    if (error) {
-      console.warn('auth:refreshSession', error.message);
-      clearStoredAuth();
-      return null;
-    }
-    const session = data.session ?? null;
-    if (session) {
-      return applySessionToClient(session);
-    }
-    return null;
-  } catch (err) {
-    console.warn('auth:refreshSession', (err as Error).message);
-    clearStoredAuth();
-    return null;
+function extractUserKey(result: unknown): string | null {
+  if (!result) return null;
+  if (Array.isArray(result)) {
+    return extractUserKey(result[0] ?? null);
   }
-}
-
-async function fetchSupabaseSession(): Promise<Session | null> {
-  const supabase = getSupabaseClient();
-  if (!supabase) return null;
-  try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      console.warn('auth:getSession', error.message);
-      return null;
-    }
-    return data?.session ?? null;
-  } catch (err) {
-    console.warn('auth:getSession', (err as Error).message);
-    return null;
+  if (typeof result === 'object' && 'user_unique_key' in result) {
+    const value = (result as { user_unique_key: unknown }).user_unique_key;
+    return typeof value === 'string' ? value : null;
   }
-}
-
-export async function getActiveSession(): Promise<Session | null> {
-  const supabaseSession = await fetchSupabaseSession();
-  if (supabaseSession) {
-    if (isSessionValid(supabaseSession)) {
-      return applySessionToClient(supabaseSession);
-    }
-    if (supabaseSession.refresh_token) {
-      const refreshed = await refreshWithTokens(supabaseSession.refresh_token, supabaseSession.access_token);
-      if (refreshed) return refreshed;
-    }
-  }
-
-  const stored = loadStoredSession();
-  if (!stored) return null;
-
-  if (isSessionValid(stored)) {
-    return applySessionToClient(stored);
-  }
-
-  if (stored.refresh_token) {
-    return refreshWithTokens(stored.refresh_token, stored.access_token);
-  }
-
-  clearStoredAuth();
   return null;
 }
 
+function createSession(nickname: string, userKey: string): Session {
+  return {
+    user_unique_key: userKey,
+    nickname,
+    authenticated_at: new Date().toISOString(),
+    user: {
+      id: userKey,
+      nickname,
+      email: null,
+    },
+  };
+}
+
+export async function getActiveSession(): Promise<Session | null> {
+  const stored = loadStoredSession();
+  if (!stored) return null;
+  if (!nicknameMatchesSession(stored.nickname, stored)) {
+    return null;
+  }
+  return stored;
+}
+
 export async function refreshActiveSession(): Promise<Session | null> {
-  const supabase = getSupabaseClient();
-  if (!supabase) return null;
+  const stored = loadStoredSession();
+  if (!stored) return null;
+  const passcode = getStoredPasscode();
+  if (!passcode) return stored;
   try {
-    const { data, error } = await supabase.auth.getSession();
-    if (error) {
-      console.warn('auth:getSession', error.message);
-    }
-    const base = data?.session ?? loadStoredSession();
-    if (!base?.refresh_token) return null;
-    return refreshWithTokens(base.refresh_token, base.access_token);
+    const refreshed = await signInWithPasscode(stored.nickname, passcode, { rememberPasscode: false });
+    return refreshed ?? stored;
   } catch (err) {
-    console.warn('auth:getSession', (err as Error).message);
-    const stored = loadStoredSession();
-    if (!stored?.refresh_token) return null;
-    return refreshWithTokens(stored.refresh_token, stored.access_token);
+    console.warn('auth:refreshActiveSession', (err as Error).message);
+    return stored;
   }
 }
 
 export async function ensureSessionForNickname(
   nickname: string,
-  passcode?: string
+  passcode?: string,
 ): Promise<Session | null> {
   const active = await getActiveSession();
   if (active && nicknameMatchesSession(nickname, active)) {
@@ -246,20 +178,25 @@ export async function ensureSessionForNickname(
 export async function signInWithPasscode(
   nickname: string,
   passcode: string,
-  options: { rememberPasscode?: boolean } = {}
+  options: { rememberPasscode?: boolean } = {},
 ): Promise<Session | null> {
   const supabase = requireSupabaseClient();
-  const email = buildAuthEmail(nickname);
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: passcode });
+  const { trimmed, numeric } = normalizePasscode(passcode);
+  const { data, error } = await supabase.rpc('verify_nickname_passcode', {
+    nickname,
+    passcode: numeric,
+  });
   if (error) {
     throw error;
   }
-  const session = data.session ?? null;
-  if (session) {
-    await applySessionToClient(session);
+  const userKey = extractUserKey(data);
+  if (!userKey) {
+    throw new Error('incorrect passcode');
   }
+  const session = createSession(nickname, userKey);
+  persistSession(session);
   if (options.rememberPasscode) {
-    rememberPasscode(passcode);
+    rememberPasscode(trimmed);
   }
   return session;
 }
@@ -267,43 +204,31 @@ export async function signInWithPasscode(
 export async function registerNicknameWithPasscode(
   nickname: string,
   passcode: string,
-  options: { rememberPasscode?: boolean } = {}
+  options: { rememberPasscode?: boolean } = {},
 ): Promise<Session | null> {
   const supabase = requireSupabaseClient();
-  const email = buildAuthEmail(nickname);
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: passcode,
-    options: { data: { nickname } },
+  const { trimmed, numeric } = normalizePasscode(passcode);
+  const { data, error } = await supabase.rpc('set_nickname_passcode', {
+    nickname,
+    passcode: numeric,
   });
   if (error) {
-    if ('status' in error && error.status === 400) {
-      // user may already exist; fall back to sign-in attempt
-      const signedIn = await signInWithPasscode(nickname, passcode, options);
-      if (signedIn) return signedIn;
-    }
     throw error;
   }
-  let session = data.session ?? null;
-  if (!session) {
-    // Some configurations require explicit sign-in after sign-up
-    const signInResult = await supabase.auth.signInWithPassword({ email, password: passcode });
-    if (signInResult.error) {
-      throw signInResult.error;
-    }
-    session = signInResult.data.session ?? null;
+  const userKey = extractUserKey(data);
+  if (!userKey) {
+    return null;
   }
-  if (session) {
-    await applySessionToClient(session);
-  }
+  const session = createSession(nickname, userKey);
+  persistSession(session);
   if (options.rememberPasscode) {
-    rememberPasscode(passcode);
+    rememberPasscode(trimmed);
   }
   return session;
 }
 
 export function storePasscode(passcode: string): void {
-  rememberPasscode(passcode);
+  rememberPasscode(passcode.trim());
 }
 
 export function getStoredSessionSnapshot(): Session | null {
