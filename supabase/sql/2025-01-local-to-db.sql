@@ -1,50 +1,45 @@
--- Persist learning progress & preferences in Supabase
+-- Core tables for Lazy Vocabulary cloud sync
 
-create table if not exists profiles (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  nickname text not null,
-  nickname_canon text not null,
+create table if not exists public.defaultVocabulary (
+  word text primary key,
+  category text not null,
+  meaning text not null,
+  example text not null,
+  translation text,
+  count integer
+);
+
+create table if not exists public.nicknames (
+  id bigserial primary key,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-create unique index if not exists ux_profiles_nickname_canon on profiles(nickname_canon);
-
-create table if not exists user_preferences (
-  user_id uuid primary key references auth.users(id) on delete cascade,
-  favorite_voice text,
-  speech_rate numeric,
-  is_muted boolean not null default false,
-  is_playing boolean not null default false,
-  daily_option text,
-  updated_at timestamptz not null default now()
+  name text not null,
+  passcode int8,
+  user_unique_key text not null unique
 );
 
-create table if not exists learned_words (
-  user_id uuid not null references auth.users(id) on delete cascade,
-  word_id text not null,
+create table if not exists public.learned_words (
+  user_unique_key text not null references public.nicknames(user_unique_key) on delete cascade,
+  word_id text not null references public.defaultVocabulary(word),
   in_review_queue boolean not null default false,
   learned_at timestamptz not null default now(),
-  primary key (user_id, word_id)
+  review_count integer,
+  last_review_at timestamptz,
+  next_review_at timestamptz,
+  next_display_at timestamptz,
+  last_seen_at timestamptz,
+  srs_interval_days integer,
+  srs_easiness numeric,
+  srs_state text,
+  primary key (user_unique_key, word_id)
 );
 
-alter table profiles enable row level security;
-alter table user_preferences enable row level security;
-alter table learned_words enable row level security;
-
-drop policy if exists "profiles_self_rw" on profiles;
-create policy "profiles_self_rw"
-on profiles for all
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
-
-drop policy if exists "prefs_self_rw" on user_preferences;
-create policy "prefs_self_rw"
-on user_preferences for all
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
-
-drop policy if exists "learned_self_rw" on learned_words;
-create policy "learned_self_rw"
-on learned_words for all
-using (user_id = auth.uid())
-with check (user_id = auth.uid());
+create table if not exists public.user_progress_summary (
+  user_unique_key text primary key references public.nicknames(user_unique_key) on delete cascade,
+  learning_count integer not null default 0,
+  learned_count integer not null default 0,
+  learning_due_count integer not null default 0,
+  remaining_count integer not null default 0,
+  updated_at timestamptz not null default now(),
+  learning_time real not null default 0,
+  learned_days text[] not null default '{}'
+);

@@ -5,7 +5,7 @@ import type {
   SeverityConfig,
   SeverityLevel
 } from '@/types/learning';
-import { getLearned, upsertLearned } from '@/lib/db/learned';
+import { getLearned, upsertLearned, type LearnedWordUpsert } from '@/lib/db/learned';
 import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { toWordId } from '@/lib/words/ids';
 import {
@@ -273,6 +273,100 @@ export class LearningProgressService {
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
+  private toIsoString(value?: string | Date | null): string {
+    if (!value) return new Date().toISOString();
+    if (value instanceof Date) return value.toISOString();
+    const parsed = Date.parse(value);
+    if (Number.isNaN(parsed)) return new Date().toISOString();
+    return new Date(parsed).toISOString();
+  }
+
+  private toIsoFromDateKey(value?: string | null): string | undefined {
+    if (!value) return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const candidate = `${trimmed}T00:00:00.000Z`;
+    const parsed = Date.parse(candidate);
+    if (Number.isNaN(parsed)) return undefined;
+    return new Date(parsed).toISOString();
+  }
+
+  private computeIntervalDays(learnedAt?: string, nextReviewAt?: string | null): number | null {
+    if (!nextReviewAt) return null;
+    const start = learnedAt ? Date.parse(learnedAt) : Date.now();
+    const end = Date.parse(nextReviewAt);
+    if (Number.isNaN(start) || Number.isNaN(end)) return null;
+    const diff = Math.max(0, end - start);
+    return Math.round(diff / 86_400_000);
+  }
+
+  private toSrsState(status?: StoredProgress['status']): string {
+    switch (status) {
+      case 'learned':
+        return 'graduated';
+      case 'due':
+        return 'review';
+      case 'not_due':
+        return 'learning';
+      default:
+        return 'new';
+    }
+  }
+
+  private isInReviewQueueStatus(status?: StoredProgress['status']): boolean {
+    if (!status) return false;
+    if (status === 'learned') return false;
+    if (status === 'new') return false;
+    return true;
+  }
+
+  private buildSupabasePayload(
+    word: string,
+    category: string | undefined,
+    progress: StoredProgress
+  ): { wordId: string; payload: LearnedWordUpsert } {
+    const reviewCount = this.coerceReviewCount(progress.reviewCount);
+    const learnedAt = this.toIsoString(progress.learnedDate ?? progress.createdDate);
+    const lastReviewAt = this.toIsoString(progress.lastPlayedDate ?? learnedAt);
+    const nextReviewAt = this.toIsoFromDateKey(progress.nextReviewDate);
+    const nextDisplayAt = progress.nextAllowedTime
+      ? this.toIsoString(progress.nextAllowedTime)
+      : nextReviewAt;
+    const intervalDays = this.computeIntervalDays(learnedAt, nextReviewAt ?? null);
+    const srsState = this.toSrsState(progress.status);
+    const wordId = toWordId(word, category);
+
+    const payload: LearnedWordUpsert = {
+      in_review_queue: this.isInReviewQueueStatus(progress.status),
+      review_count: reviewCount,
+      learned_at: learnedAt,
+      last_review_at: lastReviewAt,
+      next_review_at: nextReviewAt ?? null,
+      next_display_at: nextDisplayAt ?? null,
+      last_seen_at: lastReviewAt,
+      srs_interval_days: intervalDays,
+      srs_easiness: 2.5,
+      srs_state: srsState,
+    };
+
+    return { wordId, payload };
+  }
+
+  private async persistProgressToCloud(
+    word: string,
+    category: string | undefined,
+    progress: StoredProgress
+  ): Promise<{ wordId: string; payload: LearnedWordUpsert } | null> {
+    try {
+      const built = this.buildSupabasePayload(word, category, progress);
+      await upsertLearned(built.wordId, built.payload);
+      return built;
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to sync learned word', error);
+      return null;
+    }
+  }
+
   private calculateNextReviewDate(reviewCount: number, from: Date): string {
     const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
     const intervalDays =
@@ -427,12 +521,10 @@ export class LearningProgressService {
     return rows.map(r => ({ word: r.word_id }));
   }
 
-  async markWordLearned(wordKey: string): Promise<void> {
-    await upsertLearned(wordKey, false);
-
+  async markWordLearned(wordKey: string): Promise<{ wordId: string; payload: LearnedWordUpsert } | null> {
     const progressMap = this.loadProgressMap();
     const resolved = this.resolveProgressEntry(progressMap, wordKey);
-    if (!resolved.word) return;
+    if (!resolved.word) return null;
 
     const now = new Date();
     const todayKey = this.getTodayKey();
@@ -456,6 +548,7 @@ export class LearningProgressService {
 
     this.assignProgressEntry(progressMap, resolved.key, updated);
     this.saveProgressMap(progressMap);
+    return this.persistProgressToCloud(resolved.word, category, updated);
   }
 
   markWordAsNew(wordKey: string): void {
@@ -571,6 +664,7 @@ export class LearningProgressService {
 
     this.assignProgressEntry(progressMap, resolved.key, updated);
     this.saveProgressMap(progressMap);
+    void this.persistProgressToCloud(resolved.word, category, updated);
   }
 
   getWordProgress(wordKey: string): LearningProgress | undefined {

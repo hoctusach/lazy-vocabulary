@@ -1,6 +1,7 @@
 import { canonNickname } from '@/core/nickname';
 import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import type { LearnedWordUpsert } from '@/lib/db/learned';
 
 export type ProgressSummary = {
   learning_count: number;
@@ -144,7 +145,8 @@ export async function ensureUserKey(): Promise<string | null> {
  * and stores the returned summary counts in localStorage['progressSummary'].
  */
 export async function markLearnedServerByKey(
-  wordId: string
+  wordId: string,
+  payload?: LearnedWordUpsert | null
 ): Promise<ProgressSummary | null> {
   const session = await getActiveSession();
   if (!session?.user_unique_key) return null;
@@ -155,11 +157,32 @@ export async function markLearnedServerByKey(
   const sb = getSupabaseClient();
   if (!sb) return null;
 
+  const toIso = (value?: string | null) => {
+    if (!value) return null;
+    const parsed = Date.parse(value);
+    if (Number.isNaN(parsed)) return null;
+    return new Date(parsed).toISOString();
+  };
+
+  const toInt = (value?: number | null) => {
+    if (typeof value !== 'number' || !Number.isFinite(value)) return null;
+    return Math.trunc(value);
+  };
+
   const { data, error } = await sb.rpc('mark_word_learned_by_key', {
     p_user_unique_key: key,
     p_word_id: wordId,
-    p_marked_at: new Date().toISOString(),
+    p_marked_at: toIso(payload?.learned_at) ?? new Date().toISOString(),
     p_total_words: TOTAL_WORDS,
+    p_in_review_queue: payload?.in_review_queue ?? false,
+    p_review_count: toInt(payload?.review_count ?? null),
+    p_last_review_at: toIso(payload?.last_review_at ?? null),
+    p_next_review_at: toIso(payload?.next_review_at ?? null),
+    p_next_display_at: toIso(payload?.next_display_at ?? null),
+    p_last_seen_at: toIso(payload?.last_seen_at ?? null),
+    p_srs_interval_days: toInt(payload?.srs_interval_days ?? null),
+    p_srs_easiness: payload?.srs_easiness ?? null,
+    p_srs_state: payload?.srs_state ?? null,
   });
 
   if (error) {

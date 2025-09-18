@@ -41,7 +41,7 @@ describe('markWordLearned', () => {
     expect(result.current.todayWords.length).toBe(1);
 
     await act(async () => {
-      result.current.markWordLearned('apple');
+      await result.current.markWordLearned('apple');
     });
 
     expect(result.current.todayWords).toHaveLength(0);
