@@ -215,9 +215,14 @@ export async function registerNicknameWithPasscode(
   if (error) {
     throw error;
   }
+  const noNickname =
+    data == null || (Array.isArray(data) && data.length === 0);
+  if (noNickname) {
+    throw new Error('Nickname not found.');
+  }
   const userKey = extractUserKey(data);
   if (!userKey) {
-    return null;
+    throw new Error('Failed to register nickname.');
   }
   const session = createSession(nickname, userKey);
   persistSession(session);
