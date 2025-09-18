@@ -46,43 +46,50 @@ export async function ensureUserKey(): Promise<string | null> {
   const sb = getSupabaseClient();
   if (!sb) return null;
 
-  const storedNickname = (lsGet('lazyVoca.nickname') ?? '').trim();
-  const storedPasscode = getStoredPasscode() ?? undefined;
-  const session = storedNickname
-    ? await ensureSessionForNickname(storedNickname, storedPasscode)
-    : await getActiveSession();
-  const userId = session?.user?.id;
-  if (!userId) return null;
-
-  // cache hit
-  const cached = lsGet('lazyVoca.userKey');
+  const cached = (lsGet('lazyVoca.userKey') ?? '').trim();
   if (cached) return cached;
 
-  // who am I?
-  // 1) Try read from nicknames
+  const storedNickname = (lsGet('lazyVoca.nickname') ?? '').trim();
+  const storedPasscode = getStoredPasscode();
+
+  const activeSession = await getActiveSession();
+  let ensuredSession = activeSession;
+  if (!ensuredSession && storedNickname && storedPasscode) {
+    try {
+      ensuredSession = await ensureSessionForNickname(storedNickname, storedPasscode);
+    } catch {
+      ensuredSession = null;
+    }
+  }
+
+  const nickname = (ensuredSession?.nickname ?? storedNickname ?? '').trim();
+  const sessionKey = (ensuredSession?.user_unique_key ?? '').trim();
+  const expectedKey = sessionKey || (nickname ? canonNickname(nickname) : '');
+
+  if (!expectedKey) {
+    return null;
+  }
+
   const { data: nicknameRow, error: nicknameError } = await sb
     .from('nicknames')
     .select('user_unique_key, name')
-    .eq('user_id', userId)
+    .eq('user_unique_key', expectedKey)
     .maybeSingle<NicknameIdentityRow>();
 
-  if (nicknameError) {
+  if (nicknameError && nicknameError.code !== 'PGRST116') {
     console.warn('ensureUserKey:nicknames select', nicknameError.message);
   }
 
   let key = (nicknameRow?.user_unique_key ?? '').trim();
 
-  // 2) If missing, derive and upsert into nicknames (onConflict: user_id)
   if (!key) {
-    const storedNick = (lsGet('lazyVoca.nickname') || '').trim();
     const existingName = (nicknameRow?.name ?? '').trim();
-    const sanitizedUid = userId.replace(/-/g, '');
-
-    const preferredName = storedNick.length >= 3 ? storedNick : existingName;
-    const fallbackName = preferredName.length >= 3 ? preferredName : `Learner-${sanitizedUid}`;
+    const preferredName = nickname.length >= 3 ? nickname : existingName;
+    const fallbackSuffix = expectedKey.slice(0, 8) || 'learner';
+    const fallbackNickname = `Learner-${fallbackSuffix}`;
     const candidates = Array.from(
       new Set(
-        [preferredName, fallbackName, `Learner-${sanitizedUid}`]
+        [nickname, preferredName, fallbackNickname]
           .map((value) => value.trim())
           .filter((value) => value.length >= 3)
       )
@@ -91,13 +98,12 @@ export async function ensureUserKey(): Promise<string | null> {
     for (const candidate of candidates) {
       const { data: upserted, error: upErr } = await sb
         .from('nicknames')
-        .upsert({ user_id: userId, name: candidate }, { onConflict: 'user_id' })
+        .upsert({ user_unique_key: expectedKey, name: candidate }, { onConflict: 'user_unique_key' })
         .select('user_unique_key')
         .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
 
       if (upErr) {
         if (upErr.code === '23505') {
-          // nickname taken, try next candidate
           continue;
         }
         console.warn('ensureUserKey:nicknames upsert', upErr.message);
@@ -112,10 +118,9 @@ export async function ensureUserKey(): Promise<string | null> {
     }
 
     if (!key) {
-      const fallbackNickname = `Learner-${sanitizedUid}`;
       const { data: upserted, error: finalErr } = await sb
         .from('nicknames')
-        .upsert({ user_id: userId, name: fallbackNickname }, { onConflict: 'user_id' })
+        .upsert({ user_unique_key: expectedKey, name: fallbackNickname }, { onConflict: 'user_unique_key' })
         .select('user_unique_key')
         .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
 
@@ -142,7 +147,7 @@ export async function markLearnedServerByKey(
   wordId: string
 ): Promise<ProgressSummary | null> {
   const session = await getActiveSession();
-  if (!session?.user?.id) return null;
+  if (!session?.user_unique_key) return null;
 
   const key = await ensureUserKey();
   if (!key) return null;
@@ -175,7 +180,7 @@ export async function markLearnedServerByKey(
  */
 export async function bootstrapLearnedFromServerByKey(): Promise<void> {
   const session = await getActiveSession();
-  if (!session?.user?.id) return;
+  if (!session?.user_unique_key) return;
 
   const key = await ensureUserKey();
   if (!key) return;

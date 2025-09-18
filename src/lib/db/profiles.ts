@@ -22,21 +22,21 @@ export async function ensureProfile(nickname: string): Promise<NicknameProfile |
 
   const { data: taken, error: takenError } = await supabase
     .from('nicknames')
-    .select('user_id')
+    .select('user_unique_key')
     .eq('user_unique_key', nicknameKey)
-    .maybeSingle<{ user_id: string | null }>();
+    .maybeSingle<{ user_unique_key: string | null }>();
 
   if (takenError && takenError.code !== 'PGRST116') {
     throw takenError;
   }
 
-  if (taken && taken.user_id && taken.user_id !== user.id) {
+  if (taken && taken.user_unique_key && taken.user_unique_key !== user.id) {
     throw { code: 'NICKNAME_TAKEN' };
   }
 
   const { data, error: upsertError } = await supabase
     .from('nicknames')
-    .upsert({ user_id: user.id, name: nickname }, { onConflict: 'user_id' })
+    .upsert({ user_unique_key: nicknameKey, name: nickname }, { onConflict: 'user_unique_key' })
     .select('id, name, user_unique_key, passcode')
     .maybeSingle<{ id: string | number; name: string; user_unique_key: string; passcode: number | null }>();
 

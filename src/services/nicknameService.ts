@@ -1,3 +1,5 @@
+import { canonNickname } from '@/core/nickname';
+import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export type NicknameRecord = {
@@ -9,7 +11,7 @@ export type NicknameRecord = {
 
 // Lowercase + remove spaces for the unique key
 export function normalizeNickname(s: string) {
-  return s.toLowerCase().replace(/\s+/g, '');
+  return canonNickname(s);
 }
 
 // Optional: block risky nickname chars (doesn't affect key)
@@ -31,22 +33,60 @@ export async function getNicknameByKey(key: string): Promise<NicknameRecord | nu
 
 export async function upsertNickname(name: string): Promise<NicknameRecord> {
   const supabase = getSupabaseClient();
-  const key = normalizeNickname(name);
+  const key = canonNickname(name);
   if (!supabase) {
     return { id: key, name, user_unique_key: key, passcode: null };
   }
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-  if (userError) throw userError;
-  if (!user?.id) {
+  const storedPasscode = getStoredPasscode();
+  const activeSession = await getActiveSession();
+  let session = activeSession;
+
+  if (!session && storedPasscode) {
+    try {
+      session = await ensureSessionForNickname(name, storedPasscode);
+    } catch {
+      session = null;
+    }
+  }
+
+  const sessionKey = session?.user_unique_key ?? null;
+  const expectedKey = key;
+
+  if (!sessionKey || sessionKey !== expectedKey) {
     throw new Error('Authentication required to save nickname.');
   }
+
+  const { data: existing, error: existingError } = await supabase
+    .from('nicknames')
+    .select('id, name, user_unique_key, passcode')
+    .eq('user_unique_key', expectedKey)
+    .maybeSingle<NicknameRecord>();
+
+  if (existingError && existingError.code !== 'PGRST116') {
+    throw existingError;
+  }
+
+  const storedPasscodeNumeric = storedPasscode && /^\d+$/.test(storedPasscode)
+    ? Number(storedPasscode)
+    : null;
+
+  if (
+    existing &&
+    existing.passcode !== null &&
+    storedPasscodeNumeric !== null &&
+    existing.passcode !== storedPasscodeNumeric
+  ) {
+    throw { code: 'NICKNAME_TAKEN' };
+  }
+
+  if (existing && existing.name === name) {
+    return existing;
+  }
+
   const { data, error } = await supabase
     .from('nicknames')
     .upsert(
-      { name, user_unique_key: key, user_id: user.id },
+      { name, user_unique_key: expectedKey },
       { onConflict: 'user_unique_key' }
     )
     .select('id, name, user_unique_key, passcode')
