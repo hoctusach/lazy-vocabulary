@@ -20,13 +20,14 @@ create or replace function public.set_nickname_passcode(
     nickname text,
     passcode int8
 )
-returns void
+returns table(user_unique_key text)
 language sql
 security definer
 as $$
   update public.nicknames
   set passcode = set_nickname_passcode.passcode
-  where lower(replace(name,' ','')) = lower(replace(nickname,' ',''));
+  where lower(replace(name,' ','')) = lower(replace(nickname,' ',''))
+  returning user_unique_key;
 $$;
 
 grant execute on function public.verify_nickname_passcode(text, int8) to anon, authenticated;
