@@ -529,6 +529,12 @@ export function getSupabaseClient(): SupabaseClient | null {
     showMissingEnvMessage();
     return null;
   }
-  client = createClient(url, anon);
+  client = createClient(url, anon, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+    },
+  });
   return client;
 }
