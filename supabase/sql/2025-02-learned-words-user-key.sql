@@ -1,40 +1,17 @@
--- Migrate learned_words to user_unique_key based identity
+-- Align learned_words helpers with nicknames.user_unique_key
 
--- Ensure profiles has a user_unique_key column and uniqueness for FK reference
-alter table public.profiles add column if not exists user_unique_key text;
-
-update public.profiles
-   set user_unique_key = coalesce(user_unique_key, replace(user_id::text, '-', ''))
- where user_unique_key is null;
-
-alter table public.profiles alter column user_unique_key set not null;
-
-do $$
-begin
-  if not exists (
-    select 1
-      from pg_constraint
-     where conname = 'profiles_user_unique_key_key'
-  ) then
-    alter table public.profiles
-      add constraint profiles_user_unique_key_key unique (user_unique_key);
-  end if;
-end$$;
-
--- Add the new user_unique_key column to learned_words and backfill from profiles
-alter table public.learned_words add column if not exists user_unique_key text;
+alter table public.learned_words
+  add column if not exists user_unique_key text;
 
 update public.learned_words lw
-   set user_unique_key = p.user_unique_key
-  from public.profiles p
+   set user_unique_key = n.user_unique_key
+  from public.nicknames n
  where lw.user_unique_key is null
-   and lw.user_id = p.user_id;
+   and lower(replace(lw.word_id, ' ', '')) = lower(replace(n.name, ' ', ''));
 
 alter table public.learned_words alter column user_unique_key set not null;
 
--- Replace constraints to reference user_unique_key
 alter table public.learned_words drop constraint if exists learned_words_pkey;
-alter table public.learned_words drop constraint if exists learned_words_user_id_fkey;
 alter table public.learned_words drop constraint if exists learned_words_user_unique_key_fkey;
 
 alter table public.learned_words
@@ -43,36 +20,10 @@ alter table public.learned_words
 alter table public.learned_words
   add constraint learned_words_user_unique_key_fkey
   foreign key (user_unique_key)
-  references public.profiles(user_unique_key)
+  references public.nicknames(user_unique_key)
   on update cascade
   on delete cascade;
 
--- Drop the legacy user_id column once backfill is complete
-alter table public.learned_words drop column if exists user_id;
-
--- Refresh row level security policy to align with user_unique_key
-drop policy if exists "learned_self_rw" on public.learned_words;
-
-create policy "learned_self_rw"
-on public.learned_words for all
-using (
-  exists (
-    select 1
-      from public.profiles p
-     where p.user_unique_key = learned_words.user_unique_key
-       and p.user_id = auth.uid()
-  )
-)
-with check (
-  exists (
-    select 1
-      from public.profiles p
-     where p.user_unique_key = learned_words.user_unique_key
-       and p.user_id = auth.uid()
-  )
-);
-
--- RPC helper to fetch learned words by key
 create or replace function public.get_learned_words_by_key(p_user_unique_key text)
 returns setof text
 language sql
@@ -81,25 +32,30 @@ set search_path = public
 as $$
   select lw.word_id
     from public.learned_words lw
-    join public.profiles p
-      on p.user_unique_key = lw.user_unique_key
    where lw.user_unique_key = p_user_unique_key
-     and p.user_id = auth.uid()
    order by lw.word_id;
 $$;
 
 grant execute on function public.get_learned_words_by_key(text) to anon, authenticated;
 
--- RPC to mark a word learned by unique key with progress summary response
 create or replace function public.mark_word_learned_by_key(
   p_user_unique_key text,
   p_word_id text,
   p_marked_at timestamptz default now(),
-  p_total_words integer default 0
+  p_total_words integer default 0,
+  p_in_review_queue boolean default false,
+  p_review_count integer default null,
+  p_last_review_at timestamptz default null,
+  p_next_review_at timestamptz default null,
+  p_next_display_at timestamptz default null,
+  p_last_seen_at timestamptz default null,
+  p_srs_interval_days integer default null,
+  p_srs_easiness numeric default null,
+  p_srs_state text default null
 )
 returns jsonb
 language plpgsql
-security invoker
+security definer
 set search_path = public
 as $$
 declare
@@ -114,24 +70,87 @@ begin
     raise exception 'word_id is required';
   end if;
 
-  insert into public.learned_words (user_unique_key, word_id, in_review_queue, learned_at)
-  values (p_user_unique_key, p_word_id, false, v_marked_at)
+  insert into public.learned_words (
+    user_unique_key,
+    word_id,
+    in_review_queue,
+    learned_at,
+    review_count,
+    last_review_at,
+    next_review_at,
+    next_display_at,
+    last_seen_at,
+    srs_interval_days,
+    srs_easiness,
+    srs_state
+  )
+  values (
+    p_user_unique_key,
+    p_word_id,
+    coalesce(p_in_review_queue, false),
+    v_marked_at,
+    p_review_count,
+    coalesce(p_last_review_at, v_marked_at),
+    p_next_review_at,
+    coalesce(p_next_display_at, p_next_review_at),
+    coalesce(p_last_seen_at, v_marked_at),
+    p_srs_interval_days,
+    p_srs_easiness,
+    p_srs_state
+  )
   on conflict (user_unique_key, word_id)
   do update set
     in_review_queue = excluded.in_review_queue,
-    learned_at = excluded.learned_at;
+    learned_at = excluded.learned_at,
+    review_count = excluded.review_count,
+    last_review_at = excluded.last_review_at,
+    next_review_at = excluded.next_review_at,
+    next_display_at = excluded.next_display_at,
+    last_seen_at = excluded.last_seen_at,
+    srs_interval_days = excluded.srs_interval_days,
+    srs_easiness = excluded.srs_easiness,
+    srs_state = excluded.srs_state;
 
   with progress as (
     select
       count(*) filter (where lw.in_review_queue) as learning_count,
-      count(*) as learned_count,
+      count(*) filter (where not lw.in_review_queue) as learned_count,
       count(*) filter (
         where lw.in_review_queue
-          and lw.learned_at <= now()
+          and coalesce(lw.next_review_at, lw.learned_at) <= now()
       ) as learning_due_count
     from public.learned_words lw
     where lw.user_unique_key = p_user_unique_key
   )
+  insert into public.user_progress_summary (
+    user_unique_key,
+    learning_count,
+    learned_count,
+    learning_due_count,
+    remaining_count,
+    learning_time,
+    learned_days,
+    updated_at
+  )
+  select
+    p_user_unique_key,
+    coalesce(progress.learning_count, 0),
+    coalesce(progress.learned_count, 0),
+    coalesce(progress.learning_due_count, 0),
+    greatest(v_total - coalesce(progress.learned_count, 0), 0),
+    coalesce(ups.learning_time, 0),
+    coalesce(ups.learned_days, '{}'::text[]),
+    now()
+  from progress
+  left join public.user_progress_summary ups
+    on ups.user_unique_key = p_user_unique_key
+  on conflict (user_unique_key) do update set
+    learning_count = excluded.learning_count,
+    learned_count = excluded.learned_count,
+    learning_due_count = excluded.learning_due_count,
+    remaining_count = excluded.remaining_count,
+    updated_at = excluded.updated_at;
+
   select jsonb_build_object(
     'learning_count', coalesce(progress.learning_count, 0)::int,
     'learned_count', coalesce(progress.learned_count, 0)::int,
@@ -145,7 +164,20 @@ begin
 end;
 $$;
 
-grant execute on function public.mark_word_learned_by_key(text, text, timestamptz, integer) to anon, authenticated;
+grant execute on function public.mark_word_learned_by_key(
+  text,
+  text,
+  timestamptz,
+  integer,
+  boolean,
+  integer,
+  timestamptz,
+  timestamptz,
+  timestamptz,
+  timestamptz,
+  integer,
+  numeric,
+  text
+) to anon, authenticated;
 
--- Let PostgREST refresh cached metadata
 notify pgrst, 'reload schema';

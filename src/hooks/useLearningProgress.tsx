@@ -157,8 +157,11 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
     };
   }, []);
 
-  const markWordLearned = useCallback((word: string) => {
-    learningProgressService.markWordLearned(word);
+  const markWordLearned = useCallback(async (word: string) => {
+    const syncPayload = await learningProgressService.markWordLearned(word).catch(error => {
+      console.warn('[useLearningProgress] Failed to persist learned word', error);
+      return null;
+    });
 
     let category: string | undefined;
     if (dailySelection) {
@@ -169,8 +172,8 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
       const matched = allWords.find(w => w.word === word);
       category = matched?.category;
     }
-    const wordId = toWordId(word, category);
-    void markLearnedServerByKey(wordId).catch(() => {});
+    const wordId = syncPayload?.wordId ?? toWordId(word, category);
+    void markLearnedServerByKey(wordId, syncPayload?.payload).catch(() => {});
 
     setDailySelection(prev => {
       if (!prev) return prev;
