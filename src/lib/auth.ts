@@ -118,13 +118,18 @@ function extractUserKey(result: unknown): string | null {
 }
 
 function createSession(nickname: string, userKey: string): Session {
+  const trimmedNickname = nickname.trim();
+  const storedNickname = trimmedNickname.length ? trimmedNickname : nickname;
+  const normalizedKeySource = userKey?.trim().length ? userKey.trim() : canonNickname(storedNickname);
+  const normalizedKey = canonNickname(normalizedKeySource);
+
   return {
-    user_unique_key: userKey,
-    nickname,
+    user_unique_key: normalizedKey,
+    nickname: storedNickname,
     authenticated_at: new Date().toISOString(),
     user: {
-      id: userKey,
-      nickname,
+      id: normalizedKey,
+      nickname: storedNickname,
       email: null,
     },
   };
