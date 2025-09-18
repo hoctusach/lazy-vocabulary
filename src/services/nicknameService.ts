@@ -1,5 +1,5 @@
 import { canonNickname } from '@/core/nickname';
-import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
+import { ensureSessionForNickname, ensureSupabaseAuthSession, getStoredPasscode } from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export type NicknameRecord = {
@@ -22,6 +22,7 @@ export function sanitizeNickname(s: string) {
 export async function getNicknameByKey(key: string): Promise<NicknameRecord | null> {
   const supabase = getSupabaseClient();
   if (!supabase) return null;
+  await ensureSupabaseAuthSession();
   const { data, error } = await supabase
     .from('nicknames')
     .select('id, name, user_unique_key, passcode')
@@ -38,10 +39,9 @@ export async function upsertNickname(name: string): Promise<NicknameRecord> {
     return { id: key, name, user_unique_key: key, passcode: null };
   }
   const storedPasscode = getStoredPasscode();
-  const activeSession = await getActiveSession();
-  let session = activeSession;
+  let session = await ensureSupabaseAuthSession();
 
-  if (!session && storedPasscode) {
+  if ((!session || session.user_unique_key !== key) && storedPasscode) {
     try {
       session = await ensureSessionForNickname(name, storedPasscode);
     } catch {

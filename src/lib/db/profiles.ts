@@ -1,4 +1,8 @@
-import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
+import {
+  ensureSessionForNickname,
+  ensureSupabaseAuthSession,
+  getStoredPasscode,
+} from '@/lib/auth';
 import { getSupabaseClient } from './supabase';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
 
@@ -14,11 +18,14 @@ export async function ensureProfile(nickname: string): Promise<NicknameProfile |
   const supabase = getSupabaseClient();
   if (!supabase) return null;
   const storedPasscode = getStoredPasscode() ?? undefined;
-  const ensuredSession = await ensureSessionForNickname(nickname, storedPasscode);
-  const activeSession = ensuredSession ?? (await getActiveSession());
-  const user = activeSession?.user;
+  let ensuredSession = await ensureSupabaseAuthSession();
+  const normalizedTarget = canonNickname(nickname);
+  if (storedPasscode && (!ensuredSession || canonNickname(ensuredSession.nickname) !== normalizedTarget)) {
+    ensuredSession = await ensureSessionForNickname(nickname, storedPasscode);
+  }
+  const user = ensuredSession?.user;
   if (!user) throw new Error('Authentication required to update profile.');
-  const nicknameKey = canonNickname(nickname);
+  const nicknameKey = normalizedTarget;
 
   const { data: taken, error: takenError } = await supabase
     .from('nicknames')

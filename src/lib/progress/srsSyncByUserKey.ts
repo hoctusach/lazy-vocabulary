@@ -1,5 +1,9 @@
 import { canonNickname } from '@/core/nickname';
-import { ensureSessionForNickname, getActiveSession, getStoredPasscode } from '@/lib/auth';
+import {
+  ensureSessionForNickname,
+  ensureSupabaseAuthSession,
+  getStoredPasscode,
+} from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 
@@ -53,9 +57,8 @@ export async function ensureUserKey(): Promise<string | null> {
   const storedNickname = (lsGet('lazyVoca.nickname') ?? '').trim();
   const storedPasscode = getStoredPasscode();
 
-  const activeSession = await getActiveSession();
-  let ensuredSession = activeSession;
-  if (!ensuredSession && storedNickname && storedPasscode) {
+  let ensuredSession = await ensureSupabaseAuthSession();
+  if ((!ensuredSession || !ensuredSession.nickname) && storedNickname && storedPasscode) {
     try {
       ensuredSession = await ensureSessionForNickname(storedNickname, storedPasscode);
     } catch {
