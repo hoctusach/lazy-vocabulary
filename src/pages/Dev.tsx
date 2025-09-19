@@ -1,15 +1,10 @@
-import { getSupabaseClient } from '../lib/supabaseClient';
+import { ensureSupabaseAuthSession } from '@/lib/auth';
 
 export default function Dev() {
   if (process.env.NODE_ENV === 'production') return null;
   async function test() {
-    const supabase = getSupabaseClient();
-    if (!supabase) {
-      alert('Supabase NOT OK: Supabase credentials are missing.');
-      return;
-    }
-    const { data, error } = await supabase.auth.getSession();
-    alert(error ? 'Supabase NOT OK: ' + error.message : 'Supabase OK');
+    const session = await ensureSupabaseAuthSession();
+    alert(session ? `Custom auth OK: ${session.nickname}` : 'No active custom session');
   }
   return <button onClick={test}>Test Supabase</button>;
 }

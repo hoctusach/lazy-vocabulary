@@ -3,6 +3,7 @@ import {
   ensureSupabaseAuthSession,
   getStoredPasscode,
 } from '@/lib/auth';
+import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { getSupabaseClient } from './supabase';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
 
@@ -17,6 +18,7 @@ export async function ensureProfile(nickname: string): Promise<NicknameProfile |
   if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
   const supabase = getSupabaseClient();
   if (!supabase) return null;
+  if (CUSTOM_AUTH_MODE) return null;
   const storedPasscode = getStoredPasscode() ?? undefined;
   let ensuredSession = await ensureSupabaseAuthSession();
   const normalizedTarget = canonNickname(nickname);

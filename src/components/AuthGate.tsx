@@ -10,13 +10,14 @@ import {
 } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { ensureProfile } from '@/lib/db/profiles';
+import { signIn } from '@/lib/customAuth';
 import {
   registerNicknameWithPasscode,
-  signInWithPasscode,
   getStoredPasscode,
   PASSCODE_STORAGE_KEY,
+  storePasscode,
+  ensureSupabaseAuthSession,
 } from '@/lib/auth';
-import { requireSupabaseClient } from '@/lib/supabaseClient';
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
@@ -39,39 +40,6 @@ function validatePasscode(passcode: string): string | null {
   if (trimmed.length > 10) return 'Passcode must be at most 10 digits.';
   if (!/^\d+$/.test(trimmed)) return 'Passcode can only contain numbers.';
   return null;
-}
-
-function toNumericPasscode(passcode: string): number {
-  const numeric = Number.parseInt(passcode, 10);
-  if (Number.isNaN(numeric)) {
-    throw new Error('Passcode must be numeric.');
-  }
-  return numeric;
-}
-
-async function verifyNicknamePasscode(nickname: string, passcode: string): Promise<string | null> {
-  const supabase = requireSupabaseClient();
-  const { data, error } = await supabase.rpc('verify_nickname_passcode', {
-    nickname,
-    passcode: toNumericPasscode(passcode), // 👈 ensure int8
-  });
-  if (error) {
-    throw error;
-  }
-  const row = Array.isArray(data) ? data[0] : null;
-  const key = row?.user_unique_key;
-  return typeof key === 'string' && key.length ? key : null;
-}
-
-async function setNicknamePasscode(nickname: string, passcode: string): Promise<void> {
-  const supabase = requireSupabaseClient();
-  const { error } = await supabase.rpc('set_nickname_passcode', {
-    nickname,
-    passcode: toNumericPasscode(passcode), // 👈 ensure int8
-  });
-  if (error) {
-    throw error;
-  }
 }
 
 export default function AuthGate() {
@@ -151,21 +119,30 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        const verified = await verifyNicknamePasscode(sanitizedName, passcodeInput);
-        if (!verified) {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            mode: 'create',
-            info:
-              "We couldn't verify that passcode. Create one to secure your progress, or try signing in again.",
-            error: undefined,
-          }));
+        try {
+          await signIn(sanitizedName, passcodeInput);
+          storePasscode(passcodeInput.trim());
+          await ensureSupabaseAuthSession();
+        } catch (signErr) {
+          const rawMessage = signErr instanceof Error ? signErr.message : '';
+          const lowerMessage = rawMessage.toLowerCase();
+          if (lowerMessage.includes('incorrect')) {
+            setS((p) => ({
+              ...p,
+              pending: false,
+              mode: 'create',
+              info:
+                "We couldn't verify that passcode. Create one to secure your progress, or try signing in again.",
+              error: undefined,
+            }));
+          } else {
+            setS((p) => ({ ...p, pending: false, error: rawMessage || 'Sign-in failed' }));
+          }
           return;
         }
-        await signInWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
       } else {
         await registerNicknameWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
+        await ensureSupabaseAuthSession();
       }
 
       const existing = await getNicknameByKey(key);
@@ -174,13 +151,6 @@ export default function AuthGate() {
       localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
       await ensureProfile(chosen.name);
       await ensureUserKey().catch(() => null);
-      if (s.mode === 'create') {
-        try {
-          await setNicknamePasscode(sanitizedName, passcodeInput);
-        } catch (rpcErr) {
-          console.warn('auth:set_nickname_passcode', (rpcErr as Error).message);
-        }
-      }
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
         void mod.autoBackfillOnReload();
@@ -201,9 +171,10 @@ export default function AuthGate() {
         pending: false,
         mode: 'signin',
       });
-    } catch (err: any) {
-      const code = err?.code ?? err?.status;
-      const rawMessage = typeof err?.message === 'string' ? err.message : '';
+    } catch (err) {
+      const error = err as { code?: string; status?: string; message?: string } | undefined;
+      const code = error?.code ?? error?.status;
+      const rawMessage = typeof error?.message === 'string' ? error.message : '';
       const lowerMessage = rawMessage.toLowerCase();
       const message =
         code === 'NICKNAME_TAKEN' || code === '23505' || lowerMessage.includes('already registered')

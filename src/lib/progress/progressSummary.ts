@@ -1,3 +1,4 @@
+import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { TOTAL_WORDS } from './srsSyncByUserKey';
 
@@ -59,6 +60,7 @@ export async function mergeProgressSummary(
   if (!userKey) return;
   const client = getSupabaseClient();
   if (!client) return;
+  if (CUSTOM_AUTH_MODE) return;
 
   const existing = await fetchExistingSummary(userKey);
 
@@ -107,6 +109,7 @@ export async function recalcProgressSummary(userKey: string): Promise<void> {
   if (!userKey) return;
   const client = getSupabaseClient();
   if (!client) return;
+  if (CUSTOM_AUTH_MODE) return;
 
   const { data, error } = await client
     .from('learned_words')
@@ -161,6 +164,8 @@ export async function setLearningTimeForDay(
     learnedDays.sort();
   }
 
+  if (CUSTOM_AUTH_MODE) return;
+
   await mergeProgressSummary(userKey, {
     learning_time: hours,
     learned_days: learnedDays,
@@ -177,6 +182,7 @@ export async function ensureLearnedDay(userKey: string, dayISO: string): Promise
   if (!learnedDays.includes(safeDay)) {
     learnedDays.push(safeDay);
     learnedDays.sort();
+    if (CUSTOM_AUTH_MODE) return;
     await mergeProgressSummary(userKey, { learned_days: learnedDays });
   }
 }
