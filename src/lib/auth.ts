@@ -1,14 +1,17 @@
-import type { Session as SupabaseAuthSession } from '@supabase/supabase-js';
-
 import { canonNickname } from '@/core/nickname';
-import { getSupabaseClient, requireSupabaseClient } from './supabaseClient';
+import {
+  getSession as getCustomSession,
+  isExpired as isCustomSessionExpired,
+  signIn as customSignIn,
+  signOut as customSignOut,
+} from '@/lib/customAuth';
+import { requireSupabaseClient } from '@/lib/supabaseClient';
 
 const SESSION_STORAGE_KEY = 'lazyVoca.session';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
 const USER_KEY_STORAGE_KEY = 'lazyVoca.userKey';
 
-const STORAGE_VERSION = 3 as const;
-const TOKEN_REFRESH_BUFFER_SECONDS = 30;
+const STORAGE_VERSION = 4 as const;
 
 export type Session = {
   user_unique_key: string;
@@ -21,31 +24,9 @@ export type Session = {
   };
 };
 
-type TokenBundle = {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  expires_at: number;
-  token_type?: string;
-};
-
-type ExchangeResponse = TokenBundle & {
-  user_unique_key: string;
-  nickname?: string;
-};
-
-type StoredSupabaseSession = {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  expires_at: number;
-  token_type: string;
-};
-
 type StoredAuthPayload = {
   version: number;
   session: Session;
-  supabase: StoredSupabaseSession | null;
 };
 
 function hasLocalStorage(): boolean {
@@ -79,29 +60,7 @@ function removeFromStorage(key: string): void {
   }
 }
 
-function normalizeStoredSupabaseSession(value: unknown): StoredSupabaseSession | null {
-  if (!value || typeof value !== 'object') return null;
-  const record = value as Record<string, unknown>;
-  const accessToken = typeof record.access_token === 'string' ? record.access_token : null;
-  const refreshToken = typeof record.refresh_token === 'string' ? record.refresh_token : null;
-  const expiresAt = Number(record.expires_at);
-  const expiresIn = Number(record.expires_in);
-  const tokenType = typeof record.token_type === 'string' && record.token_type ? record.token_type : 'bearer';
-
-  if (!accessToken || !refreshToken || !Number.isFinite(expiresAt) || !Number.isFinite(expiresIn)) {
-    return null;
-  }
-
-  return {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_at: Math.trunc(expiresAt),
-    expires_in: Math.trunc(expiresIn),
-    token_type: tokenType,
-  };
-}
-
-function persistAuthState(session: Session | null, supabase: StoredSupabaseSession | null): void {
+function persistAuthState(session: Session | null): void {
   if (!session) {
     removeFromStorage(SESSION_STORAGE_KEY);
     return;
@@ -110,7 +69,6 @@ function persistAuthState(session: Session | null, supabase: StoredSupabaseSessi
   const payload: StoredAuthPayload = {
     version: STORAGE_VERSION,
     session,
-    supabase,
   };
 
   writeToStorage(SESSION_STORAGE_KEY, JSON.stringify(payload));
@@ -125,12 +83,11 @@ function loadStoredAuthPayload(): StoredAuthPayload | null {
     if (!parsed || !parsed.session) return null;
 
     if (parsed.version === STORAGE_VERSION) {
-      const supabase = normalizeStoredSupabaseSession(parsed.supabase ?? null);
-      return { version: STORAGE_VERSION, session: parsed.session, supabase };
+      return { version: STORAGE_VERSION, session: parsed.session };
     }
 
     if (!parsed.version || parsed.version < STORAGE_VERSION) {
-      return { version: STORAGE_VERSION, session: parsed.session, supabase: null };
+      return { version: STORAGE_VERSION, session: parsed.session };
     }
   } catch {
     return null;
@@ -161,16 +118,13 @@ export function clearCachedUserKey(): void {
 }
 
 export function clearStoredAuth(options: { keepPasscode?: boolean } = {}): void {
-  persistAuthState(null, null);
+  persistAuthState(null);
   if (!options.keepPasscode) {
     rememberPasscode(null);
   }
   clearCachedUserKey();
   try {
-    const supabase = getSupabaseClient();
-    if (supabase) {
-      void supabase.auth.signOut().catch(() => undefined);
-    }
+    customSignOut();
   } catch {
     // ignore sign-out errors
   }
@@ -190,19 +144,7 @@ function normalizePasscode(passcode: string): { trimmed: string; numeric: number
   return { trimmed, numeric };
 }
 
-function extractUserKey(result: unknown): string | null {
-  if (!result) return null;
-  if (Array.isArray(result)) {
-    return extractUserKey(result[0] ?? null);
-  }
-  if (typeof result === 'object' && 'user_unique_key' in result) {
-    const value = (result as { user_unique_key: unknown }).user_unique_key;
-    return typeof value === 'string' ? value : null;
-  }
-  return null;
-}
-
-function createSession(nickname: string, userKey: string): Session {
+function createSessionFromCustom(nickname: string, userKey: string): Session {
   const trimmedNickname = nickname.trim();
   const storedNickname = trimmedNickname.length ? trimmedNickname : nickname;
   const normalizedKeySource = userKey?.trim().length ? userKey.trim() : canonNickname(storedNickname);
@@ -220,162 +162,37 @@ function createSession(nickname: string, userKey: string): Session {
   };
 }
 
-function toStoredSupabaseSession(
-  session: SupabaseAuthSession | null,
-  fallback: TokenBundle,
-): StoredSupabaseSession {
-  const accessToken = session?.access_token ?? fallback.access_token;
-  const refreshToken = session?.refresh_token ?? fallback.refresh_token;
-  const expiresIn = session?.expires_in ?? fallback.expires_in;
-  const expiresAt = session?.expires_at ?? fallback.expires_at;
-  const tokenType = session?.token_type ?? fallback.token_type ?? 'bearer';
-
-  if (!accessToken || !refreshToken || !Number.isFinite(expiresIn) || !Number.isFinite(expiresAt)) {
-    throw new Error('Invalid Supabase session tokens.');
+function getActiveCustomSession() {
+  const session = getCustomSession();
+  if (!session) return null;
+  if (isCustomSessionExpired(0)) {
+    return null;
   }
-
-  return {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: Math.trunc(expiresIn),
-    expires_at: Math.trunc(expiresAt),
-    token_type: tokenType,
-  };
-}
-
-function storedToTokenBundle(tokens: StoredSupabaseSession): TokenBundle {
-  return {
-    access_token: tokens.access_token,
-    refresh_token: tokens.refresh_token,
-    expires_in: tokens.expires_in,
-    expires_at: tokens.expires_at,
-    token_type: tokens.token_type,
-  };
-}
-
-async function invokePasscodeExchange(nickname: string, passcode: number): Promise<ExchangeResponse> {
-  const supabase = requireSupabaseClient();
-  const { data, error } = await supabase.functions.invoke<ExchangeResponse>(
-    'nickname-passcode-exchange',
-    {
-      body: { nickname, passcode },
-    },
-  );
-
-  if (error) {
-    throw new Error(error.message ?? 'Failed to authenticate nickname.');
-  }
-
-  if (!data || typeof data !== 'object') {
-    throw new Error('Authentication exchange returned an invalid response.');
-  }
-
-  const accessToken = typeof data.access_token === 'string' ? data.access_token : '';
-  const refreshToken = typeof data.refresh_token === 'string' ? data.refresh_token : '';
-  const expiresIn = Number(data.expires_in);
-  const expiresAt = Number(data.expires_at);
-  const tokenType = typeof data.token_type === 'string' && data.token_type ? data.token_type : 'bearer';
-  const userKey = typeof data.user_unique_key === 'string' ? data.user_unique_key : '';
-  const returnedNickname = typeof data.nickname === 'string' ? data.nickname : undefined;
-
-  if (!accessToken || !refreshToken || !userKey || !Number.isFinite(expiresIn) || !Number.isFinite(expiresAt)) {
-    throw new Error('Authentication exchange failed.');
-  }
-
-  return {
-    access_token: accessToken,
-    refresh_token: refreshToken,
-    expires_in: Math.trunc(expiresIn),
-    expires_at: Math.trunc(expiresAt),
-    token_type: tokenType,
-    user_unique_key: userKey,
-    nickname: returnedNickname,
-  };
-}
-
-async function establishSupabaseSession(exchange: ExchangeResponse): Promise<StoredSupabaseSession> {
-  const supabase = requireSupabaseClient();
-  const { data, error } = await supabase.auth.setSession({
-    access_token: exchange.access_token,
-    refresh_token: exchange.refresh_token,
-  });
-
-  if (error) {
-    throw error;
-  }
-
-  return toStoredSupabaseSession(data.session ?? null, exchange);
-}
-
-async function applyStoredSupabaseSession(payload: StoredAuthPayload): Promise<boolean> {
-  const supabase = getSupabaseClient();
-  if (!supabase || !payload.supabase) {
-    return false;
-  }
-
-  try {
-    const { data: current } = await supabase.auth.getSession();
-    const active = current.session;
-    if (active?.access_token && active.user?.id === payload.session.user.id) {
-      return true;
-    }
-  } catch {
-    // Ignore getSession errors and attempt to restore below
-  }
-
-  const { data, error } = await supabase.auth.setSession({
-    access_token: payload.supabase.access_token,
-    refresh_token: payload.supabase.refresh_token,
-  });
-
-  if (error) {
-    console.warn('auth:applyStoredSupabaseSession', error.message);
-    return false;
-  }
-
-  if (data.session) {
-    const normalized = toStoredSupabaseSession(data.session, storedToTokenBundle(payload.supabase));
-    persistAuthState(payload.session, normalized);
-  }
-
-  return true;
-}
-
-function shouldRefresh(tokens: StoredSupabaseSession): boolean {
-  const expiresAt = tokens.expires_at;
-  if (!Number.isFinite(expiresAt)) return true;
-  const now = Math.floor(Date.now() / 1000);
-  return expiresAt - now <= TOKEN_REFRESH_BUFFER_SECONDS;
+  return session;
 }
 
 let ensuringSupabaseSession: Promise<Session | null> | null = null;
 
 async function ensureSupabaseAuthSessionInternal(): Promise<Session | null> {
-  const payload = loadStoredAuthPayload();
-  if (!payload) return null;
+  const active = getActiveCustomSession();
+  if (active) {
+    const session = createSessionFromCustom(active.nickname ?? '', active.userKey);
+    persistAuthState(session);
+    return session;
+  }
 
-  if (!nicknameMatchesSession(payload.session.nickname, payload.session)) {
+  const stored = loadStoredAuthPayload();
+  if (!stored) {
     return null;
-  }
-
-  const tokens = payload.supabase;
-  if (!tokens) {
-    return payload.session;
-  }
-
-  const needsRefresh = shouldRefresh(tokens);
-  const applied = await applyStoredSupabaseSession(payload);
-  if (applied && !needsRefresh) {
-    return payload.session;
   }
 
   const passcode = getStoredPasscode();
   if (!passcode) {
-    return applied ? payload.session : null;
+    return stored.session;
   }
 
   try {
-    const refreshed = await signInWithPasscode(payload.session.nickname, passcode, { rememberPasscode: false });
+    const refreshed = await signInWithPasscode(stored.session.nickname, passcode, { rememberPasscode: false });
     return refreshed ?? loadStoredSession();
   } catch (err) {
     console.warn('auth:ensureSupabaseAuthSession', (err as Error).message);
@@ -452,12 +269,15 @@ export async function signInWithPasscode(
   passcode: string,
   options: { rememberPasscode?: boolean } = {},
 ): Promise<Session | null> {
-  const { trimmed, numeric } = normalizePasscode(passcode);
-  const exchange = await invokePasscodeExchange(nickname, numeric);
-  const supabaseTokens = await establishSupabaseSession(exchange);
-  const session = createSession(nickname, exchange.user_unique_key);
+  const { trimmed } = normalizePasscode(passcode);
+  await customSignIn(nickname, passcode);
+  const active = getActiveCustomSession();
+  if (!active) {
+    throw new Error('Sign-in failed');
+  }
+  const session = createSessionFromCustom(active.nickname ?? nickname, active.userKey);
 
-  persistAuthState(session, supabaseTokens);
+  persistAuthState(session);
 
   if (options.rememberPasscode) {
     rememberPasscode(trimmed);
@@ -487,21 +307,7 @@ export async function registerNicknameWithPasscode(
     throw new Error('Nickname not found.');
   }
 
-  const userKeyFromRpc = extractUserKey(data);
-  if (!userKeyFromRpc) {
-    throw new Error('Failed to register nickname.');
-  }
-
-  const exchange = await invokePasscodeExchange(nickname, numeric);
-  const supabaseTokens = await establishSupabaseSession(exchange);
-  const session = createSession(nickname, exchange.user_unique_key);
-
-  persistAuthState(session, supabaseTokens);
-
-  if (options.rememberPasscode) {
-    rememberPasscode(trimmed);
-  }
-
+  const session = await signInWithPasscode(nickname, trimmed, { rememberPasscode: options.rememberPasscode });
   return session;
 }
 
