@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import {
   sanitizeNickname,
@@ -11,14 +12,44 @@ import {
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { ensureProfile } from '@/lib/db/profiles';
 import { EXCHANGE_FN_URL } from '@/config';
-import { storeSessionFromExchange, type ExchangeResponse } from '@/lib/customAuth';
+import {
+  storeSessionFromExchange,
+  type CustomSession,
+  type ExchangeResponse,
+} from '@/lib/customAuth';
 import {
   registerNicknameWithPasscode,
   getStoredPasscode,
   PASSCODE_STORAGE_KEY,
   storePasscode,
-  ensureSupabaseAuthSession,
 } from '@/lib/auth';
+
+type ExchangeResult = {
+  response: Response;
+  payload: ExchangeResponse;
+  errorMessage?: string;
+};
+
+async function exchangeNicknamePasscode(nickname: string, passcode: string): Promise<ExchangeResult> {
+  const response = await fetch(EXCHANGE_FN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname, passcode }),
+  });
+  const payload = (await response.json().catch(() => ({}))) as ExchangeResponse;
+
+  return {
+    response,
+    payload,
+    errorMessage: typeof payload?.error === 'string' ? payload.error : undefined,
+  };
+}
+
+function saveSession(payload: ExchangeResponse, passcode: string): CustomSession {
+  const session = storeSessionFromExchange(payload);
+  storePasscode(passcode);
+  return session;
+}
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
@@ -121,15 +152,12 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        const res = await fetch(EXCHANGE_FN_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nickname: sanitizedName, passcode: passcodeInput }),
-        });
-        const json = (await res.json().catch(() => ({}))) as ExchangeResponse;
-        const errorMessage = typeof json?.error === 'string' ? json.error : undefined;
+        const { response, payload, errorMessage } = await exchangeNicknamePasscode(
+          sanitizedName,
+          passcodeInput,
+        );
 
-        if (res.status === 401) {
+        if (response.status === 401) {
           if (errorMessage === 'Incorrect passcode') {
             setS((p) => ({
               ...p,
@@ -153,7 +181,7 @@ export default function AuthGate() {
           return;
         }
 
-        if (!res.ok) {
+        if (!response.ok) {
           setS((p) => ({
             ...p,
             pending: false,
@@ -164,12 +192,41 @@ export default function AuthGate() {
           return;
         }
 
-        storeSessionFromExchange(json);
-        storePasscode(passcodeInput);
-        await ensureSupabaseAuthSession();
+        const session = saveSession(payload, passcodeInput);
+        const toastNickname = session.nickname?.trim().length ? session.nickname : sanitizedName;
+        toast.success(`Signed in as ${toastNickname}`);
       } else {
         await registerNicknameWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
-        await ensureSupabaseAuthSession();
+        const { response, payload, errorMessage } = await exchangeNicknamePasscode(
+          sanitizedName,
+          passcodeInput,
+        );
+
+        if (response.status === 401) {
+          setS((p) => ({
+            ...p,
+            pending: false,
+            error: errorMessage || 'Sign-in failed',
+            info: undefined,
+            mode: 'signin',
+          }));
+          return;
+        }
+
+        if (!response.ok) {
+          setS((p) => ({
+            ...p,
+            pending: false,
+            error: errorMessage || 'Sign-in failed',
+            info: undefined,
+            mode: 'signin',
+          }));
+          return;
+        }
+
+        const session = saveSession(payload, passcodeInput);
+        const toastNickname = session.nickname?.trim().length ? session.nickname : sanitizedName;
+        toast.success(`Signed in as ${toastNickname}`);
       }
 
       const existing = await getNicknameByKey(key);
