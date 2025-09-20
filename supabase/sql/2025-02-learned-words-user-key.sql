@@ -30,6 +30,7 @@ language sql
 security definer
 set search_path = public
 as $$
+  select public.require_session_user_key(p_user_unique_key);
   select lw.word_id
     from public.learned_words lw
    where lw.user_unique_key = p_user_unique_key
@@ -63,6 +64,7 @@ declare
   v_total integer := greatest(coalesce(p_total_words, 0), 0);
   v_summary jsonb;
 begin
+  perform public.require_session_user_key(p_user_unique_key);
   if coalesce(p_user_unique_key, '') = '' then
     raise exception 'user_unique_key is required';
   end if;
