@@ -46,6 +46,10 @@ export function storeSessionFromExchange(response: ExchangeResponse): CustomSess
   return session;
 }
 
+export function saveSession(response: ExchangeResponse): CustomSession {
+  return storeSessionFromExchange(response);
+}
+
 export function loadFromStorageOnBoot(): void {
   try {
     const stored = localStorage.getItem(LS_KEY);
@@ -116,7 +120,10 @@ export function getAuthHeader(): Record<string, string> {
   return { Authorization: `Bearer ${session.sessionToken}` };
 }
 
-export async function signIn(nickname: string, passcode: string | number): Promise<void> {
+export async function exchangeNicknamePasscode(
+  nickname: string,
+  passcode: string | number,
+): Promise<ExchangeResponse> {
   const res = await fetch(EXCHANGE_FN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -124,9 +131,17 @@ export async function signIn(nickname: string, passcode: string | number): Promi
   });
   const json = (await res.json().catch(() => ({}))) as ExchangeResponse;
   if (!res.ok) {
-    throw new Error((typeof json.error === 'string' && json.error) || 'Sign-in failed');
+    const errorMessage = typeof json.error === 'string' && json.error ? json.error : 'Sign-in failed';
+    const err = new Error(errorMessage) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
-  storeSessionFromExchange(json);
+  return json;
+}
+
+export async function signIn(nickname: string, passcode: string | number): Promise<void> {
+  const exchange = await exchangeNicknamePasscode(nickname, passcode);
+  saveSession(exchange);
 }
 
 export function signOut(): void {

@@ -1,11 +1,16 @@
 import { SET_NICKNAME_FN_URL } from '@/config';
 import { canonNickname } from '@/core/nickname';
 import {
+  exchangeNicknamePasscode,
   getSession as getCustomSession,
   isExpired as isCustomSessionExpired,
+  saveSession as saveCustomSession,
   signIn as customSignIn,
   signOut as customSignOut,
 } from '@/lib/customAuth';
+import { NICKNAME_LS_KEY } from '@/lib/nickname';
+
+export { exchangeNicknamePasscode, saveCustomSession as saveSession, getCustomSession as getSession };
 
 const SESSION_STORAGE_KEY = 'lazyVoca.authState';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
@@ -291,18 +296,20 @@ export async function signInWithPasscode(
   return session;
 }
 
+export type RegisterNicknameResponse = Record<string, unknown>;
+
 export async function registerNicknameWithPasscode(
   nickname: string,
   passcode: string,
   options: { rememberPasscode?: boolean } = {},
-): Promise<Session | null> {
+): Promise<RegisterNicknameResponse> {
   const { trimmed, numeric } = normalizePasscode(passcode);
   const res = await fetch(SET_NICKNAME_FN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nickname, passcode: numeric }),
   });
-  const json = (await res.json().catch(() => ({}))) as { error?: unknown };
+  const json = (await res.json().catch(() => ({}))) as RegisterNicknameResponse & { error?: unknown };
 
   if (res.status === 409) {
     const err = new Error('Nickname already exists.') as Error & { status?: number };
@@ -317,8 +324,13 @@ export async function registerNicknameWithPasscode(
     throw err;
   }
 
-  const session = await signInWithPasscode(nickname, trimmed, { rememberPasscode: options.rememberPasscode });
-  return session;
+  if (options.rememberPasscode) {
+    rememberPasscode(trimmed);
+    const storedNickname = nickname.trim().length ? nickname.trim() : nickname;
+    writeToStorage(NICKNAME_LS_KEY, storedNickname);
+  }
+
+  return json;
 }
 
 export function storePasscode(passcode: string): void {
