@@ -1,3 +1,4 @@
+import { SET_NICKNAME_FN_URL } from '@/config';
 import { canonNickname } from '@/core/nickname';
 import {
   getSession as getCustomSession,
@@ -5,7 +6,6 @@ import {
   signIn as customSignIn,
   signOut as customSignOut,
 } from '@/lib/customAuth';
-import { requireSupabaseClient } from '@/lib/supabaseClient';
 
 const SESSION_STORAGE_KEY = 'lazyVoca.authState';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
@@ -296,20 +296,25 @@ export async function registerNicknameWithPasscode(
   passcode: string,
   options: { rememberPasscode?: boolean } = {},
 ): Promise<Session | null> {
-  const supabase = requireSupabaseClient();
   const { trimmed, numeric } = normalizePasscode(passcode);
-  const { data, error } = await supabase.rpc('set_nickname_passcode', {
-    nickname,
-    passcode: numeric,
+  const res = await fetch(SET_NICKNAME_FN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nickname, passcode: numeric }),
   });
+  const json = (await res.json().catch(() => ({}))) as { error?: unknown };
 
-  if (error) {
-    throw error;
+  if (res.status === 409) {
+    const err = new Error('Nickname already exists.') as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
 
-  const noNickname = data == null || (Array.isArray(data) && data.length === 0);
-  if (noNickname) {
-    throw new Error('Nickname not found.');
+  if (!res.ok) {
+    const message = typeof json?.error === 'string' && json.error ? json.error : 'Could not create profile';
+    const err = new Error(message) as Error & { status?: number };
+    err.status = res.status;
+    throw err;
   }
 
   const session = await signInWithPasscode(nickname, trimmed, { rememberPasscode: options.rememberPasscode });
