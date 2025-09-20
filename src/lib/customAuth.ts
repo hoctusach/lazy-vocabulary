@@ -12,6 +12,40 @@ let _session: CustomSession | null = null;
 const LS_KEY = 'lazyVoca.session';
 const LEGACY_KEY = 'lazyVoca.auth';
 
+export type ExchangeResponse = Record<string, unknown> & {
+  session_token?: unknown;
+  expires_at?: unknown;
+  expires_in?: unknown;
+  nickname?: unknown;
+  user_unique_key?: unknown;
+  error?: unknown;
+};
+
+export function storeSessionFromExchange(response: ExchangeResponse): CustomSession {
+  if (typeof response.session_token !== 'string' || typeof response.expires_at !== 'number') {
+    throw new Error('Invalid authentication response');
+  }
+
+  const session: CustomSession = {
+    sessionToken: response.session_token,
+    expiresAt: response.expires_at,
+    expiresIn: typeof response.expires_in === 'number' ? response.expires_in : 0,
+    nickname: typeof response.nickname === 'string' ? response.nickname : '',
+    userKey: typeof response.user_unique_key === 'string' ? response.user_unique_key : '',
+  };
+
+  _session = session;
+
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(session));
+    localStorage.removeItem(LEGACY_KEY);
+  } catch {
+    /* ignore storage errors */
+  }
+
+  return session;
+}
+
 export function loadFromStorageOnBoot(): void {
   try {
     const stored = localStorage.getItem(LS_KEY);
@@ -88,27 +122,11 @@ export async function signIn(nickname: string, passcode: string | number): Promi
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nickname, passcode }),
   });
-  const json = await res.json().catch(() => ({} as Record<string, unknown>));
+  const json = (await res.json().catch(() => ({}))) as ExchangeResponse;
   if (!res.ok) {
-    throw new Error(json?.error || 'Sign-in failed');
+    throw new Error((typeof json.error === 'string' && json.error) || 'Sign-in failed');
   }
-  if (typeof json.session_token !== 'string' || typeof json.expires_at !== 'number') {
-    throw new Error('Invalid authentication response');
-  }
-  const session: CustomSession = {
-    sessionToken: json.session_token,
-    expiresAt: json.expires_at,
-    expiresIn: typeof json.expires_in === 'number' ? json.expires_in : 0,
-    nickname: typeof json.nickname === 'string' ? json.nickname : '',
-    userKey: typeof json.user_unique_key === 'string' ? json.user_unique_key : '',
-  };
-  _session = session;
-  try {
-    localStorage.setItem(LS_KEY, JSON.stringify(session));
-    localStorage.removeItem(LEGACY_KEY);
-  } catch {
-    /* ignore storage errors */
-  }
+  storeSessionFromExchange(json);
 }
 
 export function signOut(): void {

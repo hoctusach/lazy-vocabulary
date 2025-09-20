@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import {
   sanitizeNickname,
@@ -10,7 +10,8 @@ import {
 } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { ensureProfile } from '@/lib/db/profiles';
-import { signIn } from '@/lib/customAuth';
+import { EXCHANGE_FN_URL } from '@/config';
+import { storeSessionFromExchange, type ExchangeResponse } from '@/lib/customAuth';
 import {
   registerNicknameWithPasscode,
   getStoredPasscode,
@@ -51,6 +52,7 @@ export default function AuthGate() {
     pending: false,
     mode: 'signin',
   });
+  const passcodeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const existingNickname = getNicknameLocal();
@@ -119,27 +121,52 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        try {
-          await signIn(sanitizedName, passcodeInput);
-          storePasscode(passcodeInput.trim());
-          await ensureSupabaseAuthSession();
-        } catch (signErr) {
-          const rawMessage = signErr instanceof Error ? signErr.message : '';
-          const lowerMessage = rawMessage.toLowerCase();
-          if (lowerMessage.includes('incorrect')) {
+        const res = await fetch(EXCHANGE_FN_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nickname: sanitizedName, passcode: passcodeInput }),
+        });
+        const json = (await res.json().catch(() => ({}))) as ExchangeResponse;
+        const errorMessage = typeof json?.error === 'string' ? json.error : undefined;
+
+        if (res.status === 401) {
+          if (errorMessage === 'Incorrect passcode') {
             setS((p) => ({
               ...p,
               pending: false,
-              mode: 'create',
-              info:
-                "We couldn't verify that passcode. Create one to secure your progress, or try signing in again.",
-              error: undefined,
+              passcode: '',
+              error: 'Incorrect passcode',
+              info: undefined,
+              mode: 'signin',
             }));
-          } else {
-            setS((p) => ({ ...p, pending: false, error: rawMessage || 'Sign-in failed' }));
+            setTimeout(() => passcodeRef.current?.focus(), 0);
+            return;
           }
+
+          setS((p) => ({
+            ...p,
+            pending: false,
+            error: 'Sign-in failed',
+            info: undefined,
+            mode: 'signin',
+          }));
           return;
         }
+
+        if (!res.ok) {
+          setS((p) => ({
+            ...p,
+            pending: false,
+            error: errorMessage || 'Sign-in failed',
+            info: undefined,
+            mode: 'signin',
+          }));
+          return;
+        }
+
+        storeSessionFromExchange(json);
+        storePasscode(passcodeInput);
+        await ensureSupabaseAuthSession();
       } else {
         await registerNicknameWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
         await ensureSupabaseAuthSession();
@@ -284,6 +311,7 @@ export default function AuthGate() {
           maxLength={10}
           disabled={s.pending}
           inputMode="numeric"
+          ref={passcodeRef}
           style={{
             width: '100%',
             padding: '10px 12px',
