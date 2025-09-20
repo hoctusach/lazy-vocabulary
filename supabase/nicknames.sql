@@ -81,32 +81,6 @@ alter table public.nicknames drop constraint if exists nicknames_name_canonical_
 alter table public.nicknames drop constraint if exists nicknames_user_unique_key_key;
 alter table public.nicknames add constraint nicknames_user_unique_key_key unique (user_unique_key);
 
--- Helper accessors for request-scoped claims
-create or replace function public.request_claim_text(claim_name text)
-returns text
-language sql
-stable
-as $$
-  select nullif(
-    (coalesce(nullif(current_setting('request.jwt.claims', true), ''), '{}')::jsonb ->> claim_name),
-    ''
-  );
-$$;
-
-create or replace function public.request_claim_bigint(claim_name text)
-returns bigint
-language sql
-stable
-as $$
-  select case
-    when claim_txt ~ '^-?\\d+$' then claim_txt::bigint
-    else null
-  end
-  from (
-    select coalesce(public.request_claim_text(claim_name), '') as claim_txt
-  ) s;
-$$;
-
 alter table public.nicknames enable row level security;
 
 -- Drop legacy auth-based policies
@@ -118,24 +92,58 @@ drop policy if exists "nicknames_manage_by_claims" on public.nicknames;
 
 drop function if exists public.rotate_claim_code(text);
 drop function if exists public.claim_nickname(text, text);
+drop function if exists public.request_claim_text(text);
+drop function if exists public.request_claim_bigint(text);
 
--- Passcode + user key based policies
-create policy "nicknames_manage_by_claims"
+create or replace function public.current_session_token()
+returns text
+language plpgsql
+stable
+as $$
+declare
+  auth_header text;
+begin
+  auth_header := nullif(current_setting('request.header.authorization', true), '');
+  if auth_header is null then
+    return null;
+  end if;
+  if auth_header ilike 'bearer %' then
+    return nullif(btrim(substring(auth_header from 8)), '');
+  end if;
+  return nullif(btrim(auth_header), '');
+end;
+$$;
+
+create or replace function public.current_session_user_key()
+returns text
+language plpgsql
+stable
+security definer
+set search_path = public
+as $$
+declare
+  token text := public.current_session_token();
+  result text;
+begin
+  if token is null then
+    return null;
+  end if;
+
+  select us.user_unique_key
+    into result
+  from public.user_sessions us
+  where us.session_token = token
+    and us.expires_at > now()
+  limit 1;
+
+  return result;
+end;
+$$;
+
+create policy "nicknames_by_session_token"
 on public.nicknames
 for all
-using (
-  public.request_claim_text('user_unique_key') = user_unique_key
-  and (
-    (passcode is null and public.request_claim_bigint('passcode') is null)
-    or (passcode is not null and public.request_claim_bigint('passcode') = passcode)
-  )
-)
-with check (
-  public.request_claim_text('user_unique_key') = user_unique_key
-  and (
-    (passcode is null and public.request_claim_bigint('passcode') is null)
-    or (passcode is not null and public.request_claim_bigint('passcode') = passcode)
-  )
-);
+using (user_unique_key = public.current_session_user_key())
+with check (user_unique_key = public.current_session_user_key());
 
 notify pgrst, 'reload schema';

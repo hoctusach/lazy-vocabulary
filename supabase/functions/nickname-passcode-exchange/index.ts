@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.0';
-import { SignJWT } from 'https://esm.sh/jose@4.15.5';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,43 +35,12 @@ function errorResponse(message: string, status = 400) {
   });
 }
 
-async function createAccessToken(
-  supabaseUrl: string,
-  jwtSecret: string,
-  userKey: string,
-  nickname: string,
-  passcode: number,
-  expiresInSeconds: number,
-): Promise<string> {
-  const now = Math.floor(Date.now() / 1000);
-  const exp = now + Math.max(60, expiresInSeconds);
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(jwtSecret),
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign'],
-  );
-
-  return new SignJWT({
-    role: 'authenticated',
-    user_unique_key: userKey,
-    passcode,
-    nickname,
-  })
-    .setProtectedHeader({ alg: 'HS256', typ: 'JWT' })
-    .setIssuedAt(now)
-    .setExpirationTime(exp)
-    .setAudience('authenticated')
-    .setIssuer(supabaseUrl)
-    .setSubject(userKey)
-    .sign(key);
-}
-
-function createRefreshToken(): string {
+function createSessionToken(): string {
   const entropy = crypto.getRandomValues(new Uint8Array(32));
-  return btoa(String.fromCharCode(...entropy));
+  return btoa(String.fromCharCode(...entropy))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/g, '');
 }
 
 Deno.serve(async (req) => {
@@ -112,9 +80,7 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  const jwtSecret = Deno.env.get('SUPABASE_JWT_SECRET') ?? Deno.env.get('JWT_SECRET');
-
-  if (!supabaseUrl || !serviceRoleKey || !jwtSecret) {
+  if (!supabaseUrl || !serviceRoleKey) {
     return errorResponse('Server misconfiguration', 500);
   }
 
@@ -137,27 +103,29 @@ Deno.serve(async (req) => {
     return errorResponse('Incorrect passcode', 401);
   }
 
-  const expiresInSeconds = 60 * 60; // 1 hour
-  const accessToken = await createAccessToken(
-    supabaseUrl,
-    jwtSecret,
-    userKey,
-    nickname,
-    passcodeNumeric,
-    expiresInSeconds,
-  );
-  const refreshToken = createRefreshToken();
+  const expiresInSeconds = 60 * 60 * 24; // 24 hours
   const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
+  const sessionToken = createSessionToken();
+
+  const { error: insertError } = await adminClient.from('user_sessions').insert({
+    session_token: sessionToken,
+    user_unique_key: userKey,
+    nickname,
+    expires_at: new Date(expiresAt * 1000).toISOString(),
+  });
+
+  if (insertError) {
+    console.error('user_sessions insert error', insertError.message);
+    return errorResponse('Authentication failed', 500);
+  }
 
   return new Response(
     JSON.stringify({
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      token_type: 'bearer',
       expires_in: expiresInSeconds,
       expires_at: expiresAt,
       user_unique_key: userKey,
       nickname,
+      session_token: sessionToken,
     }),
     {
       status: 200,

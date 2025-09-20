@@ -7,7 +7,7 @@ import {
 } from '@/lib/customAuth';
 import { requireSupabaseClient } from '@/lib/supabaseClient';
 
-const SESSION_STORAGE_KEY = 'lazyVoca.session';
+const SESSION_STORAGE_KEY = 'lazyVoca.authState';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
 const USER_KEY_STORAGE_KEY = 'lazyVoca.userKey';
 
@@ -75,7 +75,7 @@ function persistAuthState(session: Session | null): void {
 }
 
 function loadStoredAuthPayload(): StoredAuthPayload | null {
-  const raw = readFromStorage(SESSION_STORAGE_KEY);
+  const raw = readFromStorage(SESSION_STORAGE_KEY) ?? readFromStorage('lazyVoca.session');
   if (!raw) return null;
 
   try {
@@ -83,11 +83,16 @@ function loadStoredAuthPayload(): StoredAuthPayload | null {
     if (!parsed || !parsed.session) return null;
 
     if (parsed.version === STORAGE_VERSION) {
+      if (!readFromStorage(SESSION_STORAGE_KEY)) {
+        writeToStorage(SESSION_STORAGE_KEY, raw);
+      }
       return { version: STORAGE_VERSION, session: parsed.session };
     }
 
     if (!parsed.version || parsed.version < STORAGE_VERSION) {
-      return { version: STORAGE_VERSION, session: parsed.session };
+      const migrated: StoredAuthPayload = { version: STORAGE_VERSION, session: parsed.session };
+      writeToStorage(SESSION_STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
     }
   } catch {
     return null;

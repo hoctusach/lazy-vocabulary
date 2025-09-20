@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { getAuthHeader } from '@/lib/customAuth';
 
 let client: SupabaseClient | null = null;
 let hasShownMissingMessage = false;
@@ -522,6 +523,19 @@ if (typeof window !== 'undefined') {
   }
 }
 
+const createAuthenticatedFetch = (): typeof fetch => {
+  return async (input, init) => {
+    const headers = new Headers(init?.headers ?? {});
+    const auth = getAuthHeader();
+    for (const [key, value] of Object.entries(auth)) {
+      if (value) {
+        headers.set(key, value);
+      }
+    }
+    return fetch(input, { ...init, headers });
+  };
+};
+
 export function getSupabaseClient(): SupabaseClient | null {
   if (client) return client;
   const { url, anon } = resolveSupabaseConfig();
@@ -534,6 +548,9 @@ export function getSupabaseClient(): SupabaseClient | null {
       autoRefreshToken: false,
       persistSession: false,
       detectSessionInUrl: false,
+    },
+    global: {
+      fetch: createAuthenticatedFetch(),
     },
   });
   return client;

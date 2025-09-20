@@ -1,23 +1,63 @@
 import { EXCHANGE_FN_URL } from '@/config';
 
 export type CustomSession = {
-  accessToken: string;
-  refreshToken: string;
+  sessionToken: string;
   expiresAt: number; // unix seconds
+  expiresIn: number; // seconds
   nickname: string;
   userKey: string; // user_unique_key
 };
 
 let _session: CustomSession | null = null;
-const LS_KEY = 'lazyVoca.auth';
+const LS_KEY = 'lazyVoca.session';
+const LEGACY_KEY = 'lazyVoca.auth';
 
 export function loadFromStorageOnBoot(): void {
   try {
-    const raw = localStorage.getItem(LS_KEY);
+    const stored = localStorage.getItem(LS_KEY);
+    const legacyStored = stored ? null : localStorage.getItem(LEGACY_KEY);
+    const raw = stored ?? legacyStored;
     if (!raw) return;
-    const s = JSON.parse(raw) as CustomSession;
-    if (typeof s?.accessToken === 'string' && typeof s?.expiresAt === 'number') {
-      _session = s;
+    const s = JSON.parse(raw) as Partial<CustomSession> & {
+      expires_at?: number;
+      session_token?: string;
+      user_unique_key?: string;
+    };
+    const expiresAt =
+      typeof s.expiresAt === 'number'
+        ? s.expiresAt
+        : typeof s.expires_at === 'number'
+          ? s.expires_at
+          : null;
+    const sessionToken =
+      typeof s.sessionToken === 'string'
+        ? s.sessionToken
+        : typeof s.session_token === 'string'
+          ? s.session_token
+          : null;
+    if (sessionToken && expiresAt) {
+      const hydrated: CustomSession = {
+        sessionToken,
+        expiresAt,
+        expiresIn:
+          typeof s.expiresIn === 'number'
+            ? s.expiresIn
+            : typeof s.expires_in === 'number'
+              ? s.expires_in
+              : 0,
+        nickname: typeof s.nickname === 'string' ? s.nickname : '',
+        userKey:
+          typeof s.userKey === 'string'
+            ? s.userKey
+            : typeof s.user_unique_key === 'string'
+              ? s.user_unique_key
+              : '',
+      };
+      _session = hydrated;
+      if (legacyStored) {
+        localStorage.removeItem(LEGACY_KEY);
+        localStorage.setItem(LS_KEY, JSON.stringify(hydrated));
+      }
     }
   } catch {
     /* ignore storage errors */
@@ -36,13 +76,10 @@ export function getSession(): CustomSession | null {
   return _session;
 }
 
-export function getAccessToken(): string | null {
-  return getSession()?.accessToken ?? null;
-}
-
 export function getAuthHeader(): Record<string, string> {
-  const t = getAccessToken();
-  return t ? { Authorization: `Bearer ${t}` } : {};
+  const session = getSession();
+  if (!session?.sessionToken) return {};
+  return { Authorization: `Bearer ${session.sessionToken}` };
 }
 
 export async function signIn(nickname: string, passcode: string | number): Promise<void> {
@@ -55,16 +92,20 @@ export async function signIn(nickname: string, passcode: string | number): Promi
   if (!res.ok) {
     throw new Error(json?.error || 'Sign-in failed');
   }
+  if (typeof json.session_token !== 'string' || typeof json.expires_at !== 'number') {
+    throw new Error('Invalid authentication response');
+  }
   const session: CustomSession = {
-    accessToken: json.access_token,
-    refreshToken: json.refresh_token,
+    sessionToken: json.session_token,
     expiresAt: json.expires_at,
-    nickname: json.nickname,
-    userKey: json.user_unique_key,
+    expiresIn: typeof json.expires_in === 'number' ? json.expires_in : 0,
+    nickname: typeof json.nickname === 'string' ? json.nickname : '',
+    userKey: typeof json.user_unique_key === 'string' ? json.user_unique_key : '',
   };
   _session = session;
   try {
     localStorage.setItem(LS_KEY, JSON.stringify(session));
+    localStorage.removeItem(LEGACY_KEY);
   } catch {
     /* ignore storage errors */
   }
@@ -74,6 +115,7 @@ export function signOut(): void {
   _session = null;
   try {
     localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LEGACY_KEY);
   } catch {
     /* ignore storage errors */
   }
