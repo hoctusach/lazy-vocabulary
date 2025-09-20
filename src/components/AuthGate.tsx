@@ -208,7 +208,7 @@ export default function AuthGate() {
             pending: false,
             error: errorMessage || 'Sign-in failed',
             info: undefined,
-            mode: 'signin',
+            mode: 'create',
           }));
           return;
         }
@@ -219,7 +219,7 @@ export default function AuthGate() {
             pending: false,
             error: errorMessage || 'Sign-in failed',
             info: undefined,
-            mode: 'signin',
+            mode: 'create',
           }));
           return;
         }
@@ -272,13 +272,20 @@ export default function AuthGate() {
   };
 
   const BLOCKED_CHARS_HELP = "< > \" ' ` $ \\ { } | ;";
+  const isCreateMode = s.mode === 'create';
   const buttonLabel = s.pending
-    ? s.mode === 'signin'
-      ? 'Signing in…'
-      : 'Creating…'
-    : s.mode === 'signin'
-    ? 'Sign in'
-    : 'Create new profile';
+    ? isCreateMode
+      ? 'Creating…'
+      : 'Signing in…'
+    : isCreateMode
+    ? 'Create profile'
+    : 'Sign in';
+  const modeDescription = isCreateMode
+    ? 'Pick a nickname and numeric passcode to create your profile. We will sign you in after saving it.'
+    : 'Enter your nickname and passcode to sync progress across devices.';
+  const passcodeHelpText = isCreateMode
+    ? 'Choose a 4-10 digit passcode. Numbers only.'
+    : PASSCODE_HELP;
 
   return (
     <div
@@ -322,10 +329,8 @@ export default function AuthGate() {
         >
           ×
         </button>
-        <h3 style={{ margin: 0 }}>Access your vocabulary</h3>
-        <p style={{ marginTop: 6, color: '#555', fontSize: 14 }}>
-          Enter your nickname and passcode to sync progress across devices. First time here? Create a passcode below.
-        </p>
+        <h3 style={{ margin: 0 }}>{isCreateMode ? 'Create your profile' : 'Access your vocabulary'}</h3>
+        <p style={{ marginTop: 6, color: '#555', fontSize: 14 }}>{modeDescription}</p>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
           Nickname
         </label>
@@ -337,8 +342,7 @@ export default function AuthGate() {
               ...p,
               nickname: e.target.value,
               error: undefined,
-              info: undefined,
-              mode: 'signin',
+              info: p.mode === 'signin' ? undefined : p.info,
             }))
           }
           placeholder="e.g., Mi mi U"
@@ -378,7 +382,7 @@ export default function AuthGate() {
             letterSpacing: 3,
           }}
         />
-        <div style={{ marginTop: 4, fontSize: 12, color: '#777' }}>{PASSCODE_HELP}</div>
+        <div style={{ marginTop: 4, fontSize: 12, color: '#777' }}>{passcodeHelpText}</div>
         {s.info && (
           <div
             style={{
@@ -413,6 +417,34 @@ export default function AuthGate() {
         >
           {buttonLabel}
         </button>
+        {!isCreateMode && (
+          <button
+            type="button"
+            onClick={() =>
+              setS((p) => ({
+                ...p,
+                mode: 'create',
+                info:
+                  'Choose a nickname and 4-10 digit passcode. We will save it and sign you in automatically.',
+                error: undefined,
+              }))
+            }
+            disabled={s.pending}
+            style={{
+              marginTop: 10,
+              width: '100%',
+              padding: '8px 12px',
+              borderRadius: 8,
+              border: '1px solid #d4d4d4',
+              background: '#fafafa',
+              color: '#333',
+              fontSize: 13,
+              cursor: s.pending ? 'default' : 'pointer',
+            }}
+          >
+            Create a new profile
+          </button>
+        )}
         {s.mode === 'create' && (
           <button
             type="button"
@@ -437,7 +469,7 @@ export default function AuthGate() {
               cursor: s.pending ? 'default' : 'pointer',
             }}
           >
-            Already have a passcode? Try again
+            Already have a passcode? Sign in
           </button>
         )}
         <div style={{ marginTop: 8, fontSize: 12, color: '#777' }}>
