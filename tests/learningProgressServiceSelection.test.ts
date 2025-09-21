@@ -156,4 +156,51 @@ describe('LearningProgressService daily selection persistence', () => {
     expect(selection.reviewWords.map(w => w.word)).toContain('apple');
     expect(selection.newWords.some(w => w.word === 'apple')).toBe(false);
   });
+
+  it('keeps review metadata unchanged when syncing a due selection to Supabase', async () => {
+    const now = Date.now();
+    const learnedIso = new Date(now - 30 * 86400000).toISOString();
+    const lastReviewIso = new Date(now - 5 * 86400000).toISOString();
+    const dueDateKey = new Date(now - 86400000).toISOString().slice(0, 10);
+    const dueDisplayIso = new Date(now - 86400000).toISOString();
+
+    const storedProgress: Record<string, Partial<LearningProgress>> = {
+      'apple::fruit': {
+        word: 'apple',
+        category: 'fruit',
+        isLearned: true,
+        reviewCount: 3,
+        lastPlayedDate: lastReviewIso,
+        status: 'due',
+        nextReviewDate: dueDateKey,
+        createdDate: learnedIso.slice(0, 10),
+        learnedDate: learnedIso,
+        nextAllowedTime: dueDisplayIso
+      }
+    };
+
+    localStorage.setItem('learningProgress', JSON.stringify(storedProgress));
+
+    const upsertSpy = vi
+      .spyOn(learnedDb, 'upsertLearned')
+      .mockResolvedValue(undefined);
+
+    const words: VocabularyWord[] = [
+      { word: 'apple', meaning: '', example: '', category: 'fruit', count: 1 },
+      { word: 'banana', meaning: '', example: '', category: 'fruit', count: 1 }
+    ];
+
+    const selection = service.forceGenerateDailySelection(words, 'light');
+    await service.syncSelectionWithServer(selection);
+
+    expect(upsertSpy).toHaveBeenCalledTimes(1);
+    const [wordId, payload] = upsertSpy.mock.calls[0]!;
+
+    expect(wordId).toBe('fruit::apple');
+    expect(payload.review_count).toBe(3);
+    expect(payload.in_review_queue).toBe(true);
+    expect(payload.last_review_at).toBe(new Date(lastReviewIso).toISOString());
+    expect(payload.next_display_at).toBe(new Date(dueDisplayIso).toISOString());
+    expect(payload.next_review_at).toBe(`${dueDateKey}T00:00:00.000Z`);
+  });
 });

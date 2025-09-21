@@ -415,6 +415,52 @@ export class LearningProgressService {
     return Math.round(diff / 86_400_000);
   }
 
+  private toOptionalIsoString(value?: string | Date | null): string | undefined {
+    if (!value) return undefined;
+    if (value instanceof Date) return value.toISOString();
+    if (typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const parsed = Date.parse(trimmed);
+    if (Number.isNaN(parsed)) return undefined;
+    return new Date(parsed).toISOString();
+  }
+
+  private toOptionalDateKeyIso(value?: string | null): string | undefined {
+    if (!value || typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const candidate = trimmed.includes('T') ? trimmed : `${trimmed}T00:00:00.000Z`;
+    const parsed = Date.parse(candidate);
+    if (Number.isNaN(parsed)) return undefined;
+    return new Date(parsed).toISOString();
+  }
+
+  private buildSelectionSyncPayload(progress: StoredProgress): LearnedWordUpsert {
+    const hasReviewCount = progress.reviewCount !== undefined && progress.reviewCount !== null;
+    const reviewCount = this.coerceReviewCount(progress.reviewCount);
+    const learnedAt = this.toOptionalIsoString(progress.learnedDate ?? progress.createdDate);
+    const lastReviewAt = this.toOptionalIsoString(progress.lastPlayedDate);
+    const nextReviewAt = this.toOptionalDateKeyIso(progress.nextReviewDate);
+    const nextDisplayAt = this.toOptionalIsoString(progress.nextAllowedTime);
+    const intervalDays = learnedAt && nextReviewAt
+      ? this.computeIntervalDays(learnedAt, nextReviewAt)
+      : null;
+
+    return {
+      in_review_queue: this.isInReviewQueueStatus(progress.status),
+      review_count: hasReviewCount ? reviewCount : undefined,
+      learned_at: learnedAt,
+      last_review_at: lastReviewAt,
+      next_review_at: nextReviewAt,
+      next_display_at: nextDisplayAt,
+      last_seen_at: lastReviewAt,
+      srs_interval_days: intervalDays ?? undefined,
+      srs_easiness: 2.5,
+      srs_state: this.toSrsState(progress.status),
+    };
+  }
+
   private toSrsState(status?: StoredProgress['status']): string {
     switch (status) {
       case 'learned':
@@ -641,6 +687,54 @@ export class LearningProgressService {
     } catch (error) {
       console.warn('[LearningProgressService] Failed to load learned words', error);
       return Object.values(cache);
+    }
+  }
+
+  async syncSelectionWithServer(selection: DailySelection): Promise<void> {
+    if (!selection || !Array.isArray(selection.reviewWords) || selection.reviewWords.length === 0) {
+      return;
+    }
+
+    const progressMap = this.loadProgressMap();
+    const processed = new Set<string>();
+    const tasks: Promise<void>[] = [];
+
+    for (const progress of selection.reviewWords) {
+      if (!progress) continue;
+
+      const wordId = toWordId(progress.word, progress.category);
+      if (!wordId || processed.has(wordId)) continue;
+      processed.add(wordId);
+
+      const preferredKey = this.buildWordKey(progress.word, progress.category);
+      const resolved = this.resolveProgressEntry(progressMap, preferredKey);
+      const base: StoredProgress = {
+        ...(resolved.entry ?? {}),
+        word: resolved.word || progress.word,
+        category: resolved.category ?? progress.category,
+        isLearned: resolved.entry?.isLearned ?? progress.isLearned,
+        reviewCount: resolved.entry?.reviewCount ?? progress.reviewCount,
+        lastPlayedDate: resolved.entry?.lastPlayedDate ?? progress.lastPlayedDate,
+        status: resolved.entry?.status ?? progress.status,
+        nextReviewDate: resolved.entry?.nextReviewDate ?? progress.nextReviewDate,
+        createdDate: resolved.entry?.createdDate ?? progress.createdDate,
+        learnedDate: resolved.entry?.learnedDate ?? progress.learnedDate,
+        nextAllowedTime: resolved.entry?.nextAllowedTime ?? progress.nextAllowedTime,
+      };
+
+      if (!base.word) continue;
+
+      const payload = this.buildSelectionSyncPayload(base);
+
+      tasks.push(
+        upsertLearned(wordId, payload).catch(error => {
+          console.warn('[LearningProgressService] Failed to ensure learned word exists', error);
+        })
+      );
+    }
+
+    if (tasks.length > 0) {
+      await Promise.all(tasks);
     }
   }
 
