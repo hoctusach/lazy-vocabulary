@@ -10,4 +10,6 @@ export type LearnedWord = {
   word_id: string;
   in_review_queue: boolean;
   learned_at?: string; // ISO timestamp
+  next_review_at?: string | null; // Date-only ISO timestamp
+  next_display_at?: string | null; // ISO timestamp
 };

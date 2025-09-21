@@ -108,31 +108,41 @@ describe('LearningProgressService daily selection persistence', () => {
 
   it('caches Supabase due words for the current day', async () => {
     const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString();
+    const tomorrow = new Date(Date.now() + 86400000).toISOString();
+
     const getLearnedSpy = vi
       .spyOn(learnedDb, 'getLearned')
       .mockResolvedValue([
-        { word_id: 'fruit::apple', in_review_queue: true },
-        { word_id: 'fruit::apple', in_review_queue: true },
-        { word_id: 'fruit::banana', in_review_queue: false }
+        { word_id: 'fruit::apple', in_review_queue: true, next_review_at: yesterday },
+        { word_id: 'fruit::apple', in_review_queue: true, next_review_at: yesterday },
+        { word_id: 'fruit::banana', in_review_queue: true, next_review_at: tomorrow },
+        { word_id: 'fruit::cherry', in_review_queue: true, next_display_at: yesterday },
+        { word_id: 'fruit::date', in_review_queue: true, next_display_at: tomorrow },
+        { word_id: 'fruit::elderberry', in_review_queue: false, next_review_at: yesterday }
       ]);
 
     const result = await service.syncServerDueWords();
-    expect(result).toEqual(['fruit::apple']);
+    expect(result).toEqual(['fruit::apple', 'fruit::cherry']);
     expect(getLearnedSpy).toHaveBeenCalledTimes(1);
 
     const storedWords = localStorage.getItem('todayWords');
-    expect(storedWords).toBe(JSON.stringify(['fruit::apple']));
+    expect(storedWords).toBe(JSON.stringify(['fruit::apple', 'fruit::cherry']));
     expect(localStorage.getItem('lastSyncDate')).toBe(today);
 
     getLearnedSpy.mockClear();
     const secondResult = await service.syncServerDueWords();
-    expect(secondResult).toEqual(['fruit::apple']);
+    expect(secondResult).toEqual(['fruit::apple', 'fruit::cherry']);
     expect(getLearnedSpy).not.toHaveBeenCalled();
   });
 
   it('includes cached server due words in the review selection', async () => {
     vi.spyOn(learnedDb, 'getLearned').mockResolvedValue([
-      { word_id: 'fruit::apple', in_review_queue: true }
+      {
+        word_id: 'fruit::apple',
+        in_review_queue: true,
+        next_review_at: new Date(Date.now() - 86400000).toISOString()
+      }
     ]);
 
     await service.syncServerDueWords();
