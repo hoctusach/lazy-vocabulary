@@ -3,6 +3,7 @@ import type { LearnedWord } from '@/core/models';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { recalcProgressSummary } from '@/lib/progress/progressSummary';
 import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
+import { getActiveSession } from '@/lib/auth';
 
 export type LearnedWordUpsert = {
   in_review_queue: boolean;
@@ -48,6 +49,8 @@ function normaliseText(value?: string | null): string | null {
 }
 
 export async function getLearned(): Promise<LearnedWord[]> {
+  const session = await getActiveSession();
+  if (!session?.user_unique_key) return [];
   const supabase = getSupabaseClient();
   if (!supabase) return [];
   const user_unique_key = await ensureUserKey();
@@ -64,6 +67,8 @@ export async function upsertLearned(
   wordId: string,
   payload: LearnedWordUpsert
 ): Promise<void> {
+  const session = await getActiveSession();
+  if (!session?.user_unique_key) return;
   const supabase = getSupabaseClient();
   if (!supabase) return;
   const user_unique_key = await ensureUserKey();
@@ -87,7 +92,7 @@ export async function upsertLearned(
 
   const { error } = await supabase
     .from('learned_words')
-    .upsert(record, { onConflict: 'user_unique_key,word_id' });
+    .upsert(record, { onConflict: ['user_unique_key', 'word_id'] });
 
   if (error) {
     throw error;
@@ -97,6 +102,8 @@ export async function upsertLearned(
 }
 
 export async function resetLearned(wordId: string): Promise<void> {
+  const session = await getActiveSession();
+  if (!session?.user_unique_key) return;
   const supabase = getSupabaseClient();
   if (!supabase) return;
 

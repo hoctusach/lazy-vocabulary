@@ -15,6 +15,12 @@ import {
   LEARNING_PROGRESS_KEY,
   TODAY_WORDS_KEY
 } from '@/utils/storageKeys';
+import {
+  calculateNextIntervalDays,
+  addIntervalDays,
+  SRS_FIXED_INTERVALS_DAYS,
+} from '@/lib/progress/srsIntervals';
+import { getActiveSession } from '@/lib/auth';
 
 const DEFAULT_SEVERITY_CONFIG: SeverityConfig = {
   light: { min: 15, max: 25 },
@@ -22,8 +28,7 @@ const DEFAULT_SEVERITY_CONFIG: SeverityConfig = {
   intense: { min: 50, max: 100 }
 };
 
-const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
-const MASTER_INTERVAL_DAYS = 60;
+const REVIEW_INTERVALS_DAYS = Array.from(SRS_FIXED_INTERVALS_DAYS);
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 
@@ -34,6 +39,8 @@ type StoredProgress = Partial<LearningProgress> & {
 
 export class LearningProgressService {
   private readonly severityConfig: SeverityConfig = DEFAULT_SEVERITY_CONFIG;
+  private readonly serverLearnedWordCache = new Map<string, LearnedWord>();
+  private loadingServerCache: Promise<void> | null = null;
 
   static getInstance() {
     return new LearningProgressService();
@@ -133,6 +140,65 @@ export class LearningProgressService {
       storage.setItem(LAST_SYNC_DATE_KEY, date);
     } catch (error) {
       console.warn('[LearningProgressService] Failed to persist server due words', error);
+    }
+  }
+
+  private updateServerCacheFromRows(rows: LearnedWord[], replace = false): void {
+    if (!Array.isArray(rows)) return;
+    if (replace) {
+      this.serverLearnedWordCache.clear();
+    }
+
+    for (const row of rows) {
+      if (!row) continue;
+      const key = this.normaliseWordId(row.word_id);
+      if (!key) continue;
+      this.serverLearnedWordCache.set(key, { ...row, word_id: row.word_id });
+    }
+  }
+
+  private updateServerCacheEntry(wordId: string, updates: Partial<LearnedWord>): void {
+    const key = this.normaliseWordId(wordId);
+    if (!key) return;
+    const existing = this.serverLearnedWordCache.get(key) ?? { word_id: wordId, in_review_queue: false };
+    const merged: LearnedWord = {
+      ...existing,
+      ...updates,
+      word_id: updates.word_id ?? existing.word_id ?? wordId,
+    };
+    this.serverLearnedWordCache.set(key, merged);
+  }
+
+  private removeServerCacheEntry(wordId: string): void {
+    const key = this.normaliseWordId(wordId);
+    if (!key) return;
+    this.serverLearnedWordCache.delete(key);
+  }
+
+  private async ensureServerCache(): Promise<void> {
+    if (this.serverLearnedWordCache.size > 0) return;
+    if (this.loadingServerCache) {
+      try {
+        await this.loadingServerCache;
+      } catch {
+        // ignore cache load failures, caller will retry later
+      }
+      return;
+    }
+
+    this.loadingServerCache = (async () => {
+      try {
+        const rows = await getLearned();
+        this.updateServerCacheFromRows(rows, true);
+      } catch (error) {
+        console.warn('[LearningProgressService] Failed to warm server cache', error);
+      }
+    })();
+
+    try {
+      await this.loadingServerCache;
+    } finally {
+      this.loadingServerCache = null;
     }
   }
 
@@ -292,26 +358,11 @@ export class LearningProgressService {
     return new Date(parsed).toISOString();
   }
 
-  private computeIntervalDays(learnedAt?: string, nextReviewAt?: string | null): number | null {
-    if (!nextReviewAt) return null;
-    const start = learnedAt ? Date.parse(learnedAt) : Date.now();
-    const end = Date.parse(nextReviewAt);
-    if (Number.isNaN(start) || Number.isNaN(end)) return null;
-    const diff = Math.max(0, end - start);
-    return Math.round(diff / 86_400_000);
-  }
-
   private toSrsState(status?: StoredProgress['status']): string {
-    switch (status) {
-      case 'learned':
-        return 'graduated';
-      case 'due':
-        return 'review';
-      case 'not_due':
-        return 'learning';
-      default:
-        return 'new';
+    if (status === 'learned') {
+      return 'Learned';
     }
+    return 'Learning';
   }
 
   private isInReviewQueueStatus(status?: StoredProgress['status']): boolean {
@@ -326,14 +377,11 @@ export class LearningProgressService {
     category: string | undefined,
     progress: StoredProgress
   ): { wordId: string; payload: LearnedWordUpsert } {
-    const reviewCount = this.coerceReviewCount(progress.reviewCount);
+    const reviewCount = Math.max(0, Math.trunc(this.coerceReviewCount(progress.reviewCount)));
     const learnedAt = this.toIsoString(progress.learnedDate ?? progress.createdDate);
     const lastReviewAt = this.toIsoString(progress.lastPlayedDate ?? learnedAt);
     const nextReviewAt = this.toIsoFromDateKey(progress.nextReviewDate);
-    const nextDisplayAt = progress.nextAllowedTime
-      ? this.toIsoString(progress.nextAllowedTime)
-      : nextReviewAt;
-    const intervalDays = this.computeIntervalDays(learnedAt, nextReviewAt ?? null);
+    const intervalDays = reviewCount > 0 ? calculateNextIntervalDays(reviewCount) : null;
     const srsState = this.toSrsState(progress.status);
     const wordId = toWordId(word, category);
 
@@ -343,7 +391,7 @@ export class LearningProgressService {
       learned_at: learnedAt,
       last_review_at: lastReviewAt,
       next_review_at: nextReviewAt ?? null,
-      next_display_at: nextDisplayAt ?? null,
+      next_display_at: nextReviewAt ?? null,
       last_seen_at: lastReviewAt,
       srs_interval_days: intervalDays,
       srs_easiness: 2.5,
@@ -361,6 +409,19 @@ export class LearningProgressService {
     try {
       const built = this.buildSupabasePayload(word, category, progress);
       await upsertLearned(built.wordId, built.payload);
+      this.updateServerCacheEntry(built.wordId, {
+        word_id: built.wordId,
+        in_review_queue: built.payload.in_review_queue,
+        review_count: built.payload.review_count ?? null,
+        learned_at: built.payload.learned_at ?? null,
+        last_review_at: built.payload.last_review_at ?? null,
+        next_review_at: built.payload.next_review_at ?? null,
+        next_display_at: built.payload.next_display_at ?? null,
+        last_seen_at: built.payload.last_seen_at ?? null,
+        srs_interval_days: built.payload.srs_interval_days ?? null,
+        srs_easiness: built.payload.srs_easiness ?? null,
+        srs_state: built.payload.srs_state ?? null,
+      });
       return built;
     } catch (error) {
       console.warn('[LearningProgressService] Failed to sync learned word', error);
@@ -369,12 +430,10 @@ export class LearningProgressService {
   }
 
   private calculateNextReviewDate(reviewCount: number, from: Date): string {
-    const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
-    const intervalDays =
-      reviewCount > REVIEW_INTERVALS_DAYS.length
-        ? MASTER_INTERVAL_DAYS
-        : REVIEW_INTERVALS_DAYS[index];
+    const safeCount = Math.max(1, reviewCount);
+    const intervalDays = calculateNextIntervalDays(safeCount);
     const next = new Date(from);
+    next.setHours(0, 0, 0, 0);
     next.setDate(next.getDate() + intervalDays);
     return next.toISOString().slice(0, 10);
   }
@@ -472,6 +531,33 @@ export class LearningProgressService {
     return timestamp <= today.getTime();
   }
 
+  private isServerDue(nextDisplayAt?: string | null): boolean {
+    if (!nextDisplayAt) return false;
+    const parsed = Date.parse(nextDisplayAt);
+    if (Number.isNaN(parsed)) return false;
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    return parsed <= today.getTime();
+  }
+
+  private parseDate(value?: string | null): Date | null {
+    if (!value) return null;
+    const parsed = Date.parse(value);
+    if (Number.isNaN(parsed)) return null;
+    return new Date(parsed);
+  }
+
+  private startOfDay(date: Date): Date {
+    const next = new Date(date);
+    next.setHours(0, 0, 0, 0);
+    return next;
+  }
+
+  private isSameDayDates(a: Date | null, b: Date | null): boolean {
+    if (!a || !b) return false;
+    return a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
+  }
+
   private isLearnedProgress(stored?: StoredProgress): boolean {
     if (!stored) return false;
     if (stored.isLearned === true) return true;
@@ -519,6 +605,7 @@ export class LearningProgressService {
 
   async getLearnedWords(): Promise<{ word: string }[]> {
     const rows = await getLearned();
+    this.updateServerCacheFromRows(rows as LearnedWord[], true);
     return rows.map(r => ({ word: r.word_id }));
   }
 
@@ -581,6 +668,7 @@ export class LearningProgressService {
     const wordId = toWordId(resolved.word, category);
     if (wordId) {
       void resetLearned(wordId);
+      this.removeServerCacheEntry(wordId);
     }
   }
 
@@ -700,6 +788,7 @@ export class LearningProgressService {
 
     try {
       const rows = await getLearned();
+      this.updateServerCacheFromRows(rows as LearnedWord[], true);
       const dueIds = new Set<string>();
 
       for (const row of rows ?? []) {
@@ -709,12 +798,9 @@ export class LearningProgressService {
         const inQueue = this.isInReviewQueue(typed.in_review_queue);
         if (!inQueue) continue;
 
-        const due = this.isDue({
-          nextReviewDate:
-            typeof typed.next_review_at === 'string' ? typed.next_review_at : undefined,
-          nextAllowedTime:
-            typeof typed.next_display_at === 'string' ? typed.next_display_at : undefined
-        });
+        const due = this.isServerDue(
+          typeof typed.next_display_at === 'string' ? typed.next_display_at : undefined
+        );
         if (!due) continue;
 
         const wordIdValue = (typed as { word_id?: unknown }).word_id;
@@ -732,6 +818,114 @@ export class LearningProgressService {
     } catch (error) {
       console.warn('[LearningProgressService] Failed to sync due words from Supabase', error);
       return Array.from(this.getCachedServerDueWordSet(todayKey));
+    }
+  }
+
+  private async syncSelectionWithServer(selection: DailySelection | null): Promise<void> {
+    if (!selection) return;
+
+    const session = await getActiveSession();
+    if (!session?.user_unique_key) return;
+
+    try {
+      await this.ensureServerCache();
+    } catch {
+      // ignore cache warm-up errors
+    }
+
+    const entries = [...selection.reviewWords, ...selection.newWords];
+    if (!entries.length) return;
+
+    const now = new Date();
+    const todayStart = this.startOfDay(now);
+    const seen = new Set<string>();
+    const tasks: Promise<void>[] = [];
+
+    for (const progress of entries) {
+      const wordId = toWordId(progress.word, progress.category);
+      if (!wordId) continue;
+
+      const cacheKey = this.normaliseWordId(wordId);
+      if (!cacheKey || seen.has(cacheKey)) continue;
+      seen.add(cacheKey);
+
+      const existing = this.serverLearnedWordCache.get(cacheKey);
+      const existingState = (existing?.srs_state ?? '').toLowerCase();
+      const isGraduated = existingState === 'learned' || existingState === 'graduated';
+
+      let reviewCount =
+        typeof existing?.review_count === 'number' && Number.isFinite(existing.review_count)
+          ? Math.max(0, Math.trunc(existing.review_count))
+          : 0;
+
+      const lastSeen = this.parseDate(existing?.last_seen_at ?? null);
+      const seenToday = this.isSameDayDates(lastSeen, now);
+
+      let intervalDays =
+        typeof existing?.srs_interval_days === 'number' && Number.isFinite(existing.srs_interval_days)
+          ? Math.max(1, Math.trunc(existing.srs_interval_days))
+          : null;
+
+      let nextDisplayDate = existing?.next_display_at ? this.parseDate(existing.next_display_at) : null;
+
+      if (!seenToday && !isGraduated) {
+        reviewCount = reviewCount + 1 || 1;
+        intervalDays = calculateNextIntervalDays(reviewCount, intervalDays ?? undefined);
+        nextDisplayDate = addIntervalDays(todayStart, intervalDays);
+      } else {
+        if (!intervalDays && reviewCount > 0) {
+          intervalDays = calculateNextIntervalDays(reviewCount, intervalDays ?? undefined);
+        }
+        if (!nextDisplayDate && intervalDays) {
+          nextDisplayDate = addIntervalDays(todayStart, intervalDays);
+        }
+      }
+
+      const lastSeenIso = now.toISOString();
+      const nextDisplayIso = nextDisplayDate ? this.startOfDay(nextDisplayDate).toISOString() : null;
+      const inReviewQueue = isGraduated ? false : true;
+      const srsState = isGraduated ? existing?.srs_state ?? 'Learned' : 'Learning';
+
+      const payload: LearnedWordUpsert = {
+        in_review_queue: inReviewQueue,
+        review_count: reviewCount,
+        learned_at: existing?.learned_at ?? lastSeenIso,
+        last_review_at: lastSeenIso,
+        next_review_at: nextDisplayIso,
+        next_display_at: nextDisplayIso,
+        last_seen_at: lastSeenIso,
+        srs_interval_days: intervalDays ?? null,
+        srs_state: srsState,
+      };
+
+      tasks.push(
+        upsertLearned(wordId, payload)
+          .then(() => {
+            this.updateServerCacheEntry(wordId, {
+              word_id: wordId,
+              in_review_queue: payload.in_review_queue,
+              review_count: payload.review_count ?? null,
+              learned_at: payload.learned_at ?? null,
+              last_review_at: payload.last_review_at ?? null,
+              next_review_at: payload.next_review_at ?? null,
+              next_display_at: payload.next_display_at ?? null,
+              last_seen_at: payload.last_seen_at ?? null,
+              srs_interval_days: payload.srs_interval_days ?? null,
+              srs_state: payload.srs_state ?? null,
+            });
+          })
+          .catch(error => {
+            console.warn('[LearningProgressService] Failed to sync daily selection word', error);
+          })
+      );
+    }
+
+    if (tasks.length > 0) {
+      try {
+        await Promise.all(tasks);
+      } catch {
+        // errors already logged per task
+      }
     }
   }
 
@@ -817,6 +1011,7 @@ export class LearningProgressService {
     };
 
     this.persistSelection(todayKey, selection);
+    void this.syncSelectionWithServer(selection);
 
     return selection;
   }
