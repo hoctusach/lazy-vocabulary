@@ -388,11 +388,42 @@ export class LearningProgressService {
     return Number.isFinite(parsed) ? parsed : 0;
   }
 
+  private normaliseOptionalString(value: unknown): string | undefined {
+    if (typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : undefined;
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) return null;
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  }
+
   private toIsoString(value?: string | Date | null): string {
     if (!value) return new Date().toISOString();
     if (value instanceof Date) return value.toISOString();
     const parsed = Date.parse(value);
     if (Number.isNaN(parsed)) return new Date().toISOString();
+    return new Date(parsed).toISOString();
+  }
+
+  private toNullableIsoString(value?: string | Date | null): string | null {
+    if (!value) return null;
+    if (value instanceof Date) return value.toISOString();
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Date.parse(trimmed);
+    if (Number.isNaN(parsed)) return null;
     return new Date(parsed).toISOString();
   }
 
@@ -403,6 +434,16 @@ export class LearningProgressService {
     const candidate = `${trimmed}T00:00:00.000Z`;
     const parsed = Date.parse(candidate);
     if (Number.isNaN(parsed)) return undefined;
+    return new Date(parsed).toISOString();
+  }
+
+  private toNullableIsoFromDateKey(value?: string | null): string | null {
+    if (!value) return null;
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const candidate = trimmed.includes('T') ? trimmed : `${trimmed}T00:00:00.000Z`;
+    const parsed = Date.parse(candidate);
+    if (Number.isNaN(parsed)) return null;
     return new Date(parsed).toISOString();
   }
 
@@ -641,6 +682,134 @@ export class LearningProgressService {
     } catch (error) {
       console.warn('[LearningProgressService] Failed to load learned words', error);
       return Object.values(cache);
+    }
+  }
+
+  async syncSelectionWithServer(selection: DailySelection): Promise<void> {
+    const reviewWords = Array.isArray(selection?.reviewWords) ? selection.reviewWords : [];
+    if (reviewWords.length === 0) return;
+
+    const progressMap = this.loadProgressMap();
+    const uniqueWords = new Map<
+      string,
+      { selection: LearningProgress; stored?: StoredProgress }
+    >();
+
+    for (const entry of reviewWords) {
+      if (!entry || typeof entry.word !== 'string') continue;
+      const wordId = this.normaliseWordId(toWordId(entry.word, entry.category));
+      if (!wordId) continue;
+      if (uniqueWords.has(wordId)) continue;
+
+      const key = this.buildWordKey(entry.word, entry.category);
+      const stored = progressMap[key] ?? progressMap[entry.word];
+      uniqueWords.set(wordId, { selection: entry, stored });
+    }
+
+    if (uniqueWords.size === 0) return;
+
+    let remoteRows: (LearnedWord & Record<string, unknown>)[] = [];
+    try {
+      const fetched = await getLearned();
+      if (Array.isArray(fetched)) {
+        remoteRows = fetched as (LearnedWord & Record<string, unknown>)[];
+      }
+    } catch (error) {
+      console.warn(
+        '[LearningProgressService] Failed to load remote learned words for selection sync',
+        error
+      );
+    }
+
+    const remoteMap = new Map<string, LearnedWord & Record<string, unknown>>();
+    for (const row of remoteRows) {
+      if (!row || typeof row !== 'object') continue;
+      const wordIdValue = (row as { word_id?: unknown }).word_id;
+      if (typeof wordIdValue !== 'string') continue;
+      const normalised = this.normaliseWordId(wordIdValue);
+      if (!normalised) continue;
+      remoteMap.set(normalised, row);
+    }
+
+    for (const [wordId, info] of uniqueWords) {
+      const entry = info.selection;
+      const stored = info.stored;
+      const remote = remoteMap.get(wordId);
+      const remoteRecord = remote as Record<string, unknown> | undefined;
+
+      const learnedAtSource =
+        this.normaliseOptionalString(remoteRecord?.['learned_at']) ??
+        stored?.learnedDate ??
+        stored?.createdDate ??
+        entry.learnedDate ??
+        entry.createdDate;
+
+      const lastReviewSource =
+        this.normaliseOptionalString(remoteRecord?.['last_review_at']) ??
+        stored?.lastPlayedDate ??
+        entry.lastPlayedDate;
+
+      const nextReviewSource =
+        this.normaliseOptionalString(remoteRecord?.['next_review_at']) ??
+        stored?.nextReviewDate ??
+        entry.nextReviewDate;
+
+      const nextDisplaySource =
+        this.normaliseOptionalString(remoteRecord?.['next_display_at']) ??
+        stored?.nextAllowedTime ??
+        entry.nextAllowedTime;
+
+      const lastSeenSource =
+        this.normaliseOptionalString(remoteRecord?.['last_seen_at']) ??
+        stored?.lastPlayedDate ??
+        entry.lastPlayedDate;
+
+      const learnedAt = this.toNullableIsoString(learnedAtSource);
+      const nextReviewAt = this.toNullableIsoFromDateKey(nextReviewSource);
+      const nextDisplayAt = this.toNullableIsoString(nextDisplaySource ?? nextReviewAt ?? undefined);
+      const lastReviewAt = this.toNullableIsoString(lastReviewSource);
+      const lastSeenAt =
+        this.toNullableIsoString(lastSeenSource) ?? lastReviewAt ?? null;
+
+      const reviewCount =
+        this.toNullableNumber(remoteRecord?.['review_count']) ??
+        this.toNullableNumber(stored?.reviewCount) ??
+        this.toNullableNumber(entry.reviewCount);
+
+      const srsIntervalDays =
+        this.toNullableNumber(remoteRecord?.['srs_interval_days']) ??
+        (learnedAt && nextReviewAt
+          ? this.computeIntervalDays(learnedAt, nextReviewAt)
+          : null);
+
+      const srsEasiness =
+        this.toNullableNumber(remoteRecord?.['srs_easiness']) ?? 2.5;
+
+      const status = stored?.status ?? entry.status;
+      const remoteSrsState = this.normaliseOptionalString(remoteRecord?.['srs_state']);
+      const srsState = remoteSrsState ?? this.toSrsState(status);
+
+      const payload: LearnedWordUpsert = {
+        in_review_queue: true,
+        review_count: reviewCount,
+        learned_at: learnedAt,
+        last_review_at: lastReviewAt,
+        next_review_at: nextReviewAt,
+        next_display_at: nextDisplayAt,
+        last_seen_at: lastSeenAt,
+        srs_interval_days: srsIntervalDays,
+        srs_easiness: srsEasiness,
+        srs_state: srsState,
+      };
+
+      try {
+        await upsertLearned(wordId, payload);
+      } catch (error) {
+        console.warn(
+          '[LearningProgressService] Failed to ensure selection sync for word',
+          error
+        );
+      }
     }
   }
 
@@ -948,6 +1117,7 @@ export class LearningProgressService {
     };
 
     this.persistSelection(todayKey, selection);
+    void this.syncSelectionWithServer(selection);
 
     return selection;
   }
