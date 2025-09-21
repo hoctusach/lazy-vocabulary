@@ -8,3 +8,4 @@ export const DAILY_SELECTION_KEY = 'dailySelection';
 export const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
 export const TODAY_WORDS_KEY = 'todayWords';
 export const LAST_SYNC_DATE_KEY = 'lastSyncDate';
+export const LEARNED_WORDS_CACHE_KEY = 'learnedWordsCache';

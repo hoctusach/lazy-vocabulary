@@ -127,17 +127,22 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   }, [dailySelection, allWords]);
 
   const refreshLearnedWords = useCallback(async () => {
+    const cached = learningProgressService.getCachedLearnedWords();
+    setLearnedWords(Array.isArray(cached) ? cached : []);
+
     try {
       const words = await learningProgressService.getLearnedWords();
       setLearnedWords(Array.isArray(words) ? words : []);
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
-      setLearnedWords([]);
     }
   }, []);
 
   useEffect(() => {
     let isActive = true;
+    const cached = learningProgressService.getCachedLearnedWords();
+    setLearnedWords(Array.isArray(cached) ? cached : []);
+
     const loadLearnedWords = async () => {
       try {
         const words = await learningProgressService.getLearnedWords();
@@ -146,7 +151,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
       } catch (error) {
         if (!isActive) return;
         console.warn('[useLearningProgress] Failed to load learned words', error);
-        setLearnedWords([]);
       }
     };
 
@@ -158,11 +162,6 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
   }, []);
 
   const markWordLearned = useCallback(async (word: string) => {
-    const syncPayload = await learningProgressService.markWordLearned(word).catch(error => {
-      console.warn('[useLearningProgress] Failed to persist learned word', error);
-      return null;
-    });
-
     let category: string | undefined;
     if (dailySelection) {
       const entry = [...dailySelection.reviewWords, ...dailySelection.newWords].find(p => p.word === word);
@@ -172,8 +171,34 @@ export const useLearningProgress = (allWords: VocabularyWord[]) => {
       const matched = allWords.find(w => w.word === word);
       category = matched?.category;
     }
-    const wordId = syncPayload?.wordId ?? toWordId(word, category);
-    void markLearnedServerByKey(wordId, syncPayload?.payload).catch(() => {});
+
+    const optimisticWordId = toWordId(word, category);
+    const optimisticEntry: LearnedWordSummary = {
+      word: optimisticWordId,
+      category,
+      learnedDate: new Date().toISOString(),
+      status: 'learned',
+      isLearned: true
+    };
+
+    const cachedAfterOptimistic = learningProgressService.upsertCachedLearnedWord(optimisticEntry);
+    setLearnedWords(Array.isArray(cachedAfterOptimistic) ? cachedAfterOptimistic : [optimisticEntry]);
+
+    const syncPayload = await learningProgressService.markWordLearned(word).catch(error => {
+      console.warn('[useLearningProgress] Failed to persist learned word', error);
+      return null;
+    });
+
+    const finalWordId = syncPayload?.wordId ?? optimisticWordId;
+    const learnedDate = syncPayload?.payload?.learned_at ?? optimisticEntry.learnedDate;
+    const cachedAfterSync = learningProgressService.upsertCachedLearnedWord({
+      ...optimisticEntry,
+      word: finalWordId,
+      learnedDate
+    });
+    setLearnedWords(Array.isArray(cachedAfterSync) ? cachedAfterSync : [optimisticEntry]);
+
+    void markLearnedServerByKey(finalWordId, syncPayload?.payload).catch(() => {});
 
     setDailySelection(prev => {
       if (!prev) return prev;

@@ -12,6 +12,7 @@ import { toWordId } from '@/lib/words/ids';
 import {
   DAILY_SELECTION_KEY,
   LAST_SYNC_DATE_KEY,
+  LEARNED_WORDS_CACHE_KEY,
   LEARNING_PROGRESS_KEY,
   TODAY_WORDS_KEY
 } from '@/utils/storageKeys';
@@ -30,6 +31,14 @@ const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 type StoredProgress = Partial<LearningProgress> & {
   word?: string;
   category?: string;
+};
+
+type CachedLearnedWord = {
+  word: string;
+  category?: string;
+  learnedDate?: string;
+  status?: LearningProgress['status'];
+  isLearned?: boolean;
 };
 
 export class LearningProgressService {
@@ -150,6 +159,111 @@ export class LearningProgressService {
 
   private buildWordKey(word: string, category?: string): string {
     return category ? `${word}::${category}` : word;
+  }
+
+  private loadLearnedWordCache(): Record<string, CachedLearnedWord> {
+    const storage = this.getStorage();
+    if (!storage) return {};
+
+    try {
+      const raw = storage.getItem(LEARNED_WORDS_CACHE_KEY);
+      if (!raw) return {};
+
+      const parsed = JSON.parse(raw) as unknown;
+      if (Array.isArray(parsed)) {
+        const map: Record<string, CachedLearnedWord> = {};
+        for (const entry of parsed) {
+          if (!entry || typeof entry !== 'object') continue;
+          const typed = entry as CachedLearnedWord;
+          const key = this.normaliseWordId(typed.word);
+          if (!key) continue;
+          map[key] = { ...typed, word: key };
+        }
+        return map;
+      }
+
+      if (parsed && typeof parsed === 'object') {
+        const map = parsed as Record<string, CachedLearnedWord>;
+        const normalised: Record<string, CachedLearnedWord> = {};
+        for (const [key, value] of Object.entries(map)) {
+          const normalisedKey = this.normaliseWordId(key);
+          if (!normalisedKey) continue;
+          const storedWord = value?.word ? this.normaliseWordId(value.word) : normalisedKey;
+          const finalWord = storedWord || normalisedKey;
+          normalised[normalisedKey] = { ...value, word: finalWord };
+        }
+        return normalised;
+      }
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to parse learned word cache', error);
+    }
+
+    return {};
+  }
+
+  private saveLearnedWordCache(cache: Record<string, CachedLearnedWord>): void {
+    const storage = this.getStorage();
+    if (!storage) return;
+
+    try {
+      storage.setItem(LEARNED_WORDS_CACHE_KEY, JSON.stringify(cache));
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to persist learned word cache', error);
+    }
+  }
+
+  private upsertLearnedWordCacheEntry(entry: CachedLearnedWord): Record<string, CachedLearnedWord> {
+    const cache = this.loadLearnedWordCache();
+    const key = this.normaliseWordId(entry.word);
+    if (!key) return cache;
+
+    cache[key] = {
+      word: key,
+      category: entry.category ?? cache[key]?.category,
+      learnedDate: entry.learnedDate ?? cache[key]?.learnedDate,
+      status: entry.status ?? cache[key]?.status ?? 'learned',
+      isLearned: entry.isLearned ?? cache[key]?.isLearned ?? true
+    };
+
+    this.saveLearnedWordCache(cache);
+    return cache;
+  }
+
+  private mergeLearnedCacheWithRemote(
+    cache: Record<string, CachedLearnedWord>,
+    remoteRows: LearnedWord[]
+  ): Record<string, CachedLearnedWord> {
+    const merged = { ...cache };
+
+    for (const row of remoteRows ?? []) {
+      if (!row || typeof row !== 'object') continue;
+      const wordId = this.normaliseWordId((row as { word_id?: unknown }).word_id as string);
+      if (!wordId) continue;
+
+      const existing = merged[wordId];
+      merged[wordId] = {
+        word: wordId,
+        category: existing?.category,
+        learnedDate: typeof row.learned_at === 'string' && row.learned_at.trim()
+          ? row.learned_at
+          : existing?.learnedDate,
+        status: existing?.status ?? 'learned',
+        isLearned: existing?.isLearned ?? true
+      };
+    }
+
+    this.saveLearnedWordCache(merged);
+    return merged;
+  }
+
+  getCachedLearnedWords(): CachedLearnedWord[] {
+    const cache = this.loadLearnedWordCache();
+    return Object.values(cache);
+  }
+
+  upsertCachedLearnedWord(entry: CachedLearnedWord): CachedLearnedWord[] {
+    const cache = this.upsertLearnedWordCacheEntry(entry);
+    return Object.values(cache);
   }
 
   private loadProgressMap(): Record<string, StoredProgress> {
@@ -517,9 +631,17 @@ export class LearningProgressService {
     return progressMap[primary] ?? progressMap[word.word];
   }
 
-  async getLearnedWords(): Promise<{ word: string }[]> {
-    const rows = await getLearned();
-    return rows.map(r => ({ word: r.word_id }));
+  async getLearnedWords(): Promise<CachedLearnedWord[]> {
+    const cache = this.loadLearnedWordCache();
+
+    try {
+      const rows = await getLearned();
+      const merged = this.mergeLearnedCacheWithRemote(cache, rows ?? []);
+      return Object.values(merged);
+    } catch (error) {
+      console.warn('[LearningProgressService] Failed to load learned words', error);
+      return Object.values(cache);
+    }
   }
 
   async markWordLearned(wordKey: string): Promise<{ wordId: string; payload: LearnedWordUpsert } | null> {
@@ -546,6 +668,15 @@ export class LearningProgressService {
       learnedDate: resolved.entry?.learnedDate ?? learnedAt,
       nextAllowedTime: undefined
     };
+
+    const wordId = toWordId(resolved.word, category);
+    this.upsertCachedLearnedWord({
+      word: wordId,
+      category,
+      learnedDate: updated.learnedDate,
+      status: 'learned',
+      isLearned: true
+    });
 
     this.assignProgressEntry(progressMap, resolved.key, updated);
     this.saveProgressMap(progressMap);
