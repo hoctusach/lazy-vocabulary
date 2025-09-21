@@ -19,6 +19,7 @@ export type ExchangeResponse = Record<string, unknown> & {
   nickname?: unknown;
   user_unique_key?: unknown;
   error?: unknown;
+  code?: unknown;
 };
 
 export function storeSessionFromExchange(response: ExchangeResponse): CustomSession {

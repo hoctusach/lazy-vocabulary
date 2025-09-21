@@ -28,8 +28,9 @@ function extractUserKey(result: VerifyResponse): string | null {
   return null;
 }
 
-function errorResponse(message: string, status = 400) {
-  return new Response(JSON.stringify({ error: message }), {
+function errorResponse(message: string, status = 400, code?: string) {
+  const body = code ? { error: message, code } : { error: message };
+  return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
@@ -100,6 +101,24 @@ Deno.serve(async (req) => {
 
   const userKey = extractUserKey(data as VerifyResponse);
   if (!userKey) {
+    const { data: nicknameLookup, error: lookupError } = await adminClient.rpc(
+      'find_nickname_by_normalized',
+      {
+        nickname,
+      },
+    );
+
+    if (lookupError) {
+      console.error('find_nickname_by_normalized error', lookupError.message);
+      return errorResponse('Authentication failed', 500);
+    }
+
+    const nicknameExists = !!extractUserKey(nicknameLookup as VerifyResponse);
+
+    if (!nicknameExists) {
+      return errorResponse('Profile not found', 404, 'PROFILE_NOT_FOUND');
+    }
+
     return errorResponse('Incorrect passcode', 401);
   }
 

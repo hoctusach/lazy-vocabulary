@@ -28,6 +28,7 @@ type ExchangeResult = {
   response: Response;
   payload: ExchangeResponse;
   errorMessage?: string;
+  errorCode?: string;
 };
 
 async function exchangeNicknamePasscode(nickname: string, passcode: string): Promise<ExchangeResult> {
@@ -42,6 +43,7 @@ async function exchangeNicknamePasscode(nickname: string, passcode: string): Pro
     response,
     payload,
     errorMessage: typeof payload?.error === 'string' ? payload.error : undefined,
+    errorCode: typeof payload?.code === 'string' ? payload.code : undefined,
   };
 }
 
@@ -152,10 +154,23 @@ export default function AuthGate() {
 
     try {
       if (s.mode === 'signin') {
-        const { response, payload, errorMessage } = await exchangeNicknamePasscode(
+        const { response, payload, errorMessage, errorCode } = await exchangeNicknamePasscode(
           sanitizedName,
           passcodeInput,
         );
+
+        if (response.status === 404 && errorCode === 'PROFILE_NOT_FOUND') {
+          setS((p) => ({
+            ...p,
+            pending: false,
+            nickname: sanitizedName,
+            passcode: passcodeInput,
+            mode: 'create',
+            error: undefined,
+            info: 'No profile found for that nickname. Create one to get started.',
+          }));
+          return;
+        }
 
         if (response.status === 401) {
           if (errorMessage === 'Incorrect passcode') {
