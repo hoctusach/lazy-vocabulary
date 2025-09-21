@@ -1,3 +1,4 @@
+import type { LearnedWord } from '@/core/models';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type {
   DailySelection,
@@ -699,10 +700,19 @@ export class LearningProgressService {
       for (const row of rows ?? []) {
         if (!row || typeof row !== 'object') continue;
 
-        const inQueue = this.isInReviewQueue((row as { in_review_queue?: unknown }).in_review_queue);
+        const typed = row as LearnedWord;
+        const inQueue = this.isInReviewQueue(typed.in_review_queue);
         if (!inQueue) continue;
 
-        const wordIdValue = (row as { word_id?: unknown }).word_id;
+        const due = this.isDue({
+          nextReviewDate:
+            typeof typed.next_review_at === 'string' ? typed.next_review_at : undefined,
+          nextAllowedTime:
+            typeof typed.next_display_at === 'string' ? typed.next_display_at : undefined
+        });
+        if (!due) continue;
+
+        const wordIdValue = (typed as { word_id?: unknown }).word_id;
         if (typeof wordIdValue !== 'string') continue;
 
         const normalised = this.normaliseWordId(wordIdValue);
