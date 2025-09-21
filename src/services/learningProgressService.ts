@@ -6,7 +6,7 @@ import type {
   SeverityConfig,
   SeverityLevel
 } from '@/types/learning';
-import { getLearned, upsertLearned, type LearnedWordUpsert } from '@/lib/db/learned';
+import { getLearned, resetLearned, upsertLearned, type LearnedWordUpsert } from '@/lib/db/learned';
 import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { toWordId } from '@/lib/words/ids';
 import {
@@ -577,6 +577,11 @@ export class LearningProgressService {
 
     this.assignProgressEntry(progressMap, resolved.key, updated);
     this.saveProgressMap(progressMap);
+
+    const wordId = toWordId(resolved.word, category);
+    if (wordId) {
+      void resetLearned(wordId);
+    }
   }
 
   getProgressStats() {

@@ -95,3 +95,24 @@ export async function upsertLearned(
 
   await recalcProgressSummary(user_unique_key);
 }
+
+export async function resetLearned(wordId: string): Promise<void> {
+  const supabase = getSupabaseClient();
+  if (!supabase) return;
+
+  const user_unique_key = await ensureUserKey();
+  if (!user_unique_key) return;
+  if (CUSTOM_AUTH_MODE) return;
+
+  const { error } = await supabase
+    .from('learned_words')
+    .delete()
+    .eq('user_unique_key', user_unique_key)
+    .eq('word_id', wordId);
+
+  if (error) {
+    throw error;
+  }
+
+  await recalcProgressSummary(user_unique_key);
+}
