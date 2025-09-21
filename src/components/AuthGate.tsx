@@ -159,15 +159,19 @@ export default function AuthGate() {
           passcodeInput,
         );
 
-        if (response.status === 404 && errorCode === 'PROFILE_NOT_FOUND') {
+        if (
+          response.status === 404 ||
+          errorCode === 'PROFILE_NOT_FOUND' ||
+          errorMessage === 'Profile not found'
+        ) {
           setS((p) => ({
             ...p,
             pending: false,
             nickname: sanitizedName,
             passcode: passcodeInput,
             mode: 'create',
-            error: undefined,
-            info: 'No profile found for that nickname. Create one to get started.',
+            error: 'Cannot find nickname. Please create a new profile.',
+            info: undefined,
           }));
           return;
         }
