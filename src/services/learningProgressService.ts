@@ -418,7 +418,7 @@ export class LearningProgressService {
   private toSrsState(status?: StoredProgress['status']): string {
     switch (status) {
       case 'learned':
-        return 'graduated';
+        return 'learned';
       case 'due':
         return 'review';
       case 'not_due':
