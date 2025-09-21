@@ -2,11 +2,12 @@
  * @vitest-environment jsdom
  */
 import React from 'react';
-import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MarkAsNewDialog } from '@/components/MarkAsNewDialog';
 import { learningProgressService } from '@/services/learningProgressService';
+import * as learnedDb from '@/lib/db/learned';
 
 // make expect available for jest-dom extensions
 (globalThis as unknown as { expect: typeof expect }).expect = expect;
@@ -32,6 +33,8 @@ describe('Mark as New flow', () => {
       nextAllowedTime: new Date().toISOString(),
     };
     localStorage.setItem('learningProgress', JSON.stringify({ apple: learnedProgress }));
+
+    const resetLearnedSpy = vi.spyOn(learnedDb, 'resetLearned').mockResolvedValue();
 
     const TestComponent = () => {
       const [open, setOpen] = React.useState(false);
@@ -63,5 +66,12 @@ describe('Mark as New flow', () => {
     expect(progress?.isLearned).toBe(false);
     expect(progress?.status).toBe('new');
     expect(progress?.reviewCount).toBe(0);
+
+    const stats = learningProgressService.getProgressStats();
+    expect(stats.learned).toBe(0);
+
+    await waitFor(() => {
+      expect(resetLearnedSpy).toHaveBeenCalledWith('test::apple');
+    });
   });
 });
