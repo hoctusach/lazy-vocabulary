@@ -3,14 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
-import {
-  sanitizeNickname,
-  normalizeNickname,
-  getNicknameByKey,
-  upsertNickname,
-} from '@/services/nicknameService';
+import { sanitizeNickname, setNicknamePasscode } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
-import { ensureProfile } from '@/lib/db/profiles';
 import { EXCHANGE_FN_URL } from '@/config';
 import {
   storeSessionFromExchange,
@@ -18,7 +12,6 @@ import {
   type ExchangeResponse,
 } from '@/lib/customAuth';
 import {
-  registerNicknameWithPasscode,
   getStoredPasscode,
   PASSCODE_STORAGE_KEY,
   storePasscode,
@@ -150,109 +143,78 @@ export default function AuthGate() {
     setS((p) => ({ ...p, pending: true, error: undefined, info: undefined }));
 
     const sanitizedName = sanitizeNickname(nicknameInput);
-    const key = normalizeNickname(sanitizedName);
 
     try {
-      if (s.mode === 'signin') {
-        const { response, payload, errorMessage, errorCode } = await exchangeNicknamePasscode(
-          sanitizedName,
-          passcodeInput,
-        );
+      const { response: setResponse, payload: setPayload } = await setNicknamePasscode(
+        sanitizedName,
+        passcodeInput,
+      );
 
-        if (
-          response.status === 404 ||
-          errorCode === 'PROFILE_NOT_FOUND' ||
-          errorMessage === 'Profile not found'
-        ) {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            nickname: sanitizedName,
-            passcode: passcodeInput,
-            mode: 'create',
-            error: 'Cannot find nickname. Please create a new profile.',
-            info: undefined,
-          }));
-          return;
-        }
-
-        if (response.status === 401) {
-          if (errorMessage === 'Incorrect passcode') {
-            setS((p) => ({
-              ...p,
-              pending: false,
-              passcode: '',
-              error: 'Incorrect passcode',
-              info: undefined,
-              mode: 'signin',
-            }));
-            setTimeout(() => passcodeRef.current?.focus(), 0);
-            return;
-          }
-
-          setS((p) => ({
-            ...p,
-            pending: false,
-            error: 'Sign-in failed',
-            info: undefined,
-            mode: 'signin',
-          }));
-          return;
-        }
-
-        if (!response.ok) {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            error: errorMessage || 'Sign-in failed',
-            info: undefined,
-            mode: 'signin',
-          }));
-          return;
-        }
-
-        const session = saveSession(payload, passcodeInput);
-        const toastNickname = session.nickname?.trim().length ? session.nickname : sanitizedName;
-        toast.success(`Signed in as ${toastNickname}`);
-      } else {
-        await registerNicknameWithPasscode(sanitizedName, passcodeInput, { rememberPasscode: true });
-        const { response, payload, errorMessage } = await exchangeNicknamePasscode(
-          sanitizedName,
-          passcodeInput,
-        );
-
-        if (response.status === 401) {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            error: errorMessage || 'Sign-in failed',
-            info: undefined,
-            mode: 'create',
-          }));
-          return;
-        }
-
-        if (!response.ok) {
-          setS((p) => ({
-            ...p,
-            pending: false,
-            error: errorMessage || 'Sign-in failed',
-            info: undefined,
-            mode: 'create',
-          }));
-          return;
-        }
-
-        const session = saveSession(payload, passcodeInput);
-        const toastNickname = session.nickname?.trim().length ? session.nickname : sanitizedName;
-        toast.success(`Signed in as ${toastNickname}`);
+      if (setResponse.status === 409 || setPayload?.code === 'NICKNAME_TAKEN') {
+        setS((p) => ({
+          ...p,
+          pending: false,
+          error: 'That nickname is already taken. Try another.',
+          info: undefined,
+          mode: 'create',
+        }));
+        return;
       }
 
-      const existing = await getNicknameByKey(key);
-      const chosen = existing ?? (await upsertNickname(sanitizedName));
+      if (!setResponse.ok || typeof setPayload?.user_unique_key !== 'string') {
+        const fallbackError =
+          typeof setPayload?.error === 'string' && setPayload.error
+            ? setPayload.error
+            : 'Failed to save nickname';
+        setS((p) => ({
+          ...p,
+          pending: false,
+          error: fallbackError,
+          info: undefined,
+          mode: 'signin',
+        }));
+        return;
+      }
 
-      localStorage.setItem(NICKNAME_LS_KEY, chosen.name);
-      await ensureProfile(chosen.name);
+      const { response, payload, errorMessage } = await exchangeNicknamePasscode(
+        sanitizedName,
+        passcodeInput,
+      );
+
+      if (response.status === 401) {
+        setS((p) => ({
+          ...p,
+          pending: false,
+          passcode: '',
+          error: 'Incorrect passcode',
+          info: undefined,
+          mode: 'signin',
+        }));
+        setTimeout(() => passcodeRef.current?.focus(), 0);
+        return;
+      }
+
+      if (!response.ok) {
+        setS((p) => ({
+          ...p,
+          pending: false,
+          error: errorMessage || 'Sign-in failed',
+          info: undefined,
+          mode: 'signin',
+        }));
+        return;
+      }
+
+      const session = saveSession(payload, passcodeInput);
+      const nicknameFromServer =
+        typeof setPayload.nickname === 'string' && setPayload.nickname.trim().length
+          ? setPayload.nickname
+          : sanitizedName;
+      const toastNickname = session.nickname?.trim().length ? session.nickname : nicknameFromServer;
+
+      toast.success(`Signed in as ${toastNickname}`);
+
+      localStorage.setItem(NICKNAME_LS_KEY, nicknameFromServer);
       await ensureUserKey().catch(() => null);
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
@@ -269,23 +231,15 @@ export default function AuthGate() {
       setS({
         ready: true,
         show: false,
-        nickname: chosen.name,
+        nickname: nicknameFromServer,
         passcode: '',
         pending: false,
         mode: 'signin',
       });
     } catch (err) {
-      const error = err as { code?: string; status?: string; message?: string } | undefined;
-      const code = error?.code ?? error?.status;
+      const error = err as { message?: string } | undefined;
       const rawMessage = typeof error?.message === 'string' ? error.message : '';
-      const lowerMessage = rawMessage.toLowerCase();
-      const message =
-        code === 'NICKNAME_TAKEN' || code === '23505' || lowerMessage.includes('already registered')
-          ? 'That nickname is already taken. Try another.'
-          : lowerMessage.includes('invalid login credentials') ||
-            lowerMessage.includes('incorrect passcode')
-          ? 'That passcode is incorrect. Please try again.'
-          : rawMessage || 'Failed to save nickname';
+      const message = rawMessage.trim().length ? rawMessage : 'Failed to save nickname';
       setS((p) => ({ ...p, pending: false, error: message }));
     }
   };

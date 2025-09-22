@@ -110,6 +110,12 @@ npm test       # execute unit tests with vitest
 npm run lint   # check code style with ESLint
 ```
 
+## Test checklist
+
+- [ ] Create or update a profile via `/set_nickname_passcode` and confirm it returns the canonical key.
+- [ ] Sign in through `/nickname-passcode-exchange` immediately after setting the profile.
+- [ ] Retry sign-in with a wrong passcode and observe the friendly error state.
+
 ## Developer workflow
 
 1. Install dependencies with `npm i`.
