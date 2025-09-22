@@ -1,27 +1,32 @@
-import type { DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
+import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
 import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { resetLearned } from '@/lib/db/learned';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
-import { getProgressSummary, type ProgressSummaryFields } from '@/lib/progress/progressSummary';
+import {
+  getProgressSummary,
+  type ProgressSummaryFields,
+  refreshProgressSummary as refreshProgressSummaryRemote,
+} from '@/lib/progress/progressSummary';
 import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import { buildTodaysWords } from '@/utils/todayWords';
 
-const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
-  light: { min: 15, max: 25 },
-  moderate: { min: 30, max: 50 },
-  intense: { min: 50, max: 100 }
+export type GenerateParams = {
+  userKey: string;
+  mode: DailyMode;
+  count: number;
+  category?: string | null;
 };
 
-const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
-const MASTER_INTERVAL_DAYS = 60;
-const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
-const MASTER_EXPOSURE_DELAY_MINUTES = 180;
-
-const TODAY_WORDS_PREFIX = 'todayWords:';
-const ACTIVE_USER_KEY = 'todayWords.activeUser';
-
-export type TodayWordResponse = TodayWord;
+export type TodaySelectionState = {
+  date: string;
+  mode: DailyMode;
+  count: number;
+  category: string | null;
+  words: TodayWord[];
+  selection: DailySelection;
+};
 
 type DailySelectionRow = {
   word_id: string;
@@ -52,9 +57,36 @@ type LearnedRow = {
   srs_state: string | null;
 };
 
-type DailyWordsResult = {
-  words: TodayWord[];
-  selection: DailySelection;
+type SelectionNormalizationMeta = {
+  mode: DailyMode;
+  count: number;
+  category: string | null;
+};
+
+const TODAY_WORDS_PREFIX = 'todayWords:';
+const ACTIVE_USER_KEY = 'todayWords.activeUser';
+
+const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
+  light: { min: 15, max: 25 },
+  moderate: { min: 30, max: 50 },
+  intense: { min: 50, max: 100 },
+};
+
+const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
+const MASTER_INTERVAL_DAYS = 60;
+const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
+const MASTER_EXPOSURE_DELAY_MINUTES = 180;
+
+const MODE_TO_SEVERITY: Record<DailyMode, SeverityLevel> = {
+  Light: 'light',
+  Medium: 'moderate',
+  Hard: 'intense',
+};
+
+const SEVERITY_TO_MODE: Record<SeverityLevel, DailyMode> = {
+  light: 'Light',
+  moderate: 'Medium',
+  intense: 'Hard',
 };
 
 const toDateKey = (value: Date) => value.toISOString().slice(0, 10);
@@ -68,6 +100,27 @@ function safeParseJSON<T>(value: string | null): T | null {
   } catch {
     return null;
   }
+}
+
+function getStorage(): Storage | null {
+  try {
+    const globalRef = globalThis as unknown as { localStorage?: Storage };
+    return globalRef?.localStorage ?? null;
+  } catch (error) {
+    console.warn('[LearningProgress] localStorage unavailable', error);
+    return null;
+  }
+}
+
+function listStorageKeys(): string[] {
+  const storage = getStorage();
+  if (!storage) return [];
+  const keys: string[] = [];
+  for (let i = 0; i < storage.length; i += 1) {
+    const key = storage.key(i);
+    if (key) keys.push(key);
+  }
+  return keys;
 }
 
 function toIsoDate(dateKey: string | null | undefined): string | null {
@@ -98,8 +151,7 @@ function isDue(srs?: TodayWordSrs | null): boolean {
   if (!candidate) return false;
   const parsed = Date.parse(candidate);
   if (Number.isNaN(parsed)) return false;
-  const now = Date.now();
-  return parsed <= now;
+  return parsed <= Date.now();
 }
 
 function isLearnedState(srs?: TodayWordSrs | null): boolean {
@@ -150,517 +202,588 @@ function coerceCategory(category?: string | null): string {
   return trimmed || 'general';
 }
 
-export class LearningProgressService {
-  private severityConfig = DEFAULT_SEVERITY_CONFIG;
+function getDailyCount(severity: SeverityLevel): number {
+  const config = DEFAULT_SEVERITY_CONFIG[severity] ?? DEFAULT_SEVERITY_CONFIG.light;
+  return config.max;
+}
 
-  static getInstance() {
-    return new LearningProgressService();
-  }
-
-  private getStorage(): Storage | null {
-    try {
-      const globalRef = globalThis as unknown as { localStorage?: Storage };
-      return globalRef?.localStorage ?? null;
-    } catch (error) {
-      console.warn('[LearningProgressService] localStorage unavailable', error);
-      return null;
-    }
-  }
-
-  private listStorageKeys(): string[] {
-    const storage = this.getStorage();
-    if (!storage) return [];
-    const keys: string[] = [];
-    for (let i = 0; i < storage.length; i += 1) {
-      const key = storage.key(i);
-      if (key) keys.push(key);
-    }
-    return keys;
-  }
-
-  private loadTodayWords(userKey: string, date = new Date()): TodayWord[] {
-    const storage = this.getStorage();
-    if (!storage) return [];
-    const cached = safeParseJSON<TodayWord[]>(storage.getItem(todayKeyFor(userKey, date)));
-    if (!Array.isArray(cached)) return [];
-    return cached;
-  }
-
-  private saveTodayWords(userKey: string, words: TodayWord[], date = new Date()): void {
-    const storage = this.getStorage();
-    if (!storage) return;
-    try {
-      storage.setItem(todayKeyFor(userKey, date), JSON.stringify(words));
-      storage.setItem(ACTIVE_USER_KEY, userKey);
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to persist today words', error);
-    }
-  }
-
-  private clearTodayWordsForUser(userKey: string): void {
-    const storage = this.getStorage();
-    if (!storage) return;
-    const prefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
-    const keysToRemove = this.listStorageKeys().filter(key => key.startsWith(prefix));
-    for (const key of keysToRemove) {
-      storage.removeItem(key);
-    }
-  }
-
-  private clearStaleCaches(currentUserKey: string, date = new Date()): void {
-    const storage = this.getStorage();
-    if (!storage) return;
-    const todayIso = toDateKey(date);
-    const keys = this.listStorageKeys();
-    for (const key of keys) {
-      if (!key.startsWith(TODAY_WORDS_PREFIX)) continue;
-      const [, userKey, cachedDate] = key.split(':');
-      if (!cachedDate || cachedDate === todayIso) continue;
-      storage.removeItem(key);
-      if (userKey && userKey !== currentUserKey) {
-        const legacyPrefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
-        if (key.startsWith(legacyPrefix)) {
-          storage.removeItem(key);
-        }
+function buildTodayWord(
+  selectionRow: DailySelectionRow,
+  vocab: VocabularyRow,
+  learned?: LearnedRow
+): TodayWord {
+  const srs: TodayWordSrs | undefined = learned
+    ? {
+        in_review_queue: learned.in_review_queue,
+        review_count: learned.review_count,
+        learned_at: learned.learned_at,
+        last_review_at: learned.last_review_at,
+        next_review_at: learned.next_review_at,
+        next_display_at: learned.next_display_at,
+        last_seen_at: learned.last_seen_at,
+        srs_interval_days: learned.srs_interval_days,
+        srs_easiness: learned.srs_easiness,
+        srs_state: learned.srs_state,
       }
-    }
+    : undefined;
 
-    const activeUser = storage.getItem(ACTIVE_USER_KEY);
-    if (activeUser && activeUser !== currentUserKey) {
-      this.clearTodayWordsForUser(activeUser);
-    }
-    storage.setItem(ACTIVE_USER_KEY, currentUserKey);
+  return {
+    word_id: selectionRow.word_id,
+    word: vocab.word,
+    meaning: vocab.meaning,
+    example: vocab.example,
+    translation: vocab.translation ?? undefined,
+    count: vocab.count ?? 0,
+    category: coerceCategory(vocab.category ?? selectionRow.category ?? undefined),
+    nextAllowedTime: srs?.next_display_at ?? undefined,
+    srs,
+  };
+}
+
+function toLearningProgress(word: TodayWord): LearningProgress {
+  const srs = word.srs ?? undefined;
+  const reviewCount = srs?.review_count ?? 0;
+  const learnedAt = srs?.learned_at ?? null;
+  const nextReviewIso = srs?.next_review_at ?? null;
+  const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso)) : '';
+  const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs));
+
+  return {
+    word: word.word,
+    type: undefined,
+    category: word.category,
+    isLearned: isLearnedState(srs),
+    reviewCount,
+    lastPlayedDate: srs?.last_review_at ?? '',
+    status,
+    nextReviewDate,
+    createdDate: learnedAt ? toDateKey(new Date(learnedAt)) : toDateKey(new Date()),
+    learnedDate: learnedAt ?? undefined,
+    nextAllowedTime: srs?.next_display_at ?? undefined,
+  };
+}
+
+function buildSelection(words: TodayWord[], severity: SeverityLevel, meta: SelectionNormalizationMeta): DailySelection {
+  const reviewWords: LearningProgress[] = [];
+  const newWords: LearningProgress[] = [];
+
+  for (const word of words) {
+    const target = isReviewCandidate(word.srs) ? reviewWords : newWords;
+    target.push(toLearningProgress(word));
   }
 
-  private resolveCount(severity: SeverityLevel): number {
-    const config = this.severityConfig[severity] ?? this.severityConfig.light;
-    return config.max;
-  }
+  return {
+    reviewWords,
+    newWords,
+    totalCount: reviewWords.length + newWords.length,
+    severity,
+    date: meta ? toDateKey(new Date()) : undefined,
+    mode: meta.mode,
+    count: meta.count,
+    category: meta.category ?? null,
+  };
+}
 
-  private async generateDailySelection(
-    userKey: string,
-    mode: SeverityLevel,
-    count: number,
-    category?: string | null
-  ): Promise<DailySelectionRow[]> {
-    const client = getSupabaseClient();
-    if (!client) throw new Error('Supabase client unavailable');
-    if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
+function calculateNextReviewDate(reviewCount: number, from: Date): string {
+  const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
+  const intervalDays =
+    reviewCount > REVIEW_INTERVALS_DAYS.length ? MASTER_INTERVAL_DAYS : REVIEW_INTERVALS_DAYS[index];
+  const next = new Date(from);
+  next.setDate(next.getDate() + intervalDays);
+  return toDateKey(next);
+}
 
-    const { data, error } = await client.rpc('generate_daily_selection', {
-      user_unique_key: userKey,
-      mode,
-      count,
-      category: category ?? null
-    });
+function calculateNextAllowedTime(reviewCount: number, from: Date): string {
+  const index = Math.max(0, reviewCount - 1);
+  const delayMinutes =
+    index < EXPOSURE_DELAYS_MINUTES.length
+      ? EXPOSURE_DELAYS_MINUTES[index]
+      : MASTER_EXPOSURE_DELAY_MINUTES;
+  const next = new Date(from.getTime() + delayMinutes * 60_000);
+  return next.toISOString();
+}
 
-    if (error) {
-      throw new Error(error.message);
-    }
+function buildPayloadFromWord(
+  word: TodayWord,
+  reviewCount: number,
+  status: LearningProgress['status'],
+  nextReviewIso: string | null,
+  nextAllowedIso: string,
+  nowIso: string
+): LearnedWordUpsert {
+  const learnedAtIso = word.srs?.learned_at ?? nowIso;
 
-    const rows: DailySelectionRow[] = Array.isArray(data)
-      ? (data as DailySelectionRow[])
-      : [];
-    return rows.filter(row => typeof row?.word_id === 'string');
-  }
+  const payload: LearnedWordUpsert = {
+    in_review_queue: shouldRemainInQueue(status),
+    review_count: reviewCount,
+    learned_at: learnedAtIso,
+    last_review_at: nowIso,
+    next_review_at: nextReviewIso,
+    next_display_at: nextAllowedIso,
+    last_seen_at: nowIso,
+    srs_interval_days: computeIntervalDays(learnedAtIso, nextReviewIso ?? undefined),
+    srs_easiness: word.srs?.srs_easiness ?? 2.5,
+    srs_state: toSrsState(status),
+  };
 
-  private async commitDailySelection(userKey: string, wordIds: string[]): Promise<void> {
-    const client = getSupabaseClient();
-    if (!client) throw new Error('Supabase client unavailable');
-    if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
+  return payload;
+}
 
-    const { error } = await client.rpc('commit_daily_selection', {
-      user_unique_key: userKey,
-      word_ids: wordIds
-    });
+function applyReviewToWord(word: TodayWord): {
+  updated: TodayWord;
+  payload: LearnedWordUpsert;
+  progress: LearningProgress;
+} {
+  const now = new Date();
+  const reviewCount = (word.srs?.review_count ?? 0) + 1;
+  const nextReviewDateKey = calculateNextReviewDate(reviewCount, now);
+  const nextReviewIso = toIsoDate(nextReviewDateKey);
+  const nextAllowedTime = calculateNextAllowedTime(reviewCount, now);
+  const nowIso = now.toISOString();
 
-    if (error) {
-      throw new Error(error.message);
-    }
-  }
+  const status = determineStatus(reviewCount, nextReviewIso ?? '', true);
+  const payload = buildPayloadFromWord(word, reviewCount, status, nextReviewIso, nextAllowedTime, nowIso);
 
-  private async requestDailySelectionFromServer(
-    userKey: string,
-    mode: SeverityLevel,
-    count: number,
-    category?: string | null
-  ): Promise<TodayWord[]> {
-    const selection = await this.generateDailySelection(userKey, mode, count, category);
-    const wordIds = selection
-      .map(row => row.word_id)
-      .filter((id): id is string => typeof id === 'string' && id.length > 0);
-
-    await this.commitDailySelection(userKey, wordIds);
-
-    if (selection.length === 0 || wordIds.length === 0) {
-      return [];
-    }
-
-    let vocabMap: Record<string, VocabularyRow> = {};
-    let lastError: unknown;
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      try {
-        vocabMap = await this.fetchVocabularyByIds(wordIds);
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-      }
-    }
-
-    if (!vocabMap || Object.keys(vocabMap).length === 0) {
-      throw lastError instanceof Error ? lastError : new Error('Failed to fetch vocabulary details');
-    }
-
-    const srsMap = await this.fetchSrsRows(userKey, wordIds);
-    return this.mergeWordData(selection, vocabMap, srsMap);
-  }
-
-  private async fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
-    if (wordIds.length === 0) return {};
-    const client = getSupabaseClient();
-    if (!client) throw new Error('Supabase client unavailable');
-    if (CUSTOM_AUTH_MODE) throw new Error('Vocabulary fetch unavailable in custom auth mode');
-
-    const { data, error } = await client.rpc('fetch_vocabulary_by_ids', {
-      word_ids: wordIds
-    });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const rows: VocabularyRow[] = Array.isArray(data)
-      ? (data as VocabularyRow[])
-      : [];
-
-    const map: Record<string, VocabularyRow> = {};
-    for (const row of rows) {
-      if (!row || typeof row.word_id !== 'string') continue;
-      map[row.word_id] = row;
-    }
-    return map;
-  }
-
-  private async fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<string, LearnedRow>> {
-    if (wordIds.length === 0) return {};
-    const client = getSupabaseClient();
-    if (!client) throw new Error('Supabase client unavailable');
-    if (CUSTOM_AUTH_MODE) throw new Error('SRS fetch unavailable in custom auth mode');
-
-    const { data, error } = await client
-      .from('learned_words')
-      .select(
-        'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_easiness,srs_state'
-      )
-      .eq('user_unique_key', userKey)
-      .in('word_id', wordIds);
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    const rows: LearnedRow[] = Array.isArray(data)
-      ? (data as LearnedRow[])
-      : [];
-
-    const map: Record<string, LearnedRow> = {};
-    for (const row of rows) {
-      if (!row || typeof row.word_id !== 'string') continue;
-      map[row.word_id] = row;
-    }
-    return map;
-  }
-
-  private mergeWordData(
-    selection: DailySelectionRow[],
-    vocabMap: Record<string, VocabularyRow>,
-    srsMap: Record<string, LearnedRow>
-  ): TodayWord[] {
-    const words: TodayWord[] = [];
-    for (const row of selection) {
-      if (!row?.word_id) continue;
-      const vocab = vocabMap[row.word_id];
-      if (!vocab) continue;
-      const learned = srsMap[row.word_id];
-      const srs: TodayWordSrs | undefined = learned
-        ? {
-            in_review_queue: learned.in_review_queue,
-            review_count: learned.review_count,
-            learned_at: learned.learned_at,
-            last_review_at: learned.last_review_at,
-            next_review_at: learned.next_review_at,
-            next_display_at: learned.next_display_at,
-            last_seen_at: learned.last_seen_at,
-            srs_interval_days: learned.srs_interval_days,
-            srs_easiness: learned.srs_easiness,
-            srs_state: learned.srs_state
-          }
-        : undefined;
-
-      words.push({
-        word_id: row.word_id,
-        word: vocab.word,
-        meaning: vocab.meaning,
-        example: vocab.example,
-        translation: vocab.translation ?? undefined,
-        count: vocab.count ?? 0,
-        category: coerceCategory(vocab.category ?? row.category ?? undefined),
-        nextAllowedTime: srs?.next_display_at ?? undefined,
-        srs
-      });
-    }
-    return words;
-  }
-
-  private toLearningProgress(word: TodayWord): LearningProgress {
-    const srs = word.srs ?? undefined;
-    const reviewCount = srs?.review_count ?? 0;
-    const learnedAt = srs?.learned_at ?? null;
-    const nextReviewIso = srs?.next_review_at ?? null;
-    const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso)) : '';
-    const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs));
-
-    return {
-      word: word.word,
-      type: undefined,
-      category: word.category,
-      isLearned: isLearnedState(srs),
-      reviewCount,
-      lastPlayedDate: srs?.last_review_at ?? '',
-      status,
-      nextReviewDate,
-      createdDate: learnedAt ? toDateKey(new Date(learnedAt)) : toDateKey(new Date()),
-      learnedDate: learnedAt ?? undefined,
-      nextAllowedTime: srs?.next_display_at ?? undefined
-    };
-  }
-
-  private buildSelection(words: TodayWord[], severity: SeverityLevel): DailySelection {
-    const reviewWords: LearningProgress[] = [];
-    const newWords: LearningProgress[] = [];
-
-    for (const word of words) {
-      const target = isReviewCandidate(word.srs) ? reviewWords : newWords;
-      target.push(this.toLearningProgress(word));
-    }
-
-    return {
-      reviewWords,
-      newWords,
-      totalCount: reviewWords.length + newWords.length,
-      severity
-    };
-  }
-
-  private calculateNextReviewDate(reviewCount: number, from: Date): string {
-    const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
-    const intervalDays =
-      reviewCount > REVIEW_INTERVALS_DAYS.length ? MASTER_INTERVAL_DAYS : REVIEW_INTERVALS_DAYS[index];
-    const next = new Date(from);
-    next.setDate(next.getDate() + intervalDays);
-    return toDateKey(next);
-  }
-
-  private calculateNextAllowedTime(reviewCount: number, from: Date): string {
-    const index = Math.max(0, reviewCount - 1);
-    const delayMinutes =
-      index < EXPOSURE_DELAYS_MINUTES.length
-        ? EXPOSURE_DELAYS_MINUTES[index]
-        : MASTER_EXPOSURE_DELAY_MINUTES;
-    const next = new Date(from.getTime() + delayMinutes * 60_000);
-    return next.toISOString();
-  }
-
-  private buildPayloadFromWord(
-    word: TodayWord,
-    reviewCount: number,
-    status: LearningProgress['status'],
-    nextReviewIso: string | null,
-    nextAllowedIso: string,
-    nowIso: string
-  ): LearnedWordUpsert {
-    const learnedAtIso = word.srs?.learned_at ?? nowIso;
-
-    const payload: LearnedWordUpsert = {
-      in_review_queue: shouldRemainInQueue(status),
+  const updated: TodayWord = {
+    ...word,
+    nextAllowedTime,
+    srs: {
+      in_review_queue: payload.in_review_queue,
       review_count: reviewCount,
-      learned_at: learnedAtIso,
-      last_review_at: nowIso,
-      next_review_at: nextReviewIso,
-      next_display_at: nextAllowedIso,
-      last_seen_at: nowIso,
-      srs_interval_days: computeIntervalDays(learnedAtIso, nextReviewIso ?? undefined),
-      srs_easiness: word.srs?.srs_easiness ?? 2.5,
-      srs_state: toSrsState(status)
-    };
+      learned_at: payload.learned_at,
+      last_review_at: payload.last_review_at,
+      next_review_at: payload.next_review_at,
+      next_display_at: payload.next_display_at,
+      last_seen_at: payload.last_seen_at,
+      srs_interval_days: payload.srs_interval_days,
+      srs_easiness: payload.srs_easiness,
+      srs_state: payload.srs_state,
+    },
+  };
 
-    return payload;
+  return { updated, payload, progress: toLearningProgress(updated) };
+}
+
+function normalizeToDailySelection(
+  details: VocabularyRow[] | null | undefined,
+  selection: DailySelectionRow[] | null | undefined,
+  srsMap: Record<string, LearnedRow>,
+  meta: SelectionNormalizationMeta
+): TodaySelectionState {
+  const dateKey = toDateKey(new Date());
+  const selectionRows = Array.isArray(selection) ? selection : [];
+  const vocabRows = Array.isArray(details) ? details : [];
+  const vocabMap = new Map<string, VocabularyRow>();
+
+  for (const row of vocabRows) {
+    if (!row?.word_id) continue;
+    vocabMap.set(row.word_id, row);
   }
 
-  private applyReviewToWord(word: TodayWord): { updated: TodayWord; payload: LearnedWordUpsert; progress: LearningProgress } {
-    const now = new Date();
-    const reviewCount = (word.srs?.review_count ?? 0) + 1;
-    const nextReviewDateKey = this.calculateNextReviewDate(reviewCount, now);
-    const nextReviewIso = toIsoDate(nextReviewDateKey);
-    const nextAllowedTime = this.calculateNextAllowedTime(reviewCount, now);
-    const nowIso = now.toISOString();
+  const mapped: TodayWord[] = [];
 
-    const status = determineStatus(reviewCount, nextReviewIso ?? '', true);
-    const payload = this.buildPayloadFromWord(word, reviewCount, status, nextReviewIso, nextAllowedTime, nowIso);
-
-    const updated: TodayWord = {
-      ...word,
-      nextAllowedTime,
-      srs: {
-        in_review_queue: payload.in_review_queue,
-        review_count: reviewCount,
-        learned_at: payload.learned_at,
-        last_review_at: payload.last_review_at,
-        next_review_at: payload.next_review_at,
-        next_display_at: payload.next_display_at,
-        last_seen_at: payload.last_seen_at,
-        srs_interval_days: payload.srs_interval_days,
-        srs_easiness: payload.srs_easiness,
-        srs_state: payload.srs_state
-      }
-    };
-
-    return { updated, payload, progress: this.toLearningProgress(updated) };
+  for (const row of selectionRows) {
+    const vocab = row?.word_id ? vocabMap.get(row.word_id) : undefined;
+    if (!row?.word_id || !vocab) continue;
+    const learned = srsMap[row.word_id];
+    mapped.push(buildTodayWord(row, vocab, learned));
   }
 
-  async prepareUserSession(): Promise<string | null> {
-    const userKey = await ensureUserKey();
-    if (!userKey) return null;
-    this.clearStaleCaches(userKey);
-    return userKey;
-  }
+  const ordered = buildTodaysWords(mapped, 'ALL');
+  const severity = MODE_TO_SEVERITY[meta.mode] ?? 'light';
+  const selectionPayload = buildSelection(ordered, severity, meta);
+  selectionPayload.date = dateKey;
 
-  async getTodayWords(
-    userKey: string,
-    severity: SeverityLevel,
-    { refresh } = { refresh: false }
-  ): Promise<DailyWordsResult> {
-    if (!userKey) throw new Error('userKey is required');
-    const cache = this.loadTodayWords(userKey);
-    if (!refresh && cache.length > 0) {
-      return {
-        words: cache,
-        selection: this.buildSelection(cache, severity)
-      };
-    }
+  return {
+    date: dateKey,
+    mode: meta.mode,
+    count: meta.count,
+    category: meta.category ?? null,
+    words: ordered,
+    selection: selectionPayload,
+  };
+}
 
-    const count = this.resolveCount(severity);
-    const words = await this.requestDailySelectionFromServer(userKey, severity, count);
-    this.saveTodayWords(userKey, words);
+function getTodayCache(userKey: string): TodaySelectionState | null {
+  const storage = getStorage();
+  if (!storage) return null;
+  const key = todayKeyFor(userKey);
+  const cached = safeParseJSON<TodaySelectionState>(storage.getItem(key));
+  if (!cached) return null;
+  if (!Array.isArray(cached.words)) return null;
+  if (!cached.selection) return null;
+  return {
+    ...cached,
+    category: cached.category ?? null,
+    selection: {
+      ...cached.selection,
+      mode: cached.selection.mode ?? cached.mode,
+      count: cached.selection.count ?? cached.count,
+      category: cached.selection.category ?? cached.category ?? null,
+      date: cached.selection.date ?? cached.date,
+    },
+  };
+}
 
-    return {
-      words,
-      selection: this.buildSelection(words, severity)
-    };
-  }
+export function loadTodayWordsFromLocal(userKey: string): TodaySelectionState | null {
+  return getTodayCache(userKey);
+}
 
-  async regenerateTodayWords(userKey: string, severity: SeverityLevel): Promise<DailyWordsResult> {
-    this.clearTodayWordsForUser(userKey);
-    return this.getTodayWords(userKey, severity, { refresh: true });
-  }
-
-  async markWordReviewed(
-    userKey: string,
-    wordId: string,
-    severity: SeverityLevel
-  ): Promise<{
-    words: TodayWord[];
-    selection: DailySelection;
-    payload: LearnedWordUpsert;
-    progress: LearningProgress;
-    summary: ProgressSummaryFields | null;
-  }> {
-    const cache = this.loadTodayWords(userKey);
-    const index = cache.findIndex(entry => entry.word_id === wordId);
-    if (index === -1) {
-      throw new Error('Word not found in today cache');
-    }
-
-    const { updated, payload, progress } = this.applyReviewToWord(cache[index]);
-    cache[index] = updated;
-    this.saveTodayWords(userKey, cache);
-
-    const summary = await markLearnedServerByKey(wordId, payload);
-
-    return {
-      words: cache,
-      selection: this.buildSelection(cache, severity),
-      payload,
-      progress,
-      summary
-    };
-  }
-
-  async markWordAsNew(userKey: string, wordId: string): Promise<TodayWord[]>
-  {
-    const cache = this.loadTodayWords(userKey);
-    const index = cache.findIndex(entry => entry.word_id === wordId);
-    if (index === -1) return cache;
-
-    const base = cache[index];
-    const resetWord: TodayWord = {
-      ...base,
-      nextAllowedTime: undefined,
-      srs: {
-        in_review_queue: false,
-        review_count: 0,
-        learned_at: null,
-        last_review_at: null,
-        next_review_at: null,
-        next_display_at: null,
-        last_seen_at: null,
-        srs_interval_days: null,
-        srs_easiness: base.srs?.srs_easiness ?? 2.5,
-        srs_state: 'new'
-      }
-    };
-
-    cache[index] = resetWord;
-    this.saveTodayWords(userKey, cache);
-    await resetLearned(wordId);
-    return cache;
-  }
-
-  async fetchProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
-    return getProgressSummary(userKey);
-  }
-
-  async fetchLearnedWordSummaries(userKey: string): Promise<{
-    word: string;
-    category?: string;
-    learnedDate?: string;
-  }[]> {
-    const client = getSupabaseClient();
-    if (!client) return [];
-    if (CUSTOM_AUTH_MODE) return [];
-
-    const { data, error } = await client
-      .from('learned_words')
-      .select('word_id,learned_at')
-      .eq('user_unique_key', userKey)
-      .order('learned_at', { ascending: false });
-
-    if (error) {
-      console.warn('[LearningProgressService] Failed to fetch learned words', error.message);
-      return [];
-    }
-
-    return (Array.isArray(data) ? data : []).map(row => {
-      const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
-      const [word, category] = wordId.split('::');
-      return {
-        word: word || wordId,
-        category: category || undefined,
-        learnedDate: typeof row?.learned_at === 'string' ? row.learned_at : undefined
-      };
-    });
+export function saveTodayWordsToLocal(userKey: string, payload: TodaySelectionState): void {
+  const storage = getStorage();
+  if (!storage) return;
+  try {
+    const key = todayKeyFor(userKey);
+    storage.setItem(key, JSON.stringify(payload));
+    storage.setItem(ACTIVE_USER_KEY, userKey);
+  } catch (error) {
+    console.warn('[LearningProgress] Failed to persist today words', error);
   }
 }
 
-export const learningProgressService = LearningProgressService.getInstance();
+export function clearTodayWordsInLocal(userKey: string): void {
+  const storage = getStorage();
+  if (!storage) return;
+  const prefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
+  const keysToRemove = listStorageKeys().filter((key) => key.startsWith(prefix));
+  for (const key of keysToRemove) {
+    storage.removeItem(key);
+  }
+}
+
+function clearStaleCaches(currentUserKey: string, date = new Date()): void {
+  const storage = getStorage();
+  if (!storage) return;
+  const todayIso = toDateKey(date);
+  const keys = listStorageKeys();
+  for (const key of keys) {
+    if (!key.startsWith(TODAY_WORDS_PREFIX)) continue;
+    const [, userKey, cachedDate] = key.split(':');
+    if (!cachedDate || cachedDate === todayIso) continue;
+    storage.removeItem(key);
+    if (userKey && userKey !== currentUserKey) {
+      const legacyPrefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
+      if (key.startsWith(legacyPrefix)) {
+        storage.removeItem(key);
+      }
+    }
+  }
+
+  const activeUser = storage.getItem(ACTIVE_USER_KEY);
+  if (activeUser && activeUser !== currentUserKey) {
+    clearTodayWordsInLocal(activeUser);
+  }
+  storage.setItem(ACTIVE_USER_KEY, currentUserKey);
+}
+
+export function isToday(date: string | null | undefined): boolean {
+  if (!date) return false;
+  return date.slice(0, 10) === toDateKey(new Date());
+}
+
+export function matchesCurrentOptions(
+  cached: TodaySelectionState,
+  options: { mode: DailyMode; count: number; category?: string | null }
+): boolean {
+  const cachedCategory = cached.category ?? null;
+  const optionCategory = options.category ?? null;
+  return (
+    cached.mode === options.mode &&
+    cached.count === options.count &&
+    cachedCategory === optionCategory
+  );
+}
+
+async function generateDailySelection(
+  userKey: string,
+  mode: DailyMode,
+  count: number,
+  category?: string | null
+): Promise<DailySelectionRow[]> {
+  const client = getSupabaseClient();
+  if (!client) throw new Error('Supabase client unavailable');
+  if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
+
+  const { data, error } = await client.rpc('generate_daily_selection', {
+    p_user_key: userKey,
+    p_mode: mode,
+    p_count: count,
+    p_category: category ?? null,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const rows: DailySelectionRow[] = Array.isArray(data) ? (data as DailySelectionRow[]) : [];
+  return rows.filter((row) => typeof row?.word_id === 'string');
+}
+
+async function commitDailySelection(userKey: string, wordIds: string[]): Promise<void> {
+  if (wordIds.length === 0) return;
+  const client = getSupabaseClient();
+  if (!client) throw new Error('Supabase client unavailable');
+  if (CUSTOM_AUTH_MODE) return;
+
+  const { error } = await client.rpc('commit_daily_selection', {
+    p_user_key: userKey,
+    p_word_ids: wordIds,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
+  if (wordIds.length === 0) return {};
+  const client = getSupabaseClient();
+  if (!client) throw new Error('Supabase client unavailable');
+  if (CUSTOM_AUTH_MODE) throw new Error('Vocabulary fetch unavailable in custom auth mode');
+
+  const { data, error } = await client.rpc('fetch_vocabulary_by_ids', { p_ids: wordIds });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const rows: VocabularyRow[] = Array.isArray(data) ? (data as VocabularyRow[]) : [];
+  const map: Record<string, VocabularyRow> = {};
+  for (const row of rows) {
+    if (!row || typeof row.word_id !== 'string') continue;
+    map[row.word_id] = row;
+  }
+  return map;
+}
+
+async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<string, LearnedRow>> {
+  if (wordIds.length === 0) return {};
+  const client = getSupabaseClient();
+  if (!client) throw new Error('Supabase client unavailable');
+  if (CUSTOM_AUTH_MODE) throw new Error('SRS fetch unavailable in custom auth mode');
+
+  const { data, error } = await client
+    .from('learned_words')
+    .select(
+      'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_easiness,srs_state'
+    )
+    .eq('user_unique_key', userKey)
+    .in('word_id', wordIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const rows: LearnedRow[] = Array.isArray(data) ? (data as LearnedRow[]) : [];
+  const map: Record<string, LearnedRow> = {};
+  for (const row of rows) {
+    if (!row || typeof row.word_id !== 'string') continue;
+    map[row.word_id] = row;
+  }
+  return map;
+}
+
+export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
+  const { userKey, mode, count, category = null } = params;
+  const selectionRows = await generateDailySelection(userKey, mode, count, category);
+  const ids = selectionRows.map((row) => row.word_id).filter((id): id is string => typeof id === 'string' && id.length > 0);
+
+  if (ids.length > 0) {
+    try {
+      await commitDailySelection(userKey, ids);
+    } catch (error) {
+      console.warn('[LearningProgress] commit_daily_selection failed', error);
+    }
+  }
+
+  const vocabMap = await fetchVocabularyByIds(ids);
+  const srsMap = await fetchSrsRows(userKey, ids);
+  const vocabRows = ids.map((id) => vocabMap[id]).filter((row): row is VocabularyRow => Boolean(row));
+
+  const today = normalizeToDailySelection(
+    vocabRows,
+    selectionRows,
+    srsMap,
+    { mode, count, category: category ?? null }
+  );
+
+  saveTodayWordsToLocal(userKey, today);
+  await refreshProgressSummaryRemote(userKey);
+
+  return today;
+}
+
+export async function getOrCreateTodayWords(
+  userKey: string,
+  mode: DailyMode,
+  count: number,
+  category?: string | null
+): Promise<TodaySelectionState> {
+  const cached = loadTodayWordsFromLocal(userKey);
+  if (cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category: category ?? null })) {
+    return cached;
+  }
+  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+}
+
+export async function prepareUserSession(): Promise<string | null> {
+  const userKey = await ensureUserKey();
+  if (!userKey) return null;
+  clearStaleCaches(userKey);
+  return userKey;
+}
+
+export async function markWordReviewed(
+  userKey: string,
+  wordId: string,
+  severity: SeverityLevel
+): Promise<{
+  words: TodayWord[];
+  selection: DailySelection;
+  payload: LearnedWordUpsert;
+  progress: LearningProgress;
+  summary: ProgressSummaryFields | null;
+}> {
+  const cached = loadTodayWordsFromLocal(userKey);
+  if (!cached) {
+    throw new Error('No cached selection for today');
+  }
+
+  const index = cached.words.findIndex((entry) => entry.word_id === wordId);
+  if (index === -1) {
+    throw new Error('Word not found in today cache');
+  }
+
+  const { updated, payload, progress } = applyReviewToWord(cached.words[index]);
+  const words = [...cached.words];
+  words[index] = updated;
+
+  const mode = SEVERITY_TO_MODE[severity] ?? cached.mode;
+  const count = getDailyCount(severity);
+  const selection = buildSelection(words, severity, {
+    mode,
+    count,
+    category: cached.category,
+  });
+  selection.date = cached.date;
+
+  const nextCache: TodaySelectionState = {
+    ...cached,
+    words,
+    selection,
+  };
+
+  saveTodayWordsToLocal(userKey, nextCache);
+
+  const summary = await markLearnedServerByKey(wordId, payload);
+
+  return {
+    words,
+    selection,
+    payload,
+    progress,
+    summary,
+  };
+}
+
+export async function markWordAsNew(userKey: string, wordId: string): Promise<TodayWord[]> {
+  const cached = loadTodayWordsFromLocal(userKey);
+  if (!cached) return [];
+
+  const index = cached.words.findIndex((entry) => entry.word_id === wordId);
+  if (index === -1) return cached.words;
+
+  const base = cached.words[index];
+  const resetWord: TodayWord = {
+    ...base,
+    nextAllowedTime: undefined,
+    srs: {
+      in_review_queue: false,
+      review_count: 0,
+      learned_at: null,
+      last_review_at: null,
+      next_review_at: null,
+      next_display_at: null,
+      last_seen_at: null,
+      srs_interval_days: null,
+      srs_easiness: base.srs?.srs_easiness ?? 2.5,
+      srs_state: 'new',
+    },
+  };
+
+  const words = [...cached.words];
+  words[index] = resetWord;
+
+  const severity = MODE_TO_SEVERITY[cached.mode] ?? 'light';
+  const selection = buildSelection(words, severity, {
+    mode: cached.mode,
+    count: cached.count,
+    category: cached.category,
+  });
+  selection.date = cached.date;
+
+  saveTodayWordsToLocal(userKey, {
+    ...cached,
+    words,
+    selection,
+  });
+
+  await resetLearned(wordId);
+  return words;
+}
+
+export async function fetchProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+  return getProgressSummary(userKey);
+}
+
+export async function fetchLearnedWordSummaries(
+  userKey: string
+): Promise<{
+  word: string;
+  category?: string;
+  learnedDate?: string;
+}[]> {
+  const client = getSupabaseClient();
+  if (!client) return [];
+  if (CUSTOM_AUTH_MODE) return [];
+
+  const { data, error } = await client
+    .from('learned_words')
+    .select('word_id,learned_at')
+    .eq('user_unique_key', userKey)
+    .order('learned_at', { ascending: false });
+
+  if (error) {
+    console.warn('[LearningProgress] Failed to fetch learned words', error.message);
+    return [];
+  }
+
+  return (Array.isArray(data) ? data : []).map((row) => {
+    const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
+    const [word, category] = wordId.split('::');
+    return {
+      word: word || wordId,
+      category: category || undefined,
+      learnedDate: typeof row?.learned_at === 'string' ? row.learned_at : undefined,
+    };
+  });
+}
+
+export async function regenerateTodaySelection(
+  userKey: string,
+  severity: SeverityLevel,
+  category?: string | null
+): Promise<TodaySelectionState> {
+  clearTodayWordsInLocal(userKey);
+  const mode = SEVERITY_TO_MODE[severity] ?? 'Light';
+  const count = getDailyCount(severity);
+  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+}
+
+export function getModeForSeverity(severity: SeverityLevel): DailyMode {
+  return SEVERITY_TO_MODE[severity] ?? 'Light';
+}
+
+export function getCountForSeverity(severity: SeverityLevel): number {
+  return getDailyCount(severity);
+}

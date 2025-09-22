@@ -3,6 +3,7 @@ import { getActiveSession } from '@/lib/auth';
 import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
+import { persistProgressSummaryLocal } from './progressSummary';
 
 export type ProgressSummary = {
   learning_count: number;
@@ -111,7 +112,14 @@ export async function markLearnedServerByKey(
   }
 
   if (data) {
-    lsSet('progressSummary', JSON.stringify(data));
+    persistProgressSummaryLocal({
+      learning_count: data.learning_count ?? 0,
+      learned_count: data.learned_count ?? 0,
+      learning_due_count: data.learning_due_count ?? 0,
+      remaining_count: data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
+      learning_time: data.learning_time ?? 0,
+      learned_days: Array.isArray(data.learned_days) ? data.learned_days : [],
+    });
   }
 
   return data as ProgressSummary;

@@ -12,11 +12,17 @@ export interface LearningProgress {
   nextAllowedTime?: string;
 }
 
+export type DailyMode = 'Light' | 'Medium' | 'Hard';
+
 export interface DailySelection {
   newWords: LearningProgress[];
   reviewWords: LearningProgress[];
   totalCount: number;
   severity: SeverityLevel;
+  date?: string;
+  mode?: DailyMode;
+  count?: number;
+  category?: string | null;
 }
 
 export type SeverityLevel = 'light' | 'moderate' | 'intense';

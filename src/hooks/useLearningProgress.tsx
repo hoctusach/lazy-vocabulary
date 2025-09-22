@@ -1,11 +1,25 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { learningProgressService, todayKeyFor } from '@/services/learningProgressService';
+import {
+  prepareUserSession,
+  fetchProgressSummary as fetchProgressSummaryService,
+  fetchLearnedWordSummaries,
+  loadTodayWordsFromLocal,
+  isToday,
+  matchesCurrentOptions,
+  getOrCreateTodayWords,
+  fetchAndCommitTodaySelection,
+  clearTodayWordsInLocal,
+  markWordReviewed,
+  markWordAsNew as markWordAsNewService,
+  getModeForSeverity,
+  getCountForSeverity,
+} from '@/services/learningProgressService';
 import type { DailySelection, SeverityLevel } from '@/types/learning';
 import type { TodayWord } from '@/types/vocabulary';
-import { buildTodaysWords } from '@/utils/todayWords';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 import { bootstrapLearnedFromServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import type { ProgressSummaryFields } from '@/lib/progress/progressSummary';
+import { buildTodaysWords } from '@/utils/todayWords';
 
 const DEFAULT_STATS = {
   total: 0,
@@ -36,6 +50,7 @@ function toStats(summary: ProgressSummaryFields | null): typeof DEFAULT_STATS {
 export const useLearningProgress = () => {
   const [userKey, setUserKey] = useState<string | null>(null);
   const [severity, setSeverity] = useState<SeverityLevel>('light');
+  const [category] = useState<string | null>(null);
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [todayWords, setTodayWords] = useState<TodayWord[]>([]);
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
@@ -45,7 +60,7 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const summary = await learningProgressService.fetchProgressSummary(targetKey);
+      const summary = await fetchProgressSummaryService(targetKey);
       setProgressStats(toStats(summary));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load progress summary', error);
@@ -57,7 +72,7 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const rows = await learningProgressService.fetchLearnedWordSummaries(targetKey);
+      const rows = await fetchLearnedWordSummaries(targetKey);
       setLearnedWords(rows);
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
@@ -65,33 +80,10 @@ export const useLearningProgress = () => {
     }
   }, [userKey]);
 
-  const loadCachedTodayWords = useCallback((key: string): TodayWord[] => {
-    try {
-      const storage = (globalThis as unknown as { localStorage?: Storage })?.localStorage;
-      if (!storage) return [];
-      const raw = storage.getItem(key);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? (parsed as TodayWord[]) : [];
-    } catch (error) {
-      console.warn('[useLearningProgress] Failed to read cached today words', error);
-      return [];
-    }
-  }, []);
-
-  const clearCachedTodayWords = useCallback((key: string) => {
-    try {
-      const storage = (globalThis as unknown as { localStorage?: Storage })?.localStorage;
-      storage?.removeItem(key);
-    } catch (error) {
-      console.warn('[useLearningProgress] Failed to clear cached today words', error);
-    }
-  }, []);
-
   useEffect(() => {
     let isActive = true;
     const init = async () => {
-      const preparedKey = await learningProgressService.prepareUserSession();
+      const preparedKey = await prepareUserSession();
       if (!preparedKey || !isActive) return;
       setUserKey(preparedKey);
 
@@ -111,22 +103,25 @@ export const useLearningProgress = () => {
       if (!isActive) return;
       setSeverity(preferredSeverity);
 
-      const todayKey = todayKeyFor(preparedKey);
-      const cachedWords = loadCachedTodayWords(todayKey);
-      if (cachedWords.length > 0 && isActive) {
-        setTodayWords(buildTodaysWords(cachedWords, 'ALL'));
+      const mode = getModeForSeverity(preferredSeverity);
+      const count = getCountForSeverity(preferredSeverity);
+      const cached = loadTodayWordsFromLocal(preparedKey);
+      if (cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category })) {
+        if (!isActive) return;
+        setDailySelection(cached.selection);
+        setTodayWords(cached.words);
       }
 
       try {
-        const result = await learningProgressService.getTodayWords(preparedKey, preferredSeverity);
+        const result = await getOrCreateTodayWords(preparedKey, mode, count, category ?? null);
         if (!isActive) return;
         setDailySelection(result.selection);
-        setTodayWords(buildTodaysWords(result.words, 'ALL'));
+        setTodayWords(result.words);
       } catch (error) {
         if (!isActive) return;
         console.warn('[useLearningProgress] Failed to load today\'s words', error);
         setDailySelection(null);
-        if (cachedWords.length === 0) {
+        if (!cached) {
           setTodayWords([]);
         }
       }
@@ -140,26 +135,51 @@ export const useLearningProgress = () => {
     return () => {
       isActive = false;
     };
-  }, [loadCachedTodayWords, refreshLearnedWords, refreshStats]);
+  }, [category, refreshLearnedWords, refreshStats]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
       if (!userKey) return;
-      const key = todayKeyFor(userKey);
-      clearCachedTodayWords(key);
       try {
-        const result = await learningProgressService.getTodayWords(userKey, level, { refresh: true });
+        const mode = getModeForSeverity(level);
+        const count = getCountForSeverity(level);
+        const result = await fetchAndCommitTodaySelection({
+          userKey,
+          mode,
+          count,
+          category: category ?? null,
+        });
         setSeverity(level);
         setDailySelection(result.selection);
-        setTodayWords(buildTodaysWords(result.words, 'ALL'));
+        setTodayWords(result.words);
         await saveLocalPreferences({ daily_option: level });
         void refreshStats(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to regenerate daily words', error);
       }
     },
-    [clearCachedTodayWords, userKey, refreshStats]
+    [category, userKey, refreshStats]
   );
+
+  const regenerateToday = useCallback(async () => {
+    if (!userKey) return;
+    const mode = getModeForSeverity(severity);
+    const count = getCountForSeverity(severity);
+    clearTodayWordsInLocal(userKey);
+    try {
+      const result = await fetchAndCommitTodaySelection({
+        userKey,
+        mode,
+        count,
+        category: category ?? null,
+      });
+      setDailySelection(result.selection);
+      setTodayWords(result.words);
+      void refreshStats(userKey);
+    } catch (error) {
+      console.warn('[useLearningProgress] Failed to regenerate today\'s selection', error);
+    }
+  }, [category, refreshStats, severity, userKey]);
 
   const markWordAsPlayed = useCallback((word: string) => {
     const nowIso = new Date().toISOString();
@@ -184,9 +204,9 @@ export const useLearningProgress = () => {
       const target = todayWords.find(entry => entry.word === word);
       if (!target) return;
       try {
-        const result = await learningProgressService.markWordReviewed(userKey, target.word_id, severity);
+        const result = await markWordReviewed(userKey, target.word_id, severity);
         setDailySelection(result.selection);
-        setTodayWords(buildTodaysWords(result.words, 'ALL'));
+        setTodayWords(result.words);
         if (result.summary) {
           setProgressStats(toStats(result.summary));
         } else {
@@ -206,16 +226,18 @@ export const useLearningProgress = () => {
       const target = todayWords.find(entry => entry.word === word);
       if (!target) return;
       try {
-        const updated = await learningProgressService.markWordAsNew(userKey, target.word_id);
+        const updated = await markWordAsNewService(userKey, target.word_id);
         setTodayWords(buildTodaysWords(updated, 'ALL'));
-        const selection = await learningProgressService.getTodayWords(userKey, severity);
-        setDailySelection(selection.selection);
+        const refreshed = loadTodayWordsFromLocal(userKey);
+        if (refreshed) {
+          setDailySelection(refreshed.selection);
+        }
         void refreshStats(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to reset word', error);
       }
     },
-    [severity, todayWords, userKey, refreshStats]
+    [refreshStats, todayWords, userKey]
   );
 
   const orderedTodayWords = useMemo(() => buildTodaysWords(todayWords, 'ALL'), [todayWords]);
@@ -224,6 +246,7 @@ export const useLearningProgress = () => {
     dailySelection,
     progressStats,
     generateDailyWords,
+    regenerateToday,
     markWordAsPlayed,
     refreshStats,
     refreshLearnedWords,

@@ -1,9 +1,13 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useUnifiedVocabularyController } from '@/hooks/vocabulary-controller/useUnifiedVocabularyController';
+import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
-export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
+export const useStableVocabularyState = (
+  initialWords?: VocabularyWord[],
+  selection?: DailySelection | null
+) => {
   const [userInteractionState, setUserInteractionState] = useState({
     hasInitialized: false,
     interactionCount: 0,
@@ -11,7 +15,7 @@ export const useStableVocabularyState = (initialWords?: VocabularyWord[]) => {
   });
 
   // Use stable reference for the unified controller
-  const controllerState = useUnifiedVocabularyController(initialWords);
+  const controllerState = useUnifiedVocabularyController(initialWords, selection);
   
   // Memoize computed values to prevent recalculation
   const nextVoiceLabel = useMemo(() => {
