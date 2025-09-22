@@ -22,6 +22,16 @@ type SummaryRow = {
   learned_days: string[] | null;
 };
 
+export function persistProgressSummaryLocal(summary: ProgressSummaryFields): void {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('progressSummary', JSON.stringify(summary));
+    }
+  } catch (error) {
+    console.warn('progressSummary:persistLocal', error);
+  }
+}
+
 async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null> {
   const client = getSupabaseClient();
   if (!client) return null;
@@ -40,6 +50,38 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
   }
 
   return data ?? null;
+}
+
+export async function refreshProgressSummary(userKey: string): Promise<void> {
+  if (!userKey) return;
+  const client = getSupabaseClient();
+  if (!client) return;
+
+  const { data, error } = await client
+    .from('user_progress_summary')
+    .select(
+      'learning_count, learned_count, learning_due_count, remaining_count, learning_time, learned_days'
+    )
+    .eq('user_unique_key', userKey)
+    .maybeSingle<SummaryRow>();
+
+  if (error && error.code !== 'PGRST116') {
+    console.warn('progressSummary:refresh', error.message);
+    return;
+  }
+
+  if (data) {
+    const summary: ProgressSummaryFields = {
+      learning_count: data.learning_count ?? 0,
+      learned_count: data.learned_count ?? 0,
+      learning_due_count: data.learning_due_count ?? 0,
+      remaining_count:
+        data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
+      learning_time: data.learning_time ?? 0,
+      learned_days: normaliseDays(data.learned_days),
+    };
+    persistProgressSummaryLocal(summary);
+  }
 }
 
 export async function getProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {

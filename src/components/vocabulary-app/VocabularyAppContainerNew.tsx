@@ -9,6 +9,7 @@ import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabu
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
+import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
@@ -16,9 +17,16 @@ interface VocabularyAppContainerNewProps {
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;
+  dailySelection?: DailySelection | null;
 }
 
-const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ onMarkWordLearned, initialWords, additionalContent, onOpenSearch }) => {
+const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
+  onMarkWordLearned,
+  initialWords,
+  additionalContent,
+  onOpenSearch,
+  dailySelection,
+}) => {
   // Use stable state management
   const {
     currentWord,
@@ -36,7 +44,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({ o
     playCurrentWord,
     userInteractionState,
     handleInteractionUpdate
-  } = useStableVocabularyState(initialWords);
+  } = useStableVocabularyState(initialWords, dailySelection);
 
   // Optimized auto-play with reduced re-renders
   useOptimizedAutoPlay({

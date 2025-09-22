@@ -21,6 +21,7 @@ interface LearningProgressPanelProps {
     learned: number;
   };
   onGenerateDaily: (severity: SeverityLevel) => void | Promise<void>;
+  onRegenerateToday?: () => void | Promise<void>;
   learnerId: string;
 }
 
@@ -28,6 +29,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   dailySelection,
   progressStats,
   onGenerateDaily,
+  onRegenerateToday,
   learnerId
 }) => {
   const learnedPercentage = progressStats.total > 0
@@ -157,8 +159,8 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         <div className="space-y-3">
           <h4 className="font-semibold">Generate New Daily Selection</h4>
           <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => onGenerateDaily('light')}
             >
@@ -178,6 +180,17 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             >
               Intense (50-100)
             </Button>
+            {onRegenerateToday && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  void onRegenerateToday();
+                }}
+              >
+                Regenerate Today
+              </Button>
+            )}
           </div>
         </div>
         </CardContent>

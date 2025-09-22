@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
@@ -12,10 +13,19 @@ export const useVocabularyDataLoader = (
   currentIndex: number,
   selectedVoiceName: string,
   clearAutoAdvanceTimer: () => void,
-  initialWords?: VocabularyWord[]
+  initialWords?: VocabularyWord[],
+  selection?: DailySelection | null
 ) => {
   const startTimerRef = useRef<number | null>(null);
   const prevIndexRef = useRef(0);
+
+  const selectionKey = useMemo(() => {
+    if (!selection) return 'none';
+    const mode = selection.mode ?? 'unknown';
+    const category = selection.category ?? 'ALL';
+    const date = selection.date ?? 'unknown-date';
+    return `${date}|${mode}|${category}|${selection.totalCount}`;
+  }, [selection?.category, selection?.date, selection?.mode, selection?.totalCount]);
 
   useEffect(() => {
     prevIndexRef.current = currentIndex;
@@ -59,12 +69,21 @@ export const useVocabularyDataLoader = (
       setHasData(true);
     } else {
       setWordList([]);
-      setHasData(false);
+      const hasPlannedWords = Boolean(selection && selection.totalCount > 0);
+      const hasLoadedWords = Boolean(initialWords && initialWords.length > 0);
+      setHasData(hasPlannedWords && hasLoadedWords);
     }
 
     return () => {
       clearAutoAdvanceTimer();
       clearStartTimer();
     };
-  }, [initialWords, setWordList, setHasData, setCurrentIndex, clearAutoAdvanceTimer]);
+  }, [
+    initialWords,
+    selectionKey,
+    setWordList,
+    setHasData,
+    setCurrentIndex,
+    clearAutoAdvanceTimer,
+  ]);
 };
