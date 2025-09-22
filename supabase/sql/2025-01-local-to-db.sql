@@ -9,6 +9,21 @@ create table if not exists public.defaultVocabulary (
   count integer
 );
 
+create or replace view public.default_vocabulary as
+select
+  word,
+  category,
+  meaning,
+  example,
+  translation
+from public."defaultVocabulary";
+
+grant select on public.default_vocabulary to anon;
+grant select on public.default_vocabulary to authenticated;
+
+-- Row Level Security is not enabled on public."defaultVocabulary", so no view-specific
+-- policies are required to mirror table access.
+
 create table if not exists public.nicknames (
   id bigserial primary key,
   created_at timestamptz not null default now(),
