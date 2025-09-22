@@ -1,8 +1,6 @@
 
 import React from 'react';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
-import VoiceDebugPanel from '@/components/VoiceDebugPanel';
-import DebugPanel from '@/components/DebugPanel';
 
 const Index = () => {
   return (
@@ -25,8 +23,6 @@ const Index = () => {
       <footer className="mt-6 text-center text-sm text-muted-foreground">
         <p>© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
       </footer>
-      <VoiceDebugPanel />
-      <DebugPanel />
     </div>
   );
 };

@@ -237,7 +237,12 @@ export class LearningProgressService {
     return config.max;
   }
 
-  private async requestDailySelection(userKey: string, mode: SeverityLevel, count: number): Promise<DailySelectionRow[]> {
+  private async generateDailySelection(
+    userKey: string,
+    mode: SeverityLevel,
+    count: number,
+    category?: string | null
+  ): Promise<DailySelectionRow[]> {
     const client = getSupabaseClient();
     if (!client) throw new Error('Supabase client unavailable');
     if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
@@ -245,7 +250,8 @@ export class LearningProgressService {
     const { data, error } = await client.rpc('generate_daily_selection', {
       user_unique_key: userKey,
       mode,
-      count
+      count,
+      category: category ?? null
     });
 
     if (error) {
@@ -256,6 +262,58 @@ export class LearningProgressService {
       ? (data as DailySelectionRow[])
       : [];
     return rows.filter(row => typeof row?.word_id === 'string');
+  }
+
+  private async commitDailySelection(userKey: string, wordIds: string[]): Promise<void> {
+    const client = getSupabaseClient();
+    if (!client) throw new Error('Supabase client unavailable');
+    if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
+
+    const { error } = await client.rpc('commit_daily_selection', {
+      user_unique_key: userKey,
+      word_ids: wordIds
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+  }
+
+  private async requestDailySelectionFromServer(
+    userKey: string,
+    mode: SeverityLevel,
+    count: number,
+    category?: string | null
+  ): Promise<TodayWord[]> {
+    const selection = await this.generateDailySelection(userKey, mode, count, category);
+    const wordIds = selection
+      .map(row => row.word_id)
+      .filter((id): id is string => typeof id === 'string' && id.length > 0);
+
+    await this.commitDailySelection(userKey, wordIds);
+
+    if (selection.length === 0 || wordIds.length === 0) {
+      return [];
+    }
+
+    let vocabMap: Record<string, VocabularyRow> = {};
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      try {
+        vocabMap = await this.fetchVocabularyByIds(wordIds);
+        lastError = null;
+        break;
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!vocabMap || Object.keys(vocabMap).length === 0) {
+      throw lastError instanceof Error ? lastError : new Error('Failed to fetch vocabulary details');
+    }
+
+    const srsMap = await this.fetchSrsRows(userKey, wordIds);
+    return this.mergeWordData(selection, vocabMap, srsMap);
   }
 
   private async fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
@@ -493,35 +551,7 @@ export class LearningProgressService {
     }
 
     const count = this.resolveCount(severity);
-    const selection = await this.requestDailySelection(userKey, severity, count);
-    if (selection.length === 0) {
-      this.saveTodayWords(userKey, []);
-      return {
-        words: [],
-        selection: this.buildSelection([], severity)
-      };
-    }
-
-    const wordIds = selection.map(row => row.word_id);
-
-    let vocabMap: Record<string, VocabularyRow> = {};
-    let lastError: unknown;
-    for (let attempt = 0; attempt < 2; attempt += 1) {
-      try {
-        vocabMap = await this.fetchVocabularyByIds(wordIds);
-        lastError = null;
-        break;
-      } catch (error) {
-        lastError = error;
-      }
-    }
-
-    if (!vocabMap || Object.keys(vocabMap).length === 0) {
-      throw lastError instanceof Error ? lastError : new Error('Failed to fetch vocabulary details');
-    }
-
-    const srsMap = await this.fetchSrsRows(userKey, wordIds);
-    const words = this.mergeWordData(selection, vocabMap, srsMap);
+    const words = await this.requestDailySelectionFromServer(userKey, severity, count);
     this.saveTodayWords(userKey, words);
 
     return {
