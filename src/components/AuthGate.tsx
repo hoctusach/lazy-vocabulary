@@ -113,6 +113,39 @@ export default function AuthGate() {
     const trimmedPasscode = passcodeInput.trim();
     const isCreateMode = s.mode === 'create';
 
+    const handleExchangeError = (error: unknown) => {
+      const code = typeof (error as { code?: unknown })?.code === 'string'
+        ? (error as { code: string }).code
+        : undefined;
+      if (code === 'NICKNAME_NOT_FOUND') {
+        setS((p) => ({
+          ...p,
+          pending: false,
+          show: true,
+          mode: 'create',
+          nickname: sanitizedName,
+          passcode: trimmedPasscode,
+          info: 'We couldn’t find this nickname. Create a profile to continue.',
+          error: undefined,
+        }));
+        return true;
+      }
+      if (code === 'INCORRECT_PASSCODE') {
+        setS((p) => ({
+          ...p,
+          pending: false,
+          show: true,
+          mode: 'signin',
+          passcode: '',
+          error: 'Incorrect passcode. Try again.',
+          info: undefined,
+        }));
+        setTimeout(() => passcodeRef.current?.focus(), 0);
+        return true;
+      }
+      return false;
+    };
+
     const completeSignIn = async (nicknameHint?: string) => {
       const session = (await exchangeNicknamePasscode(
         sanitizedName,
@@ -163,6 +196,7 @@ export default function AuthGate() {
         nicknameHint = typeof result?.nickname === 'string' ? result.nickname : undefined;
       } catch (error) {
         console.error('AuthGate:createProfile', error);
+        if (handleExchangeError(error)) return;
         const rawMessage = typeof (error as { message?: string })?.message === 'string'
           ? (error as { message?: string }).message
           : '';
@@ -183,22 +217,18 @@ export default function AuthGate() {
         return;
       } catch (error) {
         console.error('AuthGate:signInAfterCreate', error);
+        if (handleExchangeError(error)) return;
         const rawMessage = typeof (error as { message?: string })?.message === 'string'
           ? (error as { message?: string }).message
           : '';
         const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
-        const isInvalidPasscode = /401|incorrect/i.test(message);
         setS((p) => ({
           ...p,
           pending: false,
-          passcode: isInvalidPasscode ? '' : p.passcode,
-          error: isInvalidPasscode ? 'Incorrect passcode' : message,
+          error: message,
           info: undefined,
           mode: 'signin',
         }));
-        if (isInvalidPasscode) {
-          setTimeout(() => passcodeRef.current?.focus(), 0);
-        }
         return;
       }
     }
@@ -207,22 +237,18 @@ export default function AuthGate() {
       await completeSignIn();
     } catch (error) {
       console.error('AuthGate:signIn', error);
+      if (handleExchangeError(error)) return;
       const rawMessage = typeof (error as { message?: string })?.message === 'string'
         ? (error as { message?: string }).message
         : '';
       const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
-      const isInvalidPasscode = /401|incorrect/i.test(message);
       setS((p) => ({
         ...p,
         pending: false,
-        passcode: isInvalidPasscode ? '' : p.passcode,
-        error: isInvalidPasscode ? 'Incorrect passcode' : message,
+        error: message,
         info: undefined,
         mode: 'signin',
       }));
-      if (isInvalidPasscode) {
-        setTimeout(() => passcodeRef.current?.focus(), 0);
-      }
     }
   };
 
