@@ -1,1 +1,1 @@
-export const EDGE_BASE_URL = 'https://vijvcojvemkzgpzpowzh.supabase.co/functions/v1';
+export { EDGE_BASE as EDGE_BASE_URL } from './lib/edgeApi';
