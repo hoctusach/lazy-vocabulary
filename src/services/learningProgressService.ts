@@ -1,23 +1,13 @@
-import type { LearnedWord } from '@/core/models';
-import type { VocabularyWord } from '@/types/vocabulary';
-import type {
-  DailySelection,
-  LearningProgress,
-  SeverityConfig,
-  SeverityLevel
-} from '@/types/learning';
-import { getLearned, resetLearned, upsertLearned, type LearnedWordUpsert } from '@/lib/db/learned';
-import { TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
-import { toWordId } from '@/lib/words/ids';
-import {
-  DAILY_SELECTION_KEY,
-  LAST_SYNC_DATE_KEY,
-  LEARNED_WORDS_CACHE_KEY,
-  LEARNING_PROGRESS_KEY,
-  TODAY_WORDS_KEY
-} from '@/utils/storageKeys';
+import type { DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
+import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
+import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
+import { resetLearned } from '@/lib/db/learned';
+import type { LearnedWordUpsert } from '@/lib/db/learned';
+import { getProgressSummary, type ProgressSummaryFields } from '@/lib/progress/progressSummary';
+import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
-const DEFAULT_SEVERITY_CONFIG: SeverityConfig = {
+const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
   light: { min: 15, max: 25 },
   moderate: { min: 30, max: 50 },
   intense: { min: 50, max: 100 }
@@ -28,21 +18,140 @@ const MASTER_INTERVAL_DAYS = 60;
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 
-type StoredProgress = Partial<LearningProgress> & {
-  word?: string;
-  category?: string;
+const TODAY_WORDS_PREFIX = 'todayWords:';
+const ACTIVE_USER_KEY = 'todayWords.activeUser';
+
+export type TodayWordResponse = TodayWord;
+
+type DailySelectionRow = {
+  word_id: string;
+  category: string | null;
 };
 
-type CachedLearnedWord = {
+type VocabularyRow = {
+  word_id: string;
   word: string;
-  category?: string;
-  learnedDate?: string;
-  status?: LearningProgress['status'];
-  isLearned?: boolean;
+  meaning: string;
+  example: string;
+  translation?: string | null;
+  category?: string | null;
+  count?: number | string | null;
 };
+
+type LearnedRow = {
+  word_id: string;
+  in_review_queue: boolean | null;
+  review_count: number | null;
+  learned_at: string | null;
+  last_review_at: string | null;
+  next_review_at: string | null;
+  next_display_at: string | null;
+  last_seen_at: string | null;
+  srs_interval_days: number | null;
+  srs_easiness: number | null;
+  srs_state: string | null;
+};
+
+type DailyWordsResult = {
+  words: TodayWord[];
+  selection: DailySelection;
+};
+
+const toDateKey = (value: Date) => value.toISOString().slice(0, 10);
+
+export const todayKeyFor = (userKey: string, d = new Date()) => `${TODAY_WORDS_PREFIX}${userKey}:${toDateKey(d)}`;
+
+function safeParseJSON<T>(value: string | null): T | null {
+  if (!value) return null;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+function toIsoDate(dateKey: string | null | undefined): string | null {
+  if (!dateKey) return null;
+  const trimmed = dateKey.trim();
+  if (!trimmed) return null;
+  if (trimmed.includes('T')) {
+    const parsed = Date.parse(trimmed);
+    return Number.isNaN(parsed) ? null : new Date(parsed).toISOString();
+  }
+  const candidate = `${trimmed}T00:00:00.000Z`;
+  const parsed = Date.parse(candidate);
+  return Number.isNaN(parsed) ? null : new Date(parsed).toISOString();
+}
+
+function computeIntervalDays(learnedAt?: string | null, nextReviewAt?: string | null): number | null {
+  if (!learnedAt || !nextReviewAt) return null;
+  const start = Date.parse(learnedAt);
+  const end = Date.parse(nextReviewAt);
+  if (Number.isNaN(start) || Number.isNaN(end)) return null;
+  const diff = Math.max(0, end - start);
+  return Math.round(diff / 86_400_000);
+}
+
+function isDue(srs?: TodayWordSrs | null): boolean {
+  if (!srs) return false;
+  const candidate = srs.next_review_at ?? srs.next_display_at;
+  if (!candidate) return false;
+  const parsed = Date.parse(candidate);
+  if (Number.isNaN(parsed)) return false;
+  const now = Date.now();
+  return parsed <= now;
+}
+
+function isLearnedState(srs?: TodayWordSrs | null): boolean {
+  if (!srs) return false;
+  if (srs.in_review_queue === false) return true;
+  if ((srs.review_count ?? 0) >= REVIEW_INTERVALS_DAYS.length + 1) return true;
+  const state = (srs.srs_state ?? '').toLowerCase();
+  return state === 'learned';
+}
+
+function isReviewCandidate(srs?: TodayWordSrs | null): boolean {
+  if (!srs) return false;
+  if (srs.in_review_queue === false) return false;
+  return (srs.review_count ?? 0) > 0 || isDue(srs);
+}
+
+function determineStatus(reviewCount: number, nextReviewIso: string, isLearned: boolean): LearningProgress['status'] {
+  if (!isLearned || reviewCount === 0) return 'new';
+  if (!nextReviewIso) return 'learned';
+  return isDue({ next_review_at: nextReviewIso })
+    ? 'due'
+    : reviewCount >= REVIEW_INTERVALS_DAYS.length + 1
+      ? 'learned'
+      : 'not_due';
+}
+
+function toSrsState(status: LearningProgress['status']): string {
+  switch (status) {
+    case 'due':
+      return 'review';
+    case 'learned':
+      return 'learned';
+    case 'not_due':
+      return 'learning';
+    default:
+      return 'new';
+  }
+}
+
+function shouldRemainInQueue(status: LearningProgress['status']): boolean {
+  if (status === 'learned') return false;
+  if (status === 'new') return false;
+  return true;
+}
+
+function coerceCategory(category?: string | null): string {
+  const trimmed = (category ?? '').trim();
+  return trimmed || 'general';
+}
 
 export class LearningProgressService {
-  private readonly severityConfig: SeverityConfig = DEFAULT_SEVERITY_CONFIG;
+  private severityConfig = DEFAULT_SEVERITY_CONFIG;
 
   static getInstance() {
     return new LearningProgressService();
@@ -58,480 +167,241 @@ export class LearningProgressService {
     }
   }
 
-  private getTodayKey(): string {
-    const now = new Date();
-    return now.toISOString().slice(0, 10);
-  }
-
-  private getSelectionStorageKey(date: string): string {
-    return `${DAILY_SELECTION_KEY}:${date}`;
-  }
-
-  private normaliseWordId(wordId: string | undefined | null): string {
-    if (typeof wordId !== 'string') return '';
-    return wordId.trim().toLowerCase();
-  }
-
-  private normaliseWordIdList(values: unknown[]): string[] {
-    const ids: string[] = [];
-    for (const value of values) {
-      if (typeof value === 'string') {
-        const normalised = this.normaliseWordId(value);
-        if (normalised) ids.push(normalised);
-        continue;
-      }
-
-      if (value && typeof value === 'object') {
-        const candidate = (value as { word_id?: unknown; id?: unknown }).word_id ??
-          (value as { id?: unknown }).id;
-        if (typeof candidate === 'string') {
-          const normalised = this.normaliseWordId(candidate);
-          if (normalised) ids.push(normalised);
-        }
-      }
-    }
-
-    return Array.from(new Set(ids));
-  }
-
-  private parseCachedWordIds(raw: string | null): string[] {
-    if (!raw) return [];
-
-    try {
-      const parsed = JSON.parse(raw) as unknown;
-      if (Array.isArray(parsed)) {
-        return this.normaliseWordIdList(parsed);
-      }
-
-      if (parsed && typeof parsed === 'object') {
-        const withIds = parsed as { dueWordIds?: unknown; words?: unknown };
-        if (Array.isArray(withIds.dueWordIds)) {
-          return this.normaliseWordIdList(withIds.dueWordIds);
-        }
-        if (Array.isArray(withIds.words)) {
-          return this.normaliseWordIdList(withIds.words);
-        }
-      }
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to parse cached due words', error);
-    }
-
-    return [];
-  }
-
-  private getCachedServerDueWordSet(date: string): Set<string> {
+  private listStorageKeys(): string[] {
     const storage = this.getStorage();
-    if (!storage) return new Set();
-
-    const lastSync = storage.getItem(LAST_SYNC_DATE_KEY);
-    if (!lastSync || lastSync !== date) {
-      return new Set();
+    if (!storage) return [];
+    const keys: string[] = [];
+    for (let i = 0; i < storage.length; i += 1) {
+      const key = storage.key(i);
+      if (key) keys.push(key);
     }
-
-    const ids = this.parseCachedWordIds(storage.getItem(TODAY_WORDS_KEY));
-    return new Set(ids);
+    return keys;
   }
 
-  private persistServerDueWordIds(date: string, wordIds: string[]): void {
+  private loadTodayWords(userKey: string, date = new Date()): TodayWord[] {
+    const storage = this.getStorage();
+    if (!storage) return [];
+    const cached = safeParseJSON<TodayWord[]>(storage.getItem(todayKeyFor(userKey, date)));
+    if (!Array.isArray(cached)) return [];
+    return cached;
+  }
+
+  private saveTodayWords(userKey: string, words: TodayWord[], date = new Date()): void {
     const storage = this.getStorage();
     if (!storage) return;
-
     try {
-      const unique = Array.from(new Set(wordIds.map(id => this.normaliseWordId(id)).filter(Boolean)));
-      storage.setItem(TODAY_WORDS_KEY, JSON.stringify(unique));
-      storage.setItem(LAST_SYNC_DATE_KEY, date);
+      storage.setItem(todayKeyFor(userKey, date), JSON.stringify(words));
+      storage.setItem(ACTIVE_USER_KEY, userKey);
     } catch (error) {
-      console.warn('[LearningProgressService] Failed to persist server due words', error);
+      console.warn('[LearningProgressService] Failed to persist today words', error);
     }
   }
 
-  private isInReviewQueue(value: unknown): boolean {
-    if (value === true) return true;
-    if (typeof value === 'number') {
-      return Number.isFinite(value) && value > 0;
-    }
-    if (typeof value === 'string') {
-      const normalised = value.trim().toLowerCase();
-      return normalised === 'true' || normalised === '1' || normalised === 'yes';
-    }
-    return false;
-  }
-
-  private buildWordKey(word: string, category?: string): string {
-    return category ? `${word}::${category}` : word;
-  }
-
-  private loadLearnedWordCache(): Record<string, CachedLearnedWord> {
-    const storage = this.getStorage();
-    if (!storage) return {};
-
-    try {
-      const raw = storage.getItem(LEARNED_WORDS_CACHE_KEY);
-      if (!raw) return {};
-
-      const parsed = JSON.parse(raw) as unknown;
-      if (Array.isArray(parsed)) {
-        const map: Record<string, CachedLearnedWord> = {};
-        for (const entry of parsed) {
-          if (!entry || typeof entry !== 'object') continue;
-          const typed = entry as CachedLearnedWord;
-          const key = this.normaliseWordId(typed.word);
-          if (!key) continue;
-          map[key] = { ...typed, word: key };
-        }
-        return map;
-      }
-
-      if (parsed && typeof parsed === 'object') {
-        const map = parsed as Record<string, CachedLearnedWord>;
-        const normalised: Record<string, CachedLearnedWord> = {};
-        for (const [key, value] of Object.entries(map)) {
-          const normalisedKey = this.normaliseWordId(key);
-          if (!normalisedKey) continue;
-          const storedWord = value?.word ? this.normaliseWordId(value.word) : normalisedKey;
-          const finalWord = storedWord || normalisedKey;
-          normalised[normalisedKey] = { ...value, word: finalWord };
-        }
-        return normalised;
-      }
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to parse learned word cache', error);
-    }
-
-    return {};
-  }
-
-  private saveLearnedWordCache(cache: Record<string, CachedLearnedWord>): void {
+  private clearTodayWordsForUser(userKey: string): void {
     const storage = this.getStorage();
     if (!storage) return;
-
-    try {
-      storage.setItem(LEARNED_WORDS_CACHE_KEY, JSON.stringify(cache));
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to persist learned word cache', error);
+    const prefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
+    const keysToRemove = this.listStorageKeys().filter(key => key.startsWith(prefix));
+    for (const key of keysToRemove) {
+      storage.removeItem(key);
     }
   }
 
-  private upsertLearnedWordCacheEntry(entry: CachedLearnedWord): Record<string, CachedLearnedWord> {
-    const cache = this.loadLearnedWordCache();
-    const key = this.normaliseWordId(entry.word);
-    if (!key) return cache;
-
-    cache[key] = {
-      word: key,
-      category: entry.category ?? cache[key]?.category,
-      learnedDate: entry.learnedDate ?? cache[key]?.learnedDate,
-      status: entry.status ?? cache[key]?.status ?? 'learned',
-      isLearned: entry.isLearned ?? cache[key]?.isLearned ?? true
-    };
-
-    this.saveLearnedWordCache(cache);
-    return cache;
-  }
-
-  private mergeLearnedCacheWithRemote(
-    cache: Record<string, CachedLearnedWord>,
-    remoteRows: LearnedWord[]
-  ): Record<string, CachedLearnedWord> {
-    const merged = { ...cache };
-
-    for (const row of remoteRows ?? []) {
-      if (!row || typeof row !== 'object') continue;
-      const wordId = this.normaliseWordId((row as { word_id?: unknown }).word_id as string);
-      if (!wordId) continue;
-
-      const existing = merged[wordId];
-      merged[wordId] = {
-        word: wordId,
-        category: existing?.category,
-        learnedDate: typeof row.learned_at === 'string' && row.learned_at.trim()
-          ? row.learned_at
-          : existing?.learnedDate,
-        status: existing?.status ?? 'learned',
-        isLearned: existing?.isLearned ?? true
-      };
-    }
-
-    this.saveLearnedWordCache(merged);
-    return merged;
-  }
-
-  getCachedLearnedWords(): CachedLearnedWord[] {
-    const cache = this.loadLearnedWordCache();
-    return Object.values(cache);
-  }
-
-  upsertCachedLearnedWord(entry: CachedLearnedWord): CachedLearnedWord[] {
-    const cache = this.upsertLearnedWordCacheEntry(entry);
-    return Object.values(cache);
-  }
-
-  private loadProgressMap(): Record<string, StoredProgress> {
+  private clearStaleCaches(currentUserKey: string, date = new Date()): void {
     const storage = this.getStorage();
-    if (!storage) return {};
+    if (!storage) return;
+    const todayIso = toDateKey(date);
+    const keys = this.listStorageKeys();
+    for (const key of keys) {
+      if (!key.startsWith(TODAY_WORDS_PREFIX)) continue;
+      const [, userKey, cachedDate] = key.split(':');
+      if (!cachedDate || cachedDate === todayIso) continue;
+      storage.removeItem(key);
+      if (userKey && userKey !== currentUserKey) {
+        const legacyPrefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
+        if (key.startsWith(legacyPrefix)) {
+          storage.removeItem(key);
+        }
+      }
+    }
 
-    try {
-      const raw = storage.getItem(LEARNING_PROGRESS_KEY);
-      if (!raw) return {};
-      const parsed = JSON.parse(raw) as unknown;
-      if (Array.isArray(parsed)) {
-        const map: Record<string, StoredProgress> = {};
-        for (const entry of parsed) {
-          if (entry && typeof entry === 'object') {
-            const progress = entry as StoredProgress;
-            const key = this.buildWordKey(progress.word ?? '', progress.category);
-            if (key.trim()) map[key] = progress;
+    const activeUser = storage.getItem(ACTIVE_USER_KEY);
+    if (activeUser && activeUser !== currentUserKey) {
+      this.clearTodayWordsForUser(activeUser);
+    }
+    storage.setItem(ACTIVE_USER_KEY, currentUserKey);
+  }
+
+  private resolveCount(severity: SeverityLevel): number {
+    const config = this.severityConfig[severity] ?? this.severityConfig.light;
+    return config.max;
+  }
+
+  private async requestDailySelection(userKey: string, mode: SeverityLevel, count: number): Promise<DailySelectionRow[]> {
+    const client = getSupabaseClient();
+    if (!client) throw new Error('Supabase client unavailable');
+    if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
+
+    const { data, error } = await client.rpc('generate_daily_selection', {
+      user_unique_key: userKey,
+      mode,
+      count
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const rows: DailySelectionRow[] = Array.isArray(data)
+      ? (data as DailySelectionRow[])
+      : [];
+    return rows.filter(row => typeof row?.word_id === 'string');
+  }
+
+  private async fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
+    if (wordIds.length === 0) return {};
+    const client = getSupabaseClient();
+    if (!client) throw new Error('Supabase client unavailable');
+    if (CUSTOM_AUTH_MODE) throw new Error('Vocabulary fetch unavailable in custom auth mode');
+
+    const { data, error } = await client.rpc('fetch_vocabulary_by_ids', {
+      word_ids: wordIds
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const rows: VocabularyRow[] = Array.isArray(data)
+      ? (data as VocabularyRow[])
+      : [];
+
+    const map: Record<string, VocabularyRow> = {};
+    for (const row of rows) {
+      if (!row || typeof row.word_id !== 'string') continue;
+      map[row.word_id] = row;
+    }
+    return map;
+  }
+
+  private async fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<string, LearnedRow>> {
+    if (wordIds.length === 0) return {};
+    const client = getSupabaseClient();
+    if (!client) throw new Error('Supabase client unavailable');
+    if (CUSTOM_AUTH_MODE) throw new Error('SRS fetch unavailable in custom auth mode');
+
+    const { data, error } = await client
+      .from('learned_words')
+      .select(
+        'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_easiness,srs_state'
+      )
+      .eq('user_unique_key', userKey)
+      .in('word_id', wordIds);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const rows: LearnedRow[] = Array.isArray(data)
+      ? (data as LearnedRow[])
+      : [];
+
+    const map: Record<string, LearnedRow> = {};
+    for (const row of rows) {
+      if (!row || typeof row.word_id !== 'string') continue;
+      map[row.word_id] = row;
+    }
+    return map;
+  }
+
+  private mergeWordData(
+    selection: DailySelectionRow[],
+    vocabMap: Record<string, VocabularyRow>,
+    srsMap: Record<string, LearnedRow>
+  ): TodayWord[] {
+    const words: TodayWord[] = [];
+    for (const row of selection) {
+      if (!row?.word_id) continue;
+      const vocab = vocabMap[row.word_id];
+      if (!vocab) continue;
+      const learned = srsMap[row.word_id];
+      const srs: TodayWordSrs | undefined = learned
+        ? {
+            in_review_queue: learned.in_review_queue,
+            review_count: learned.review_count,
+            learned_at: learned.learned_at,
+            last_review_at: learned.last_review_at,
+            next_review_at: learned.next_review_at,
+            next_display_at: learned.next_display_at,
+            last_seen_at: learned.last_seen_at,
+            srs_interval_days: learned.srs_interval_days,
+            srs_easiness: learned.srs_easiness,
+            srs_state: learned.srs_state
           }
-        }
-        return map;
-      }
-      if (parsed && typeof parsed === 'object') {
-        return parsed as Record<string, StoredProgress>;
-      }
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to parse learning progress', error);
-    }
+        : undefined;
 
-    return {};
+      words.push({
+        word_id: row.word_id,
+        word: vocab.word,
+        meaning: vocab.meaning,
+        example: vocab.example,
+        translation: vocab.translation ?? undefined,
+        count: vocab.count ?? 0,
+        category: coerceCategory(vocab.category ?? row.category ?? undefined),
+        nextAllowedTime: srs?.next_display_at ?? undefined,
+        srs
+      });
+    }
+    return words;
   }
 
-  private saveProgressMap(progressMap: Record<string, StoredProgress>): void {
-    const storage = this.getStorage();
-    if (!storage) return;
+  private toLearningProgress(word: TodayWord): LearningProgress {
+    const srs = word.srs ?? undefined;
+    const reviewCount = srs?.review_count ?? 0;
+    const learnedAt = srs?.learned_at ?? null;
+    const nextReviewIso = srs?.next_review_at ?? null;
+    const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso)) : '';
+    const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs));
 
-    try {
-      storage.setItem(LEARNING_PROGRESS_KEY, JSON.stringify(progressMap));
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to persist learning progress', error);
-    }
+    return {
+      word: word.word,
+      type: undefined,
+      category: word.category,
+      isLearned: isLearnedState(srs),
+      reviewCount,
+      lastPlayedDate: srs?.last_review_at ?? '',
+      status,
+      nextReviewDate,
+      createdDate: learnedAt ? toDateKey(new Date(learnedAt)) : toDateKey(new Date()),
+      learnedDate: learnedAt ?? undefined,
+      nextAllowedTime: srs?.next_display_at ?? undefined
+    };
   }
 
-  private parseWordKey(wordKey: string): { word: string; category?: string } {
-    const trimmed = (wordKey ?? '').trim();
-    if (!trimmed) {
-      return { word: '' };
-    }
+  private buildSelection(words: TodayWord[], severity: SeverityLevel): DailySelection {
+    const reviewWords: LearningProgress[] = [];
+    const newWords: LearningProgress[] = [];
 
-    const parts = trimmed.split('::');
-    if (parts.length >= 2) {
-      const [word, ...categoryParts] = parts;
-      const category = categoryParts.join('::').trim();
-      return { word: word.trim(), category: category || undefined };
-    }
-
-    return { word: trimmed };
-  }
-
-  private resolveProgressEntry(
-    progressMap: Record<string, StoredProgress>,
-    wordKey: string
-  ): {
-    key?: string;
-    entry?: StoredProgress;
-    word: string;
-    category?: string;
-  } {
-    const parsed = this.parseWordKey(wordKey);
-    let word = parsed.word;
-    const category = parsed.category;
-    const candidates = new Set<string>();
-
-    const trimmedKey = (wordKey ?? '').trim();
-    if (trimmedKey) candidates.add(trimmedKey);
-
-    const builtKey = this.buildWordKey(parsed.word, parsed.category);
-    if (builtKey) candidates.add(builtKey);
-
-    if (parsed.word) candidates.add(parsed.word);
-
-    for (const candidate of candidates) {
-      if (!candidate) continue;
-      const entry = progressMap[candidate];
-      if (!entry) continue;
-      return {
-        key: candidate,
-        entry,
-        word: typeof entry.word === 'string' && entry.word.trim() ? entry.word : word,
-        category: entry.category ?? category
-      };
-    }
-
-    for (const [key, entry] of Object.entries(progressMap)) {
-      if (!entry) continue;
-      const storedWord = typeof entry.word === 'string' ? entry.word : '';
-      if (storedWord && (storedWord === parsed.word || storedWord === trimmedKey)) {
-        return {
-          key,
-          entry,
-          word: storedWord,
-          category: entry.category ?? category
-        };
-      }
-    }
-
-    if (!word && trimmedKey) {
-      word = trimmedKey;
+    for (const word of words) {
+      const target = isReviewCandidate(word.srs) ? reviewWords : newWords;
+      target.push(this.toLearningProgress(word));
     }
 
     return {
-      key: builtKey || trimmedKey || word,
-      word,
-      category
+      reviewWords,
+      newWords,
+      totalCount: reviewWords.length + newWords.length,
+      severity
     };
-  }
-
-  private coerceReviewCount(value: unknown): number {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  private normaliseOptionalString(value: unknown): string | undefined {
-    if (typeof value !== 'string') return undefined;
-    const trimmed = value.trim();
-    return trimmed.length ? trimmed : undefined;
-  }
-
-  private toNullableNumber(value: unknown): number | null {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
-
-    if (typeof value === 'string') {
-      const trimmed = value.trim();
-      if (!trimmed) return null;
-      const parsed = Number(trimmed);
-      return Number.isFinite(parsed) ? parsed : null;
-    }
-
-    return null;
-  }
-
-  private toIsoString(value?: string | Date | null): string {
-    if (!value) return new Date().toISOString();
-    if (value instanceof Date) return value.toISOString();
-    const parsed = Date.parse(value);
-    if (Number.isNaN(parsed)) return new Date().toISOString();
-    return new Date(parsed).toISOString();
-  }
-
-  private toNullableIsoString(value?: string | Date | null): string | null {
-    if (!value) return null;
-    if (value instanceof Date) return value.toISOString();
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const parsed = Date.parse(trimmed);
-    if (Number.isNaN(parsed)) return null;
-    return new Date(parsed).toISOString();
-  }
-
-  private toIsoFromDateKey(value?: string | null): string | undefined {
-    if (!value) return undefined;
-    const trimmed = value.trim();
-    if (!trimmed) return undefined;
-    const candidate = `${trimmed}T00:00:00.000Z`;
-    const parsed = Date.parse(candidate);
-    if (Number.isNaN(parsed)) return undefined;
-    return new Date(parsed).toISOString();
-  }
-
-  private toNullableIsoFromDateKey(value?: string | null): string | null {
-    if (!value) return null;
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const candidate = trimmed.includes('T') ? trimmed : `${trimmed}T00:00:00.000Z`;
-    const parsed = Date.parse(candidate);
-    if (Number.isNaN(parsed)) return null;
-    return new Date(parsed).toISOString();
-  }
-
-  private computeIntervalDays(learnedAt?: string, nextReviewAt?: string | null): number | null {
-    if (!nextReviewAt) return null;
-    const start = learnedAt ? Date.parse(learnedAt) : Date.now();
-    const end = Date.parse(nextReviewAt);
-    if (Number.isNaN(start) || Number.isNaN(end)) return null;
-    const diff = Math.max(0, end - start);
-    return Math.round(diff / 86_400_000);
-  }
-
-  private toSrsState(status?: StoredProgress['status']): string {
-    switch (status) {
-      case 'learned':
-        return 'learned';
-      case 'due':
-        return 'review';
-      case 'not_due':
-        return 'learning';
-      default:
-        return 'new';
-    }
-  }
-
-  private isInReviewQueueStatus(status?: StoredProgress['status']): boolean {
-    if (!status) return false;
-    if (status === 'learned') return false;
-    if (status === 'new') return false;
-    return true;
-  }
-
-  private buildSupabasePayload(
-    word: string,
-    category: string | undefined,
-    progress: StoredProgress
-  ): { wordId: string; payload: LearnedWordUpsert } {
-    const reviewCount = this.coerceReviewCount(progress.reviewCount);
-    const learnedAt = this.toIsoString(progress.learnedDate ?? progress.createdDate);
-    const lastReviewAt = this.toIsoString(progress.lastPlayedDate ?? learnedAt);
-    const nextReviewAt = this.toIsoFromDateKey(progress.nextReviewDate);
-    const nextDisplayAt = progress.nextAllowedTime
-      ? this.toIsoString(progress.nextAllowedTime)
-      : nextReviewAt;
-    const intervalDays = this.computeIntervalDays(learnedAt, nextReviewAt ?? null);
-    const srsState = this.toSrsState(progress.status);
-    const wordId = toWordId(word, category);
-
-    const payload: LearnedWordUpsert = {
-      in_review_queue: this.isInReviewQueueStatus(progress.status),
-      review_count: reviewCount,
-      learned_at: learnedAt,
-      last_review_at: lastReviewAt,
-      next_review_at: nextReviewAt ?? null,
-      next_display_at: nextDisplayAt ?? null,
-      last_seen_at: lastReviewAt,
-      srs_interval_days: intervalDays,
-      srs_easiness: 2.5,
-      srs_state: srsState,
-    };
-
-    return { wordId, payload };
-  }
-
-  private async persistProgressToCloud(
-    word: string,
-    category: string | undefined,
-    progress: StoredProgress
-  ): Promise<{ wordId: string; payload: LearnedWordUpsert } | null> {
-    try {
-      const built = this.buildSupabasePayload(word, category, progress);
-      await upsertLearned(built.wordId, built.payload);
-      return built;
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to sync learned word', error);
-      return null;
-    }
   }
 
   private calculateNextReviewDate(reviewCount: number, from: Date): string {
     const index = Math.max(0, Math.min(reviewCount - 1, REVIEW_INTERVALS_DAYS.length - 1));
     const intervalDays =
-      reviewCount > REVIEW_INTERVALS_DAYS.length
-        ? MASTER_INTERVAL_DAYS
-        : REVIEW_INTERVALS_DAYS[index];
+      reviewCount > REVIEW_INTERVALS_DAYS.length ? MASTER_INTERVAL_DAYS : REVIEW_INTERVALS_DAYS[index];
     const next = new Date(from);
     next.setDate(next.getDate() + intervalDays);
-    return next.toISOString().slice(0, 10);
+    return toDateKey(next);
   }
 
   private calculateNextAllowedTime(reviewCount: number, from: Date): string {
@@ -544,611 +414,222 @@ export class LearningProgressService {
     return next.toISOString();
   }
 
-  private determineStatus(
+  private buildPayloadFromWord(
+    word: TodayWord,
     reviewCount: number,
-    nextReviewDate: string,
-    isLearned: boolean
-  ): LearningProgress['status'] {
-    if (!isLearned || reviewCount === 0) {
-      return 'new';
-    }
+    status: LearningProgress['status'],
+    nextReviewIso: string | null,
+    nextAllowedIso: string,
+    nowIso: string
+  ): LearnedWordUpsert {
+    const learnedAtIso = word.srs?.learned_at ?? nowIso;
 
-    const due = this.isDue({ nextReviewDate } as StoredProgress);
-    if (due) {
-      return 'due';
-    }
-
-    if (reviewCount >= REVIEW_INTERVALS_DAYS.length + 1) {
-      return 'learned';
-    }
-
-    return 'not_due';
-  }
-
-  private assignProgressEntry(
-    progressMap: Record<string, StoredProgress>,
-    preferredKey: string | undefined,
-    progress: StoredProgress
-  ): void {
-    const key = (preferredKey ?? '').trim() || this.buildWordKey(progress.word ?? '', progress.category);
-    if (!key) return;
-
-    progressMap[key] = progress;
-
-    const { word, category } = progress;
-    if (!word) return;
-
-    for (const existingKey of Object.keys(progressMap)) {
-      if (existingKey === key) continue;
-      const entry = progressMap[existingKey];
-      if (!entry) continue;
-      if (entry.word !== word) continue;
-      if (category && entry.category && entry.category !== category) continue;
-      if (!category && entry.category) continue;
-      delete progressMap[existingKey];
-    }
-  }
-
-  private normaliseProgress(
-    word: VocabularyWord,
-    stored?: StoredProgress
-  ): LearningProgress {
-    const today = this.getTodayKey();
-    const category = stored?.category ?? word.category ?? 'general';
-    const status = stored?.status ?? (stored?.isLearned ? 'not_due' : 'new');
-
-    return {
-      word: stored?.word ?? word.word,
-      type: stored?.type,
-      category,
-      isLearned: stored?.isLearned ?? false,
-      reviewCount: stored?.reviewCount ?? 0,
-      lastPlayedDate: stored?.lastPlayedDate ?? '',
-      status,
-      nextReviewDate: stored?.nextReviewDate ?? '',
-      createdDate: stored?.createdDate ?? today,
-      learnedDate: stored?.learnedDate,
-      nextAllowedTime: stored?.nextAllowedTime
+    const payload: LearnedWordUpsert = {
+      in_review_queue: shouldRemainInQueue(status),
+      review_count: reviewCount,
+      learned_at: learnedAtIso,
+      last_review_at: nowIso,
+      next_review_at: nextReviewIso,
+      next_display_at: nextAllowedIso,
+      last_seen_at: nowIso,
+      srs_interval_days: computeIntervalDays(learnedAtIso, nextReviewIso ?? undefined),
+      srs_easiness: word.srs?.srs_easiness ?? 2.5,
+      srs_state: toSrsState(status)
     };
+
+    return payload;
   }
 
-  private isDue(stored?: StoredProgress): boolean {
-    if (!stored) return false;
-    if (stored.status === 'due') return true;
-
-    const candidate = stored.nextReviewDate ?? stored.nextAllowedTime;
-    if (!candidate) return false;
-
-    const timestamp = Date.parse(candidate);
-    if (Number.isNaN(timestamp)) return false;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return timestamp <= today.getTime();
-  }
-
-  private isLearnedProgress(stored?: StoredProgress): boolean {
-    if (!stored) return false;
-    if (stored.isLearned === true) return true;
-
-    const rawIsLearned = (stored as Record<string, unknown>).isLearned;
-    if (typeof rawIsLearned === 'string') {
-      const normalized = rawIsLearned.trim().toLowerCase();
-      if (normalized === 'true' || normalized === '1' || normalized === 'yes') {
-        return true;
-      }
-    }
-
-    const status = stored.status;
-    if (typeof status === 'string' && status.trim().toLowerCase() === 'learned') {
-      return true;
-    }
-
-    const rawStatus = (stored as Record<string, unknown>).status;
-    if (typeof rawStatus === 'number' && rawStatus >= 3) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private persistSelection(date: string, selection: DailySelection): void {
-    const storage = this.getStorage();
-    if (!storage) return;
-
-    try {
-      storage.setItem(this.getSelectionStorageKey(date), JSON.stringify(selection));
-      storage.setItem(DAILY_SELECTION_KEY, JSON.stringify(selection));
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to persist daily selection', error);
-    }
-  }
-
-  private getStoredProgress(
-    progressMap: Record<string, StoredProgress>,
-    word: VocabularyWord
-  ): StoredProgress | undefined {
-    const primary = this.buildWordKey(word.word, word.category);
-    return progressMap[primary] ?? progressMap[word.word];
-  }
-
-  async getLearnedWords(): Promise<CachedLearnedWord[]> {
-    const cache = this.loadLearnedWordCache();
-
-    try {
-      const rows = await getLearned();
-      const merged = this.mergeLearnedCacheWithRemote(cache, rows ?? []);
-      return Object.values(merged);
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to load learned words', error);
-      return Object.values(cache);
-    }
-  }
-
-  async syncSelectionWithServer(selection: DailySelection): Promise<void> {
-    const reviewWords = Array.isArray(selection?.reviewWords) ? selection.reviewWords : [];
-    if (reviewWords.length === 0) return;
-
-    const progressMap = this.loadProgressMap();
-    const uniqueWords = new Map<
-      string,
-      { selection: LearningProgress; stored?: StoredProgress }
-    >();
-
-    for (const entry of reviewWords) {
-      if (!entry || typeof entry.word !== 'string') continue;
-      const wordId = this.normaliseWordId(toWordId(entry.word, entry.category));
-      if (!wordId) continue;
-      if (uniqueWords.has(wordId)) continue;
-
-      const key = this.buildWordKey(entry.word, entry.category);
-      const stored = progressMap[key] ?? progressMap[entry.word];
-      uniqueWords.set(wordId, { selection: entry, stored });
-    }
-
-    if (uniqueWords.size === 0) return;
-
-    let remoteRows: (LearnedWord & Record<string, unknown>)[] = [];
-    try {
-      const fetched = await getLearned();
-      if (Array.isArray(fetched)) {
-        remoteRows = fetched as (LearnedWord & Record<string, unknown>)[];
-      }
-    } catch (error) {
-      console.warn(
-        '[LearningProgressService] Failed to load remote learned words for selection sync',
-        error
-      );
-    }
-
-    const remoteMap = new Map<string, LearnedWord & Record<string, unknown>>();
-    for (const row of remoteRows) {
-      if (!row || typeof row !== 'object') continue;
-      const wordIdValue = (row as { word_id?: unknown }).word_id;
-      if (typeof wordIdValue !== 'string') continue;
-      const normalised = this.normaliseWordId(wordIdValue);
-      if (!normalised) continue;
-      remoteMap.set(normalised, row);
-    }
-
-    for (const [wordId, info] of uniqueWords) {
-      const entry = info.selection;
-      const stored = info.stored;
-      const remote = remoteMap.get(wordId);
-      const remoteRecord = remote as Record<string, unknown> | undefined;
-
-      const learnedAtSource =
-        this.normaliseOptionalString(remoteRecord?.['learned_at']) ??
-        stored?.learnedDate ??
-        stored?.createdDate ??
-        entry.learnedDate ??
-        entry.createdDate;
-
-      const lastReviewSource =
-        this.normaliseOptionalString(remoteRecord?.['last_review_at']) ??
-        stored?.lastPlayedDate ??
-        entry.lastPlayedDate;
-
-      const nextReviewSource =
-        this.normaliseOptionalString(remoteRecord?.['next_review_at']) ??
-        stored?.nextReviewDate ??
-        entry.nextReviewDate;
-
-      const nextDisplaySource =
-        this.normaliseOptionalString(remoteRecord?.['next_display_at']) ??
-        stored?.nextAllowedTime ??
-        entry.nextAllowedTime;
-
-      const lastSeenSource =
-        this.normaliseOptionalString(remoteRecord?.['last_seen_at']) ??
-        stored?.lastPlayedDate ??
-        entry.lastPlayedDate;
-
-      const learnedAt = this.toNullableIsoString(learnedAtSource);
-      const nextReviewAt = this.toNullableIsoFromDateKey(nextReviewSource);
-      const nextDisplayAt = this.toNullableIsoString(nextDisplaySource ?? nextReviewAt ?? undefined);
-      const lastReviewAt = this.toNullableIsoString(lastReviewSource);
-      const lastSeenAt =
-        this.toNullableIsoString(lastSeenSource) ?? lastReviewAt ?? null;
-
-      const reviewCount =
-        this.toNullableNumber(remoteRecord?.['review_count']) ??
-        this.toNullableNumber(stored?.reviewCount) ??
-        this.toNullableNumber(entry.reviewCount);
-
-      const srsIntervalDays =
-        this.toNullableNumber(remoteRecord?.['srs_interval_days']) ??
-        (learnedAt && nextReviewAt
-          ? this.computeIntervalDays(learnedAt, nextReviewAt)
-          : null);
-
-      const srsEasiness =
-        this.toNullableNumber(remoteRecord?.['srs_easiness']) ?? 2.5;
-
-      const status = stored?.status ?? entry.status;
-      const remoteSrsState = this.normaliseOptionalString(remoteRecord?.['srs_state']);
-      const srsState = remoteSrsState ?? this.toSrsState(status);
-
-      const payload: LearnedWordUpsert = {
-        in_review_queue: true,
-        review_count: reviewCount,
-        learned_at: learnedAt,
-        last_review_at: lastReviewAt,
-        next_review_at: nextReviewAt,
-        next_display_at: nextDisplayAt,
-        last_seen_at: lastSeenAt,
-        srs_interval_days: srsIntervalDays,
-        srs_easiness: srsEasiness,
-        srs_state: srsState,
-      };
-
-      try {
-        await upsertLearned(wordId, payload);
-      } catch (error) {
-        console.warn(
-          '[LearningProgressService] Failed to ensure selection sync for word',
-          error
-        );
-      }
-    }
-  }
-
-  async markWordLearned(wordKey: string): Promise<{ wordId: string; payload: LearnedWordUpsert } | null> {
-    const progressMap = this.loadProgressMap();
-    const resolved = this.resolveProgressEntry(progressMap, wordKey);
-    if (!resolved.word) return null;
-
+  private applyReviewToWord(word: TodayWord): { updated: TodayWord; payload: LearnedWordUpsert; progress: LearningProgress } {
     const now = new Date();
-    const todayKey = this.getTodayKey();
-    const learnedAt = now.toISOString();
-
-    const category = resolved.category ?? resolved.entry?.category;
-
-    const updated: StoredProgress = {
-      ...resolved.entry,
-      word: resolved.word,
-      category,
-      isLearned: true,
-      reviewCount: this.coerceReviewCount(resolved.entry?.reviewCount),
-      lastPlayedDate: resolved.entry?.lastPlayedDate ?? learnedAt,
-      status: 'learned',
-      nextReviewDate: '',
-      createdDate: resolved.entry?.createdDate ?? todayKey,
-      learnedDate: resolved.entry?.learnedDate ?? learnedAt,
-      nextAllowedTime: undefined
-    };
-
-    const wordId = toWordId(resolved.word, category);
-    this.upsertCachedLearnedWord({
-      word: wordId,
-      category,
-      learnedDate: updated.learnedDate,
-      status: 'learned',
-      isLearned: true
-    });
-
-    this.assignProgressEntry(progressMap, resolved.key, updated);
-    this.saveProgressMap(progressMap);
-    return this.persistProgressToCloud(resolved.word, category, updated);
-  }
-
-  markWordAsNew(wordKey: string): void {
-    const progressMap = this.loadProgressMap();
-    const resolved = this.resolveProgressEntry(progressMap, wordKey);
-    if (!resolved.word) return;
-
-    const todayKey = this.getTodayKey();
-
-    const category = resolved.category ?? resolved.entry?.category;
-
-    const updated: StoredProgress = {
-      ...resolved.entry,
-      word: resolved.word,
-      category,
-      isLearned: false,
-      reviewCount: 0,
-      lastPlayedDate: '',
-      status: 'new',
-      nextReviewDate: '',
-      createdDate: resolved.entry?.createdDate ?? todayKey,
-      learnedDate: undefined,
-      nextAllowedTime: undefined
-    };
-
-    this.assignProgressEntry(progressMap, resolved.key, updated);
-    this.saveProgressMap(progressMap);
-
-    const wordId = toWordId(resolved.word, category);
-    if (wordId) {
-      void resetLearned(wordId);
-    }
-  }
-
-  getProgressStats() {
-    const progressMap = this.loadProgressMap();
-    let learning = 0;
-    let learned = 0;
-    let due = 0;
-    let newCount = 0;
-
-    for (const stored of Object.values(progressMap)) {
-      if (!stored) continue;
-
-      if (this.isLearnedProgress(stored)) {
-        learned += 1;
-        if (this.isDue(stored)) {
-          due += 1;
-        }
-        continue;
-      }
-
-      const rawReviewCount =
-        typeof stored.reviewCount === 'number'
-          ? stored.reviewCount
-          : Number(stored.reviewCount ?? 0);
-      const reviewCount = Number.isNaN(rawReviewCount) ? 0 : rawReviewCount;
-      const lastPlayedDate = stored.lastPlayedDate ?? '';
-
-      if (
-        stored.status === 'new' ||
-        (reviewCount === 0 && !lastPlayedDate)
-      ) {
-        newCount += 1;
-      } else {
-        learning += 1;
-      }
-    }
-
-    const total = TOTAL_WORDS;
-    const accounted = learning + learned + newCount;
-    if (accounted < total) {
-      newCount += total - accounted;
-    }
-
-    return {
-      total,
-      learning,
-      new: newCount,
-      due,
-      learned
-    };
-  }
-
-  updateWordProgress(wordKey: string): void {
-    const progressMap = this.loadProgressMap();
-    const resolved = this.resolveProgressEntry(progressMap, wordKey);
-    if (!resolved.word) return;
-
-    const now = new Date();
-    const todayKey = this.getTodayKey();
-    const existing = resolved.entry;
-    const category = resolved.category ?? existing?.category;
-    const previousCount = this.coerceReviewCount(existing?.reviewCount);
-    const reviewCount = previousCount + 1;
-    const nextReviewDate = this.calculateNextReviewDate(reviewCount, now);
+    const reviewCount = (word.srs?.review_count ?? 0) + 1;
+    const nextReviewDateKey = this.calculateNextReviewDate(reviewCount, now);
+    const nextReviewIso = toIsoDate(nextReviewDateKey);
     const nextAllowedTime = this.calculateNextAllowedTime(reviewCount, now);
-    const learnedDate =
-      typeof existing?.learnedDate === 'string' && existing.learnedDate.trim()
-        ? existing.learnedDate
-        : now.toISOString();
-    const isLearned = true;
-    const status = this.determineStatus(reviewCount, nextReviewDate, isLearned);
+    const nowIso = now.toISOString();
 
-    const updated: StoredProgress = {
-      ...existing,
-      word: resolved.word,
-      category,
-      isLearned,
-      reviewCount,
-      lastPlayedDate: now.toISOString(),
-      status,
-      nextReviewDate,
-      createdDate: existing?.createdDate ?? todayKey,
-      learnedDate,
-      nextAllowedTime
+    const status = determineStatus(reviewCount, nextReviewIso ?? '', true);
+    const payload = this.buildPayloadFromWord(word, reviewCount, status, nextReviewIso, nextAllowedTime, nowIso);
+
+    const updated: TodayWord = {
+      ...word,
+      nextAllowedTime,
+      srs: {
+        in_review_queue: payload.in_review_queue,
+        review_count: reviewCount,
+        learned_at: payload.learned_at,
+        last_review_at: payload.last_review_at,
+        next_review_at: payload.next_review_at,
+        next_display_at: payload.next_display_at,
+        last_seen_at: payload.last_seen_at,
+        srs_interval_days: payload.srs_interval_days,
+        srs_easiness: payload.srs_easiness,
+        srs_state: payload.srs_state
+      }
     };
 
-    this.assignProgressEntry(progressMap, resolved.key, updated);
-    this.saveProgressMap(progressMap);
-    void this.persistProgressToCloud(resolved.word, category, updated);
+    return { updated, payload, progress: this.toLearningProgress(updated) };
   }
 
-  getWordProgress(wordKey: string): LearningProgress | undefined {
-    const progressMap = this.loadProgressMap();
-    const resolved = this.resolveProgressEntry(progressMap, wordKey);
-    if (!resolved.entry || !resolved.word) return undefined;
-
-    const baseWord: VocabularyWord = {
-      word: resolved.entry.word ?? resolved.word,
-      meaning: '',
-      example: '',
-      category: resolved.entry.category ?? resolved.category ?? 'general'
-    };
-
-    return this.normaliseProgress(baseWord, resolved.entry);
+  async prepareUserSession(): Promise<string | null> {
+    const userKey = await ensureUserKey();
+    if (!userKey) return null;
+    this.clearStaleCaches(userKey);
+    return userKey;
   }
 
-  async syncServerDueWords(): Promise<string[]> {
-    const storage = this.getStorage();
-    if (!storage) return [];
-
-    const todayKey = this.getTodayKey();
-    const lastSync = storage.getItem(LAST_SYNC_DATE_KEY);
-    if (lastSync === todayKey) {
-      return Array.from(this.getCachedServerDueWordSet(todayKey));
+  async getTodayWords(
+    userKey: string,
+    severity: SeverityLevel,
+    { refresh } = { refresh: false }
+  ): Promise<DailyWordsResult> {
+    if (!userKey) throw new Error('userKey is required');
+    const cache = this.loadTodayWords(userKey);
+    if (!refresh && cache.length > 0) {
+      return {
+        words: cache,
+        selection: this.buildSelection(cache, severity)
+      };
     }
 
-    try {
-      const rows = await getLearned();
-      const dueIds = new Set<string>();
-
-      for (const row of rows ?? []) {
-        if (!row || typeof row !== 'object') continue;
-
-        const typed = row as LearnedWord;
-        const inQueue = this.isInReviewQueue(typed.in_review_queue);
-        if (!inQueue) continue;
-
-        const due = this.isDue({
-          nextReviewDate:
-            typeof typed.next_review_at === 'string' ? typed.next_review_at : undefined,
-          nextAllowedTime:
-            typeof typed.next_display_at === 'string' ? typed.next_display_at : undefined
-        });
-        if (!due) continue;
-
-        const wordIdValue = (typed as { word_id?: unknown }).word_id;
-        if (typeof wordIdValue !== 'string') continue;
-
-        const normalised = this.normaliseWordId(wordIdValue);
-        if (!normalised) continue;
-
-        dueIds.add(normalised);
-      }
-
-      const result = Array.from(dueIds);
-      this.persistServerDueWordIds(todayKey, result);
-      return result;
-    } catch (error) {
-      console.warn('[LearningProgressService] Failed to sync due words from Supabase', error);
-      return Array.from(this.getCachedServerDueWordSet(todayKey));
-    }
-  }
-
-  forceGenerateDailySelection(
-    words: VocabularyWord[],
-    severity: SeverityLevel = 'light'
-  ): DailySelection {
-    const severityKey: SeverityLevel = this.severityConfig[severity]
-      ? severity
-      : 'light';
-    const config = this.severityConfig[severityKey];
-    const todayKey = this.getTodayKey();
-    const progressMap = this.loadProgressMap();
-    const serverDueSet = this.getCachedServerDueWordSet(todayKey);
-
-    const reviewCandidates: LearningProgress[] = [];
-    const newCandidates: LearningProgress[] = [];
-
-    for (const word of words) {
-      const stored = this.getStoredProgress(progressMap, word);
-      const wordId = this.normaliseWordId(toWordId(word.word, word.category));
-      const isServerDue = serverDueSet.has(wordId);
-
-      if (stored) {
-        const normalised = this.normaliseProgress(word, stored);
-        if (isServerDue || this.isDue(stored)) {
-          normalised.status = 'due';
-          reviewCandidates.push(normalised);
-          if (isServerDue) {
-            serverDueSet.delete(wordId);
-          }
-          continue;
-        }
-
-        if (!stored.isLearned) {
-          normalised.status = 'new';
-          newCandidates.push(normalised);
-        }
-        continue;
-      }
-
-      if (isServerDue) {
-        const nowIso = new Date().toISOString();
-        const normalised = this.normaliseProgress(word, {
-          word: word.word,
-          category: word.category,
-          isLearned: true,
-          status: 'due',
-          reviewCount: 1,
-          nextReviewDate: todayKey,
-          lastPlayedDate: nowIso,
-          nextAllowedTime: nowIso
-        });
-        normalised.status = 'due';
-        reviewCandidates.push(normalised);
-        serverDueSet.delete(wordId);
-        continue;
-      }
-
-      newCandidates.push(this.normaliseProgress(word));
+    const count = this.resolveCount(severity);
+    const selection = await this.requestDailySelection(userKey, severity, count);
+    if (selection.length === 0) {
+      this.saveTodayWords(userKey, []);
+      return {
+        words: [],
+        selection: this.buildSelection([], severity)
+      };
     }
 
-    reviewCandidates.sort((a, b) => {
-      const aTime = a.nextReviewDate ? Date.parse(a.nextReviewDate) : Number.POSITIVE_INFINITY;
-      const bTime = b.nextReviewDate ? Date.parse(b.nextReviewDate) : Number.POSITIVE_INFINITY;
-      return aTime - bTime;
-    });
+    const wordIds = selection.map(row => row.word_id);
 
-    const available = reviewCandidates.length + newCandidates.length;
-    const maxTarget = Math.min(config.max, available);
-    const target = available >= config.min ? maxTarget : available;
-
-    const reviewWords = reviewCandidates.slice(0, Math.min(reviewCandidates.length, target));
-    const remaining = Math.max(0, target - reviewWords.length);
-    const newWords = newCandidates.slice(0, remaining);
-    const totalCount = reviewWords.length + newWords.length;
-
-    const selection: DailySelection = {
-      newWords,
-      reviewWords,
-      totalCount,
-      severity: severityKey
-    };
-
-    this.persistSelection(todayKey, selection);
-    void this.syncSelectionWithServer(selection);
-
-    return selection;
-  }
-
-  getTodaySelection(): DailySelection | null {
-    const storage = this.getStorage();
-    if (!storage) return null;
-
-    const todayKey = this.getTodayKey();
-    const keysToTry = [this.getSelectionStorageKey(todayKey), DAILY_SELECTION_KEY];
-
-    for (const key of keysToTry) {
-      const raw = storage.getItem(key);
-      if (!raw) continue;
-
+    let vocabMap: Record<string, VocabularyRow> = {};
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
       try {
-        const parsed = JSON.parse(raw) as DailySelection | { selection?: DailySelection };
-        if (parsed && typeof parsed === 'object') {
-          if ('newWords' in parsed && 'reviewWords' in parsed) {
-            return parsed as DailySelection;
-          }
-          if ('selection' in parsed && parsed.selection) {
-            return parsed.selection as DailySelection;
-          }
-        }
+        vocabMap = await this.fetchVocabularyByIds(wordIds);
+        lastError = null;
+        break;
       } catch (error) {
-        console.warn('[LearningProgressService] Failed to parse cached daily selection', error);
+        lastError = error;
       }
     }
 
-    return null;
+    if (!vocabMap || Object.keys(vocabMap).length === 0) {
+      throw lastError instanceof Error ? lastError : new Error('Failed to fetch vocabulary details');
+    }
+
+    const srsMap = await this.fetchSrsRows(userKey, wordIds);
+    const words = this.mergeWordData(selection, vocabMap, srsMap);
+    this.saveTodayWords(userKey, words);
+
+    return {
+      words,
+      selection: this.buildSelection(words, severity)
+    };
+  }
+
+  async regenerateTodayWords(userKey: string, severity: SeverityLevel): Promise<DailyWordsResult> {
+    this.clearTodayWordsForUser(userKey);
+    return this.getTodayWords(userKey, severity, { refresh: true });
+  }
+
+  async markWordReviewed(
+    userKey: string,
+    wordId: string,
+    severity: SeverityLevel
+  ): Promise<{
+    words: TodayWord[];
+    selection: DailySelection;
+    payload: LearnedWordUpsert;
+    progress: LearningProgress;
+    summary: ProgressSummaryFields | null;
+  }> {
+    const cache = this.loadTodayWords(userKey);
+    const index = cache.findIndex(entry => entry.word_id === wordId);
+    if (index === -1) {
+      throw new Error('Word not found in today cache');
+    }
+
+    const { updated, payload, progress } = this.applyReviewToWord(cache[index]);
+    cache[index] = updated;
+    this.saveTodayWords(userKey, cache);
+
+    const summary = await markLearnedServerByKey(wordId, payload);
+
+    return {
+      words: cache,
+      selection: this.buildSelection(cache, severity),
+      payload,
+      progress,
+      summary
+    };
+  }
+
+  async markWordAsNew(userKey: string, wordId: string): Promise<TodayWord[]>
+  {
+    const cache = this.loadTodayWords(userKey);
+    const index = cache.findIndex(entry => entry.word_id === wordId);
+    if (index === -1) return cache;
+
+    const base = cache[index];
+    const resetWord: TodayWord = {
+      ...base,
+      nextAllowedTime: undefined,
+      srs: {
+        in_review_queue: false,
+        review_count: 0,
+        learned_at: null,
+        last_review_at: null,
+        next_review_at: null,
+        next_display_at: null,
+        last_seen_at: null,
+        srs_interval_days: null,
+        srs_easiness: base.srs?.srs_easiness ?? 2.5,
+        srs_state: 'new'
+      }
+    };
+
+    cache[index] = resetWord;
+    this.saveTodayWords(userKey, cache);
+    await resetLearned(wordId);
+    return cache;
+  }
+
+  async fetchProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+    return getProgressSummary(userKey);
+  }
+
+  async fetchLearnedWordSummaries(userKey: string): Promise<{
+    word: string;
+    category?: string;
+    learnedDate?: string;
+  }[]> {
+    const client = getSupabaseClient();
+    if (!client) return [];
+    if (CUSTOM_AUTH_MODE) return [];
+
+    const { data, error } = await client
+      .from('learned_words')
+      .select('word_id,learned_at')
+      .eq('user_unique_key', userKey)
+      .order('learned_at', { ascending: false });
+
+    if (error) {
+      console.warn('[LearningProgressService] Failed to fetch learned words', error.message);
+      return [];
+    }
+
+    return (Array.isArray(data) ? data : []).map(row => {
+      const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
+      const [word, category] = wordId.split('::');
+      return {
+        word: word || wordId,
+        category: category || undefined,
+        learnedDate: typeof row?.learned_at === 'string' ? row.learned_at : undefined
+      };
+    });
   }
 }
 
