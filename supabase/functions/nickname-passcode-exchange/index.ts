@@ -1,154 +1,120 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.48.0';
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.48.0";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Max-Age": "86400",
+  "Vary": "Origin",
+} as const;
 
-type VerifyResponse = { user_unique_key: string } | { user_unique_key?: string }[] | null;
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
+function errorResponse(message: string, status = 400, code?: string) {
+  return json(code ? { error: message, code } : { error: message }, status);
+}
 
-type ExchangePayload = {
-  nickname?: unknown;
-  passcode?: unknown;
-};
-
-function extractUserKey(result: VerifyResponse): string | null {
-  if (!result) return null;
-  if (Array.isArray(result)) {
-    for (const entry of result) {
-      const key = extractUserKey(entry as VerifyResponse);
-      if (key) return key;
+type VerifyRow = { user_unique_key?: string };
+function getUserKey(data: unknown): string | null {
+  if (!data) return null;
+  if (Array.isArray(data)) {
+    for (const r of data) {
+      const k = (r as VerifyRow)?.user_unique_key;
+      if (typeof k === "string" && k) return k;
     }
     return null;
   }
-  if (typeof result === 'object' && 'user_unique_key' in result) {
-    const value = (result as { user_unique_key: unknown }).user_unique_key;
-    return typeof value === 'string' ? value : null;
-  }
-  return null;
+  const k = (data as VerifyRow)?.user_unique_key;
+  return typeof k === "string" && k ? k : null;
 }
 
-function errorResponse(message: string, status = 400, code?: string) {
-  const body = code ? { error: message, code } : { error: message };
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
+const canon = (s: string) =>
+  s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
 
 function createSessionToken(): string {
-  const entropy = crypto.getRandomValues(new Uint8Array(32));
-  return btoa(String.fromCharCode(...entropy))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/g, '');
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes))
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replace(/=+$/, "");
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+  if (req.method === "OPTIONS")
+    return new Response(null, { status: 204, headers: corsHeaders });
+  if (req.method !== "POST") return errorResponse("Method not allowed", 405);
+
+  let body: any;
+  try { body = await req.json(); } catch {
+    return errorResponse("Invalid JSON payload", 400);
   }
+  const nickname = typeof body?.nickname === "string" ? body.nickname.trim() : "";
+  const passRaw =
+    typeof body?.passcode === "number" || typeof body?.passcode === "string"
+      ? String(body.passcode).trim()
+      : "";
 
-  if (req.method !== 'POST') {
-    return errorResponse('Method not allowed', 405);
-  }
+  if (!nickname) return errorResponse("Nickname is required", 400);
+  if (!/^\d{4,10}$/.test(passRaw))
+    return errorResponse("Passcode must be 4-10 digits", 400);
+  const passcode = Number(passRaw);
+  if (!Number.isFinite(passcode))
+    return errorResponse("Passcode must be numeric", 400);
 
-  let payload: ExchangePayload;
-  try {
-    payload = (await req.json()) as ExchangePayload;
-  } catch {
-    return errorResponse('Invalid JSON payload', 400);
-  }
+  const url = Deno.env.get("SUPABASE_URL");
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!url || !serviceKey) return errorResponse("Server misconfiguration", 500);
 
-  const nickname = typeof payload.nickname === 'string' ? payload.nickname.trim() : '';
-  const passcodeRaw =
-    typeof payload.passcode === 'number' || typeof payload.passcode === 'string'
-      ? String(payload.passcode).trim()
-      : '';
-
-  if (!nickname) {
-    return errorResponse('Nickname is required', 400);
-  }
-
-  if (!passcodeRaw) {
-    return errorResponse('Passcode is required', 400);
-  }
-
-  const passcodeNumeric = Number(passcodeRaw);
-  if (!Number.isFinite(passcodeNumeric)) {
-    return errorResponse('Passcode must be numeric', 400);
-  }
-
-  const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (!supabaseUrl || !serviceRoleKey) {
-    return errorResponse('Server misconfiguration', 500);
-  }
-
-  const adminClient = createClient(supabaseUrl, serviceRoleKey, {
+  const admin = createClient(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data, error } = await adminClient.rpc('verify_nickname_passcode', {
+  // Verify (passcode + nickname)
+  const { data, error } = await admin.rpc("verify_nickname_passcode", {
     nickname,
-    passcode: passcodeNumeric,
+    passcode,
   });
-
   if (error) {
-    console.error('verify_nickname_passcode error', error.message);
-    return errorResponse('Authentication failed', 401);
+    console.error("verify_nickname_passcode:", error);
+    return errorResponse("Authentication failed", 401, "AUTH_FAILED");
   }
 
-  const userKey = extractUserKey(data as VerifyResponse);
+  const userKey = getUserKey(data);
   if (!userKey) {
-    const { data: nicknameLookup, error: lookupError } = await adminClient.rpc(
-      'find_nickname_by_normalized',
-      {
-        nickname,
-      },
-    );
+    // Distinguish "not found" vs "wrong passcode"
+    const key = canon(nickname);
+    const { data: existsRow } = await admin
+      .from("nicknames")
+      .select("user_unique_key")
+      .eq("user_unique_key", key)
+      .maybeSingle();
 
-    if (lookupError) {
-      console.error('find_nickname_by_normalized error', lookupError.message);
-      return errorResponse('Authentication failed', 500);
+    if (!existsRow) {
+      return errorResponse(
+        "Nickname not found. Create a profile to continue.",
+        404,
+        "NICKNAME_NOT_FOUND",
+      );
     }
-
-    const nicknameExists = !!extractUserKey(nicknameLookup as VerifyResponse);
-
-    if (!nicknameExists) {
-      return errorResponse('Profile not found', 404, 'PROFILE_NOT_FOUND');
-    }
-
-    return errorResponse('Incorrect passcode', 401);
+    return errorResponse("Incorrect passcode", 401, "INCORRECT_PASSCODE");
   }
 
-  const expiresInSeconds = 60 * 60 * 24; // 24 hours
-  const expiresAt = Math.floor(Date.now() / 1000) + expiresInSeconds;
-  const sessionToken = createSessionToken();
-
-  const { error: insertError } = await adminClient.from('user_sessions').insert({
-    session_token: sessionToken,
-    user_unique_key: userKey,
-    nickname,
-    expires_at: new Date(expiresAt * 1000).toISOString(),
-  });
-
-  if (insertError) {
-    console.error('user_sessions insert error', insertError.message);
-    return errorResponse('Authentication failed', 500);
-  }
-
-  return new Response(
-    JSON.stringify({
-      expires_in: expiresInSeconds,
-      expires_at: expiresAt,
+  const now = Math.floor(Date.now() / 1000);
+  const expiresIn = 60 * 60 * 24;
+  return json(
+    {
+      session_token: createSessionToken(),
+      token_type: "bearer",
+      expires_in: expiresIn,
+      expires_at: now + expiresIn,
       user_unique_key: userKey,
       nickname,
-      session_token: sessionToken,
-    }),
-    {
-      status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     },
+    200,
   );
 });
