@@ -59,12 +59,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-        <p>
-          ⭐ No personal login or data is stored on any server. Your progress is saved locally in your browser on your device.
-          Available voices depend on your browser and device—at first, try
-          different browsers to find the best one for learning. Make sure you
-          use the same device and browser to keep your progress.
-        </p>
       </div>
 
 

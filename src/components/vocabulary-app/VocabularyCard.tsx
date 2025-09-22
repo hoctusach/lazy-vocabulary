@@ -141,13 +141,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               style={{ color: '#6b7280', fontSize: '0.8rem' }}
             >
               <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-              <p>
-                ⭐ No personal login or data is stored on any server. Your
-                progress is saved locally in your browser on your device.
-                Available voices depend on your browser and device—at first, try
-                different browsers to find the best one for learning. Make sure
-                you use the same device and browser to keep your progress.
-              </p>
             </div>
           )}
         </div>
