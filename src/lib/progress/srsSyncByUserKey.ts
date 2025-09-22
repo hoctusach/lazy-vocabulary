@@ -1,10 +1,5 @@
 import { canonNickname } from '@/core/nickname';
-import {
-  ensureSessionForNickname,
-  ensureSupabaseAuthSession,
-  getStoredPasscode,
-  getActiveSession,
-} from '@/lib/auth';
+import { getActiveSession } from '@/lib/auth';
 import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
@@ -14,11 +9,6 @@ export type ProgressSummary = {
   learned_count: number;
   learning_due_count: number;
   remaining_count: number;
-};
-
-type NicknameIdentityRow = {
-  user_unique_key: string | null;
-  name: string | null;
 };
 
 // Hard-coded total number of vocabulary words used for progress calculations
@@ -44,110 +34,29 @@ function lsSet(key: string, value: string) {
 
 /**
  * Ensures and returns the current user's user_unique_key.
- * Source of truth: nicknames.user_unique_key.
  * - Reads from localStorage cache if available
- * - Otherwise tries nicknames; if missing, derives from nickname (or user id) and upserts into nicknames
+ * - Otherwise derives the key from the active session or stored nickname
  * - Caches the key in localStorage['lazyVoca.userKey']
  */
 export async function ensureUserKey(): Promise<string | null> {
-  const sb = getSupabaseClient();
-  if (!sb) return null;
-
   const cached = (lsGet('lazyVoca.userKey') ?? '').trim();
   if (cached) return cached;
 
   const storedNickname = (lsGet('lazyVoca.nickname') ?? '').trim();
-  const storedPasscode = getStoredPasscode();
+  const activeSession = await getActiveSession();
 
-  let ensuredSession = await ensureSupabaseAuthSession();
-  if ((!ensuredSession || !ensuredSession.nickname) && storedNickname && storedPasscode) {
-    try {
-      ensuredSession = await ensureSessionForNickname(storedNickname, storedPasscode);
-    } catch {
-      ensuredSession = null;
-    }
-  }
+  const nicknameSource =
+    activeSession?.nickname?.trim().length ? activeSession.nickname : storedNickname;
+  const derivedKey = nicknameSource ? canonNickname(nicknameSource) : '';
+  const fallbackKey = activeSession?.user_unique_key?.trim() ?? '';
+  const userKey = derivedKey || (fallbackKey ? canonNickname(fallbackKey) : '');
 
-  const nickname = (ensuredSession?.nickname ?? storedNickname ?? '').trim();
-  const sessionKey = (ensuredSession?.user_unique_key ?? '').trim();
-  const expectedKey = sessionKey || (nickname ? canonNickname(nickname) : '');
-
-  if (!expectedKey) {
+  if (!userKey) {
     return null;
   }
 
-  if (CUSTOM_AUTH_MODE) {
-    lsSet('lazyVoca.userKey', expectedKey);
-    return expectedKey;
-  }
-
-  const { data: nicknameRow, error: nicknameError } = await sb
-    .from('nicknames')
-    .select('user_unique_key, name')
-    .eq('user_unique_key', expectedKey)
-    .maybeSingle<NicknameIdentityRow>();
-
-  if (nicknameError && nicknameError.code !== 'PGRST116') {
-    console.warn('ensureUserKey:nicknames select', nicknameError.message);
-  }
-
-  let key = (nicknameRow?.user_unique_key ?? '').trim();
-
-  if (!key) {
-    const existingName = (nicknameRow?.name ?? '').trim();
-    const preferredName = nickname.length >= 3 ? nickname : existingName;
-    const fallbackSuffix = expectedKey.slice(0, 8) || 'learner';
-    const fallbackNickname = `Learner-${fallbackSuffix}`;
-    const candidates = Array.from(
-      new Set(
-        [nickname, preferredName, fallbackNickname]
-          .map((value) => value.trim())
-          .filter((value) => value.length >= 3)
-      )
-    );
-
-    for (const candidate of candidates) {
-      const { data: upserted, error: upErr } = await sb
-        .from('nicknames')
-        .upsert({ user_unique_key: expectedKey, name: candidate }, { onConflict: 'user_unique_key' })
-        .select('user_unique_key')
-        .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
-
-      if (upErr) {
-        if (upErr.code === '23505') {
-          continue;
-        }
-        console.warn('ensureUserKey:nicknames upsert', upErr.message);
-        return null;
-      }
-
-      const upsertedKey = (upserted?.user_unique_key ?? '').trim();
-      if (upsertedKey) {
-        key = upsertedKey;
-        break;
-      }
-    }
-
-    if (!key) {
-      const { data: upserted, error: finalErr } = await sb
-        .from('nicknames')
-        .upsert({ user_unique_key: expectedKey, name: fallbackNickname }, { onConflict: 'user_unique_key' })
-        .select('user_unique_key')
-        .maybeSingle<Pick<NicknameIdentityRow, 'user_unique_key'>>();
-
-      if (finalErr) {
-        console.warn('ensureUserKey:nicknames final upsert', finalErr.message);
-        return null;
-      }
-      const fallbackKey = (upserted?.user_unique_key ?? '').trim();
-      key = fallbackKey.length ? fallbackKey : canonNickname(fallbackNickname);
-    }
-  }
-
-  if (key) {
-    lsSet('lazyVoca.userKey', key);
-  }
-  return key;
+  lsSet('lazyVoca.userKey', userKey);
+  return userKey;
 }
 
 /**

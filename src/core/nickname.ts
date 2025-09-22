@@ -1,5 +1,8 @@
 export function canonNickname(raw: string): string {
-  return raw.toLowerCase().replace(/\s+/g, '');
+  return raw
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/\s+/g, '');
 }
 
 export function isNicknameAllowed(raw: string): boolean {
