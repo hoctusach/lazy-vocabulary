@@ -10,6 +10,25 @@ export interface VocabularyWord {
   nextAllowedTime?: string;
 }
 
+export type TodayWordSrs = {
+  in_review_queue?: boolean | null;
+  review_count?: number | null;
+  learned_at?: string | null;
+  last_review_at?: string | null;
+  next_review_at?: string | null;
+  next_display_at?: string | null;
+  last_seen_at?: string | null;
+  srs_interval_days?: number | null;
+  srs_easiness?: number | null;
+  srs_state?: string | null;
+};
+
+export interface TodayWord extends VocabularyWord {
+  word_id: string;
+  category: string;
+  srs?: TodayWordSrs | null;
+}
+
 export type ReadonlyWord = Readonly<VocabularyWord>;
 
 // Interface for editing or adding words where category is required

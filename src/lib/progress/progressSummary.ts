@@ -42,6 +42,20 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
   return data ?? null;
 }
 
+export async function getProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+  if (!userKey) return null;
+  const existing = await fetchExistingSummary(userKey);
+  if (!existing) return null;
+  return {
+    learning_count: existing.learning_count ?? 0,
+    learned_count: existing.learned_count ?? 0,
+    learning_due_count: existing.learning_due_count ?? 0,
+    remaining_count: existing.remaining_count ?? Math.max(TOTAL_WORDS - (existing.learned_count ?? 0), 0),
+    learning_time: existing.learning_time ?? 0,
+    learned_days: normaliseDays(existing.learned_days)
+  };
+}
+
 function normaliseDays(days: string[] | null | undefined): string[] {
   if (!Array.isArray(days)) return [];
   const seen = new Set<string>();

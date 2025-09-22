@@ -1,30 +1,39 @@
-import { LearningProgress } from '@/types/learning';
-import { VocabularyWord } from '@/types/vocabulary';
+import type { TodayWord } from '@/types/vocabulary';
 
-/**
- * Build the union of today's new and review words, de-duplicated and
- * optionally filtered by category. The original lists are not mutated.
- */
-export function buildTodaysWords(
-  reviewWords: LearningProgress[],
-  newWords: LearningProgress[],
-  allWords: VocabularyWord[],
-  category: string
-): VocabularyWord[] {
-  const map = new Map<string, VocabularyWord>();
-  // Combine review words before new words to prioritize due items
-  const combined = [...reviewWords, ...newWords];
+const isReviewCandidate = (word: TodayWord): boolean => {
+  const srs = word.srs ?? undefined;
+  if (!srs) return false;
+  if (srs.in_review_queue === false) return false;
+  const reviewCount = srs.review_count ?? 0;
+  if (reviewCount > 0) return true;
+  const candidate = srs.next_review_at ?? srs.next_display_at;
+  if (!candidate) return false;
+  const parsed = Date.parse(candidate);
+  return Number.isFinite(parsed) && parsed <= Date.now();
+};
 
-  combined.forEach(p => {
-    const word = allWords.find(w => w.word === p.word && w.category === p.category);
-    if (word) {
-      map.set(`${word.word}__${word.category}`, word);
+const dueTimestamp = (word: TodayWord): number => {
+  const candidate = word.srs?.next_display_at ?? word.srs?.next_review_at;
+  if (!candidate) return Number.POSITIVE_INFINITY;
+  const parsed = Date.parse(candidate);
+  return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+};
+
+export function buildTodaysWords(words: TodayWord[], category: string): TodayWord[] {
+  const filtered = category === 'ALL' ? words : words.filter(w => w.category === category);
+  return [...filtered].sort((a, b) => {
+    const aReview = isReviewCandidate(a);
+    const bReview = isReviewCandidate(b);
+    if (aReview !== bReview) {
+      return aReview ? -1 : 1;
     }
-  });
 
-  const result = Array.from(map.values());
-  if (category === 'ALL') {
-    return result;
-  }
-  return result.filter(w => w.category === category);
+    const aDue = dueTimestamp(a);
+    const bDue = dueTimestamp(b);
+    if (aDue !== bDue) {
+      return aDue - bDue;
+    }
+
+    return a.word.localeCompare(b.word);
+  });
 }

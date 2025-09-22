@@ -3,7 +3,6 @@ import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNe
 import { LearningProgressPanel } from './LearningProgressPanel';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { vocabularyService } from '@/services/vocabularyService';
-import { VocabularyWord } from '@/types/vocabulary';
 import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, RotateCcw, Eye } from 'lucide-react';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
@@ -14,10 +13,10 @@ import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { normalizeQuery } from '@/utils/text/normalizeQuery';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { VocabularyWord } from '@/types/vocabulary';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
-  const [allWords, setAllWords] = useState<VocabularyWord[]>([]);
   const [summaryOpen, setSummaryOpen] = useState(true);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<string | null>(null);
@@ -33,29 +32,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     markWordAsNew,
     todayWords,
     learnedWords
-  } = useLearningProgress(allWords);
-
-  // Load vocabulary data
-  useEffect(() => {
-    const load = async () => {
-      console.log("VocabularyAppWithLearning - loading vocabulary data");
-      if (!vocabularyService.hasData()) {
-        await vocabularyService.loadDefaultVocabulary();
-      }
-
-      // Get all words from all categories
-      const allWordsFromService: VocabularyWord[] = [];
-      vocabularyService.getAllSheetNames().forEach(sheetName => {
-        vocabularyService.switchSheet(sheetName);
-        const words = vocabularyService.getWordList();
-        allWordsFromService.push(...words);
-      });
-
-      setAllWords(allWordsFromService);
-    };
-
-    load();
-  }, []);
+  } = useLearningProgress();
 
   // Track when words are played (integrate with existing word navigation)
   const previousWordRef = useRef<VocabularyWord | null>(null);
