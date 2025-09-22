@@ -1,7 +1,3 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { getAuthHeader } from '@/lib/auth';
-
-let client: SupabaseClient | null = null;
 let hasShownMissingMessage = false;
 
 type DevSupabaseSettings = {
@@ -499,7 +495,7 @@ function showMissingEnvMessage() {
   }
 }
 
-function resolveSupabaseConfig() {
+export function resolveSupabaseConfig() {
   let url = readImportMetaEnv('VITE_SUPABASE_URL') ?? readProcessEnv('NEXT_PUBLIC_SUPABASE_URL');
   let anon = readImportMetaEnv('VITE_SUPABASE_ANON_KEY') ?? readProcessEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
 
@@ -521,37 +517,4 @@ if (typeof window !== 'undefined') {
   if (!initialUrl || !initialAnon) {
     showMissingEnvMessage();
   }
-}
-
-const createAuthenticatedFetch = (): typeof fetch => {
-  return async (input, init) => {
-    const headers = new Headers(init?.headers ?? {});
-    const auth = getAuthHeader();
-    for (const [key, value] of Object.entries(auth)) {
-      if (value) {
-        headers.set(key, value);
-      }
-    }
-    return fetch(input, { ...init, headers });
-  };
-};
-
-export function getSupabaseClient(): SupabaseClient | null {
-  if (client) return client;
-  const { url, anon } = resolveSupabaseConfig();
-  if (!url || !anon) {
-    showMissingEnvMessage();
-    return null;
-  }
-  client = createClient(url, anon, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      fetch: createAuthenticatedFetch(),
-    },
-  });
-  return client;
 }
