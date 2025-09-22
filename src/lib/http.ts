@@ -1,5 +1,5 @@
 import { EDGE_BASE_URL } from '@/config';
-import { getAuthHeader, signOut } from '@/lib/customAuth';
+import { clearStoredAuth, getAuthHeader } from '@/lib/auth';
 
 export async function apiFetchAbsolute(url: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers || {});
@@ -18,7 +18,7 @@ export async function apiFetchAbsolute(url: string, init: RequestInit = {}) {
 
   if (res.status === 401) {
     // Token invalid/expired → sign out locally
-    signOut();
+    clearStoredAuth({ keepPasscode: true });
   }
   return res;
 }

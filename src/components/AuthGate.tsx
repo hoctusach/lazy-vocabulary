@@ -3,48 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
-import { sanitizeNickname, setNicknamePasscode } from '@/services/nicknameService';
+import { sanitizeNickname } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
-import { EXCHANGE_FN_URL } from '@/config';
-import {
-  storeSessionFromExchange,
-  type CustomSession,
-  type ExchangeResponse,
-} from '@/lib/customAuth';
+import { saveSession, type Session as EdgeSession } from '@/lib/customAuth';
+import { exchangeNicknamePasscode, setNicknamePasscode } from '@/lib/edgeApi';
 import {
   getStoredPasscode,
   PASSCODE_STORAGE_KEY,
   storePasscode,
 } from '@/lib/auth';
-
-type ExchangeResult = {
-  response: Response;
-  payload: ExchangeResponse;
-  errorMessage?: string;
-  errorCode?: string;
-};
-
-async function exchangeNicknamePasscode(nickname: string, passcode: string): Promise<ExchangeResult> {
-  const response = await fetch(EXCHANGE_FN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nickname, passcode }),
-  });
-  const payload = (await response.json().catch(() => ({}))) as ExchangeResponse;
-
-  return {
-    response,
-    payload,
-    errorMessage: typeof payload?.error === 'string' ? payload.error : undefined,
-    errorCode: typeof payload?.code === 'string' ? payload.code : undefined,
-  };
-}
-
-function saveSession(payload: ExchangeResponse, passcode: string): CustomSession {
-  const session = storeSessionFromExchange(payload);
-  storePasscode(passcode);
-  return session;
-}
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
@@ -143,78 +110,27 @@ export default function AuthGate() {
     setS((p) => ({ ...p, pending: true, error: undefined, info: undefined }));
 
     const sanitizedName = sanitizeNickname(nicknameInput);
+    const trimmedPasscode = passcodeInput.trim();
+    const isCreateMode = s.mode === 'create';
 
-    try {
-      const { response: setResponse, payload: setPayload } = await setNicknamePasscode(
+    const completeSignIn = async (nicknameHint?: string) => {
+      const session = (await exchangeNicknamePasscode(
         sanitizedName,
-        passcodeInput,
-      );
+        trimmedPasscode,
+      )) as EdgeSession;
+      saveSession(session);
+      storePasscode(trimmedPasscode);
 
-      if (setResponse.status === 409 || setPayload?.code === 'NICKNAME_TAKEN') {
-        setS((p) => ({
-          ...p,
-          pending: false,
-          error: 'That nickname is already taken. Try another.',
-          info: undefined,
-          mode: 'create',
-        }));
-        return;
-      }
+      const nicknameFromSession =
+        typeof session?.nickname === 'string' && session.nickname.trim().length
+          ? session.nickname
+          : nicknameHint && nicknameHint.trim().length
+            ? nicknameHint
+            : sanitizedName;
 
-      if (!setResponse.ok || typeof setPayload?.user_unique_key !== 'string') {
-        const fallbackError =
-          typeof setPayload?.error === 'string' && setPayload.error
-            ? setPayload.error
-            : 'Failed to save nickname';
-        setS((p) => ({
-          ...p,
-          pending: false,
-          error: fallbackError,
-          info: undefined,
-          mode: 'signin',
-        }));
-        return;
-      }
+      toast.success(`Signed in as ${nicknameFromSession}`);
 
-      const { response, payload, errorMessage } = await exchangeNicknamePasscode(
-        sanitizedName,
-        passcodeInput,
-      );
-
-      if (response.status === 401) {
-        setS((p) => ({
-          ...p,
-          pending: false,
-          passcode: '',
-          error: 'Incorrect passcode',
-          info: undefined,
-          mode: 'signin',
-        }));
-        setTimeout(() => passcodeRef.current?.focus(), 0);
-        return;
-      }
-
-      if (!response.ok) {
-        setS((p) => ({
-          ...p,
-          pending: false,
-          error: errorMessage || 'Sign-in failed',
-          info: undefined,
-          mode: 'signin',
-        }));
-        return;
-      }
-
-      const session = saveSession(payload, passcodeInput);
-      const nicknameFromServer =
-        typeof setPayload.nickname === 'string' && setPayload.nickname.trim().length
-          ? setPayload.nickname
-          : sanitizedName;
-      const toastNickname = session.nickname?.trim().length ? session.nickname : nicknameFromServer;
-
-      toast.success(`Signed in as ${toastNickname}`);
-
-      localStorage.setItem(NICKNAME_LS_KEY, nicknameFromServer);
+      localStorage.setItem(NICKNAME_LS_KEY, nicknameFromSession);
       await ensureUserKey().catch(() => null);
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
@@ -231,16 +147,82 @@ export default function AuthGate() {
       setS({
         ready: true,
         show: false,
-        nickname: nicknameFromServer,
+        nickname: nicknameFromSession,
         passcode: '',
         pending: false,
         mode: 'signin',
       });
-    } catch (err) {
-      const error = err as { message?: string } | undefined;
-      const rawMessage = typeof error?.message === 'string' ? error.message : '';
-      const message = rawMessage.trim().length ? rawMessage : 'Failed to save nickname';
-      setS((p) => ({ ...p, pending: false, error: message }));
+    };
+
+    if (isCreateMode) {
+      let nicknameHint: string | undefined;
+      try {
+        const result = (await setNicknamePasscode(sanitizedName, trimmedPasscode)) as {
+          nickname?: string;
+        };
+        nicknameHint = typeof result?.nickname === 'string' ? result.nickname : undefined;
+      } catch (error) {
+        console.error('AuthGate:createProfile', error);
+        const rawMessage = typeof (error as { message?: string })?.message === 'string'
+          ? (error as { message?: string }).message
+          : '';
+        const message = rawMessage.trim().length ? rawMessage.trim() : 'Failed to save nickname';
+        const isTaken = /409|taken|exists|NICKNAME_TAKEN/i.test(message);
+        setS((p) => ({
+          ...p,
+          pending: false,
+          error: isTaken ? 'That nickname is already taken. Try another.' : message,
+          info: undefined,
+          mode: 'create',
+        }));
+        return;
+      }
+
+      try {
+        await completeSignIn(nicknameHint);
+        return;
+      } catch (error) {
+        console.error('AuthGate:signInAfterCreate', error);
+        const rawMessage = typeof (error as { message?: string })?.message === 'string'
+          ? (error as { message?: string }).message
+          : '';
+        const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
+        const isInvalidPasscode = /401|incorrect/i.test(message);
+        setS((p) => ({
+          ...p,
+          pending: false,
+          passcode: isInvalidPasscode ? '' : p.passcode,
+          error: isInvalidPasscode ? 'Incorrect passcode' : message,
+          info: undefined,
+          mode: 'signin',
+        }));
+        if (isInvalidPasscode) {
+          setTimeout(() => passcodeRef.current?.focus(), 0);
+        }
+        return;
+      }
+    }
+
+    try {
+      await completeSignIn();
+    } catch (error) {
+      console.error('AuthGate:signIn', error);
+      const rawMessage = typeof (error as { message?: string })?.message === 'string'
+        ? (error as { message?: string }).message
+        : '';
+      const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
+      const isInvalidPasscode = /401|incorrect/i.test(message);
+      setS((p) => ({
+        ...p,
+        pending: false,
+        passcode: isInvalidPasscode ? '' : p.passcode,
+        error: isInvalidPasscode ? 'Incorrect passcode' : message,
+        info: undefined,
+        mode: 'signin',
+      }));
+      if (isInvalidPasscode) {
+        setTimeout(() => passcodeRef.current?.focus(), 0);
+      }
     }
   };
 

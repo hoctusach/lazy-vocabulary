@@ -1,20 +1,20 @@
-import { SET_NICKNAME_FN_URL } from '@/config';
 import { canonNickname } from '@/core/nickname';
+import { exchangeNicknamePasscode, setNicknamePasscode } from '@/lib/edgeApi';
 import {
-  exchangeNicknamePasscode,
-  getSession as getCustomSession,
-  isExpired as isCustomSessionExpired,
-  saveSession as saveCustomSession,
-  signIn as customSignIn,
-  signOut as customSignOut,
+  getSession as getEdgeSession,
+  saveSession as saveEdgeSession,
+  signOut as signOutEdge,
+  type Session as EdgeSession,
 } from '@/lib/customAuth';
 import { NICKNAME_LS_KEY } from '@/lib/nickname';
 
-export { exchangeNicknamePasscode, saveCustomSession as saveSession, getCustomSession as getSession };
+export { exchangeNicknamePasscode } from '@/lib/edgeApi';
+export { saveEdgeSession as saveSession, getEdgeSession as getSession };
 
 const SESSION_STORAGE_KEY = 'lazyVoca.authState';
 export const PASSCODE_STORAGE_KEY = 'lazyVoca.passcode';
 const USER_KEY_STORAGE_KEY = 'lazyVoca.userKey';
+const LEGACY_SESSION_KEY = 'lazyVoca.session';
 
 const STORAGE_VERSION = 4 as const;
 
@@ -52,7 +52,7 @@ function writeToStorage(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
   } catch {
-    // ignore storage write failures (private mode, quota, etc.)
+    /* ignore */
   }
 }
 
@@ -61,13 +61,14 @@ function removeFromStorage(key: string): void {
   try {
     localStorage.removeItem(key);
   } catch {
-    // ignore
+    /* ignore */
   }
 }
 
 function persistAuthState(session: Session | null): void {
   if (!session) {
     removeFromStorage(SESSION_STORAGE_KEY);
+    removeFromStorage(LEGACY_SESSION_KEY);
     return;
   }
 
@@ -77,10 +78,11 @@ function persistAuthState(session: Session | null): void {
   };
 
   writeToStorage(SESSION_STORAGE_KEY, JSON.stringify(payload));
+  removeFromStorage(LEGACY_SESSION_KEY);
 }
 
 function loadStoredAuthPayload(): StoredAuthPayload | null {
-  const raw = readFromStorage(SESSION_STORAGE_KEY) ?? readFromStorage('lazyVoca.session');
+  const raw = readFromStorage(SESSION_STORAGE_KEY) ?? readFromStorage(LEGACY_SESSION_KEY);
   if (!raw) return null;
 
   try {
@@ -97,6 +99,7 @@ function loadStoredAuthPayload(): StoredAuthPayload | null {
     if (!parsed.version || parsed.version < STORAGE_VERSION) {
       const migrated: StoredAuthPayload = { version: STORAGE_VERSION, session: parsed.session };
       writeToStorage(SESSION_STORAGE_KEY, JSON.stringify(migrated));
+      removeFromStorage(LEGACY_SESSION_KEY);
       return migrated;
     }
   } catch {
@@ -134,9 +137,9 @@ export function clearStoredAuth(options: { keepPasscode?: boolean } = {}): void 
   }
   clearCachedUserKey();
   try {
-    customSignOut();
+    signOutEdge();
   } catch {
-    // ignore sign-out errors
+    /* ignore */
   }
 }
 
@@ -154,41 +157,55 @@ function normalizePasscode(passcode: string): { trimmed: string; numeric: number
   return { trimmed, numeric };
 }
 
-function createSessionFromCustom(nickname: string, userKey: string): Session {
-  const trimmedNickname = nickname.trim();
-  const storedNickname = trimmedNickname.length ? trimmedNickname : nickname;
-  const normalizedKeySource = userKey?.trim().length ? userKey.trim() : canonNickname(storedNickname);
-  const normalizedKey = canonNickname(normalizedKeySource);
+function isEdgeSessionExpired(session: EdgeSession | null, skewSec = 30): boolean {
+  if (!session) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return now + skewSec >= session.expires_at;
+}
+
+function createSessionFromEdge(edge: EdgeSession, nicknameHint?: string): Session {
+  const hinted = nicknameHint?.trim().length ? nicknameHint.trim() : '';
+  const rawNickname = edge.nickname?.trim().length ? edge.nickname.trim() : hinted;
+  const nickname = rawNickname || hinted || '';
+  const rawUserKey = edge.user_unique_key?.trim().length ? edge.user_unique_key.trim() : '';
+  const normalizedSource = rawUserKey || (nickname ? canonNickname(nickname) : '');
+  const userKey = normalizedSource ? canonNickname(normalizedSource) : '';
+  const safeKey = userKey || rawUserKey || (nickname ? canonNickname(nickname) : '');
+
+  const displayNickname = nickname || hinted || '';
 
   return {
-    user_unique_key: normalizedKey,
-    nickname: storedNickname,
+    user_unique_key: safeKey,
+    nickname: displayNickname,
     authenticated_at: new Date().toISOString(),
     user: {
-      id: normalizedKey,
-      nickname: storedNickname,
+      id: safeKey,
+      nickname: displayNickname,
       email: null,
     },
   };
 }
 
-function getActiveCustomSession() {
-  const session = getCustomSession();
+function hydrateEdgeSession(edge: EdgeSession | null, nicknameHint?: string): Session | null {
+  if (!edge) return null;
+  const session = createSessionFromEdge(edge, nicknameHint);
+  persistAuthState(session);
+  return session;
+}
+
+function getActiveEdgeSession(): EdgeSession | null {
+  const session = getEdgeSession();
   if (!session) return null;
-  if (isCustomSessionExpired(0)) {
-    return null;
-  }
+  if (isEdgeSessionExpired(session)) return null;
   return session;
 }
 
 let ensuringSupabaseSession: Promise<Session | null> | null = null;
 
 async function ensureSupabaseAuthSessionInternal(): Promise<Session | null> {
-  const active = getActiveCustomSession();
-  if (active) {
-    const session = createSessionFromCustom(active.nickname ?? '', active.userKey);
-    persistAuthState(session);
-    return session;
+  const activeEdge = getActiveEdgeSession();
+  if (activeEdge) {
+    return hydrateEdgeSession(activeEdge);
   }
 
   const stored = loadStoredAuthPayload();
@@ -198,12 +215,13 @@ async function ensureSupabaseAuthSessionInternal(): Promise<Session | null> {
 
   const passcode = getStoredPasscode();
   if (!passcode) {
+    persistAuthState(stored.session);
     return stored.session;
   }
 
   try {
     const refreshed = await signInWithPasscode(stored.session.nickname, passcode, { rememberPasscode: false });
-    return refreshed ?? loadStoredSession();
+    return refreshed ?? stored.session;
   } catch (err) {
     console.warn('auth:ensureSupabaseAuthSession', (err as Error).message);
     clearStoredAuth({ keepPasscode: true });
@@ -222,7 +240,7 @@ export async function ensureSupabaseAuthSession(): Promise<Session | null> {
 
 export async function getActiveSession(): Promise<Session | null> {
   const ensured = await ensureSupabaseAuthSession();
-  if (ensured && nicknameMatchesSession(ensured.nickname, ensured)) {
+  if (ensured) {
     return ensured;
   }
   const stored = loadStoredSession();
@@ -238,6 +256,7 @@ export async function refreshActiveSession(): Promise<Session | null> {
 
   const passcode = getStoredPasscode();
   if (!passcode) {
+    persistAuthState(stored.session);
     return stored.session;
   }
 
@@ -280,13 +299,10 @@ export async function signInWithPasscode(
   options: { rememberPasscode?: boolean } = {},
 ): Promise<Session | null> {
   const { trimmed } = normalizePasscode(passcode);
-  await customSignIn(nickname, passcode);
-  const active = getActiveCustomSession();
-  if (!active) {
-    throw new Error('Sign-in failed');
-  }
-  const session = createSessionFromCustom(active.nickname ?? nickname, active.userKey);
+  const edgeSession = (await exchangeNicknamePasscode(nickname, trimmed)) as EdgeSession;
+  saveEdgeSession(edgeSession);
 
+  const session = hydrateEdgeSession(edgeSession, nickname) ?? createSessionFromEdge(edgeSession, nickname);
   persistAuthState(session);
 
   if (options.rememberPasscode) {
@@ -304,25 +320,7 @@ export async function registerNicknameWithPasscode(
   options: { rememberPasscode?: boolean } = {},
 ): Promise<RegisterNicknameResponse> {
   const { trimmed, numeric } = normalizePasscode(passcode);
-  const res = await fetch(SET_NICKNAME_FN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nickname, passcode: numeric }),
-  });
-  const json = (await res.json().catch(() => ({}))) as RegisterNicknameResponse & { error?: unknown };
-
-  if (res.status === 409) {
-    const err = new Error('Nickname already exists.') as Error & { status?: number };
-    err.status = res.status;
-    throw err;
-  }
-
-  if (!res.ok) {
-    const message = typeof json?.error === 'string' && json.error ? json.error : 'Could not create profile';
-    const err = new Error(message) as Error & { status?: number };
-    err.status = res.status;
-    throw err;
-  }
+  const response = await setNicknamePasscode(nickname, numeric);
 
   if (options.rememberPasscode) {
     rememberPasscode(trimmed);
@@ -330,7 +328,18 @@ export async function registerNicknameWithPasscode(
     writeToStorage(NICKNAME_LS_KEY, storedNickname);
   }
 
-  return json;
+  return response as RegisterNicknameResponse;
+}
+
+export function getAuthHeader(): Record<string, string> {
+  const session = getActiveEdgeSession();
+  if (!session) return {};
+  const token = typeof session.session_token === 'string' ? session.session_token.trim() : '';
+  if (!token) return {};
+  const tokenType = typeof session.token_type === 'string' && session.token_type.trim().length
+    ? session.token_type.trim()
+    : 'bearer';
+  return { Authorization: `${tokenType} ${token}` };
 }
 
 export function storePasscode(passcode: string): void {
