@@ -1,4 +1,4 @@
-import { getSupabaseClient } from './supabase';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWord } from '@/core/models';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { recalcProgressSummary } from '@/lib/progress/progressSummary';
