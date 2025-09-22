@@ -1,5 +1,5 @@
-import { SET_NICKNAME_FN_URL } from '@/config';
 import { canonNickname, isNicknameAllowed } from '@/core/nickname';
+import { setNicknamePasscode } from '@/lib/edgeApi';
 
 type NicknameProfile = {
   id: string;
@@ -30,20 +30,23 @@ export async function ensureProfile(
   if (!isNicknameAllowed(nickname)) throw new Error('Invalid nickname');
   const safePasscode = toDigitPasscode(passcode);
 
-  const response = await fetch(SET_NICKNAME_FN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ nickname, passcode: safePasscode }),
-  });
-  const payload = (await response.json().catch(() => ({}))) as EdgeResponse;
-
-  if (response.status === 409 || payload?.code === 'NICKNAME_TAKEN') {
-    const err = new Error('Nickname already exists.');
-    (err as Error & { code?: string }).code = 'NICKNAME_TAKEN';
-    throw err;
+  let payload: EdgeResponse;
+  try {
+    payload = (await setNicknamePasscode(nickname, safePasscode)) as EdgeResponse;
+  } catch (error) {
+    const rawMessage = typeof (error as { message?: string })?.message === 'string'
+      ? (error as { message?: string }).message
+      : '';
+    const message = rawMessage.trim().length ? rawMessage.trim() : 'Failed to ensure profile';
+    if (/409|taken|exists|NICKNAME_TAKEN/i.test(message)) {
+      const err = new Error('Nickname already exists.');
+      (err as Error & { code?: string }).code = 'NICKNAME_TAKEN';
+      throw err;
+    }
+    throw new Error(message);
   }
 
-  if (!response.ok || typeof payload?.user_unique_key !== 'string') {
+  if (typeof payload?.user_unique_key !== 'string') {
     const message =
       typeof payload?.error === 'string' && payload.error
         ? payload.error

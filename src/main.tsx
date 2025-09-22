@@ -2,7 +2,7 @@
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { loadFromStorageOnBoot } from '@/lib/customAuth'
+import { loadSessionOnBoot } from '@/lib/customAuth'
 
 // Disable console logs in production for better performance
 if (import.meta.env.PROD) {
@@ -11,7 +11,7 @@ if (import.meta.env.PROD) {
   console.info = () => {};
 }
 
-loadFromStorageOnBoot();
+loadSessionOnBoot();
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {

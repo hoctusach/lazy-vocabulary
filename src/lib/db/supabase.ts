@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { getAuthHeader } from '@/lib/customAuth';
+import { getAuthHeader } from '@/lib/auth';
 
 let client: SupabaseClient | null = null;
 let hasShownMissingMessage = false;
