@@ -1,24 +1,19 @@
-export const SET_PROFILE_URL = "https://vijvcojvemkzgpzpowzh.supabase.co/functions/v1/set_nickname_passcode";
-export const EXCHANGE_URL    = "https://vijvcojvemkzgpzpowzh.supabase.co/functions/v1/nickname-passcode-exchange";
+export const EDGE_BASE =
+  "https://vijvcojvemkzgpzpowzh.supabase.co/functions/v1";
+export const SET_PROFILE_URL = `${EDGE_BASE}/set_nickname_passcode`;
+export const EXCHANGE_URL = `${EDGE_BASE}/nickname-passcode-exchange`;
 
-async function postJson(url: string, body: Record<string, unknown>) {
+async function postJson(url: string, body: any) {
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
-    // Important: do NOT send cookies
-    // credentials: "omit"
-    // mode: "cors"
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(json?.error || `HTTP ${res.status}`);
   return json;
 }
-
-export function setNicknamePasscode(nickname: string, passcode: string | number) {
-  return postJson(SET_PROFILE_URL, { nickname, passcode });
-}
-
-export function exchangeNicknamePasscode(nickname: string, passcode: string | number) {
-  return postJson(EXCHANGE_URL, { nickname, passcode });
-}
+export const setNicknamePasscode = (n: string, p: string | number) =>
+  postJson(SET_PROFILE_URL, { nickname: n, passcode: p });
+export const exchangeNicknamePasscode = (n: string, p: string | number) =>
+  postJson(EXCHANGE_URL, { nickname: n, passcode: p });
