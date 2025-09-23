@@ -37,6 +37,19 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
     : 0;
   const [open, setOpen] = useState(false);
   const { totalHours } = useLearnerHours(learnerId);
+  const newWords = dailySelection?.newWords ?? [];
+  const reviewWords = dailySelection?.reviewWords ?? [];
+  const totalSelection = newWords.length + reviewWords.length;
+  const selectionSeverity = dailySelection?.severity ?? '—';
+  const selectionHasWords = totalSelection > 0;
+  const categoryBreakdown = selectionHasWords
+    ? Object.entries(
+        [...newWords, ...reviewWords].reduce((acc, word) => {
+          acc[word.category] = (acc[word.category] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>)
+      )
+    : [];
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -66,7 +79,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    aria-label="How DUE REVIEW work?"
+                    aria-label="How does due review count work?"
                     className="h-10 w-10 text-gray-500 hover:text-gray-700"
                   >
                     <Info className="h-4 w-4" />
@@ -74,7 +87,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                 </PopoverTrigger>
                 <PopoverContent className="max-w-xs text-left">
                   <div className="space-y-1">
-                    <p className="font-bold">How DUE REVIEW work?</p>
+                    <p className="font-bold">How does due review count work?</p>
                     <p>It goes with the Spaced Repetition Principle.</p>
                     <p>
                       Each correct review pushes the next one farther out: 2 → 3 → 5 → 7 → 10 → 14 → 21 → 28 → 35 days. After that, mastered items return every 60 days.
@@ -116,44 +129,38 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
         </div>
 
         {/* Daily Selection Info */}
-        {dailySelection && (
-          <div className="space-y-3">
-            <h4 className="font-semibold">Today's Selection</h4>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="border-0">
-                Total: {dailySelection.newWords.length + dailySelection.reviewWords.length}
-              </Badge>
-              <Badge variant="outline" className="text-green-600 border-0">
-                New: {dailySelection.newWords.length}
-              </Badge>
-              <Badge variant="outline" className="text-blue-600 border-0">
-                Review: {dailySelection.reviewWords.length}
-              </Badge>
-              <Badge variant="outline" className="border-0">
-                Level: {dailySelection.severity}
-              </Badge>
-            </div>
-            
-            {/* Category breakdown for all words in today's selection */}
-            {(dailySelection.newWords.length > 0 || dailySelection.reviewWords.length > 0) && (
-              <div className="text-sm">
-                <div className="font-medium mb-1">By Category:</div>
-                <div className="flex flex-wrap gap-1">
-                  {Object.entries(
-                    [...dailySelection.newWords, ...dailySelection.reviewWords].reduce((acc, word) => {
-                      acc[word.category] = (acc[word.category] || 0) + 1;
-                      return acc;
-                    }, {} as Record<string, number>)
-                  ).map(([category, count]) => (
-                    <Badge key={category} variant="outline" className="text-xs border-0">
-                      {category}: {count}
-                    </Badge>
-                  ))}
-                </div>
+        <div className="space-y-3">
+          <h4 className="font-semibold">Today's Selection</h4>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="secondary" className="border-0">
+              Total: {totalSelection}
+            </Badge>
+            <Badge variant="outline" className="text-green-600 border-0">
+              New: {newWords.length}
+            </Badge>
+            <Badge variant="outline" className="text-blue-600 border-0">
+              Review: {reviewWords.length}
+            </Badge>
+            <Badge variant="outline" className="border-0">
+              Level: {selectionSeverity}
+            </Badge>
+          </div>
+
+          <div className="text-sm">
+            <div className="font-medium mb-1">By Category:</div>
+            {selectionHasWords ? (
+              <div className="flex flex-wrap gap-1">
+                {categoryBreakdown.map(([category, count]) => (
+                  <Badge key={category} variant="outline" className="text-xs border-0">
+                    {category}: {count}
+                  </Badge>
+                ))}
               </div>
+            ) : (
+              <div className="italic text-gray-500">No words selected yet.</div>
             )}
           </div>
-        )}
+        </div>
 
         {/* Generate Daily Selection */}
         <div className="space-y-3">

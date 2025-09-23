@@ -54,6 +54,9 @@ const VocabularyAppWithLearning: React.FC = () => {
   }, [markWordAsPlayed]);
 
   const learnedWordsList = Array.isArray(learnedWords) ? learnedWords : [];
+  const newWords = dailySelection?.newWords ?? [];
+  const reviewWords = dailySelection?.reviewWords ?? [];
+  const hasSelectionWords = newWords.length > 0 || reviewWords.length > 0;
 
   useEffect(() => {
     if (dailySelection) {
@@ -91,109 +94,118 @@ const VocabularyAppWithLearning: React.FC = () => {
         learnerId="default"
       />
 
-      {dailySelection && (
-        <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <CollapsibleTrigger className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold">Word Summary</h3>
-                <span className="text-xs text-muted-foreground hidden sm:inline">
-                  Tap to show or hide details
-                </span>
-                <ChevronDown
-                  className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')}
-                />
-              </CollapsibleTrigger>
-            </TooltipTrigger>
-            <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
-          </Tooltip>
-          <CollapsibleContent className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-3">
-              {dailySelection.newWords.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-green-600">Today's New ({dailySelection.newWords.length})</h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {dailySelection.newWords.map((word, index) => (
-                      <div key={index} className="text-sm p-2 bg-green-50 rounded border">
-                        <div className="font-medium">{word.word}</div>
-                        <div className="text-xs text-gray-600">{word.category}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {dailySelection.reviewWords.length > 0 && (
-                <div className="space-y-2">
-                  <h4 className="font-medium text-red-600">
-                    Today's Due Review ({dailySelection.reviewWords.length})
-                  </h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
-                    {dailySelection.reviewWords.map((word, index) => (
-                      <div
-                        key={index}
-                        className="text-sm p-2 bg-red-50 rounded border"
-                      >
-                        <div className="font-medium">{word.word}</div>
-                        <div className="text-xs text-gray-600">
-                          {word.category} • Review #{word.reviewCount}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          Next review: {word.nextReviewDate}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <h4 className="font-medium text-gray-600">Learned ({learnedWordsList.length})</h4>
-                <div className="space-y-1 max-h-60 overflow-y-auto">
-                  {learnedWordsList.length > 0 ? (
-                    learnedWordsList.map((word, index) => (
-                      <div
-                        key={index}
-                        className="text-sm p-2 bg-gray-50 rounded border opacity-75 flex items-center justify-between"
-                      >
-                        <div>
-                          <div className="font-medium text-gray-700">{word.word}</div>
-                          <div className="text-xs text-gray-500">
-                            {word.category} • Learned {word.learnedDate}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            aria-label="View Word"
-                            className="text-gray-400 hover:text-gray-600"
-                            onClick={() => openSearch(word.word)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                          <button
-                            aria-label="Mark as New"
-                            className="text-gray-400 hover:text-gray-600"
-                            onClick={() => {
-                              setWordToReset(word.word);
-                              setIsMarkAsNewDialogOpen(true);
-                            }}
-                          >
-                            <RotateCcw className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
-                      No learned words
+      <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <CollapsibleTrigger className="flex items-center gap-2">
+              <h3 className="text-lg font-semibold">Word Summary</h3>
+              <span className="text-xs text-muted-foreground hidden sm:inline">
+                Tap to show or hide details
+              </span>
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')}
+              />
+            </CollapsibleTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
+        </Tooltip>
+        <CollapsibleContent className="space-y-4">
+          {!hasSelectionWords && (
+            <div className="text-sm text-gray-500 italic">No daily selection available yet.</div>
+          )}
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="space-y-2">
+              <h4 className="font-medium text-green-600">Today's New ({newWords.length})</h4>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {newWords.length > 0 ? (
+                  newWords.map((word, index) => (
+                    <div key={index} className="text-sm p-2 bg-green-50 rounded border">
+                      <div className="font-medium">{word.word}</div>
+                      <div className="text-xs text-gray-600">{word.category}</div>
                     </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="text-sm p-2 bg-green-50 rounded border text-gray-500 italic">
+                    No new words assigned
+                  </div>
+                )}
               </div>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
-      )}
+
+            <div className="space-y-2">
+              <h4 className="font-medium text-red-600">
+                Today's Due Review ({reviewWords.length})
+              </h4>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {reviewWords.length > 0 ? (
+                  reviewWords.map((word, index) => (
+                    <div
+                      key={index}
+                      className="text-sm p-2 bg-red-50 rounded border"
+                    >
+                      <div className="font-medium">{word.word}</div>
+                      <div className="text-xs text-gray-600">
+                        {word.category} • Review #{word.reviewCount}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Next review: {word.nextReviewDate}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm p-2 bg-red-50 rounded border text-gray-500 italic">
+                    No due reviews assigned
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium text-gray-600">Learned ({learnedWordsList.length})</h4>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {learnedWordsList.length > 0 ? (
+                  learnedWordsList.map((word, index) => (
+                    <div
+                      key={index}
+                      className="text-sm p-2 bg-gray-50 rounded border opacity-75 flex items-center justify-between"
+                    >
+                      <div>
+                        <div className="font-medium text-gray-700">{word.word}</div>
+                        <div className="text-xs text-gray-500">
+                          {word.category} • Learned {word.learnedDate}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          aria-label="View Word"
+                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => openSearch(word.word)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                        <button
+                          aria-label="Mark as New"
+                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => {
+                            setWordToReset(word.word);
+                            setIsMarkAsNewDialogOpen(true);
+                          }}
+                        >
+                          <RotateCcw className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
+                    No learned words
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
       </div>
     </TooltipProvider>
   );
