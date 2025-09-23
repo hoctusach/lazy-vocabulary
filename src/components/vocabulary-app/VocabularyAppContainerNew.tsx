@@ -96,31 +96,16 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     );
   }
 
-  if (!hasData) {
-    return (
-      <DebugInfoContext.Provider value={debugInfo}>
-        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-          <div className="space-y-4">
-            <UserInteractionManager
-              currentWord={currentWord}
-              playCurrentWord={playCurrentWord}
-              onInteractionUpdate={handleInteractionUpdate}
-            />
-            <VocabularyCardNew
-              word={`No words in "${currentCategory}" category`}
-              meaning="Try switching to another category"
-              example=""
-              backgroundColor="#F0F8FF"
-              isSpeaking={false}
-              category={currentCategory}
-            />
-          </div>
-        </VocabularyLayout>
-      </DebugInfoContext.Provider>
-    );
-  }
+  const emptyState = !hasData
+    ? {
+        word: `No words in "${currentCategory}" category`,
+        meaning: "Try switching categories or regenerate today's list",
+        example: '',
+        category: currentCategory || 'No Data'
+      }
+    : undefined;
 
-  if (!currentWord) {
+  if (!currentWord && hasData) {
     return (
       <DebugInfoContext.Provider value={debugInfo}>
         <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
@@ -158,6 +143,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
 
           <ContentWithDataNew
             displayWord={currentWord}
+            emptyState={emptyState}
             muted={isMuted}
             paused={isPaused}
             toggleMute={toggleMute}

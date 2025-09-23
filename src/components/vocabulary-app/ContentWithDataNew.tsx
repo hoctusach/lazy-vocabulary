@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
-import { VocabularyWord } from '@/types/vocabulary';
+import React from 'react';
+import type { ReadonlyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
 
 interface ContentWithDataNewProps {
-  displayWord: ReadonlyWord;
+  displayWord: ReadonlyWord | null;
   muted: boolean;
   paused: boolean;
   toggleMute: () => void;
@@ -17,6 +17,13 @@ interface ContentWithDataNewProps {
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
   additionalContent?: React.ReactNode;
+  emptyState?: {
+    word: string;
+    meaning: string;
+    example?: string;
+    translation?: string;
+    category?: string;
+  };
 }
 
 const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
@@ -33,13 +40,15 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   playCurrentWord,
   onMarkWordLearned,
   onOpenSearch,
-  additionalContent
+  additionalContent,
+  emptyState
 }) => {
   return (
     <>
       {/* Main vocabulary display */}
       <VocabularyMainNew
         currentWord={displayWord}
+        emptyState={emptyState}
         mute={muted}
         isPaused={paused}
         toggleMute={toggleMute}

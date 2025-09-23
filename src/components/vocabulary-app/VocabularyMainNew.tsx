@@ -6,7 +6,7 @@ import { useBackgroundColor } from './useBackgroundColor';
 import VocabularyControlsColumn from './VocabularyControlsColumn';
 
 interface VocabularyMainNewProps {
-  currentWord: ReadonlyWord;
+  currentWord: ReadonlyWord | null;
   mute: boolean;
   isPaused: boolean;
   toggleMute: () => void;
@@ -20,6 +20,13 @@ interface VocabularyMainNewProps {
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
+  emptyState?: {
+    word: string;
+    meaning: string;
+    example?: string;
+    translation?: string;
+    category?: string;
+  };
 }
 
 const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
@@ -37,25 +44,33 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   playCurrentWord,
   onMarkWordLearned,
   onOpenSearch,
+  emptyState
   }) => {
   const { backgroundColor } = useBackgroundColor();
+
+  const wordToDisplay = currentWord?.word ?? emptyState?.word ?? 'No vocabulary available';
+  const meaningToDisplay = currentWord?.meaning ?? emptyState?.meaning ?? '';
+  const exampleToDisplay = currentWord?.example ?? emptyState?.example ?? '';
+  const translationToDisplay = currentWord?.translation ?? emptyState?.translation;
+  const categoryToDisplay = currentWord?.category ?? emptyState?.category ?? '';
+  const shouldShowWordCount = showWordCount && Boolean(currentWord);
 
   return (
     <div className="flex flex-row items-start gap-2 sm:gap-4 w-full max-w-5xl mx-auto">
       {/* Main card - takes most of the space */}
         <div className="flex-1 min-w-0">
           <VocabularyCardNew
-            word={currentWord.word}
-            meaning={currentWord.meaning}
-            example={currentWord.example}
-            translation={currentWord.translation}
+            word={wordToDisplay}
+            meaning={meaningToDisplay}
+            example={exampleToDisplay}
+            translation={translationToDisplay}
             backgroundColor={backgroundColor}
-            isSpeaking={isSoundPlaying}
-            category={currentWord.category || ''}
-            showWordCount={showWordCount}
+            isSpeaking={isSoundPlaying && Boolean(currentWord)}
+            category={categoryToDisplay}
+            showWordCount={shouldShowWordCount}
           />
         </div>
-      
+
       {/* Controls column - positioned on the right side */}
         <div className="flex-none flex flex-col justify-start items-end">
           <VocabularyControlsColumn
