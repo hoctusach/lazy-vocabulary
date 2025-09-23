@@ -42,6 +42,12 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   const totalSelection = newWords.length + reviewWords.length;
   const selectionSeverity = dailySelection?.severity ?? '—';
   const selectionHasWords = totalSelection > 0;
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgressPanel] rendering word list', {
+      itemsLength: totalSelection,
+      category: dailySelection?.category ?? null,
+    });
+  }
   const categoryBreakdown = selectionHasWords
     ? Object.entries(
         [...newWords, ...reviewWords].reduce((acc, word) => {

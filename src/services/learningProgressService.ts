@@ -588,12 +588,21 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   const selectionRows = await generateDailySelection(userKey, mode, count, category);
   const ids = selectionRows.map((row) => row.word_id).filter((id): id is string => typeof id === 'string' && id.length > 0);
 
+  let committedIdsLength = 0;
   if (ids.length > 0) {
     try {
       await commitDailySelection(userKey, ids);
+      committedIdsLength = ids.length;
     } catch (error) {
       console.warn('[LearningProgress] commit_daily_selection failed', error);
     }
+  }
+
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] fetchAndCommitTodaySelection rpc result', {
+      generatedCount: selectionRows.length,
+      committedIdsLength,
+    });
   }
 
   const vocabMap = await fetchVocabularyByIds(ids);
@@ -610,6 +619,12 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   saveTodayWordsToLocal(userKey, today);
   await refreshProgressSummaryRemote(userKey);
 
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] fetchAndCommitTodaySelection final selection', {
+      selectionSize: today.words.length,
+    });
+  }
+
   return today;
 }
 
@@ -620,14 +635,42 @@ export async function getOrCreateTodayWords(
   category?: string | null
 ): Promise<TodaySelectionState> {
   const cached = loadTodayWordsFromLocal(userKey);
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] getOrCreateTodayWords cache status', {
+      cache: cached
+        ? {
+            day: cached.date,
+            idsLength: cached.words.length,
+          }
+        : null,
+      todayISO: new Date().toISOString(),
+      category,
+      planSize: count,
+    });
+  }
   if (cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category: category ?? null })) {
+    if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+      console.log('[LearningProgress] getOrCreateTodayWords using cache', {
+        day: cached.date,
+        idsLength: cached.words.length,
+      });
+    }
     return cached;
+  }
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] getOrCreateTodayWords fetching new selection', {
+      category,
+      planSize: count,
+    });
   }
   return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
 }
 
 export async function prepareUserSession(): Promise<string | null> {
   const userKey = await ensureUserKey();
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] prepareUserSession resolved', { userKey });
+  }
   if (!userKey) return null;
   clearStaleCaches(userKey);
   return userKey;

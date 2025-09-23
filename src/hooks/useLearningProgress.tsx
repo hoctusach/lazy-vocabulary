@@ -85,6 +85,9 @@ export const useLearningProgress = () => {
     const init = async () => {
       const preparedKey = await prepareUserSession();
       if (!preparedKey || !isActive) return;
+      if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+        console.log('[useLearningProgress] prepareUserSession resolved', { userKey: preparedKey });
+      }
       setUserKey(preparedKey);
 
       await bootstrapLearnedFromServerByKey();
