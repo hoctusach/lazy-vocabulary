@@ -31,6 +31,7 @@ export type TodaySelectionState = {
 type DailySelectionRow = {
   word_id: string;
   category: string | null;
+  is_due: boolean | null;
 };
 
 type VocabularyRow = {
@@ -504,19 +505,51 @@ async function generateDailySelection(
   if (!client) throw new Error('Supabase client unavailable');
   if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
 
-  const { data, error } = await client.rpc('generate_daily_selection', {
+  const params = {
     p_user_key: userKey,
     p_mode: mode,
     p_count: count,
     p_category: category ?? null,
-  });
+  } as const;
 
-  if (error) {
-    throw new Error(error.message);
+  const normalizeRows = (data: unknown): DailySelectionRow[] => {
+    if (!Array.isArray(data)) return [];
+    const normalized: DailySelectionRow[] = [];
+    for (const entry of data as unknown[]) {
+      const candidate = entry as { word_id?: unknown; category?: unknown; is_due?: unknown };
+      const wordId = typeof candidate.word_id === 'string' ? candidate.word_id : null;
+      if (!wordId) continue;
+
+      const rawCategory = candidate.category;
+      const categoryValue = typeof rawCategory === 'string' ? rawCategory : null;
+
+      const rawIsDue = candidate.is_due;
+      const isDueValue = typeof rawIsDue === 'boolean' ? rawIsDue : null;
+
+      normalized.push({
+        word_id: wordId,
+        category: categoryValue,
+        is_due: isDueValue,
+      });
+    }
+    return normalized;
+  };
+
+  const v2Result = await client.rpc('generate_daily_selection_v2', params);
+
+  if (!v2Result.error) {
+    return normalizeRows(v2Result.data);
   }
 
-  const rows: DailySelectionRow[] = Array.isArray(data) ? (data as DailySelectionRow[]) : [];
-  return rows.filter((row) => typeof row?.word_id === 'string');
+  console.warn('[LearningProgress] generate_daily_selection_v2 failed, falling back', v2Result.error);
+
+  const legacyResult = await client.rpc('generate_daily_selection', params);
+
+  if (legacyResult.error) {
+    throw new Error(legacyResult.error.message);
+  }
+
+  return normalizeRows(legacyResult.data);
 }
 
 async function commitDailySelection(userKey: string, wordIds: string[]): Promise<void> {
