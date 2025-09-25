@@ -22,18 +22,9 @@ const dueTimestamp = (word: TodayWord): number => {
 export function buildTodaysWords(words: TodayWord[], category: string): TodayWord[] {
   const filtered = category === 'ALL' ? words : words.filter(w => w.category === category);
   return [...filtered].sort((a, b) => {
-    const aReview = isReviewCandidate(a);
-    const bReview = isReviewCandidate(b);
-    if (aReview !== bReview) {
-      return aReview ? -1 : 1;
+    if (a.is_due !== b.is_due) {
+      return a.is_due ? -1 : 1;
     }
-
-    const aDue = dueTimestamp(a);
-    const bDue = dueTimestamp(b);
-    if (aDue !== bDue) {
-      return aDue - bDue;
-    }
-
     return a.word.localeCompare(b.word);
   });
 }

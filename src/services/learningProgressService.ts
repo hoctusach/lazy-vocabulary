@@ -2,6 +2,7 @@ import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from 
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
 import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { resetLearned } from '@/lib/db/learned';
+import { getDailySelectionV2 } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import {
   getProgressSummary,
@@ -236,6 +237,7 @@ function buildTodayWord(
     translation: vocab.translation ?? undefined,
     count: vocab.count ?? 0,
     category: coerceCategory(vocab.category ?? selectionRow.category ?? undefined),
+    is_due: Boolean(selectionRow.is_due) || isReviewCandidate(srs),
     nextAllowedTime: srs?.next_display_at ?? undefined,
     srs,
   };
@@ -267,16 +269,21 @@ function toLearningProgress(word: TodayWord): LearningProgress {
 function buildSelection(words: TodayWord[], severity: SeverityLevel, meta: SelectionNormalizationMeta): DailySelection {
   const reviewWords: LearningProgress[] = [];
   const newWords: LearningProgress[] = [];
+  let dueCount = 0;
 
   for (const word of words) {
-    const target = isReviewCandidate(word.srs) ? reviewWords : newWords;
-    target.push(toLearningProgress(word));
+    const progress = toLearningProgress(word);
+    progress.isDue = word.is_due;
+    const target = word.is_due ? reviewWords : newWords;
+    target.push(progress);
+    if (word.is_due) dueCount += 1;
   }
 
   return {
     reviewWords,
     newWords,
     totalCount: reviewWords.length + newWords.length,
+    dueCount,
     severity,
     date: meta ? toDateKey(new Date()) : undefined,
     mode: meta.mode,
@@ -347,6 +354,7 @@ function applyReviewToWord(word: TodayWord): {
 
   const updated: TodayWord = {
     ...word,
+    is_due: false,
     nextAllowedTime,
     srs: {
       in_review_queue: payload.in_review_queue,
@@ -495,7 +503,7 @@ export function matchesCurrentOptions(
   );
 }
 
-async function generateDailySelection(
+async function generateDailySelectionV2(
   userKey: string,
   mode: DailyMode,
   count: number,
@@ -505,67 +513,13 @@ async function generateDailySelection(
   if (!client) throw new Error('Supabase client unavailable');
   if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
 
-  const params = {
-    p_user_key: userKey,
-    p_mode: mode,
-    p_count: count,
-    p_category: category ?? null,
-  } as const;
-
-  const normalizeRows = (data: unknown): DailySelectionRow[] => {
-    if (!Array.isArray(data)) return [];
-    const normalized: DailySelectionRow[] = [];
-    for (const entry of data as unknown[]) {
-      const candidate = entry as { word_id?: unknown; category?: unknown; is_due?: unknown };
-      const wordId = typeof candidate.word_id === 'string' ? candidate.word_id : null;
-      if (!wordId) continue;
-
-      const rawCategory = candidate.category;
-      const categoryValue = typeof rawCategory === 'string' ? rawCategory : null;
-
-      const rawIsDue = candidate.is_due;
-      const isDueValue = typeof rawIsDue === 'boolean' ? rawIsDue : null;
-
-      normalized.push({
-        word_id: wordId,
-        category: categoryValue,
-        is_due: isDueValue,
-      });
-    }
-    return normalized;
-  };
-
-  const v2Result = await client.rpc('generate_daily_selection_v2', params);
-
-  if (!v2Result.error) {
-    return normalizeRows(v2Result.data);
-  }
-
-  console.warn('[LearningProgress] generate_daily_selection_v2 failed, falling back', v2Result.error);
-
-  const legacyResult = await client.rpc('generate_daily_selection', params);
-
-  if (legacyResult.error) {
-    throw new Error(legacyResult.error.message);
-  }
-
-  return normalizeRows(legacyResult.data);
-}
-
-async function commitDailySelection(userKey: string, wordIds: string[]): Promise<void> {
-  if (wordIds.length === 0) return;
-  const client = getSupabaseClient();
-  if (!client) throw new Error('Supabase client unavailable');
-  if (CUSTOM_AUTH_MODE) return;
-
-  const { error } = await client.rpc('commit_daily_selection', {
-    p_user_key: userKey,
-    p_word_ids: wordIds,
+  const rows = await getDailySelectionV2(client, {
+    userKey,
+    mode,
+    count,
+    category: category ?? null,
   });
-
-  if (error) {
-    throw new Error(error.message);
-  }
+  return rows;
 }
 
 async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
@@ -618,23 +572,12 @@ async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<
 
 export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
   const { userKey, mode, count, category = null } = params;
-  const selectionRows = await generateDailySelection(userKey, mode, count, category);
+  const selectionRows = await generateDailySelectionV2(userKey, mode, count, category);
   const ids = selectionRows.map((row) => row.word_id).filter((id): id is string => typeof id === 'string' && id.length > 0);
-
-  let committedIdsLength = 0;
-  if (ids.length > 0) {
-    try {
-      await commitDailySelection(userKey, ids);
-      committedIdsLength = ids.length;
-    } catch (error) {
-      console.warn('[LearningProgress] commit_daily_selection failed', error);
-    }
-  }
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] fetchAndCommitTodaySelection rpc result', {
       generatedCount: selectionRows.length,
-      committedIdsLength,
     });
   }
 
@@ -772,6 +715,7 @@ export async function markWordAsNew(userKey: string, wordId: string): Promise<To
   const base = cached.words[index];
   const resetWord: TodayWord = {
     ...base,
+    is_due: false,
     nextAllowedTime: undefined,
     srs: {
       in_review_queue: false,
