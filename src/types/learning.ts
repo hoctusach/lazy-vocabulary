@@ -10,6 +10,7 @@ export interface LearningProgress {
   createdDate: string;
   learnedDate?: string;
   nextAllowedTime?: string;
+  isDue?: boolean;
 }
 
 export type DailyMode = 'Light' | 'Medium' | 'Hard';
@@ -18,6 +19,7 @@ export interface DailySelection {
   newWords: LearningProgress[];
   reviewWords: LearningProgress[];
   totalCount: number;
+  dueCount?: number;
   severity: SeverityLevel;
   date?: string;
   mode?: DailyMode;
