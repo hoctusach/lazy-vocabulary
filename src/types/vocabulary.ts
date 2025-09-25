@@ -26,6 +26,7 @@ export type TodayWordSrs = {
 export interface TodayWord extends VocabularyWord {
   word_id: string;
   category: string;
+  is_due: boolean;
   srs?: TodayWordSrs | null;
 }
 

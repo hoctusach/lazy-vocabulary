@@ -1,3 +1,5 @@
+import type { createClient } from '@supabase/supabase-js';
+
 let hasShownMissingMessage = false;
 
 type DevSupabaseSettings = {
@@ -517,4 +519,30 @@ if (typeof window !== 'undefined') {
   if (!initialUrl || !initialAnon) {
     showMissingEnvMessage();
   }
+}
+
+export type DailySelectionV2Row = {
+  word_id: string;
+  category: string | null;
+  is_due: boolean | null;
+};
+
+export async function getDailySelectionV2(
+  client: ReturnType<typeof createClient>,
+  params: { userKey: string; mode: string; count: number; category?: string | null }
+): Promise<DailySelectionV2Row[]> {
+  const { data, error } = await client.rpc("generate_daily_selection_v2", {
+    p_user_key: params.userKey,
+    p_mode: params.mode,
+    p_count: params.count,
+    p_category: params.category ?? null,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (Array.isArray(data) ? data : []).filter(
+    (row): row is DailySelectionV2Row => typeof row?.word_id === "string"
+  );
 }
