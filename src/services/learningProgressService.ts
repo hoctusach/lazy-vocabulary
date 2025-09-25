@@ -7,7 +7,6 @@ import type { LearnedWordUpsert } from '@/lib/db/learned';
 import {
   getProgressSummary,
   type ProgressSummaryFields,
-  refreshProgressSummary as refreshProgressSummaryRemote,
 } from '@/lib/progress/progressSummary';
 import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import { getSupabaseClient } from '@/lib/supabaseClient';
@@ -511,7 +510,6 @@ async function generateDailySelectionV2(
 ): Promise<DailySelectionRow[]> {
   const client = getSupabaseClient();
   if (!client) throw new Error('Supabase client unavailable');
-  if (CUSTOM_AUTH_MODE) throw new Error('Daily selection is unavailable in custom auth mode');
 
   const rows = await getDailySelectionV2(client, {
     userKey,
@@ -526,7 +524,6 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   if (wordIds.length === 0) return {};
   const client = getSupabaseClient();
   if (!client) throw new Error('Supabase client unavailable');
-  if (CUSTOM_AUTH_MODE) throw new Error('Vocabulary fetch unavailable in custom auth mode');
 
   const { data, error } = await client.rpc('fetch_vocabulary_by_ids', { p_ids: wordIds });
 
@@ -547,7 +544,6 @@ async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<
   if (wordIds.length === 0) return {};
   const client = getSupabaseClient();
   if (!client) throw new Error('Supabase client unavailable');
-  if (CUSTOM_AUTH_MODE) throw new Error('SRS fetch unavailable in custom auth mode');
 
   const { data, error } = await client
     .from('learned_words')
@@ -593,7 +589,6 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   );
 
   saveTodayWordsToLocal(userKey, today);
-  await refreshProgressSummaryRemote(userKey);
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] fetchAndCommitTodaySelection final selection', {
