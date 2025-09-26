@@ -1,6 +1,5 @@
 import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
-import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { resetLearned } from '@/lib/db/learned';
 import { getDailySelectionV2 } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
@@ -42,6 +41,7 @@ type VocabularyRow = {
   translation?: string | null;
   category?: string | null;
   count?: number | string | null;
+  is_due?: boolean | null;
 };
 
 type LearnedRow = {
@@ -569,7 +569,16 @@ async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<
 export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
   const { userKey, mode, count, category = null } = params;
   const selectionRows = await generateDailySelectionV2(userKey, mode, count, category);
-  const ids = selectionRows.map((row) => row.word_id).filter((id): id is string => typeof id === 'string' && id.length > 0);
+  if (!Array.isArray(selectionRows) || selectionRows.length === 0) {
+    throw new Error('No daily selection rows returned');
+  }
+
+  const selectionById = new Map(
+    selectionRows
+      .filter((row) => typeof row?.word_id === 'string' && row.word_id.length > 0)
+      .map((row) => [row.word_id, row])
+  );
+  const ids = Array.from(selectionById.keys());
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] fetchAndCommitTodaySelection rpc result', {
@@ -579,7 +588,22 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
 
   const vocabMap = await fetchVocabularyByIds(ids);
   const srsMap = await fetchSrsRows(userKey, ids);
-  const vocabRows = ids.map((id) => vocabMap[id]).filter((row): row is VocabularyRow => Boolean(row));
+  const vocabRows = ids
+    .map((id) => {
+      const vocab = vocabMap[id];
+      if (!vocab) return null;
+      const selection = selectionById.get(id);
+      const next: VocabularyRow = {
+        ...vocab,
+        is_due: Boolean(selection?.is_due),
+      };
+      return next;
+    })
+    .filter((row): row is VocabularyRow => Boolean(row));
+
+  if (vocabRows.length === 0) {
+    throw new Error('No vocabulary details available for selection');
+  }
 
   const today = normalizeToDailySelection(
     vocabRows,
@@ -760,7 +784,6 @@ export async function fetchLearnedWordSummaries(
 }[]> {
   const client = getSupabaseClient();
   if (!client) return [];
-  if (CUSTOM_AUTH_MODE) return [];
 
   const { data, error } = await client
     .from('learned_words')

@@ -1,1 +1,1 @@
-export const CUSTOM_AUTH_MODE = true;
+export const CUSTOM_AUTH_MODE = false;

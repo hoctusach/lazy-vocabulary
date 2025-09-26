@@ -2,7 +2,6 @@ import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWord } from '@/core/models';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { recalcProgressSummary } from '@/lib/progress/progressSummary';
-import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 
 export type LearnedWordUpsert = {
   in_review_queue: boolean;
@@ -68,8 +67,6 @@ export async function upsertLearned(
   if (!supabase) return;
   const user_unique_key = await ensureUserKey();
   if (!user_unique_key) return;
-  if (CUSTOM_AUTH_MODE) return;
-
   const record = {
     user_unique_key,
     word_id: wordId,
@@ -102,8 +99,6 @@ export async function resetLearned(wordId: string): Promise<void> {
 
   const user_unique_key = await ensureUserKey();
   if (!user_unique_key) return;
-  if (CUSTOM_AUTH_MODE) return;
-
   const { error } = await supabase
     .from('learned_words')
     .delete()

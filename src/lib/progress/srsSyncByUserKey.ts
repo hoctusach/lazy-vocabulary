@@ -1,6 +1,5 @@
 import { canonNickname } from '@/core/nickname';
 import { getActiveSession } from '@/lib/auth';
-import { CUSTOM_AUTH_MODE } from '@/lib/customAuthMode';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import { persistProgressSummaryLocal } from './progressSummary';
@@ -76,8 +75,6 @@ export async function markLearnedServerByKey(
 
   const sb = getSupabaseClient();
   if (!sb) return null;
-  if (CUSTOM_AUTH_MODE) return null;
-
   const toIso = (value?: string | null) => {
     if (!value) return null;
     const parsed = Date.parse(value);
@@ -138,8 +135,6 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
 
   const sb = getSupabaseClient();
   if (!sb) return;
-  if (CUSTOM_AUTH_MODE) return;
-
   const { data, error } = await sb.rpc('get_learned_words_by_key', { p_user_unique_key: key });
   if (error || !Array.isArray(data)) return;
 
