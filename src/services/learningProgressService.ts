@@ -5,6 +5,7 @@ import { getDailySelectionV2 } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import {
   getProgressSummary,
+  refreshProgressSummary,
   type ProgressSummaryFields,
 } from '@/lib/progress/progressSummary';
 import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
@@ -54,7 +55,7 @@ type LearnedRow = {
   next_display_at: string | null;
   last_seen_at: string | null;
   srs_interval_days: number | null;
-  srs_easiness: number | null;
+  srs_ease: number | null;
   srs_state: string | null;
 };
 
@@ -223,7 +224,7 @@ function buildTodayWord(
         next_display_at: learned.next_display_at,
         last_seen_at: learned.last_seen_at,
         srs_interval_days: learned.srs_interval_days,
-        srs_easiness: learned.srs_easiness,
+        srs_ease: learned.srs_ease,
         srs_state: learned.srs_state,
       }
     : undefined;
@@ -329,7 +330,7 @@ function buildPayloadFromWord(
     next_display_at: nextAllowedIso,
     last_seen_at: nowIso,
     srs_interval_days: computeIntervalDays(learnedAtIso, nextReviewIso ?? undefined),
-    srs_easiness: word.srs?.srs_easiness ?? 2.5,
+    srs_ease: word.srs?.srs_ease ?? 2.5,
     srs_state: toSrsState(status),
   };
 
@@ -364,7 +365,7 @@ function applyReviewToWord(word: TodayWord): {
       next_display_at: payload.next_display_at,
       last_seen_at: payload.last_seen_at,
       srs_interval_days: payload.srs_interval_days,
-      srs_easiness: payload.srs_easiness,
+      srs_ease: payload.srs_ease,
       srs_state: payload.srs_state,
     },
   };
@@ -541,29 +542,32 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
 }
 
 async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<string, LearnedRow>> {
-  if (wordIds.length === 0) return {};
   const client = getSupabaseClient();
   if (!client) throw new Error('Supabase client unavailable');
 
-  const { data, error } = await client
+  let query = client
     .from('learned_words')
     .select(
-      'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_easiness,srs_state'
+      'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_ease,srs_state'
     )
-    .eq('user_unique_key', userKey)
-    .in('word_id', wordIds);
+    .eq('user_unique_key', userKey);
 
+  if (Array.isArray(wordIds) && wordIds.length > 0) {
+    query = query.in('word_id', wordIds);
+  }
+
+  const { data, error } = await query;
   if (error) {
     throw new Error(error.message);
   }
 
   const rows: LearnedRow[] = Array.isArray(data) ? (data as LearnedRow[]) : [];
-  const map: Record<string, LearnedRow> = {};
-  for (const row of rows) {
-    if (!row || typeof row.word_id !== 'string') continue;
-    map[row.word_id] = row;
-  }
-  return map;
+  return rows.reduce<Record<string, LearnedRow>>((acc, row) => {
+    if (row && typeof row.word_id === 'string') {
+      acc[row.word_id] = row;
+    }
+    return acc;
+  }, {});
 }
 
 export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
@@ -745,7 +749,7 @@ export async function markWordAsNew(userKey: string, wordId: string): Promise<To
       next_display_at: null,
       last_seen_at: null,
       srs_interval_days: null,
-      srs_easiness: base.srs?.srs_easiness ?? 2.5,
+      srs_ease: base.srs?.srs_ease ?? 2.5,
       srs_state: 'new',
     },
   };
@@ -772,6 +776,8 @@ export async function markWordAsNew(userKey: string, wordId: string): Promise<To
 }
 
 export async function fetchProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+  const refreshed = await refreshProgressSummary(userKey);
+  if (refreshed) return refreshed;
   return getProgressSummary(userKey);
 }
 

@@ -99,7 +99,7 @@ export async function markLearnedServerByKey(
     p_next_display_at: toIso(payload?.next_display_at ?? null),
     p_last_seen_at: toIso(payload?.last_seen_at ?? null),
     p_srs_interval_days: toInt(payload?.srs_interval_days ?? null),
-    p_srs_easiness: payload?.srs_easiness ?? null,
+    p_srs_ease: payload?.srs_ease ?? null,
     p_srs_state: payload?.srs_state ?? null,
   });
 
@@ -135,8 +135,19 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
 
   const sb = getSupabaseClient();
   if (!sb) return;
-  const { data, error } = await sb.rpc('get_learned_words_by_key', { p_user_unique_key: key });
-  if (error || !Array.isArray(data)) return;
+  const { data, error } = await sb
+    .from('learned_words')
+    .select('word_id')
+    .eq('user_unique_key', key);
+
+  if (error) {
+    console.warn('bootstrapLearnedFromServerByKey', error.message);
+    return;
+  }
+
+  const rows: { word_id: string | null }[] = Array.isArray(data)
+    ? (data as { word_id: string | null }[])
+    : [];
 
   const raw = lsGet('learningProgress');
   const existing: Record<string, any> = raw
@@ -151,12 +162,13 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
 
   const nowISO = new Date().toISOString();
 
-  for (const entry of data as unknown[]) {
-    if (typeof entry !== 'string' || !entry) continue;
-    const current = existing[entry] || {};
+  for (const entry of rows) {
+    const wordId = typeof entry?.word_id === 'string' ? entry.word_id : '';
+    if (!wordId) continue;
+    const current = existing[wordId] || {};
     const statusValue = Number(current.status ?? current.status_value ?? 0);
     const safeStatus = Number.isFinite(statusValue) ? statusValue : 0;
-    existing[entry] = {
+    existing[wordId] = {
       ...current,
       status: Math.max(3, safeStatus),
       isLearned: true,
