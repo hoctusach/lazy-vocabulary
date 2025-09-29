@@ -51,10 +51,16 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
   return data ?? null;
 }
 
-export async function refreshProgressSummary(userKey: string): Promise<void> {
-  if (!userKey) return;
+export async function refreshProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+  if (!userKey) return null;
   const client = getSupabaseClient();
-  if (!client) return;
+  if (!client) return null;
+
+  await client
+    .rpc('refresh_user_progress_summary', { p_user_key: userKey })
+    .catch((error) => {
+      console.warn('progressSummary:refresh:rpc', error?.message ?? error);
+    });
 
   const { data, error } = await client
     .from('user_progress_summary')
@@ -66,21 +72,23 @@ export async function refreshProgressSummary(userKey: string): Promise<void> {
 
   if (error && error.code !== 'PGRST116') {
     console.warn('progressSummary:refresh', error.message);
-    return;
+    return null;
   }
 
-  if (data) {
-    const summary: ProgressSummaryFields = {
-      learning_count: data.learning_count ?? 0,
-      learned_count: data.learned_count ?? 0,
-      learning_due_count: data.learning_due_count ?? 0,
-      remaining_count:
-        data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
-      learning_time: data.learning_time ?? 0,
-      learned_days: normaliseDays(data.learned_days),
-    };
-    persistProgressSummaryLocal(summary);
-  }
+  if (!data) return null;
+
+  const summary: ProgressSummaryFields = {
+    learning_count: data.learning_count ?? 0,
+    learned_count: data.learned_count ?? 0,
+    learning_due_count: data.learning_due_count ?? 0,
+    remaining_count:
+      data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
+    learning_time: data.learning_time ?? 0,
+    learned_days: normaliseDays(data.learned_days),
+  };
+
+  persistProgressSummaryLocal(summary);
+  return summary;
 }
 
 export async function getProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
@@ -134,14 +142,13 @@ export async function mergeProgressSummary(
       : normaliseDays(existing?.learned_days ?? []),
   };
 
-  await client.from('user_progress_summary').upsert(
-    {
-      user_unique_key: userKey,
-      ...merged,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_unique_key' }
-  );
+  persistProgressSummaryLocal(merged);
+
+  await client
+    .rpc('refresh_user_progress_summary', { p_user_key: userKey })
+    .catch((error) => {
+      console.warn('progressSummary:merge:rpc', error?.message ?? error);
+    });
 }
 
 function isDueToday(nextReviewAt: string | null | undefined): boolean {

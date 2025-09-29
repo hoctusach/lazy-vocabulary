@@ -19,7 +19,7 @@ export type TodayWordSrs = {
   next_display_at?: string | null;
   last_seen_at?: string | null;
   srs_interval_days?: number | null;
-  srs_easiness?: number | null;
+  srs_ease?: number | null;
   srs_state?: string | null;
 };
 

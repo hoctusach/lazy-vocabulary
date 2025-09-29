@@ -12,7 +12,7 @@ export type LearnedWordUpsert = {
   next_display_at?: string | null;
   last_seen_at?: string | null;
   srs_interval_days?: number | null;
-  srs_easiness?: number | null;
+  srs_ease?: number | null;
   srs_state?: string | null;
 };
 
@@ -78,7 +78,7 @@ export async function upsertLearned(
     next_display_at: normaliseISO(payload.next_display_at),
     last_seen_at: normaliseISO(payload.last_seen_at),
     srs_interval_days: normaliseNumber(payload.srs_interval_days),
-    srs_easiness: normaliseNumber(payload.srs_easiness),
+    srs_ease: normaliseNumber(payload.srs_ease),
     srs_state: normaliseText(payload.srs_state),
   };
 
