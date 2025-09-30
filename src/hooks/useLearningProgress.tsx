@@ -70,7 +70,11 @@ export const useLearningProgress = () => {
       const { filtered, filteredCount } = await fetchLearnedWordSummaries(targetKey);
       setLearnedWords(filtered);
       setProgressStats(prev => {
-        const updated = { ...prev, learned: filteredCount };
+        const updated = {
+          ...prev,
+          learned: filteredCount,
+          total: prev.learning + prev.new + filteredCount,
+        };
         if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
           console.log('[useLearningProgress] refreshed learned count', {
             learned: filteredCount,
@@ -83,7 +87,11 @@ export const useLearningProgress = () => {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
       setProgressStats(prev => {
-        const updated = { ...prev, learned: 0 };
+        const updated = {
+          ...prev,
+          learned: 0,
+          total: prev.learning + prev.new,
+        };
         if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
           console.log('[useLearningProgress] refreshed learned count (error fallback)', {
             learned: 0,
@@ -94,6 +102,16 @@ export const useLearningProgress = () => {
       });
     }
   }, [userKey]);
+
+  const refreshSummaryAndLearned = useCallback(
+    async (key?: string) => {
+      const targetKey = key ?? userKey;
+      if (!targetKey) return;
+      await refreshStats(targetKey);
+      await refreshLearnedWords(targetKey);
+    },
+    [refreshLearnedWords, refreshStats, userKey]
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -149,8 +167,7 @@ export const useLearningProgress = () => {
         }
       }
 
-      await refreshStats(preparedKey);
-      await refreshLearnedWords(preparedKey);
+      await refreshSummaryAndLearned(preparedKey);
     };
 
     void init();
@@ -158,7 +175,7 @@ export const useLearningProgress = () => {
     return () => {
       isActive = false;
     };
-  }, [category, refreshLearnedWords, refreshStats]);
+  }, [category, refreshSummaryAndLearned]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
@@ -181,12 +198,12 @@ export const useLearningProgress = () => {
           });
         }
         await saveLocalPreferences({ daily_option: level });
-        void refreshStats(userKey);
+        await refreshSummaryAndLearned(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to regenerate daily words', error);
       }
     },
-    [category, userKey, refreshStats]
+    [category, refreshSummaryAndLearned, userKey]
   );
 
   const regenerateToday = useCallback(async () => {
@@ -208,11 +225,11 @@ export const useLearningProgress = () => {
           words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
         });
       }
-      void refreshStats(userKey);
+      await refreshSummaryAndLearned(userKey);
     } catch (error) {
       console.warn('[useLearningProgress] Failed to regenerate today\'s selection', error);
     }
-  }, [category, refreshStats, severity, userKey]);
+  }, [category, refreshSummaryAndLearned, severity, userKey]);
 
   const markWordAsPlayed = useCallback((word: string) => {
     const nowIso = new Date().toISOString();
@@ -242,15 +259,15 @@ export const useLearningProgress = () => {
         setTodayWords(result.words);
         if (result.summary) {
           setProgressStats(toStats(result.summary));
+          await refreshLearnedWords(userKey);
         } else {
-          void refreshStats(userKey);
+          await refreshSummaryAndLearned(userKey);
         }
-        void refreshLearnedWords(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to mark word learned', error);
       }
     },
-    [refreshLearnedWords, refreshStats, severity, todayWords, userKey]
+    [refreshLearnedWords, refreshSummaryAndLearned, severity, todayWords, userKey]
   );
 
   const markWordAsNew = useCallback(
@@ -265,12 +282,12 @@ export const useLearningProgress = () => {
         if (refreshed) {
           setDailySelection(refreshed.selection);
         }
-        void refreshStats(userKey);
+        await refreshSummaryAndLearned(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to reset word', error);
       }
     },
-    [refreshStats, todayWords, userKey]
+    [refreshSummaryAndLearned, todayWords, userKey]
   );
 
   const orderedTodayWords = useMemo(() => buildTodaysWords(todayWords, 'ALL'), [todayWords]);
