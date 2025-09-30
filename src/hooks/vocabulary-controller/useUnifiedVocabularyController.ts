@@ -129,6 +129,21 @@ export const useUnifiedVocabularyController = (
     selection
   );
 
+  const wordListLength = wordList.length;
+
+  useEffect(() => {
+    if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+      console.log('[UNIFIED-CONTROLLER] vocabulary data debug', {
+        initialWords: (initialWords ?? []).map(word => ({
+          word_id: word.word_id,
+          word: word.word,
+          category: word.category
+        })),
+        wordListLength,
+      });
+    }
+  }, [initialWords, wordListLength]);
+
   // Set up word completion callback with auto-advance
   const handleWordComplete = useMemo(() => {
     return () => {
