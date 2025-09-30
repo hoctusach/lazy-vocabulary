@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   prepareUserSession,
   fetchProgressSummary as fetchProgressSummaryService,
@@ -54,26 +54,51 @@ export const useLearningProgress = () => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [todayWords, setTodayWords] = useState<TodayWord[]>([]);
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
+  const learnedCountRef = useRef<number | null>(null);
   const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
+
+  const applyLearnedOverride = useCallback(
+    (stats: typeof DEFAULT_STATS) => {
+      const learnedOverride = learnedCountRef.current;
+      if (learnedOverride == null) {
+        return stats;
+      }
+      return {
+        ...stats,
+        learned: learnedOverride,
+        total: learnedOverride + stats.learning + stats.new,
+      };
+    },
+    []
+  );
 
   const refreshStats = useCallback(async (key?: string) => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
       const summary = await fetchProgressSummaryService(targetKey);
-      setProgressStats(toStats(summary));
+      setProgressStats(applyLearnedOverride(toStats(summary)));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load progress summary', error);
-      setProgressStats(DEFAULT_STATS);
+      setProgressStats(applyLearnedOverride(DEFAULT_STATS));
     }
-  }, [userKey]);
+  }, [applyLearnedOverride, userKey]);
 
   const refreshLearnedWords = useCallback(async (key?: string) => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
       const rows = await fetchLearnedWordSummaries(targetKey);
+      learnedCountRef.current = rows.length;
       setLearnedWords(rows);
+      setProgressStats(prev => {
+        const learned = rows.length;
+        return {
+          ...prev,
+          learned,
+          total: learned + prev.learning + prev.new,
+        };
+      });
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
@@ -226,7 +251,7 @@ export const useLearningProgress = () => {
         setDailySelection(result.selection);
         setTodayWords(result.words);
         if (result.summary) {
-          setProgressStats(toStats(result.summary));
+          setProgressStats(applyLearnedOverride(toStats(result.summary)));
         } else {
           void refreshStats(userKey);
         }
@@ -235,7 +260,7 @@ export const useLearningProgress = () => {
         console.warn('[useLearningProgress] Failed to mark word learned', error);
       }
     },
-    [refreshLearnedWords, refreshStats, severity, todayWords, userKey]
+    [applyLearnedOverride, refreshLearnedWords, refreshStats, severity, todayWords, userKey]
   );
 
   const markWordAsNew = useCallback(
