@@ -14,9 +14,7 @@ describe('LearningProgressPanel', () => {
     render(
       <TooltipProvider>
         <LearningProgressPanel
-          dailySelection={null}
           progressStats={progressStats}
-          onGenerateDaily={() => {}}
           learnerId="test"
         />
       </TooltipProvider>
@@ -35,9 +33,7 @@ describe('LearningProgressPanel', () => {
     render(
       <TooltipProvider>
         <LearningProgressPanel
-          dailySelection={null}
           progressStats={progressStats}
-          onGenerateDaily={() => {}}
           learnerId="test"
         />
       </TooltipProvider>

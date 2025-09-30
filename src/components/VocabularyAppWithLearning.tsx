@@ -26,8 +26,6 @@ const VocabularyAppWithLearning: React.FC = () => {
   const {
     dailySelection,
     progressStats,
-    generateDailyWords,
-    regenerateToday,
     markWordAsPlayed,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
@@ -87,10 +85,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     <TooltipProvider>
       <div className="space-y-4 mt-4">
       <LearningProgressPanel
-        dailySelection={dailySelection}
         progressStats={progressStats}
-        onGenerateDaily={generateDailyWords}
-        onRegenerateToday={regenerateToday}
         learnerId="default"
       />
 
