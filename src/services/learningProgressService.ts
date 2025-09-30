@@ -32,13 +32,17 @@ type DailySelectionRow = {
   word_id: string;
   category: string | null;
   is_due: boolean | null;
+  word?: string | null;
+  meaning?: string | null;
+  example?: string | null;
+  translation?: string | null;
 };
 
 type VocabularyRow = {
   word_id: string;
-  word: string;
-  meaning: string;
-  example: string;
+  word?: string | null;
+  meaning?: string | null;
+  example?: string | null;
   translation?: string | null;
   category?: string | null;
   count?: number | string | null;
@@ -204,16 +208,24 @@ function coerceCategory(category?: string | null): string {
   return trimmed || 'general';
 }
 
+function deriveWordFromId(wordId: string): string {
+  const segments = wordId.split('::');
+  const candidate = segments[segments.length - 1]?.trim();
+  return candidate || wordId;
+}
+
 function getDailyCount(severity: SeverityLevel): number {
   const config = DEFAULT_SEVERITY_CONFIG[severity] ?? DEFAULT_SEVERITY_CONFIG.light;
   return config.max;
 }
 
 function buildTodayWord(
-  selectionRow: DailySelectionRow,
-  vocab: VocabularyRow,
+  selectionRow: DailySelectionRow | null | undefined,
+  vocab: VocabularyRow | undefined,
   learned?: LearnedRow
-): TodayWord {
+): TodayWord | null {
+  if (!selectionRow?.word_id) return null;
+
   const srs: TodayWordSrs | undefined = learned
     ? {
         in_review_queue: learned.in_review_queue,
@@ -229,15 +241,23 @@ function buildTodayWord(
       }
     : undefined;
 
+  const word = selectionRow.word ?? vocab?.word ?? deriveWordFromId(selectionRow.word_id);
+  const meaning = selectionRow.meaning ?? vocab?.meaning ?? '';
+  const example = selectionRow.example ?? vocab?.example ?? '';
+  const translation = selectionRow.translation ?? vocab?.translation ?? null;
+  const count = vocab?.count ?? 0;
+  const category = selectionRow.category ?? vocab?.category ?? null;
+  const isDueFlag = selectionRow.is_due ?? vocab?.is_due ?? false;
+
   return {
     word_id: selectionRow.word_id,
-    word: vocab.word,
-    meaning: vocab.meaning,
-    example: vocab.example,
-    translation: vocab.translation ?? undefined,
-    count: vocab.count ?? 0,
-    category: coerceCategory(vocab.category ?? selectionRow.category ?? undefined),
-    is_due: Boolean(selectionRow.is_due) || isReviewCandidate(srs),
+    word,
+    meaning,
+    example,
+    translation: translation ?? undefined,
+    count,
+    category: coerceCategory(category ?? undefined),
+    is_due: Boolean(isDueFlag) || isReviewCandidate(srs),
     nextAllowedTime: srs?.next_display_at ?? undefined,
     srs,
   };
@@ -392,10 +412,11 @@ function normalizeToDailySelection(
   const mapped: TodayWord[] = [];
 
   for (const row of selectionRows) {
-    const vocab = row?.word_id ? vocabMap.get(row.word_id) : undefined;
-    if (!row?.word_id || !vocab) continue;
+    if (!row?.word_id) continue;
+    const vocab = vocabMap.get(row.word_id);
     const learned = srsMap[row.word_id];
-    mapped.push(buildTodayWord(row, vocab, learned));
+    const todayWord = buildTodayWord(row, vocab, learned);
+    if (todayWord) mapped.push(todayWord);
   }
 
   const ordered = buildTodaysWords(mapped, 'ALL');
@@ -626,14 +647,24 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   const srsMap = await fetchSrsRows(userKey, ids);
   const vocabRows = ids
     .map((id) => {
-      const vocab = vocabMap[id];
-      if (!vocab) return null;
       const selection = selectionById.get(id);
-      const next: VocabularyRow = {
-        ...vocab,
-        is_due: Boolean(selection?.is_due),
+      const vocab = vocabMap[id];
+
+      if (!selection && !vocab) return null;
+
+      const merged: VocabularyRow = {
+        ...(vocab ?? {}),
+        word_id: id,
+        word: selection?.word ?? vocab?.word ?? deriveWordFromId(id),
+        meaning: selection?.meaning ?? vocab?.meaning ?? '',
+        example: selection?.example ?? vocab?.example ?? '',
+        translation: selection?.translation ?? vocab?.translation ?? null,
+        category: selection?.category ?? vocab?.category ?? null,
+        count: vocab?.count ?? 0,
+        is_due: selection?.is_due ?? vocab?.is_due ?? null,
       };
-      return next;
+
+      return merged;
     })
     .filter((row): row is VocabularyRow => Boolean(row));
 
@@ -649,6 +680,7 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   );
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[Normalized TodayWords]', today.words);
     console.log('[LearningProgress] fetchAndCommitTodaySelection vocab details', {
       words: today.words.map((word) => ({
         word_id: word.word_id,

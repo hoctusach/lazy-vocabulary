@@ -102,6 +102,10 @@ export type DailySelectionV2Row = {
   word_id: string;
   category: string | null;
   is_due: boolean | null;
+  word?: string | null;
+  meaning?: string | null;
+  example?: string | null;
+  translation?: string | null;
 };
 
 export async function getDailySelectionV2(

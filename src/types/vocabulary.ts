@@ -23,10 +23,16 @@ export type TodayWordSrs = {
   srs_state?: string | null;
 };
 
-export interface TodayWord extends VocabularyWord {
+export interface TodayWord {
   word_id: string;
+  word: string;
+  meaning: string;
+  example: string;
+  translation?: string;
+  count: number | string;
   category: string;
   is_due: boolean;
+  nextAllowedTime?: string;
   srs?: TodayWordSrs | null;
 }
 
