@@ -8,6 +8,7 @@ export type ProgressSummaryFields = {
   remaining_count: number;
   learning_time: number;
   learned_days: string[];
+  updated_at: string | null;
 };
 
 type PartialSummary = Partial<ProgressSummaryFields>;
@@ -19,6 +20,7 @@ type SummaryRow = {
   remaining_count: number | null;
   learning_time: number | null;
   learned_days: string[] | null;
+  updated_at: string | null;
 };
 
 export function persistProgressSummaryLocal(summary: ProgressSummaryFields): void {
@@ -31,77 +33,154 @@ export function persistProgressSummaryLocal(summary: ProgressSummaryFields): voi
   }
 }
 
+function readProgressSummaryLocal(): SummaryRow | null {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem('progressSummary');
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as Partial<ProgressSummaryFields>;
+    const toNumber = (v: unknown) =>
+      typeof v === 'number' && Number.isFinite(v) ? v : null;
+    const toString = (v: unknown) => (typeof v === 'string' ? v : null);
+
+    return {
+      learning_count: toNumber(parsed.learning_count),
+      learned_count: toNumber(parsed.learned_count),
+      learning_due_count: toNumber(parsed.learning_due_count),
+      remaining_count: toNumber(parsed.remaining_count),
+      learning_time: toNumber(parsed.learning_time),
+      learned_days: Array.isArray(parsed.learned_days)
+        ? parsed.learned_days.filter((d): d is string => typeof d === 'string')
+        : null,
+      updated_at: toString(parsed.updated_at),
+    };
+  } catch (e) {
+    console.warn('progressSummary:readLocal', e);
+    return null;
+  }
+}
+
 async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null> {
   const client = getSupabaseClient();
   if (!client) return null;
 
+  const local = readProgressSummaryLocal();
+
   const { data, error } = await client
     .from('user_progress_summary')
-    .select(
-      'learning_count, learned_count, learning_due_count, remaining_count, learning_time, learned_days'
-    )
+    .select('learning_count, learned_count, learning_due_count, remaining_count, updated_at')
     .eq('user_unique_key', userKey)
-    .maybeSingle<SummaryRow>();
+    .maybeSingle<Pick<
+      SummaryRow,
+      'learning_count' | 'learned_count' | 'learning_due_count' | 'remaining_count' | 'updated_at'
+    >>();
 
-  if (error && error.code !== 'PGRST116') {
+  // PGRST116 = no rows; fall back to local cache if present
+  if (error && (error as any).code !== 'PGRST116') {
     console.warn('progressSummary:fetchExistingSummary', error.message);
-    return null;
+    return local;
   }
+  const counts = data ?? null;
+  if (!counts && !local) return null;
 
-  return data ?? null;
+  const learnedCount = counts?.learned_count ?? local?.learned_count ?? 0;
+
+  return {
+    learning_count: counts?.learning_count ?? local?.learning_count ?? 0,
+    learned_count: learnedCount,
+    learning_due_count: counts?.learning_due_count ?? local?.learning_due_count ?? 0,
+    remaining_count:
+      counts?.remaining_count ??
+      local?.remaining_count ??
+      Math.max(TOTAL_WORDS - learnedCount, 0),
+    learning_time: local?.learning_time ?? 0,          // not stored server-side in schema you showed
+    learned_days: local?.learned_days ?? null,         // local-only detail
+    updated_at: counts?.updated_at ?? local?.updated_at ?? null,
+  };
 }
 
-export async function refreshProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+export async function refreshProgressSummary(
+  userKey: string
+): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
   const client = getSupabaseClient();
   if (!client) return null;
 
+  const local = readProgressSummaryLocal();
+
+  // Server recompute (SECURITY DEFINER RPC)
   await client
     .rpc('refresh_user_progress_summary', { p_user_key: userKey })
-    .catch((error) => {
-      console.warn('progressSummary:refresh:rpc', error?.message ?? error);
+    .catch((err) => {
+      console.warn('progressSummary:refresh:rpc', err?.message ?? err);
     });
 
   const { data, error } = await client
     .from('user_progress_summary')
-    .select(
-      'learning_count, learned_count, learning_due_count, remaining_count, learning_time, learned_days'
-    )
+    .select('learning_count, learned_count, learning_due_count, remaining_count, updated_at')
     .eq('user_unique_key', userKey)
-    .maybeSingle<SummaryRow>();
+    .maybeSingle<Pick<
+      SummaryRow,
+      'learning_count' | 'learned_count' | 'learning_due_count' | 'remaining_count' | 'updated_at'
+    >>();
 
-  if (error && error.code !== 'PGRST116') {
+  if (error && (error as any).code !== 'PGRST116') {
     console.warn('progressSummary:refresh', error.message);
-    return null;
+
+    if (!local) return null;
+    const fallback: ProgressSummaryFields = {
+      learning_count: local.learning_count ?? 0,
+      learned_count: local.learned_count ?? 0,
+      learning_due_count: local.learning_due_count ?? 0,
+      remaining_count:
+        local.remaining_count ?? Math.max(TOTAL_WORDS - (local.learned_count ?? 0), 0),
+      learning_time: local.learning_time ?? 0,
+      learned_days: normaliseDays(local.learned_days),
+      updated_at: local.updated_at ?? null,
+    };
+    persistProgressSummaryLocal(fallback);
+    return fallback;
   }
 
-  if (!data) return null;
+  if (!data && !local) return null;
+
+  const learnedCount = (data?.learned_count ?? local?.learned_count) ?? 0;
 
   const summary: ProgressSummaryFields = {
-    learning_count: data.learning_count ?? 0,
-    learned_count: data.learned_count ?? 0,
-    learning_due_count: data.learning_due_count ?? 0,
+    learning_count: data?.learning_count ?? local?.learning_count ?? 0,
+    learned_count: learnedCount,
+    learning_due_count: data?.learning_due_count ?? local?.learning_due_count ?? 0,
     remaining_count:
-      data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
-    learning_time: data.learning_time ?? 0,
-    learned_days: normaliseDays(data.learned_days),
+      data?.remaining_count ??
+      local?.remaining_count ??
+      Math.max(TOTAL_WORDS - learnedCount, 0),
+    learning_time: local?.learning_time ?? 0,
+    learned_days: normaliseDays(local?.learned_days),
+    updated_at: data?.updated_at ?? local?.updated_at ?? null,
   };
 
   persistProgressSummaryLocal(summary);
   return summary;
 }
 
-export async function getProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
+export async function getProgressSummary(
+  userKey: string
+): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
   const existing = await fetchExistingSummary(userKey);
   if (!existing) return null;
+
+  const learnedCount = existing.learned_count ?? 0;
+
   return {
     learning_count: existing.learning_count ?? 0,
-    learned_count: existing.learned_count ?? 0,
+    learned_count: learnedCount,
     learning_due_count: existing.learning_due_count ?? 0,
-    remaining_count: existing.remaining_count ?? Math.max(TOTAL_WORDS - (existing.learned_count ?? 0), 0),
+    remaining_count: existing.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
     learning_time: existing.learning_time ?? 0,
-    learned_days: normaliseDays(existing.learned_days)
+    learned_days: normaliseDays(existing.learned_days),
+    updated_at: existing.updated_at ?? null,
   };
 }
 
@@ -140,6 +219,7 @@ export async function mergeProgressSummary(
     learned_days: updates.learned_days
       ? normaliseDays(updates.learned_days)
       : normaliseDays(existing?.learned_days ?? []),
+    updated_at: updates.updated_at ?? existing?.updated_at ?? null,
   };
 
   persistProgressSummaryLocal(merged);

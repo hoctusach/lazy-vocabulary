@@ -9,6 +9,9 @@ export type ProgressSummary = {
   learned_count: number;
   learning_due_count: number;
   remaining_count: number;
+  learning_time: number;
+  learned_days: string[];
+  updated_at: string | null;
 };
 
 // Hard-coded total number of vocabulary words used for progress calculations
@@ -108,18 +111,22 @@ export async function markLearnedServerByKey(
     return null;
   }
 
-  if (data) {
-    persistProgressSummaryLocal({
-      learning_count: data.learning_count ?? 0,
-      learned_count: data.learned_count ?? 0,
-      learning_due_count: data.learning_due_count ?? 0,
-      remaining_count: data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
-      learning_time: data.learning_time ?? 0,
-      learned_days: Array.isArray(data.learned_days) ? data.learned_days : [],
-    });
+  if (!data) {
+    return null;
   }
 
-  return data as ProgressSummary;
+  const summary: ProgressSummary = {
+    learning_count: data.learning_count ?? 0,
+    learned_count: data.learned_count ?? 0,
+    learning_due_count: data.learning_due_count ?? 0,
+    remaining_count: data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
+    learning_time: data.learning_time ?? 0,
+    learned_days: Array.isArray(data.learned_days) ? data.learned_days : [],
+    updated_at: typeof data.updated_at === 'string' ? data.updated_at : null,
+  };
+
+  persistProgressSummaryLocal(summary);
+  return summary;
 }
 
 /**

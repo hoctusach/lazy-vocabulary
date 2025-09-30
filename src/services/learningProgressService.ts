@@ -541,15 +541,16 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   return map;
 }
 
-async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<string, LearnedRow>> {
+async function fetchSrsRows(
+  userKey: string,
+  wordIds: string[]
+): Promise<Record<string, LearnedRow>> {
   const client = getSupabaseClient();
   if (!client) throw new Error('Supabase client unavailable');
 
   let query = client
     .from('learned_words')
-    .select(
-      'word_id,in_review_queue,review_count,learned_at,last_review_at,next_review_at,next_display_at,last_seen_at,srs_interval_days,srs_ease,srs_state'
-    )
+    .select('word_id,in_review_queue,next_review_at,review_count,srs_state,srs_ease')
     .eq('user_unique_key', userKey);
 
   if (Array.isArray(wordIds) && wordIds.length > 0) {
@@ -561,11 +562,26 @@ async function fetchSrsRows(userKey: string, wordIds: string[]): Promise<Record<
     throw new Error(error.message);
   }
 
-  const rows: LearnedRow[] = Array.isArray(data) ? (data as LearnedRow[]) : [];
+  const rows = Array.isArray(data) ? (data as Partial<LearnedRow>[]) : [];
+
   return rows.reduce<Record<string, LearnedRow>>((acc, row) => {
-    if (row && typeof row.word_id === 'string') {
-      acc[row.word_id] = row;
-    }
+    const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
+    if (!wordId) return acc;
+
+    // Fill only what we fetched; keep other fields null-safe.
+    acc[wordId] = {
+      word_id: wordId,
+      in_review_queue: row?.in_review_queue ?? null,
+      review_count: row?.review_count ?? null,
+      learned_at: null,
+      last_review_at: null,
+      next_review_at: row?.next_review_at ?? null,
+      next_display_at: null,
+      last_seen_at: null,
+      srs_interval_days: null,
+      srs_ease: row?.srs_ease ?? null,
+      srs_state: row?.srs_state ?? null,
+    };
     return acc;
   }, {});
 }
