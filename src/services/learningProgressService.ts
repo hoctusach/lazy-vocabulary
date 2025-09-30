@@ -835,7 +835,20 @@ export async function fetchLearnedWordSummaries(
 
   const { data, error } = await client
     .from('learned_words')
-    .select('word_id,learned_at')
+    .select(
+      [
+        'word_id',
+        'in_review_queue',
+        'next_review_at',
+        'review_count',
+        'srs_state',
+        'srs_ease',
+        'learned_at',
+        'last_review_at',
+        'next_display_at',
+        'last_seen_at',
+      ].join(',')
+    )
     .eq('user_unique_key', userKey)
     .order('learned_at', { ascending: false });
 
@@ -844,15 +857,34 @@ export async function fetchLearnedWordSummaries(
     return [];
   }
 
-  return (Array.isArray(data) ? data : []).map((row) => {
+  const rawRows = Array.isArray(data) ? (data as LearnedRow[]) : [];
+  const learnedRows = rawRows.filter((row): row is LearnedRow => row?.srs_state === 'learned');
+
+  const summaries = learnedRows.map((row) => {
     const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
     const [word, category] = wordId.split('::');
+    const learnedDate =
+      toIsoDate(row?.learned_at) ??
+      toIsoDate(row?.last_review_at) ??
+      toIsoDate(row?.next_review_at) ??
+      undefined;
+
     return {
       word: word || wordId,
       category: category || undefined,
-      learnedDate: typeof row?.learned_at === 'string' ? row.learned_at : undefined,
+      learnedDate,
     };
   });
+
+  if (process.env.DEBUG_PROGRESS) {
+    console.debug('[LearningProgress] Learned summary debug', {
+      rawCount: rawRows.length,
+      filteredCount: learnedRows.length,
+      summary: summaries,
+    });
+  }
+
+  return summaries;
 }
 
 export async function regenerateTodaySelection(
