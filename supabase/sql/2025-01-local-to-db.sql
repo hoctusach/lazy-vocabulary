@@ -43,7 +43,7 @@ create table if not exists public.learned_words (
   next_display_at timestamptz,
   last_seen_at timestamptz,
   srs_interval_days integer,
-  srs_easiness numeric,
+  srs_ease numeric,
   srs_state text,
   primary key (user_unique_key, word_id)
 );

@@ -51,7 +51,7 @@ create or replace function public.mark_word_learned_by_key(
   p_next_display_at timestamptz default null,
   p_last_seen_at timestamptz default null,
   p_srs_interval_days integer default null,
-  p_srs_easiness numeric default null,
+  p_srs_ease numeric default null,
   p_srs_state text default null
 )
 returns jsonb
@@ -83,7 +83,7 @@ begin
     next_display_at,
     last_seen_at,
     srs_interval_days,
-    srs_easiness,
+    srs_ease,
     srs_state
   )
   values (
@@ -97,7 +97,7 @@ begin
     coalesce(p_next_display_at, p_next_review_at),
     coalesce(p_last_seen_at, v_marked_at),
     p_srs_interval_days,
-    p_srs_easiness,
+    p_srs_ease,
     p_srs_state
   )
   on conflict (user_unique_key, word_id)
@@ -110,7 +110,7 @@ begin
     next_display_at = excluded.next_display_at,
     last_seen_at = excluded.last_seen_at,
     srs_interval_days = excluded.srs_interval_days,
-    srs_easiness = excluded.srs_easiness,
+    srs_ease = excluded.srs_ease,
     srs_state = excluded.srs_state;
 
   with progress as (
