@@ -3,6 +3,7 @@ import {
   prepareUserSession,
   fetchProgressSummary as fetchProgressSummaryService,
   fetchLearnedWordSummaries,
+  type LearnedWordSummaryRow,
   loadTodayWordsFromLocal,
   isToday,
   matchesCurrentOptions,
@@ -29,12 +30,6 @@ const DEFAULT_STATS = {
   learned: 0
 };
 
-type LearnedWordSummary = {
-  word: string;
-  category?: string;
-  learnedDate?: string;
-};
-
 function toStats(summary: ProgressSummaryFields | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
   const total = summary.learning_count + summary.learned_count + summary.remaining_count;
@@ -54,7 +49,7 @@ export const useLearningProgress = () => {
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [todayWords, setTodayWords] = useState<TodayWord[]>([]);
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
-  const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
+  const [learnedWords, setLearnedWords] = useState<LearnedWordSummaryRow[]>([]);
 
   const refreshStats = useCallback(async (key?: string) => {
     const targetKey = key ?? userKey;
@@ -72,11 +67,31 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const rows = await fetchLearnedWordSummaries(targetKey);
-      setLearnedWords(rows);
+      const { filtered, filteredCount } = await fetchLearnedWordSummaries(targetKey);
+      setLearnedWords(filtered);
+      setProgressStats(prev => {
+        const updated = { ...prev, learned: filteredCount };
+        if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+          console.log('[useLearningProgress] refreshed learned count', {
+            learned: filteredCount,
+            total: updated.total,
+          });
+        }
+        return updated;
+      });
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
+      setProgressStats(prev => {
+        const updated = { ...prev, learned: 0 };
+        if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+          console.log('[useLearningProgress] refreshed learned count (error fallback)', {
+            learned: 0,
+            total: updated.total,
+          });
+        }
+        return updated;
+      });
     }
   }, [userKey]);
 

@@ -823,15 +823,23 @@ export async function fetchProgressSummary(userKey: string): Promise<ProgressSum
   return getProgressSummary(userKey);
 }
 
-export async function fetchLearnedWordSummaries(
-  userKey: string
-): Promise<{
+export type LearnedWordSummaryRow = {
   word: string;
   category?: string;
   learnedDate?: string;
-}[]> {
+};
+
+export async function fetchLearnedWordSummaries(
+  userKey: string
+): Promise<{
+  rows: LearnedWordSummaryRow[];
+  filtered: LearnedWordSummaryRow[];
+  filteredCount: number;
+}> {
   const client = getSupabaseClient();
-  if (!client) return [];
+  if (!client) {
+    return { rows: [], filtered: [], filteredCount: 0 };
+  }
 
   const { data, error } = await client
     .from('learned_words')
@@ -841,10 +849,10 @@ export async function fetchLearnedWordSummaries(
 
   if (error) {
     console.warn('[LearningProgress] Failed to fetch learned words', error.message);
-    return [];
+    return { rows: [], filtered: [], filteredCount: 0 };
   }
 
-  return (Array.isArray(data) ? data : []).map((row) => {
+  const rows: LearnedWordSummaryRow[] = (Array.isArray(data) ? data : []).map((row) => {
     const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
     const [word, category] = wordId.split('::');
     return {
@@ -853,6 +861,22 @@ export async function fetchLearnedWordSummaries(
       learnedDate: typeof row?.learned_at === 'string' ? row.learned_at : undefined,
     };
   });
+
+  const filteredMap = new Map<string, LearnedWordSummaryRow>();
+  for (const entry of rows) {
+    const key = `${entry.word}::${entry.category ?? ''}`;
+    if (!filteredMap.has(key)) {
+      filteredMap.set(key, entry);
+    }
+  }
+
+  const filtered = Array.from(filteredMap.values());
+
+  return {
+    rows,
+    filtered,
+    filteredCount: filtered.length,
+  };
 }
 
 export async function regenerateTodaySelection(
