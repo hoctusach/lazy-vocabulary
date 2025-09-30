@@ -120,6 +120,11 @@ export const useLearningProgress = () => {
         if (!isActive) return;
         setDailySelection(result.selection);
         setTodayWords(result.words);
+        if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+          console.log('[useLearningProgress] setTodayWords from init', {
+            words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
+          });
+        }
       } catch (error) {
         if (!isActive) return;
         console.warn('[useLearningProgress] Failed to load today\'s words', error);
@@ -155,6 +160,11 @@ export const useLearningProgress = () => {
         setSeverity(level);
         setDailySelection(result.selection);
         setTodayWords(result.words);
+        if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+          console.log('[useLearningProgress] setTodayWords from generateDailyWords', {
+            words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
+          });
+        }
         await saveLocalPreferences({ daily_option: level });
         void refreshStats(userKey);
       } catch (error) {
@@ -178,6 +188,11 @@ export const useLearningProgress = () => {
       });
       setDailySelection(result.selection);
       setTodayWords(result.words);
+      if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+        console.log('[useLearningProgress] setTodayWords from regenerateToday', {
+          words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
+        });
+      }
       void refreshStats(userKey);
     } catch (error) {
       console.warn('[useLearningProgress] Failed to regenerate today\'s selection', error);

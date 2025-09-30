@@ -518,6 +518,10 @@ async function generateDailySelectionV2(
     count,
     category: category ?? null,
   });
+
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] getDailySelectionV2 raw payload', rows);
+  }
   return rows;
 }
 
@@ -535,8 +539,20 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   const rows: VocabularyRow[] = Array.isArray(data) ? (data as VocabularyRow[]) : [];
   const map: Record<string, VocabularyRow> = {};
   for (const row of rows) {
-    if (!row || typeof row.word_id !== 'string') continue;
-    map[row.word_id] = row;
+    if (!row) continue;
+    const rawId = typeof row.word_id === 'string' && row.word_id.length > 0 ? row.word_id : null;
+    const rawWord = typeof row.word === 'string' && row.word.length > 0 ? row.word : null;
+    const key = rawId ?? rawWord;
+    if (!key) continue;
+    const normalized: VocabularyRow = {
+      ...row,
+      word_id: rawId ?? key,
+      word: rawWord ?? key,
+    };
+    map[normalized.word_id] = normalized;
+    if (normalized.word !== normalized.word_id) {
+      map[normalized.word] = normalized;
+    }
   }
   return map;
 }
@@ -631,6 +647,16 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
     srsMap,
     { mode, count, category: category ?? null }
   );
+
+  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] fetchAndCommitTodaySelection vocab details', {
+      words: today.words.map((word) => ({
+        word_id: word.word_id,
+        category: word.category,
+        word: word.word,
+      })),
+    });
+  }
 
   saveTodayWordsToLocal(userKey, today);
 
