@@ -1,6 +1,38 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
+import { getAuthHeader } from './auth';
 import { resolveSupabaseConfig } from './db/supabase';
+
+function isValidJwt(token: string): boolean {
+  const parts = token.split('.');
+  return parts.length === 3 && parts.every((part) => part.length > 0);
+}
+
+function getSessionAuthorization(): string | null {
+  const auth = getAuthHeader();
+  const raw = auth.Authorization ?? auth.authorization;
+  const normalized = raw?.trim();
+  if (!normalized) return null;
+
+  const token = normalized.split(/\s+/).slice(-1)[0] ?? '';
+  if (!isValidJwt(token)) return null;
+
+  return normalized;
+}
+
+const authorizedFetch: typeof fetch = (input, init = {}) => {
+  const authHeader = getSessionAuthorization();
+  if (!authHeader) {
+    return fetch(input, init);
+  }
+
+  const headers = new Headers(init.headers ?? {});
+  if (!headers.has('authorization')) {
+    headers.set('Authorization', authHeader);
+  }
+
+  return fetch(input, { ...init, headers });
+};
 
 let client: SupabaseClient | null = null;
 
@@ -26,6 +58,9 @@ export function getSupabaseClient(): SupabaseClient {
       persistSession: false,
       autoRefreshToken: false,
       detectSessionInUrl: false,
+    },
+    global: {
+      fetch: authorizedFetch,
     },
   });
 
