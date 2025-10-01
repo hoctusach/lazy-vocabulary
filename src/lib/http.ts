@@ -7,7 +7,20 @@ export async function apiFetchAbsolute(url: string, init: RequestInit = {}) {
   // Attach Authorization only for our Edge Functions
   if (url.startsWith(EDGE_BASE_URL)) {
     const auth = getAuthHeader();
-    for (const [k, v] of Object.entries(auth)) headers.set(k, v);
+    for (const [key, value] of Object.entries(auth)) {
+      const normalizedValue = value?.trim();
+      if (!normalizedValue) continue;
+
+      if (key.toLowerCase() === 'authorization') {
+        const token = normalizedValue.split(/\s+/).slice(-1)[0] ?? '';
+        const parts = token.split('.');
+        if (parts.length !== 3 || parts.some((part) => !part.length)) {
+          continue;
+        }
+      }
+
+      headers.set(key, normalizedValue);
+    }
   }
 
   if (!headers.has('Content-Type') && !(init.body instanceof FormData)) {
