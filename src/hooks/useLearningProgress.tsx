@@ -19,6 +19,11 @@ import type { TodayWord } from '@/types/vocabulary';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 import { bootstrapLearnedFromServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import type { ProgressSummaryFields } from '@/lib/progress/progressSummary';
+import {
+  legacySummaryToDerived,
+  type DerivedProgressSummary,
+  type LearnedWordSummary,
+} from '@/lib/progress/learnedWordStats';
 import { buildTodaysWords } from '@/utils/todayWords';
 
 const DEFAULT_STATS = {
@@ -29,21 +34,15 @@ const DEFAULT_STATS = {
   learned: 0
 };
 
-type LearnedWordSummary = {
-  word: string;
-  category?: string;
-  learnedDate?: string;
-};
-
-function toStats(summary: ProgressSummaryFields | null): typeof DEFAULT_STATS {
+function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
-  const total = summary.learning_count + summary.learned_count + summary.remaining_count;
+  const total = summary.learned + summary.learning + summary.new;
   return {
     total,
-    learning: summary.learning_count,
-    new: summary.remaining_count,
-    due: summary.learning_due_count,
-    learned: summary.learned_count
+    learning: summary.learning,
+    new: summary.new,
+    due: summary.due,
+    learned: summary.learned
   };
 }
 
@@ -77,7 +76,8 @@ export const useLearningProgress = () => {
     if (!targetKey) return;
     try {
       const summary = await fetchProgressSummaryService(targetKey);
-      setProgressStats(applyLearnedOverride(toStats(summary)));
+      const derived = legacySummaryToDerived(summary);
+      setProgressStats(applyLearnedOverride(toStats(derived)));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load progress summary', error);
       setProgressStats(applyLearnedOverride(DEFAULT_STATS));
@@ -250,12 +250,17 @@ export const useLearningProgress = () => {
         const result = await markWordReviewed(userKey, target.word_id, severity);
         setDailySelection(result.selection);
         setTodayWords(result.words);
+        if (result.learnedWords) {
+          learnedCountRef.current = result.learnedWords.length;
+          setLearnedWords(result.learnedWords);
+        } else {
+          void refreshLearnedWords(userKey);
+        }
         if (result.summary) {
           setProgressStats(applyLearnedOverride(toStats(result.summary)));
         } else {
           void refreshStats(userKey);
         }
-        void refreshLearnedWords(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to mark word learned', error);
       }
