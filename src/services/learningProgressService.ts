@@ -8,9 +8,15 @@ import {
   refreshProgressSummary,
   type ProgressSummaryFields,
 } from '@/lib/progress/progressSummary';
-import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
+import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { buildTodaysWords } from '@/utils/todayWords';
+import {
+  computeLearnedWordStats,
+  type DerivedProgressSummary,
+  type LearnedWordRow,
+  type LearnedWordSummary,
+} from '@/lib/progress/learnedWordStats';
 
 export type GenerateParams = {
   userKey: string;
@@ -47,20 +53,6 @@ type VocabularyRow = {
   category?: string | null;
   count?: number | string | null;
   is_due?: boolean | null;
-};
-
-type LearnedRow = {
-  word_id: string;
-  in_review_queue: boolean | null;
-  review_count: number | null;
-  learned_at: string | null;
-  last_review_at: string | null;
-  next_review_at: string | null;
-  next_display_at: string | null;
-  last_seen_at: string | null;
-  srs_interval_days: number | null;
-  srs_ease: number | null;
-  srs_state: string | null;
 };
 
 type SelectionNormalizationMeta = {
@@ -758,7 +750,8 @@ export async function markWordReviewed(
   selection: DailySelection;
   payload: LearnedWordUpsert;
   progress: LearningProgress;
-  summary: ProgressSummaryFields | null;
+  summary: DerivedProgressSummary | null;
+  learnedWords: LearnedWordSummary[] | null;
 }> {
   const cached = loadTodayWordsFromLocal(userKey);
   if (!cached) {
@@ -791,7 +784,18 @@ export async function markWordReviewed(
 
   saveTodayWordsToLocal(userKey, nextCache);
 
-  const summary = await markLearnedServerByKey(wordId, payload);
+  const rows = await markLearnedServerByKey(wordId, payload);
+
+  let summary: DerivedProgressSummary | null = null;
+  let learnedSummaries: LearnedWordSummary[] | null = null;
+
+  if (rows) {
+    const { learnedWords: derivedWords, summary: derivedSummary } = computeLearnedWordStats(rows, {
+      totalWords: TOTAL_WORDS,
+    });
+    summary = derivedSummary;
+    learnedSummaries = derivedWords;
+  }
 
   return {
     words,
@@ -799,6 +803,7 @@ export async function markWordReviewed(
     payload,
     progress,
     summary,
+    learnedWords: learnedSummaries,
   };
 }
 
@@ -889,29 +894,15 @@ export async function fetchLearnedWordSummaries(
     return [];
   }
 
-  const rawRows = Array.isArray(data) ? (data as LearnedRow[]) : [];
-  const learnedRows = rawRows.filter((row): row is LearnedRow => row?.srs_state === 'learned');
-
-  const summaries = learnedRows.map((row) => {
-    const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
-    const [word, category] = wordId.split('::');
-    const learnedDate =
-      toIsoDate(row?.learned_at) ??
-      toIsoDate(row?.last_review_at) ??
-      toIsoDate(row?.next_review_at) ??
-      undefined;
-
-    return {
-      word: word || wordId,
-      category: category || undefined,
-      learnedDate,
-    };
+  const rawRows = Array.isArray(data) ? (data as LearnedWordRow[]) : [];
+  const { learnedWords: summaries } = computeLearnedWordStats(rawRows, {
+    totalWords: TOTAL_WORDS,
   });
 
   if (process.env.DEBUG_PROGRESS) {
     console.debug('[LearningProgress] Learned summary debug', {
       rawCount: rawRows.length,
-      filteredCount: learnedRows.length,
+      filteredCount: summaries.length,
       summary: summaries,
     });
   }

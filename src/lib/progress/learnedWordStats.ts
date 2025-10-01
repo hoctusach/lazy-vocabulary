@@ -1,0 +1,137 @@
+import type { ProgressSummaryFields } from './progressSummary';
+
+type Nullable<T> = T | null | undefined;
+
+export type LearnedWordRow = {
+  word_id: string | null;
+  srs_state: string | null;
+  learned_at: string | null;
+  last_review_at: string | null;
+  next_review_at: string | null;
+  next_display_at: string | null;
+  in_review_queue: boolean | null;
+  review_count: number | null;
+  srs_interval_days: number | null;
+  srs_ease: number | null;
+};
+
+export type LearnedWordSummary = {
+  word: string;
+  category?: string;
+  learnedDate?: string;
+};
+
+export type DerivedProgressSummary = {
+  learned: number;
+  learning: number;
+  new: number;
+  due: number;
+  remaining: number;
+};
+
+type ComputeOptions = {
+  now?: Date;
+  totalWords?: number;
+};
+
+// Normalizes arbitrary timestamp input into a consistent ISO string so that
+// date-only values (e.g. "2024-02-01") and timezone-offset strings can be
+// compared safely. Invalid inputs resolve to null.
+function normaliseIso(value: Nullable<string>): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const parsed = Date.parse(trimmed);
+  if (Number.isNaN(parsed)) return null;
+  return new Date(parsed).toISOString();
+}
+
+function toDateKey(date: Date): string {
+  return date.toISOString().slice(0, 10);
+}
+
+function matchesToday(value: Nullable<string>, today: Date): boolean {
+  const iso = normaliseIso(value);
+  if (!iso) return false;
+  return iso.slice(0, 10) === toDateKey(today);
+}
+
+function isDue(row: LearnedWordRow, now: Date): boolean {
+  const candidates: (Nullable<string>)[] = [row.next_review_at, row.next_display_at, row.learned_at];
+  for (const candidate of candidates) {
+    const iso = normaliseIso(candidate);
+    if (!iso) continue;
+    const parsed = Date.parse(iso);
+    if (!Number.isNaN(parsed) && parsed <= now.getTime()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function toLearnedSummary(row: LearnedWordRow): LearnedWordSummary | null {
+  const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
+  if (!wordId) return null;
+  const [word, category] = wordId.split('::');
+  const learnedDate =
+    normaliseIso(row.learned_at) ??
+    normaliseIso(row.last_review_at) ??
+    normaliseIso(row.next_review_at) ??
+    undefined;
+  return {
+    word: word || wordId,
+    category: category || undefined,
+    learnedDate,
+  };
+}
+
+/**
+ * Shapes the Supabase learned_words RPC payload into UI friendly learned word
+ * summaries and derived progress counters.
+ *
+ * - Missing timestamps fallback to the most recent available column so we can
+ *   keep the "learned" list stable even when the backend omits optional data.
+ * - Date comparisons are performed in UTC to avoid local timezone drift when
+ *   classifying "new" (today reviewed) entries.
+ */
+export function computeLearnedWordStats(
+  rows: LearnedWordRow[],
+  options: ComputeOptions = {}
+): { learnedWords: LearnedWordSummary[]; summary: DerivedProgressSummary } {
+  const now = options.now ?? new Date();
+  const totalWords = Math.max(options.totalWords ?? 0, 0);
+
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const learnedRows = safeRows.filter((row) => (row?.srs_state ?? '').toLowerCase() === 'learned');
+  const learningRows = safeRows.filter((row) => (row?.srs_state ?? '').toLowerCase() === 'learning');
+
+  const newRows = learningRows.filter((row) => matchesToday(row.last_review_at, now));
+  const activeLearningRows = learningRows.filter((row) => !matchesToday(row.last_review_at, now));
+
+  const dueRows = activeLearningRows.filter((row) => isDue(row, now));
+
+  const learnedWords = learnedRows
+    .map(toLearnedSummary)
+    .filter((value): value is LearnedWordSummary => value !== null);
+
+  const summary: DerivedProgressSummary = {
+    learned: learnedRows.length,
+    learning: activeLearningRows.length,
+    new: newRows.length,
+    due: dueRows.length,
+    remaining: Math.max(totalWords - learnedRows.length - activeLearningRows.length - newRows.length, 0),
+  };
+
+  return { learnedWords, summary };
+}
+
+export function legacySummaryToDerived(summary: ProgressSummaryFields | null): DerivedProgressSummary | null {
+  if (!summary) return null;
+  return {
+    learned: summary.learned_count ?? 0,
+    learning: summary.learning_count ?? 0,
+    new: summary.remaining_count ?? 0,
+    due: summary.learning_due_count ?? 0,
+    remaining: summary.remaining_count ?? 0,
+  };
+}

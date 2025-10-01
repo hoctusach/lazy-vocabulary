@@ -2,17 +2,7 @@ import { canonNickname } from '@/core/nickname';
 import { getActiveSession } from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
-import { persistProgressSummaryLocal } from './progressSummary';
-
-export type ProgressSummary = {
-  learning_count: number;
-  learned_count: number;
-  learning_due_count: number;
-  remaining_count: number;
-  learning_time: number;
-  learned_days: string[];
-  updated_at: string | null;
-};
+import type { LearnedWordRow } from './learnedWordStats';
 
 // Hard-coded total number of vocabulary words used for progress calculations
 export const TOTAL_WORDS = 3035;
@@ -135,13 +125,14 @@ export async function ensureUserKey(): Promise<string | null> {
 }
 
 /**
- * Called after marking a word learned locally. Also persists to server
- * and stores the returned summary counts in localStorage['progressSummary'].
+ * Called after marking a word learned locally. Persists to the server and
+ * returns the full learned_words rows so the client can derive summary data
+ * without additional round-trips.
  */
 export async function markLearnedServerByKey(
   wordId: string,
   payload?: LearnedWordUpsert | null
-): Promise<ProgressSummary | null> {
+): Promise<LearnedWordRow[] | null> {
   const session = await getActiveSession();
   if (!session?.user_unique_key) return null;
 
@@ -157,26 +148,9 @@ export async function markLearnedServerByKey(
     return new Date(parsed).toISOString();
   };
 
-  const toInt = (value?: number | null) => {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return null;
-    return Math.trunc(value);
-  };
-
-  const markedAt = toIso(payload?.learned_at) ?? new Date().toISOString();
   const rpcPayload = {
     p_user_unique_key: key,
     p_word_id: wordId,
-    p_marked_at: markedAt,
-    p_total_words: TOTAL_WORDS,
-    p_in_review_queue: payload?.in_review_queue ?? false,
-    p_review_count: toInt(payload?.review_count ?? null),
-    p_last_review_at: toIso(payload?.last_review_at ?? null),
-    p_next_review_at: toIso(payload?.next_review_at ?? null),
-    p_next_display_at: toIso(payload?.next_display_at ?? null),
-    p_last_seen_at: toIso(payload?.last_seen_at ?? null),
-    p_srs_interval_days: toInt(payload?.srs_interval_days ?? null),
-    p_srs_ease: payload?.srs_ease ?? null,
-    p_srs_state: payload?.srs_state ?? null,
   };
 
   const { data, error } = await sb.rpc('mark_word_learned_by_key', rpcPayload);
@@ -186,34 +160,69 @@ export async function markLearnedServerByKey(
     return null;
   }
 
-  if (!data) {
-    return null;
+  const rawRows: LearnedWordRow[] = Array.isArray(data)
+    ? (data as LearnedWordRow[])
+    : [];
+
+  const normalisedRows = rawRows
+    .map((row) => toLearnedWordRow(row))
+    .filter((row): row is LearnedWordRow => row !== null);
+
+  if (normalisedRows.length === 0) {
+    return [];
   }
 
   try {
     const { state, userProgress } = loadLearningProgressForUser(rpcPayload.p_user_unique_key);
-    const existingEntry = userProgress[rpcPayload.p_word_id];
-    const nextEntry = isPlainObject(existingEntry) ? { ...existingEntry } : {};
-    nextEntry.srs_state = 'learned';
-    nextEntry.mark_learned_at = markedAt;
-    userProgress[rpcPayload.p_word_id] = nextEntry;
-    persistLearningProgress(rpcPayload.p_user_unique_key, state, userProgress);
+    let didUpdate = false;
+    const fallbackMarkedAt = toIso(payload?.learned_at) ?? new Date().toISOString();
+
+    for (const row of normalisedRows) {
+      const learnedWordId = typeof row.word_id === 'string' ? row.word_id : '';
+      if (!learnedWordId) continue;
+      if ((row.srs_state ?? '').toLowerCase() !== 'learned') continue;
+
+      const existingEntry = userProgress[learnedWordId];
+      const nextEntry = isPlainObject(existingEntry) ? { ...existingEntry } : {};
+      nextEntry.srs_state = 'learned';
+      nextEntry.mark_learned_at =
+        toIso(row.learned_at) ?? toIso(row.last_review_at) ?? fallbackMarkedAt;
+      userProgress[learnedWordId] = nextEntry;
+      didUpdate = true;
+    }
+
+    if (didUpdate) {
+      persistLearningProgress(rpcPayload.p_user_unique_key, state, userProgress);
+    }
   } catch (storageError) {
     console.warn('mark_word_learned_by_key:local_sync', storageError);
   }
 
-  const summary: ProgressSummary = {
-    learning_count: data.learning_count ?? 0,
-    learned_count: data.learned_count ?? 0,
-    learning_due_count: data.learning_due_count ?? 0,
-    remaining_count: data.remaining_count ?? Math.max(TOTAL_WORDS - (data.learned_count ?? 0), 0),
-    learning_time: data.learning_time ?? 0,
-    learned_days: Array.isArray(data.learned_days) ? data.learned_days : [],
-    updated_at: typeof data.updated_at === 'string' ? data.updated_at : null,
+  return normalisedRows;
+}
+
+function toLearnedWordRow(value: unknown): LearnedWordRow | null {
+  if (!isPlainObject(value)) return null;
+  const ensureNumber = (candidate: unknown): number | null => {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+    return null;
   };
 
-  persistProgressSummaryLocal(summary);
-  return summary;
+  return {
+    word_id: typeof value.word_id === 'string' ? value.word_id : null,
+    srs_state: typeof value.srs_state === 'string' ? value.srs_state : null,
+    learned_at: typeof value.learned_at === 'string' ? value.learned_at : null,
+    last_review_at: typeof value.last_review_at === 'string' ? value.last_review_at : null,
+    next_review_at: typeof value.next_review_at === 'string' ? value.next_review_at : null,
+    next_display_at: typeof value.next_display_at === 'string' ? value.next_display_at : null,
+    in_review_queue:
+      typeof value.in_review_queue === 'boolean'
+        ? value.in_review_queue
+        : null,
+    review_count: ensureNumber(value.review_count),
+    srs_interval_days: ensureNumber(value.srs_interval_days),
+    srs_ease: ensureNumber(value.srs_ease),
+  };
 }
 
 /**
