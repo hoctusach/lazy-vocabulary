@@ -35,6 +35,78 @@ function lsSet(key: string, value: string) {
   }
 }
 
+const LEGACY_PROGRESS_KEYS = ['status', 'isLearned', 'reviewCount', 'mark_learned_at', 'srs_state'];
+
+type LearningProgressState = Record<string, Record<string, any>>;
+
+function isPlainObject(value: unknown): value is Record<string, any> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function parseLearningProgress(): Record<string, any> {
+  const raw = lsGet('learningProgress');
+  if (!raw) return {};
+  try {
+    const candidate = JSON.parse(raw) as unknown;
+    return isPlainObject(candidate) ? candidate : {};
+  } catch {
+    return {};
+  }
+}
+
+function loadLearningProgressForUser(userKey: string): {
+  state: LearningProgressState;
+  userProgress: Record<string, any>;
+} {
+  const raw = parseLearningProgress();
+  const entries = Object.entries(raw);
+
+  const looksLegacy =
+    entries.length > 0 &&
+    raw[userKey] === undefined &&
+    entries.every(([, value]) => {
+      if (!isPlainObject(value)) return false;
+      const keys = Object.keys(value);
+      return keys.some((keyName) => LEGACY_PROGRESS_KEYS.includes(keyName));
+    });
+
+  if (looksLegacy) {
+    const userProgress = entries.reduce<Record<string, any>>((acc, [wordKey, value]) => {
+      if (isPlainObject(value)) {
+        acc[wordKey] = { ...value };
+      }
+      return acc;
+    }, {});
+    return { state: {}, userProgress };
+  }
+
+  const state = entries.reduce<LearningProgressState>((acc, [entryKey, entryValue]) => {
+    if (isPlainObject(entryValue)) {
+      acc[entryKey] = { ...entryValue };
+    }
+    return acc;
+  }, {});
+
+  const candidate = Object.prototype.hasOwnProperty.call(state, userKey)
+    ? (state as Record<string, unknown>)[userKey]
+    : undefined;
+  const userProgress = isPlainObject(candidate) ? { ...candidate } : {};
+  return { state, userProgress };
+}
+
+function persistLearningProgress(
+  userKey: string,
+  state: LearningProgressState,
+  userProgress: Record<string, any>
+): void {
+  try {
+    const nextState: LearningProgressState = { ...state, [userKey]: userProgress };
+    lsSet('learningProgress', JSON.stringify(nextState));
+  } catch (error) {
+    console.warn('learningProgress:persist', error);
+  }
+}
+
 /**
  * Ensures and returns the current user's user_unique_key.
  * - Reads from localStorage cache if available
@@ -90,10 +162,11 @@ export async function markLearnedServerByKey(
     return Math.trunc(value);
   };
 
-  const { data, error } = await sb.rpc('mark_word_learned_by_key', {
+  const markedAt = toIso(payload?.learned_at) ?? new Date().toISOString();
+  const rpcPayload = {
     p_user_unique_key: key,
     p_word_id: wordId,
-    p_marked_at: toIso(payload?.learned_at) ?? new Date().toISOString(),
+    p_marked_at: markedAt,
     p_total_words: TOTAL_WORDS,
     p_in_review_queue: payload?.in_review_queue ?? false,
     p_review_count: toInt(payload?.review_count ?? null),
@@ -104,7 +177,9 @@ export async function markLearnedServerByKey(
     p_srs_interval_days: toInt(payload?.srs_interval_days ?? null),
     p_srs_ease: payload?.srs_ease ?? null,
     p_srs_state: payload?.srs_state ?? null,
-  });
+  };
+
+  const { data, error } = await sb.rpc('mark_word_learned_by_key', rpcPayload);
 
   if (error) {
     console.warn('mark_word_learned_by_key', error.message);
@@ -113,6 +188,18 @@ export async function markLearnedServerByKey(
 
   if (!data) {
     return null;
+  }
+
+  try {
+    const { state, userProgress } = loadLearningProgressForUser(rpcPayload.p_user_unique_key);
+    const existingEntry = userProgress[rpcPayload.p_word_id];
+    const nextEntry = isPlainObject(existingEntry) ? { ...existingEntry } : {};
+    nextEntry.srs_state = 'learned';
+    nextEntry.mark_learned_at = markedAt;
+    userProgress[rpcPayload.p_word_id] = nextEntry;
+    persistLearningProgress(rpcPayload.p_user_unique_key, state, userProgress);
+  } catch (storageError) {
+    console.warn('mark_word_learned_by_key:local_sync', storageError);
   }
 
   const summary: ProgressSummary = {
@@ -156,26 +243,17 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
     ? (data as { word_id: string | null }[])
     : [];
 
-  const raw = lsGet('learningProgress');
-  const existing: Record<string, any> = raw
-    ? (() => {
-        try {
-          return JSON.parse(raw) as Record<string, any>;
-        } catch {
-          return {} as Record<string, any>;
-        }
-      })()
-    : {};
+  const { state, userProgress } = loadLearningProgressForUser(key);
 
   const nowISO = new Date().toISOString();
 
   for (const entry of rows) {
     const wordId = typeof entry?.word_id === 'string' ? entry.word_id : '';
     if (!wordId) continue;
-    const current = existing[wordId] || {};
+    const current = userProgress[wordId] || {};
     const statusValue = Number(current.status ?? current.status_value ?? 0);
     const safeStatus = Number.isFinite(statusValue) ? statusValue : 0;
-    existing[wordId] = {
+    userProgress[wordId] = {
       ...current,
       status: Math.max(3, safeStatus),
       isLearned: true,
@@ -183,5 +261,5 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
     };
   }
 
-  lsSet('learningProgress', JSON.stringify(existing));
+  persistLearningProgress(key, state, userProgress);
 }
