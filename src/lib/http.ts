@@ -1,6 +1,11 @@
 import { EDGE_BASE_URL } from '@/config';
 import { clearStoredAuth, getAuthHeader } from '@/lib/auth';
 
+function isValidJwt(token: string): boolean {
+  const parts = token.split('.');
+  return parts.length === 3 && parts.every((part) => part.length > 0);
+}
+
 export async function apiFetchAbsolute(url: string, init: RequestInit = {}) {
   const headers = new Headers(init.headers || {});
 
@@ -13,8 +18,7 @@ export async function apiFetchAbsolute(url: string, init: RequestInit = {}) {
 
       if (key.toLowerCase() === 'authorization') {
         const token = normalizedValue.split(/\s+/).slice(-1)[0] ?? '';
-        const parts = token.split('.');
-        if (parts.length !== 3 || parts.some((part) => !part.length)) {
+        if (!isValidJwt(token)) {
           continue;
         }
       }
