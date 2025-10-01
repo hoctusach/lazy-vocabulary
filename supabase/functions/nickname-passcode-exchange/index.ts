@@ -106,12 +106,28 @@ Deno.serve(async (req) => {
 
   const now = Math.floor(Date.now() / 1000);
   const expiresIn = 60 * 60 * 24;
+  const sessionToken = createSessionToken();
+  const expiresAtUnix = now + expiresIn;
+  const expiresAtIso = new Date(expiresAtUnix * 1000).toISOString();
+
+  const { error: upsertError } = await admin.from("user_sessions").upsert({
+    session_token: sessionToken,
+    user_unique_key: userKey,
+    nickname,
+    expires_at: expiresAtIso,
+  });
+
+  if (upsertError) {
+    console.error("user_sessions upsert:", upsertError);
+    return errorResponse("Failed to create session", 500);
+  }
+
   return json(
     {
-      session_token: createSessionToken(),
+      session_token: sessionToken,
       token_type: "bearer",
       expires_in: expiresIn,
-      expires_at: now + expiresIn,
+      expires_at: expiresAtUnix,
       user_unique_key: userKey,
       nickname,
     },
