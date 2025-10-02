@@ -55,6 +55,7 @@ export const useLearningProgress = () => {
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
   const learnedCountRef = useRef<number | null>(null);
   const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
+  const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
 
   const applyLearnedOverride = useCallback(
     (stats: typeof DEFAULT_STATS) => {
@@ -138,9 +139,13 @@ export const useLearningProgress = () => {
         if (!isActive) return;
         setDailySelection(cached.selection);
         setTodayWords(cached.words);
+        setIsDailySelectionLoading(false);
       }
 
       try {
+        if (!cached || !isToday(cached.date) || !matchesCurrentOptions(cached, { mode, count, category })) {
+          setIsDailySelectionLoading(true);
+        }
         const result = await getOrCreateTodayWords(preparedKey, mode, count, category ?? null);
         if (!isActive) return;
         setDailySelection(result.selection);
@@ -156,6 +161,10 @@ export const useLearningProgress = () => {
         setDailySelection(null);
         if (!cached) {
           setTodayWords([]);
+        }
+      } finally {
+        if (isActive) {
+          setIsDailySelectionLoading(false);
         }
       }
 
@@ -176,6 +185,7 @@ export const useLearningProgress = () => {
       try {
         const mode = getModeForSeverity(level);
         const count = getCountForSeverity(level);
+        setIsDailySelectionLoading(true);
         const result = await fetchAndCommitTodaySelection({
           userKey,
           mode,
@@ -194,6 +204,8 @@ export const useLearningProgress = () => {
         void refreshStats(userKey);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to regenerate daily words', error);
+      } finally {
+        setIsDailySelectionLoading(false);
       }
     },
     [category, userKey, refreshStats]
@@ -205,6 +217,7 @@ export const useLearningProgress = () => {
     const count = getCountForSeverity(severity);
     clearTodayWordsInLocal(userKey);
     try {
+      setIsDailySelectionLoading(true);
       const result = await fetchAndCommitTodaySelection({
         userKey,
         mode,
@@ -221,6 +234,8 @@ export const useLearningProgress = () => {
       void refreshStats(userKey);
     } catch (error) {
       console.warn('[useLearningProgress] Failed to regenerate today\'s selection', error);
+    } finally {
+      setIsDailySelectionLoading(false);
     }
   }, [category, refreshStats, severity, userKey]);
 
@@ -302,5 +317,6 @@ export const useLearningProgress = () => {
     markWordLearned,
     markWordAsNew,
     todayWords: orderedTodayWords,
+    isDailySelectionLoading,
   };
 };
