@@ -135,7 +135,10 @@ export const useLearningProgress = () => {
       const mode = getModeForSeverity(preferredSeverity);
       const count = getCountForSeverity(preferredSeverity);
       const cached = loadTodayWordsFromLocal(preparedKey);
-      if (cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category })) {
+      const hasUsableCache = Boolean(
+        cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category })
+      );
+      if (hasUsableCache && cached) {
         if (!isActive) return;
         setDailySelection(cached.selection);
         setTodayWords(cached.words);
@@ -143,7 +146,7 @@ export const useLearningProgress = () => {
       }
 
       try {
-        if (!cached || !isToday(cached.date) || !matchesCurrentOptions(cached, { mode, count, category })) {
+        if (!hasUsableCache) {
           setIsDailySelectionLoading(true);
         }
         const result = await getOrCreateTodayWords(preparedKey, mode, count, category ?? null);
@@ -158,8 +161,8 @@ export const useLearningProgress = () => {
       } catch (error) {
         if (!isActive) return;
         console.warn('[useLearningProgress] Failed to load today\'s words', error);
-        setDailySelection(null);
-        if (!cached) {
+        if (!hasUsableCache) {
+          setDailySelection(null);
           setTodayWords([]);
         }
       } finally {

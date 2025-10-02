@@ -654,6 +654,9 @@ export async function getOrCreateTodayWords(
   category?: string | null
 ): Promise<TodaySelectionState> {
   const cached = loadTodayWordsFromLocal(userKey);
+  const hasValidCache = Boolean(
+    cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category: category ?? null })
+  );
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] getOrCreateTodayWords cache status', {
       cache: cached
@@ -667,22 +670,35 @@ export async function getOrCreateTodayWords(
       planSize: count,
     });
   }
-  if (cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category: category ?? null })) {
-    if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-      console.log('[LearningProgress] getOrCreateTodayWords using cache', {
-        day: cached.date,
-        idsLength: cached.words.length,
-      });
-    }
-    return cached;
-  }
-  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[LearningProgress] getOrCreateTodayWords fetching new selection', {
-      category,
-      planSize: count,
+  if (hasValidCache && cached && process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+    console.log('[LearningProgress] getOrCreateTodayWords serving cached selection while refreshing', {
+      day: cached.date,
+      idsLength: cached.words.length,
     });
   }
-  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+  const fetchPromise = (async () => {
+    if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+      console.log('[LearningProgress] getOrCreateTodayWords fetching new selection', {
+        category,
+        planSize: count,
+      });
+    }
+    return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+  })();
+
+  try {
+    const result = await fetchPromise;
+    return result;
+  } catch (error) {
+    console.warn('[LearningProgress] Failed to refresh today\'s words from server', {
+      error,
+      hasValidCache,
+    });
+    if (hasValidCache && cached) {
+      return cached;
+    }
+    throw error;
+  }
 }
 
 export async function prepareUserSession(): Promise<string | null> {
