@@ -12,6 +12,11 @@ import {
   PASSCODE_STORAGE_KEY,
   storePasscode,
 } from '@/lib/auth';
+import type { SeverityLevel } from '@/types/learning';
+
+function isSeverityLevel(value: unknown): value is SeverityLevel {
+  return value === 'light' || value === 'moderate' || value === 'intense';
+}
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
@@ -164,7 +169,40 @@ export default function AuthGate() {
       toast.success(`Signed in as ${nicknameFromSession}`);
 
       localStorage.setItem(NICKNAME_LS_KEY, nicknameFromSession);
-      await ensureUserKey().catch(() => null);
+
+      let userKey: string | null = null;
+      try {
+        userKey = await ensureUserKey();
+      } catch (error) {
+        console.error('AuthGate:ensureUserKey', error);
+      }
+
+      if (userKey) {
+        void (async () => {
+          try {
+            const [{ getPreferences }, progress] = await Promise.all([
+              import('../lib/db/preferences'),
+              import('../services/learningProgressService'),
+            ]);
+            const prefs = await getPreferences();
+            const severity = isSeverityLevel(prefs?.daily_option)
+              ? prefs.daily_option
+              : 'light';
+            const mode = progress.getModeForSeverity(severity);
+            const count = progress.getCountForSeverity(severity);
+            await progress.fetchAndCommitTodaySelection({
+              userKey,
+              mode,
+              count,
+              category: null,
+            });
+          } catch (error) {
+            console.error('AuthGate:prepareTodaySelection', error);
+            toast.error("Failed to prepare today's words. Please refresh if they don't load.");
+          }
+        })();
+      }
+
       try {
         const mod = await import('../lib/sync/autoBackfillOnReload');
         void mod.autoBackfillOnReload();
