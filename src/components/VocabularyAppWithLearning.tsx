@@ -30,7 +30,8 @@ const VocabularyAppWithLearning: React.FC = () => {
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
     todayWords,
-    learnedWords
+    learnedWords,
+    isDailySelectionLoading,
   } = useLearningProgress();
 
   // Track when words are played (integrate with existing word navigation)
@@ -212,6 +213,7 @@ const VocabularyAppWithLearning: React.FC = () => {
         <VocabularyAppContainerNew
           initialWords={todayWords}
           dailySelection={dailySelection}
+          isLoadingSelection={isDailySelectionLoading}
           onMarkWordLearned={(word) => {
             markCurrentWordLearned(word);
           }}

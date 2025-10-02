@@ -1,0 +1,77 @@
+.lv-loading-card {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 2rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(236, 72, 153, 0.12));
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.lv-loading-card__inner {
+  font-family: 'Fira Code', 'Source Code Pro', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 1.05rem;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lv-loading-card__text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid rgba(15, 23, 42, 0.75);
+  letter-spacing: 0.02em;
+  animation: lv-typewriter 3s steps(36, end) 0.2s forwards;
+}
+
+.lv-loading-card__cursor {
+  width: 0.75rem;
+  height: 1.4rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  border-radius: 2px;
+  animation: lv-caret-blink 0.9s steps(1) infinite;
+  margin-top: 0.2rem;
+}
+
+@keyframes lv-typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 36ch;
+  }
+}
+
+@keyframes lv-caret-blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .lv-loading-card {
+    min-height: 180px;
+    padding: 2rem 1.5rem;
+  }
+
+  .lv-loading-card__inner {
+    font-size: 0.95rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .lv-loading-card__cursor {
+    margin-top: 0.6rem;
+    width: 0.6rem;
+    height: 1.1rem;
+  }
+}

@@ -4,6 +4,7 @@ import VocabularyLayout from "@/components/VocabularyLayout";
 import ErrorDisplay from "./ErrorDisplay";
 import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
+import LoadingCard from "./LoadingCard";
 import UserInteractionManager from "./UserInteractionManager";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
@@ -18,6 +19,7 @@ interface VocabularyAppContainerNewProps {
   additionalContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;
   dailySelection?: DailySelection | null;
+  isLoadingSelection?: boolean;
 }
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
@@ -26,6 +28,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   additionalContent,
   onOpenSearch,
   dailySelection,
+  isLoadingSelection = false,
 }) => {
   // Use stable state management
   const {
@@ -71,6 +74,18 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     isPaused,
     currentWord: debugData
   }), [isMuted, selectedVoiceName, isPaused, debugData]);
+
+  if (isLoadingSelection) {
+    return (
+      <DebugInfoContext.Provider value={debugInfo}>
+        <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
+          <div className="space-y-4">
+            <LoadingCard />
+          </div>
+        </VocabularyLayout>
+      </DebugInfoContext.Provider>
+    );
+  }
 
   if (!hasData && !vocabularyService.hasData()) {
     return (
