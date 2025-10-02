@@ -75,7 +75,11 @@ describe('useLearningProgress', () => {
     };
 
     fetchProgressSummaryMock.mockResolvedValue(initialSummary);
-    fetchLearnedWordSummariesMock.mockResolvedValue(overrideRows);
+    fetchLearnedWordSummariesMock.mockResolvedValue({
+      learnedWords: overrideRows,
+      newTodayWords: [],
+      dueTodayWords: [],
+    });
 
     const { result } = renderHook(() => useLearningProgress([]));
 

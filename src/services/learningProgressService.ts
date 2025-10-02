@@ -16,6 +16,7 @@ import {
   type DerivedProgressSummary,
   type LearnedWordRow,
   type LearnedWordSummary,
+  type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
 
 export type GenerateParams = {
@@ -722,6 +723,8 @@ export async function markWordReviewed(
   progress: LearningProgress;
   summary: DerivedProgressSummary | null;
   learnedWords: LearnedWordSummary[] | null;
+  newTodayWords: TodayLearnedWordSummary[] | null;
+  dueTodayWords: TodayLearnedWordSummary[] | null;
 }> {
   const cached = loadTodayWordsFromLocal(userKey);
   if (!cached) {
@@ -758,13 +761,22 @@ export async function markWordReviewed(
 
   let summary: DerivedProgressSummary | null = null;
   let learnedSummaries: LearnedWordSummary[] | null = null;
+  let newTodaySummaries: TodayLearnedWordSummary[] | null = null;
+  let dueTodaySummaries: TodayLearnedWordSummary[] | null = null;
 
   if (rows) {
-    const { learnedWords: derivedWords, summary: derivedSummary } = computeLearnedWordStats(rows, {
+    const {
+      learnedWords: derivedWords,
+      newTodayWords: derivedNewToday,
+      dueTodayWords: derivedDueToday,
+      summary: derivedSummary,
+    } = computeLearnedWordStats(rows, {
       totalWords: TOTAL_WORDS,
     });
     summary = derivedSummary;
     learnedSummaries = derivedWords;
+    newTodaySummaries = derivedNewToday;
+    dueTodaySummaries = derivedDueToday;
   }
 
   return {
@@ -774,6 +786,8 @@ export async function markWordReviewed(
     progress,
     summary,
     learnedWords: learnedSummaries,
+    newTodayWords: newTodaySummaries,
+    dueTodayWords: dueTodaySummaries,
   };
 }
 
@@ -833,39 +847,39 @@ export async function fetchProgressSummary(userKey: string): Promise<ProgressSum
 export async function fetchLearnedWordSummaries(
   userKey: string
 ): Promise<{
-  word: string;
-  category?: string;
-  learnedDate?: string;
-}[]> {
+  learnedWords: LearnedWordSummary[];
+  newTodayWords: TodayLearnedWordSummary[];
+  dueTodayWords: TodayLearnedWordSummary[];
+}> {
   const client = getSupabaseClient();
-  if (!client) return [];
+  if (!client)
+    return {
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+    };
 
   const { data, error } = await client
     .from('learned_words')
-    .select(
-      [
-        'word_id',
-        'in_review_queue',
-        'next_review_at',
-        'review_count',
-        'srs_state',
-        'srs_ease',
-        'learned_at',
-        'last_review_at',
-        'next_display_at',
-        'last_seen_at',
-      ].join(',')
-    )
+    .select('*')
     .eq('user_unique_key', userKey)
     .order('learned_at', { ascending: false });
 
   if (error) {
     console.warn('[LearningProgress] Failed to fetch learned words', error.message);
-    return [];
+    return {
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+    };
   }
 
   const rawRows = Array.isArray(data) ? (data as LearnedWordRow[]) : [];
-  const { learnedWords: summaries } = computeLearnedWordStats(rawRows, {
+  const {
+    learnedWords: summaries,
+    newTodayWords,
+    dueTodayWords,
+  } = computeLearnedWordStats(rawRows, {
     totalWords: TOTAL_WORDS,
   });
 
@@ -874,10 +888,16 @@ export async function fetchLearnedWordSummaries(
       rawCount: rawRows.length,
       filteredCount: summaries.length,
       summary: summaries,
+      newToday: newTodayWords,
+      dueToday: dueTodayWords,
     });
   }
 
-  return summaries;
+  return {
+    learnedWords: summaries,
+    newTodayWords,
+    dueTodayWords,
+  };
 }
 
 export async function regenerateTodaySelection(

@@ -23,6 +23,7 @@ import {
   legacySummaryToDerived,
   type DerivedProgressSummary,
   type LearnedWordSummary,
+  type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
 import { buildTodaysWords } from '@/utils/todayWords';
 
@@ -55,6 +56,8 @@ export const useLearningProgress = () => {
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
   const learnedCountRef = useRef<number | null>(null);
   const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
+  const [newTodayLearnedWords, setNewTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
+  const [dueTodayLearnedWords, setDueTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
 
   const applyLearnedOverride = useCallback(
@@ -89,20 +92,24 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const rows = await fetchLearnedWordSummaries(targetKey);
-      learnedCountRef.current = rows.length;
-      setLearnedWords(rows);
+      const { learnedWords: learned, newTodayWords, dueTodayWords } = await fetchLearnedWordSummaries(targetKey);
+      learnedCountRef.current = learned.length;
+      setLearnedWords(learned);
+      setNewTodayLearnedWords(newTodayWords);
+      setDueTodayLearnedWords(dueTodayWords);
       setProgressStats(prev => {
-        const learned = rows.length;
+        const learnedCount = learned.length;
         return {
           ...prev,
-          learned,
-          total: learned + prev.learning + prev.new,
+          learned: learnedCount,
+          total: learnedCount + prev.learning + prev.new,
         };
       });
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
+      setNewTodayLearnedWords([]);
+      setDueTodayLearnedWords([]);
     }
   }, [userKey]);
 
@@ -271,7 +278,18 @@ export const useLearningProgress = () => {
         if (result.learnedWords) {
           learnedCountRef.current = result.learnedWords.length;
           setLearnedWords(result.learnedWords);
+        }
+        if (result.newTodayWords) {
+          setNewTodayLearnedWords(result.newTodayWords);
         } else {
+          setNewTodayLearnedWords([]);
+        }
+        if (result.dueTodayWords) {
+          setDueTodayLearnedWords(result.dueTodayWords);
+        } else {
+          setDueTodayLearnedWords([]);
+        }
+        if (!result.learnedWords || !result.newTodayWords || !result.dueTodayWords) {
           void refreshLearnedWords(userKey);
         }
         if (result.summary) {
@@ -317,6 +335,8 @@ export const useLearningProgress = () => {
     refreshStats,
     refreshLearnedWords,
     learnedWords,
+    newTodayLearnedWords,
+    dueTodayLearnedWords,
     markWordLearned,
     markWordAsNew,
     todayWords: orderedTodayWords,

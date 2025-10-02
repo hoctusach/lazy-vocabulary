@@ -31,6 +31,8 @@ const VocabularyAppWithLearning: React.FC = () => {
     markWordAsNew,
     todayWords,
     learnedWords,
+    newTodayLearnedWords,
+    dueTodayLearnedWords,
     isDailySelectionLoading,
   } = useLearningProgress();
 
@@ -53,9 +55,10 @@ const VocabularyAppWithLearning: React.FC = () => {
   }, [markWordAsPlayed]);
 
   const learnedWordsList = Array.isArray(learnedWords) ? learnedWords : [];
-  const newWords = dailySelection?.newWords ?? [];
-  const reviewWords = dailySelection?.reviewWords ?? [];
-  const hasSelectionWords = newWords.length > 0 || reviewWords.length > 0;
+  const newTodayList = Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : [];
+  const dueTodayList = Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : [];
+  const hasSelectionWords =
+    newTodayList.length > 0 || dueTodayList.length > 0 || learnedWordsList.length > 0;
 
   useEffect(() => {
     if (dailySelection) {
@@ -111,53 +114,56 @@ const VocabularyAppWithLearning: React.FC = () => {
           )}
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
-              <h4 className="font-medium text-green-600">Today's New ({newWords.length})</h4>
+              <h4 className="font-medium text-green-600">NEW TODAY ({newTodayList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
-                {newWords.length > 0 ? (
-                  newWords.map((word, index) => (
-                    <div key={index} className="text-sm p-2 bg-green-50 rounded border">
+                {newTodayList.length > 0 ? (
+                  newTodayList.map((word, index) => (
+                    <div key={`${word.word}-${index}`} className="text-sm p-2 bg-green-50 rounded border">
                       <div className="font-medium">{word.word}</div>
-                      <div className="text-xs text-gray-600">{word.category}</div>
+                      {word.category && (
+                        <div className="text-xs text-gray-600">{word.category}</div>
+                      )}
+                      {word.lastReviewedAt && (
+                        <div className="text-xs text-gray-500">Last reviewed: {word.lastReviewedAt}</div>
+                      )}
                     </div>
                   ))
                 ) : (
                   <div className="text-sm p-2 bg-green-50 rounded border text-gray-500 italic">
-                    No new words assigned
+                    No new words assigned today
                   </div>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium text-red-600">
-                Today's Due Review ({reviewWords.length})
-              </h4>
+              <h4 className="font-medium text-red-600">DUE TODAY ({dueTodayList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
-                {reviewWords.length > 0 ? (
-                  reviewWords.map((word, index) => (
+                {dueTodayList.length > 0 ? (
+                  dueTodayList.map((word, index) => (
                     <div
-                      key={index}
+                      key={`${word.word}-${index}`}
                       className="text-sm p-2 bg-red-50 rounded border"
                     >
                       <div className="font-medium">{word.word}</div>
-                      <div className="text-xs text-gray-600">
-                        {word.category} • Review #{word.reviewCount}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Next review: {word.nextReviewDate}
-                      </div>
+                      {word.category && (
+                        <div className="text-xs text-gray-600">{word.category}</div>
+                      )}
+                      {word.lastReviewedAt && (
+                        <div className="text-xs text-gray-500">Last reviewed: {word.lastReviewedAt}</div>
+                      )}
                     </div>
                   ))
                 ) : (
                   <div className="text-sm p-2 bg-red-50 rounded border text-gray-500 italic">
-                    No due reviews assigned
+                    No due reviews today
                   </div>
                 )}
               </div>
             </div>
 
             <div className="space-y-2">
-              <h4 className="font-medium text-gray-600">Learned ({learnedWordsList.length})</h4>
+              <h4 className="font-medium text-gray-600">LEARNED ({learnedWordsList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {learnedWordsList.length > 0 ? (
                   learnedWordsList.map((word, index) => (

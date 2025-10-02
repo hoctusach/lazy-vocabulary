@@ -6,6 +6,7 @@ export type LearnedWordRow = {
   word_id: string | null;
   srs_state: string | null;
   learned_at: string | null;
+  mark_learned_at: string | null;
   last_review_at: string | null;
   next_review_at: string | null;
   next_display_at: string | null;
@@ -13,12 +14,21 @@ export type LearnedWordRow = {
   review_count: number | null;
   srs_interval_days: number | null;
   srs_ease: number | null;
+  is_today_selection: boolean | null;
+  due_selected_today: boolean | null;
 };
 
 export type LearnedWordSummary = {
   word: string;
   category?: string;
   learnedDate?: string;
+};
+
+export type TodayLearnedWordSummary = {
+  word: string;
+  category?: string;
+  lastReviewedAt?: string;
+  dueSelectedToday: boolean;
 };
 
 export type DerivedProgressSummary = {
@@ -69,19 +79,39 @@ function isDue(row: LearnedWordRow, now: Date): boolean {
   return false;
 }
 
-function toLearnedSummary(row: LearnedWordRow): LearnedWordSummary | null {
+function toWordAndCategory(row: LearnedWordRow): { word: string; category?: string } | null {
   const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
   if (!wordId) return null;
   const [word, category] = wordId.split('::');
+  return {
+    word: word || wordId,
+    category: category || undefined,
+  };
+}
+
+function toLearnedSummary(row: LearnedWordRow): LearnedWordSummary | null {
+  const base = toWordAndCategory(row);
+  if (!base) return null;
   const learnedDate =
+    normaliseIso(row.mark_learned_at) ??
     normaliseIso(row.learned_at) ??
     normaliseIso(row.last_review_at) ??
     normaliseIso(row.next_review_at) ??
     undefined;
   return {
-    word: word || wordId,
-    category: category || undefined,
+    ...base,
     learnedDate,
+  };
+}
+
+function toTodaySummary(row: LearnedWordRow, dueSelectedToday: boolean): TodayLearnedWordSummary | null {
+  const base = toWordAndCategory(row);
+  if (!base) return null;
+  const lastReviewedAt = normaliseIso(row.last_review_at) ?? undefined;
+  return {
+    ...base,
+    lastReviewedAt,
+    dueSelectedToday,
   };
 }
 
@@ -97,7 +127,12 @@ function toLearnedSummary(row: LearnedWordRow): LearnedWordSummary | null {
 export function computeLearnedWordStats(
   rows: LearnedWordRow[],
   options: ComputeOptions = {}
-): { learnedWords: LearnedWordSummary[]; summary: DerivedProgressSummary } {
+): {
+  learnedWords: LearnedWordSummary[];
+  newTodayWords: TodayLearnedWordSummary[];
+  dueTodayWords: TodayLearnedWordSummary[];
+  summary: DerivedProgressSummary;
+} {
   const now = options.now ?? new Date();
   const totalWords = Math.max(options.totalWords ?? 0, 0);
 
@@ -109,6 +144,29 @@ export function computeLearnedWordStats(
   const activeLearningRows = learningRows.filter((row) => !matchesToday(row.last_review_at, now));
 
   const dueRows = activeLearningRows.filter((row) => isDue(row, now));
+
+  const isTodaySelection = (row: LearnedWordRow) => Boolean(row?.is_today_selection);
+  const isDueSelectedToday = (row: LearnedWordRow) => Boolean(row?.due_selected_today);
+
+  const newTodayWords = safeRows
+    .filter(
+      (row) =>
+        matchesToday(row.last_review_at, now) &&
+        isTodaySelection(row) &&
+        !isDueSelectedToday(row)
+    )
+    .map((row) => toTodaySummary(row, false))
+    .filter((value): value is TodayLearnedWordSummary => value !== null);
+
+  const dueTodayWords = safeRows
+    .filter(
+      (row) =>
+        matchesToday(row.last_review_at, now) &&
+        isTodaySelection(row) &&
+        isDueSelectedToday(row)
+    )
+    .map((row) => toTodaySummary(row, true))
+    .filter((value): value is TodayLearnedWordSummary => value !== null);
 
   const learnedWords = learnedRows
     .map(toLearnedSummary)
@@ -122,7 +180,7 @@ export function computeLearnedWordStats(
     remaining: Math.max(totalWords - learnedRows.length - activeLearningRows.length - newRows.length, 0),
   };
 
-  return { learnedWords, summary };
+  return { learnedWords, newTodayWords, dueTodayWords, summary };
 }
 
 export function legacySummaryToDerived(summary: ProgressSummaryFields | null): DerivedProgressSummary | null {

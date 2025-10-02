@@ -212,6 +212,7 @@ function toLearnedWordRow(value: unknown): LearnedWordRow | null {
     word_id: typeof value.word_id === 'string' ? value.word_id : null,
     srs_state: typeof value.srs_state === 'string' ? value.srs_state : null,
     learned_at: typeof value.learned_at === 'string' ? value.learned_at : null,
+    mark_learned_at: typeof value.mark_learned_at === 'string' ? value.mark_learned_at : null,
     last_review_at: typeof value.last_review_at === 'string' ? value.last_review_at : null,
     next_review_at: typeof value.next_review_at === 'string' ? value.next_review_at : null,
     next_display_at: typeof value.next_display_at === 'string' ? value.next_display_at : null,
@@ -222,6 +223,14 @@ function toLearnedWordRow(value: unknown): LearnedWordRow | null {
     review_count: ensureNumber(value.review_count),
     srs_interval_days: ensureNumber(value.srs_interval_days),
     srs_ease: ensureNumber(value.srs_ease),
+    is_today_selection:
+      typeof value.is_today_selection === 'boolean'
+        ? value.is_today_selection
+        : null,
+    due_selected_today:
+      typeof value.due_selected_today === 'boolean'
+        ? value.due_selected_today
+        : null,
   };
 }
 
