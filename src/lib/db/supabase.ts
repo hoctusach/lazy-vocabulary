@@ -101,20 +101,33 @@ export function resolveSupabaseConfig() {
 export type DailySelectionV2Row = {
   word_id: string;
   category: string | null;
-  is_due: boolean | null;
+  is_today_selection?: boolean | null;
+  due_selected_today?: boolean | null;
+  new_selected_today?: boolean | null;
+  due_candidate_count?: number | null;
+  new_candidate_count?: number | null;
+  in_review_queue?: boolean | null;
+  review_count?: number | null;
+  learned_at?: string | null;
+  last_review_at?: string | null;
+  next_review_at?: string | null;
+  next_display_at?: string | null;
+  last_seen_at?: string | null;
+  srs_interval_days?: number | null;
+  srs_ease?: number | null;
+  srs_state?: string | null;
   word?: string | null;
   meaning?: string | null;
   example?: string | null;
   translation?: string | null;
-};
+} & Record<string, unknown>;
 
 export async function getDailySelectionV2(
   client: ReturnType<typeof createClient>,
-  params: { userKey: string; mode: string; count: number; category?: string | null }
+  params: { userKey: string; count: number; category?: string | null }
 ): Promise<DailySelectionV2Row[]> {
   const { data, error } = await client.rpc("generate_daily_selection_v2", {
     p_user_key: params.userKey,
-    p_mode: params.mode,
     p_count: params.count,
     p_category: params.category ?? null,
   });

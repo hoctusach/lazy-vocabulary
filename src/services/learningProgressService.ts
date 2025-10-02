@@ -1,7 +1,7 @@
 import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
 import { resetLearned } from '@/lib/db/learned';
-import { getDailySelectionV2 } from '@/lib/db/supabase';
+import { getDailySelectionV2, type DailySelectionV2Row } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import {
   getProgressSummary,
@@ -34,15 +34,7 @@ export type TodaySelectionState = {
   selection: DailySelection;
 };
 
-type DailySelectionRow = {
-  word_id: string;
-  category: string | null;
-  is_due: boolean | null;
-  word?: string | null;
-  meaning?: string | null;
-  example?: string | null;
-  translation?: string | null;
-};
+type DailySelectionRow = DailySelectionV2Row;
 
 type VocabularyRow = {
   word_id: string;
@@ -52,7 +44,6 @@ type VocabularyRow = {
   translation?: string | null;
   category?: string | null;
   count?: number | string | null;
-  is_due?: boolean | null;
 };
 
 type SelectionNormalizationMeta = {
@@ -211,27 +202,33 @@ function getDailyCount(severity: SeverityLevel): number {
   return config.max;
 }
 
+function buildSrsFromSelection(selectionRow: DailySelectionRow | null | undefined): TodayWordSrs | undefined {
+  if (!selectionRow) return undefined;
+
+  const srs: TodayWordSrs = {
+    in_review_queue: selectionRow.in_review_queue ?? undefined,
+    review_count: selectionRow.review_count ?? undefined,
+    learned_at: selectionRow.learned_at ?? undefined,
+    last_review_at: selectionRow.last_review_at ?? undefined,
+    next_review_at: selectionRow.next_review_at ?? undefined,
+    next_display_at: selectionRow.next_display_at ?? undefined,
+    last_seen_at: selectionRow.last_seen_at ?? undefined,
+    srs_interval_days: selectionRow.srs_interval_days ?? undefined,
+    srs_ease: selectionRow.srs_ease ?? undefined,
+    srs_state: selectionRow.srs_state ?? undefined,
+  };
+
+  const hasSrsData = Object.values(srs).some((value) => value !== undefined && value !== null);
+  return hasSrsData ? srs : undefined;
+}
+
 function buildTodayWord(
   selectionRow: DailySelectionRow | null | undefined,
-  vocab: VocabularyRow | undefined,
-  learned?: LearnedRow
+  vocab: VocabularyRow | undefined
 ): TodayWord | null {
   if (!selectionRow?.word_id) return null;
 
-  const srs: TodayWordSrs | undefined = learned
-    ? {
-        in_review_queue: learned.in_review_queue,
-        review_count: learned.review_count,
-        learned_at: learned.learned_at,
-        last_review_at: learned.last_review_at,
-        next_review_at: learned.next_review_at,
-        next_display_at: learned.next_display_at,
-        last_seen_at: learned.last_seen_at,
-        srs_interval_days: learned.srs_interval_days,
-        srs_ease: learned.srs_ease,
-        srs_state: learned.srs_state,
-      }
-    : undefined;
+  const srs = buildSrsFromSelection(selectionRow);
 
   const word = selectionRow.word ?? vocab?.word ?? deriveWordFromId(selectionRow.word_id);
   const meaning = selectionRow.meaning ?? vocab?.meaning ?? '';
@@ -239,7 +236,9 @@ function buildTodayWord(
   const translation = selectionRow.translation ?? vocab?.translation ?? null;
   const count = vocab?.count ?? 0;
   const category = selectionRow.category ?? vocab?.category ?? null;
-  const isDueFlag = selectionRow.is_due ?? vocab?.is_due ?? false;
+  const isDueFromFlags =
+    (selectionRow.is_today_selection ?? true) && Boolean(selectionRow.due_selected_today);
+  const isDue = isDueFromFlags || isReviewCandidate(srs);
 
   return {
     word_id: selectionRow.word_id,
@@ -249,7 +248,7 @@ function buildTodayWord(
     translation: translation ?? undefined,
     count,
     category: coerceCategory(category ?? undefined),
-    is_due: Boolean(isDueFlag) || isReviewCandidate(srs),
+    is_due: isDue,
     nextAllowedTime: srs?.next_display_at ?? undefined,
     srs,
   };
@@ -388,7 +387,6 @@ function applyReviewToWord(word: TodayWord): {
 function normalizeToDailySelection(
   details: VocabularyRow[] | null | undefined,
   selection: DailySelectionRow[] | null | undefined,
-  srsMap: Record<string, LearnedRow>,
   meta: SelectionNormalizationMeta
 ): TodaySelectionState {
   const dateKey = toDateKey(new Date());
@@ -405,9 +403,9 @@ function normalizeToDailySelection(
 
   for (const row of selectionRows) {
     if (!row?.word_id) continue;
+    if (row.is_today_selection === false) continue;
     const vocab = vocabMap.get(row.word_id);
-    const learned = srsMap[row.word_id];
-    const todayWord = buildTodayWord(row, vocab, learned);
+    const todayWord = buildTodayWord(row, vocab);
     if (todayWord) mapped.push(todayWord);
   }
 
@@ -527,7 +525,6 @@ async function generateDailySelectionV2(
 
   const rows = await getDailySelectionV2(client, {
     userKey,
-    mode,
     count,
     category: category ?? null,
   });
@@ -570,51 +567,6 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   return map;
 }
 
-async function fetchSrsRows(
-  userKey: string,
-  wordIds: string[]
-): Promise<Record<string, LearnedRow>> {
-  const client = getSupabaseClient();
-  if (!client) throw new Error('Supabase client unavailable');
-
-  let query = client
-    .from('learned_words')
-    .select('word_id,in_review_queue,next_review_at,review_count,srs_state,srs_ease')
-    .eq('user_unique_key', userKey);
-
-  if (Array.isArray(wordIds) && wordIds.length > 0) {
-    query = query.in('word_id', wordIds);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  const rows = Array.isArray(data) ? (data as Partial<LearnedRow>[]) : [];
-
-  return rows.reduce<Record<string, LearnedRow>>((acc, row) => {
-    const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
-    if (!wordId) return acc;
-
-    // Fill only what we fetched; keep other fields null-safe.
-    acc[wordId] = {
-      word_id: wordId,
-      in_review_queue: row?.in_review_queue ?? null,
-      review_count: row?.review_count ?? null,
-      learned_at: null,
-      last_review_at: null,
-      next_review_at: row?.next_review_at ?? null,
-      next_display_at: null,
-      last_seen_at: null,
-      srs_interval_days: null,
-      srs_ease: row?.srs_ease ?? null,
-      srs_state: row?.srs_state ?? null,
-    };
-    return acc;
-  }, {});
-}
-
 export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
   const { userKey, mode, count, category = null } = params;
   const selectionRows = await generateDailySelectionV2(userKey, mode, count, category);
@@ -624,7 +576,12 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
 
   const selectionById = new Map(
     selectionRows
-      .filter((row) => typeof row?.word_id === 'string' && row.word_id.length > 0)
+      .filter(
+        (row) =>
+          typeof row?.word_id === 'string' &&
+          row.word_id.length > 0 &&
+          row.is_today_selection !== false
+      )
       .map((row) => [row.word_id, row])
   );
   const ids = Array.from(selectionById.keys());
@@ -636,7 +593,6 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   }
 
   const vocabMap = await fetchVocabularyByIds(ids);
-  const srsMap = await fetchSrsRows(userKey, ids);
   const vocabRows = ids
     .map((id) => {
       const selection = selectionById.get(id);
@@ -653,7 +609,6 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
         translation: selection?.translation ?? vocab?.translation ?? null,
         category: selection?.category ?? vocab?.category ?? null,
         count: vocab?.count ?? 0,
-        is_due: selection?.is_due ?? vocab?.is_due ?? null,
       };
 
       return merged;
@@ -667,7 +622,6 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
   const today = normalizeToDailySelection(
     vocabRows,
     selectionRows,
-    srsMap,
     { mode, count, category: category ?? null }
   );
 
