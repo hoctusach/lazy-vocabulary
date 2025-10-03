@@ -67,16 +67,11 @@ function matchesToday(value: Nullable<string>, today: Date): boolean {
 }
 
 function isDue(row: LearnedWordRow, now: Date): boolean {
-  const candidates: (Nullable<string>)[] = [row.next_review_at, row.next_display_at, row.learned_at];
-  for (const candidate of candidates) {
-    const iso = normaliseIso(candidate);
-    if (!iso) continue;
-    const parsed = Date.parse(iso);
-    if (!Number.isNaN(parsed) && parsed <= now.getTime()) {
-      return true;
-    }
-  }
-  return false;
+  const iso = normaliseIso(row.next_review_at);
+  if (!iso) return false;
+  const parsed = Date.parse(iso);
+  if (Number.isNaN(parsed)) return false;
+  return parsed <= now.getTime();
 }
 
 function toWordAndCategory(row: LearnedWordRow): { word: string; category?: string } | null {
@@ -140,10 +135,7 @@ export function computeLearnedWordStats(
   const learnedRows = safeRows.filter((row) => (row?.srs_state ?? '').toLowerCase() === 'learned');
   const learningRows = safeRows.filter((row) => (row?.srs_state ?? '').toLowerCase() === 'learning');
 
-  const newRows = learningRows.filter((row) => matchesToday(row.last_review_at, now));
-  const activeLearningRows = learningRows.filter((row) => !matchesToday(row.last_review_at, now));
-
-  const dueRows = activeLearningRows.filter((row) => isDue(row, now));
+  const dueRows = learningRows.filter((row) => isDue(row, now));
 
   const isTodaySelection = (row: LearnedWordRow) => Boolean(row?.is_today_selection);
   const isDueSelectedToday = (row: LearnedWordRow) => Boolean(row?.due_selected_today);
@@ -174,10 +166,10 @@ export function computeLearnedWordStats(
 
   const summary: DerivedProgressSummary = {
     learned: learnedRows.length,
-    learning: activeLearningRows.length,
-    new: newRows.length,
+    learning: learningRows.length,
+    new: Math.max(totalWords - learningRows.length, 0),
     due: dueRows.length,
-    remaining: Math.max(totalWords - learnedRows.length - activeLearningRows.length - newRows.length, 0),
+    remaining: Math.max(totalWords - learnedRows.length - learningRows.length, 0),
   };
 
   return { learnedWords, newTodayWords, dueTodayWords, summary };
