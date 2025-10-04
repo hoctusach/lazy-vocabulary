@@ -346,6 +346,3 @@ export function storePasscode(passcode: string): void {
   rememberPasscode(passcode.trim());
 }
 
-export function getStoredSessionSnapshot(): Session | null {
-  return loadStoredSession();
-}
