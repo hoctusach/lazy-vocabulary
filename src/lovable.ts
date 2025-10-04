@@ -1,5 +1,3 @@
-// Utilities for speech playback and API integration
-
 import { toast as defaultToast } from '@/hooks/use-toast';
 
 const DEFAULT_RETRY_ATTEMPTS = 2;
@@ -70,68 +68,11 @@ export interface FetchLatestMessageOptions {
   broadcast?: boolean | LovableBroadcastOptions;
 }
 
-interface SpeechState {
-  isMuted: boolean;
-  voiceRegion: 'US' | 'UK' | 'AU';
-}
-
-let speechUnlocked = false;
-
-function unlockSpeech() {
-  if (speechUnlocked) return;
-  speechUnlocked = true;
-  try {
-    const u = new SpeechSynthesisUtterance('');
-    u.volume = 0;
-    window.speechSynthesis.speak(u);
-  } catch (err) {
-    console.warn('Failed to unlock speech', err);
-  }
-}
-
-if (typeof document !== 'undefined') {
-  document.addEventListener('click', unlockSpeech, { once: true });
-  document.addEventListener('touchstart', unlockSpeech, { once: true });
-}
-
-export function executeSpeech(
-  text: string,
-  state: SpeechState,
-  scheduleNextWord: () => void
-) {
-  if (!text || state.isMuted || !speechUnlocked) return;
-
-  const speakNow = () => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = state.voiceRegion === 'UK' ? 'en-GB' : 'en-US';
-    utterance.onend = () => scheduleNextWord();
-    utterance.onerror = (e) => console.error('Speech error:', e);
-    window.speechSynthesis.speak(utterance);
-  };
-
-  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-    window.speechSynthesis.cancel();
-    setTimeout(speakNow, 50);
-  } else {
-    speakNow();
-  }
-}
-
 export async function fetchLatestMessage(
   projectId: string,
   options: FetchLatestMessageOptions = {}
 ) {
   return fetchLatestMessageWithOptions(projectId, options);
-}
-
-export function disableLovableBroadcast(
-  channelName: string = DEFAULT_BROADCAST_CHANNEL,
-  reason: LovableBroadcastDisableReason = 'manual'
-): boolean {
-  const state = broadcastStates.get(channelName);
-  if (!state) return false;
-  const projectId = state.lastProjectId ?? 'unknown';
-  return disableBroadcastState(state, projectId, reason);
 }
 
 function fetchLatestMessageWithOptions(
