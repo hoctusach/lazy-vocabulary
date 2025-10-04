@@ -165,11 +165,11 @@ export function computeLearnedWordStats(
   const learnedCount = learnedRows.length;
   const learningCount = learningRows.length;
   const summary: DerivedProgressSummary = {
-    learned: learnedCount,
-    learning: learningCount,
-    new: Math.max(totalWords - learningCount, 0),
+    learned: learnedRows.length,
+    learning: learningRows.length,
+    new: Math.max(totalWords - learningRows.length, 0),
     due: dueRows.length,
-    remaining: Math.max(totalWords - learnedCount - learningCount, 0),
+    remaining: Math.max(totalWords - learnedRows.length - learningRows.length, 0),
   };
 
   return { learnedWords, newTodayWords, dueTodayWords, summary };
