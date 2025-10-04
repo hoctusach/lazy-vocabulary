@@ -14,7 +14,7 @@ export {
 } from './validationTypes';
 
 // Export sanitization utilities
-export { sanitizeInput, sanitizeUserInput } from './sanitization';
+export { sanitizeInput } from './sanitization';
 
 // Export vocabulary validation functions from the new modular structure
 export { 

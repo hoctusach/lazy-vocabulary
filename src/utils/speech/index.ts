@@ -3,8 +3,6 @@ import { calculateSpeechDuration } from "./durationUtils";
 import { speak } from "./core/speechPlayer";
 import {
   stopSpeaking,
-  pauseSpeaking,
-  resumeSpeaking,
   keepSpeechAlive,
   ensureSpeechEngineReady,
 } from "./core/speechEngine";

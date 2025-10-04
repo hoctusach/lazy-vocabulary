@@ -1,8 +1,6 @@
 // Main speech engine - re-exports all core functionality from focused modules
 export {
   stopSpeaking,
-  pauseSpeaking,
-  resumeSpeaking,
   keepSpeechAlive,
 } from "./modules/speechControl";
 
