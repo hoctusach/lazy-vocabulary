@@ -1,5 +1,3 @@
-import type { ProgressSummaryFields } from './progressSummary';
-
 type Nullable<T> = T | null | undefined;
 
 export type LearnedWordRow = {
@@ -164,6 +162,8 @@ export function computeLearnedWordStats(
     .map(toLearnedSummary)
     .filter((value): value is LearnedWordSummary => value !== null);
 
+  const learnedCount = learnedRows.length;
+  const learningCount = learningRows.length;
   const summary: DerivedProgressSummary = {
     learned: learnedRows.length,
     learning: learningRows.length,
@@ -173,15 +173,4 @@ export function computeLearnedWordStats(
   };
 
   return { learnedWords, newTodayWords, dueTodayWords, summary };
-}
-
-export function legacySummaryToDerived(summary: ProgressSummaryFields | null): DerivedProgressSummary | null {
-  if (!summary) return null;
-  return {
-    learned: summary.learned_count ?? 0,
-    learning: summary.learning_count ?? 0,
-    new: summary.remaining_count ?? 0,
-    due: summary.learning_due_count ?? 0,
-    remaining: summary.remaining_count ?? 0,
-  };
 }
