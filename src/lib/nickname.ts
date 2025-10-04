@@ -4,10 +4,6 @@ export function getNicknameLocal(): string | null {
   try { return localStorage.getItem(NICKNAME_LS_KEY); } catch { return null; }
 }
 
-export function setNicknameLocal(v: string) {
-  try { localStorage.setItem(NICKNAME_LS_KEY, v); } catch {}
-}
-
 export function toCanonical(s: string): string {
   return s.normalize('NFKC').toLowerCase().replace(/\s+/g, '');
 }
