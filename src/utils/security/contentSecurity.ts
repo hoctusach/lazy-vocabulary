@@ -20,15 +20,6 @@ export const CSP_CONFIG = {
 };
 
 /**
- * Generates CSP header value
- */
-export const generateCSPHeader = (): string => {
-  return Object.entries(CSP_CONFIG)
-    .map(([directive, sources]) => `${directive} ${sources.join(' ')}`)
-    .join('; ');
-};
-
-/**
  * HTML encoding for XSS prevention
  */
 export const htmlEncode = (str: string): string => {
