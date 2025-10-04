@@ -47,9 +47,3 @@ export function splitTextIntoChunks(text: string): string[] {
   
   return chunks;
 }
-
-// Utility function to estimate the number of chunks needed for a text
-export function estimateChunkCount(text: string): number {
-  // Simple estimation: approximately one chunk per 200 characters
-  return Math.ceil(text.length / 200);
-}
