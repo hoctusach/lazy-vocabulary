@@ -18,9 +18,7 @@ import type { DailySelection, SeverityLevel } from '@/types/learning';
 import type { TodayWord } from '@/types/vocabulary';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 import { bootstrapLearnedFromServerByKey } from '@/lib/progress/srsSyncByUserKey';
-import type { ProgressSummaryFields } from '@/lib/progress/progressSummary';
 import {
-  legacySummaryToDerived,
   type DerivedProgressSummary,
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
@@ -37,7 +35,7 @@ const DEFAULT_STATS = {
 
 function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
-  const total = summary.learned + summary.learning + summary.new;
+  const total = summary.learned + summary.learning + summary.remaining;
   return {
     total,
     learning: summary.learning,
@@ -69,7 +67,7 @@ export const useLearningProgress = () => {
       return {
         ...stats,
         learned: learnedOverride,
-        total: learnedOverride + stats.learning + stats.new,
+        total: learnedOverride + stats.learning + Math.max(stats.total - stats.learning - learnedOverride, 0),
       };
     },
     []
@@ -80,8 +78,7 @@ export const useLearningProgress = () => {
     if (!targetKey) return;
     try {
       const summary = await fetchProgressSummaryService(targetKey);
-      const derived = legacySummaryToDerived(summary);
-      setProgressStats(applyLearnedOverride(toStats(derived)));
+      setProgressStats(applyLearnedOverride(toStats(summary)));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load progress summary', error);
       setProgressStats(applyLearnedOverride(DEFAULT_STATS));
@@ -92,19 +89,12 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const { learnedWords: learned, newTodayWords, dueTodayWords } = await fetchLearnedWordSummaries(targetKey);
+      const { learnedWords: learned, newTodayWords, dueTodayWords, summary } = await fetchLearnedWordSummaries(targetKey);
       learnedCountRef.current = learned.length;
       setLearnedWords(learned);
       setNewTodayLearnedWords(newTodayWords);
       setDueTodayLearnedWords(dueTodayWords);
-      setProgressStats(prev => {
-        const learnedCount = learned.length;
-        return {
-          ...prev,
-          learned: learnedCount,
-          total: learnedCount + prev.learning + prev.new,
-        };
-      });
+      setProgressStats(applyLearnedOverride(toStats(summary)));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
