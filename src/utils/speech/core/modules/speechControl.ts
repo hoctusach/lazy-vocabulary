@@ -40,13 +40,3 @@ export const keepSpeechAlive = (): void => {
   }
 };
 
-export const resetSpeechEngine = (): void => {
-  if (!canPerformOperation()) {
-    return;
-  }
-  
-  if (window.speechSynthesis) {
-    console.log('[ENGINE] Resetting speech engine');
-    window.speechSynthesis.cancel();
-  }
-};

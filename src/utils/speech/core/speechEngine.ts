@@ -4,15 +4,9 @@ export {
   pauseSpeaking,
   resumeSpeaking,
   keepSpeechAlive,
-  resetSpeechEngine,
 } from "./modules/speechControl";
 
-export {
-  waitForSpeechReadiness,
-  validateCurrentSpeech,
-  ensureSpeechEngineReady,
-  isSpeechSynthesisSupported,
-} from "./modules/speechValidation";
+export { ensureSpeechEngineReady } from "./modules/speechValidation";
 
 export { unlockAudio } from "./modules/speechUnlock";
 
