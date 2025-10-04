@@ -19,34 +19,9 @@ export const stopSpeaking = (): void => {
   }
 };
 
-export const pauseSpeaking = (): void => {
-  if (window.speechSynthesis && window.speechSynthesis.speaking) {
-    console.log('[ENGINE] Pausing speech');
-    window.speechSynthesis.pause();
-  }
-};
-
-export const resumeSpeaking = (): void => {
-  if (window.speechSynthesis && window.speechSynthesis.paused) {
-    console.log('[ENGINE] Resuming speech');
-    window.speechSynthesis.resume();
-  }
-};
-
 export const keepSpeechAlive = (): void => {
   if (window.speechSynthesis) {
     window.speechSynthesis.pause();
     window.speechSynthesis.resume();
-  }
-};
-
-export const resetSpeechEngine = (): void => {
-  if (!canPerformOperation()) {
-    return;
-  }
-  
-  if (window.speechSynthesis) {
-    console.log('[ENGINE] Resetting speech engine');
-    window.speechSynthesis.cancel();
   }
 };
