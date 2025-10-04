@@ -5,22 +5,13 @@ import {
   stopSpeaking,
   keepSpeechAlive,
   ensureSpeechEngineReady,
-  isSpeechSynthesisSupported,
 } from "./core/speechEngine";
-import {
-  extractMainWord,
-  prepareTextForSpeech,
-  forceResyncIfNeeded,
-} from "./core/speechText";
+import { extractMainWord, prepareTextForSpeech, forceResyncIfNeeded } from "./core/speechText";
 import {
   getSpeechRate,
   getSpeechPitch,
   getSpeechVolume,
 } from "./core/speechSettings";
-import { splitTextIntoChunks } from "./core/textChunker";
-import { speakChunksInSequence } from "./core/chunkSequencer";
-import { createSpeechMonitor, clearSpeechMonitor } from "./core/speechMonitor";
-import { synthesizeAudio } from "./synthesisUtils";
 import { formatSpeechText } from "./formatSpeechText";
 import {
   initializeSpeechSystem,
@@ -33,7 +24,6 @@ export {
   findFallbackVoice,
   getAllAvailableVoices,
   calculateSpeechDuration,
-  isSpeechSynthesisSupported,
   stopSpeaking,
   pauseSpeaking,
   resumeSpeaking,
@@ -45,11 +35,6 @@ export {
   getSpeechPitch,
   getSpeechVolume,
   prepareTextForSpeech,
-  splitTextIntoChunks,
-  speakChunksInSequence,
-  createSpeechMonitor,
-  clearSpeechMonitor,
-  synthesizeAudio,
   formatSpeechText,
 };
 

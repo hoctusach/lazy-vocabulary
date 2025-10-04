@@ -13,9 +13,3 @@ export const ensureSpeechEngineReady = async (): Promise<void> => {
     console.log('[ENGINE] Speech engine prepared');
   }
 };
-
-export const isSpeechSynthesisSupported = (): boolean => {
-  const isSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
-  console.log(`[ENGINE] Speech synthesis supported: ${isSupported}`);
-  return isSupported;
-};

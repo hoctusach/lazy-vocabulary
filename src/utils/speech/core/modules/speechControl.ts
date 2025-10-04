@@ -25,3 +25,4 @@ export const keepSpeechAlive = (): void => {
     window.speechSynthesis.resume();
   }
 };
+

@@ -4,10 +4,7 @@ export {
   keepSpeechAlive,
 } from "./modules/speechControl";
 
-export {
-  ensureSpeechEngineReady,
-  isSpeechSynthesisSupported,
-} from "./modules/speechValidation";
+export { ensureSpeechEngineReady } from "./modules/speechValidation";
 
 export { unlockAudio } from "./modules/speechUnlock";
 
