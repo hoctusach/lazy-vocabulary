@@ -3,12 +3,7 @@ import { calculateSpeechDuration } from "./durationUtils";
 import { speak } from "./core/speechPlayer";
 import {
   stopSpeaking,
-  pauseSpeaking,
-  resumeSpeaking,
   keepSpeechAlive,
-  waitForSpeechReadiness,
-  resetSpeechEngine,
-  validateCurrentSpeech,
   ensureSpeechEngineReady,
   isSpeechSynthesisSupported,
 } from "./core/speechEngine";
@@ -43,9 +38,6 @@ export {
   pauseSpeaking,
   resumeSpeaking,
   keepSpeechAlive,
-  waitForSpeechReadiness,
-  resetSpeechEngine,
-  validateCurrentSpeech,
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
   extractMainWord,
