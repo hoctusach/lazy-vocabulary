@@ -67,6 +67,3 @@ export function getSupabaseClient(): SupabaseClient {
   return client;
 }
 
-export function requireSupabaseClient(): SupabaseClient {
-  return getSupabaseClient();
-}
