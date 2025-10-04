@@ -53,9 +53,6 @@ type SelectionNormalizationMeta = {
   category: string | null;
 };
 
-const TODAY_WORDS_PREFIX = 'todayWords:';
-const ACTIVE_USER_KEY = 'todayWords.activeUser';
-
 const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
   light: { min: 15, max: 25 },
   moderate: { min: 30, max: 50 },
@@ -80,38 +77,6 @@ const SEVERITY_TO_MODE: Record<SeverityLevel, DailyMode> = {
 };
 
 const toDateKey = (value: Date) => value.toISOString().slice(0, 10);
-
-export const todayKeyFor = (userKey: string, d = new Date()) => `${TODAY_WORDS_PREFIX}${userKey}:${toDateKey(d)}`;
-
-function safeParseJSON<T>(value: string | null): T | null {
-  if (!value) return null;
-  try {
-    return JSON.parse(value) as T;
-  } catch {
-    return null;
-  }
-}
-
-function getStorage(): Storage | null {
-  try {
-    const globalRef = globalThis as unknown as { localStorage?: Storage };
-    return globalRef?.localStorage ?? null;
-  } catch (error) {
-    console.warn('[LearningProgress] localStorage unavailable', error);
-    return null;
-  }
-}
-
-function listStorageKeys(): string[] {
-  const storage = getStorage();
-  if (!storage) return [];
-  const keys: string[] = [];
-  for (let i = 0; i < storage.length; i += 1) {
-    const key = storage.key(i);
-    if (key) keys.push(key);
-  }
-  return keys;
-}
 
 function toIsoDate(dateKey: string | null | undefined): string | null {
   if (!dateKey) return null;
@@ -425,96 +390,6 @@ function normalizeToDailySelection(
   };
 }
 
-function getTodayCache(userKey: string): TodaySelectionState | null {
-  const storage = getStorage();
-  if (!storage) return null;
-  const key = todayKeyFor(userKey);
-  const cached = safeParseJSON<TodaySelectionState>(storage.getItem(key));
-  if (!cached) return null;
-  if (!Array.isArray(cached.words)) return null;
-  if (!cached.selection) return null;
-  return {
-    ...cached,
-    category: cached.category ?? null,
-    selection: {
-      ...cached.selection,
-      mode: cached.selection.mode ?? cached.mode,
-      count: cached.selection.count ?? cached.count,
-      category: cached.selection.category ?? cached.category ?? null,
-      date: cached.selection.date ?? cached.date,
-    },
-  };
-}
-
-export function loadTodayWordsFromLocal(userKey: string): TodaySelectionState | null {
-  return getTodayCache(userKey);
-}
-
-export function saveTodayWordsToLocal(userKey: string, payload: TodaySelectionState): void {
-  const storage = getStorage();
-  if (!storage) return;
-  try {
-    const key = todayKeyFor(userKey);
-    storage.setItem(key, JSON.stringify(payload));
-    storage.setItem(ACTIVE_USER_KEY, userKey);
-  } catch (error) {
-    console.warn('[LearningProgress] Failed to persist today words', error);
-  }
-}
-
-export function clearTodayWordsInLocal(userKey: string): void {
-  const storage = getStorage();
-  if (!storage) return;
-  const prefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
-  const keysToRemove = listStorageKeys().filter((key) => key.startsWith(prefix));
-  for (const key of keysToRemove) {
-    storage.removeItem(key);
-  }
-}
-
-function clearStaleCaches(currentUserKey: string, date = new Date()): void {
-  const storage = getStorage();
-  if (!storage) return;
-  const todayIso = toDateKey(date);
-  const keys = listStorageKeys();
-  for (const key of keys) {
-    if (!key.startsWith(TODAY_WORDS_PREFIX)) continue;
-    const [, userKey, cachedDate] = key.split(':');
-    if (!cachedDate || cachedDate === todayIso) continue;
-    storage.removeItem(key);
-    if (userKey && userKey !== currentUserKey) {
-      const legacyPrefix = `${TODAY_WORDS_PREFIX}${userKey}:`;
-      if (key.startsWith(legacyPrefix)) {
-        storage.removeItem(key);
-      }
-    }
-  }
-
-  const activeUser = storage.getItem(ACTIVE_USER_KEY);
-  if (activeUser && activeUser !== currentUserKey) {
-    clearTodayWordsInLocal(activeUser);
-  }
-  storage.setItem(ACTIVE_USER_KEY, currentUserKey);
-}
-
-export function isToday(date: string | null | undefined): boolean {
-  if (!date) return false;
-  return date.slice(0, 10) === toDateKey(new Date());
-}
-
-export function matchesCurrentOptions(
-  cached: TodaySelectionState,
-  options: { mode: DailyMode; count: number; category?: string | null }
-): boolean {
-  const cachedCategory = cached.category ?? null;
-  const optionCategory = options.category ?? null;
-  return (
-    cached.mode === options.mode &&
-    cached.count === options.count &&
-    cachedCategory === optionCategory
-  );
-}
-
 async function generateDailySelectionV2(
   userKey: string,
   mode: DailyMode,
@@ -637,8 +512,6 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
     });
   }
 
-  saveTodayWordsToLocal(userKey, today);
-
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] fetchAndCommitTodaySelection final selection', {
       selectionSize: today.words.length,
@@ -654,52 +527,14 @@ export async function getOrCreateTodayWords(
   count: number,
   category?: string | null
 ): Promise<TodaySelectionState> {
-  const cached = loadTodayWordsFromLocal(userKey);
-  const hasValidCache = Boolean(
-    cached && isToday(cached.date) && matchesCurrentOptions(cached, { mode, count, category: category ?? null })
-  );
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[LearningProgress] getOrCreateTodayWords cache status', {
-      cache: cached
-        ? {
-            day: cached.date,
-            idsLength: cached.words.length,
-          }
-        : null,
-      todayISO: new Date().toISOString(),
+    console.log('[LearningProgress] getOrCreateTodayWords fetching selection', {
       category,
       planSize: count,
     });
   }
-  if (hasValidCache && cached && process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[LearningProgress] getOrCreateTodayWords serving cached selection while refreshing', {
-      day: cached.date,
-      idsLength: cached.words.length,
-    });
-  }
-  const fetchPromise = (async () => {
-    if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-      console.log('[LearningProgress] getOrCreateTodayWords fetching new selection', {
-        category,
-        planSize: count,
-      });
-    }
-    return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
-  })();
 
-  try {
-    const result = await fetchPromise;
-    return result;
-  } catch (error) {
-    console.warn('[LearningProgress] Failed to refresh today\'s words from server', {
-      error,
-      hasValidCache,
-    });
-    if (hasValidCache && cached) {
-      return cached;
-    }
-    throw error;
-  }
+  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
 }
 
 export async function prepareUserSession(): Promise<string | null> {
@@ -708,14 +543,14 @@ export async function prepareUserSession(): Promise<string | null> {
     console.log('[LearningProgress] prepareUserSession resolved', { userKey });
   }
   if (!userKey) return null;
-  clearStaleCaches(userKey);
   return userKey;
 }
 
 export async function markWordReviewed(
   userKey: string,
   wordId: string,
-  severity: SeverityLevel
+  severity: SeverityLevel,
+  currentState: TodaySelectionState
 ): Promise<{
   words: TodayWord[];
   selection: DailySelection;
@@ -726,36 +561,23 @@ export async function markWordReviewed(
   newTodayWords: TodayLearnedWordSummary[] | null;
   dueTodayWords: TodayLearnedWordSummary[] | null;
 }> {
-  const cached = loadTodayWordsFromLocal(userKey);
-  if (!cached) {
-    throw new Error('No cached selection for today');
-  }
-
-  const index = cached.words.findIndex((entry) => entry.word_id === wordId);
+  const index = currentState.words.findIndex((entry) => entry.word_id === wordId);
   if (index === -1) {
     throw new Error('Word not found in today cache');
   }
 
-  const { updated, payload, progress } = applyReviewToWord(cached.words[index]);
-  const words = [...cached.words];
+  const { updated, payload, progress } = applyReviewToWord(currentState.words[index]);
+  const words = [...currentState.words];
   words[index] = updated;
 
-  const mode = SEVERITY_TO_MODE[severity] ?? cached.mode;
+  const mode = SEVERITY_TO_MODE[severity] ?? currentState.mode;
   const count = getDailyCount(severity);
   const selection = buildSelection(words, severity, {
     mode,
     count,
-    category: cached.category,
+    category: currentState.category,
   });
-  selection.date = cached.date;
-
-  const nextCache: TodaySelectionState = {
-    ...cached,
-    words,
-    selection,
-  };
-
-  saveTodayWordsToLocal(userKey, nextCache);
+  selection.date = currentState.selection.date ?? currentState.date;
 
   const rows = await markLearnedServerByKey(wordId, payload);
 
@@ -791,14 +613,15 @@ export async function markWordReviewed(
   };
 }
 
-export async function markWordAsNew(userKey: string, wordId: string): Promise<TodayWord[]> {
-  const cached = loadTodayWordsFromLocal(userKey);
-  if (!cached) return [];
+export async function markWordAsNew(
+  userKey: string,
+  wordId: string,
+  currentState: TodaySelectionState
+): Promise<TodaySelectionState> {
+  const index = currentState.words.findIndex((entry) => entry.word_id === wordId);
+  if (index === -1) return currentState;
 
-  const index = cached.words.findIndex((entry) => entry.word_id === wordId);
-  if (index === -1) return cached.words;
-
-  const base = cached.words[index];
+  const base = currentState.words[index];
   const resetWord: TodayWord = {
     ...base,
     is_due: false,
@@ -817,25 +640,23 @@ export async function markWordAsNew(userKey: string, wordId: string): Promise<To
     },
   };
 
-  const words = [...cached.words];
+  const words = [...currentState.words];
   words[index] = resetWord;
 
-  const severity = MODE_TO_SEVERITY[cached.mode] ?? 'light';
+  const severity = MODE_TO_SEVERITY[currentState.mode] ?? currentState.selection.severity ?? 'light';
   const selection = buildSelection(words, severity, {
-    mode: cached.mode,
-    count: cached.count,
-    category: cached.category,
+    mode: currentState.mode,
+    count: currentState.count,
+    category: currentState.category,
   });
-  selection.date = cached.date;
-
-  saveTodayWordsToLocal(userKey, {
-    ...cached,
-    words,
-    selection,
-  });
+  selection.date = currentState.selection.date ?? currentState.date;
 
   await resetLearned(wordId);
-  return words;
+  return {
+    ...currentState,
+    words,
+    selection,
+  };
 }
 
 export async function fetchProgressSummary(userKey: string): Promise<ProgressSummaryFields | null> {
@@ -905,7 +726,6 @@ export async function regenerateTodaySelection(
   severity: SeverityLevel,
   category?: string | null
 ): Promise<TodaySelectionState> {
-  clearTodayWordsInLocal(userKey);
   const mode = SEVERITY_TO_MODE[severity] ?? 'Light';
   const count = getDailyCount(severity);
   return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
