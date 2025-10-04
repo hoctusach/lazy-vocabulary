@@ -19,18 +19,9 @@ export const prepareTextForSpeech = (text: string): string => {
   return prepared;
 };
 
-export const addPausesToText = (text: string): string => {
-  // Replace XML break tags with actual SSML pause marks that won't be read aloud
-  return text.replace(/\./g, '.');
-};
-
-export const checkSoundDisplaySync = (text: string, spokenText: string): boolean => {
-  return spokenText.toLowerCase().includes(text.toLowerCase());
-};
-
 export const forceResyncIfNeeded = (
-  currentWord: string, 
-  processedText: string, 
+  currentWord: string,
+  processedText: string,
   resyncCallback: () => void
 ): void => {
   if (!processedText.toLowerCase().includes(currentWord.toLowerCase())) {

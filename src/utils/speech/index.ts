@@ -10,8 +10,6 @@ import {
 import {
   extractMainWord,
   prepareTextForSpeech,
-  addPausesToText,
-  checkSoundDisplaySync,
   forceResyncIfNeeded,
 } from "./core/speechText";
 import {
@@ -37,7 +35,8 @@ export {
   calculateSpeechDuration,
   isSpeechSynthesisSupported,
   stopSpeaking,
-  checkSoundDisplaySync,
+  pauseSpeaking,
+  resumeSpeaking,
   keepSpeechAlive,
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
@@ -46,7 +45,6 @@ export {
   getSpeechPitch,
   getSpeechVolume,
   prepareTextForSpeech,
-  addPausesToText,
   splitTextIntoChunks,
   speakChunksInSequence,
   createSpeechMonitor,
