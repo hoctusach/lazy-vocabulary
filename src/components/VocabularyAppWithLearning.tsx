@@ -11,7 +11,6 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
-import { normalizeQuery } from '@/utils/text/normalizeQuery';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { VocabularyWord } from '@/types/vocabulary';
 
@@ -67,12 +66,12 @@ const VocabularyAppWithLearning: React.FC = () => {
   }, [dailySelection]);
 
   const openSearch = (word?: string) => {
-    const normalized = normalizeQuery(word || '');
-    if (word && normalized === '') {
+    const nextQuery = word ?? '';
+    if (word && !word.trim()) {
       toast.warning('Please enter a valid search query.');
       return;
     }
-    setSearchWord(normalized);
+    setSearchWord(nextQuery);
     setIsSearchOpen(true);
   };
 
