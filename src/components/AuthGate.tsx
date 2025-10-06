@@ -13,6 +13,7 @@ import {
   storePasscode,
 } from '@/lib/auth';
 import type { SeverityLevel } from '@/types/learning';
+import { identifyUser } from '@/services/analyticsService';
 
 function isSeverityLevel(value: unknown): value is SeverityLevel {
   return value === 'light' || value === 'moderate' || value === 'intense';
@@ -178,6 +179,7 @@ export default function AuthGate() {
       }
 
       if (userKey) {
+        identifyUser(userKey, nicknameFromSession);
         void (async () => {
           try {
             const [{ getPreferences }, progress] = await Promise.all([

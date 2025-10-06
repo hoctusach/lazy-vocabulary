@@ -21,6 +21,8 @@ import {
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
 import { buildTodaysWords } from '@/utils/todayWords';
+import { identifyUser, trackReviewDue, trackWordLearned } from '@/services/analyticsService';
+import { getNicknameLocal } from '@/lib/nickname';
 
 const DEFAULT_STATS = {
   total: 0,
@@ -54,6 +56,8 @@ export const useLearningProgress = () => {
   const [newTodayLearnedWords, setNewTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [dueTodayLearnedWords, setDueTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
+  const dueEventTrackerRef = useRef<Set<string>>(new Set());
+  const identifiedKeyRef = useRef<string | null>(null);
 
   const applyLearnedOverride = useCallback(
     (stats: typeof DEFAULT_STATS) => {
@@ -98,6 +102,15 @@ export const useLearningProgress = () => {
       setNewTodayLearnedWords([]);
       setDueTodayLearnedWords([]);
     }
+  }, [userKey]);
+
+  useEffect(() => {
+    if (!userKey) return;
+    if (identifiedKeyRef.current === userKey) return;
+
+    identifiedKeyRef.current = userKey;
+    const nickname = getNicknameLocal();
+    identifyUser(userKey, nickname);
   }, [userKey]);
 
   useEffect(() => {
@@ -237,6 +250,29 @@ export const useLearningProgress = () => {
     });
   }, []);
 
+  useEffect(() => {
+    dueEventTrackerRef.current.clear();
+  }, [dailySelection?.date, userKey]);
+
+  useEffect(() => {
+    if (!userKey) return;
+
+    const tracker = dueEventTrackerRef.current;
+    todayWords.forEach((word) => {
+      if (!word.is_due) return;
+
+      const trackerKey = `${word.word_id}:${word.nextAllowedTime ?? ''}`;
+      if (tracker.has(trackerKey)) return;
+
+      tracker.add(trackerKey);
+      trackReviewDue(userKey, {
+        wordId: word.word_id,
+        category: word.category,
+        srsIntervalDays: word.srs?.srs_interval_days ?? null,
+      });
+    });
+  }, [todayWords, userKey]);
+
   const buildCurrentTodayState = useCallback((): TodaySelectionState | null => {
     if (!dailySelection) return null;
     const date = dailySelection.date ?? new Date().toISOString();
@@ -271,6 +307,12 @@ export const useLearningProgress = () => {
         const result = await markWordReviewed(userKey, target.word_id, severity, currentState);
         setDailySelection(result.selection);
         setTodayWords(result.words);
+        trackWordLearned(userKey, {
+          wordId: target.word_id,
+          category: target.category,
+          srsState: result.payload?.srs_state ?? target.srs?.srs_state ?? null,
+          srsIntervalDays: result.payload?.srs_interval_days ?? target.srs?.srs_interval_days ?? null,
+        });
         if (result.learnedWords) {
           learnedCountRef.current = result.learnedWords.length;
           setLearnedWords(result.learnedWords);
