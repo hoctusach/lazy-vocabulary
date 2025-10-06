@@ -13,12 +13,13 @@ import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { VocabularyWord } from '@/types/vocabulary';
+import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
   const [summaryOpen, setSummaryOpen] = useState(true);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
-  const [wordToReset, setWordToReset] = useState<string | null>(null);
+  const [wordToReset, setWordToReset] = useState<LearnedWordSummary | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchWord, setSearchWord] = useState('');
 
@@ -75,10 +76,16 @@ const VocabularyAppWithLearning: React.FC = () => {
     setIsSearchOpen(true);
   };
 
-  const handleMarkAsNew = () => {
+  const handleMarkAsNew = async () => {
     if (wordToReset) {
-      markWordAsNew(wordToReset);
-      toast.success('Word reset to new.');
+      const category = (wordToReset.category ?? '').trim();
+      const wordId = category ? `${wordToReset.word}::${category}` : wordToReset.word;
+      const didReset = await markWordAsNew(wordId);
+      if (didReset) {
+        toast.success('Moved back to Learning!');
+      } else {
+        toast.error('Unable to move word back to learning. Please try again.');
+      }
     }
     setIsMarkAsNewDialogOpen(false);
     setWordToReset(null);
@@ -188,7 +195,7 @@ const VocabularyAppWithLearning: React.FC = () => {
                           aria-label="Mark as New"
                           className="text-gray-400 hover:text-gray-600"
                           onClick={() => {
-                            setWordToReset(word.word);
+                            setWordToReset(word);
                             setIsMarkAsNewDialogOpen(true);
                           }}
                         >
@@ -230,7 +237,7 @@ const VocabularyAppWithLearning: React.FC = () => {
         isOpen={isMarkAsNewDialogOpen}
         onClose={() => setIsMarkAsNewDialogOpen(false)}
         onConfirm={handleMarkAsNew}
-        word={wordToReset || ''}
+        word={wordToReset?.word ?? ''}
       />
       <WordSearchModal
         isOpen={isSearchOpen}
