@@ -1,15 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader, Search } from 'lucide-react';
-import { VocabularyWord } from '@/types/vocabulary';
 import { Badge } from '@/components/ui/badge';
 import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
-import { normalizeQuery } from '@/utils/text/normalizeQuery';
+import { getSupabaseClient } from '@/lib/supabaseClient';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -18,16 +17,24 @@ interface WordSearchModalProps {
 }
 
 
+interface VocabularySearchResult {
+  word_id: string;
+  word: string;
+  category: string | null;
+  meaning: string;
+  example: string;
+  translation: string | null;
+  match_rank: number;
+}
+
+
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
-  const searchRef = useRef<((q: string) => VocabularyWord[]) | null>(null);
-  const wordsRef = useRef<VocabularyWord[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState('');
-  const [query, setQuery] = useState(normalizeQuery(initialQuery));
-  const [debouncedQuery, setDebouncedQuery] = useState(normalizeQuery(initialQuery));
-  const [results, setResults] = useState<VocabularyWord[]>([]);
-  const [selectedWord, setSelectedWord] = useState<VocabularyWord | null>(null);
-  const [validationMessage, setValidationMessage] = useState('');
+  const [query, setQuery] = useState(initialQuery);
+  const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+  const [results, setResults] = useState<VocabularySearchResult[]>([]);
+  const [selectedWord, setSelectedWord] = useState<VocabularySearchResult | null>(null);
   const previewVoice: VoiceSelection = {
     label: 'US',
     region: 'US',
@@ -36,66 +43,50 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   };
 
   useEffect(() => {
-    if (isOpen && !searchRef.current && !loading) {
-      setLoading(true);
-      import('@/services/search/vocabularySearch')
-        .then(async mod => {
-          await mod.loadVocabularyIndex();
-          searchRef.current = mod.searchVocabulary;
-          setLoading(false);
-          setLoadError('');
-          if (debouncedQuery.trim()) {
-            const filtered = mod.searchVocabulary(debouncedQuery);
-            wordsRef.current = filtered;
-            setResults(filtered);
-            setSelectedWord(filtered[0] || null);
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          setLoadError('Failed to load vocabulary');
-          setLoading(false);
-        });
-    }
-  }, [isOpen, loading, debouncedQuery]);
-
-  useEffect(() => {
     if (isOpen) {
-      const normalized = normalizeQuery(initialQuery);
-      setQuery(normalized);
-      setDebouncedQuery(normalized);
-      if (initialQuery.trim() && normalized === '') {
-        setValidationMessage('Please enter a valid search query.');
-      } else {
-        setValidationMessage('');
-      }
+      setQuery(initialQuery);
+      setDebouncedQuery(initialQuery);
+      setSelectedWord(null);
+      setResults([]);
+      setLoadError('');
     }
   }, [isOpen, initialQuery]);
 
-  const highlightMatch = (text: string) => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return text;
-
-    const regex = new RegExp(`\\b${normalized}\\b`, 'i');
-    const match = text.match(regex);
-    if (!match || match.index === undefined) return text;
-
-    const idx = match.index;
-    const matchText = match[0];
-
-    return (
-      <>
-        {text.slice(0, idx)}
-        <mark className="bg-yellow-200">{matchText}</mark>
-        {text.slice(idx + matchText.length)}
-      </>
-    );
-  };
-
   useEffect(() => {
-    const id = setTimeout(() => setDebouncedQuery(query), 200);
+    if (!isOpen) return;
+    const id = setTimeout(() => setDebouncedQuery(query), 400);
     return () => clearTimeout(id);
-  }, [query]);
+  }, [query, isOpen]);
+
+  const highlightMatch = (text: string) => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return text;
+
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    try {
+      const regex = new RegExp(`(${escapeRegExp(trimmedQuery)})`, 'ig');
+      const parts = text.split(regex);
+      if (parts.length === 1) return text;
+
+      return (
+        <>
+          {parts.map((part, index) =>
+            index % 2 === 1 ? (
+              <mark key={`${part}-${index}`} className="bg-yellow-200">
+                {part}
+              </mark>
+            ) : (
+              <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>
+            )
+          )}
+        </>
+      );
+    } catch (error) {
+      console.error('Failed to highlight search match', error);
+      return text;
+    }
+  };
 
   // Clear any selected word when the search query changes
   useEffect(() => {
@@ -106,20 +97,59 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   }, [query]);
 
   useEffect(() => {
-    if (!searchRef.current) return;
+    if (!isOpen) return;
 
-    const normalized = debouncedQuery.trim().toLowerCase();
-    if (normalized === '') {
+    const currentQuery = debouncedQuery;
+    const trimmed = currentQuery.trim();
+
+    if (!trimmed) {
       setResults([]);
       setSelectedWord(null);
+      setLoading(false);
+      setLoadError('');
       return;
     }
 
-    const filtered = searchRef.current(debouncedQuery);
-    wordsRef.current = filtered;
-    setResults(filtered);
-    setSelectedWord(filtered[0] || null);
-  }, [debouncedQuery]);
+    let isCancelled = false;
+
+    const fetchResults = async () => {
+      setLoading(true);
+      setLoadError('');
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase.rpc('search_vocabulary', {
+          p_query: currentQuery,
+        });
+
+        if (isCancelled) return;
+
+        if (error) {
+          throw error;
+        }
+
+        const nextResults = Array.isArray(data) ? data : [];
+        setResults(nextResults);
+        setSelectedWord(nextResults.length > 0 ? nextResults[0] : null);
+      } catch (err) {
+        console.error('Failed to fetch vocabulary search results', err);
+        if (!isCancelled) {
+          setLoadError('Failed to fetch results');
+          setResults([]);
+          setSelectedWord(null);
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchResults();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [debouncedQuery, isOpen]);
 
   const handlePlay = () => {
     if (!selectedWord) return;
@@ -139,24 +169,15 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   };
 
   const handleInputChange = (value: string) => {
-    const normalized = normalizeQuery(value);
-    setQuery(normalized);
-    if (value.trim() && normalized === '') {
-      setValidationMessage('Please enter a valid search query.');
-      setResults([]);
-      setSelectedWord(null);
-      return;
-    }
-    setValidationMessage('');
-    if (normalized === '') {
-      setResults([]);
-      setSelectedWord(null);
-    }
+    setQuery(value);
   };
 
   const handleClose = () => {
     setQuery('');
+    setDebouncedQuery('');
+    setResults([]);
     setSelectedWord(null);
+    setLoadError('');
     onClose();
   };
 
@@ -174,59 +195,63 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
             placeholder="Search word..."
             value={query}
             onChange={e => handleInputChange(e.target.value)}
-            onKeyUp={e => handleInputChange((e.target as HTMLInputElement).value)}
             onKeyDown={e => {
               if (e.key === 'Enter') e.preventDefault();
             }}
           />
-          <Button size="icon" variant="outline" aria-label="Search">
+          <Button
+            size="icon"
+            variant="outline"
+            aria-label="Search"
+            onClick={() => setDebouncedQuery(query)}
+          >
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        {validationMessage && (
-          <p className="mt-2 text-sm text-destructive">{validationMessage}</p>
-        )}
         {!selectedWord ? (
-          <ScrollArea className="h-40 mt-3 border rounded-md">
-            {loading && !wordsRef.current && (
-              <div className="flex justify-center py-4" aria-label="loading">
-                <Loader className="h-4 w-4 animate-spin" />
-
-              </div>
-            )}
-            {loadError && (
-              <p className="p-2 text-sm text-destructive">{loadError}</p>
-            )}
-            {results.map((item) => (
-              <div
-                key={`${item.word}-${item.category}`}
-                className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
-                onClick={() => setSelectedWord(item)}
-              >
-                <span className="mr-2 flex-1">
-                  {highlightMatch(item.word)}
-                </span>
-                {item.category && (
-                  <Badge variant="secondary" className="shrink-0">
-                    {item.category}
-                  </Badge>
-                )}
-              </div>
-            ))}
+          <>
+            <ScrollArea className="h-40 mt-3 border rounded-md">
+              {loading && (
+                <div className="flex justify-center py-4" aria-label="loading">
+                  <Loader className="h-4 w-4 animate-spin" />
+                </div>
+              )}
+              {loadError && (
+                <p className="p-2 text-sm text-destructive">{loadError}</p>
+              )}
+              {results.map((item) => (
+                <div
+                  key={`${item.word}-${item.category}`}
+                  className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
+                  onClick={() => setSelectedWord(item)}
+                >
+                  <span className="mr-2 flex-1">
+                    {highlightMatch(item.word)}
+                  </span>
+                  {item.category && (
+                    <Badge variant="secondary" className="shrink-0">
+                      {item.category}
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </ScrollArea>
             {results.length === 0 &&
               debouncedQuery.trim() &&
               !loading &&
               !loadError && (
-                <p className="p-2 text-sm text-muted-foreground">No results</p>
+                <div className="mt-2">
+                  <p className="text-gray-400 italic text-sm">No results found.</p>
+                </div>
               )}
-          </ScrollArea>
+          </>
         ) : (
           <div className="mt-3 space-y-2">
             <VocabularyCard
               word={selectedWord.word}
               meaning={selectedWord.meaning}
               example={selectedWord.example}
-              translation={selectedWord.translation}
+              translation={selectedWord.translation ?? undefined}
               backgroundColor="#ffffff"
               isMuted={false}
               isPaused={false}
