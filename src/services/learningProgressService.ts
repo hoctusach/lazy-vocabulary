@@ -1,11 +1,11 @@
 import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from '@/types/learning';
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
-import { resetLearned } from '@/lib/db/learned';
 import { getDailySelectionV2, type DailySelectionV2Row } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { buildTodaysWords } from '@/utils/todayWords';
+import { LEARNED_WORDS_CACHE_KEY } from '@/utils/storageKeys';
 import {
   computeLearnedWordStats,
   type DerivedProgressSummary,
@@ -608,59 +608,132 @@ export async function markWordReviewed(
   };
 }
 
+export type MarkWordAsNewResult = {
+  learnedWords: LearnedWordSummary[];
+  newTodayWords: TodayLearnedWordSummary[];
+  dueTodayWords: TodayLearnedWordSummary[];
+  summary: DerivedProgressSummary;
+};
+
 export async function markWordAsNew(
   userKey: string,
-  wordId: string,
-  currentState: TodaySelectionState
-): Promise<TodaySelectionState> {
-  const index = currentState.words.findIndex((entry) => entry.word_id === wordId);
-  if (index === -1) return currentState;
+  wordId: string
+): Promise<MarkWordAsNewResult | null> {
+  if (!userKey || !wordId) return null;
 
-  const base = currentState.words[index];
-  const resetWord: TodayWord = {
-    ...base,
-    is_due: false,
-    nextAllowedTime: undefined,
-    srs: {
-      in_review_queue: false,
-      review_count: 0,
-      learned_at: null,
-      last_review_at: null,
-      next_review_at: null,
-      next_display_at: null,
-      last_seen_at: null,
-      srs_interval_days: null,
-      srs_ease: base.srs?.srs_ease ?? 2.5,
-      srs_state: 'new',
-    },
-  };
+  const client = getSupabaseClient();
+  if (!client) return null;
 
-  const words = [...currentState.words];
-  words[index] = resetWord;
+  try {
+    const { data, error } = await client.rpc('mark_word_new_by_key', {
+      p_user_key: userKey,
+      p_word_id: wordId,
+    });
 
-  const severity = MODE_TO_SEVERITY[currentState.mode] ?? currentState.selection.severity ?? 'light';
-  const selection = buildSelection(words, severity, {
-    mode: currentState.mode,
-    count: currentState.count,
-    category: currentState.category,
-  });
-  selection.date = currentState.selection.date ?? currentState.date;
+    if (error) {
+      console.warn('[LearningProgress] Failed to reset learned word', error.message);
+      return null;
+    }
 
-  await resetLearned(wordId);
-  return {
-    ...currentState,
-    words,
-    selection,
-  };
+    const normalizedRows = Array.isArray(data)
+      ? (data as unknown[])
+          .map((entry) => normalizeLearnedWordRow(entry))
+          .filter((row): row is LearnedWordRow => row !== null)
+      : [];
+
+    persistLearnedWordRows(normalizedRows);
+
+    const { learnedWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
+      totalWords: TOTAL_WORDS,
+    });
+
+    return {
+      learnedWords,
+      newTodayWords,
+      dueTodayWords,
+      summary,
+    };
+  } catch (error) {
+    console.warn('[LearningProgress] markWordAsNew RPC failed', error);
+    return null;
+  }
 }
 
 type LearnedWordStatsPayload = ReturnType<typeof computeLearnedWordStats>;
+
+const isPlainObject = (value: unknown): value is Record<string, any> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+function normalizeLearnedWordRow(value: unknown): LearnedWordRow | null {
+  if (!isPlainObject(value)) return null;
+
+  const ensureNumber = (candidate: unknown): number | null => {
+    if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+    return null;
+  };
+
+  return {
+    word_id: typeof value.word_id === 'string' ? value.word_id : null,
+    srs_state: typeof value.srs_state === 'string' ? value.srs_state : null,
+    learned_at: typeof value.learned_at === 'string' ? value.learned_at : null,
+    mark_learned_at: typeof value.mark_learned_at === 'string' ? value.mark_learned_at : null,
+    last_review_at: typeof value.last_review_at === 'string' ? value.last_review_at : null,
+    next_review_at: typeof value.next_review_at === 'string' ? value.next_review_at : null,
+    next_display_at: typeof value.next_display_at === 'string' ? value.next_display_at : null,
+    in_review_queue:
+      typeof value.in_review_queue === 'boolean' ? value.in_review_queue : null,
+    review_count: ensureNumber(value.review_count),
+    srs_interval_days: ensureNumber(value.srs_interval_days),
+    srs_ease: ensureNumber(value.srs_ease),
+    is_today_selection:
+      typeof value.is_today_selection === 'boolean' ? value.is_today_selection : null,
+    due_selected_today:
+      typeof value.due_selected_today === 'boolean' ? value.due_selected_today : null,
+  };
+}
+
+function readCachedLearnedWordRows(): LearnedWordRow[] | null {
+  if (typeof localStorage === 'undefined') return null;
+
+  try {
+    const raw = localStorage.getItem(LEARNED_WORDS_CACHE_KEY);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return null;
+
+    const rows = parsed
+      .map((entry) => normalizeLearnedWordRow(entry))
+      .filter((row): row is LearnedWordRow => row !== null);
+
+    return rows.length > 0 ? rows : [];
+  } catch (error) {
+    console.warn('[LearningProgress] Failed to read learned words cache', error);
+    return null;
+  }
+}
+
+function persistLearnedWordRows(rows: LearnedWordRow[]): void {
+  if (typeof localStorage === 'undefined') return;
+
+  try {
+    localStorage.setItem(LEARNED_WORDS_CACHE_KEY, JSON.stringify(rows));
+  } catch (error) {
+    console.warn('[LearningProgress] Failed to persist learned words cache', error);
+  }
+}
 
 async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPayload | null> {
   if (!userKey) return null;
 
   const client = getSupabaseClient();
-  if (!client) return null;
+  if (!client) {
+    const cachedRows = readCachedLearnedWordRows();
+    if (!cachedRows) return null;
+    return computeLearnedWordStats(cachedRows, {
+      totalWords: TOTAL_WORDS,
+    });
+  }
 
   const { data, error } = await client
     .from('learned_words')
@@ -670,12 +743,22 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
 
   if (error) {
     console.warn('[LearningProgress] Failed to fetch learned words', error.message);
-    return null;
+    const cachedRows = readCachedLearnedWordRows();
+    if (!cachedRows) return null;
+    return computeLearnedWordStats(cachedRows, {
+      totalWords: TOTAL_WORDS,
+    });
   }
 
-  const rawRows = Array.isArray(data) ? (data as LearnedWordRow[]) : [];
+  const normalizedRows = Array.isArray(data)
+    ? (data as unknown[])
+        .map((entry) => normalizeLearnedWordRow(entry))
+        .filter((row): row is LearnedWordRow => row !== null)
+    : [];
 
-  return computeLearnedWordStats(rawRows, {
+  persistLearnedWordRows(normalizedRows);
+
+  return computeLearnedWordStats(normalizedRows, {
     totalWords: TOTAL_WORDS,
   });
 }

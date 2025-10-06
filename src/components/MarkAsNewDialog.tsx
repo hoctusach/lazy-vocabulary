@@ -13,7 +13,7 @@ import {
 interface MarkAsNewDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   word: string;
 }
 

@@ -309,22 +309,30 @@ export const useLearningProgress = () => {
   );
 
   const markWordAsNew = useCallback(
-    async (word: string) => {
-      if (!userKey) return;
-      const target = todayWords.find(entry => entry.word === word);
-      if (!target) return;
-      const currentState = buildCurrentTodayState();
-      if (!currentState) return;
+    async (wordId: string) => {
+      if (!userKey || !wordId) return false;
       try {
-        const result = await markWordAsNewService(userKey, target.word_id, currentState);
-        setTodayWords(buildTodaysWords(result.words, 'ALL'));
-        setDailySelection(result.selection);
-        void refreshStats(userKey);
+        const result = await markWordAsNewService(userKey, wordId);
+        if (!result) {
+          await refreshLearnedWords(userKey);
+          await refreshStats(userKey);
+          return false;
+        }
+
+        learnedCountRef.current = result.learnedWords.length;
+        setLearnedWords(result.learnedWords);
+        setNewTodayLearnedWords(result.newTodayWords);
+        setDueTodayLearnedWords(result.dueTodayWords);
+        setProgressStats(applyLearnedOverride(toStats(result.summary)));
+        return true;
       } catch (error) {
         console.warn('[useLearningProgress] Failed to reset word', error);
+        await refreshLearnedWords(userKey);
+        await refreshStats(userKey);
+        return false;
       }
     },
-    [buildCurrentTodayState, refreshStats, todayWords, userKey]
+    [applyLearnedOverride, refreshLearnedWords, refreshStats, userKey]
   );
 
   const orderedTodayWords = useMemo(() => buildTodaysWords(todayWords, 'ALL'), [todayWords]);
