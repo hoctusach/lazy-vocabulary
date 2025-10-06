@@ -30,11 +30,11 @@ interface VocabularySearchResult {
 
 const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, initialQuery = '' }) => {
   const [loading, setLoading] = useState(false);
-  const [loadError, setLoadError] = useState('');
   const [query, setQuery] = useState(initialQuery);
   const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
   const [results, setResults] = useState<VocabularySearchResult[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularySearchResult | null>(null);
+  const [noResults, setNoResults] = useState(false);
   const previewVoice: VoiceSelection = {
     label: 'US',
     region: 'US',
@@ -48,7 +48,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setDebouncedQuery(initialQuery);
       setSelectedWord(null);
       setResults([]);
-      setLoadError('');
+      setNoResults(false);
+      setLoading(false);
     }
   }, [isOpen, initialQuery]);
 
@@ -106,7 +107,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setResults([]);
       setSelectedWord(null);
       setLoading(false);
-      setLoadError('');
+      setNoResults(false);
       return;
     }
 
@@ -114,28 +115,38 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
 
     const fetchResults = async () => {
       setLoading(true);
-      setLoadError('');
+      setResults([]);
+      setSelectedWord(null);
+      setNoResults(false);
       try {
         const supabase = getSupabaseClient();
         const { data, error } = await supabase.rpc('search_vocabulary', {
-          p_query: currentQuery,
+          p_query: trimmed.toLowerCase(),
         });
 
         if (isCancelled) return;
 
         if (error) {
-          throw error;
+          console.error('Failed to fetch vocabulary search results', error);
+          setNoResults(true);
+          return;
         }
 
         const nextResults = Array.isArray(data) ? data : [];
+        if (nextResults.length === 0) {
+          setNoResults(true);
+          return;
+        }
+
         setResults(nextResults);
-        setSelectedWord(nextResults.length > 0 ? nextResults[0] : null);
+        setSelectedWord(nextResults[0] ?? null);
+        setNoResults(false);
       } catch (err) {
-        console.error('Failed to fetch vocabulary search results', err);
         if (!isCancelled) {
-          setLoadError('Failed to fetch results');
+          console.error('Failed to fetch vocabulary search results', err);
           setResults([]);
           setSelectedWord(null);
+          setNoResults(true);
         }
       } finally {
         if (!isCancelled) {
@@ -177,7 +188,8 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     setDebouncedQuery('');
     setResults([]);
     setSelectedWord(null);
-    setLoadError('');
+    setNoResults(false);
+    setLoading(false);
     onClose();
   };
 
@@ -216,9 +228,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                   <Loader className="h-4 w-4 animate-spin" />
                 </div>
               )}
-              {loadError && (
-                <p className="p-2 text-sm text-destructive">{loadError}</p>
-              )}
               {results.map((item) => (
                 <div
                   key={`${item.word}-${item.category}`}
@@ -236,10 +245,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                 </div>
               ))}
             </ScrollArea>
-            {results.length === 0 &&
-              debouncedQuery.trim() &&
-              !loading &&
-              !loadError && (
+            {noResults && debouncedQuery.trim() && !loading && (
                 <div className="mt-2">
                   <p className="text-gray-400 italic text-sm">No results found.</p>
                 </div>
