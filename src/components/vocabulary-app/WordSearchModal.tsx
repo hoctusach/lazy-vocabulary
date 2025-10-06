@@ -172,6 +172,22 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     setQuery(value);
   };
 
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      return;
+    }
+
+    const isSpaceKey =
+      event.key === ' ' ||
+      event.key === 'Spacebar' ||
+      event.code === 'Space';
+
+    if (isSpaceKey) {
+      event.stopPropagation();
+    }
+  };
+
   const handleClose = () => {
     setQuery('');
     setDebouncedQuery('');
@@ -195,9 +211,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
             placeholder="Search word..."
             value={query}
             onChange={e => handleInputChange(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') e.preventDefault();
-            }}
+            onKeyDown={handleInputKeyDown}
           />
           <Button
             size="icon"
