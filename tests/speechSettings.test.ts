@@ -50,4 +50,22 @@ describe('speechSettings', () => {
     // Should not re-read from storage after caching the new value
     expect(mockReadSpeechRate).not.toHaveBeenCalled();
   });
+
+  it('clamps values read from storage into the supported range', async () => {
+    mockReadSpeechRate.mockReturnValue(0.1);
+    const { getSpeechRate } = await importSpeechSettings();
+    const { MIN_SPEECH_RATE } = await import('@/services/speech/core/constants');
+
+    expect(getSpeechRate()).toBe(MIN_SPEECH_RATE);
+  });
+
+  it('clamps values written to storage into the supported range', async () => {
+    mockReadSpeechRate.mockReturnValue(0.8);
+    const { setSpeechRate } = await importSpeechSettings();
+    const { MAX_SPEECH_RATE } = await import('@/services/speech/core/constants');
+
+    setSpeechRate(5);
+
+    expect(mockWriteSpeechRate).toHaveBeenCalledWith(MAX_SPEECH_RATE);
+  });
 });
