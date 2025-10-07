@@ -113,3 +113,24 @@ Implement Python versions of Unit 4 (Learning Progress Integration) and Unit 5 (
 ```
 
 Plan is ready for implementation with confirmed minimal approach decisions.
+
+## Future Work: Playback Preference Persistence
+
+### Objective
+Ensure the audio player automatically restores the last selected mute state, voice, and playback speed from `localStorage` immediately after a user signs in, registers, or reloads the page.
+
+### Step 1: Preference Audit and Schema Definition
+- [ ] Identify the existing `localStorage` keys (or define new ones) that capture mute status, selected voice identifier, and playback rate.
+- [ ] Document default values for each preference to guarantee predictable behavior when no stored value exists.
+
+### Step 2: Persistence Hooks on User Actions
+- [ ] Update login and registration success flows to trigger a preference restoration routine once authentication completes.
+- [ ] Ensure the preference-saving logic runs whenever the user changes mute, voice, or speed so that `localStorage` always reflects the latest selections.
+
+### Step 3: Player Initialization Routine
+- [ ] On app bootstrap, load the stored preferences, reconcile them with the available voice list, and gracefully fall back to defaults if necessary.
+- [ ] Apply the restored values to the audio player component, covering both UI state (e.g., mute toggle, dropdown selections) and playback engine configuration.
+
+### Step 4: Testing and Validation
+- [ ] Add automated tests (unit and/or integration) to verify that preferences persist across reloads and post-authentication flows.
+- [ ] Manually QA the login, registration, and reload sequences to confirm the player reflects saved preferences and plays audio with the expected settings.

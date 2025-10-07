@@ -4,6 +4,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import {
   getLocalPreferences,
+  readPreferencesFromStorage,
   saveLocalPreferences,
 } from '@/lib/preferences/localPreferences';
 
@@ -17,16 +18,23 @@ export const useVocabularyState = () => {
   const [hasData, setHasData] = useState(false);
   
   // Control state with persistence
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const initialPrefsRef = useRef(readPreferencesFromStorage());
+  const [isPaused, setIsPaused] = useState<boolean>(() => !initialPrefsRef.current.is_playing);
+  const [isMuted, setIsMuted] = useState<boolean>(() => !!initialPrefsRef.current.is_muted);
 
   useEffect(() => {
+    let isActive = true;
     getLocalPreferences()
       .then(p => {
-        setIsPaused(!p.is_playing);
-        setIsMuted(!!p.is_muted);
+        if (!isActive) return;
+        setIsPaused(prev => (prev === !p.is_playing ? prev : !p.is_playing));
+        setIsMuted(prev => (prev === !!p.is_muted ? prev : !!p.is_muted));
       })
       .catch(() => {});
+
+    return () => {
+      isActive = false;
+    };
   }, []);
   const {
     allVoices,
