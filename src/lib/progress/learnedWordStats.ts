@@ -26,6 +26,8 @@ export type TodayLearnedWordSummary = {
   word: string;
   category?: string;
   lastReviewedAt?: string;
+  nextReviewAt?: string;
+  reviewCount?: number;
   dueSelectedToday: boolean;
 };
 
@@ -101,9 +103,13 @@ function toTodaySummary(row: LearnedWordRow, dueSelectedToday: boolean): TodayLe
   const base = toWordAndCategory(row);
   if (!base) return null;
   const lastReviewedAt = normaliseIso(row.last_review_at) ?? undefined;
+  const nextReviewAt = normaliseIso(row.next_review_at) ?? undefined;
+  const reviewCount = typeof row.review_count === 'number' ? row.review_count : undefined;
   return {
     ...base,
     lastReviewedAt,
+    nextReviewAt,
+    reviewCount,
     dueSelectedToday,
   };
 }
