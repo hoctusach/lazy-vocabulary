@@ -208,7 +208,13 @@ const VocabularyAppWithLearning: React.FC = () => {
                       <div>
                         <div className="font-medium text-gray-700">{word.word}</div>
                         <div className="text-xs text-gray-500">
-                          {word.category} • Learned {word.learnedDate}
+                          {word.category ? (
+                            <>
+                              {word.category} • Learned {formatDateOnly(word.learnedDate)}
+                            </>
+                          ) : (
+                            <>Learned {formatDateOnly(word.learnedDate)}</>
+                          )}
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
