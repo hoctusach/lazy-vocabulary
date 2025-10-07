@@ -1,5 +1,6 @@
 import { canonNickname } from '@/core/nickname';
 import { getActiveSession } from '@/lib/auth';
+import { dispatchUserKeyChange } from '@/lib/userKeyEvents';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
@@ -121,6 +122,7 @@ export async function ensureUserKey(): Promise<string | null> {
   }
 
   lsSet('lazyVoca.userKey', userKey);
+  dispatchUserKeyChange(userKey);
   return userKey;
 }
 

@@ -1,5 +1,6 @@
 import { canonNickname } from '@/core/nickname';
 import { exchangeNicknamePasscode, setNicknamePasscode } from '@/lib/edgeApi';
+import { dispatchUserKeyChange } from '@/lib/userKeyEvents';
 import {
   getSession as getEdgeSession,
   saveSession as saveEdgeSession,
@@ -128,6 +129,7 @@ export function getStoredPasscode(): string | null {
 
 export function clearCachedUserKey(): void {
   removeFromStorage(USER_KEY_STORAGE_KEY);
+  dispatchUserKeyChange(null);
 }
 
 export function clearStoredAuth(options: { keepPasscode?: boolean } = {}): void {

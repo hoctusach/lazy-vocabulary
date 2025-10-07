@@ -14,6 +14,7 @@ import {
 import type { DailySelection, SeverityLevel } from '@/types/learning';
 import type { TodayWord } from '@/types/vocabulary';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
+import { USER_KEY_EVENT_NAME, type UserKeyEventDetail } from '@/lib/userKeyEvents';
 import { bootstrapLearnedFromServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import {
   type DerivedProgressSummary,
@@ -102,7 +103,7 @@ export const useLearningProgress = () => {
       setNewTodayLearnedWords([]);
       setDueTodayLearnedWords([]);
     }
-  }, [userKey]);
+  }, [applyLearnedOverride, userKey]);
 
   useEffect(() => {
     if (!userKey) return;
@@ -114,47 +115,119 @@ export const useLearningProgress = () => {
   }, [userKey]);
 
   useEffect(() => {
-    let isActive = true;
-    const init = async () => {
-      const preparedKey = await prepareUserSession();
-      if (!preparedKey || !isActive) return;
-      if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-        console.log('[useLearningProgress] prepareUserSession resolved', { userKey: preparedKey });
-      }
-      setUserKey(preparedKey);
+    let isMounted = true;
 
-      await bootstrapLearnedFromServerByKey();
+    const handleUserKeyChange = (event: Event) => {
+      if (!isMounted) return;
+      const detail = (event as CustomEvent<UserKeyEventDetail>).detail;
+      const nextKey = typeof detail?.userKey === 'string' && detail.userKey.trim().length ? detail.userKey : null;
 
-      let preferredSeverity: SeverityLevel = 'light';
-      try {
-        const prefs = await getLocalPreferences();
-        const stored = (prefs.daily_option as SeverityLevel) || 'light';
-        preferredSeverity = stored;
-        if (!prefs.daily_option) {
-          await saveLocalPreferences({ daily_option: stored });
+      if (nextKey) {
+        if (nextKey === userKey) {
+          return;
         }
-      } catch {
-        // ignore preference errors
-      }
-      if (!isActive) return;
-      setSeverity(preferredSeverity);
-
-      const mode = getModeForSeverity(preferredSeverity);
-      const count = getCountForSeverity(preferredSeverity);
-      try {
+        learnedCountRef.current = null;
+        setDailySelection(null);
+        setTodayWords([]);
+        setLearnedWords([]);
+        setNewTodayLearnedWords([]);
+        setDueTodayLearnedWords([]);
+        setProgressStats(applyLearnedOverride(DEFAULT_STATS));
         setIsDailySelectionLoading(true);
-        const result = await getOrCreateTodayWords(preparedKey, mode, count, category ?? null);
-        if (!isActive) return;
-        setDailySelection(result.selection);
-        setTodayWords(result.words);
+        setUserKey(nextKey);
+        return;
+      }
+
+      learnedCountRef.current = null;
+      setUserKey(null);
+      setDailySelection(null);
+      setTodayWords([]);
+      setLearnedWords([]);
+      setNewTodayLearnedWords([]);
+      setDueTodayLearnedWords([]);
+      setProgressStats(applyLearnedOverride(DEFAULT_STATS));
+      setIsDailySelectionLoading(false);
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener(USER_KEY_EVENT_NAME, handleUserKeyChange as EventListener);
+    }
+
+    const prepare = async () => {
+      try {
+        const preparedKey = await prepareUserSession();
+        if (!isMounted) return;
         if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-          console.log('[useLearningProgress] setTodayWords from init', {
-            words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
-          });
+          console.log('[useLearningProgress] prepareUserSession resolved', { userKey: preparedKey });
+        }
+        if (preparedKey) {
+          setUserKey(preparedKey);
+        } else {
+          setIsDailySelectionLoading(false);
+        }
+      } catch (error) {
+        if (!isMounted) return;
+        console.warn('[useLearningProgress] prepareUserSession failed', error);
+        setIsDailySelectionLoading(false);
+      }
+    };
+
+    void prepare();
+
+    return () => {
+      isMounted = false;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener(USER_KEY_EVENT_NAME, handleUserKeyChange as EventListener);
+      }
+    };
+  }, [applyLearnedOverride, userKey]);
+
+  useEffect(() => {
+    if (!userKey) return;
+
+    let isActive = true;
+
+    const initForUser = async () => {
+      setIsDailySelectionLoading(true);
+      try {
+        await bootstrapLearnedFromServerByKey();
+
+        let preferredSeverity: SeverityLevel = 'light';
+        try {
+          const prefs = await getLocalPreferences();
+          const stored = (prefs.daily_option as SeverityLevel) || 'light';
+          preferredSeverity = stored;
+          if (!prefs.daily_option) {
+            await saveLocalPreferences({ daily_option: stored });
+          }
+        } catch {
+          // ignore preference errors
+        }
+        if (!isActive) return;
+        setSeverity(preferredSeverity);
+
+        const mode = getModeForSeverity(preferredSeverity);
+        const count = getCountForSeverity(preferredSeverity);
+
+        try {
+          const result = await getOrCreateTodayWords(userKey, mode, count, category ?? null);
+          if (!isActive) return;
+          setDailySelection(result.selection);
+          setTodayWords(result.words);
+          if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
+            console.log('[useLearningProgress] setTodayWords from init', {
+              words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
+            });
+          }
+        } catch (error) {
+          if (!isActive) return;
+          console.warn('[useLearningProgress] Failed to load today\'s words', error);
+          setDailySelection(null);
+          setTodayWords([]);
         }
       } catch (error) {
         if (!isActive) return;
-        console.warn('[useLearningProgress] Failed to load today\'s words', error);
+        console.warn('[useLearningProgress] Failed to initialize learning progress', error);
         setDailySelection(null);
         setTodayWords([]);
       } finally {
@@ -163,16 +236,17 @@ export const useLearningProgress = () => {
         }
       }
 
-      await refreshStats(preparedKey);
-      await refreshLearnedWords(preparedKey);
+      await refreshStats(userKey);
+      if (!isActive) return;
+      await refreshLearnedWords(userKey);
     };
 
-    void init();
+    void initForUser();
 
     return () => {
       isActive = false;
     };
-  }, [category, refreshLearnedWords, refreshStats]);
+  }, [category, refreshLearnedWords, refreshStats, userKey]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
