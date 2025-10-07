@@ -1,16 +1,26 @@
 import { DEFAULT_SPEECH_RATE } from '@/services/speech/core/constants';
 import {
-  getSpeechRate as getStoredSpeechRate,
-  setSpeechRate as setStoredSpeechRate,
+  getSpeechRate as readSpeechRateFromPreferences,
+  setSpeechRate as writeSpeechRateToPreferences,
 } from '@/lib/localPreferences';
 
-let cachedRate = getStoredSpeechRate() ?? DEFAULT_SPEECH_RATE;
+let cachedRate: number | undefined;
 
-export const getSpeechRate = (): number => cachedRate;
+const resolveCachedRate = (): number => {
+  if (typeof cachedRate === 'number') {
+    return cachedRate;
+  }
+
+  const storedRate = readSpeechRateFromPreferences();
+  cachedRate = storedRate ?? DEFAULT_SPEECH_RATE;
+  return cachedRate;
+};
+
+export const getSpeechRate = (): number => resolveCachedRate();
 
 export const setSpeechRate = (rate: number): void => {
   cachedRate = rate;
-  setStoredSpeechRate(rate);
+  writeSpeechRateToPreferences(rate);
 };
 
 export const getSpeechPitch = (): number => 1.0;
