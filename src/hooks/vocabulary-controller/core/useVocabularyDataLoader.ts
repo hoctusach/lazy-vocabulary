@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 /**
  * Data loading and persistence
@@ -47,22 +48,55 @@ export const useVocabularyDataLoader = (
   useEffect(() => {
     if (initialWords && initialWords.length > 0) {
       const prevIndex = prevIndexRef.current;
+      const todayLastWord = getTodayLastWord();
       setWordList(prevList => {
         const prevWord = prevList[prevIndex];
         const newList = initialWords;
         let newIndex = prevIndex;
-        if (prevWord) {
-          const foundIndex = newList.findIndex(
-            w => w.word === prevWord.word && w.category === prevWord.category
-          );
-          if (foundIndex >= 0) {
-            newIndex = foundIndex;
+
+        if (todayLastWord) {
+          const isIndexValid = todayLastWord.index >= 0 && todayLastWord.index < newList.length;
+          if (isIndexValid) {
+            const candidate = newList[todayLastWord.index];
+            if (
+              candidate &&
+              candidate.word === todayLastWord.word &&
+              (!todayLastWord.category || candidate.category === todayLastWord.category)
+            ) {
+              newIndex = todayLastWord.index;
+            }
+          }
+
+          if (newIndex === prevIndex) {
+            const fallbackIndex = newList.findIndex(word =>
+              word.word === todayLastWord.word &&
+              (!todayLastWord.category || word.category === todayLastWord.category)
+            );
+            if (fallbackIndex >= 0) {
+              newIndex = fallbackIndex;
+            }
+          }
+        }
+
+        if (newIndex === prevIndex) {
+          if (prevWord) {
+            const foundIndex = newList.findIndex(
+              w => w.word === prevWord.word && w.category === prevWord.category
+            );
+            if (foundIndex >= 0) {
+              newIndex = foundIndex;
+            } else {
+              newIndex = Math.min(prevIndex, newList.length - 1);
+            }
           } else {
             newIndex = Math.min(prevIndex, newList.length - 1);
           }
-        } else {
-          newIndex = Math.min(prevIndex, newList.length - 1);
         }
+
+        if (newIndex < 0 || newIndex >= newList.length) {
+          newIndex = 0;
+        }
+
         setCurrentIndex(newIndex);
         return newList;
       });
