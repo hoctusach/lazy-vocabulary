@@ -14,6 +14,8 @@ import {
 } from '@/lib/auth';
 import type { SeverityLevel } from '@/types/learning';
 import { identifyUser } from '@/services/analyticsService';
+import { dispatchNicknameChange, NICKNAME_EVENT_NAME } from '@/lib/nicknameEvents';
+import type { NicknameEventDetail } from '@/lib/nicknameEvents';
 
 function isSeverityLevel(value: unknown): value is SeverityLevel {
   return value === 'light' || value === 'moderate' || value === 'intense';
@@ -88,8 +90,17 @@ export default function AuthGate() {
       }
     }
 
+    function onNicknameChange(event: Event) {
+      const detail = (event as CustomEvent<NicknameEventDetail>).detail;
+      syncVisibility({ nickname: detail?.nickname ?? null });
+    }
+
     window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener(NICKNAME_EVENT_NAME, onNicknameChange);
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener(NICKNAME_EVENT_NAME, onNicknameChange);
+    };
   }, []);
 
   if (!s.ready || !s.show) return null;
@@ -170,6 +181,7 @@ export default function AuthGate() {
       toast.success(`Signed in as ${nicknameFromSession}`);
 
       localStorage.setItem(NICKNAME_LS_KEY, nicknameFromSession);
+      dispatchNicknameChange(nicknameFromSession);
 
       let userKey: string | null = null;
       try {
