@@ -1,6 +1,7 @@
 
 import React from 'react';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
+import UserGreeting from '@/components/UserGreeting';
 
 const Index = () => {
   return (
@@ -22,6 +23,7 @@ const Index = () => {
       
       <footer className="mt-6 text-center text-sm text-muted-foreground">
         <p>© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
+        <UserGreeting />
       </footer>
     </div>
   );
