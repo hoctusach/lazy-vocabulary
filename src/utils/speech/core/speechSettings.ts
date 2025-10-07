@@ -21,11 +21,17 @@ let cachedRate: number | undefined;
 
 const resolveStoredSpeechRate = (): number => {
   const storedRate = readSpeechRateFromPreferences();
-  if (typeof storedRate !== 'number') {
+  if (typeof storedRate !== 'number' || !Number.isFinite(storedRate)) {
+    writeSpeechRateToPreferences(DEFAULT_SPEECH_RATE);
     return DEFAULT_SPEECH_RATE;
   }
 
-  return clampSpeechRate(storedRate);
+  const normalizedRate = clampSpeechRate(storedRate);
+  if (normalizedRate !== storedRate) {
+    writeSpeechRateToPreferences(normalizedRate);
+  }
+
+  return normalizedRate;
 };
 
 const resolveCachedRate = (): number => {
