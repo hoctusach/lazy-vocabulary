@@ -105,7 +105,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     if (typeof window === 'undefined') return;
 
     const confirmed = window.confirm(
-      'This will remove all saved vocabulary data and sign you out. Continue?',
+      'Clearing all preferences in this device and sign out, your learning progress still can be accessible from this or other devices after re-login. Continue?',
     );
     if (!confirmed) return;
 
