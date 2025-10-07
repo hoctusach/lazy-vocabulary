@@ -1,7 +1,17 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker, Search, CheckCircle } from 'lucide-react';
+import {
+  Volume2,
+  VolumeX,
+  Pause,
+  Play,
+  SkipForward,
+  Speaker,
+  Search,
+  CheckCircle,
+  Trash2,
+} from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
@@ -10,6 +20,7 @@ import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
+import { signOut } from '@/lib/customAuth';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -88,6 +99,46 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     if (!isMuted && !isPaused) {
       playCurrentWord();
     }
+  };
+
+  const handleResetApp = () => {
+    if (typeof window === 'undefined') return;
+
+    const confirmed = window.confirm(
+      'This will remove all saved vocabulary data and sign you out. Continue?',
+    );
+    if (!confirmed) return;
+
+    try {
+      signOut();
+    } catch (error) {
+      console.error('Reset:signOut', error);
+    }
+
+    try {
+      window.localStorage.clear();
+    } catch (error) {
+      console.error('Reset:localStorage', error);
+      toast.error('Unable to clear saved data. Please try again.');
+      return;
+    }
+
+    try {
+      window.sessionStorage?.clear();
+    } catch (error) {
+      console.error('Reset:sessionStorage', error);
+    }
+
+    trackEvent('reset_app', 'Reset App');
+    toast.success('All saved data cleared. Please sign in or register again.');
+
+    setTimeout(() => {
+      try {
+        window.location.reload();
+      } catch (error) {
+        console.error('Reset:reload', error);
+      }
+    }, 300);
   };
 
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
@@ -186,7 +237,18 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           <CheckCircle size={16} />
         </Button>
       )}
-      
+
+      <Button
+        variant="destructive"
+        size="sm"
+        onClick={handleResetApp}
+        className="h-8 w-8 p-0"
+        title="Reset & Clear Saved Data"
+        aria-label="Reset & Clear Saved Data"
+      >
+        <Trash2 size={16} />
+      </Button>
+
       <MarkAsLearnedDialog
         isOpen={isMarkAsLearnedDialogOpen}
         onClose={() => setIsMarkAsLearnedDialogOpen(false)}
