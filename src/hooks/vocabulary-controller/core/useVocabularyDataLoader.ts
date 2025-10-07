@@ -41,6 +41,10 @@ export const useVocabularyDataLoader = (
 
   // Persist selected voice whenever it changes
   useEffect(() => {
+    if (!selectedVoiceName) {
+      return;
+    }
+
     setFavoriteVoice(selectedVoiceName);
   }, [selectedVoiceName]);
 
