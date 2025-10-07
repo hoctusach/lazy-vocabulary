@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 import {
-  getSpeechRate as getStoredSpeechRate,
+  getSpeechRate,
   normalizeSpeechRate,
-  setSpeechRate as setStoredSpeechRate,
+  setSpeechRate as persistSpeechRate,
 } from '@/utils/speech/core/speechSettings';
 
 /**
@@ -13,17 +13,17 @@ import {
  */
 export const useSpeechRate = () => {
   // initialise from stored preference or fall back to default value from settings
-  const [speechRate, setSpeechRateState] = useState(() => getStoredSpeechRate());
+  const [speechRate, setSpeechRateState] = useState(() => getSpeechRate());
 
   // ensure state stays in sync with any external changes
   useEffect(() => {
-    setSpeechRateState(getStoredSpeechRate());
+    setSpeechRateState(getSpeechRate());
   }, []);
 
   const setSpeechRate = useCallback((rate: number) => {
     const normalized = normalizeSpeechRate(rate);
     setSpeechRateState(normalized);
-    setStoredSpeechRate(normalized);
+    persistSpeechRate(normalized);
   }, []);
 
   return { speechRate, setSpeechRate };

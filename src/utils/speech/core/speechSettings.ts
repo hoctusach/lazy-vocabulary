@@ -4,8 +4,8 @@ import {
   MIN_SPEECH_RATE,
 } from '@/services/speech/core/constants';
 import {
-  getSpeechRate as getStoredSpeechRate,
-  setSpeechRate as setStoredSpeechRate,
+  getSpeechRate as readSpeechRateFromPreferences,
+  setSpeechRate as writeSpeechRateToPreferences,
 } from '@/lib/localPreferences';
 
 const clampSpeechRate = (rate: number | null | undefined): number => {
@@ -17,14 +17,33 @@ const clampSpeechRate = (rate: number | null | undefined): number => {
   return Math.round(clamped * 100) / 100;
 };
 
-let cachedRate = clampSpeechRate(getStoredSpeechRate());
+let cachedRate: number | undefined;
 
-export const getSpeechRate = (): number => cachedRate;
+const resolveStoredSpeechRate = (): number => {
+  const storedRate = readSpeechRateFromPreferences();
+  if (typeof storedRate !== 'number') {
+    return DEFAULT_SPEECH_RATE;
+  }
+
+  return clampSpeechRate(storedRate);
+};
+
+const resolveCachedRate = (): number => {
+  if (typeof cachedRate === 'number') {
+    return cachedRate;
+  }
+
+  const normalizedRate = resolveStoredSpeechRate();
+  cachedRate = normalizedRate;
+  return normalizedRate;
+};
+
+export const getSpeechRate = (): number => resolveCachedRate();
 
 export const setSpeechRate = (rate: number): void => {
   const normalizedRate = clampSpeechRate(rate);
   cachedRate = normalizedRate;
-  setStoredSpeechRate(normalizedRate);
+  writeSpeechRateToPreferences(normalizedRate);
 };
 
 export const normalizeSpeechRate = clampSpeechRate;
