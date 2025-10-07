@@ -63,16 +63,16 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           </div>
 
           {/* Meaning - transparent background, left-aligned, smaller font */}
-          <div style={{ color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', background: 'transparent' }}>
+          <div style={{ color: '#2E7D32', fontSize: '1rem', textAlign: 'left', fontStyle: 'italic', borderRadius: '0.5rem', background: 'transparent', whiteSpace: 'pre-line' }}>
             <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
           </div>
 
           {/* Example - transparent background, left-aligned, smaller font */}
-          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic', background: 'transparent' }}>
+          <div style={{ color: '#B71C1C', fontSize: '0.9rem', textAlign: 'left', fontStyle: 'italic', background: 'transparent', whiteSpace: 'pre-line' }}>
             <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
           </div>
           {translation && (
-            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left' }}>
+            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
               <em>* {translation}</em>
             </div>
           )}
