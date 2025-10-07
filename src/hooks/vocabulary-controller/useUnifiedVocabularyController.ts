@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useRef } from 'react';
 import { vocabularyService } from '@/services/vocabularyService';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { useVocabularyState } from './core/useVocabularyState';
@@ -11,6 +11,8 @@ import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
 import { saveLastWord, saveTodayLastWord } from '@/utils/lastWordStorage';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
+import { resolvePlaybackPreferences } from '@/lib/preferences/playbackPreferences';
+import { setSpeechRate } from '@/utils/speech/core/speechSettings';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
@@ -128,6 +130,58 @@ export const useUnifiedVocabularyController = (
     initialWords,
     selection
   );
+
+  const preferencesRestoredRef = useRef(false);
+
+  useEffect(() => {
+    if (preferencesRestoredRef.current) return;
+    if (wordList.length === 0) return;
+
+    const {
+      isMuted: preferredMuted,
+      isPaused: preferredPaused,
+      requestedVoice,
+      resolvedVoice,
+      speechRate: preferredRate,
+    } = resolvePlaybackPreferences(allVoices);
+
+    if (requestedVoice && allVoices.length === 0) {
+      return;
+    }
+
+    if (preferredMuted !== isMuted) {
+      setIsMuted(preferredMuted);
+    }
+
+    if (preferredPaused !== isPaused) {
+      setIsPaused(preferredPaused);
+    }
+
+    if (typeof preferredRate === 'number') {
+      setSpeechRate(preferredRate);
+    }
+
+    if (resolvedVoice && resolvedVoice !== selectedVoiceName) {
+      setSelectedVoiceName(resolvedVoice);
+    }
+
+    preferencesRestoredRef.current = true;
+
+    if (!preferredMuted && !preferredPaused && currentWord) {
+      playCurrentWord();
+    }
+  }, [
+    allVoices,
+    currentWord,
+    isMuted,
+    isPaused,
+    playCurrentWord,
+    selectedVoiceName,
+    setIsMuted,
+    setIsPaused,
+    setSelectedVoiceName,
+    wordList.length,
+  ]);
 
   const wordListLength = wordList.length;
 

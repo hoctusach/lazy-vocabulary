@@ -68,6 +68,20 @@ describe('local preferences storage', () => {
     mockStorage.clear();
   });
 
+  it('persists mute and playing flags across saves', async () => {
+    await saveLocalPreferences({ is_muted: true, is_playing: false });
+
+    let prefs = await getLocalPreferences();
+    expect(prefs.is_muted).toBe(true);
+    expect(prefs.is_playing).toBe(false);
+
+    await saveLocalPreferences({ is_muted: false, is_playing: true });
+
+    prefs = await getLocalPreferences();
+    expect(prefs.is_muted).toBe(false);
+    expect(prefs.is_playing).toBe(true);
+  });
+
   it('saves and reloads favorite voice and speech rate from consolidated preferences', async () => {
     await saveLocalPreferences({ favorite_voice: 'Test Voice', speech_rate: 1.25 });
 
