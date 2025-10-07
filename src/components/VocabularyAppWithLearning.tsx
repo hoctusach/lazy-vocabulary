@@ -60,6 +60,32 @@ const VocabularyAppWithLearning: React.FC = () => {
   const hasSelectionWords =
     newTodayList.length > 0 || dueTodayList.length > 0 || learnedWordsList.length > 0;
 
+  const formatReviewCount = (count?: number) => {
+    if (typeof count !== 'number' || !Number.isFinite(count)) {
+      return '—';
+    }
+    const safeCount = Math.max(0, Math.trunc(count));
+    return `${safeCount}`;
+  };
+
+  const formatDateOnly = (value?: string) => {
+    if (!value) {
+      return '—';
+    }
+    const trimmed = typeof value === 'string' ? value.trim() : '';
+    if (!trimmed) {
+      return '—';
+    }
+    if (trimmed.length >= 10) {
+      return trimmed.slice(0, 10);
+    }
+    const parsed = Date.parse(trimmed);
+    if (Number.isNaN(parsed)) {
+      return trimmed;
+    }
+    return new Date(parsed).toISOString().slice(0, 10);
+  };
+
   useEffect(() => {
     if (dailySelection) {
       setSummaryOpen(true);
@@ -129,9 +155,10 @@ const VocabularyAppWithLearning: React.FC = () => {
                       {word.category && (
                         <div className="text-xs text-gray-600">{word.category}</div>
                       )}
-                      {word.lastReviewedAt && (
-                        <div className="text-xs text-gray-500">Last reviewed: {word.lastReviewedAt}</div>
-                      )}
+                      <div className="text-xs text-gray-500 space-y-0.5">
+                        <div>Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div>Next review: {formatDateOnly(word.nextReviewAt)}</div>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -155,9 +182,10 @@ const VocabularyAppWithLearning: React.FC = () => {
                       {word.category && (
                         <div className="text-xs text-gray-600">{word.category}</div>
                       )}
-                      {word.lastReviewedAt && (
-                        <div className="text-xs text-gray-500">Last reviewed: {word.lastReviewedAt}</div>
-                      )}
+                      <div className="text-xs text-gray-500 space-y-0.5">
+                        <div>Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div>Next review: {formatDateOnly(word.nextReviewAt)}</div>
+                      </div>
                     </div>
                   ))
                 ) : (
