@@ -171,17 +171,20 @@ export default function AuthGate() {
       saveSession(session);
       storePasscode(trimmedPasscode);
 
-      const nicknameFromSession =
-        typeof session?.nickname === 'string' && session.nickname.trim().length
+      const displayNameFromSession =
+        (typeof session?.name === 'string' && session.name.trim().length
+          ? session.name
+          : undefined) ??
+        (typeof session?.nickname === 'string' && session.nickname.trim().length
           ? session.nickname
-          : nicknameHint && nicknameHint.trim().length
-            ? nicknameHint
-            : sanitizedName;
+          : undefined) ??
+        (nicknameHint && nicknameHint.trim().length ? nicknameHint : undefined) ??
+        sanitizedName;
 
-      toast.success(`Signed in as ${nicknameFromSession}`);
+      toast.success(`Signed in as ${displayNameFromSession}`);
 
-      localStorage.setItem(NICKNAME_LS_KEY, nicknameFromSession);
-      dispatchNicknameChange(nicknameFromSession);
+      localStorage.setItem(NICKNAME_LS_KEY, displayNameFromSession);
+      dispatchNicknameChange(displayNameFromSession);
 
       let userKey: string | null = null;
       try {
@@ -191,7 +194,7 @@ export default function AuthGate() {
       }
 
       if (userKey) {
-        identifyUser(userKey, nicknameFromSession);
+        identifyUser(userKey, displayNameFromSession);
         void (async () => {
           try {
             const [{ getPreferences }, progress] = await Promise.all([
@@ -232,7 +235,7 @@ export default function AuthGate() {
       setS({
         ready: true,
         show: false,
-        nickname: nicknameFromSession,
+        nickname: displayNameFromSession,
         passcode: '',
         pending: false,
         mode: 'signin',
@@ -244,8 +247,16 @@ export default function AuthGate() {
       try {
         const result = (await setNicknamePasscode(sanitizedName, trimmedPasscode)) as {
           nickname?: string;
+          name?: string;
         };
-        nicknameHint = typeof result?.nickname === 'string' ? result.nickname : undefined;
+        if (typeof result?.name === 'string' && result.name.trim().length) {
+          nicknameHint = result.name;
+        } else {
+          nicknameHint =
+            typeof result?.nickname === 'string' && result.nickname.trim().length
+              ? result.nickname
+              : undefined;
+        }
       } catch (error) {
         console.error('AuthGate:createProfile', error);
         if (handleExchangeError(error)) return;

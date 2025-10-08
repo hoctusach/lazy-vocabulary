@@ -35,9 +35,14 @@ const UserGreeting = () => {
       try {
         const session = await getActiveSession();
         if (disposed) return;
-        const sessionNickname = session?.user?.nickname ?? session?.nickname ?? null;
-        if (sessionNickname) {
-          applyNickname(sessionNickname);
+        const sessionDisplayName =
+          session?.user?.name ??
+          session?.name ??
+          session?.user?.nickname ??
+          session?.nickname ??
+          null;
+        if (sessionDisplayName) {
+          applyNickname(sessionDisplayName);
         }
       } catch (error) {
         console.warn('UserGreeting:activeSession', error);
