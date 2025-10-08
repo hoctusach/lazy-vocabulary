@@ -24,10 +24,12 @@ const STORAGE_VERSION = 4 as const;
 export type Session = {
   user_unique_key: string;
   nickname: string;
+  name?: string;
   authenticated_at: string;
   user: {
     id: string;
     nickname: string;
+    name?: string;
     email: string | null;
   };
 };
@@ -172,22 +174,33 @@ function isEdgeSessionExpired(session: EdgeSession | null, skewSec = 30): boolea
 
 function createSessionFromEdge(edge: EdgeSession, nicknameHint?: string): Session {
   const hinted = nicknameHint?.trim().length ? nicknameHint.trim() : '';
-  const rawNickname = edge.nickname?.trim().length ? edge.nickname.trim() : hinted;
-  const nickname = rawNickname || hinted || '';
+  const rawNickname =
+    typeof edge.nickname === 'string' && edge.nickname.trim().length ? edge.nickname.trim() : '';
+  const loginNickname = rawNickname || hinted;
+  const edgeWithName = edge as EdgeSession & { name?: string };
+  const rawName =
+    typeof edgeWithName.name === 'string' && edgeWithName.name.trim().length
+      ? edgeWithName.name.trim()
+      : '';
+  const displayName = rawName || loginNickname;
   const rawUserKey = edge.user_unique_key?.trim().length ? edge.user_unique_key.trim() : '';
-  const normalizedSource = rawUserKey || (nickname ? canonNickname(nickname) : '');
+  const normalizedSource = rawUserKey || (loginNickname ? canonNickname(loginNickname) : '');
   const userKey = normalizedSource ? canonNickname(normalizedSource) : '';
-  const safeKey = userKey || rawUserKey || (nickname ? canonNickname(nickname) : '');
+  const safeKey = userKey || rawUserKey || (loginNickname ? canonNickname(loginNickname) : '');
 
-  const displayNickname = nickname || hinted || '';
+  const safeNickname = loginNickname || hinted || '';
+  const safeDisplayName = displayName || safeNickname;
+  const normalizedDisplayName = safeDisplayName.length ? safeDisplayName : undefined;
 
   return {
     user_unique_key: safeKey,
-    nickname: displayNickname,
+    nickname: safeNickname,
+    name: normalizedDisplayName,
     authenticated_at: new Date().toISOString(),
     user: {
       id: safeKey,
-      nickname: displayNickname,
+      nickname: safeNickname,
+      name: normalizedDisplayName,
       email: null,
     },
   };

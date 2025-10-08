@@ -11,6 +11,7 @@ type NicknameProfile = {
 type EdgeResponse = {
   user_unique_key?: unknown;
   nickname?: unknown;
+  name?: unknown;
   error?: unknown;
   code?: unknown;
 };
@@ -55,9 +56,13 @@ export async function ensureProfile(
   }
 
   const nicknameFromServer =
-    typeof payload.nickname === 'string' && payload.nickname.trim().length
+    (typeof payload.name === 'string' && payload.name.trim().length
+      ? payload.name
+      : undefined) ??
+    (typeof payload.nickname === 'string' && payload.nickname.trim().length
       ? payload.nickname
-      : nickname;
+      : undefined) ??
+    nickname;
   const userKey = canonNickname(payload.user_unique_key);
 
   return {

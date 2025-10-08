@@ -5,6 +5,7 @@ export type Session = {
   expires_at: number;
   user_unique_key: string;
   nickname: string;
+  name?: string;
 };
 
 const LS_KEY = "lazyVoca.auth";
