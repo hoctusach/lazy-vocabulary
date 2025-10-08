@@ -8,6 +8,7 @@ import {
   type Session as EdgeSession,
 } from '@/lib/customAuth';
 import { NICKNAME_LS_KEY } from '@/lib/nickname';
+import { clearUserCaches } from '@/lib/cleanup/clearUserCaches';
 import { dispatchNicknameChange } from '@/lib/nicknameEvents';
 
 export { exchangeNicknamePasscode } from '@/lib/edgeApi';
@@ -140,6 +141,7 @@ export function clearStoredAuth(options: { keepPasscode?: boolean } = {}): void 
     removeFromStorage(NICKNAME_LS_KEY);
   }
   dispatchNicknameChange(null);
+  clearUserCaches();
   clearCachedUserKey();
   try {
     signOutEdge();

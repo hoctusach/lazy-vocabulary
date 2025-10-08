@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type MouseEvent } from 'react';
-import { clearStoredAuth } from '@/lib/auth';
+import { clearStoredAuth, getActiveSession } from '@/lib/auth';
 import { getNicknameLocal, NICKNAME_LS_KEY } from '@/lib/nickname';
 import {
   dispatchNicknameChange,
@@ -30,6 +30,20 @@ const UserGreeting = () => {
 
     applyNickname(getNicknameLocal());
 
+    let disposed = false;
+    void (async () => {
+      try {
+        const session = await getActiveSession();
+        if (disposed) return;
+        const sessionNickname = session?.user?.nickname ?? session?.nickname ?? null;
+        if (sessionNickname) {
+          applyNickname(sessionNickname);
+        }
+      } catch (error) {
+        console.warn('UserGreeting:activeSession', error);
+      }
+    })();
+
     const handleStorage = (event: StorageEvent) => {
       if (event.key && event.key !== NICKNAME_LS_KEY) return;
       applyNickname(event.newValue ?? null);
@@ -44,6 +58,7 @@ const UserGreeting = () => {
     window.addEventListener(NICKNAME_EVENT_NAME, handleNicknameEvent);
 
     return () => {
+      disposed = true;
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener(NICKNAME_EVENT_NAME, handleNicknameEvent);
     };
