@@ -344,24 +344,6 @@ export default function AuthGate() {
           position: 'relative',
         }}
       >
-        <button
-          type="button"
-          onClick={() => setS((p) => ({ ...p, show: false }))}
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            border: 'none',
-            background: 'transparent',
-            fontSize: 20,
-            lineHeight: 1,
-            cursor: 'pointer',
-            color: '#666',
-          }}
-          aria-label="Close"
-        >
-          ×
-        </button>
         <h3 style={{ margin: 0 }}>{isCreateMode ? 'Create your profile' : 'Access your vocabulary'}</h3>
         <p style={{ marginTop: 6, color: '#555', fontSize: 14 }}>{modeDescription}</p>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
