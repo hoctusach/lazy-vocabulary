@@ -1,5 +1,6 @@
 
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { cleanSpeechText } from '@/utils/speech/core/speechText';
 
 /**
  * Centralized Speech Controller - Single source of truth for all speech operations
@@ -208,7 +209,9 @@ class SpeechController {
       onError?: (error: SpeechSynthesisErrorEvent) => void;
     } = {}
   ): Promise<boolean> {
-    console.log(`[CONTROLLER] Speak request: "${text.substring(0, 50)}..."`);
+    const sanitizedText = cleanSpeechText(text);
+    const textForSpeech = sanitizedText || text;
+    console.log(`[CONTROLLER] Speak request: "${textForSpeech.substring(0, 50)}..."`);
     console.log('[CONTROLLER] Current state before speak:', {
       isActive: this.state.isActive,
       browserSpeaking: window.speechSynthesis?.speaking,
@@ -242,7 +245,7 @@ class SpeechController {
 
     return new Promise((resolve) => {
       try {
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance(textForSpeech);
         
         // Configure utterance
         if (options.voice) {
@@ -287,6 +290,10 @@ class SpeechController {
         
         // Start speaking
         console.log('[CONTROLLER] About to call speechSynthesis.speak()');
+        const debugWindow = window as Window & { DEBUG_SPEECH?: boolean };
+        if (debugWindow.DEBUG_SPEECH) {
+          console.debug('[Speech] Speaking:', utterance.text);
+        }
         window.speechSynthesis.speak(utterance);
         console.log('[CONTROLLER] Speech initiated, state updated to active');
 

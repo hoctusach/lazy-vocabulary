@@ -6,7 +6,7 @@ import {
   keepSpeechAlive,
   ensureSpeechEngineReady,
 } from "./core/speechEngine";
-import { extractMainWord, prepareTextForSpeech, forceResyncIfNeeded } from "./core/speechText";
+import { extractMainWord, prepareTextForSpeech, forceResyncIfNeeded, cleanSpeechText } from "./core/speechText";
 import {
   getSpeechRate,
   getSpeechPitch,
@@ -31,6 +31,7 @@ export {
   forceResyncIfNeeded,
   ensureSpeechEngineReady,
   extractMainWord,
+  cleanSpeechText,
   getSpeechRate,
   getSpeechPitch,
   getSpeechVolume,

@@ -9,6 +9,7 @@ import VocabularyCard from './VocabularyCard';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import { cleanSpeechText } from '@/utils/speech';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -167,7 +168,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     const text = [selectedWord.word, selectedWord.meaning, selectedWord.example]
       .filter(Boolean)
       .join('. ');
-    const utterance = new SpeechSynthesisUtterance(text);
+    const sanitized = cleanSpeechText(text);
+    const speechText = sanitized || text;
+    const utterance = new SpeechSynthesisUtterance(speechText);
     const voices = window.speechSynthesis.getVoices();
     const voice = findVoice(voices, previewVoice);
     if (voice) {
@@ -175,6 +178,10 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       utterance.lang = voice.lang;
     } else {
       utterance.lang = previewVoice.region === 'US' ? 'en-US' : 'en-GB';
+    }
+    const debugWindow = window as Window & { DEBUG_SPEECH?: boolean };
+    if (debugWindow.DEBUG_SPEECH) {
+      console.debug('[Speech] Speaking:', utterance.text);
     }
     window.speechSynthesis.speak(utterance);
   };

@@ -7,6 +7,7 @@ import {
 import { SpeechStateManager } from './speechStateManager';
 import { SpeechOptions } from './types';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { cleanSpeechText } from '@/utils/speech/core/speechText';
 
 /**
  * Handles speech execution with comprehensive pause state checking
@@ -19,18 +20,20 @@ export class SpeechExecutor {
       const run = async () => {
         try {
         const speechId = Math.random().toString(36).substring(7);
-        console.log(`[SPEECH-EXECUTOR-${speechId}] Starting speech process for text:`, text.substring(0, 50));
+        const sanitizedText = cleanSpeechText(text);
+        const textForSpeech = sanitizedText || text;
+        console.log(`[SPEECH-EXECUTOR-${speechId}] Starting speech process for text:`, textForSpeech.substring(0, 50));
         
         // Critical pause check - reject immediately if paused
         if (this.stateManager.isPaused() && !options.allowOverride) {
           console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech is paused, rejecting request immediately`);
-          this.stateManager.storePausedContent(text, options);
+          this.stateManager.storePausedContent(textForSpeech, options);
           resolve(false);
           return;
         }
 
         // Register this speech request for coordination
-        const canProceed = registerSpeechRequest(speechId, text, options);
+        const canProceed = registerSpeechRequest(speechId, textForSpeech, options);
         if (!canProceed && !options.allowOverride) {
           console.log(`[SPEECH-EXECUTOR-${speechId}] ✗ Speech request blocked by coordination`);
           resolve(false);
@@ -58,10 +61,10 @@ export class SpeechExecutor {
         // Reset state flags
         this.stateManager.setSpeechProgress(false, false);
         this.stateManager.setCurrentSpeech(null, speechId);
-        this.stateManager.storePausedContent('', null);
+          this.stateManager.storePausedContent('', null);
         
         // Create new utterance
-        const utterance = new SpeechSynthesisUtterance(text);
+        const utterance = new SpeechSynthesisUtterance(textForSpeech);
         
         // Set properties
         if (options.voice) {
@@ -137,6 +140,10 @@ export class SpeechExecutor {
         }
         
         console.log(`[SPEECH-EXECUTOR-${speechId}] ✓ Initiating speech synthesis`);
+        const debugWindow = window as Window & { DEBUG_SPEECH?: boolean };
+        if (debugWindow.DEBUG_SPEECH) {
+          console.debug('[Speech] Speaking:', utterance.text);
+        }
         window.speechSynthesis.speak(utterance);
         
         // Speech monitoring with pause checking
