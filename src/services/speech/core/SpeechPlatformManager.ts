@@ -6,6 +6,7 @@ import { SpeechEventHandler } from './SpeechEventHandler';
 import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { cleanSpeechText } from '@/utils/speech';
 
 /**
  * Manages platform-specific speech execution (mobile vs desktop)
@@ -28,7 +29,8 @@ export class SpeechPlatformManager {
     resetRetryCount: () => void,
     options?: SpeechOptions
   ): void {
-    const speechText = this.voiceManager.createSpeechText(word);
+    const rawSpeechText = this.voiceManager.createSpeechText(word);
+    const speechText = cleanSpeechText(rawSpeechText) || rawSpeechText;
     directSpeechService.speak(speechText, {
       voiceRegion,
       onStart: () => {
@@ -77,8 +79,11 @@ export class SpeechPlatformManager {
     resetRetryCount: () => void,
     options?: SpeechOptions
   ): void {
-    const speechText = this.voiceManager.createSpeechText(word);
+    const rawSpeechText = this.voiceManager.createSpeechText(word);
+    const speechText = cleanSpeechText(rawSpeechText) || rawSpeechText;
     const utterance = new SpeechSynthesisUtterance(speechText);
+    const debugWindow = window as Window & { DEBUG_SPEECH?: boolean };
+    const debugSpeech = Boolean(debugWindow.DEBUG_SPEECH);
     
     const voice = this.voiceManager.findVoice(voiceRegion);
     if (voice) {
@@ -115,14 +120,20 @@ export class SpeechPlatformManager {
     setCancelledUtterance(null);
     
     console.log(`[SPEECH-PLATFORM-${speechId}] -> invoking window.speechSynthesis.speak`);
-    
+
     if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
       console.log(`[SPEECH-PLATFORM-${speechId}] Canceling existing speech before new utterance`);
       window.speechSynthesis.cancel();
       setTimeout(() => {
+        if (debugSpeech) {
+          console.debug('[Speech] Speaking:', utterance.text);
+        }
         window.speechSynthesis.speak(utterance);
       }, 300);
     } else {
+      if (debugSpeech) {
+        console.debug('[Speech] Speaking:', utterance.text);
+      }
       window.speechSynthesis.speak(utterance);
     }
 

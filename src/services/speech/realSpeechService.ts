@@ -1,4 +1,5 @@
 import { getSpeechRate } from "@/utils/speech/core/speechSettings";
+import { cleanSpeechText } from "@/utils/speech/core/speechText";
 import {
   initializeSpeechSystem,
   speechInitialized,
@@ -55,16 +56,19 @@ class RealSpeechService {
       return false;
     }
 
+    const sanitizedText = cleanSpeechText(text);
+    const textForSpeech = sanitizedText || text;
+
     logSpeechEvent({
       timestamp: Date.now(),
       event: "speak-attempt",
-      text: text.substring(0, 60),
+      text: textForSpeech.substring(0, 60),
       voice: options.voiceName,
     });
     if (DEBUG_SPEECH) {
       console.log(
         "RealSpeechService: Starting speech for:",
-        text.substring(0, 50) + "...",
+        textForSpeech.substring(0, 50) + "...",
       );
     }
 
@@ -84,7 +88,7 @@ class RealSpeechService {
         resolve(false);
         return;
       }
-      const utterance = new SpeechSynthesisUtterance(text);
+      const utterance = new SpeechSynthesisUtterance(textForSpeech);
 
       // Set voice by name when provided
       const allVoices = speechSynthesis.getVoices();
@@ -129,13 +133,13 @@ class RealSpeechService {
       // Set up event handlers
       utterance.onstart = () => {
         if (!unifiedSpeechController.canSpeak(epoch)) return;
-        if (DEBUG_SPEECH) console.log("Speech started for:", text.substring(0, 30) + "...");
+        if (DEBUG_SPEECH) console.log("Speech started for:", textForSpeech.substring(0, 30) + "...");
         this.isActive = true;
         this.currentUtterance = utterance;
         logSpeechEvent({
           timestamp: Date.now(),
           event: "start",
-          text: text.substring(0, 60),
+          text: textForSpeech.substring(0, 60),
           voice: utterance.voice?.name,
         });
         if (options.onStart) {
@@ -154,7 +158,7 @@ class RealSpeechService {
         logSpeechEvent({
           timestamp: Date.now(),
           event: "end",
-          text: text.substring(0, 60),
+          text: textForSpeech.substring(0, 60),
           voice: utterance.voice?.name,
         });
         const finalize = () => {
@@ -175,7 +179,7 @@ class RealSpeechService {
         logFn(
           event.error === 'canceled' ? '[Speech canceled]' : '[Speech ERROR]',
           event.error,
-          text.substring(0, 60),
+          textForSpeech.substring(0, 60),
           utterance.voice?.name,
           utterance.voice?.lang,
           'speaking:',
@@ -184,7 +188,7 @@ class RealSpeechService {
         logSpeechEvent({
           timestamp: Date.now(),
           event: "error",
-          text: text.substring(0, 60),
+          text: textForSpeech.substring(0, 60),
           voice: utterance.voice?.name,
           details: event.error,
         });
@@ -210,6 +214,9 @@ class RealSpeechService {
       // Start speech
       try {
         if (unifiedSpeechController.canSpeak(epoch)) {
+          if (DEBUG_SPEECH) {
+            console.debug("[Speech] Speaking:", utterance.text);
+          }
           window.speechSynthesis.speak(utterance);
           console.log("Speech synthesis started successfully");
         }
