@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, RotateCcw, Eye } from 'lucide-react';
@@ -26,6 +27,7 @@ const VocabularyAppWithLearning: React.FC = () => {
   const {
     dailySelection,
     progressStats,
+    generateDailyWords,
     markWordAsPlayed,
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
@@ -35,6 +37,29 @@ const VocabularyAppWithLearning: React.FC = () => {
     dueTodayLearnedWords,
     isDailySelectionLoading,
   } = useLearningProgress();
+  const [didTriggerFirstTimeLoad, setDidTriggerFirstTimeLoad] = useState(false);
+
+  useEffect(() => {
+    if (didTriggerFirstTimeLoad) return;
+    if (isDailySelectionLoading) return;
+
+    const hasWords = todayWords.length > 0 || Boolean(dailySelection?.totalCount);
+    if (hasWords) return;
+    if (hasCachedTodaySelection()) return;
+
+    const storedUserKey =
+      typeof window !== 'undefined' ? window.localStorage?.getItem('lazyVoca.userKey') : null;
+    if (!storedUserKey) return;
+
+    setDidTriggerFirstTimeLoad(true);
+    void generateDailyWords('light');
+  }, [
+    dailySelection?.totalCount,
+    didTriggerFirstTimeLoad,
+    generateDailyWords,
+    isDailySelectionLoading,
+    todayWords.length,
+  ]);
 
   // Track when words are played (integrate with existing word navigation)
   const previousWordRef = useRef<VocabularyWord | null>(null);
