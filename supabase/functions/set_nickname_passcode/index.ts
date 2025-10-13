@@ -8,6 +8,7 @@ const corsHeaders = {
 type Payload = {
   nickname?: unknown;
   passcode?: unknown;
+  timezone?: unknown;
 };
 
 type RpcResponse = {
@@ -20,6 +21,16 @@ function canonNickname(input: string): string {
     .normalize('NFKC')
     .toLowerCase()
     .replace(/\s+/g, '');
+}
+
+function isValidTimezone(timezone: string): boolean {
+  try {
+    // This throws a RangeError when the provided timezone is not a valid IANA entry.
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone }).format();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function errorResponse(message: string, status = 400, code?: string) {
@@ -75,6 +86,14 @@ Deno.serve(async (req) => {
     return errorResponse('Passcode must be numeric.', 400);
   }
 
+  const timezoneRaw =
+    typeof payload.timezone === 'string' ? payload.timezone.trim() : '';
+  if (timezoneRaw && !isValidTimezone(timezoneRaw)) {
+    return errorResponse('Invalid timezone provided.', 400, 'INVALID_TIMEZONE');
+  }
+
+  const timezone = timezoneRaw || null;
+
   const userKey = canonNickname(nickname);
   if (!userKey) {
     return errorResponse('Failed to derive user key', 400);
@@ -94,6 +113,8 @@ Deno.serve(async (req) => {
     user_unique_key: userKey,
     nickname,
     passcode: passcodeNumeric,
+    // Forward the validated timezone so the database can persist it with the nickname.
+    p_timezone: timezone,
   });
 
   if (error) {
