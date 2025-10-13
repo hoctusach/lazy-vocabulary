@@ -6,6 +6,7 @@ import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progre
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { buildTodaysWords } from '@/utils/todayWords';
 import { LEARNED_WORDS_CACHE_KEY } from '@/utils/storageKeys';
+import { formatDateKey, normalizeTimeZone, resolveLocalTimezone } from '@/utils/dateKey';
 import {
   computeLearnedWordStats,
   type DerivedProgressSummary,
@@ -26,6 +27,7 @@ export type TodaySelectionState = {
   mode: DailyMode;
   count: number;
   category: string | null;
+  timezone: string | null;
   words: TodayWord[];
   selection: DailySelection;
 };
@@ -46,6 +48,7 @@ type SelectionNormalizationMeta = {
   mode: DailyMode;
   count: number;
   category: string | null;
+  timezone: string | null;
 };
 
 const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
@@ -71,7 +74,42 @@ const SEVERITY_TO_MODE: Record<SeverityLevel, DailyMode> = {
   intense: 'Hard',
 };
 
-const toDateKey = (value: Date) => value.toISOString().slice(0, 10);
+const timezoneCache = new Map<string, string | null>();
+
+async function resolveUserTimezone(userKey: string): Promise<string | null> {
+  if (!userKey) return resolveLocalTimezone();
+  if (timezoneCache.has(userKey)) {
+    return timezoneCache.get(userKey) ?? null;
+  }
+
+  let timezone: string | null = null;
+
+  try {
+    const client = getSupabaseClient();
+    const { data, error } = await client
+      .from('nicknames')
+      .select('timezone')
+      .eq('user_unique_key', userKey)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[LearningProgress] Failed to fetch user timezone', error.message);
+    }
+
+    const normalized = normalizeTimeZone(data?.timezone);
+    timezone = normalized ?? resolveLocalTimezone();
+  } catch (error) {
+    console.warn('[LearningProgress] Unable to resolve user timezone', error);
+    timezone = resolveLocalTimezone();
+  }
+
+  timezoneCache.set(userKey, timezone ?? null);
+  return timezone ?? null;
+}
+
+function toDateKey(value: Date, timezone: string | null = null): string {
+  return formatDateKey(value, timezone);
+}
 
 function toIsoDate(dateKey: string | null | undefined): string | null {
   if (!dateKey) return null;
@@ -215,12 +253,12 @@ function buildTodayWord(
   };
 }
 
-function toLearningProgress(word: TodayWord): LearningProgress {
+function toLearningProgress(word: TodayWord, timezone: string | null): LearningProgress {
   const srs = word.srs ?? undefined;
   const reviewCount = srs?.review_count ?? 0;
   const learnedAt = srs?.learned_at ?? null;
   const nextReviewIso = srs?.next_review_at ?? null;
-  const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso)) : '';
+  const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso), timezone) : '';
   const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs));
 
   return {
@@ -232,7 +270,9 @@ function toLearningProgress(word: TodayWord): LearningProgress {
     lastPlayedDate: srs?.last_review_at ?? '',
     status,
     nextReviewDate,
-    createdDate: learnedAt ? toDateKey(new Date(learnedAt)) : toDateKey(new Date()),
+    createdDate: learnedAt
+      ? toDateKey(new Date(learnedAt), timezone)
+      : toDateKey(new Date(), timezone),
     learnedDate: learnedAt ?? undefined,
     nextAllowedTime: srs?.next_display_at ?? undefined,
   };
@@ -244,7 +284,7 @@ function buildSelection(words: TodayWord[], severity: SeverityLevel, meta: Selec
   let dueCount = 0;
 
   for (const word of words) {
-    const progress = toLearningProgress(word);
+    const progress = toLearningProgress(word, meta.timezone);
     progress.isDue = word.is_due;
     const target = word.is_due ? reviewWords : newWords;
     target.push(progress);
@@ -257,10 +297,11 @@ function buildSelection(words: TodayWord[], severity: SeverityLevel, meta: Selec
     totalCount: reviewWords.length + newWords.length,
     dueCount,
     severity,
-    date: meta ? toDateKey(new Date()) : undefined,
+    date: meta ? toDateKey(new Date(), meta.timezone) : undefined,
     mode: meta.mode,
     count: meta.count,
     category: meta.category ?? null,
+    timezone: meta.timezone ?? null,
   };
 }
 
@@ -350,7 +391,7 @@ function normalizeToDailySelection(
   selection: DailySelectionRow[] | null | undefined,
   meta: SelectionNormalizationMeta
 ): TodaySelectionState {
-  const dateKey = toDateKey(new Date());
+  const dateKey = toDateKey(new Date(), meta.timezone);
   const selectionRows = Array.isArray(selection) ? selection : [];
   const vocabRows = Array.isArray(details) ? details : [];
   const vocabMap = new Map<string, VocabularyRow>();
@@ -380,6 +421,7 @@ function normalizeToDailySelection(
     mode: meta.mode,
     count: meta.count,
     category: meta.category ?? null,
+    timezone: meta.timezone ?? null,
     words: ordered,
     selection: selectionPayload,
   };
@@ -440,7 +482,10 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
 
 export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
   const { userKey, mode, count, category = null } = params;
-  const selectionRows = await generateDailySelectionV2(userKey, mode, count, category);
+  const [selectionRows, timezone] = await Promise.all([
+    generateDailySelectionV2(userKey, mode, count, category),
+    resolveUserTimezone(userKey),
+  ]);
   if (!Array.isArray(selectionRows) || selectionRows.length === 0) {
     throw new Error('No daily selection rows returned');
   }
@@ -490,11 +535,12 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
     throw new Error('No vocabulary details available for selection');
   }
 
-  const today = normalizeToDailySelection(
-    vocabRows,
-    selectionRows,
-    { mode, count, category: category ?? null }
-  );
+  const today = normalizeToDailySelection(vocabRows, selectionRows, {
+    mode,
+    count,
+    category: category ?? null,
+    timezone: timezone ?? null,
+  });
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[Normalized TodayWords]', today.words);
@@ -571,8 +617,10 @@ export async function markWordReviewed(
     mode,
     count,
     category: currentState.category,
+    timezone: currentState.timezone,
   });
   selection.date = currentState.selection.date ?? currentState.date;
+  selection.timezone = currentState.selection.timezone ?? currentState.timezone ?? null;
 
   const rows = await markLearnedServerByKey(wordId, payload);
 
@@ -589,6 +637,7 @@ export async function markWordReviewed(
       summary: derivedSummary,
     } = computeLearnedWordStats(rows, {
       totalWords: TOTAL_WORDS,
+      timezone: currentState.timezone,
     });
     summary = derivedSummary;
     learnedSummaries = derivedWords;
@@ -624,6 +673,8 @@ export async function markWordAsNew(
   const client = getSupabaseClient();
   if (!client) return null;
 
+  const timezone = await resolveUserTimezone(userKey);
+
   try {
     const { data, error } = await client.rpc('mark_word_new_by_key', {
       p_user_key: userKey,
@@ -645,6 +696,7 @@ export async function markWordAsNew(
 
     const { learnedWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
       totalWords: TOTAL_WORDS,
+      timezone,
     });
 
     return {
@@ -726,12 +778,15 @@ function persistLearnedWordRows(rows: LearnedWordRow[]): void {
 async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPayload | null> {
   if (!userKey) return null;
 
+  const timezone = await resolveUserTimezone(userKey);
+
   const client = getSupabaseClient();
   if (!client) {
     const cachedRows = readCachedLearnedWordRows();
     if (!cachedRows) return null;
     return computeLearnedWordStats(cachedRows, {
       totalWords: TOTAL_WORDS,
+      timezone,
     });
   }
 
@@ -747,6 +802,7 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
     if (!cachedRows) return null;
     return computeLearnedWordStats(cachedRows, {
       totalWords: TOTAL_WORDS,
+      timezone,
     });
   }
 
@@ -760,6 +816,7 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
 
   return computeLearnedWordStats(normalizedRows, {
     totalWords: TOTAL_WORDS,
+    timezone,
   });
 }
 

@@ -25,6 +25,7 @@ export interface DailySelection {
   mode?: DailyMode;
   count?: number;
   category?: string | null;
+  timezone?: string | null;
 }
 
 export type SeverityLevel = 'light' | 'moderate' | 'intense';

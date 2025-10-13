@@ -1,3 +1,5 @@
+import { formatDateKey, toDateKeyFromISOString } from '@/utils/dateKey';
+
 type Nullable<T> = T | null | undefined;
 
 export type LearnedWordRow = {
@@ -42,6 +44,7 @@ export type DerivedProgressSummary = {
 type ComputeOptions = {
   now?: Date;
   totalWords?: number;
+  timezone?: string | null;
 };
 
 // Normalizes arbitrary timestamp input into a consistent ISO string so that
@@ -56,14 +59,12 @@ function normaliseIso(value: Nullable<string>): string | null {
   return new Date(parsed).toISOString();
 }
 
-function toDateKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
-function matchesToday(value: Nullable<string>, today: Date): boolean {
+function matchesToday(value: Nullable<string>, today: Date, timezone: string | null): boolean {
   const iso = normaliseIso(value);
   if (!iso) return false;
-  return iso.slice(0, 10) === toDateKey(today);
+  const dateKey = toDateKeyFromISOString(iso, timezone);
+  if (!dateKey) return false;
+  return dateKey === formatDateKey(today, timezone);
 }
 
 function isDue(row: LearnedWordRow, now: Date): boolean {
@@ -120,8 +121,8 @@ function toTodaySummary(row: LearnedWordRow, dueSelectedToday: boolean): TodayLe
  *
  * - Missing timestamps fallback to the most recent available column so we can
  *   keep the "learned" list stable even when the backend omits optional data.
- * - Date comparisons are performed in UTC to avoid local timezone drift when
- *   classifying "new" (today reviewed) entries.
+ * - Date comparisons prefer backend-provided flags and fall back to the user's
+ *   timezone when classifying "today" entries.
  */
 export function computeLearnedWordStats(
   rows: LearnedWordRow[],
@@ -141,26 +142,29 @@ export function computeLearnedWordStats(
 
   const dueRows = learningRows.filter((row) => isDue(row, now));
 
-  const isTodaySelection = (row: LearnedWordRow) => Boolean(row?.is_today_selection);
-  const isDueSelectedToday = (row: LearnedWordRow) => Boolean(row?.due_selected_today);
+  const timezone = options.timezone ?? null;
+
+  const isTodaySelection = (row: LearnedWordRow) => {
+    if (row?.is_today_selection !== null && row?.is_today_selection !== undefined) {
+      return Boolean(row.is_today_selection);
+    }
+    return matchesToday(row.last_review_at, now, timezone);
+  };
+
+  const isDueSelectedToday = (row: LearnedWordRow) => {
+    if (row?.due_selected_today !== null && row?.due_selected_today !== undefined) {
+      return Boolean(row.due_selected_today);
+    }
+    return isDue(row, now);
+  };
 
   const newTodayWords = safeRows
-    .filter(
-      (row) =>
-        matchesToday(row.last_review_at, now) &&
-        isTodaySelection(row) &&
-        !isDueSelectedToday(row)
-    )
+    .filter((row) => isTodaySelection(row) && !isDueSelectedToday(row))
     .map((row) => toTodaySummary(row, false))
     .filter((value): value is TodayLearnedWordSummary => value !== null);
 
   const dueTodayWords = safeRows
-    .filter(
-      (row) =>
-        matchesToday(row.last_review_at, now) &&
-        isTodaySelection(row) &&
-        isDueSelectedToday(row)
-    )
+    .filter((row) => isTodaySelection(row) && isDueSelectedToday(row))
     .map((row) => toTodaySummary(row, true))
     .filter((value): value is TodayLearnedWordSummary => value !== null);
 
