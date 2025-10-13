@@ -36,6 +36,16 @@ function getUserKey(data: unknown): string | null {
 const canon = (s: string) =>
   s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
 
+function isValidTimezone(timezone: string): boolean {
+  try {
+    // Leverage Intl to confirm the client provided a valid IANA timezone name.
+    new Intl.DateTimeFormat("en-US", { timeZone: timezone }).format();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function createSessionToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
   return btoa(String.fromCharCode(...bytes))
@@ -66,6 +76,12 @@ Deno.serve(async (req) => {
   if (!Number.isFinite(passcode))
     return errorResponse("Passcode must be numeric", 400);
 
+  const timezoneRaw =
+    typeof body?.timezone === "string" ? body.timezone.trim() : "";
+  if (timezoneRaw && !isValidTimezone(timezoneRaw))
+    return errorResponse("Invalid timezone provided", 400, "INVALID_TIMEZONE");
+  const timezone = timezoneRaw || null;
+
   const url = Deno.env.get("SUPABASE_URL");
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!url || !serviceKey) return errorResponse("Server misconfiguration", 500);
@@ -73,6 +89,8 @@ Deno.serve(async (req) => {
   const admin = createClient(url, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+
+  const canonicalKey = canon(nickname);
 
   // Verify (passcode + nickname)
   const { data, error } = await admin.rpc("verify_nickname_passcode", {
@@ -87,11 +105,10 @@ Deno.serve(async (req) => {
   const userKey = getUserKey(data);
   if (!userKey) {
     // Distinguish "not found" vs "wrong passcode"
-    const key = canon(nickname);
     const { data: existsRow } = await admin
       .from("nicknames")
       .select("user_unique_key")
-      .eq("user_unique_key", key)
+      .eq("user_unique_key", canonicalKey)
       .maybeSingle();
 
     if (!existsRow) {
@@ -109,6 +126,19 @@ Deno.serve(async (req) => {
   const sessionToken = createSessionToken();
   const expiresAtUnix = now + expiresIn;
   const expiresAtIso = new Date(expiresAtUnix * 1000).toISOString();
+
+  const { error: profileError } = await admin.rpc("upsert_or_verify_profile", {
+    user_unique_key: userKey,
+    nickname,
+    passcode,
+    // Ensure timezone changes are reflected for existing profiles without duplicating rows.
+    p_timezone: timezone,
+  });
+
+  if (profileError) {
+    console.error("upsert_or_verify_profile:", profileError);
+    return errorResponse("Failed to update profile", 500);
+  }
 
   const { error: upsertError } = await admin.from("user_sessions").upsert({
     session_token: sessionToken,
