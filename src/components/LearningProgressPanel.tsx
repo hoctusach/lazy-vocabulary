@@ -5,7 +5,6 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import { useLearnerHours } from '@/hooks/useLearnerHours';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
@@ -21,14 +20,12 @@ interface LearningProgressPanelProps {
 }
 
 export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
-  progressStats,
-  learnerId
+  progressStats
 }) => {
   const learnedPercentage = progressStats.total > 0
     ? ((progressStats.learning + progressStats.learned) / progressStats.total) * 100
     : 0;
   const [open, setOpen] = useState(false);
-  const { totalHours } = useLearnerHours(learnerId);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -82,10 +79,6 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{progressStats.learning}</div>
                   <div className="text-sm text-gray-600">Learning</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{totalHours.toFixed(1)}</div>
-                  <div className="text-sm text-gray-600">Hours Learned</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
