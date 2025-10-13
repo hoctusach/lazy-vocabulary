@@ -24,6 +24,7 @@ import {
 import { buildTodaysWords } from '@/utils/todayWords';
 import { identifyUser, trackReviewDue, trackWordLearned } from '@/services/analyticsService';
 import { getNicknameLocal } from '@/lib/nickname';
+import { formatDateKey } from '@/utils/dateKey';
 
 const DEFAULT_STATS = {
   total: 0,
@@ -349,7 +350,8 @@ export const useLearningProgress = () => {
 
   const buildCurrentTodayState = useCallback((): TodaySelectionState | null => {
     if (!dailySelection) return null;
-    const date = dailySelection.date ?? new Date().toISOString();
+    const timezone = dailySelection.timezone ?? null;
+    const date = dailySelection.date ?? formatDateKey(new Date(), timezone);
     const resolvedMode = dailySelection.mode ?? getModeForSeverity(severity);
     const resolvedCount = dailySelection.count ?? getCountForSeverity(severity);
     const resolvedCategory = dailySelection.category ?? category ?? null;
@@ -359,6 +361,7 @@ export const useLearningProgress = () => {
       mode: resolvedMode,
       count: resolvedCount,
       category: resolvedCategory,
+      timezone,
       words: todayWords,
       selection: {
         ...dailySelection,
@@ -366,6 +369,7 @@ export const useLearningProgress = () => {
         mode: resolvedMode,
         count: resolvedCount,
         category: resolvedCategory,
+        timezone,
       },
     };
   }, [category, dailySelection, severity, todayWords]);
