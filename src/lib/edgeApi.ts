@@ -22,8 +22,19 @@ async function postJson(url: string, body: any) {
   return json;
 }
 
-export const setNicknamePasscode = (nickname: string, passcode: string|number) =>
-  postJson(SET_PROFILE_URL, { nickname, passcode });
+export const setNicknamePasscode = (
+  nickname: string,
+  passcode: string | number,
+) => {
+  let timezone: string | undefined;
+  try {
+    timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    timezone = undefined;
+  }
+
+  return postJson(SET_PROFILE_URL, { nickname, passcode, timezone });
+};
 
 export const exchangeNicknamePasscode = (nickname: string, passcode: string|number) =>
   postJson(EXCHANGE_URL, { nickname, passcode });
