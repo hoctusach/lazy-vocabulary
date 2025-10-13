@@ -6,7 +6,7 @@ import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
 
 // Hard-coded total number of vocabulary words used for progress calculations
-export const TOTAL_WORDS = 3035;
+export const TOTAL_WORDS = 3261;
 
 function lsGet(key: string) {
   try {
