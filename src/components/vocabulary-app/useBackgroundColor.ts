@@ -2,10 +2,11 @@
 import { useState, useCallback } from "react";
 
 const backgroundColors = [
-  "#f2f2f2", "#e6f7ff", "#fff3e6", "#f9e6f6", "#f0f8ff",
-  "#faebd7", "#ffefd5", "#e6e6fa", "#dcdcdc", "#fdf5e6",
-  "#ffe4e1", "#fff0f5", "#f5fffa", "#f0fff0", "#f5f5dc",
-  "#faf0e6", "#fffacd", "#e0ffff", "#e0f7fa", "#fce4ec"
+  "var(--lv-card-tone-1)",
+  "var(--lv-card-tone-2)",
+  "var(--lv-card-tone-3)",
+  "var(--lv-card-tone-4)",
+  "var(--lv-card-tone-5)"
 ];
 
 export function useBackgroundColor() {

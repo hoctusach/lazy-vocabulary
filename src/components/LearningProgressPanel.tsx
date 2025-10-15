@@ -30,7 +30,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   return (
     <TooltipProvider delayDuration={0}>
       <Collapsible open={open} onOpenChange={setOpen} className="w-full">
-        <Card className="w-full">
+        <Card className="w-full theme-card-surface theme-border">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CollapsibleTrigger className="flex items-center gap-2">
@@ -43,8 +43,12 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-600">{progressStats.learned}</div>
-                  <div className="text-sm text-gray-600">Learned</div>
+                  <div className="text-2xl font-bold" style={{ color: 'var(--lv-text-secondary)' }}>
+                    {progressStats.learned}
+                  </div>
+                  <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    Learned
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-1">
@@ -55,7 +59,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                           variant="ghost"
                           size="icon"
                           aria-label="How does due review count work?"
-                          className="h-10 w-10 text-gray-500 hover:text-gray-700"
+                          className="h-10 w-10 text-[var(--lv-helper-text)] hover:text-[var(--lv-text-primary)]"
                         >
                           <Info className="h-4 w-4" />
                         </Button>
@@ -74,19 +78,27 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <div className="text-sm text-gray-600">Due Review</div>
+                  <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    Due Review
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-green-600">{progressStats.learning}</div>
-                  <div className="text-sm text-gray-600">Learning</div>
+                  <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    Learning
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
-                  <div className="text-sm text-gray-600">New</div>
+                  <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    New
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
-                  <div className="text-sm text-gray-600">Total</div>
+                  <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    Total
+                  </div>
                 </div>
               </div>
 

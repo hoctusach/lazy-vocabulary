@@ -18,8 +18,11 @@ const WordCountDisplay: React.FC<WordCountDisplayProps> = ({
   const count = wordSelectionService.getWordCount(word);
   
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-500">
-      <Badge variant="secondary" className="text-xs">
+    <div className="flex items-center gap-2 text-xs theme-muted-text">
+      <Badge
+        variant="secondary"
+        className="text-xs border theme-border bg-[var(--lv-card-bg)] text-[var(--lv-text-secondary)]"
+      >
         Shown: {count} time{count !== 1 ? 's' : ''}
       </Badge>
     </div>

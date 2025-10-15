@@ -354,7 +354,7 @@ export default function AuthGate() {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(0,0,0,0.45)',
+        background: 'var(--lv-overlay)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -367,14 +367,14 @@ export default function AuthGate() {
           width: 360,
           padding: 20,
           borderRadius: 12,
-          background: '#fff',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.25)',
+          background: 'var(--lv-card-bg)',
+          boxShadow: 'var(--lv-shadow)',
           fontFamily: 'system-ui, sans-serif',
           position: 'relative',
         }}
       >
         <h3 style={{ margin: 0 }}>{isCreateMode ? 'Create your profile' : 'Access your vocabulary'}</h3>
-        <p style={{ marginTop: 6, color: '#555', fontSize: 14 }}>{modeDescription}</p>
+        <p style={{ marginTop: 6, color: 'var(--lv-helper-text)', fontSize: 14 }}>{modeDescription}</p>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
           Nickname
         </label>
@@ -397,10 +397,12 @@ export default function AuthGate() {
             padding: '10px 12px',
             fontSize: 14,
             borderRadius: 8,
-            border: '1px solid #ccc',
+            border: '1px solid var(--lv-field-border)',
+            background: 'var(--lv-field-bg)',
+            color: 'var(--lv-field-text)',
           }}
         />
-        <div style={{ marginTop: 4, fontSize: 12, color: '#777' }}>
+        <div style={{ marginTop: 4, fontSize: 12, color: 'var(--lv-helper-text)' }}>
           Names match case-insensitively and ignore spaces. Allowed: most characters; blocked: {BLOCKED_CHARS_HELP}
         </div>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
@@ -422,17 +424,19 @@ export default function AuthGate() {
             padding: '10px 12px',
             fontSize: 14,
             borderRadius: 8,
-            border: '1px solid #ccc',
+            border: '1px solid var(--lv-field-border)',
+            background: 'var(--lv-field-bg)',
+            color: 'var(--lv-field-text)',
             letterSpacing: 3,
           }}
         />
-        <div style={{ marginTop: 4, fontSize: 12, color: '#777' }}>{passcodeHelpText}</div>
+        <div style={{ marginTop: 4, fontSize: 12, color: 'var(--lv-helper-text)' }}>{passcodeHelpText}</div>
         {s.info && (
           <div
             style={{
               marginTop: 10,
-              background: '#f0f9ff',
-              color: '#0c4a6e',
+              background: 'var(--lv-card-tone-2)',
+              color: 'var(--lv-info)',
               padding: '8px 12px',
               borderRadius: 8,
               fontSize: 13,
@@ -442,7 +446,7 @@ export default function AuthGate() {
           </div>
         )}
         {s.error && (
-          <div style={{ color: '#c00', marginTop: 8, fontSize: 13 }}>{s.error}</div>
+          <div style={{ color: 'var(--lv-error)', marginTop: 8, fontSize: 13 }}>{s.error}</div>
         )}
         <button
           type="submit"
@@ -453,8 +457,8 @@ export default function AuthGate() {
             padding: '10px 12px',
             borderRadius: 8,
             border: 'none',
-            background: '#111',
-            color: '#fff',
+            background: 'var(--lv-button-primary-bg)',
+            color: 'var(--lv-button-primary-text)',
             fontWeight: 600,
             cursor: s.pending ? 'default' : 'pointer',
           }}
@@ -479,9 +483,9 @@ export default function AuthGate() {
               width: '100%',
               padding: '8px 12px',
               borderRadius: 8,
-              border: '1px solid #d4d4d4',
-              background: '#fafafa',
-              color: '#333',
+              border: '1px solid var(--lv-field-border)',
+              background: 'var(--lv-button-secondary-bg)',
+              color: 'var(--lv-button-secondary-text)',
               fontSize: 13,
               cursor: s.pending ? 'default' : 'pointer',
             }}
@@ -506,9 +510,9 @@ export default function AuthGate() {
               width: '100%',
               padding: '8px 12px',
               borderRadius: 8,
-              border: '1px solid #d4d4d4',
-              background: '#fafafa',
-              color: '#333',
+              border: '1px solid var(--lv-field-border)',
+              background: 'var(--lv-button-secondary-bg)',
+              color: 'var(--lv-button-secondary-text)',
               fontSize: 13,
               cursor: s.pending ? 'default' : 'pointer',
             }}
@@ -516,7 +520,7 @@ export default function AuthGate() {
             Already have a passcode? Sign in
           </button>
         )}
-        <div style={{ marginTop: 8, fontSize: 12, color: '#777' }}>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--lv-helper-text)' }}>
           Stored locally as “{NICKNAME_LS_KEY}”. You can update it later in Settings.
         </div>
       </form>

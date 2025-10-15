@@ -69,19 +69,23 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const safeNextCategory = nextCategory || 'Next';
 
   return (
-    <Card 
+    <Card
       className={cn(
-        "w-full max-w-xl mx-auto transition-colors duration-300",
-        "border-0 shadow-lg",
-        isSpeaking ? "ring-2 ring-blue-400" : ""
+        "w-full max-w-xl mx-auto transition-colors duration-300 border-2 theme-card-surface",
+        isSpeaking ? "ring-2 ring-[var(--lv-accent)]/50" : ""
       )}
-      style={{ backgroundColor }}
+      style={{ background: backgroundColor }}
     >
       <CardContent className="p-2">
         <div className="space-y-2">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="font-bold" style={{ color: '#1F305E', fontSize: '2rem', textAlign: 'left' }}>{mainWord}</h2>
+              <h2
+                className="font-bold"
+                style={{ color: 'var(--lv-word-title)', fontSize: '2rem', textAlign: 'left' }}
+              >
+                {mainWord}
+              </h2>
               {wordType && (
                 <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
@@ -93,12 +97,20 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             )}
           </div>
           
-          <div className="italic" style={{ color: '#2E7D32', fontSize: '1.25rem', textAlign: 'left', whiteSpace: 'pre-line' }}>
-            <span style={{ color: '#2E7D32', fontStyle: 'italic' }}>* </span>{meaning}
+          <div
+            className="italic"
+            style={{ color: 'var(--lv-meaning)', fontSize: '1.25rem', textAlign: 'left', whiteSpace: 'pre-line' }}
+          >
+            <span style={{ color: 'var(--lv-meaning)', fontStyle: 'italic' }}>* </span>
+            {meaning}
           </div>
 
-          <div className="italic" style={{ color: '#B71C1C', fontSize: '1rem', textAlign: 'left', whiteSpace: 'pre-line' }}>
-            <span style={{ color: '#B71C1C', fontStyle: 'italic' }}>* </span>{example}
+          <div
+            className="italic"
+            style={{ color: 'var(--lv-example)', fontSize: '1rem', textAlign: 'left', whiteSpace: 'pre-line' }}
+          >
+            <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
+            {example}
           </div>
 
           {translation && (
