@@ -151,7 +151,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleNextWord}
-        className="h-8 w-8 p-0 text-indigo-700 bg-indigo-50"
+        className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]"
         title="Next Word"
         aria-label="Next Word"
       >
@@ -162,7 +162,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleCycleVoice}
-        className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50 flex items-center justify-center"
+        className={cn(
+          'h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]',
+          allVoices.length < 2 ? 'cursor-not-allowed opacity-50' : ''
+        )}
         title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
         disabled={allVoices.length < 2}
         aria-label="Change Voice"
@@ -187,7 +190,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           variant="outline"
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
+          className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]"
           title="Mark as Learned"
           aria-label="Mark as Learned"
           disabled={!currentWord}
