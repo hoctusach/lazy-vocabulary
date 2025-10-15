@@ -8,7 +8,6 @@ import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, RotateCcw, Eye } from 'lucide-react';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
@@ -158,9 +157,7 @@ const VocabularyAppWithLearning: React.FC = () => {
               <span className="text-xs text-muted-foreground hidden sm:inline">
                 Tap to show or hide details
               </span>
-              <ChevronDown
-                className={cn('h-4 w-4 transition-transform', summaryOpen && 'rotate-180')}
-              />
+              <ChevronDown className="h-4 w-4" />
             </CollapsibleTrigger>
           </TooltipTrigger>
           <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
