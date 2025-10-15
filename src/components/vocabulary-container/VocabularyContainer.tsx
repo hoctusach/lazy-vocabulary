@@ -62,8 +62,13 @@ const VocabularyContainer: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="text-center space-y-4">
-          <h3 className="text-2xl font-bold text-gray-800">No Vocabulary Data</h3>
-          <p className="text-gray-600 max-w-md">
+          <h3
+            className="text-2xl font-bold"
+            style={{ color: 'var(--lv-text-primary)' }}
+          >
+            No Vocabulary Data
+          </h3>
+          <p className="max-w-md" style={{ color: 'var(--lv-text-secondary)' }}>
             Upload an Excel file with your vocabulary words to get started.
           </p>
         </div>
@@ -76,7 +81,7 @@ const VocabularyContainer: React.FC = () => {
   if (!containerState.hasData && !controllerState.hasData) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-gray-600">No data for this category</p>
+        <p style={{ color: 'var(--lv-text-secondary)' }}>No data for this category</p>
       </div>
     );
   }
@@ -86,8 +91,8 @@ const VocabularyContainer: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600">Loading vocabulary...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--lv-accent)] mx-auto"></div>
+          <p style={{ color: 'var(--lv-text-secondary)' }}>Loading vocabulary...</p>
         </div>
       </div>
     );
@@ -100,7 +105,7 @@ const VocabularyContainer: React.FC = () => {
         meaning={controllerState.currentWord.meaning}
         example={controllerState.currentWord.example}
         translation={controllerState.currentWord.translation}
-        backgroundColor="#F0F8FF"
+        backgroundColor="var(--lv-card-highlight)"
         isMuted={controllerState.isMuted}
         isPaused={controllerState.isPaused}
         isSpeaking={controllerState.isSpeaking}

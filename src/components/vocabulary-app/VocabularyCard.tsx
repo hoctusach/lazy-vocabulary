@@ -138,7 +138,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           {!searchPreview && (
             <div
               className="mobile-note text-left italic mt-2"
-              style={{ color: '#6b7280', fontSize: '0.8rem' }}
+              style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}
             >
               <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
             </div>

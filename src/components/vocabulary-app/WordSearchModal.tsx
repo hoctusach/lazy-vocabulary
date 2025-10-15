@@ -268,7 +268,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
             </ScrollArea>
             {noResults && debouncedQuery.trim() && !loading && (
                 <div className="mt-2">
-                  <p className="text-gray-400 italic text-sm">No results found.</p>
+                  <p className="italic text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                    No results found.
+                  </p>
                 </div>
               )}
           </>
@@ -279,7 +281,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
               meaning={selectedWord.meaning}
               example={selectedWord.example}
               translation={selectedWord.translation ?? undefined}
-              backgroundColor="#ffffff"
+              backgroundColor="var(--lv-card-bg)"
               isMuted={false}
               isPaused={false}
               onToggleMute={() => {}}

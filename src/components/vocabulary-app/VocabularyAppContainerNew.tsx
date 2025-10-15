@@ -101,7 +101,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
               word="No vocabulary data"
               meaning="Please upload a vocabulary file to get started"
               example=""
-              backgroundColor="#F0F8FF"
+              backgroundColor="var(--lv-card-highlight)"
               isSpeaking={false}
               category="No Data"
             />
@@ -134,7 +134,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
               word="Loading vocabulary..."
               meaning="Please wait while we load your vocabulary data"
               example=""
-              backgroundColor="#F0F8FF"
+              backgroundColor="var(--lv-card-highlight)"
               isSpeaking={false}
               category="Loading"
             />

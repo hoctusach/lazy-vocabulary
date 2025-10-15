@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  :root[data-theme="default"] {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
@@ -49,6 +50,37 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --lv-body-bg: #f3f4f6;
+    --lv-card-bg: #ffffff;
+    --lv-card-highlight: #f0f8ff;
+    --lv-text-primary: #111827;
+    --lv-text-secondary: #4b5563;
+    --lv-heading: #1d4ed8;
+    --lv-subheading: #333333;
+    --lv-accent: #2563eb;
+    --lv-accent-soft: #dbeafe;
+    --lv-border-color: rgba(17, 24, 39, 0.12);
+    --lv-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+    --lv-card-tone-1: #f0f8ff;
+    --lv-card-tone-2: #e0f2fe;
+    --lv-card-tone-3: #fef3c7;
+    --lv-card-tone-4: #ede9fe;
+    --lv-card-tone-5: #dcfce7;
+    --lv-word-title: #1f305e;
+    --lv-meaning: #2e7d32;
+    --lv-example: #b71c1c;
+    --lv-info: #1d4ed8;
+    --lv-error: #dc2626;
+    --lv-overlay: rgba(0, 0, 0, 0.45);
+    --lv-button-primary-bg: #111827;
+    --lv-button-primary-text: #ffffff;
+    --lv-button-secondary-bg: rgba(255, 255, 255, 0.92);
+    --lv-button-secondary-text: #1f2937;
+    --lv-field-bg: #ffffff;
+    --lv-field-border: rgba(15, 23, 42, 0.2);
+    --lv-field-text: #111827;
+    --lv-helper-text: #4b5563;
   }
 
   .dark {
@@ -90,6 +122,112 @@
   }
 }
 
+:root[data-theme="playful"] {
+  --background: 210 40% 98%;
+  --foreground: 221 39% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 221 39% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 221 39% 11%;
+  --primary: 250 95% 66%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 221 39% 11%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 220 14% 45%;
+  --accent: 250 95% 66%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 210 20% 90%;
+  --input: 210 20% 90%;
+  --ring: 250 95% 66%;
+
+  --lv-body-bg: linear-gradient(135deg, #e8f9fd, #ffffff 60%);
+  --lv-card-bg: rgba(255, 255, 255, 0.95);
+  --lv-card-highlight: #eef2ff;
+  --lv-text-primary: #1a1a1a;
+  --lv-text-secondary: #374151;
+  --lv-heading: #7b61ff;
+  --lv-subheading: #1f2937;
+  --lv-accent: #7b61ff;
+  --lv-accent-soft: #c4b5fd;
+  --lv-border-color: rgba(123, 97, 255, 0.35);
+  --lv-shadow: 0 12px 35px rgba(123, 97, 255, 0.25);
+  --lv-card-tone-1: #f3e8ff;
+  --lv-card-tone-2: #e0f7ff;
+  --lv-card-tone-3: #fff4d6;
+  --lv-card-tone-4: #ffe3f1;
+  --lv-card-tone-5: #e6ffed;
+  --lv-word-title: #5b21b6;
+  --lv-meaning: #039c7f;
+  --lv-example: #ff5178;
+  --lv-info: #7b61ff;
+  --lv-error: #ff4d6d;
+  --lv-overlay: rgba(123, 97, 255, 0.28);
+  --lv-button-primary-bg: #7b61ff;
+  --lv-button-primary-text: #ffffff;
+  --lv-button-secondary-bg: rgba(255, 255, 255, 0.9);
+  --lv-button-secondary-text: #1a1a1a;
+  --lv-field-bg: rgba(255, 255, 255, 0.96);
+  --lv-field-border: rgba(123, 97, 255, 0.4);
+  --lv-field-text: #1a1a1a;
+  --lv-helper-text: #374151;
+}
+
+:root[data-theme="classic"] {
+  --background: 45 29% 97%;
+  --foreground: 220 15% 25%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 15% 25%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 15% 25%;
+  --primary: 215 45% 30%;
+  --primary-foreground: 45 29% 97%;
+  --secondary: 30 25% 92%;
+  --secondary-foreground: 220 15% 25%;
+  --muted: 30 25% 92%;
+  --muted-foreground: 210 12% 40%;
+  --accent: 30 25% 92%;
+  --accent-foreground: 220 15% 25%;
+  --destructive: 0 63% 41%;
+  --destructive-foreground: 45 29% 97%;
+  --border: 32 21% 85%;
+  --input: 32 21% 85%;
+  --ring: 215 45% 30%;
+
+  --lv-body-bg: #faf9f7;
+  --lv-card-bg: #ffffff;
+  --lv-card-highlight: #f4ede3;
+  --lv-text-primary: #2a2a2a;
+  --lv-text-secondary: #4a4a4a;
+  --lv-heading: #2a4365;
+  --lv-subheading: #3f3a37;
+  --lv-accent: #2a4365;
+  --lv-accent-soft: #c4a484;
+  --lv-border-color: rgba(76, 60, 45, 0.25);
+  --lv-shadow: 0 10px 28px rgba(76, 60, 45, 0.18);
+  --lv-card-tone-1: #f4ede3;
+  --lv-card-tone-2: #ebe2d3;
+  --lv-card-tone-3: #e2ecf4;
+  --lv-card-tone-4: #f1e8dc;
+  --lv-card-tone-5: #e9f3ff;
+  --lv-word-title: #2f4858;
+  --lv-meaning: #3f6f4b;
+  --lv-example: #8b3a3a;
+  --lv-info: #2a4365;
+  --lv-error: #b03030;
+  --lv-overlay: rgba(58, 49, 40, 0.35);
+  --lv-button-primary-bg: #2a4365;
+  --lv-button-primary-text: #ffffff;
+  --lv-button-secondary-bg: #f5efe6;
+  --lv-button-secondary-text: #2a2a2a;
+  --lv-field-bg: #ffffff;
+  --lv-field-border: rgba(76, 60, 45, 0.3);
+  --lv-field-text: #2a2a2a;
+  --lv-helper-text: #4a4a4a;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -97,7 +235,43 @@
 
   body {
     @apply bg-background text-foreground;
+    background: var(--lv-body-bg);
+    color: var(--lv-text-primary);
+    transition: background 0.3s ease, color 0.3s ease;
   }
+}
+
+body {
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+.theme-card-surface {
+  background: var(--lv-card-bg);
+  color: var(--lv-text-primary);
+  border-color: var(--lv-border-color);
+  box-shadow: var(--lv-shadow);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.theme-card-highlight {
+  background: var(--lv-card-highlight);
+  color: var(--lv-text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.theme-accent-text {
+  color: var(--lv-accent);
+  transition: color 0.3s ease;
+}
+
+.theme-muted-text {
+  color: var(--lv-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.theme-border {
+  border-color: var(--lv-border-color);
+  transition: border-color 0.3s ease;
 }
 .voice-debug-panel {
   font-size: 10px;
@@ -111,16 +285,18 @@
 }
 
 .slogan-note {
-  color: #FF6F00;
+  color: var(--lv-accent);
   font-style: italic;
   text-align: center;
   margin-top: 8px;
   font-size: 0.85em;
+  transition: color 0.3s ease;
 }
 .app-name {
-  color: #333333;
+  color: var(--lv-text-secondary);
   font-size: 1.2em;
   font-weight: 400;
+  transition: color 0.3s ease;
 }
 
 .seo-hidden {
@@ -135,11 +311,12 @@
 
 /* Medal styling */
 .medal-item {
-  border: 2px solid #FFC107;
+  border: 2px solid var(--lv-accent-soft);
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--lv-shadow);
   padding: 12px;
-  background-color: #fff;
+  background-color: var(--lv-card-bg);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .dark .medal-item {
