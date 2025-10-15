@@ -34,8 +34,8 @@ const Index = () => {
         className="mt-6 text-center text-sm"
         style={{ color: 'var(--lv-text-secondary)' }}
       >
-        <p>© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
         <UserGreeting />
+        <p className="mt-2">© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
       </footer>
     </div>
   );
