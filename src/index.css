@@ -2,67 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
+html[data-theme] {
+  transition: background 0.5s ease, color 0.3s ease;
+}
+
 @layer base {
   :root,
   :root[data-theme="default"] {
+    --bg: #ffffff;
+    --card: #f8fafc;
+    --text: #1a1a1a;
+    --subtext: #6b7280;
+    --accent: #2563eb;
+    --accent2: #60a5fa;
+    --shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-
     --primary: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
-
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
-
     --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --lv-body-bg: #f3f4f6;
-    --lv-card-bg: #ffffff;
-    --lv-card-highlight: #f0f8ff;
-    --lv-text-primary: #111827;
-    --lv-text-secondary: #4b5563;
-    --lv-heading: #1d4ed8;
-    --lv-subheading: #333333;
-    --lv-accent: #2563eb;
-    --lv-accent-soft: #dbeafe;
-    --lv-border-color: rgba(17, 24, 39, 0.12);
-    --lv-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
-    --lv-card-tone-1: #f0f8ff;
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: #eef2ff;
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #1f2937;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(96, 165, 250, 0.2);
+    --lv-border-color: rgba(37, 99, 235, 0.16);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: #e8f1ff;
     --lv-card-tone-2: #e0f2fe;
     --lv-card-tone-3: #fef3c7;
     --lv-card-tone-4: #ede9fe;
@@ -70,44 +63,161 @@
     --lv-word-title: #1f305e;
     --lv-meaning: #2e7d32;
     --lv-example: #b71c1c;
-    --lv-info: #1d4ed8;
+    --lv-info: #2563eb;
     --lv-error: #dc2626;
-    --lv-overlay: rgba(0, 0, 0, 0.45);
-    --lv-button-primary-bg: #111827;
+    --lv-overlay: rgba(15, 23, 42, 0.4);
+    --lv-button-primary-bg: #1e40af;
     --lv-button-primary-text: #ffffff;
-    --lv-button-secondary-bg: rgba(255, 255, 255, 0.92);
+    --lv-button-secondary-bg: rgba(248, 250, 252, 0.9);
     --lv-button-secondary-text: #1f2937;
     --lv-field-bg: #ffffff;
-    --lv-field-border: rgba(15, 23, 42, 0.2);
-    --lv-field-text: #111827;
-    --lv-helper-text: #4b5563;
+    --lv-field-border: rgba(15, 23, 42, 0.18);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
   }
 
+  :root[data-theme="playful"] {
+    --bg: linear-gradient(135deg, #e0f7fa, #fce4ec);
+    --card: rgba(255, 255, 255, 0.8);
+    --text: #222222;
+    --subtext: #555555;
+    --accent: #7b61ff;
+    --accent2: #00c9a7;
+    --shadow: 0 6px 20px rgba(123, 97, 255, 0.15);
+
+    --background: 210 40% 98%;
+    --foreground: 221 39% 11%;
+    --card-foreground: 221 39% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 221 39% 11%;
+    --primary: 250 95% 66%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 221 39% 11%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 220 14% 45%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 210 20% 90%;
+    --input: 210 20% 90%;
+    --ring: 250 95% 66%;
+
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: rgba(255, 255, 255, 0.9);
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #1f2937;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(123, 97, 255, 0.18);
+    --lv-border-color: rgba(123, 97, 255, 0.35);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: rgba(123, 97, 255, 0.18);
+    --lv-card-tone-2: rgba(0, 201, 167, 0.18);
+    --lv-card-tone-3: rgba(255, 196, 0, 0.18);
+    --lv-card-tone-4: rgba(255, 120, 170, 0.18);
+    --lv-card-tone-5: rgba(98, 204, 255, 0.18);
+    --lv-word-title: #5b21b6;
+    --lv-meaning: #039c7f;
+    --lv-example: #ff5178;
+    --lv-info: var(--accent);
+    --lv-error: #ff4d6d;
+    --lv-overlay: rgba(123, 97, 255, 0.28);
+    --lv-button-primary-bg: var(--accent);
+    --lv-button-primary-text: #ffffff;
+    --lv-button-secondary-bg: rgba(255, 255, 255, 0.9);
+    --lv-button-secondary-text: var(--text);
+    --lv-field-bg: rgba(255, 255, 255, 0.92);
+    --lv-field-border: rgba(123, 97, 255, 0.4);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
+  }
+
+  :root[data-theme="classic"] {
+    --bg: linear-gradient(120deg, #f6f5f3, #fdfcfb);
+    --card: #ffffff;
+    --text: #2a2a2a;
+    --subtext: #595959;
+    --accent: #2a4365;
+    --accent2: #c4a484;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+    --background: 45 29% 97%;
+    --foreground: 220 15% 25%;
+    --card-foreground: 220 15% 25%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 25%;
+    --primary: 215 45% 30%;
+    --primary-foreground: 45 29% 97%;
+    --secondary: 30 25% 92%;
+    --secondary-foreground: 220 15% 25%;
+    --muted: 30 25% 92%;
+    --muted-foreground: 210 12% 40%;
+    --accent-foreground: 45 29% 97%;
+    --destructive: 0 63% 41%;
+    --destructive-foreground: 45 29% 97%;
+    --border: 32 21% 85%;
+    --input: 32 21% 85%;
+    --ring: 215 45% 30%;
+
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: #f4ede3;
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #3f3a37;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(196, 164, 132, 0.3);
+    --lv-border-color: rgba(76, 60, 45, 0.25);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: #f4ede3;
+    --lv-card-tone-2: #ebe2d3;
+    --lv-card-tone-3: #e2ecf4;
+    --lv-card-tone-4: #f1e8dc;
+    --lv-card-tone-5: #e9f3ff;
+    --lv-word-title: #2f4858;
+    --lv-meaning: #3f6f4b;
+    --lv-example: #8b3a3a;
+    --lv-info: var(--accent);
+    --lv-error: #b03030;
+    --lv-overlay: rgba(58, 49, 40, 0.35);
+    --lv-button-primary-bg: var(--accent);
+    --lv-button-primary-text: #ffffff;
+    --lv-button-secondary-bg: #f5efe6;
+    --lv-button-secondary-text: var(--text);
+    --lv-field-bg: #ffffff;
+    --lv-field-border: rgba(76, 60, 45, 0.3);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
+  }
+
+  :root[data-theme="default-dark"],
   .dark {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --text: #e2e8f0;
+    --subtext: #a1a1aa;
+    --accent: #3b82f6;
+    --accent2: #60a5fa;
+    --shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -119,116 +229,121 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: #1b2537;
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #cbd5f5;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(59, 130, 246, 0.25);
+    --lv-border-color: rgba(148, 163, 184, 0.35);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: rgba(59, 130, 246, 0.12);
+    --lv-card-tone-2: rgba(96, 165, 250, 0.1);
+    --lv-card-tone-3: rgba(250, 204, 21, 0.12);
+    --lv-card-tone-4: rgba(196, 181, 253, 0.12);
+    --lv-card-tone-5: rgba(74, 222, 128, 0.12);
+    --lv-word-title: #93c5fd;
+    --lv-meaning: #4ade80;
+    --lv-example: #fca5a5;
+    --lv-info: var(--accent);
+    --lv-error: #f87171;
+    --lv-overlay: rgba(15, 23, 42, 0.6);
+    --lv-button-primary-bg: #1d4ed8;
+    --lv-button-primary-text: #f8fafc;
+    --lv-button-secondary-bg: rgba(30, 41, 59, 0.8);
+    --lv-button-secondary-text: var(--text);
+    --lv-field-bg: rgba(30, 41, 59, 0.9);
+    --lv-field-border: rgba(148, 163, 184, 0.4);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
   }
-}
 
-:root[data-theme="playful"] {
-  --background: 210 40% 98%;
-  --foreground: 221 39% 11%;
-  --card: 0 0% 100%;
-  --card-foreground: 221 39% 11%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 221 39% 11%;
-  --primary: 250 95% 66%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 221 39% 11%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 220 14% 45%;
-  --accent: 250 95% 66%;
-  --accent-foreground: 210 40% 98%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 210 40% 98%;
-  --border: 210 20% 90%;
-  --input: 210 20% 90%;
-  --ring: 250 95% 66%;
+  :root[data-theme="playful-dark"] {
+    --bg: linear-gradient(135deg, #2c003e, #000428);
+    --card: rgba(255, 255, 255, 0.05);
+    --text: #f4f4f5;
+    --subtext: #b8b8c0;
+    --accent: #c084fc;
+    --accent2: #4ade80;
+    --shadow: 0 8px 24px rgba(255, 255, 255, 0.08);
 
-  --lv-body-bg: linear-gradient(135deg, #e8f9fd, #ffffff 60%);
-  --lv-card-bg: rgba(255, 255, 255, 0.95);
-  --lv-card-highlight: #eef2ff;
-  --lv-text-primary: #1a1a1a;
-  --lv-text-secondary: #374151;
-  --lv-heading: #7b61ff;
-  --lv-subheading: #1f2937;
-  --lv-accent: #7b61ff;
-  --lv-accent-soft: #c4b5fd;
-  --lv-border-color: rgba(123, 97, 255, 0.35);
-  --lv-shadow: 0 12px 35px rgba(123, 97, 255, 0.25);
-  --lv-card-tone-1: #f3e8ff;
-  --lv-card-tone-2: #e0f7ff;
-  --lv-card-tone-3: #fff4d6;
-  --lv-card-tone-4: #ffe3f1;
-  --lv-card-tone-5: #e6ffed;
-  --lv-word-title: #5b21b6;
-  --lv-meaning: #039c7f;
-  --lv-example: #ff5178;
-  --lv-info: #7b61ff;
-  --lv-error: #ff4d6d;
-  --lv-overlay: rgba(123, 97, 255, 0.28);
-  --lv-button-primary-bg: #7b61ff;
-  --lv-button-primary-text: #ffffff;
-  --lv-button-secondary-bg: rgba(255, 255, 255, 0.9);
-  --lv-button-secondary-text: #1a1a1a;
-  --lv-field-bg: rgba(255, 255, 255, 0.96);
-  --lv-field-border: rgba(123, 97, 255, 0.4);
-  --lv-field-text: #1a1a1a;
-  --lv-helper-text: #374151;
-}
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: rgba(192, 132, 252, 0.12);
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #d9d9e3;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(192, 132, 252, 0.25);
+    --lv-border-color: rgba(192, 132, 252, 0.28);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: rgba(192, 132, 252, 0.16);
+    --lv-card-tone-2: rgba(74, 222, 128, 0.14);
+    --lv-card-tone-3: rgba(236, 72, 153, 0.12);
+    --lv-card-tone-4: rgba(59, 130, 246, 0.14);
+    --lv-card-tone-5: rgba(250, 204, 21, 0.14);
+    --lv-word-title: #c084fc;
+    --lv-meaning: #4ade80;
+    --lv-example: #fb7185;
+    --lv-info: var(--accent);
+    --lv-error: #fb7185;
+    --lv-overlay: rgba(10, 10, 45, 0.65);
+    --lv-button-primary-bg: var(--accent);
+    --lv-button-primary-text: #120a32;
+    --lv-button-secondary-bg: rgba(255, 255, 255, 0.12);
+    --lv-button-secondary-text: var(--text);
+    --lv-field-bg: rgba(15, 23, 42, 0.6);
+    --lv-field-border: rgba(192, 132, 252, 0.4);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
+  }
 
-:root[data-theme="classic"] {
-  --background: 45 29% 97%;
-  --foreground: 220 15% 25%;
-  --card: 0 0% 100%;
-  --card-foreground: 220 15% 25%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 220 15% 25%;
-  --primary: 215 45% 30%;
-  --primary-foreground: 45 29% 97%;
-  --secondary: 30 25% 92%;
-  --secondary-foreground: 220 15% 25%;
-  --muted: 30 25% 92%;
-  --muted-foreground: 210 12% 40%;
-  --accent: 30 25% 92%;
-  --accent-foreground: 220 15% 25%;
-  --destructive: 0 63% 41%;
-  --destructive-foreground: 45 29% 97%;
-  --border: 32 21% 85%;
-  --input: 32 21% 85%;
-  --ring: 215 45% 30%;
+  :root[data-theme="classic-dark"] {
+    --bg: linear-gradient(120deg, #1a1a1a, #262626);
+    --card: #2d2d2d;
+    --text: #e6e6e6;
+    --subtext: #bfbfbf;
+    --accent: #90cdf4;
+    --accent2: #d9b68c;
+    --shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 
-  --lv-body-bg: #faf9f7;
-  --lv-card-bg: #ffffff;
-  --lv-card-highlight: #f4ede3;
-  --lv-text-primary: #2a2a2a;
-  --lv-text-secondary: #4a4a4a;
-  --lv-heading: #2a4365;
-  --lv-subheading: #3f3a37;
-  --lv-accent: #2a4365;
-  --lv-accent-soft: #c4a484;
-  --lv-border-color: rgba(76, 60, 45, 0.25);
-  --lv-shadow: 0 10px 28px rgba(76, 60, 45, 0.18);
-  --lv-card-tone-1: #f4ede3;
-  --lv-card-tone-2: #ebe2d3;
-  --lv-card-tone-3: #e2ecf4;
-  --lv-card-tone-4: #f1e8dc;
-  --lv-card-tone-5: #e9f3ff;
-  --lv-word-title: #2f4858;
-  --lv-meaning: #3f6f4b;
-  --lv-example: #8b3a3a;
-  --lv-info: #2a4365;
-  --lv-error: #b03030;
-  --lv-overlay: rgba(58, 49, 40, 0.35);
-  --lv-button-primary-bg: #2a4365;
-  --lv-button-primary-text: #ffffff;
-  --lv-button-secondary-bg: #f5efe6;
-  --lv-button-secondary-text: #2a2a2a;
-  --lv-field-bg: #ffffff;
-  --lv-field-border: rgba(76, 60, 45, 0.3);
-  --lv-field-text: #2a2a2a;
-  --lv-helper-text: #4a4a4a;
-}
+    --lv-body-bg: var(--bg);
+    --lv-card-bg: var(--card);
+    --lv-card-highlight: rgba(217, 182, 140, 0.14);
+    --lv-text-primary: var(--text);
+    --lv-text-secondary: var(--subtext);
+    --lv-heading: var(--accent);
+    --lv-subheading: #dcd7d3;
+    --lv-accent: var(--accent);
+    --lv-accent-soft: rgba(217, 182, 140, 0.2);
+    --lv-border-color: rgba(217, 182, 140, 0.25);
+    --lv-shadow: var(--shadow);
+    --lv-card-tone-1: rgba(217, 182, 140, 0.18);
+    --lv-card-tone-2: rgba(144, 205, 244, 0.2);
+    --lv-card-tone-3: rgba(76, 161, 175, 0.15);
+    --lv-card-tone-4: rgba(244, 209, 154, 0.16);
+    --lv-card-tone-5: rgba(94, 234, 212, 0.14);
+    --lv-word-title: #d9b68c;
+    --lv-meaning: #94d3ac;
+    --lv-example: #fca5a5;
+    --lv-info: var(--accent);
+    --lv-error: #f87171;
+    --lv-overlay: rgba(12, 12, 12, 0.65);
+    --lv-button-primary-bg: rgba(144, 205, 244, 0.85);
+    --lv-button-primary-text: #1c1c1c;
+    --lv-button-secondary-bg: rgba(45, 45, 45, 0.85);
+    --lv-button-secondary-text: var(--text);
+    --lv-field-bg: rgba(45, 45, 45, 0.85);
+    --lv-field-border: rgba(217, 182, 140, 0.35);
+    --lv-field-text: var(--text);
+    --lv-helper-text: var(--subtext);
+  }
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -237,7 +352,7 @@
     @apply bg-background text-foreground;
     background: var(--lv-body-bg);
     color: var(--lv-text-primary);
-    transition: background 0.3s ease, color 0.3s ease;
+    transition: background 0.5s ease, color 0.3s ease;
   }
 }
 
@@ -250,13 +365,15 @@ body {
   color: var(--lv-text-primary);
   border-color: var(--lv-border-color);
   box-shadow: var(--lv-shadow);
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(12px);
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .theme-card-highlight {
   background: var(--lv-card-highlight);
   color: var(--lv-text-primary);
-  transition: background 0.3s ease, color 0.3s ease;
+  backdrop-filter: blur(12px);
+  transition: background 0.3s ease, color 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .theme-accent-text {
@@ -272,6 +389,26 @@ body {
 .theme-border {
   border-color: var(--lv-border-color);
   transition: border-color 0.3s ease;
+}
+
+button:hover {
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 .voice-debug-panel {
   font-size: 10px;
