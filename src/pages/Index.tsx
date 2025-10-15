@@ -8,9 +8,6 @@ const Index = () => {
   return (
     <div className="min-h-screen py-4 transition-colors duration-300">
       <header className="relative mb-4 pt-10 sm:pt-4">
-        <div className="absolute right-2 top-2 sm:right-4 sm:top-4">
-          <ThemeSwitcher />
-        </div>
         <h1 className="text-xl font-bold text-center" style={{ color: 'var(--lv-heading)' }}>
           Lazy Vocabulary
         </h1>
@@ -35,6 +32,9 @@ const Index = () => {
         style={{ color: 'var(--lv-text-secondary)' }}
       >
         <UserGreeting />
+        <div className="mt-3 flex justify-center">
+          <ThemeSwitcher />
+        </div>
         <p className="mt-2">© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
       </footer>
     </div>
