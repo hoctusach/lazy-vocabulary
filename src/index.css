@@ -393,7 +393,7 @@ body {
 
 /* 🌿 Mint Breeze */
 body.theme-mint {
-  --bg-color: linear-gradient(135deg, #A8FF78, #78FFD6);
+  --bg-color: linear-gradient(135deg, #E8FFF0, #D6FFF6);
   --text-color: #053B2E;
   --accent-color: #00BFA6;
   --card-bg: rgba(255, 255, 255, 0.7);
@@ -431,11 +431,11 @@ body.theme-mint {
   --lv-accent-soft: rgba(0, 191, 166, 0.2);
   --lv-border-color: rgba(0, 140, 120, 0.35);
   --lv-shadow: 0 12px 34px rgba(0, 96, 80, 0.25);
-  --lv-card-tone-1: rgba(168, 255, 120, 0.45);
-  --lv-card-tone-2: rgba(120, 255, 214, 0.4);
-  --lv-card-tone-3: rgba(255, 214, 126, 0.35);
-  --lv-card-tone-4: rgba(120, 210, 255, 0.32);
-  --lv-card-tone-5: rgba(186, 255, 214, 0.4);
+  --lv-card-tone-1: rgba(220, 255, 214, 0.45);
+  --lv-card-tone-2: rgba(206, 255, 242, 0.38);
+  --lv-card-tone-3: rgba(255, 236, 198, 0.32);
+  --lv-card-tone-4: rgba(204, 234, 255, 0.3);
+  --lv-card-tone-5: rgba(216, 255, 236, 0.36);
   --lv-word-title: #07503c;
   --lv-meaning: #0d805a;
   --lv-example: #c0392b;
