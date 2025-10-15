@@ -39,7 +39,7 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
         <Button
           variant="outline"
           size="sm"
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)] dark:text-gray-200 dark:hover:text-[var(--lv-accent)]"
           title="Speech Rate"
         >
           <Gauge size={16} />
