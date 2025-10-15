@@ -177,7 +177,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={handleNextClick}
-              className="h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50"
+              className={cn(
+                'h-6 text-xs px-1.5 text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100/80',
+                'dark:text-indigo-200 dark:bg-indigo-900/40 dark:border-indigo-700 dark:hover:bg-indigo-900/60'
+              )}
             >
               <SkipForward size={12} className="mr-1" />
               Next
@@ -188,7 +191,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               variant="outline"
               size="sm"
               onClick={handleCycleVoiceClick}
-              className="h-6 text-xs px-1.5 text-blue-700 border-blue-300 bg-blue-50"
+              className={cn(
+                'h-6 text-xs px-1.5 text-blue-700 border border-blue-200 bg-blue-50 hover:bg-blue-100/80',
+                'dark:text-blue-200 dark:bg-blue-900/40 dark:border-blue-700 dark:hover:bg-blue-900/60'
+              )}
             >
               {nextVoiceLabel}
             </Button>
