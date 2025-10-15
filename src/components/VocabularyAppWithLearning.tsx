@@ -111,6 +111,19 @@ const VocabularyAppWithLearning: React.FC = () => {
     return new Date(parsed).toISOString().slice(0, 10);
   };
 
+  const renderCategoryRow = (category?: string) => {
+    const trimmedCategory = typeof category === 'string' ? category.trim() : '';
+    if (!trimmedCategory) {
+      return <div className="text-xs text-gray-400 italic">Category: Not set</div>;
+    }
+
+    return (
+      <div className="text-xs text-gray-600">
+        Category: <span className="font-medium text-gray-700">{trimmedCategory}</span>
+      </div>
+    );
+  };
+
   useEffect(() => {
     if (dailySelection) {
       setSummaryOpen(true);
@@ -177,12 +190,10 @@ const VocabularyAppWithLearning: React.FC = () => {
                   newTodayList.map((word, index) => (
                     <div key={`${word.word}-${index}`} className="text-sm p-2 bg-green-50 rounded border">
                       <div className="font-medium">{word.word}</div>
-                      {word.category && (
-                        <div className="text-xs text-gray-600">{word.category}</div>
-                      )}
-                      <div className="text-xs text-gray-500 space-y-0.5">
-                        <div>Review #{formatReviewCount(word.reviewCount)}</div>
-                        <div>Next review: {formatDateOnly(word.nextReviewAt)}</div>
+                      <div className="space-y-0.5">
+                        {renderCategoryRow(word.category)}
+                        <div className="text-xs text-gray-500">Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div className="text-xs text-gray-500">Next review: {formatDateOnly(word.nextReviewAt)}</div>
                       </div>
                     </div>
                   ))
@@ -204,12 +215,10 @@ const VocabularyAppWithLearning: React.FC = () => {
                       className="text-sm p-2 bg-red-50 rounded border"
                     >
                       <div className="font-medium">{word.word}</div>
-                      {word.category && (
-                        <div className="text-xs text-gray-600">{word.category}</div>
-                      )}
-                      <div className="text-xs text-gray-500 space-y-0.5">
-                        <div>Review #{formatReviewCount(word.reviewCount)}</div>
-                        <div>Next review: {formatDateOnly(word.nextReviewAt)}</div>
+                      <div className="space-y-0.5">
+                        {renderCategoryRow(word.category)}
+                        <div className="text-xs text-gray-500">Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div className="text-xs text-gray-500">Next review: {formatDateOnly(word.nextReviewAt)}</div>
                       </div>
                     </div>
                   ))
@@ -232,14 +241,11 @@ const VocabularyAppWithLearning: React.FC = () => {
                     >
                       <div>
                         <div className="font-medium text-gray-700">{word.word}</div>
-                        <div className="text-xs text-gray-500">
-                          {word.category ? (
-                            <>
-                              {word.category} • Learned {formatDateOnly(word.learnedDate)}
-                            </>
-                          ) : (
-                            <>Learned {formatDateOnly(word.learnedDate)}</>
-                          )}
+                        <div className="space-y-0.5">
+                          {renderCategoryRow(word.category)}
+                          <div className="text-xs text-gray-500">
+                            Learned {formatDateOnly(word.learnedDate)}
+                          </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
