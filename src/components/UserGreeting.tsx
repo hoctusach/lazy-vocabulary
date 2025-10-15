@@ -91,7 +91,7 @@ const UserGreeting = () => {
 
   return (
     <p className="mt-2 text-center text-sm text-muted-foreground">
-      Hello <span className="font-semibold text-foreground dark:text-foreground">{nickname}</span>,{' '}
+      Hello <span className="font-semibold text-gray-900">{nickname}</span>,{' '}
       <a
         href="#sign-out"
         onClick={handleSignOut}
