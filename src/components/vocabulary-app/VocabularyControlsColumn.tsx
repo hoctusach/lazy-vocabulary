@@ -34,6 +34,15 @@ interface VocabularyControlsColumnProps {
   onOpenSearch: (word?: string) => void;
 }
 
+const accentIconButtonClasses = {
+  next:
+    'text-indigo-700 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 dark:text-indigo-200 dark:border-indigo-800 dark:bg-indigo-950 dark:hover:bg-indigo-900 dark:hover:text-indigo-100',
+  voice:
+    'text-blue-700 border-blue-200 bg-blue-50 hover:bg-blue-100 hover:text-blue-800 dark:text-blue-200 dark:border-blue-800 dark:bg-blue-950 dark:hover:bg-blue-900 dark:hover:text-blue-100',
+  learned:
+    'text-red-600 border-red-200 bg-red-50 hover:bg-red-100 hover:text-red-700 dark:text-red-300 dark:border-red-800 dark:bg-red-950 dark:hover:bg-red-900 dark:hover:text-red-200'
+};
+
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   isMuted,
   isPaused,
@@ -151,7 +160,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleNextWord}
-        className="h-8 w-8 p-0 text-indigo-700 bg-indigo-50"
+        className={cn('h-8 w-8 p-0', accentIconButtonClasses.next)}
         title="Next Word"
         aria-label="Next Word"
       >
@@ -162,7 +171,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleCycleVoice}
-        className="h-8 w-8 p-0 text-blue-700 border-blue-300 bg-blue-50 flex items-center justify-center"
+        className={cn('h-8 w-8 p-0', accentIconButtonClasses.voice)}
         title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
         disabled={allVoices.length < 2}
         aria-label="Change Voice"
@@ -187,7 +196,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           variant="outline"
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="h-8 w-8 p-0 text-red-600 border-red-300 bg-red-50"
+          className={cn('h-8 w-8 p-0', accentIconButtonClasses.learned)}
           title="Mark as Learned"
           aria-label="Mark as Learned"
           disabled={!currentWord}
