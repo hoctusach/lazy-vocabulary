@@ -17,6 +17,20 @@ const themeOptions: ThemeOption[] = [
   { name: "cyber", emoji: "🔮", label: "Cyber Night" }
 ];
 
+type BaseThemeName = "default" | "playful" | "classic";
+
+type BaseThemeOption = {
+  name: BaseThemeName;
+  emoji: string;
+  label: string;
+};
+
+const baseThemeOptions: BaseThemeOption[] = [
+  { name: "default", emoji: "🎨", label: "Default" },
+  { name: "playful", emoji: "🎉", label: "Playful" },
+  { name: "classic", emoji: "📜", label: "Classic" }
+];
+
 const ThemeSwitcher: React.FC = () => {
   const { theme, setTheme, toggleDark, isDark } = useTheme();
   const [activeQuickTheme, setActiveQuickTheme] = useState(() => getActiveTheme());
@@ -44,6 +58,30 @@ const ThemeSwitcher: React.FC = () => {
     applyTheme(name);
     setActiveQuickTheme(name);
   };
+
+  const baseThemeButtons = useMemo(
+    () =>
+      baseThemeOptions.map((option) => {
+        const isActive = theme === option.name;
+        return (
+          <button
+            key={option.name}
+            type="button"
+            data-theme={option.name}
+            onClick={() => setTheme(option.name)}
+            className={`w-9 h-9 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center text-lg transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${
+              isActive ? "ring-2 ring-[var(--lv-accent)] scale-110" : ""
+            }`}
+            title={option.label}
+            aria-label={option.label}
+            aria-pressed={isActive}
+          >
+            {option.emoji}
+          </button>
+        );
+      }),
+    [setTheme, theme]
+  );
 
   const quickThemeButtons = useMemo(
     () =>
@@ -95,6 +133,7 @@ const ThemeSwitcher: React.FC = () => {
       </div>
 
       <div className="theme-switcher flex flex-wrap gap-2 items-center justify-center w-full">
+        {baseThemeButtons}
         {quickThemeButtons}
       </div>
     </div>
