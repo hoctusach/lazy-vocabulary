@@ -175,23 +175,16 @@ const VocabularyAppWithLearning: React.FC = () => {
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {newTodayList.length > 0 ? (
                   newTodayList.map((word, index) => (
-                    <div
-                      key={`${word.word}-${index}`}
-                      className="text-sm p-2 rounded border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/40"
-                    >
-                      <div className="font-semibold text-green-900 dark:text-green-100">{word.word}</div>
+                    <div key={`${word.word}-${index}`} className="text-sm p-2 bg-green-50 rounded border">
+                      <div className="font-medium">{word.word}</div>
                       <div className="space-y-0.5">
-                        <div className="text-xs text-green-700 dark:text-green-200">
-                          Review #{formatReviewCount(word.reviewCount)}
-                        </div>
-                        <div className="text-xs text-green-700 dark:text-green-200">
-                          Next review: {formatDateOnly(word.nextReviewAt)}
-                        </div>
+                        <div className="text-xs text-gray-500">Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div className="text-xs text-gray-500">Next review: {formatDateOnly(word.nextReviewAt)}</div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-sm p-2 rounded border border-green-200 bg-green-50 text-green-800 italic dark:border-green-800 dark:bg-green-900/40 dark:text-green-100">
+                  <div className="text-sm p-2 bg-green-50 rounded border text-gray-500 italic">
                     No new words assigned today
                   </div>
                 )}
@@ -205,21 +198,17 @@ const VocabularyAppWithLearning: React.FC = () => {
                   dueTodayList.map((word, index) => (
                     <div
                       key={`${word.word}-${index}`}
-                      className="text-sm p-2 rounded border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/40"
+                      className="text-sm p-2 bg-red-50 rounded border"
                     >
-                      <div className="font-semibold text-red-900 dark:text-red-100">{word.word}</div>
+                      <div className="font-medium">{word.word}</div>
                       <div className="space-y-0.5">
-                        <div className="text-xs text-red-700 dark:text-red-200">
-                          Review #{formatReviewCount(word.reviewCount)}
-                        </div>
-                        <div className="text-xs text-red-700 dark:text-red-200">
-                          Next review: {formatDateOnly(word.nextReviewAt)}
-                        </div>
+                        <div className="text-xs text-gray-500">Review #{formatReviewCount(word.reviewCount)}</div>
+                        <div className="text-xs text-gray-500">Next review: {formatDateOnly(word.nextReviewAt)}</div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-sm p-2 rounded border border-red-200 bg-red-50 text-red-800 italic dark:border-red-800 dark:bg-red-900/40 dark:text-red-100">
+                  <div className="text-sm p-2 bg-red-50 rounded border text-gray-500 italic">
                     No due reviews today
                   </div>
                 )}
@@ -233,12 +222,12 @@ const VocabularyAppWithLearning: React.FC = () => {
                   learnedWordsList.map((word, index) => (
                     <div
                       key={index}
-                      className="text-sm p-2 rounded border border-slate-200 bg-slate-100 flex items-center justify-between dark:border-slate-700 dark:bg-slate-900/40"
+                      className="text-sm p-2 bg-gray-50 rounded border opacity-75 flex items-center justify-between"
                     >
                       <div>
-                        <div className="font-semibold text-slate-900 dark:text-slate-100">{word.word}</div>
+                        <div className="font-medium text-gray-700">{word.word}</div>
                         <div className="space-y-0.5">
-                          <div className="text-xs text-slate-700 dark:text-slate-200">
+                          <div className="text-xs text-gray-500">
                             Learned {formatDateOnly(word.learnedDate)}
                           </div>
                         </div>
@@ -246,14 +235,14 @@ const VocabularyAppWithLearning: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <button
                           aria-label="View Word"
-                          className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+                          className="text-gray-400 hover:text-gray-600"
                           onClick={() => openSearch(word.word)}
                         >
                           <Eye className="h-4 w-4" />
                         </button>
                         <button
                           aria-label="Mark as New"
-                          className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
+                          className="text-gray-400 hover:text-gray-600"
                           onClick={() => {
                             setWordToReset(word);
                             setIsMarkAsNewDialogOpen(true);
@@ -265,7 +254,7 @@ const VocabularyAppWithLearning: React.FC = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-sm p-2 rounded border border-slate-200 bg-slate-100 text-slate-800 italic dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-100">
+                  <div className="text-sm p-2 bg-gray-50 rounded border text-gray-500 italic">
                     No learned words
                   </div>
                 )}
