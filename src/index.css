@@ -352,7 +352,7 @@ html[data-theme] {
     @apply bg-background text-foreground;
     background: var(--lv-body-bg);
     color: var(--lv-text-primary);
-    transition: background 0.5s ease, color 0.3s ease;
+    transition: background 0.8s ease, color 0.8s ease;
   }
 }
 
@@ -389,6 +389,316 @@ body {
 .theme-border {
   border-color: var(--lv-border-color);
   transition: border-color 0.3s ease;
+}
+
+/* 🌿 Mint Breeze */
+body.theme-mint {
+  --bg-color: linear-gradient(135deg, #A8FF78, #78FFD6);
+  --text-color: #053B2E;
+  --accent-color: #00BFA6;
+  --card-bg: rgba(255, 255, 255, 0.7);
+
+  --background: 150 86% 90%;
+  --foreground: 162 73% 16%;
+  --card: 0 0% 100%;
+  --card-foreground: var(--foreground);
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--foreground);
+  --primary: 168 74% 40%;
+  --primary-foreground: 160 100% 96%;
+  --secondary: 150 65% 85%;
+  --secondary-foreground: var(--foreground);
+  --muted: 152 55% 88%;
+  --muted-foreground: 165 34% 28%;
+  --accent: var(--accent-color);
+  --accent2: #78ffd6;
+  --accent-foreground: var(--foreground);
+  --destructive: 2 78% 48%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 156 42% 72%;
+  --input: 156 42% 72%;
+  --ring: 168 74% 40%;
+  --radius: 0.5rem;
+
+  --lv-body-bg: var(--bg-color);
+  --lv-card-bg: var(--card-bg);
+  --lv-card-highlight: rgba(255, 255, 255, 0.78);
+  --lv-text-primary: var(--text-color);
+  --lv-text-secondary: rgba(5, 59, 46, 0.72);
+  --lv-heading: var(--accent-color);
+  --lv-subheading: #0b5c49;
+  --lv-accent: var(--accent-color);
+  --lv-accent-soft: rgba(0, 191, 166, 0.2);
+  --lv-border-color: rgba(0, 140, 120, 0.35);
+  --lv-shadow: 0 12px 34px rgba(0, 96, 80, 0.25);
+  --lv-card-tone-1: rgba(168, 255, 120, 0.45);
+  --lv-card-tone-2: rgba(120, 255, 214, 0.4);
+  --lv-card-tone-3: rgba(255, 214, 126, 0.35);
+  --lv-card-tone-4: rgba(120, 210, 255, 0.32);
+  --lv-card-tone-5: rgba(186, 255, 214, 0.4);
+  --lv-word-title: #07503c;
+  --lv-meaning: #0d805a;
+  --lv-example: #c0392b;
+  --lv-info: var(--accent-color);
+  --lv-error: #c23a22;
+  --lv-overlay: rgba(5, 59, 46, 0.4);
+  --lv-button-primary-bg: var(--accent-color);
+  --lv-button-primary-text: #ffffff;
+  --lv-button-secondary-bg: rgba(255, 255, 255, 0.82);
+  --lv-button-secondary-text: var(--text-color);
+  --lv-field-bg: rgba(255, 255, 255, 0.78);
+  --lv-field-border: rgba(0, 140, 120, 0.35);
+  --lv-field-text: var(--text-color);
+  --lv-helper-text: rgba(5, 59, 46, 0.7);
+}
+
+/* ☀️ Morning Glow */
+body.theme-morning {
+  --bg-color: linear-gradient(135deg, #FFF5C3, #FFD1DC);
+  --text-color: #4A2C2A;
+  --accent-color: #FF9A76;
+  --card-bg: rgba(255, 255, 255, 0.8);
+
+  --background: 27 100% 90%;
+  --foreground: 9 40% 26%;
+  --card: 0 0% 100%;
+  --card-foreground: var(--foreground);
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--foreground);
+  --primary: 18 100% 67%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 340 100% 92%;
+  --secondary-foreground: var(--foreground);
+  --muted: 30 70% 88%;
+  --muted-foreground: 14 35% 34%;
+  --accent: var(--accent-color);
+  --accent2: #ffd1dc;
+  --accent-foreground: var(--foreground);
+  --destructive: 4 74% 45%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 18 74% 78%;
+  --input: 18 74% 78%;
+  --ring: 18 100% 67%;
+  --radius: 0.5rem;
+
+  --lv-body-bg: var(--bg-color);
+  --lv-card-bg: var(--card-bg);
+  --lv-card-highlight: rgba(255, 244, 230, 0.86);
+  --lv-text-primary: var(--text-color);
+  --lv-text-secondary: rgba(74, 44, 42, 0.72);
+  --lv-heading: var(--accent-color);
+  --lv-subheading: #6b3d34;
+  --lv-accent: var(--accent-color);
+  --lv-accent-soft: rgba(255, 154, 118, 0.25);
+  --lv-border-color: rgba(255, 154, 118, 0.35);
+  --lv-shadow: 0 12px 28px rgba(122, 78, 72, 0.2);
+  --lv-card-tone-1: rgba(255, 206, 173, 0.45);
+  --lv-card-tone-2: rgba(255, 209, 220, 0.45);
+  --lv-card-tone-3: rgba(255, 245, 195, 0.45);
+  --lv-card-tone-4: rgba(255, 154, 118, 0.35);
+  --lv-card-tone-5: rgba(255, 210, 160, 0.35);
+  --lv-word-title: #6b3d34;
+  --lv-meaning: #ba7b52;
+  --lv-example: #d1495b;
+  --lv-info: var(--accent-color);
+  --lv-error: #b91c1c;
+  --lv-overlay: rgba(74, 44, 42, 0.3);
+  --lv-button-primary-bg: var(--accent-color);
+  --lv-button-primary-text: #ffffff;
+  --lv-button-secondary-bg: rgba(255, 255, 255, 0.85);
+  --lv-button-secondary-text: var(--text-color);
+  --lv-field-bg: rgba(255, 255, 255, 0.85);
+  --lv-field-border: rgba(255, 154, 118, 0.4);
+  --lv-field-text: var(--text-color);
+  --lv-helper-text: rgba(74, 44, 42, 0.7);
+}
+
+/* 🌊 Ocean Depth */
+body.theme-ocean {
+  --bg-color: linear-gradient(135deg, #1CB5E0, #000046);
+  --text-color: #E6F2F8;
+  --accent-color: #00E1FF;
+  --card-bg: rgba(20, 20, 40, 0.6);
+
+  --background: 228 84% 22%;
+  --foreground: 200 100% 95%;
+  --card: 228 45% 18%;
+  --card-foreground: var(--foreground);
+  --popover: 228 45% 18%;
+  --popover-foreground: var(--foreground);
+  --primary: 188 100% 50%;
+  --primary-foreground: 210 100% 96%;
+  --secondary: 220 65% 32%;
+  --secondary-foreground: var(--foreground);
+  --muted: 222 55% 28%;
+  --muted-foreground: 210 70% 82%;
+  --accent: var(--accent-color);
+  --accent2: #1cb5e0;
+  --accent-foreground: 228 84% 16%;
+  --destructive: 2 90% 62%;
+  --destructive-foreground: 210 100% 96%;
+  --border: 197 78% 45%;
+  --input: 197 78% 45%;
+  --ring: 188 100% 50%;
+  --radius: 0.5rem;
+
+  --lv-body-bg: var(--bg-color);
+  --lv-card-bg: var(--card-bg);
+  --lv-card-highlight: rgba(15, 30, 55, 0.65);
+  --lv-text-primary: var(--text-color);
+  --lv-text-secondary: rgba(230, 242, 248, 0.75);
+  --lv-heading: var(--accent-color);
+  --lv-subheading: #9bd4f1;
+  --lv-accent: var(--accent-color);
+  --lv-accent-soft: rgba(0, 225, 255, 0.25);
+  --lv-border-color: rgba(0, 225, 255, 0.4);
+  --lv-shadow: 0 18px 32px rgba(0, 0, 40, 0.35);
+  --lv-card-tone-1: rgba(0, 225, 255, 0.28);
+  --lv-card-tone-2: rgba(28, 181, 224, 0.35);
+  --lv-card-tone-3: rgba(0, 70, 120, 0.45);
+  --lv-card-tone-4: rgba(0, 65, 130, 0.4);
+  --lv-card-tone-5: rgba(0, 205, 172, 0.28);
+  --lv-word-title: #b7e9ff;
+  --lv-meaning: #5eead4;
+  --lv-example: #fda4af;
+  --lv-info: var(--accent-color);
+  --lv-error: #f87171;
+  --lv-overlay: rgba(0, 24, 64, 0.55);
+  --lv-button-primary-bg: var(--accent-color);
+  --lv-button-primary-text: #002a36;
+  --lv-button-secondary-bg: rgba(28, 181, 224, 0.2);
+  --lv-button-secondary-text: var(--text-color);
+  --lv-field-bg: rgba(20, 20, 40, 0.72);
+  --lv-field-border: rgba(0, 225, 255, 0.35);
+  --lv-field-text: var(--text-color);
+  --lv-helper-text: rgba(230, 242, 248, 0.7);
+}
+
+/* 🌸 Sakura Dream */
+body.theme-sakura {
+  --bg-color: linear-gradient(135deg, #FFE6F7, #FDE2E4);
+  --text-color: #3D1E26;
+  --accent-color: #FF7B9C;
+  --card-bg: rgba(255, 255, 255, 0.6);
+
+  --background: 340 70% 94%;
+  --foreground: 330 38% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: var(--foreground);
+  --popover: 0 0% 100%;
+  --popover-foreground: var(--foreground);
+  --primary: 346 100% 74%;
+  --primary-foreground: 340 100% 98%;
+  --secondary: 348 82% 90%;
+  --secondary-foreground: var(--foreground);
+  --muted: 348 82% 90%;
+  --muted-foreground: 332 35% 32%;
+  --accent: var(--accent-color);
+  --accent2: #fde2e4;
+  --accent-foreground: var(--foreground);
+  --destructive: 358 75% 55%;
+  --destructive-foreground: 340 100% 98%;
+  --border: 346 60% 80%;
+  --input: 346 60% 80%;
+  --ring: 346 100% 74%;
+  --radius: 0.5rem;
+
+  --lv-body-bg: var(--bg-color);
+  --lv-card-bg: var(--card-bg);
+  --lv-card-highlight: rgba(255, 255, 255, 0.75);
+  --lv-text-primary: var(--text-color);
+  --lv-text-secondary: rgba(61, 30, 38, 0.7);
+  --lv-heading: var(--accent-color);
+  --lv-subheading: #5b2b3b;
+  --lv-accent: var(--accent-color);
+  --lv-accent-soft: rgba(255, 123, 156, 0.25);
+  --lv-border-color: rgba(255, 123, 156, 0.35);
+  --lv-shadow: 0 10px 26px rgba(93, 43, 59, 0.18);
+  --lv-card-tone-1: rgba(255, 123, 156, 0.35);
+  --lv-card-tone-2: rgba(253, 226, 228, 0.45);
+  --lv-card-tone-3: rgba(255, 230, 247, 0.45);
+  --lv-card-tone-4: rgba(255, 173, 198, 0.35);
+  --lv-card-tone-5: rgba(210, 173, 255, 0.28);
+  --lv-word-title: #5b2b3b;
+  --lv-meaning: #c26d85;
+  --lv-example: #d1498b;
+  --lv-info: var(--accent-color);
+  --lv-error: #d44871;
+  --lv-overlay: rgba(61, 30, 38, 0.3);
+  --lv-button-primary-bg: var(--accent-color);
+  --lv-button-primary-text: #fff5fb;
+  --lv-button-secondary-bg: rgba(255, 255, 255, 0.78);
+  --lv-button-secondary-text: var(--text-color);
+  --lv-field-bg: rgba(255, 255, 255, 0.78);
+  --lv-field-border: rgba(255, 123, 156, 0.35);
+  --lv-field-text: var(--text-color);
+  --lv-helper-text: rgba(61, 30, 38, 0.68);
+}
+
+/* 🔮 Cyber Night */
+body.theme-cyber {
+  --bg-color: linear-gradient(135deg, #141E30, #2A0845);
+  --text-color: #E6E6FA;
+  --accent-color: #FF00FF;
+  --card-bg: rgba(50, 50, 80, 0.4);
+
+  --background: 258 40% 14%;
+  --foreground: 240 67% 94%;
+  --card: 258 35% 18%;
+  --card-foreground: var(--foreground);
+  --popover: 258 35% 18%;
+  --popover-foreground: var(--foreground);
+  --primary: 300 100% 50%;
+  --primary-foreground: 240 67% 94%;
+  --secondary: 258 35% 24%;
+  --secondary-foreground: var(--foreground);
+  --muted: 258 35% 24%;
+  --muted-foreground: 240 40% 80%;
+  --accent: var(--accent-color);
+  --accent2: #00e1ff;
+  --accent-foreground: 240 67% 94%;
+  --destructive: 2 90% 60%;
+  --destructive-foreground: 240 67% 94%;
+  --border: 282 55% 40%;
+  --input: 282 55% 40%;
+  --ring: 300 100% 50%;
+  --radius: 0.5rem;
+
+  --lv-body-bg: var(--bg-color);
+  --lv-card-bg: var(--card-bg);
+  --lv-card-highlight: rgba(44, 28, 68, 0.6);
+  --lv-text-primary: var(--text-color);
+  --lv-text-secondary: rgba(230, 230, 250, 0.7);
+  --lv-heading: var(--accent-color);
+  --lv-subheading: #9c8cd9;
+  --lv-accent: var(--accent-color);
+  --lv-accent-soft: rgba(255, 0, 255, 0.2);
+  --lv-border-color: rgba(255, 0, 255, 0.25);
+  --lv-shadow: 0 16px 40px rgba(20, 14, 40, 0.45);
+  --lv-card-tone-1: rgba(255, 0, 255, 0.28);
+  --lv-card-tone-2: rgba(0, 225, 255, 0.25);
+  --lv-card-tone-3: rgba(44, 28, 68, 0.45);
+  --lv-card-tone-4: rgba(84, 37, 122, 0.35);
+  --lv-card-tone-5: rgba(20, 14, 40, 0.4);
+  --lv-word-title: #c084fc;
+  --lv-meaning: #5eead4;
+  --lv-example: #f472b6;
+  --lv-info: var(--accent-color);
+  --lv-error: #fb7185;
+  --lv-overlay: rgba(20, 14, 40, 0.55);
+  --lv-button-primary-bg: var(--accent-color);
+  --lv-button-primary-text: #1b1028;
+  --lv-button-secondary-bg: rgba(20, 30, 48, 0.6);
+  --lv-button-secondary-text: var(--text-color);
+  --lv-field-bg: rgba(28, 24, 56, 0.7);
+  --lv-field-border: rgba(255, 0, 255, 0.25);
+  --lv-field-text: var(--text-color);
+  --lv-helper-text: rgba(230, 230, 250, 0.72);
+}
+
+/* Transition effect for theme changes */
+body {
+  transition: background 0.8s ease, color 0.8s ease;
 }
 
 button:hover {
