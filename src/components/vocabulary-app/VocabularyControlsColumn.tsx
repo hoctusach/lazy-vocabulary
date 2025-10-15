@@ -124,8 +124,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleToggleMute}
         className={cn(
-          'h-8 w-8 p-0',
-          isMuted ? 'text-purple-700 border-purple-300 bg-purple-50' : 'text-gray-700'
+          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          isMuted
+            ? 'text-purple-700 border-purple-300 bg-purple-50 dark:text-purple-100 dark:border-purple-700 dark:bg-purple-900/40'
+            : ''
         )}
         title={isMuted ? 'Unmute' : 'Mute'}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
@@ -138,8 +140,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleTogglePause}
         className={cn(
-          'h-8 w-8 p-0',
-          isPaused ? 'text-orange-500 border-orange-300 bg-orange-50' : 'text-gray-700'
+          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          isPaused
+            ? 'text-orange-500 border-orange-300 bg-orange-50 dark:text-orange-200 dark:border-orange-700 dark:bg-orange-900/40'
+            : ''
         )}
         title={isPaused ? 'Play' : 'Pause'}
         aria-label={isPaused ? 'Play' : 'Pause'}
@@ -151,7 +155,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleNextWord}
-        className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]"
+        className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
         title="Next Word"
         aria-label="Next Word"
       >
@@ -163,7 +167,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleCycleVoice}
         className={cn(
-          'h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]',
+          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
           allVoices.length < 2 ? 'cursor-not-allowed opacity-50' : ''
         )}
         title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
@@ -178,19 +182,19 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={() => onOpenSearch()}
-        className="h-8 w-8 p-0"
+        className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
         title="Quick Search"
         aria-label="Quick Search"
       >
         <Search size={16} />
       </Button>
-      
+
       {onMarkWordLearned && (
         <Button
           variant="outline"
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)]"
+          className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
           title="Mark as Learned"
           aria-label="Mark as Learned"
           disabled={!currentWord}
