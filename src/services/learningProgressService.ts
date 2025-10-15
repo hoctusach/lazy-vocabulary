@@ -794,6 +794,8 @@ function normalizeLearnedWordRow(value: unknown): LearnedWordRow | null {
       typeof value.is_today_selection === 'boolean' ? value.is_today_selection : null,
     due_selected_today:
       typeof value.due_selected_today === 'boolean' ? value.due_selected_today : null,
+    category: typeof value.category === 'string' ? value.category : null,
+    word: typeof value.word === 'string' ? value.word : null,
   };
 }
 
