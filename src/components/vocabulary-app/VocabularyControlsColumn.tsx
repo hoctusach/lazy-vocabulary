@@ -199,7 +199,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           aria-label="Mark as Learned"
           disabled={!currentWord}
         >
-          <CheckCircle size={16} />
+          <CheckCircle
+            size={16}
+            className="text-emerald-600 dark:text-emerald-400"
+          />
         </Button>
       )}
 
