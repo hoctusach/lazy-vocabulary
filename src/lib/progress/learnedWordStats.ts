@@ -16,6 +16,8 @@ export type LearnedWordRow = {
   srs_ease: number | null;
   is_today_selection: boolean | null;
   due_selected_today: boolean | null;
+  category?: string | null;
+  word?: string | null;
 };
 
 export type LearnedWordSummary = {
@@ -76,12 +78,41 @@ function isDue(row: LearnedWordRow, now: Date): boolean {
 }
 
 function toWordAndCategory(row: LearnedWordRow): { word: string; category?: string } | null {
-  const wordId = typeof row?.word_id === 'string' ? row.word_id : '';
-  if (!wordId) return null;
-  const [word, category] = wordId.split('::');
+  const rawWordId = typeof row?.word_id === 'string' ? row.word_id : '';
+  const fallbackCategory =
+    typeof row?.category === 'string' && row.category.trim().length > 0
+      ? row.category.trim()
+      : '';
+  const fallbackWord = typeof row?.word === 'string' ? row.word.trim() : '';
+
+  const segments = rawWordId
+    .split('::')
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0);
+
+  if (segments.length === 0) {
+    if (!fallbackWord) {
+      return null;
+    }
+    return {
+      word: fallbackWord,
+      category: fallbackCategory || undefined,
+    };
+  }
+
+  let word = segments[0];
+  let categoryFromId = segments.length > 1 ? segments.slice(1).join('::') : '';
+
+  if (fallbackCategory && segments[0].toLowerCase() === fallbackCategory.toLowerCase()) {
+    word = segments[segments.length - 1];
+    categoryFromId = fallbackCategory;
+  }
+
+  const category = categoryFromId || fallbackCategory || undefined;
+
   return {
-    word: word || wordId,
-    category: category || undefined,
+    word: word || fallbackWord || rawWordId,
+    category,
   };
 }
 

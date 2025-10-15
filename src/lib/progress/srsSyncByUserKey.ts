@@ -233,6 +233,8 @@ function toLearnedWordRow(value: unknown): LearnedWordRow | null {
       typeof value.due_selected_today === 'boolean'
         ? value.due_selected_today
         : null,
+    category: typeof value.category === 'string' ? value.category : null,
+    word: typeof value.word === 'string' ? value.word : null,
   };
 }
 
