@@ -5,7 +5,14 @@ import type { LearnedWordUpsert } from '@/lib/db/learned';
 import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { buildTodaysWords } from '@/utils/todayWords';
-import { LEARNED_WORDS_CACHE_KEY } from '@/utils/storageKeys';
+import {
+  DAILY_SELECTION_KEY,
+  LAST_SELECTION_DATE_KEY,
+  LEARNED_WORDS_CACHE_KEY,
+  TODAY_DATE_KEY,
+  TODAY_SELECTION_KEY,
+  TODAY_WORDS_KEY,
+} from '@/utils/storageKeys';
 import { formatDateKey, normalizeTimeZone, resolveLocalTimezone } from '@/utils/dateKey';
 import {
   computeLearnedWordStats,
@@ -61,6 +68,50 @@ const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
 const MASTER_INTERVAL_DAYS = 60;
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
+
+const TODAY_SELECTION_STORAGE_KEY = TODAY_SELECTION_KEY;
+const TODAY_DATE_STORAGE_KEY = TODAY_DATE_KEY;
+
+function persistTodaySelectionState(state: TodaySelectionState | null): void {
+  if (typeof localStorage === 'undefined') return;
+
+  if (!state || !state.selection) {
+    try {
+      localStorage.removeItem(DAILY_SELECTION_KEY);
+      localStorage.removeItem(TODAY_SELECTION_STORAGE_KEY);
+      localStorage.removeItem(TODAY_WORDS_KEY);
+      localStorage.removeItem(TODAY_DATE_STORAGE_KEY);
+    } catch (error) {
+      console.warn('[LearningProgress] Failed to clear today selection cache', error);
+    }
+    return;
+  }
+
+  const dateKey = state.date || formatDateKey(new Date(), state.timezone ?? null);
+
+  try {
+    const serialisedSelection = JSON.stringify(state.selection);
+    localStorage.setItem(DAILY_SELECTION_KEY, serialisedSelection);
+    localStorage.setItem(TODAY_SELECTION_STORAGE_KEY, serialisedSelection);
+    localStorage.setItem(TODAY_WORDS_KEY, JSON.stringify(state.words ?? []));
+    localStorage.setItem(LAST_SELECTION_DATE_KEY, dateKey);
+    localStorage.setItem(TODAY_DATE_STORAGE_KEY, dateKey);
+  } catch (error) {
+    console.warn('[LearningProgress] Failed to persist today selection cache', error);
+  }
+}
+
+export function hasCachedTodaySelection(): boolean {
+  if (typeof localStorage === 'undefined') return false;
+  try {
+    const selection =
+      localStorage.getItem(TODAY_SELECTION_STORAGE_KEY) ?? localStorage.getItem(DAILY_SELECTION_KEY);
+    const words = localStorage.getItem(TODAY_WORDS_KEY);
+    return Boolean(selection && words);
+  } catch {
+    return false;
+  }
+}
 
 const MODE_TO_SEVERITY: Record<DailyMode, SeverityLevel> = {
   Light: 'light',
@@ -558,6 +609,8 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
       selectionSize: today.words.length,
     });
   }
+
+  persistTodaySelectionState(today);
 
   return today;
 }

@@ -9,3 +9,5 @@ export const LAST_SELECTION_DATE_KEY = 'lastSelectionDate';
 export const TODAY_WORDS_KEY = 'todayWords';
 export const LAST_SYNC_DATE_KEY = 'lastSyncDate';
 export const LEARNED_WORDS_CACHE_KEY = 'learnedWordsCache';
+export const TODAY_SELECTION_KEY = 'todaySelection';
+export const TODAY_DATE_KEY = 'todayDate';

@@ -163,7 +163,9 @@ export default function AuthGate() {
       return false;
     };
 
-    const completeSignIn = async (nicknameHint?: string) => {
+    const completeSignIn = async (options?: { nicknameHint?: string; blockUntilReady?: boolean }) => {
+      const nicknameHint = options?.nicknameHint;
+      const blockUntilReady = options?.blockUntilReady ?? false;
       const session = (await exchangeNicknamePasscode(
         sanitizedName,
         trimmedPasscode,
@@ -193,9 +195,10 @@ export default function AuthGate() {
         console.error('AuthGate:ensureUserKey', error);
       }
 
+      let prepareSelectionPromise: Promise<void> | null = null;
       if (userKey) {
         identifyUser(userKey, displayNameFromSession);
-        void (async () => {
+        prepareSelectionPromise = (async () => {
           try {
             const [{ getPreferences }, progress] = await Promise.all([
               import('../lib/db/preferences'),
@@ -216,6 +219,7 @@ export default function AuthGate() {
           } catch (error) {
             console.error('AuthGate:prepareTodaySelection', error);
             toast.error("Failed to prepare today's words. Please refresh if they don't load.");
+            throw error;
           }
         })();
       }
@@ -230,6 +234,20 @@ export default function AuthGate() {
         (await import('../lib/storage/migrateLocalVocabToDb')).migrateLocalVocabToDb?.();
       } catch {
         // ignore migration errors
+      }
+
+      if (prepareSelectionPromise) {
+        if (blockUntilReady) {
+          try {
+            await prepareSelectionPromise;
+          } catch {
+            // Error already handled above.
+          }
+        } else {
+          void prepareSelectionPromise.catch(() => {
+            /* handled */
+          });
+        }
       }
 
       setS({
@@ -276,7 +294,7 @@ export default function AuthGate() {
       }
 
       try {
-        await completeSignIn(nicknameHint);
+        await completeSignIn({ nicknameHint, blockUntilReady: true });
         return;
       } catch (error) {
         console.error('AuthGate:signInAfterCreate', error);

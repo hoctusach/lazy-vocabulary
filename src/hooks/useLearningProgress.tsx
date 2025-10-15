@@ -25,6 +25,13 @@ import { buildTodaysWords } from '@/utils/todayWords';
 import { identifyUser, trackReviewDue, trackWordLearned } from '@/services/analyticsService';
 import { getNicknameLocal } from '@/lib/nickname';
 import { formatDateKey } from '@/utils/dateKey';
+import {
+  DAILY_SELECTION_KEY,
+  LAST_SELECTION_DATE_KEY,
+  TODAY_DATE_KEY,
+  TODAY_SELECTION_KEY,
+  TODAY_WORDS_KEY,
+} from '@/utils/storageKeys';
 
 const DEFAULT_STATS = {
   total: 0,
@@ -456,6 +463,35 @@ export const useLearningProgress = () => {
   );
 
   const orderedTodayWords = useMemo(() => buildTodaysWords(todayWords, 'ALL'), [todayWords]);
+
+  useEffect(() => {
+    if (typeof localStorage === 'undefined') return;
+
+    if (!dailySelection) {
+      try {
+        localStorage.removeItem(DAILY_SELECTION_KEY);
+        localStorage.removeItem(TODAY_SELECTION_KEY);
+        localStorage.removeItem(TODAY_WORDS_KEY);
+        localStorage.removeItem(TODAY_DATE_KEY);
+      } catch (error) {
+        console.warn('[useLearningProgress] Failed to clear today selection cache', error);
+      }
+      return;
+    }
+
+    const dateKey = dailySelection.date ?? formatDateKey(new Date(), dailySelection.timezone ?? null);
+
+    try {
+      const serialisedSelection = JSON.stringify(dailySelection);
+      localStorage.setItem(DAILY_SELECTION_KEY, serialisedSelection);
+      localStorage.setItem(TODAY_SELECTION_KEY, serialisedSelection);
+      localStorage.setItem(TODAY_WORDS_KEY, JSON.stringify(orderedTodayWords));
+      localStorage.setItem(LAST_SELECTION_DATE_KEY, dateKey);
+      localStorage.setItem(TODAY_DATE_KEY, dateKey);
+    } catch (error) {
+      console.warn('[useLearningProgress] Failed to persist today selection cache', error);
+    }
+  }, [dailySelection, orderedTodayWords]);
 
   return {
     dailySelection,
