@@ -63,7 +63,7 @@ const ThemeSwitcher: React.FC = () => {
   );
 
   return (
-    <div className="theme-switcher flex flex-wrap gap-2 items-center justify-center sm:justify-end w-full text-sm">
+    <div className="theme-switcher flex flex-wrap gap-2 items-center justify-center w-full text-sm">
       {quickThemeButtons}
       <button
         type="button"
