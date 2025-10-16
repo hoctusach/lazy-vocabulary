@@ -68,7 +68,7 @@ const ThemeSwitcher: React.FC = () => {
       <button
         type="button"
         onClick={toggleDark}
-        className="w-9 h-9 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center text-lg transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)]"
+        className="w-11 h-11 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center text-2xl transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)]"
         title="Toggle dark mode"
         aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
         aria-pressed={isDark}
