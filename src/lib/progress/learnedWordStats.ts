@@ -189,12 +189,12 @@ export function computeLearnedWordStats(
     return isDue(row, now);
   };
 
-  const newTodayWords = safeRows
+  const newTodayWords = learningRows
     .filter((row) => isTodaySelection(row) && !isDueSelectedToday(row))
     .map((row) => toTodaySummary(row, false))
     .filter((value): value is TodayLearnedWordSummary => value !== null);
 
-  const dueTodayWords = safeRows
+  const dueTodayWords = learningRows
     .filter((row) => isTodaySelection(row) && isDueSelectedToday(row))
     .map((row) => toTodaySummary(row, true))
     .filter((value): value is TodayLearnedWordSummary => value !== null);
