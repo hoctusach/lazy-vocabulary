@@ -151,16 +151,18 @@ export async function markLearnedServerByKey(
   };
 
   const rpcPayload = {
-    user_unique_key: key,
-    word_id: wordId,
+    p_user_key: key,
+    p_word_id: wordId,
   };
 
   const { data, error } = await sb.rpc('mark_word_learned_by_key', rpcPayload);
 
   if (error) {
-    console.warn('mark_word_learned_by_key', error.message);
+    console.error('❌ RPC failed:', error);
     return null;
   }
+
+  console.log('✅ Marked learned:', data);
 
   const rawRows: LearnedWordRow[] = Array.isArray(data)
     ? (data as LearnedWordRow[])
@@ -175,7 +177,7 @@ export async function markLearnedServerByKey(
   }
 
   try {
-    const { state, userProgress } = loadLearningProgressForUser(rpcPayload.user_unique_key);
+    const { state, userProgress } = loadLearningProgressForUser(rpcPayload.p_user_key);
     let didUpdate = false;
     const fallbackMarkedAt = toIso(payload?.learned_at) ?? new Date().toISOString();
 
@@ -194,7 +196,7 @@ export async function markLearnedServerByKey(
     }
 
     if (didUpdate) {
-      persistLearningProgress(rpcPayload.user_unique_key, state, userProgress);
+      persistLearningProgress(rpcPayload.p_user_key, state, userProgress);
     }
   } catch (storageError) {
     console.warn('mark_word_learned_by_key:local_sync', storageError);
