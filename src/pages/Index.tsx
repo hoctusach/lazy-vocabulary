@@ -7,7 +7,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 const Index = () => {
   return (
     <div className="min-h-screen py-4 transition-colors duration-300">
-      <header className="relative mb-4 pt-10 sm:pt-4">
+      <header className="relative mb-4 pt-6 sm:pt-2">
         <h1 className="text-xl font-bold text-center" style={{ color: 'var(--lv-heading)' }}>
           Lazy Vocabulary
         </h1>
