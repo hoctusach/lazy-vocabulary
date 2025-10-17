@@ -81,4 +81,33 @@ describe('computeLearnedWordStats', () => {
     expect(summary.new).toBe(0);
     expect(summary.remaining).toBe(0);
   });
+
+  it('excludes learned rows from today selections', () => {
+    const now = new Date('2024-03-10T12:00:00Z');
+    const rows: LearnedWordRow[] = [
+      createRow({
+        word_id: 'learned-today::core',
+        srs_state: 'learned',
+        is_today_selection: true,
+        due_selected_today: false,
+      }),
+      createRow({
+        word_id: 'learning-new::core',
+        is_today_selection: true,
+        due_selected_today: false,
+      }),
+      createRow({
+        word_id: 'learning-due::core',
+        is_today_selection: true,
+        due_selected_today: true,
+      }),
+    ];
+
+    const { newTodayWords, dueTodayWords } = computeLearnedWordStats(rows, { now, totalWords: 10 });
+
+    expect(newTodayWords).toHaveLength(1);
+    expect(newTodayWords[0]?.word).toBe('learning-new');
+    expect(dueTodayWords).toHaveLength(1);
+    expect(dueTodayWords[0]?.word).toBe('learning-due');
+  });
 });
