@@ -731,7 +731,7 @@ export async function markWordAsNew(
   try {
     const { data, error } = await client.rpc('mark_word_new_by_key', {
       p_user_key: userKey,
-      p_word_id: wordId,
+      word_id: wordId,
     });
 
     if (error) {

@@ -151,8 +151,8 @@ export async function markLearnedServerByKey(
   };
 
   const rpcPayload = {
-    p_user_unique_key: key,
-    p_word_id: wordId,
+    user_unique_key: key,
+    word_id: wordId,
   };
 
   const { data, error } = await sb.rpc('mark_word_learned_by_key', rpcPayload);
@@ -175,7 +175,7 @@ export async function markLearnedServerByKey(
   }
 
   try {
-    const { state, userProgress } = loadLearningProgressForUser(rpcPayload.p_user_unique_key);
+    const { state, userProgress } = loadLearningProgressForUser(rpcPayload.user_unique_key);
     let didUpdate = false;
     const fallbackMarkedAt = toIso(payload?.learned_at) ?? new Date().toISOString();
 
@@ -194,7 +194,7 @@ export async function markLearnedServerByKey(
     }
 
     if (didUpdate) {
-      persistLearningProgress(rpcPayload.p_user_unique_key, state, userProgress);
+      persistLearningProgress(rpcPayload.user_unique_key, state, userProgress);
     }
   } catch (storageError) {
     console.warn('mark_word_learned_by_key:local_sync', storageError);

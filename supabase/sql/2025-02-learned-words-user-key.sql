@@ -24,24 +24,24 @@ alter table public.learned_words
   on update cascade
   on delete cascade;
 
-create or replace function public.get_learned_words_by_key(p_user_unique_key text)
+create or replace function public.get_learned_words_by_key(user_unique_key text)
 returns setof text
 language sql
 security definer
 set search_path = public
 as $$
-  select public.require_session_user_key(p_user_unique_key);
+  select public.require_session_user_key(user_unique_key);
   select lw.word_id
     from public.learned_words lw
-   where lw.user_unique_key = p_user_unique_key
+   where lw.user_unique_key = user_unique_key
    order by lw.word_id;
 $$;
 
 grant execute on function public.get_learned_words_by_key(text) to anon, authenticated;
 
 create or replace function public.mark_word_learned_by_key(
-  p_user_unique_key text,
-  p_word_id text,
+  user_unique_key text,
+  word_id text,
   p_marked_at timestamptz default now(),
   p_total_words integer default 0,
   p_in_review_queue boolean default false,
@@ -64,11 +64,11 @@ declare
   v_total integer := greatest(coalesce(p_total_words, 0), 0);
   v_summary jsonb;
 begin
-  perform public.require_session_user_key(p_user_unique_key);
-  if coalesce(p_user_unique_key, '') = '' then
+  perform public.require_session_user_key(user_unique_key);
+  if coalesce(user_unique_key, '') = '' then
     raise exception 'user_unique_key is required';
   end if;
-  if coalesce(p_word_id, '') = '' then
+  if coalesce(word_id, '') = '' then
     raise exception 'word_id is required';
   end if;
 
@@ -87,8 +87,8 @@ begin
     srs_state
   )
   values (
-    p_user_unique_key,
-    p_word_id,
+    user_unique_key,
+    word_id,
     coalesce(p_in_review_queue, false),
     v_marked_at,
     p_review_count,
@@ -122,7 +122,7 @@ begin
           and coalesce(lw.next_review_at, lw.learned_at) <= now()
       ) as learning_due_count
     from public.learned_words lw
-    where lw.user_unique_key = p_user_unique_key
+    where lw.user_unique_key = user_unique_key
   )
   insert into public.user_progress_summary (
     user_unique_key,
@@ -135,7 +135,7 @@ begin
     updated_at
   )
   select
-    p_user_unique_key,
+    user_unique_key,
     coalesce(progress.learning_count, 0),
     coalesce(progress.learned_count, 0),
     coalesce(progress.learning_due_count, 0),
@@ -145,7 +145,7 @@ begin
     now()
   from progress
   left join public.user_progress_summary ups
-    on ups.user_unique_key = p_user_unique_key
+    on ups.user_unique_key = user_unique_key
   on conflict (user_unique_key) do update set
     learning_count = excluded.learning_count,
     learned_count = excluded.learned_count,
