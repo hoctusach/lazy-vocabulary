@@ -6,13 +6,13 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 
 const Index = () => {
   return (
-    <div className="min-h-screen py-4 transition-colors duration-300">
-      <header className="relative mb-4 pt-6 sm:pt-2">
+    <div className="min-h-screen py-2 transition-colors duration-300">
+      <header className="relative mb-2 pt-4 sm:pt-1">
         <h1 className="text-xl font-bold text-center" style={{ color: 'var(--lv-heading)' }}>
           Lazy Vocabulary
         </h1>
         <h2
-          className="text-center mt-1 text-sm font-medium"
+          className="text-center mt-0.5 text-sm font-medium"
           style={{ color: 'var(--lv-subheading)' }}
         >
           Master vocabulary with passive learning!
@@ -27,12 +27,9 @@ const Index = () => {
         <VocabularyAppWithLearning />
       </main>
 
-      <footer
-        className="mt-6 text-center text-sm"
-        style={{ color: 'var(--lv-text-secondary)' }}
-      >
+      <footer className="mt-4 text-center text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
         <UserGreeting />
-        <div className="mt-3 flex justify-center">
+        <div className="mt-2 flex justify-center">
           <ThemeSwitcher />
         </div>
         <p className="mt-2">© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
