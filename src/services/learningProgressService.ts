@@ -660,9 +660,12 @@ export async function markWordReviewed(
     throw new Error('Word not found in today cache');
   }
 
-  const { updated, payload, progress } = applyReviewToWord(currentState.words[index]);
+  const { payload, progress } = applyReviewToWord(currentState.words[index]);
   const words = [...currentState.words];
-  words[index] = updated;
+
+  // Remove the word from today's queue once it is explicitly marked as learned so
+  // it will not continue to autoplay during the same session.
+  words.splice(index, 1);
 
   const mode = SEVERITY_TO_MODE[severity] ?? currentState.mode;
   const count = getDailyCount(severity);
