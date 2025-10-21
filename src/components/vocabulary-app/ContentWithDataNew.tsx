@@ -66,7 +66,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {additionalContent}
 
       {/* Mobile speech note statically above debug panel */}
-      <div className="mobile-note text-xs italic text-gray-500 text-left my-2">
+      <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
       </div>
 

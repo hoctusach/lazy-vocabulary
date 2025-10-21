@@ -144,7 +144,7 @@ const VocabularyAppWithLearning: React.FC = () => {
 
   const learningSection = (
     <TooltipProvider>
-      <div className="space-y-4 mt-4">
+      <div className="space-y-3 mt-3">
       <LearningProgressPanel
         progressStats={progressStats}
         learnerId="default"
@@ -165,12 +165,12 @@ const VocabularyAppWithLearning: React.FC = () => {
           </TooltipTrigger>
           <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
         </Tooltip>
-        <CollapsibleContent className="space-y-4">
+        <CollapsibleContent className="space-y-3">
           {!hasSelectionWords && (
             <div className="text-sm text-gray-500 italic">No daily selection available yet.</div>
           )}
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="space-y-2">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="space-y-1.5">
               <h4 className="font-medium text-green-600">NEW TODAY ({newTodayList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {newTodayList.length > 0 ? (
@@ -198,7 +198,7 @@ const VocabularyAppWithLearning: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h4 className="font-medium text-red-600">DUE TODAY ({dueTodayList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {dueTodayList.length > 0 ? (
@@ -226,7 +226,7 @@ const VocabularyAppWithLearning: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <h4 className="font-medium text-gray-600">LEARNED ({learnedWordsList.length})</h4>
               <div className="space-y-1 max-h-60 overflow-y-auto">
                 {learnedWordsList.length > 0 ? (

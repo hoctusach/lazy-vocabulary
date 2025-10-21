@@ -79,7 +79,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     return (
       <DebugInfoContext.Provider value={debugInfo}>
         <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <LoadingCard />
           </div>
         </VocabularyLayout>
@@ -91,7 +91,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     return (
       <DebugInfoContext.Provider value={debugInfo}>
         <VocabularyLayout showWordCard={true} hasData={false} onToggleView={() => {}}>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <UserInteractionManager
               currentWord={currentWord}
               playCurrentWord={playCurrentWord}
@@ -124,7 +124,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     return (
       <DebugInfoContext.Provider value={debugInfo}>
         <VocabularyLayout showWordCard={true} hasData={true} onToggleView={() => {}}>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <UserInteractionManager
               currentWord={currentWord}
               playCurrentWord={playCurrentWord}
@@ -147,7 +147,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   return (
     <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-        <div className="space-y-4">
+        <div className="space-y-3">
           <UserInteractionManager
             currentWord={currentWord}
             playCurrentWord={playCurrentWord}

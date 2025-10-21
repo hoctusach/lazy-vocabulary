@@ -36,8 +36,8 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
               <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
             </CollapsibleTrigger>
           </div>
-          <CollapsibleContent className="space-y-4 pt-2">
-            <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+          <CollapsibleContent className="space-y-3 pt-1">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
               <div className="text-center">
                 <div className="text-2xl font-bold" style={{ color: 'var(--lv-text-secondary)' }}>
                   {progressStats.learned}
@@ -98,7 +98,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between text-sm">
                 <span>Learning Progress</span>
                 <span>{Math.round(learnedPercentage)}%</span>
