@@ -5,7 +5,7 @@ import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
-import { ChevronDown, RotateCcw, Eye } from 'lucide-react';
+import { ChevronDown, Eye } from 'lucide-react';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
@@ -243,23 +243,13 @@ const VocabularyAppWithLearning: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center">
                         <button
                           aria-label="View Word"
                           className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
                           onClick={() => openSearch(word.word)}
                         >
                           <Eye className="h-4 w-4" />
-                        </button>
-                        <button
-                          aria-label="Mark as New"
-                          className="text-slate-500 hover:text-slate-700 dark:text-slate-300 dark:hover:text-slate-100"
-                          onClick={() => {
-                            setWordToReset(word);
-                            setIsMarkAsNewDialogOpen(true);
-                          }}
-                        >
-                          <RotateCcw className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
