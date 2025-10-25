@@ -4,6 +4,7 @@ import { dispatchUserKeyChange } from '@/lib/userKeyEvents';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
+import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 
 // Hard-coded total number of vocabulary words used for progress calculations
 export const TOTAL_WORDS = 3261;
@@ -163,6 +164,10 @@ export async function markLearnedServerByKey(
   }
 
   console.log('✅ Marked learned:', data);
+
+  if (typeof window !== 'undefined') {
+    showCongratsEffect();
+  }
 
   const rawRows: LearnedWordRow[] = Array.isArray(data)
     ? (data as LearnedWordRow[])
