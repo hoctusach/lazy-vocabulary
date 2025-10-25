@@ -101,10 +101,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
   const [wordToMark, setWordToMark] = React.useState('');
-  const learnedSoundRef = React.useRef<HTMLAudioElement | null>(null);
-  React.useEffect(() => {
-    learnedSoundRef.current = new Audio('/beep2.wav');
-  }, []);
 
   const handleMarkAsLearnedClick = () => {
     setWordToMark(currentWord?.word || '');
@@ -113,7 +109,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const handleMarkAsLearnedConfirm = () => {
     if (onMarkWordLearned && wordToMark) onMarkWordLearned(wordToMark);
     setIsMarkAsLearnedDialogOpen(false);
-    learnedSoundRef.current?.play().catch(() => {});
     toast('Word marked as learned.');
   };
 
