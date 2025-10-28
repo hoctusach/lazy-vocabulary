@@ -21,6 +21,7 @@ import {
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
+import { extractServerSummary } from '@/lib/progress/serverSummary';
 
 export type GenerateParams = {
   userKey: string;
@@ -499,6 +500,49 @@ async function generateDailySelectionV2(
   return rows;
 }
 
+export async function loadDailySelectionSummary(
+  userKey: string,
+  opts?: { count?: number; category?: string | null; timezone?: string }
+): Promise<{ summary: DerivedProgressSummary; rows: DailySelectionRow[] }> {
+  const client = getSupabaseClient();
+  if (!client) {
+    throw new Error('Supabase client unavailable');
+  }
+
+  const rows = await getDailySelectionV2(client, {
+    userKey,
+    count: opts?.count ?? 10,
+    category: opts?.category ?? null,
+  });
+
+  const server = extractServerSummary(rows);
+  if (server) {
+    const total = server.learned + server.learning + server.remaining;
+    const summary: DerivedProgressSummary = {
+      learned: server.learned,
+      learning: server.learning,
+      new: server.remaining,
+      due: server.due,
+      remaining: server.remaining,
+      total,
+      learnedDays: server.learnedDays,
+      source: 'server',
+    };
+
+    return { summary, rows };
+  }
+
+  const fallback = computeLearnedWordStats(rows as unknown as LearnedWordRow[], {
+    totalWords: TOTAL_WORDS,
+    timezone: opts?.timezone ?? null,
+  });
+
+  return {
+    summary: fallback.summary,
+    rows,
+  };
+}
+
 async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, VocabularyRow>> {
   if (wordIds.length === 0) return {};
   const client = getSupabaseClient();
@@ -678,14 +722,15 @@ export async function markWordReviewed(
   selection.date = currentState.selection.date ?? currentState.date;
   selection.timezone = currentState.selection.timezone ?? currentState.timezone ?? null;
 
-  const rows = await markLearnedServerByKey(wordId, payload);
+  const markResult = await markLearnedServerByKey(wordId, payload);
 
   let summary: DerivedProgressSummary | null = null;
   let learnedSummaries: LearnedWordSummary[] | null = null;
   let newTodaySummaries: TodayLearnedWordSummary[] | null = null;
   let dueTodaySummaries: TodayLearnedWordSummary[] | null = null;
 
-  if (rows) {
+  if (markResult) {
+    const rows = markResult.rows;
     const {
       learnedWords: derivedWords,
       newTodayWords: derivedNewToday,
@@ -699,6 +744,21 @@ export async function markWordReviewed(
     learnedSummaries = derivedWords;
     newTodaySummaries = derivedNewToday;
     dueTodaySummaries = derivedDueToday;
+
+    if (markResult.serverSummary) {
+      const server = markResult.serverSummary;
+      const total = server.learned + server.learning + server.remaining;
+      summary = {
+        learned: server.learned,
+        learning: server.learning,
+        new: server.remaining,
+        due: server.due,
+        remaining: server.remaining,
+        total,
+        learnedDays: server.learnedDays,
+        source: 'server',
+      };
+    }
   }
 
   return {

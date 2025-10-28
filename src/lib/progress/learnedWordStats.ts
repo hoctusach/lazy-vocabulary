@@ -41,6 +41,9 @@ export type DerivedProgressSummary = {
   new: number;
   due: number;
   remaining: number;
+  total?: number;
+  learnedDays?: string[];
+  source?: 'client' | 'server';
 };
 
 type ComputeOptions = {
@@ -205,12 +208,16 @@ export function computeLearnedWordStats(
 
   const learnedCount = learnedRows.length;
   const learningCount = learningRows.length;
+  const remainingCount = Math.max(totalWords - learnedCount - learningCount, 0);
+
   const summary: DerivedProgressSummary = {
-    learned: learnedRows.length,
-    learning: learningRows.length,
-    new: Math.max(totalWords - learningRows.length, 0),
+    learned: learnedCount,
+    learning: learningCount,
+    new: Math.max(totalWords - learningCount, 0),
     due: dueRows.length,
-    remaining: Math.max(totalWords - learnedRows.length - learningRows.length, 0),
+    remaining: remainingCount,
+    total: learnedCount + learningCount + remainingCount,
+    source: 'client',
   };
 
   return { learnedWords, newTodayWords, dueTodayWords, summary };

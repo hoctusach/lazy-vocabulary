@@ -120,17 +120,24 @@ export type DailySelectionV2Row = {
   meaning?: string | null;
   example?: string | null;
   translation?: string | null;
+  learning_count?: number | null;
+  learned_count?: number | null;
+  learning_due_count?: number | null;
+  remaining_count?: number | null;
+  v_learned_days?: string[] | null;
 } & Record<string, unknown>;
 
 export async function getDailySelectionV2(
   client: ReturnType<typeof createClient>,
   params: { userKey: string; count: number; category?: string | null }
 ): Promise<DailySelectionV2Row[]> {
-  const { data, error } = await client.rpc("generate_daily_selection_v2", {
-    p_user_key: params.userKey,
-    p_count: params.count,
-    p_category: params.category ?? null,
-  });
+  const { data, error } = await client
+    .rpc("generate_daily_selection_v2", {
+      p_user_key: params.userKey,
+      p_count: params.count,
+      p_category: params.category ?? null,
+    })
+    .select("*");
 
   if (error) {
     throw new Error(error.message);
