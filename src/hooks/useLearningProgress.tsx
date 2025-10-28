@@ -43,7 +43,7 @@ const DEFAULT_STATS = {
 
 function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
-  const total = summary.learned + summary.learning + summary.remaining;
+  const total = summary.total ?? summary.learned + summary.learning + summary.remaining;
   return {
     total,
     learning: summary.learning,
@@ -69,15 +69,36 @@ export const useLearningProgress = () => {
   const identifiedKeyRef = useRef<string | null>(null);
 
   const applyLearnedOverride = useCallback(
-    (stats: typeof DEFAULT_STATS) => {
+    (summary: DerivedProgressSummary | null) => {
+      const stats = toStats(summary);
+      if (!summary) {
+        const learnedOverride = learnedCountRef.current;
+        if (learnedOverride == null) {
+          return stats;
+        }
+        return {
+          ...stats,
+          learned: learnedOverride,
+          total: learnedOverride + stats.learning + Math.max(stats.total - stats.learning - learnedOverride, 0),
+        };
+      }
+
+      if (summary.source === 'server') {
+        return stats;
+      }
+
       const learnedOverride = learnedCountRef.current;
       if (learnedOverride == null) {
         return stats;
       }
+
+      const total =
+        learnedOverride + stats.learning + Math.max(stats.total - stats.learning - learnedOverride, 0);
+
       return {
         ...stats,
         learned: learnedOverride,
-        total: learnedOverride + stats.learning + Math.max(stats.total - stats.learning - learnedOverride, 0),
+        total,
       };
     },
     []
@@ -88,10 +109,13 @@ export const useLearningProgress = () => {
     if (!targetKey) return;
     try {
       const summary = await fetchProgressSummaryService(targetKey);
-      setProgressStats(applyLearnedOverride(toStats(summary)));
+      if (summary?.source === 'server') {
+        learnedCountRef.current = null;
+      }
+      setProgressStats(applyLearnedOverride(summary));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load progress summary', error);
-      setProgressStats(applyLearnedOverride(DEFAULT_STATS));
+      setProgressStats(applyLearnedOverride(null));
     }
   }, [applyLearnedOverride, userKey]);
 
@@ -100,11 +124,11 @@ export const useLearningProgress = () => {
     if (!targetKey) return;
     try {
       const { learnedWords: learned, newTodayWords, dueTodayWords, summary } = await fetchLearnedWordSummaries(targetKey);
-      learnedCountRef.current = learned.length;
+      learnedCountRef.current = summary?.source === 'server' ? null : learned.length;
       setLearnedWords(learned);
       setNewTodayLearnedWords(newTodayWords);
       setDueTodayLearnedWords(dueTodayWords);
-      setProgressStats(applyLearnedOverride(toStats(summary)));
+      setProgressStats(applyLearnedOverride(summary));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to load learned words', error);
       setLearnedWords([]);
@@ -140,7 +164,7 @@ export const useLearningProgress = () => {
         setLearnedWords([]);
         setNewTodayLearnedWords([]);
         setDueTodayLearnedWords([]);
-        setProgressStats(applyLearnedOverride(DEFAULT_STATS));
+        setProgressStats(applyLearnedOverride(null));
         setIsDailySelectionLoading(true);
         setUserKey(nextKey);
         return;
@@ -153,7 +177,7 @@ export const useLearningProgress = () => {
       setLearnedWords([]);
       setNewTodayLearnedWords([]);
       setDueTodayLearnedWords([]);
-      setProgressStats(applyLearnedOverride(DEFAULT_STATS));
+      setProgressStats(applyLearnedOverride(null));
       setIsDailySelectionLoading(false);
     };
 
@@ -398,8 +422,13 @@ export const useLearningProgress = () => {
           srsState: result.payload?.srs_state ?? target.srs?.srs_state ?? null,
           srsIntervalDays: result.payload?.srs_interval_days ?? target.srs?.srs_interval_days ?? null,
         });
+        if (result.summary?.source === 'server') {
+          learnedCountRef.current = null;
+        }
         if (result.learnedWords) {
-          learnedCountRef.current = result.learnedWords.length;
+          if (result.summary?.source !== 'server') {
+            learnedCountRef.current = result.learnedWords.length;
+          }
           setLearnedWords(result.learnedWords);
         }
         if (result.newTodayWords) {
@@ -416,7 +445,7 @@ export const useLearningProgress = () => {
           void refreshLearnedWords(userKey);
         }
         if (result.summary) {
-          setProgressStats(applyLearnedOverride(toStats(result.summary)));
+          setProgressStats(applyLearnedOverride(result.summary));
         } else {
           void refreshStats(userKey);
         }
@@ -446,11 +475,11 @@ export const useLearningProgress = () => {
           return false;
         }
 
-        learnedCountRef.current = result.learnedWords.length;
+        learnedCountRef.current = result.summary.source === 'server' ? null : result.learnedWords.length;
         setLearnedWords(result.learnedWords);
         setNewTodayLearnedWords(result.newTodayWords);
         setDueTodayLearnedWords(result.dueTodayWords);
-        setProgressStats(applyLearnedOverride(toStats(result.summary)));
+        setProgressStats(applyLearnedOverride(result.summary));
         return true;
       } catch (error) {
         console.warn('[useLearningProgress] Failed to reset word', error);

@@ -4,6 +4,7 @@ import { dispatchUserKeyChange } from '@/lib/userKeyEvents';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
+import { extractServerSummary, type ServerSummary } from './serverSummary';
 import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 
 // Hard-coded total number of vocabulary words used for progress calculations
@@ -132,10 +133,15 @@ export async function ensureUserKey(): Promise<string | null> {
  * returns the full learned_words rows so the client can derive summary data
  * without additional round-trips.
  */
+export type MarkLearnedServerResult = {
+  rows: LearnedWordRow[];
+  serverSummary: ServerSummary | null;
+};
+
 export async function markLearnedServerByKey(
   wordId: string,
   payload?: LearnedWordUpsert | null
-): Promise<LearnedWordRow[] | null> {
+): Promise<MarkLearnedServerResult | null> {
   const session = await getActiveSession();
   if (!session?.user_unique_key) return null;
 
@@ -156,7 +162,9 @@ export async function markLearnedServerByKey(
     p_word_id: wordId,
   };
 
-  const { data, error } = await sb.rpc('mark_word_learned_by_key', rpcPayload);
+  const { data, error } = await sb
+    .rpc('mark_word_learned_by_key', rpcPayload)
+    .select('*');
 
   if (error) {
     console.error('❌ RPC failed:', error);
@@ -169,16 +177,15 @@ export async function markLearnedServerByKey(
     showCongratsEffect();
   }
 
-  const rawRows: LearnedWordRow[] = Array.isArray(data)
-    ? (data as LearnedWordRow[])
-    : [];
+  const rawRows = Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
+  const serverSummary = extractServerSummary(rawRows);
 
   const normalisedRows = rawRows
     .map((row) => toLearnedWordRow(row))
     .filter((row): row is LearnedWordRow => row !== null);
 
   if (normalisedRows.length === 0) {
-    return [];
+    return { rows: [], serverSummary };
   }
 
   try {
@@ -207,7 +214,7 @@ export async function markLearnedServerByKey(
     console.warn('mark_word_learned_by_key:local_sync', storageError);
   }
 
-  return normalisedRows;
+  return { rows: normalisedRows, serverSummary };
 }
 
 function toLearnedWordRow(value: unknown): LearnedWordRow | null {
