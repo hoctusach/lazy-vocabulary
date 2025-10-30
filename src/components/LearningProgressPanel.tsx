@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
@@ -33,7 +32,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
           <div className="flex items-center justify-between">
             <CollapsibleTrigger className="flex items-center gap-2">
               <h3 className="text-lg font-semibold">Learning Progress</h3>
-              <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
+              <ChevronDown className="h-4 w-4" />
             </CollapsibleTrigger>
           </div>
           <CollapsibleContent className="space-y-3 pt-1">
