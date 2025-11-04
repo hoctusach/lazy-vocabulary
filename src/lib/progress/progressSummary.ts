@@ -193,12 +193,9 @@ export async function recalcProgressSummary(userKey: string): Promise<void> {
   const client = getSupabaseClient();
   if (!client) return;
   const { data, error } = await client
-    .rpc('generate_daily_selection_v2', {
-      p_user_key: userKey,
-      p_count: TOTAL_WORDS,
-      p_category: null,
-    })
-    .select('next_review_at');
+    .from('learned_words')
+    .select('in_review_queue, next_review_at')
+    .eq('user_unique_key', userKey);
 
   if (error) {
     console.warn('progressSummary:recalc', error.message);

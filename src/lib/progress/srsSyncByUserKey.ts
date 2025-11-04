@@ -266,12 +266,9 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
   const sb = getSupabaseClient();
   if (!sb) return;
   const { data, error } = await sb
-    .rpc('generate_daily_selection_v2', {
-      p_user_key: key,
-      p_count: TOTAL_WORDS,
-      p_category: null,
-    })
-    .select('word_id');
+    .from('learned_words')
+    .select('word_id')
+    .eq('user_unique_key', key);
 
   if (error) {
     console.warn('bootstrapLearnedFromServerByKey', error.message);

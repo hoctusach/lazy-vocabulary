@@ -909,28 +909,9 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
   }
 
   const { data, error } = await client
-    .rpc('generate_daily_selection_v2', {
-      p_user_key: userKey,
-      p_count: TOTAL_WORDS,
-      p_category: null,
-    })
-    .select(
-      [
-        'word_id',
-        'srs_state',
-        'learned_at',
-        'last_review_at',
-        'next_review_at',
-        'next_display_at',
-        'review_count',
-        'srs_interval_days',
-        'srs_ease',
-        'is_today_selection',
-        'due_selected_today',
-        'category',
-        'word',
-      ].join(', ')
-    )
+    .from('learned_words')
+    .select('*')
+    .eq('user_unique_key', userKey)
     .order('learned_at', { ascending: false });
 
   if (error) {
