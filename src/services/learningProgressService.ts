@@ -922,7 +922,6 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
         'last_review_at',
         'next_review_at',
         'next_display_at',
-        'in_review_queue',
         'review_count',
         'srs_interval_days',
         'srs_ease',

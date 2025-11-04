@@ -198,7 +198,7 @@ export async function recalcProgressSummary(userKey: string): Promise<void> {
       p_count: TOTAL_WORDS,
       p_category: null,
     })
-    .select('in_review_queue, next_review_at');
+    .select('next_review_at');
 
   if (error) {
     console.warn('progressSummary:recalc', error.message);
