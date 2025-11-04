@@ -49,6 +49,14 @@ describe('useLearningProgress', () => {
   beforeEach(() => {
     fetchProgressSummaryMock.mockReset();
     fetchLearnedWordSummariesMock.mockReset();
+    fetchProgressSummaryMock.mockResolvedValue({ summary: null, error: null });
+    fetchLearnedWordSummariesMock.mockResolvedValue({
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+      summary: null,
+      error: null,
+    });
   });
 
   it('keeps learned stat aligned with learned summaries across refreshes', async () => {
@@ -78,12 +86,13 @@ describe('useLearningProgress', () => {
       remaining: totalWords - 4 - 4,
     };
 
-    fetchProgressSummaryMock.mockResolvedValue(initialSummary);
+    fetchProgressSummaryMock.mockResolvedValue({ summary: initialSummary, error: null });
     fetchLearnedWordSummariesMock.mockResolvedValue({
       learnedWords: overrideRows,
       newTodayWords: [],
       dueTodayWords: [],
       summary: learnedSummary,
+      error: null,
     });
 
     const { result } = renderHook(() => useLearningProgress([]));
@@ -91,6 +100,7 @@ describe('useLearningProgress', () => {
     await act(async () => {
       await result.current.refreshStats('user-key');
     });
+    expect(result.current.progressError).toBeNull();
     expect(result.current.progressStats).toMatchObject({
       learning: initialSummary.learning,
       new: initialSummary.new,
@@ -102,15 +112,17 @@ describe('useLearningProgress', () => {
     await act(async () => {
       await result.current.refreshLearnedWords('user-key');
     });
+    expect(result.current.progressError).toBeNull();
     expect(result.current.progressStats.learned).toBe(overrideRows.length);
     expect(result.current.progressStats.total).toBe(totalWords);
     expect(result.current.progressStats.new).toBe(learnedSummary.new);
 
-    fetchProgressSummaryMock.mockResolvedValue(refreshedSummary);
+    fetchProgressSummaryMock.mockResolvedValue({ summary: refreshedSummary, error: null });
 
     await act(async () => {
       await result.current.refreshStats('user-key');
     });
+    expect(result.current.progressError).toBeNull();
     expect(result.current.progressStats.learning).toBe(refreshedSummary.learning);
     expect(result.current.progressStats.new).toBe(refreshedSummary.new);
     expect(result.current.progressStats.due).toBe(refreshedSummary.due);
@@ -170,10 +182,11 @@ describe('useLearningProgress', () => {
 
     const stats = computeLearnedWordStats(rows, { now, totalWords: 50 });
 
-    fetchProgressSummaryMock.mockResolvedValue(stats.summary);
+    fetchProgressSummaryMock.mockResolvedValue({ summary: stats.summary, error: null });
     fetchLearnedWordSummariesMock.mockResolvedValue({
       ...stats,
       summary: stats.summary,
+      error: null,
     });
 
     const { result } = renderHook(() => useLearningProgress([]));
@@ -182,6 +195,7 @@ describe('useLearningProgress', () => {
       await result.current.refreshStats('user-key');
     });
 
+    expect(result.current.progressError).toBeNull();
     expect(result.current.progressStats).toMatchObject({
       learned: stats.summary.learned,
       learning: stats.summary.learning,
@@ -194,6 +208,7 @@ describe('useLearningProgress', () => {
       await result.current.refreshLearnedWords('user-key');
     });
 
+    expect(result.current.progressError).toBeNull();
     expect(result.current.progressStats).toMatchObject({
       learned: stats.learnedWords.length,
       learning: stats.summary.learning,
@@ -201,5 +216,47 @@ describe('useLearningProgress', () => {
       new: stats.summary.new,
       total: stats.summary.learned + stats.summary.learning + stats.summary.remaining,
     });
+  });
+
+  it('surfaces administrator notice when server data is unavailable', async () => {
+    fetchProgressSummaryMock.mockResolvedValue({
+      summary: null,
+      error: { type: 'no-server' },
+    });
+    fetchLearnedWordSummariesMock.mockResolvedValue({
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+      summary: null,
+      error: { type: 'no-server' },
+    });
+
+    const { result } = renderHook(() => useLearningProgress([]));
+
+    await act(async () => {
+      await result.current.refreshStats('user-key');
+    });
+
+    expect(result.current.progressError).toBe(
+      'Progress data unavailable. Please check with your administrator.'
+    );
+    expect(result.current.progressStats).toMatchObject({
+      learned: 0,
+      learning: 0,
+      new: 0,
+      due: 0,
+      total: 0,
+    });
+
+    await act(async () => {
+      await result.current.refreshLearnedWords('user-key');
+    });
+
+    expect(result.current.progressError).toBe(
+      'Progress data unavailable. Please check with your administrator.'
+    );
+    expect(result.current.learnedWords).toEqual([]);
+    expect(result.current.newTodayLearnedWords).toEqual([]);
+    expect(result.current.dueTodayLearnedWords).toEqual([]);
   });
 });

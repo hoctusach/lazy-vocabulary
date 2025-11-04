@@ -41,6 +41,9 @@ const DEFAULT_STATS = {
   learned: 0
 };
 
+const PROGRESS_UNAVAILABLE_MESSAGE =
+  'Progress data unavailable. Please check with your administrator.';
+
 function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
   const total = summary.total ?? summary.learned + summary.learning + summary.remaining;
@@ -65,6 +68,7 @@ export const useLearningProgress = () => {
   const [newTodayLearnedWords, setNewTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [dueTodayLearnedWords, setDueTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
+  const [progressError, setProgressError] = useState<string | null>(null);
   const dueEventTrackerRef = useRef<Set<string>>(new Set());
   const identifiedKeyRef = useRef<string | null>(null);
 
@@ -108,7 +112,13 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const summary = await fetchProgressSummaryService(targetKey);
+      const { summary, error } = await fetchProgressSummaryService(targetKey);
+      if (error?.type === 'no-server') {
+        setProgressError(PROGRESS_UNAVAILABLE_MESSAGE);
+        setProgressStats(applyLearnedOverride(null));
+        return;
+      }
+      setProgressError(null);
       if (summary?.source === 'server') {
         learnedCountRef.current = null;
       }
@@ -123,7 +133,23 @@ export const useLearningProgress = () => {
     const targetKey = key ?? userKey;
     if (!targetKey) return;
     try {
-      const { learnedWords: learned, newTodayWords, dueTodayWords, summary } = await fetchLearnedWordSummaries(targetKey);
+      const {
+        learnedWords: learned,
+        newTodayWords,
+        dueTodayWords,
+        summary,
+        error,
+      } = await fetchLearnedWordSummaries(targetKey);
+      if (error?.type === 'no-server') {
+        setProgressError(PROGRESS_UNAVAILABLE_MESSAGE);
+        learnedCountRef.current = null;
+        setLearnedWords([]);
+        setNewTodayLearnedWords([]);
+        setDueTodayLearnedWords([]);
+        setProgressStats(applyLearnedOverride(null));
+        return;
+      }
+      setProgressError(null);
       learnedCountRef.current = summary?.source === 'server' ? null : learned.length;
       setLearnedWords(learned);
       setNewTodayLearnedWords(newTodayWords);
@@ -159,6 +185,7 @@ export const useLearningProgress = () => {
           return;
         }
         learnedCountRef.current = null;
+        setProgressError(null);
         setDailySelection(null);
         setTodayWords([]);
         setLearnedWords([]);
@@ -171,6 +198,7 @@ export const useLearningProgress = () => {
       }
 
       learnedCountRef.current = null;
+      setProgressError(null);
       setUserKey(null);
       setDailySelection(null);
       setTodayWords([]);
@@ -422,6 +450,7 @@ export const useLearningProgress = () => {
           srsState: result.payload?.srs_state ?? target.srs?.srs_state ?? null,
           srsIntervalDays: result.payload?.srs_interval_days ?? target.srs?.srs_interval_days ?? null,
         });
+        setProgressError(null);
         if (result.summary?.source === 'server') {
           learnedCountRef.current = null;
         }
@@ -475,6 +504,7 @@ export const useLearningProgress = () => {
           return false;
         }
 
+        setProgressError(null);
         learnedCountRef.current = result.summary.source === 'server' ? null : result.learnedWords.length;
         setLearnedWords(result.learnedWords);
         setNewTodayLearnedWords(result.newTodayWords);
@@ -537,5 +567,6 @@ export const useLearningProgress = () => {
     markWordAsNew,
     todayWords: orderedTodayWords,
     isDailySelectionLoading,
+    progressError,
   };
 };

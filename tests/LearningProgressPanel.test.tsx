@@ -16,6 +16,7 @@ describe('LearningProgressPanel', () => {
         <LearningProgressPanel
           progressStats={progressStats}
           learnerId="test"
+          progressError={null}
         />
       </TooltipProvider>
     );
@@ -35,6 +36,7 @@ describe('LearningProgressPanel', () => {
         <LearningProgressPanel
           progressStats={progressStats}
           learnerId="test"
+          progressError={null}
         />
       </TooltipProvider>
     );
@@ -47,5 +49,25 @@ describe('LearningProgressPanel', () => {
 
     const tooltipTexts = await screen.findAllByText(/Each correct review pushes the next one farther out/i);
     expect(tooltipTexts.length).toBeGreaterThan(0);
+  });
+
+  it('renders error notice when progress data is unavailable', async () => {
+    const progressStats = { total: 0, learning: 0, new: 0, due: 0, learned: 0 };
+
+    render(
+      <TooltipProvider>
+        <LearningProgressPanel
+          progressStats={progressStats}
+          learnerId="test"
+          progressError="Progress data unavailable. Please check with your administrator."
+        />
+      </TooltipProvider>
+    );
+
+    const triggers = screen.getAllByRole('button', { name: 'Learning Progress' });
+    await userEvent.click(triggers[triggers.length - 1]);
+
+    const notice = await screen.findByText(/Progress data unavailable\. Please check with your administrator\./i);
+    expect(notice).toBeTruthy();
   });
 });
