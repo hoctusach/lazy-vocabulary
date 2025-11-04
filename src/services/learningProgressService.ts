@@ -8,7 +8,6 @@ import { buildTodaysWords } from '@/utils/todayWords';
 import {
   DAILY_SELECTION_KEY,
   LAST_SELECTION_DATE_KEY,
-  LEARNED_WORDS_CACHE_KEY,
   TODAY_DATE_KEY,
   TODAY_SELECTION_KEY,
   TODAY_WORDS_KEY,
@@ -808,8 +807,6 @@ export async function markWordAsNew(
           .filter((row): row is LearnedWordRow => row !== null)
       : [];
 
-    persistLearnedWordRows(normalizedRows);
-
     const { learnedWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
       totalWords: TOTAL_WORDS,
       timezone,
@@ -862,50 +859,29 @@ function normalizeLearnedWordRow(value: unknown): LearnedWordRow | null {
   };
 }
 
-function readCachedLearnedWordRows(): LearnedWordRow[] | null {
-  if (typeof localStorage === 'undefined') return null;
+type LoadLearnedWordStatsError = { type: 'no-server' };
 
-  try {
-    const raw = localStorage.getItem(LEARNED_WORDS_CACHE_KEY);
-    if (!raw) return null;
+type LoadLearnedWordStatsResult = {
+  stats: LearnedWordStatsPayload | null;
+  error: LoadLearnedWordStatsError | null;
+};
 
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return null;
-
-    const rows = parsed
-      .map((entry) => normalizeLearnedWordRow(entry))
-      .filter((row): row is LearnedWordRow => row !== null);
-
-    return rows.length > 0 ? rows : [];
-  } catch (error) {
-    console.warn('[LearningProgress] Failed to read learned words cache', error);
-    return null;
+async function loadLearnedWordStats(userKey: string): Promise<LoadLearnedWordStatsResult> {
+  if (!userKey) {
+    return {
+      stats: null,
+      error: null,
+    };
   }
-}
-
-function persistLearnedWordRows(rows: LearnedWordRow[]): void {
-  if (typeof localStorage === 'undefined') return;
-
-  try {
-    localStorage.setItem(LEARNED_WORDS_CACHE_KEY, JSON.stringify(rows));
-  } catch (error) {
-    console.warn('[LearningProgress] Failed to persist learned words cache', error);
-  }
-}
-
-async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPayload | null> {
-  if (!userKey) return null;
 
   const timezone = await resolveUserTimezone(userKey);
 
   const client = getSupabaseClient();
   if (!client) {
-    const cachedRows = readCachedLearnedWordRows();
-    if (!cachedRows) return null;
-    return computeLearnedWordStats(cachedRows, {
-      totalWords: TOTAL_WORDS,
-      timezone,
-    });
+    return {
+      stats: null,
+      error: { type: 'no-server' },
+    };
   }
 
   const { data, error } = await client
@@ -916,12 +892,10 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
 
   if (error) {
     console.warn('[LearningProgress] Failed to fetch learned words', error.message);
-    const cachedRows = readCachedLearnedWordRows();
-    if (!cachedRows) return null;
-    return computeLearnedWordStats(cachedRows, {
-      totalWords: TOTAL_WORDS,
-      timezone,
-    });
+    return {
+      stats: null,
+      error: { type: 'no-server' },
+    };
   }
 
   const normalizedRows = Array.isArray(data)
@@ -930,17 +904,23 @@ async function loadLearnedWordStats(userKey: string): Promise<LearnedWordStatsPa
         .filter((row): row is LearnedWordRow => row !== null)
     : [];
 
-  persistLearnedWordRows(normalizedRows);
-
-  return computeLearnedWordStats(normalizedRows, {
-    totalWords: TOTAL_WORDS,
-    timezone,
-  });
+  return {
+    stats: computeLearnedWordStats(normalizedRows, {
+      totalWords: TOTAL_WORDS,
+      timezone,
+    }),
+    error: null,
+  };
 }
 
-export async function fetchProgressSummary(userKey: string): Promise<DerivedProgressSummary | null> {
-  const stats = await loadLearnedWordStats(userKey);
-  return stats?.summary ?? null;
+export async function fetchProgressSummary(
+  userKey: string
+): Promise<{ summary: DerivedProgressSummary | null; error: LoadLearnedWordStatsError | null }> {
+  const result = await loadLearnedWordStats(userKey);
+  return {
+    summary: result.stats?.summary ?? null,
+    error: result.error,
+  };
 }
 
 export async function fetchLearnedWordSummaries(
@@ -950,15 +930,28 @@ export async function fetchLearnedWordSummaries(
   newTodayWords: TodayLearnedWordSummary[];
   dueTodayWords: TodayLearnedWordSummary[];
   summary: DerivedProgressSummary | null;
+  error: LoadLearnedWordStatsError | null;
 }> {
-  const stats = await loadLearnedWordStats(userKey);
+  const result = await loadLearnedWordStats(userKey);
 
+  if (result.error) {
+    return {
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+      summary: null,
+      error: result.error,
+    };
+  }
+
+  const stats = result.stats;
   if (!stats) {
     return {
       learnedWords: [],
       newTodayWords: [],
       dueTodayWords: [],
       summary: null,
+      error: null,
     };
   }
 
@@ -978,6 +971,7 @@ export async function fetchLearnedWordSummaries(
     newTodayWords,
     dueTodayWords,
     summary,
+    error: null,
   };
 }
 
