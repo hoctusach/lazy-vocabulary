@@ -14,7 +14,7 @@ export const cleanSpeechText = (text: string): string => {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) =>
-      line.replace(/\b(\d+)\.\s*/g, (_match, num: string) => `Number ${num}: `)
+      line.replace(/^(\d+)[.)]\s*/g, (_match, num: string) => `${num}. `)
     )
     .join('. ');
 
