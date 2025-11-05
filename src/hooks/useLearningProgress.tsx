@@ -279,26 +279,39 @@ export const useLearningProgress = () => {
               words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
             });
           }
+          setProgressError(null);
+          learnedCountRef.current =
+            result.summary?.source === 'server' ? null : result.learnedWords.length;
+          setLearnedWords(result.learnedWords);
+          setNewTodayLearnedWords(result.newTodayWords);
+          setDueTodayLearnedWords(result.dueTodayWords);
+          setProgressStats(applyLearnedOverride(result.summary ?? null));
         } catch (error) {
           if (!isActive) return;
           console.warn('[useLearningProgress] Failed to load today\'s words', error);
           setDailySelection(null);
           setTodayWords([]);
+          learnedCountRef.current = null;
+          setLearnedWords([]);
+          setNewTodayLearnedWords([]);
+          setDueTodayLearnedWords([]);
+          setProgressStats(applyLearnedOverride(null));
         }
       } catch (error) {
         if (!isActive) return;
         console.warn('[useLearningProgress] Failed to initialize learning progress', error);
         setDailySelection(null);
         setTodayWords([]);
+        learnedCountRef.current = null;
+        setLearnedWords([]);
+        setNewTodayLearnedWords([]);
+        setDueTodayLearnedWords([]);
+        setProgressStats(applyLearnedOverride(null));
       } finally {
         if (isActive) {
           setIsDailySelectionLoading(false);
         }
       }
-
-      await refreshStats(userKey);
-      if (!isActive) return;
-      await refreshLearnedWords(userKey);
     };
 
     void initForUser();
@@ -306,7 +319,7 @@ export const useLearningProgress = () => {
     return () => {
       isActive = false;
     };
-  }, [category, refreshLearnedWords, refreshStats, userKey]);
+  }, [applyLearnedOverride, category, userKey]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
@@ -330,14 +343,20 @@ export const useLearningProgress = () => {
           });
         }
         await saveLocalPreferences({ daily_option: level });
-        void refreshStats(userKey);
+        setProgressError(null);
+        learnedCountRef.current =
+          result.summary?.source === 'server' ? null : result.learnedWords.length;
+        setLearnedWords(result.learnedWords);
+        setNewTodayLearnedWords(result.newTodayWords);
+        setDueTodayLearnedWords(result.dueTodayWords);
+        setProgressStats(applyLearnedOverride(result.summary ?? null));
       } catch (error) {
         console.warn('[useLearningProgress] Failed to regenerate daily words', error);
       } finally {
         setIsDailySelectionLoading(false);
       }
     },
-    [category, userKey, refreshStats]
+    [applyLearnedOverride, category, userKey]
   );
 
   const regenerateToday = useCallback(async () => {
@@ -359,13 +378,19 @@ export const useLearningProgress = () => {
           words: result.words.map(word => ({ word_id: word.word_id, word: word.word, category: word.category })),
         });
       }
-      void refreshStats(userKey);
+      setProgressError(null);
+      learnedCountRef.current =
+        result.summary?.source === 'server' ? null : result.learnedWords.length;
+      setLearnedWords(result.learnedWords);
+      setNewTodayLearnedWords(result.newTodayWords);
+      setDueTodayLearnedWords(result.dueTodayWords);
+      setProgressStats(applyLearnedOverride(result.summary ?? null));
     } catch (error) {
       console.warn('[useLearningProgress] Failed to regenerate today\'s selection', error);
     } finally {
       setIsDailySelectionLoading(false);
     }
-  }, [category, refreshStats, severity, userKey]);
+  }, [applyLearnedOverride, category, severity, userKey]);
 
   const markWordAsPlayed = useCallback((word: string) => {
     const nowIso = new Date().toISOString();
