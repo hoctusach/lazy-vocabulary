@@ -33,6 +33,19 @@ export function persistProgressSummaryLocal(summary: ProgressSummaryFields): voi
   }
 }
 
+function toNumber(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function toString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function toStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  return value.filter((entry): entry is string => typeof entry === 'string');
+}
+
 function readProgressSummaryLocal(): SummaryRow | null {
   if (typeof localStorage === 'undefined') return null;
   try {
@@ -40,23 +53,53 @@ function readProgressSummaryLocal(): SummaryRow | null {
     if (!raw) return null;
 
     const parsed = JSON.parse(raw) as Partial<ProgressSummaryFields>;
-    const toNumber = (v: unknown) =>
-      typeof v === 'number' && Number.isFinite(v) ? v : null;
-    const toString = (v: unknown) => (typeof v === 'string' ? v : null);
-
     return {
       learning_count: toNumber(parsed.learning_count),
       learned_count: toNumber(parsed.learned_count),
       learning_due_count: toNumber(parsed.learning_due_count),
       remaining_count: toNumber(parsed.remaining_count),
       learning_time: toNumber(parsed.learning_time),
-      learned_days: Array.isArray(parsed.learned_days)
-        ? parsed.learned_days.filter((d): d is string => typeof d === 'string')
-        : null,
+      learned_days: toStringArray(parsed.learned_days),
       updated_at: toString(parsed.updated_at),
     };
   } catch (e) {
     console.warn('progressSummary:readLocal', e);
+    return null;
+  }
+}
+
+async function fetchSummaryFromServer(userKey: string): Promise<SummaryRow | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+
+  try {
+    const { data, error } = await client
+      .from('user_progress_summary')
+      .select(
+        'learning_count, learned_count, learning_due_count, remaining_count, learning_time, learned_days, updated_at'
+      )
+      .eq('user_unique_key', userKey)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('progressSummary:fetchServer', error.message);
+      return null;
+    }
+
+    if (!data) return null;
+
+    const record = data as Record<string, unknown>;
+    return {
+      learning_count: toNumber(record.learning_count),
+      learned_count: toNumber(record.learned_count),
+      learning_due_count: toNumber(record.learning_due_count),
+      remaining_count: toNumber(record.remaining_count),
+      learning_time: toNumber(record.learning_time),
+      learned_days: toStringArray(record.learned_days),
+      updated_at: toString(record.updated_at),
+    };
+  } catch (error) {
+    console.warn('progressSummary:fetchServer', error);
     return null;
   }
 }
@@ -79,6 +122,21 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
     };
   }
 
+  const remote = await fetchSummaryFromServer(userKey);
+  if (remote) {
+    return {
+      learning_count: remote.learning_count ?? 0,
+      learned_count: remote.learned_count ?? 0,
+      learning_due_count: remote.learning_due_count ?? 0,
+      remaining_count:
+        remote.remaining_count ??
+        Math.max(TOTAL_WORDS - (remote.learned_count ?? 0), 0),
+      learning_time: remote.learning_time ?? 0,
+      learned_days: remote.learned_days ?? null,
+      updated_at: remote.updated_at ?? null,
+    };
+  }
+
   // TODO: compute progress summary client-side
   return {
     learning_count: 0,
@@ -95,21 +153,9 @@ export async function refreshProgressSummary(
   userKey: string
 ): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
-  const existing = await fetchExistingSummary(userKey);
-  if (!existing) return null;
-
-  const learnedCount = existing.learned_count ?? 0;
-
-  const summary: ProgressSummaryFields = {
-    learning_count: existing.learning_count ?? 0,
-    learned_count: learnedCount,
-    learning_due_count: existing.learning_due_count ?? 0,
-    remaining_count:
-      existing.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
-    learning_time: existing.learning_time ?? 0,
-    learned_days: normaliseDays(existing.learned_days),
-    updated_at: existing.updated_at ?? null,
-  };
+  const remote = await fetchSummaryFromServer(userKey);
+  const summary = toProgressSummary(remote) ?? toProgressSummary(await fetchExistingSummary(userKey));
+  if (!summary) return null;
 
   persistProgressSummaryLocal(summary);
   return summary;
@@ -119,20 +165,7 @@ export async function getProgressSummary(
   userKey: string
 ): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
-  const existing = await fetchExistingSummary(userKey);
-  if (!existing) return null;
-
-  const learnedCount = existing.learned_count ?? 0;
-
-  return {
-    learning_count: existing.learning_count ?? 0,
-    learned_count: learnedCount,
-    learning_due_count: existing.learning_due_count ?? 0,
-    remaining_count: existing.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
-    learning_time: existing.learning_time ?? 0,
-    learned_days: normaliseDays(existing.learned_days),
-    updated_at: existing.updated_at ?? null,
-  };
+  return toProgressSummary(await fetchExistingSummary(userKey));
 }
 
 function normaliseDays(days: string[] | null | undefined): string[] {
@@ -144,6 +177,21 @@ function normaliseDays(days: string[] | null | undefined): string[] {
     }
   }
   return Array.from(seen).sort();
+}
+
+function toProgressSummary(source: SummaryRow | null): ProgressSummaryFields | null {
+  if (!source) return null;
+  const learnedCount = source.learned_count ?? 0;
+  return {
+    learning_count: source.learning_count ?? 0,
+    learned_count: learnedCount,
+    learning_due_count: source.learning_due_count ?? 0,
+    remaining_count:
+      source.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
+    learning_time: source.learning_time ?? 0,
+    learned_days: normaliseDays(source.learned_days),
+    updated_at: source.updated_at ?? null,
+  };
 }
 
 export async function mergeProgressSummary(
@@ -174,56 +222,23 @@ export async function mergeProgressSummary(
   persistProgressSummaryLocal(merged);
 }
 
-function isDueToday(nextReviewAt: string | null | undefined): boolean {
-  if (!nextReviewAt) return false;
-  const parsed = Date.parse(nextReviewAt);
-  if (Number.isNaN(parsed)) return false;
-  const today = new Date();
-  today.setHours(23, 59, 59, 999);
-  return parsed <= today.getTime();
-}
-
-type LearnedWordRow = {
-  in_review_queue: boolean | null;
-  next_review_at: string | null;
-};
-
 export async function recalcProgressSummary(userKey: string): Promise<void> {
   if (!userKey) return;
-  const client = getSupabaseClient();
-  if (!client) return;
-  const { data, error } = await client
-    .from('learned_words')
-    .select('in_review_queue, next_review_at')
-    .eq('user_unique_key', userKey);
 
-  if (error) {
-    console.warn('progressSummary:recalc', error.message);
-    return;
-  }
+  const remote = await fetchSummaryFromServer(userKey);
+  if (!remote) return;
 
-  const rows: LearnedWordRow[] = Array.isArray(data) ? (data as LearnedWordRow[]) : [];
-  let learning = 0;
-  let learned = 0;
-  let due = 0;
-
-  for (const row of rows) {
-    const inQueue = row?.in_review_queue === true;
-    if (inQueue) {
-      learning += 1;
-      if (isDueToday(row?.next_review_at ?? null)) {
-        due += 1;
-      }
-    } else {
-      learned += 1;
-    }
-  }
+  const learnedCount = remote.learned_count ?? 0;
 
   await mergeProgressSummary(userKey, {
-    learning_count: learning,
-    learned_count: learned,
-    learning_due_count: due,
-    remaining_count: Math.max(TOTAL_WORDS - learned, 0),
+    learning_count: remote.learning_count ?? 0,
+    learned_count: learnedCount,
+    learning_due_count: remote.learning_due_count ?? 0,
+    remaining_count:
+      remote.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
+    learning_time: remote.learning_time ?? undefined,
+    learned_days: remote.learned_days ?? undefined,
+    updated_at: remote.updated_at ?? undefined,
   });
 }
 
