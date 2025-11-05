@@ -221,6 +221,13 @@ function toLearnedWordRow(value: unknown): LearnedWordRow | null {
   if (!isPlainObject(value)) return null;
   const ensureNumber = (candidate: unknown): number | null => {
     if (typeof candidate === 'number' && Number.isFinite(candidate)) return candidate;
+    if (typeof candidate === 'bigint') return Number(candidate);
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (!trimmed) return null;
+      const parsed = Number(trimmed);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
     return null;
   };
 
