@@ -270,6 +270,16 @@ export default function AuthGate() {
         pending: false,
         mode: 'signin',
       });
+
+      if (typeof window !== 'undefined') {
+        setTimeout(() => {
+          try {
+            window.location.reload();
+          } catch (error) {
+            console.error('AuthGate:reloadAfterSignIn', error);
+          }
+        }, 0);
+      }
     };
 
     if (isCreateMode) {
