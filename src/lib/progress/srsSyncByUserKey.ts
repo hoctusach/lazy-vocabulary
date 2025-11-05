@@ -263,39 +263,7 @@ export async function bootstrapLearnedFromServerByKey(): Promise<void> {
   const key = await ensureUserKey();
   if (!key) return;
 
-  const sb = getSupabaseClient();
-  if (!sb) return;
-  const { data, error } = await sb
-    .from('learned_words')
-    .select('word_id')
-    .eq('user_unique_key', key);
-
-  if (error) {
-    console.warn('bootstrapLearnedFromServerByKey', error.message);
-    return;
-  }
-
-  const rows: { word_id: string | null }[] = Array.isArray(data)
-    ? (data as { word_id: string | null }[])
-    : [];
-
-  const { state, userProgress } = loadLearningProgressForUser(key);
-
-  const nowISO = new Date().toISOString();
-
-  for (const entry of rows) {
-    const wordId = typeof entry?.word_id === 'string' ? entry.word_id : '';
-    if (!wordId) continue;
-    const current = userProgress[wordId] || {};
-    const statusValue = Number(current.status ?? current.status_value ?? 0);
-    const safeStatus = Number.isFinite(statusValue) ? statusValue : 0;
-    userProgress[wordId] = {
-      ...current,
-      status: Math.max(3, safeStatus),
-      isLearned: true,
-      learned_at: current.learned_at || nowISO,
-    };
-  }
-
-  persistLearningProgress(key, state, userProgress);
+  console.warn(
+    '[srsSyncByUserKey] bootstrapLearnedFromServerByKey skipped: learned_words access disabled.'
+  );
 }
