@@ -8,20 +8,34 @@ export const extractMainWord = (word: string): string => {
 export const cleanSpeechText = (text: string): string => {
   if (!text || typeof text !== 'string') return '';
 
-  return text
+  const linesWithBreaks = text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) =>
+      line.replace(/\b(\d+)\.\s*/g, (_match, num: string) => `Number ${num}: `)
+    )
+    .join('. ');
+
+  const cleaned = linesWithBreaks
     // Remove slash-delimited segments such as IPA transcriptions
     .replace(/\/[^/]*\//g, ' ')
     // Remove parenthetical content
     .replace(/\([^)]*\)/g, ' ')
     // Remove square bracket annotations
     .replace(/\[[^\]]*\]/g, ' ')
-    // Remove numbering like "1." even when embedded in a sentence
-    .replace(/\b\d+\.\s*/g, '')
     // Normalise spacing and punctuation gaps
     .replace(/\s+([,;:.!?])/g, '$1')
     .replace(/([,;:.!?])\s+/g, '$1 ')
     .replace(/\s{2,}/g, ' ')
     .trim();
+
+  if (!cleaned) {
+    return '';
+  }
+
+  return /[.!?]$/.test(cleaned) ? cleaned : `${cleaned}.`;
 };
 
 export const prepareTextForSpeech = (text: string): string => {
