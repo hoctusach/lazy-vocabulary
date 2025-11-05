@@ -127,6 +127,110 @@ export type DailySelectionV2Row = {
   v_learned_days?: string[] | null;
 } & Record<string, unknown>;
 
+type RawDailySelectionRow = Record<string, unknown>;
+
+function toOptionalString(value: unknown): string | null {
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length ? trimmed : null;
+  }
+  return null;
+}
+
+function toOptionalNumber(value: unknown): number | null {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "bigint") {
+    return Number(value);
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function toOptionalBoolean(value: unknown): boolean | null {
+  if (typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return null;
+  }
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    if (["true", "t", "1", "yes", "y"].includes(normalized)) return true;
+    if (["false", "f", "0", "no", "n"].includes(normalized)) return false;
+  }
+  return null;
+}
+
+function toStringArray(value: unknown): string[] | null {
+  if (!Array.isArray(value)) return null;
+  const entries = value
+    .map((entry) => {
+      if (typeof entry === "string") {
+        const trimmed = entry.trim();
+        return trimmed.length ? trimmed : null;
+      }
+      if (typeof entry === "number" && Number.isFinite(entry)) {
+        return String(entry);
+      }
+      if (typeof entry === "bigint") {
+        return String(entry);
+      }
+      return null;
+    })
+    .filter((entry): entry is string => entry !== null);
+
+  if (entries.length === 0) {
+    return [];
+  }
+  return entries;
+}
+
+function normalizeDailySelectionRow(row: RawDailySelectionRow): DailySelectionV2Row | null {
+  const rawWordId = toOptionalString(row.word_id) ?? toOptionalString(row.word);
+  if (!rawWordId) {
+    return null;
+  }
+
+  return {
+    word_id: rawWordId,
+    category: toOptionalString(row.category),
+    is_today_selection: toOptionalBoolean(row.is_today_selection),
+    due_selected_today: toOptionalBoolean(row.due_selected_today),
+    new_selected_today: toOptionalBoolean(row.new_selected_today),
+    due_candidate_count: toOptionalNumber(row.due_candidate_count),
+    new_candidate_count: toOptionalNumber(row.new_candidate_count),
+    in_review_queue: toOptionalBoolean(row.in_review_queue),
+    review_count: toOptionalNumber(row.review_count),
+    learned_at: toOptionalString(row.learned_at),
+    last_review_at: toOptionalString(row.last_review_at),
+    next_review_at: toOptionalString(row.next_review_at),
+    next_display_at: toOptionalString(row.next_display_at),
+    last_seen_at: toOptionalString(row.last_seen_at),
+    srs_interval_days: toOptionalNumber(row.srs_interval_days),
+    srs_ease: toOptionalNumber(row.srs_ease),
+    srs_state: toOptionalString(row.srs_state),
+    word: toOptionalString(row.word),
+    meaning: toOptionalString(row.meaning),
+    example: toOptionalString(row.example),
+    translation: toOptionalString(row.translation),
+    learning_count: toOptionalNumber(row.learning_count),
+    learned_count: toOptionalNumber(row.learned_count),
+    learning_due_count: toOptionalNumber(row.learning_due_count),
+    remaining_count: toOptionalNumber(row.remaining_count),
+    v_learned_days: toStringArray(row.v_learned_days),
+  };
+}
+
 export async function getDailySelectionV2(
   client: ReturnType<typeof createClient>,
   params: { userKey: string; count: number; category?: string | null }
@@ -143,7 +247,7 @@ export async function getDailySelectionV2(
     throw new Error(error.message);
   }
 
-  return (Array.isArray(data) ? data : []).filter(
-    (row): row is DailySelectionV2Row => typeof row?.word_id === "string"
-  );
+  return (Array.isArray(data) ? data : [])
+    .map((row) => normalizeDailySelectionRow(row as RawDailySelectionRow))
+    .filter((row): row is DailySelectionV2Row => Boolean(row?.word_id));
 }
