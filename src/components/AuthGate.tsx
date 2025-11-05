@@ -16,6 +16,8 @@ import type { SeverityLevel } from '@/types/learning';
 import { identifyUser } from '@/services/analyticsService';
 import { dispatchNicknameChange, NICKNAME_EVENT_NAME } from '@/lib/nicknameEvents';
 import type { NicknameEventDetail } from '@/lib/nicknameEvents';
+import { initializeSpeechSystem } from '@/utils/speech';
+import { markUserInteraction } from '@/utils/userInteraction';
 
 function isSeverityLevel(value: unknown): value is SeverityLevel {
   return value === 'light' || value === 'moderate' || value === 'intense';
@@ -172,6 +174,16 @@ export default function AuthGate() {
       )) as EdgeSession;
       saveSession(session);
       storePasscode(trimmedPasscode);
+
+      try {
+        markUserInteraction();
+      } catch (error) {
+        console.warn('AuthGate:markUserInteraction', error);
+      }
+
+      void initializeSpeechSystem().catch((error) => {
+        console.warn('AuthGate:initializeSpeechSystem', error);
+      });
 
       const displayNameFromSession =
         (typeof session?.name === 'string' && session.name.trim().length
