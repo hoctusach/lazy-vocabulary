@@ -874,8 +874,6 @@ async function loadLearnedWordStats(userKey: string): Promise<LoadLearnedWordSta
     };
   }
 
-  const timezone = await resolveUserTimezone(userKey);
-
   const client = getSupabaseClient();
   if (!client) {
     return {
@@ -884,32 +882,10 @@ async function loadLearnedWordStats(userKey: string): Promise<LoadLearnedWordSta
     };
   }
 
-  const { data, error } = await client
-    .from('learned_words')
-    .select('*')
-    .eq('user_unique_key', userKey)
-    .order('learned_at', { ascending: false });
-
-  if (error) {
-    console.warn('[LearningProgress] Failed to fetch learned words', error.message);
-    return {
-      stats: null,
-      error: { type: 'no-server' },
-    };
-  }
-
-  const normalizedRows = Array.isArray(data)
-    ? (data as unknown[])
-        .map((entry) => normalizeLearnedWordRow(entry))
-        .filter((row): row is LearnedWordRow => row !== null)
-    : [];
-
+  console.warn('[LearningProgress] learned_words access disabled; skipping remote stats load.');
   return {
-    stats: computeLearnedWordStats(normalizedRows, {
-      totalWords: TOTAL_WORDS,
-      timezone,
-    }),
-    error: null,
+    stats: null,
+    error: { type: 'no-server' },
   };
 }
 
