@@ -39,6 +39,13 @@ export type TodaySelectionState = {
   selection: DailySelection;
 };
 
+export type TodaySelectionWithStats = TodaySelectionState & {
+  summary: DerivedProgressSummary | null;
+  learnedWords: LearnedWordSummary[];
+  newTodayWords: TodayLearnedWordSummary[];
+  dueTodayWords: TodayLearnedWordSummary[];
+};
+
 type DailySelectionRow = DailySelectionV2Row;
 
 type VocabularyRow = {
@@ -574,7 +581,9 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   return map;
 }
 
-export async function fetchAndCommitTodaySelection(params: GenerateParams): Promise<TodaySelectionState> {
+export async function fetchAndCommitTodaySelection(
+  params: GenerateParams
+): Promise<TodaySelectionWithStats> {
   const { userKey, mode, count, category = null } = params;
   const [selectionRows, timezone] = await Promise.all([
     generateDailySelectionV2(userKey, mode, count, category),
@@ -653,9 +662,37 @@ export async function fetchAndCommitTodaySelection(params: GenerateParams): Prom
     });
   }
 
+  const derived = computeLearnedWordStats(selectionRows as unknown as LearnedWordRow[], {
+    totalWords: TOTAL_WORDS,
+    timezone,
+  });
+
+  const serverSummary = extractServerSummary(selectionRows);
+
+  const summary: DerivedProgressSummary = serverSummary
+    ? {
+        learned: serverSummary.learned,
+        learning: serverSummary.learning,
+        new: serverSummary.remaining,
+        due: serverSummary.due,
+        remaining: serverSummary.remaining,
+        total: serverSummary.learned + serverSummary.learning + serverSummary.remaining,
+        learnedDays: serverSummary.learnedDays,
+        source: 'server',
+      }
+    : derived.summary;
+
+  const result: TodaySelectionWithStats = {
+    ...today,
+    summary,
+    learnedWords: derived.learnedWords,
+    newTodayWords: derived.newTodayWords,
+    dueTodayWords: derived.dueTodayWords,
+  };
+
   persistTodaySelectionState(today);
 
-  return today;
+  return result;
 }
 
 export async function getOrCreateTodayWords(
@@ -663,7 +700,7 @@ export async function getOrCreateTodayWords(
   mode: DailyMode,
   count: number,
   category?: string | null
-): Promise<TodaySelectionState> {
+): Promise<TodaySelectionWithStats> {
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] getOrCreateTodayWords fetching selection', {
       category,
@@ -955,7 +992,7 @@ export async function regenerateTodaySelection(
   userKey: string,
   severity: SeverityLevel,
   category?: string | null
-): Promise<TodaySelectionState> {
+): Promise<TodaySelectionWithStats> {
   const mode = SEVERITY_TO_MODE[severity] ?? 'Light';
   const count = getDailyCount(severity);
   return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
