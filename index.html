@@ -20,12 +20,41 @@
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
     <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HQ5Q01TG2L"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-HQ5Q01TG2L', { send_page_view: false });
+      (function loadGoogleAnalytics() {
+        const envId = '%VITE_GA_MEASUREMENT_ID%';
+        const trimmed = typeof envId === 'string' ? envId.trim() : '';
+        const id = trimmed && trimmed !== 'undefined' ? trimmed : 'G-HQ5Q01TG2L';
+
+        if (!id) {
+          return;
+        }
+
+        const lowered = id.toLowerCase();
+        if (lowered === '0' || lowered === 'false' || lowered === 'disabled' || lowered === 'none') {
+          return;
+        }
+
+        const dataLayer = (window.dataLayer = window.dataLayer || []);
+        const queueGtag = function gtag(){
+          dataLayer.push(arguments);
+        };
+
+        if (typeof window.gtag !== 'function') {
+          window.gtag = queueGtag;
+        }
+
+        window.gtag('js', new Date());
+        window.gtag('config', id, { send_page_view: false });
+
+        if (!document.head.querySelector('script[data-ga-loader="true"]')) {
+          const script = document.createElement('script');
+          script.async = true;
+          script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`;
+          script.setAttribute('data-ga-loader', 'true');
+          document.head.appendChild(script);
+        }
+      })();
     </script>
     <script type="application/ld+json">
       {

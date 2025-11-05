@@ -1,6 +1,24 @@
 import { getDeviceInfo } from '@/utils/deviceInfo';
 
-const GA_MEASUREMENT_ID = 'G-HQ5Q01TG2L';
+const DEFAULT_GA_MEASUREMENT_ID = 'G-HQ5Q01TG2L';
+
+function resolveMeasurementId(): string {
+  const envId = typeof import.meta !== 'undefined' ? import.meta.env?.VITE_GA_MEASUREMENT_ID : undefined;
+  const trimmed = typeof envId === 'string' ? envId.trim() : '';
+
+  if (!trimmed || trimmed === 'undefined') {
+    return DEFAULT_GA_MEASUREMENT_ID;
+  }
+
+  const lowered = trimmed.toLowerCase();
+  if (lowered === '0' || lowered === 'false' || lowered === 'disabled' || lowered === 'none') {
+    return '';
+  }
+
+  return trimmed;
+}
+
+const GA_MEASUREMENT_ID = resolveMeasurementId();
 
 declare global {
   interface Window {
