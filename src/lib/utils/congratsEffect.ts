@@ -23,7 +23,7 @@ export function showCongratsEffect() {
 
   // Popup message 🥳
   const popup = document.createElement("div");
-  popup.textContent = "🎉 Woohoo! Word mastery unlocked! ✨";
+  popup.textContent = "🎉🎉🎉 Woohoo! It’s stuck in your brain now! ✨✨✨";
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
