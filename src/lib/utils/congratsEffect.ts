@@ -23,7 +23,13 @@ export function showCongratsEffect() {
 
   // Popup message 🥳
   const popup = document.createElement("div");
-  popup.textContent = "🎉🎉🎉 Woohoo! It’s stuck in your brain now! ✨✨✨";
+  const messages = [
+    "Woohoo! You finally nailed it!",
+    "You got it into that smart head of yours!",
+    "Woohoo! It’s stuck in your brain now!",
+  ];
+  const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+  popup.textContent = `🎉🎉🎉 ${randomMessage} ✨✨✨`;
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
