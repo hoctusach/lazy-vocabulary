@@ -23,7 +23,7 @@ export function showCongratsEffect() {
 
   // Popup message 🥳
   const popup = document.createElement("div");
-  popup.textContent = "🎉 Congratulations! You’ve mastered this word! 🥳";
+  popup.textContent = "🎉🎉🎉 Woohoo! It’s stuck in your brain now! ✨✨✨";
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
@@ -32,6 +32,7 @@ export function showCongratsEffect() {
   popup.style.color = "#333";
   popup.style.fontSize = "1.4rem";
   popup.style.fontWeight = "bold";
+  popup.style.textAlign = "center";
   popup.style.padding = "20px 30px";
   popup.style.borderRadius = "16px";
   popup.style.boxShadow = "0 4px 20px rgba(0,0,0,0.2)";
