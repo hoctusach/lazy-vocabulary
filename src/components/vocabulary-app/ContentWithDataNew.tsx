@@ -1,4 +1,5 @@
 import React from 'react';
+import { Speaker } from 'lucide-react';
 import type { ReadonlyWord } from '@/types/vocabulary';
 import VocabularyMainNew from './VocabularyMainNew';
 
@@ -68,6 +69,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
+        <p className="flex items-center gap-1 mt-1">
+          <Speaker size={12} aria-hidden="true" />
+          <span>As this is free app, there are some free voices by device and browser — please pick your preferred one!</span>
+        </p>
       </div>
 
 

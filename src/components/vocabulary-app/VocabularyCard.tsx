@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
@@ -141,6 +141,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}
             >
               <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
+              <p className="flex items-center gap-1 mt-1">
+                <Speaker size={12} aria-hidden="true" />
+                <span>As this is free app, there are some free voices by device and browser — please pick your preferred one!</span>
+              </p>
             </div>
           )}
         </div>
