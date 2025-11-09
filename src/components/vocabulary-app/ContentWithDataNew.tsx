@@ -69,13 +69,15 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-        <p className="flex items-center gap-1 mt-1">
+        <p className="flex items-start gap-2 mt-1">
           <Speaker
             aria-hidden="true"
-            className="h-4 w-4 text-yellow-500"
+            className="h-5 w-5 shrink-0 text-yellow-500"
             strokeWidth={2.4}
           />
-          <span>As this is free app, there are some free voices by device and browser — please pick your preferred one!</span>
+          <span className="leading-snug">
+            As this is free app, there are some free voices by device and browser — please pick your preferred one!
+          </span>
         </p>
       </div>
 

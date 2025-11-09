@@ -141,9 +141,11 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}
             >
               <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-              <p className="flex items-center gap-1 mt-1">
-                <Speaker size={12} aria-hidden="true" />
-                <span>As this is free app, there are some free voices by device and browser — please pick your preferred one!</span>
+              <p className="flex items-start gap-2 mt-1">
+                <Speaker size={16} aria-hidden="true" className="shrink-0 text-yellow-500" />
+                <span className="leading-snug">
+                  As this is free app, there are some free voices by device and browser — please pick your preferred one!
+                </span>
               </p>
             </div>
           )}
