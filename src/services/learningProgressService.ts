@@ -287,6 +287,10 @@ function buildTodayWord(
 
   const srs = buildSrsFromSelection(selectionRow);
 
+  if (isLearnedState(srs)) {
+    return null;
+  }
+
   const word = selectionRow.word ?? vocab?.word ?? deriveWordFromId(selectionRow.word_id);
   const meaning = selectionRow.meaning ?? vocab?.meaning ?? '';
   const example = selectionRow.example ?? vocab?.example ?? '';
