@@ -37,7 +37,8 @@ export const registerSpeechInitGesture = () => {
     initializeSpeechSystem();
   };
 
-  document.addEventListener("click", handleGesture, { once: true });
-  document.addEventListener("touchstart", handleGesture, { once: true });
-  document.addEventListener("keydown", handleGesture, { once: true });
+  const listenerOptions: AddEventListenerOptions = { once: true, capture: true };
+  document.addEventListener("click", handleGesture, listenerOptions);
+  document.addEventListener("touchstart", handleGesture, listenerOptions);
+  document.addEventListener("keydown", handleGesture, listenerOptions);
 };
