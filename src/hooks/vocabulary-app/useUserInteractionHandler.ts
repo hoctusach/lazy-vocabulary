@@ -71,15 +71,16 @@ export const useUserInteractionHandler = ({
     }
 
     // Add event listeners for various user interaction types
-    document.addEventListener("click", enableAudioPlayback);
-    document.addEventListener("touchstart", enableAudioPlayback);
-    document.addEventListener("keydown", enableAudioPlayback);
+    const listenerOptions: AddEventListenerOptions = { capture: true };
+    document.addEventListener("click", enableAudioPlayback, listenerOptions);
+    document.addEventListener("touchstart", enableAudioPlayback, listenerOptions);
+    document.addEventListener("keydown", enableAudioPlayback, listenerOptions);
 
     // Clean up on unmount
     return () => {
-      document.removeEventListener("click", enableAudioPlayback);
-      document.removeEventListener("touchstart", enableAudioPlayback);
-      document.removeEventListener("keydown", enableAudioPlayback);
+      document.removeEventListener("click", enableAudioPlayback, listenerOptions);
+      document.removeEventListener("touchstart", enableAudioPlayback, listenerOptions);
+      document.removeEventListener("keydown", enableAudioPlayback, listenerOptions);
     };
   }, [userInteractionRef, onUserInteraction]);
 };

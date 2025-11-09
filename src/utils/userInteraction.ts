@@ -44,9 +44,10 @@ export const setupUserInteractionListeners = () => {
     return;
   }
 
-  document.addEventListener('click', enableAudio, { once: true });
-  document.addEventListener('keydown', enableAudio, { once: true });
-  document.addEventListener('touchstart', enableAudio, { once: true });
+  const listenerOptions: AddEventListenerOptions = { once: true, capture: true };
+  document.addEventListener('click', enableAudio, listenerOptions);
+  document.addEventListener('keydown', enableAudio, listenerOptions);
+  document.addEventListener('touchstart', enableAudio, listenerOptions);
 };
 
 export const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
