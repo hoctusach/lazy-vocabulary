@@ -70,7 +70,11 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
         <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
         <p className="flex items-center gap-1 mt-1">
-          <Speaker size={12} aria-hidden="true" />
+          <Speaker
+            aria-hidden="true"
+            className="h-4 w-4 text-yellow-500"
+            strokeWidth={2.4}
+          />
           <span>As this is free app, there are some free voices by device and browser — please pick your preferred one!</span>
         </p>
       </div>
