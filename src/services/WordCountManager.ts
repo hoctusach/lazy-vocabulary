@@ -1,6 +1,8 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 
+export const WORD_COUNT_STORAGE_KEY = 'vocabulary-word-counts';
+
 interface WordCount {
   word: string;
   count: number;
@@ -13,7 +15,7 @@ interface WordCountData {
 
 class WordCountManager {
   private static instance: WordCountManager;
-  private storageKey = 'vocabulary-word-counts';
+  private storageKey = WORD_COUNT_STORAGE_KEY;
   private wordCounts: WordCountData = {};
 
   private constructor() {
