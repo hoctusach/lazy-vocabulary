@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type MouseEvent } from 'react';
 import { clearStoredAuth, getActiveSession } from '@/lib/auth';
+import { resetPlayerData } from '@/lib/cleanup/resetPlayerData';
 import { getNicknameLocal, NICKNAME_LS_KEY } from '@/lib/nickname';
 import {
   dispatchNicknameChange,
@@ -101,24 +102,12 @@ const UserGreeting = () => {
 
       try {
         try {
-          clearStoredAuth();
+          resetPlayerData();
         } catch (error) {
-          recordIssue('ResetPlayer:clearStoredAuth', error);
+          recordIssue('ResetPlayer:data', error);
         }
 
         if (typeof window !== 'undefined') {
-          try {
-            window.localStorage?.clear();
-          } catch (error) {
-            recordIssue('ResetPlayer:localStorage', error);
-          }
-
-          try {
-            window.sessionStorage?.clear();
-          } catch (error) {
-            recordIssue('ResetPlayer:sessionStorage', error);
-          }
-
           if ('caches' in window) {
             try {
               const cacheNames = await window.caches.keys();
