@@ -10,6 +10,7 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { cleanSpeechText } from '@/utils/speech';
+import { trackUiInteraction, trackWordSearch } from '@/services/analyticsService';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -51,6 +52,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setResults([]);
       setNoResults(false);
       setLoading(false);
+      trackUiInteraction('search_modal_viewed', {
+        context: { has_initial_query: Boolean(initialQuery) },
+      });
     }
   }, [isOpen, initialQuery]);
 
@@ -115,6 +119,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     let isCancelled = false;
 
     const fetchResults = async () => {
+      const startedAt = typeof performance !== 'undefined' ? performance.now() : null;
       setLoading(true);
       setResults([]);
       setSelectedWord(null);
@@ -130,24 +135,60 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
         if (error) {
           console.error('Failed to fetch vocabulary search results', error);
           setNoResults(true);
+          trackWordSearch({
+            query: trimmed,
+            resultCount: 0,
+            source: 'modal_error',
+            durationMs:
+              startedAt != null && typeof performance !== 'undefined'
+                ? Math.round(performance.now() - startedAt)
+                : null,
+          });
           return;
         }
 
         const nextResults = Array.isArray(data) ? data : [];
         if (nextResults.length === 0) {
           setNoResults(true);
+          trackWordSearch({
+            query: trimmed,
+            resultCount: 0,
+            source: 'modal',
+            durationMs:
+              startedAt != null && typeof performance !== 'undefined'
+                ? Math.round(performance.now() - startedAt)
+                : null,
+          });
           return;
         }
 
         setResults(nextResults);
         setSelectedWord(nextResults[0] ?? null);
         setNoResults(false);
+        trackWordSearch({
+          query: trimmed,
+          resultCount: nextResults.length,
+          source: 'modal',
+          durationMs:
+            startedAt != null && typeof performance !== 'undefined'
+              ? Math.round(performance.now() - startedAt)
+              : null,
+        });
       } catch (err) {
         if (!isCancelled) {
           console.error('Failed to fetch vocabulary search results', err);
           setResults([]);
           setSelectedWord(null);
           setNoResults(true);
+          trackWordSearch({
+            query: trimmed,
+            resultCount: 0,
+            source: 'modal_exception',
+            durationMs:
+              startedAt != null && typeof performance !== 'undefined'
+                ? Math.round(performance.now() - startedAt)
+                : null,
+          });
         }
       } finally {
         if (!isCancelled) {
@@ -183,6 +224,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     if (debugWindow.DEBUG_SPEECH) {
       console.debug('[Speech] Speaking:', utterance.text);
     }
+    trackUiInteraction('search_preview_play', { label: selectedWord.word });
     window.speechSynthesis.speak(utterance);
   };
 
@@ -253,7 +295,13 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                 <div
                   key={`${item.word}-${item.category}`}
                   className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
-                  onClick={() => setSelectedWord(item)}
+                  onClick={() => {
+                    trackUiInteraction('search_result_selected', {
+                      label: item.word,
+                      context: { category: item.category, match_rank: item.match_rank },
+                    });
+                    setSelectedWord(item);
+                  }}
                 >
                   <span className="mr-2 flex-1">
                     {highlightMatch(item.word)}

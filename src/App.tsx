@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -15,6 +15,7 @@ import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKe
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
 import { autoBackfillOnReload } from "@/lib/sync/autoBackfillOnReload";
 import { bootstrapLearnedFromServerByKey } from "@/lib/progress/srsSyncByUserKey";
+import { trackPageView } from "@/services/analyticsService";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <AnalyticsRouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
             {process.env.NODE_ENV !== "production" && (
@@ -58,6 +60,17 @@ const App = () => {
       </TooltipProvider>
     </QueryClientProvider>
   );
+};
+
+const AnalyticsRouteTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    const path = `${location.pathname}${location.search}${location.hash}`;
+    trackPageView(path, typeof document !== "undefined" ? document.title : undefined);
+  }, [location]);
+
+  return null;
 };
 
 export default App;
