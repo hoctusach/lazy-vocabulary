@@ -7,6 +7,7 @@ import { isMobileDevice } from '@/utils/device';
 import { directSpeechService } from '../directSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { cleanSpeechText } from '@/utils/speech';
+import { syllableTimingService } from '../syllableTimingService';
 
 /**
  * Manages platform-specific speech execution (mobile vs desktop)
@@ -31,6 +32,7 @@ export class SpeechPlatformManager {
   ): void {
     const rawSpeechText = this.voiceManager.createSpeechText(word);
     const speechText = cleanSpeechText(rawSpeechText) || rawSpeechText;
+    const stopwatch = syllableTimingService.createStopwatch();
     directSpeechService.speak(speechText, {
       voiceRegion,
       onStart: () => {
@@ -42,16 +44,21 @@ export class SpeechPlatformManager {
           currentUtterance: null
         });
         resetRetryCount();
-        
+
         options?.onStart?.();
+        stopwatch.start();
       },
       onEnd: () => {
         console.log(`[SPEECH-PLATFORM-${speechId}] ✓ Mobile speech completed`);
+        const elapsed = stopwatch.stop();
+        if (elapsed && elapsed > 0) {
+          syllableTimingService.recordWordSample(word, elapsed);
+        }
         onReset();
         onStateUpdate({ phase: 'finished' });
         const state = getState();
         onScheduleAdvance(1500, state.isPaused, state.isMuted);
-        
+
         options?.onEnd?.();
         
         resolve(true);
