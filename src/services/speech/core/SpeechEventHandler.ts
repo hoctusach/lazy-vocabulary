@@ -1,6 +1,11 @@
 
 import { VocabularyWord } from '@/types/vocabulary';
 import { SpeechOptions } from './SpeechOptions';
+import { syllableTimingService } from '../syllableTimingService';
+
+const now = () => (typeof performance !== 'undefined' && typeof performance.now === 'function'
+  ? performance.now()
+  : Date.now());
 
 /**
  * Handles speech synthesis events
@@ -20,6 +25,8 @@ export class SpeechEventHandler {
     resetRetryCount: () => void,
     options?: SpeechOptions
   ): void {
+    let speechStartTime: number | null = null;
+
     utterance.onstart = () => {
       if (isStopping() || getCancelledUtterance() === utterance) {
         console.log(`[SPEECH-EVENT-${speechId}] Speech cancelled before start`);
@@ -27,6 +34,7 @@ export class SpeechEventHandler {
       }
 
       console.log(`[SPEECH-EVENT-${speechId}] ✓ Speech started for: ${word.word}`);
+      speechStartTime = now();
       onStateUpdate({
         phase: 'speaking',
         isActive: true,
@@ -47,11 +55,15 @@ export class SpeechEventHandler {
       }
 
       console.log(`[SPEECH-EVENT-${speechId}] ✓ Speech completed for: ${word.word}`);
+      const elapsed = speechStartTime !== null ? now() - speechStartTime : null;
       onReset();
       onStateUpdate({ phase: 'finished' });
       const state = getState();
+      if (!state.isMuted && elapsed && elapsed > 0) {
+        syllableTimingService.recordWordSample(word, elapsed);
+      }
       onScheduleAdvance(1500, state.isPaused, state.isMuted);
-      
+
       if (options?.onEnd) {
         options.onEnd();
       }

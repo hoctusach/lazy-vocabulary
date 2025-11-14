@@ -8,6 +8,7 @@ import { SpeechGuard } from './SpeechGuard';
 import { SpeechEventHandler } from './SpeechEventHandler';
 import { SpeechPlatformManager } from './SpeechPlatformManager';
 import { isMobileDevice } from '@/utils/device';
+import { syllableTimingService } from '../syllableTimingService';
 
 /**
  * Core speech execution logic
@@ -68,6 +69,13 @@ export class SpeechExecutionCore {
     const guardCheck = this.guard.canPlay();
     if (!guardCheck.canPlay) {
       console.log(`[SPEECH-CORE-${speechId}] Guard check failed: ${guardCheck.reason}`);
+      if (guardCheck.reason === 'muted') {
+        const estimatedSpeech = syllableTimingService.estimateSpeechDurationForWord(word);
+        const pause = syllableTimingService.computePostSpeechPause(estimatedSpeech);
+        const state = this.stateManager.getState();
+        this.autoAdvanceTimer.clear();
+        this.autoAdvanceTimer.schedule(estimatedSpeech + pause, state.isPaused, true);
+      }
       return false;
     }
 
