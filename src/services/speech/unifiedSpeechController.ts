@@ -26,8 +26,12 @@ class UnifiedSpeechController {
     return this.playbackEpoch;
   }
 
+  canAdvance(epoch?: number): boolean {
+    return epoch === undefined || epoch === this.playbackEpoch;
+  }
+
   canSpeak(epoch?: number): boolean {
-    return !this.isMutedState && (epoch === undefined || epoch === this.playbackEpoch);
+    return !this.isMutedState && this.canAdvance(epoch);
   }
 
   registerTimer(id: number): void {
@@ -78,7 +82,7 @@ class UnifiedSpeechController {
   ): Promise<boolean> {
     return new Promise(resolve => {
       const epoch = this.currentEpoch();
-      if (!this.canSpeak(epoch)) {
+      if (!this.canAdvance(epoch)) {
         resolve(false);
         return;
       }
@@ -91,7 +95,7 @@ class UnifiedSpeechController {
     if (this.isSpeaking || this.queue.length === 0) return;
 
     const { word, voiceName, resolve, epoch } = this.queue.shift()!;
-    if (!this.canSpeak(epoch)) {
+    if (!this.canAdvance(epoch)) {
       resolve(false);
       return;
     }
@@ -124,11 +128,11 @@ class UnifiedSpeechController {
       muted: this.isMutedState,
       epoch,
       onStart: () => {
-        if (!this.canSpeak(epoch)) return;
+        if (!this.canAdvance(epoch)) return;
         if (DEBUG_SPEECH) console.log('Word speech started:', word.word, 'epoch', epoch);
       },
       onEnd: () => {
-        if (!this.canSpeak(epoch)) return;
+        if (!this.canAdvance(epoch)) return;
         if (DEBUG_SPEECH) console.log('Word speech completed:', word.word, 'epoch', epoch);
         this.isSpeaking = false;
         if (this.wordCompleteCallback) {
@@ -138,7 +142,7 @@ class UnifiedSpeechController {
         this.processQueue();
       },
       onError: (error) => {
-        if (!this.canSpeak(epoch)) return;
+        if (!this.canAdvance(epoch)) return;
         if ((error as SpeechSynthesisErrorEvent).error === 'not-allowed') {
           window.dispatchEvent(new Event('speechblocked'));
           this.isSpeaking = false;

@@ -50,7 +50,7 @@ export const useAutoPlay = (
       return;
     }
 
-    if (!unifiedSpeechController.canSpeak()) {
+    if (!unifiedSpeechController.canAdvance()) {
       return;
     }
 
@@ -80,7 +80,7 @@ export const useAutoPlay = (
       if (!hasUserInteracted()) {
         return;
       }
-      if (!paused && !speechController.isActive() && unifiedSpeechController.canSpeak()) {
+      if (!paused && !speechController.isActive() && unifiedSpeechController.canAdvance()) {
         console.log(`[AUTO-PLAY] Executing auto-play for: ${currentWord.word}`);
         playCurrentWord();
       } else {
