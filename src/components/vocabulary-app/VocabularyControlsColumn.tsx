@@ -56,7 +56,11 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     trackUiInteraction(isMuted ? 'unmute' : 'mute', {
       label: isMuted ? 'Unmute' : 'Mute',
     });
-    toast(isMuted ? 'Audio unmuted' : 'Audio muted');
+    if (isMuted) {
+      toast('Audio unmuted. Speech will resume from the next word.');
+    } else {
+      toast('Audio muted');
+    }
   };
 
   const handleTogglePause = () => {
