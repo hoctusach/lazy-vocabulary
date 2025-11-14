@@ -4,6 +4,22 @@ import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings
 
 type ChunkResult = { success: boolean, error?: string };
 
+const MUTED_FALLBACK_BUCKETS = [
+  { maxWords: 15, delay: 5_000 },
+  { maxWords: 45, delay: 15_000 },
+  { maxWords: 90, delay: 30_000 },
+  { maxWords: Number.POSITIVE_INFINITY, delay: 60_000 }
+];
+
+const getMutedFallbackDelay = (text: string): number => {
+  const wordCount = text.trim().length === 0
+    ? 0
+    : text.trim().split(/\s+/).length;
+
+  const bucket = MUTED_FALLBACK_BUCKETS.find(({ maxWords }) => wordCount <= maxWords);
+  return bucket?.delay ?? 5_000;
+};
+
 interface SequenceOptions {
   langCode: string;
   voice: SpeechSynthesisVoice | null;
@@ -90,7 +106,7 @@ export async function speakChunksInSequence(
 
         if (muted) {
           const estimatedDuration = calculateSpeechDuration(chunk, chunkUtterance.rate);
-          const fallbackDelay = Math.max(300, Math.min(estimatedDuration, 5000));
+          const fallbackDelay = Math.max(300, Math.min(getMutedFallbackDelay(chunk), estimatedDuration));
           fallbackTimer = setTimeout(() => {
             console.log(
               `[SEQUENCE] Fallback completion triggered for muted chunk ${i + 1}/${chunks.length} after ${fallbackDelay}ms`
