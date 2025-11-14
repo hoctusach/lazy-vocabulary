@@ -28,7 +28,7 @@ class RealSpeechService {
 
   async speak(text: string, options: SpeechOptions): Promise<boolean> {
     const epoch = options.epoch;
-    if (!unifiedSpeechController.canSpeak(epoch)) {
+    if (!unifiedSpeechController.canAdvance(epoch)) {
       return false;
     }
     if (!window.speechSynthesis) {
@@ -52,7 +52,7 @@ class RealSpeechService {
       await initializeSpeechSystem();
     }
 
-    if (!unifiedSpeechController.canSpeak(epoch)) {
+    if (!unifiedSpeechController.canAdvance(epoch)) {
       return false;
     }
 
@@ -84,7 +84,7 @@ class RealSpeechService {
     await this.ensureVoicesLoaded();
 
     return new Promise((resolve) => {
-      if (!unifiedSpeechController.canSpeak(epoch)) {
+      if (!unifiedSpeechController.canAdvance(epoch)) {
         resolve(false);
         return;
       }
@@ -132,7 +132,7 @@ class RealSpeechService {
 
       // Set up event handlers
       utterance.onstart = () => {
-        if (!unifiedSpeechController.canSpeak(epoch)) return;
+        if (!unifiedSpeechController.canAdvance(epoch)) return;
         if (DEBUG_SPEECH) console.log("Speech started for:", textForSpeech.substring(0, 30) + "...");
         this.isActive = true;
         this.currentUtterance = utterance;
@@ -148,7 +148,7 @@ class RealSpeechService {
       };
 
       utterance.onend = () => {
-        if (!unifiedSpeechController.canSpeak(epoch)) {
+        if (!unifiedSpeechController.canAdvance(epoch)) {
           resolve(false);
           return;
         }
@@ -171,7 +171,7 @@ class RealSpeechService {
       };
 
       utterance.onerror = (event) => {
-        if (!unifiedSpeechController.canSpeak(epoch)) {
+        if (!unifiedSpeechController.canAdvance(epoch)) {
           resolve(false);
           return;
         }
@@ -213,7 +213,7 @@ class RealSpeechService {
 
       // Start speech
       try {
-        if (unifiedSpeechController.canSpeak(epoch)) {
+        if (unifiedSpeechController.canAdvance(epoch)) {
           if (DEBUG_SPEECH) {
             console.debug("[Speech] Speaking:", utterance.text);
           }

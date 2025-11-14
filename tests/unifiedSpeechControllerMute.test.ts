@@ -33,6 +33,8 @@ describe('unifiedSpeechController mute handling', () => {
     expect((window as any).speechSynthesis.cancel).toHaveBeenCalledTimes(1);
     expect(unifiedSpeechController.currentEpoch()).toBe(epoch + 1);
     expect(unifiedSpeechController.canSpeak(epoch)).toBe(false);
+    expect(unifiedSpeechController.canAdvance(epoch)).toBe(false);
+    expect(unifiedSpeechController.canAdvance()).toBe(true);
     expect(clearSpy).toHaveBeenCalledWith(timer);
     clearSpy.mockRestore();
   });
