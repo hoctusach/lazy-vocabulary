@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
+import { trackUiInteraction } from '@/services/analyticsService';
 
 interface VocabularyControlsColumnProps {
   isMuted: boolean;
@@ -50,25 +51,19 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
   
-  const trackEvent = (name: string, label: string, value?: number) => {
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', name, {
-        event_category: 'interaction',
-        event_label: label,
-        ...(typeof value === 'number' ? { value } : {})
-      });
-    }
-  };
-
   const handleToggleMute = () => {
     onToggleMute();
-    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
+    trackUiInteraction(isMuted ? 'unmute' : 'mute', {
+      label: isMuted ? 'Unmute' : 'Mute',
+    });
     toast(isMuted ? 'Audio unmuted' : 'Audio muted');
   };
 
   const handleTogglePause = () => {
     onTogglePause();
-    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
+    trackUiInteraction(isPaused ? 'play' : 'pause', {
+      label: isPaused ? 'Play' : 'Pause',
+    });
     toast(isPaused ? 'Playback resumed' : 'Playback paused');
   };
 
@@ -78,7 +73,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       return;
     }
     onNextWord();
-    trackEvent('next_word', 'Next Word');
+    trackUiInteraction('next_word', { label: 'Next Word' });
   };
 
   const handleCycleVoice = () => {
@@ -87,12 +82,15 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       return;
     }
     onCycleVoice();
-    trackEvent('cycle_voice', selectedVoiceName);
+    trackUiInteraction('cycle_voice', { label: selectedVoiceName });
   };
 
   const handleRateChange = (r: number) => {
     setSpeechRate(r);
-    trackEvent('speech_rate_change', `${r}x`, r);
+    trackUiInteraction('speech_rate_change', {
+      label: `${r}x`,
+      value: r,
+    });
     unifiedSpeechController.stop();
     if (!isMuted && !isPaused) {
       playCurrentWord();
@@ -104,9 +102,15 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleMarkAsLearnedClick = () => {
     setWordToMark(currentWord?.word || '');
+    trackUiInteraction('mark_as_learned_dialog_opened', {
+      label: currentWord?.word || '',
+    });
     setIsMarkAsLearnedDialogOpen(true);
   };
   const handleMarkAsLearnedConfirm = () => {
+    if (wordToMark) {
+      trackUiInteraction('mark_as_learned_confirm', { label: wordToMark });
+    }
     if (onMarkWordLearned && wordToMark) onMarkWordLearned(wordToMark);
     setIsMarkAsLearnedDialogOpen(false);
     toast('Word marked as learned.');
@@ -176,7 +180,12 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       <Button
         variant="outline"
         size="sm"
-        onClick={() => onOpenSearch()}
+        onClick={() => {
+          trackUiInteraction('search_modal_opened', {
+            label: currentWord?.word || '',
+          });
+          onOpenSearch();
+        }}
         className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
         title="Quick Search"
         aria-label="Quick Search"
