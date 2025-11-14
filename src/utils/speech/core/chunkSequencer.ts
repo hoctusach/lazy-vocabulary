@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { calculateSpeechDuration } from '../durationUtils';
 import { getSpeechRate, getSpeechPitch, getSpeechVolume } from './speechSettings';
 
 type ChunkResult = { success: boolean, error?: string };
@@ -51,31 +52,59 @@ export async function speakChunksInSequence(
       
       // Speak this chunk and await its completion
       await new Promise<void>((resolve, reject) => {
-        chunkUtterance.onend = () => {
-          console.log(`[SEQUENCE] Chunk ${i + 1}/${chunks.length} completed`);
-          resolve();
-        };
-        
-        chunkUtterance.onerror = (event) => {
-          console.error(`[SEQUENCE] Error in chunk ${i + 1}/${chunks.length}:`, event.error);
-          
-          // For network errors or timeouts, we'll continue to the next chunk
-          if (event.error === 'network' || event.error === 'interrupted') {
-            resolve(); // Continue despite error
-          } else if (event.error === 'canceled') {
-            // Cancellation is often intentional
-            resolve();
-          } else {
-            reject(new Error(`Speech error in chunk ${i + 1}: ${event.error}`));
+        let settled = false;
+        let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
+
+        const clearFallbackTimer = () => {
+          if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = undefined;
           }
         };
-        
+
+        const settle = (action: () => void) => {
+          if (settled) return;
+          settled = true;
+          clearFallbackTimer();
+          action();
+        };
+
+        chunkUtterance.onend = () => {
+          console.log(`[SEQUENCE] Chunk ${i + 1}/${chunks.length} completed`);
+          settle(resolve);
+        };
+
+        chunkUtterance.onerror = (event) => {
+          console.error(`[SEQUENCE] Error in chunk ${i + 1}/${chunks.length}:`, event.error);
+
+          // For network errors or timeouts, we'll continue to the next chunk
+          if (event.error === 'network' || event.error === 'interrupted') {
+            settle(resolve); // Continue despite error
+          } else if (event.error === 'canceled') {
+            // Cancellation is often intentional
+            settle(resolve);
+          } else {
+            settle(() => reject(new Error(`Speech error in chunk ${i + 1}: ${event.error}`)));
+          }
+        };
+
+        if (muted) {
+          const estimatedDuration = calculateSpeechDuration(chunk, chunkUtterance.rate);
+          const fallbackDelay = Math.max(300, Math.min(estimatedDuration, 5000));
+          fallbackTimer = setTimeout(() => {
+            console.log(
+              `[SEQUENCE] Fallback completion triggered for muted chunk ${i + 1}/${chunks.length} after ${fallbackDelay}ms`
+            );
+            settle(resolve);
+          }, fallbackDelay);
+        }
+
         // Start speaking this chunk
         try {
           window.speechSynthesis.speak(chunkUtterance);
         } catch (error) {
           console.error(`[SEQUENCE] Error starting chunk ${i + 1}/${chunks.length}:`, error);
-          reject(error);
+          settle(() => reject(error as Error));
         }
       });
       
