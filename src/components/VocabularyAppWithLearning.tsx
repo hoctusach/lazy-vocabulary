@@ -15,6 +15,7 @@ import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
+import { trackUiInteraction } from '@/services/analyticsService';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
@@ -124,6 +125,10 @@ const VocabularyAppWithLearning: React.FC = () => {
       toast.warning('Please enter a valid search query.');
       return;
     }
+    trackUiInteraction('search_modal_requested', {
+      label: nextQuery,
+      context: { via: word ? 'prefilled' : 'empty' },
+    });
     setSearchWord(nextQuery);
     setIsSearchOpen(true);
   };
@@ -132,6 +137,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     if (wordToReset) {
       const category = (wordToReset.category ?? '').trim();
       const wordId = category ? `${wordToReset.word}::${category}` : wordToReset.word;
+      trackUiInteraction('mark_as_new_confirm', { label: wordToReset.word });
       const didReset = await markWordAsNew(wordId);
       if (didReset) {
         toast.success('Moved back to Learning!');

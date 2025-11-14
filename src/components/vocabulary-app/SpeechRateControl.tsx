@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from '@/components/ui/popover';
 import { Gauge } from 'lucide-react';
+import { trackUiInteraction } from '@/services/analyticsService';
 
 interface SpeechRateControlProps {
   rate: number;
@@ -23,13 +24,11 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
 
   const handleChange = (v: number) => {
     onChange(v);
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', 'speech_rate_change', {
-        event_category: 'interaction',
-        event_label: `${v}x`,
-        value: v
-      });
-    }
+    trackUiInteraction('speech_rate_change', {
+      label: `${v}x`,
+      value: v,
+      context: { source: 'speech_rate_control' },
+    });
     setOpen(false); // close popup after selecting rate
   };
 

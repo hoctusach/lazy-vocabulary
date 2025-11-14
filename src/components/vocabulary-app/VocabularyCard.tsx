@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
+import { trackUiInteraction } from '@/services/analyticsService';
 
 interface VocabularyCardProps {
   word: string;
@@ -66,33 +67,27 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   const phoneticPart = wordParts.length > 2 ? wordParts.slice(2).join(' ').trim() : '';
   const { main, annotations } = parseWordAnnotations(word);
 
-  const trackEvent = (name: string, label: string, value?: number) => {
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', name, {
-        event_category: 'interaction',
-        event_label: label,
-        ...(typeof value === 'number' ? { value } : {})
-      });
-    }
-  };
-
   const handleMuteClick = () => {
-    trackEvent(isMuted ? 'unmute' : 'mute', isMuted ? 'Unmute' : 'Mute');
+    trackUiInteraction(isMuted ? 'unmute' : 'mute', {
+      label: isMuted ? 'Unmute' : 'Mute',
+    });
     onToggleMute();
   };
 
   const handlePauseClick = () => {
-    trackEvent(isPaused ? 'play' : 'pause', isPaused ? 'Play' : 'Pause');
+    trackUiInteraction(isPaused ? 'play' : 'pause', {
+      label: isPaused ? 'Play' : 'Pause',
+    });
     onTogglePause();
   };
 
   const handleNextClick = () => {
-    trackEvent('next_word', 'Next');
+    trackUiInteraction('next_word', { label: 'Next' });
     onNextWord();
   };
 
   const handleCycleVoiceClick = () => {
-    trackEvent('cycle_voice', nextVoiceLabel);
+    trackUiInteraction('cycle_voice', { label: nextVoiceLabel });
     onCycleVoice();
   };
 
