@@ -95,6 +95,17 @@ export async function speakChunksInSequence(
             console.log(
               `[SEQUENCE] Fallback completion triggered for muted chunk ${i + 1}/${chunks.length} after ${fallbackDelay}ms`
             );
+            // When the browser never fires `onend`, the speech engine keeps the
+            // utterance queued. Cancelling explicitly allows the next chunk to
+            // start immediately while mimicking the natural timing we use when
+            // audio is audible.
+            try {
+              if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                window.speechSynthesis.cancel();
+              }
+            } catch (cancelError) {
+              console.warn('[SEQUENCE] Failed to cancel muted utterance:', cancelError);
+            }
             settle(resolve);
           }, fallbackDelay);
         }
