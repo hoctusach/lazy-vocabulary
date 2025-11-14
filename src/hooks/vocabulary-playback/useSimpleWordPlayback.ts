@@ -1,10 +1,11 @@
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { VocabularyWord } from '@/types/vocabulary';
 import { VoiceSelection } from './useVoiceSelection';
 import { useSimpleSpeech } from '@/hooks/speech/useSimpleSpeech';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { formatSpeechText } from '@/utils/speech';
+import { syllableTimingService } from '@/services/speech/syllableTimingService';
 
 /**
  * Simplified word playback with improved coordination and pause handling
@@ -18,6 +19,41 @@ export const useSimpleWordPlayback = (
 ) => {
   const { speak, stop, isSpeaking } = useSimpleSpeech();
   const playingRef = useRef(false);
+  const mutedAdvanceTimerRef = useRef<number | null>(null);
+
+  const clearMutedAdvanceTimer = useCallback(() => {
+    if (mutedAdvanceTimerRef.current !== null) {
+      window.clearTimeout(mutedAdvanceTimerRef.current);
+      mutedAdvanceTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleMutedAdvance = useCallback((word: VocabularyWord) => {
+    if (paused || unifiedSpeechController.isPaused()) {
+      console.log('[WORD-PLAYBACK] Skipping muted advance scheduling - playback paused');
+      playingRef.current = false;
+      clearMutedAdvanceTimer();
+      return;
+    }
+
+    const delay = syllableTimingService.estimateMutedAutoAdvanceDelay(word);
+    console.log(`[WORD-PLAYBACK] Scheduling muted auto-advance in ${delay}ms for word: ${word.word}`);
+
+    playingRef.current = true;
+    clearMutedAdvanceTimer();
+
+    mutedAdvanceTimerRef.current = window.setTimeout(() => {
+      mutedAdvanceTimerRef.current = null;
+      playingRef.current = false;
+
+      if (!paused && !unifiedSpeechController.isPaused()) {
+        console.log('[WORD-PLAYBACK] Advancing to next word after muted delay');
+        goToNextWord();
+      } else {
+        console.log('[WORD-PLAYBACK] Muted delay completed but playback paused - not advancing');
+      }
+    }, delay);
+  }, [clearMutedAdvanceTimer, goToNextWord, paused]);
 
   const playWord = useCallback(async (word: VocabularyWord) => {
     const playbackId = Math.random().toString(36).substring(7);
@@ -38,6 +74,14 @@ export const useSimpleWordPlayback = (
     // Prevent overlapping playback
     if (playingRef.current) {
       console.log(`[WORD-PLAYBACK-${playbackId}] Already playing, skipping`);
+      return;
+    }
+
+    unifiedSpeechController.setMuted(muted);
+
+    if (muted) {
+      console.log(`[WORD-PLAYBACK-${playbackId}] Muted playback - using estimated timing only`);
+      scheduleMutedAdvance(word);
       return;
     }
 
@@ -65,8 +109,6 @@ export const useSimpleWordPlayback = (
       }
 
       console.log(`[WORD-PLAYBACK-${playbackId}] Starting speech`);
-
-      unifiedSpeechController.setMuted(muted);
 
       const success = await speak(speechText, {
         voice,
@@ -108,13 +150,32 @@ export const useSimpleWordPlayback = (
         goToNextWord();
       }
     }
-  }, [speak, selectedVoice, findVoice, goToNextWord, muted, paused]);
+  }, [speak, selectedVoice, findVoice, goToNextWord, muted, paused, scheduleMutedAdvance]);
 
   const stopPlayback = useCallback(() => {
     console.log('[WORD-PLAYBACK] Stopping playback');
     stop();
     playingRef.current = false;
-  }, [stop]);
+    clearMutedAdvanceTimer();
+  }, [stop, clearMutedAdvanceTimer]);
+
+  useEffect(() => {
+    if (!muted) {
+      clearMutedAdvanceTimer();
+      playingRef.current = false;
+    }
+  }, [muted, clearMutedAdvanceTimer]);
+
+  useEffect(() => {
+    if (paused) {
+      clearMutedAdvanceTimer();
+      playingRef.current = false;
+    }
+  }, [paused, clearMutedAdvanceTimer]);
+
+  useEffect(() => () => {
+    clearMutedAdvanceTimer();
+  }, [clearMutedAdvanceTimer]);
 
   return {
     playWord,
