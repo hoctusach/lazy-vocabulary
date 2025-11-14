@@ -90,7 +90,7 @@ export async function speakChunksInSequence(
 
         if (muted) {
           const estimatedDuration = calculateSpeechDuration(chunk, chunkUtterance.rate);
-          const fallbackDelay = Math.max(150, estimatedDuration);
+          const fallbackDelay = Math.max(300, Math.min(estimatedDuration, 5000));
           fallbackTimer = setTimeout(() => {
             console.log(
               `[SEQUENCE] Fallback completion triggered for muted chunk ${i + 1}/${chunks.length} after ${fallbackDelay}ms`
@@ -100,7 +100,9 @@ export async function speakChunksInSequence(
             // start immediately while mimicking the natural timing we use when
             // audio is audible.
             try {
-              window.speechSynthesis.cancel();
+              if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+                window.speechSynthesis.cancel();
+              }
             } catch (cancelError) {
               console.warn('[SEQUENCE] Failed to cancel muted utterance:', cancelError);
             }
