@@ -59,6 +59,11 @@ export const useSpeechIntegration = (
       return;
     }
 
+    if (isMuted) {
+      console.log('[SPEECH-INTEGRATION] Muted, skipping speech trigger');
+      return;
+    }
+
     console.log('[SPEECH-INTEGRATION] Dependencies changed, attempting to speak:', currentWord.word);
     playCurrentWord();
 
