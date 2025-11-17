@@ -6,12 +6,12 @@ import { VoiceSelection } from '../../useVoiceSelection';
 import { useVoiceLoader } from './useVoiceLoader';
 import { usePermissionState } from './usePermissionState';
 import { useWordTransition } from './useWordTransition';
-import { 
+import {
   useUtteranceManager,
-  usePlayEffect,
   useUserInteractionEffect,
   useWordPlaybackLogic
 } from './hooks';
+import { useAutoPlay } from '../playback-states';
 
 /**
  * Core hook for managing word playback functionality
@@ -77,7 +77,7 @@ export const useWordPlaybackCore = (
   );
   
   // Setup auto-play effect
-  usePlayEffect(currentWord, playCurrentWord);
+  useAutoPlay(currentWord, muted, paused, playCurrentWord);
   
   // Setup user interaction effect
   useUserInteractionEffect(

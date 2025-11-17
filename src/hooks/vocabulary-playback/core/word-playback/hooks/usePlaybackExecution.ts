@@ -54,9 +54,7 @@ export const usePlaybackExecution = (
     );
 
     if (!conditionCheck.canPlay) {
-      if (conditionCheck.reason === 'muted') {
-        scheduleAutoAdvance(3000);
-      } else if (conditionCheck.reason === 'word-transition') {
+      if (conditionCheck.reason === 'word-transition') {
         setTimeout(() => executePlayback(currentWord, setPlayInProgress, isPlayInProgress, resetPlayInProgress), 150);
       }
       return;

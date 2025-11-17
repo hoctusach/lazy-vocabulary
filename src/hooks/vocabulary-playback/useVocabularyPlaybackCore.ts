@@ -7,10 +7,9 @@ import {
   usePlaybackControls, 
   useWordPlayback 
 } from './core';
-import { 
+import {
   useUserInteraction,
-  useSpeechCancellation,
-  useAutoPlay
+  useSpeechCancellation
 } from './core/playback-states';
 import { usePlaybackState } from './core/word-playback/hooks/usePlaybackState';
 import { useSafariSupport } from './core/ios-support';
@@ -131,14 +130,6 @@ export const useVocabularyPlaybackCore = (wordList: VocabularyWord[]) => {
   
   // Handle iOS and Safari-specific initialization
   useSafariSupport(userInteractionRef);
-  
-  // Auto-play the current word when it changes
-  useAutoPlay(
-    currentWord, 
-    muted, 
-    paused, 
-    () => playCurrentWordRef.current()
-  );
   
   return {
     currentWord,

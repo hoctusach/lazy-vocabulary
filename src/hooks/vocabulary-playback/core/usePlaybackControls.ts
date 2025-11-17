@@ -50,7 +50,6 @@ export const usePlaybackControls = (cancelSpeech: () => void, playCurrentWord: (
       if (newMuted) {
         cancelSpeech();
         unifiedSpeechController.setMuted(true);
-        playCurrentWord();
         toast.info("Audio playback muted");
       } else {
         unifiedSpeechController.setMuted(false);

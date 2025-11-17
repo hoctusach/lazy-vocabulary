@@ -5,6 +5,18 @@ import { speechController } from '@/utils/speech/core/speechController';
 import { hasUserInteracted } from '@/utils/userInteraction';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
+interface AutoPlayOptions {
+  /**
+   * Optional guard that must return true for auto-play to execute.
+   * Use this to compose additional preconditions (e.g. data loaded).
+   */
+  guard?: () => boolean;
+  /**
+   * Optional delay override for the playback scheduler.
+   */
+  delayMs?: number;
+}
+
 /**
  * Hook for auto-playing the current word when it changes
  * Now with proper coordination to prevent multiple triggers
@@ -13,12 +25,15 @@ export const useAutoPlay = (
   currentWord: VocabularyWord | null,
   muted: boolean,
   paused: boolean,
-  playCurrentWord: () => void
+  playCurrentWord: () => void,
+  options?: AutoPlayOptions
 ) => {
   const lastWordRef = useRef<string | null>(null);
   const prevMutedRef = useRef(muted);
   const prevPausedRef = useRef(paused);
   const autoPlayTimeoutRef = useRef<number | null>(null);
+  const guard = options?.guard;
+  const delayMs = options?.delayMs ?? 400;
 
   // Reset lastWordRef when unmuting
   useEffect(() => {
@@ -45,12 +60,16 @@ export const useAutoPlay = (
       autoPlayTimeoutRef.current = null;
     }
 
-    // Only proceed if we have a word and we're not paused
-    if (!currentWord || paused) {
+    // Only proceed if we have a word and we're not paused or muted
+    if (!currentWord || paused || muted) {
       return;
     }
 
     if (!unifiedSpeechController.canAdvance()) {
+      return;
+    }
+
+    if (guard && !guard()) {
       return;
     }
 
@@ -80,15 +99,15 @@ export const useAutoPlay = (
       if (!hasUserInteracted()) {
         return;
       }
-      if (!paused && !speechController.isActive() && unifiedSpeechController.canAdvance()) {
+      if (!paused && !muted && !speechController.isActive() && unifiedSpeechController.canAdvance()) {
         console.log(`[AUTO-PLAY] Executing auto-play for: ${currentWord.word}`);
         playCurrentWord();
       } else {
         console.log('[AUTO-PLAY] Conditions changed, skipping execution');
       }
-    }, 400); // Longer delay to prevent race conditions
+    }, delayMs); // Delay to prevent race conditions and allow composition guards
     unifiedSpeechController.registerTimer(autoPlayTimeoutRef.current);
-    
+
     return () => {
       if (autoPlayTimeoutRef.current) {
         clearTimeout(autoPlayTimeoutRef.current);
@@ -96,7 +115,7 @@ export const useAutoPlay = (
         autoPlayTimeoutRef.current = null;
       }
     };
-  }, [currentWord, muted, paused, playCurrentWord]);
+  }, [currentWord, muted, paused, playCurrentWord, guard, delayMs]);
 
   // Reset tracking when word actually changes
   useEffect(() => {
@@ -106,5 +125,5 @@ export const useAutoPlay = (
         lastWordRef.current = currentWordId;
       }
     }
-  }, [currentWord?.word]);
+  }, [currentWord]);
 };
