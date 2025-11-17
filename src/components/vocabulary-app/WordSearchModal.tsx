@@ -203,6 +203,23 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     };
   }, [debouncedQuery, isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const normalizedInitial = initialQuery.trim().toLowerCase();
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedInitial || normalizedInitial !== normalizedQuery) return;
+    if (!results.length || selectedWord) return;
+
+    const matchedResult =
+      results.find((item) => item.word.trim().toLowerCase() === normalizedInitial) ?? results[0];
+
+    if (matchedResult) {
+      setSelectedWord(matchedResult);
+    }
+  }, [initialQuery, isOpen, query, results, selectedWord]);
+
   const handlePlay = () => {
     if (!selectedWord) return;
     const text = [selectedWord.word, selectedWord.meaning, selectedWord.example]
