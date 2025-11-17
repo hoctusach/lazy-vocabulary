@@ -79,7 +79,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
         <>
           {parts.map((part, index) =>
             index % 2 === 1 ? (
-              <mark key={`${part}-${index}`} className="bg-yellow-200">
+              <mark
+                key={`${part}-${index}`}
+                className="rounded px-1"
+                style={{
+                  backgroundColor: 'var(--lv-card-tone-3)',
+                  color: 'var(--lv-text-primary)',
+                }}
+              >
                 {part}
               </mark>
             ) : (
@@ -308,7 +315,10 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                   }`}
                   onClick={() => handleSelectWord(item)}
                 >
-                  <span className="mr-2 flex-1 font-medium text-slate-800">
+                  <span
+                    className="mr-2 flex-1 font-medium"
+                    style={{ color: 'var(--lv-text-primary)' }}
+                  >
                     {highlightMatch(item.word)}
                   </span>
                   {item.category && (
