@@ -191,16 +191,25 @@ const VocabularyAppWithLearning: React.FC = () => {
                       newTodayList.map((word, index) => (
                         <div
                           key={`${word.word}-${index}`}
-                          className="text-sm p-2 rounded border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/40"
+                          className="text-sm p-2 rounded border border-green-200 bg-green-50 flex items-start justify-between gap-2 dark:border-green-800 dark:bg-green-900/40"
                         >
-                          <div className="font-semibold text-green-900 dark:text-green-100">{word.word}</div>
                           <div className="space-y-0.5">
+                            <div className="font-semibold text-green-900 dark:text-green-100">{word.word}</div>
                             <div className="text-xs text-green-700 dark:text-green-200">
                               Review #{formatReviewCount(word.reviewCount)}
                             </div>
                             <div className="text-xs text-green-700 dark:text-green-200">
                               Next review: {formatDateOnly(word.nextReviewAt)}
                             </div>
+                          </div>
+                          <div className="flex items-center pt-1">
+                            <button
+                              aria-label={`View ${word.word}`}
+                              className="text-green-700 hover:text-green-900 dark:text-green-200 dark:hover:text-green-50"
+                              onClick={() => openSearch(word.word)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
                       ))
@@ -219,16 +228,25 @@ const VocabularyAppWithLearning: React.FC = () => {
                       dueTodayList.map((word, index) => (
                         <div
                           key={`${word.word}-${index}`}
-                          className="text-sm p-2 rounded border border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/40"
+                          className="text-sm p-2 rounded border border-red-200 bg-red-50 flex items-start justify-between gap-2 dark:border-red-800 dark:bg-red-900/40"
                         >
-                          <div className="font-semibold text-red-900 dark:text-red-100">{word.word}</div>
                           <div className="space-y-0.5">
+                            <div className="font-semibold text-red-900 dark:text-red-100">{word.word}</div>
                             <div className="text-xs text-red-700 dark:text-red-200">
                               Review #{formatReviewCount(word.reviewCount)}
                             </div>
                             <div className="text-xs text-red-700 dark:text-red-200">
                               Next review: {formatDateOnly(word.nextReviewAt)}
                             </div>
+                          </div>
+                          <div className="flex items-center pt-1">
+                            <button
+                              aria-label={`View ${word.word}`}
+                              className="text-red-700 hover:text-red-900 dark:text-red-200 dark:hover:text-red-50"
+                              onClick={() => openSearch(word.word)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </button>
                           </div>
                         </div>
                       ))
