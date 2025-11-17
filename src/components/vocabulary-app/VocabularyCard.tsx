@@ -102,30 +102,54 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
         <div>
           {/* Word */}
           <h2
-            className="text-left font-semibold text-base md:text-sm text-gray-900 leading-tight mb-2"
-            style={{ marginTop: 0 }}
+            className="text-left font-semibold text-base md:text-sm leading-tight mb-2"
+            style={{ marginTop: 0, color: 'var(--lv-word-title)' }}
           >
             {main}
             {annotations.map((t, i) => (
-              <span key={i} className="ml-1 text-xs text-gray-500">{t}</span>
+              <span
+                key={i}
+                className="ml-1 text-xs"
+                style={{ color: 'var(--lv-text-secondary)' }}
+              >
+                {t}
+              </span>
             ))}
           </h2>
           {/* Meaning */}
           <div
-            className="text-left text-base md:text-sm text-emerald-700 italic mb-2"
-            style={{ background: 'transparent', marginTop: 0, whiteSpace: 'pre-line' }}
+            className="text-left text-base md:text-sm italic mb-2"
+            style={{
+              background: 'transparent',
+              marginTop: 0,
+              whiteSpace: 'pre-line',
+              color: 'var(--lv-meaning)',
+            }}
           >
-            <span className="italic text-emerald-700">*</span> {meaning}
+            <span className="italic" style={{ color: 'var(--lv-meaning)' }}>*</span> {meaning}
           </div>
           {/* Example */}
           <div
-            className="text-left text-base md:text-sm text-red-600 italic"
-            style={{ background: 'transparent', marginTop: 0, whiteSpace: 'pre-line' }}
+            className="text-left text-base md:text-sm italic"
+            style={{
+              background: 'transparent',
+              marginTop: 0,
+              whiteSpace: 'pre-line',
+              color: 'var(--lv-example)',
+            }}
           >
-            <span className="italic text-red-600">*</span> {example}
+            <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
           </div>
           {translation && (
-            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
+            <div
+              style={{
+                fontStyle: 'italic',
+                fontSize: '0.9em',
+                textAlign: 'left',
+                whiteSpace: 'pre-line',
+                color: 'var(--lv-text-primary)',
+              }}
+            >
               <em>* {translation}</em>
             </div>
           )}
