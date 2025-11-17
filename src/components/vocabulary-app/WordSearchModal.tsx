@@ -163,7 +163,6 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
         }
 
         setResults(nextResults);
-        setSelectedWord(nextResults[0] ?? null);
         setNoResults(false);
         trackWordSearch({
           query: trimmed,
@@ -258,6 +257,14 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     onClose();
   };
 
+  const handleSelectWord = (item: VocabularySearchResult) => {
+    trackUiInteraction('search_result_selected', {
+      label: item.word,
+      context: { category: item.category, match_rank: item.match_rank },
+    });
+    setSelectedWord(item);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
@@ -283,68 +290,75 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        {!selectedWord ? (
-          <>
-            <ScrollArea className="h-40 mt-3 border rounded-md">
-              {loading && (
-                <div className="flex justify-center py-4" aria-label="loading">
-                  <Loader className="h-4 w-4 animate-spin" />
-                </div>
-              )}
-              {results.map((item) => (
+
+        <div className="mt-3 space-y-3">
+          <ScrollArea className="h-40 border rounded-md">
+            {loading && (
+              <div className="flex justify-center py-4" aria-label="loading">
+                <Loader className="h-4 w-4 animate-spin" />
+              </div>
+            )}
+            {results.map((item) => {
+              const isSelected = selectedWord?.word_id === item.word_id;
+              return (
                 <div
-                  key={`${item.word}-${item.category}`}
-                  className="px-2 py-1 cursor-pointer hover:bg-accent flex justify-between"
-                  onClick={() => {
-                    trackUiInteraction('search_result_selected', {
-                      label: item.word,
-                      context: { category: item.category, match_rank: item.match_rank },
-                    });
-                    setSelectedWord(item);
-                  }}
+                  key={item.word_id}
+                  className={`px-2 py-1 cursor-pointer flex justify-between ${
+                    isSelected ? 'bg-accent/80' : 'hover:bg-accent'
+                  }`}
+                  onClick={() => handleSelectWord(item)}
                 >
-                  <span className="mr-2 flex-1">
+                  <span className="mr-2 flex-1 font-medium text-slate-800">
                     {highlightMatch(item.word)}
                   </span>
                   {item.category && (
-                    <Badge variant="secondary" className="shrink-0">
+                    <Badge variant={isSelected ? 'default' : 'secondary'} className="shrink-0">
                       {item.category}
                     </Badge>
                   )}
                 </div>
-              ))}
-            </ScrollArea>
-            {noResults && debouncedQuery.trim() && !loading && (
-                <div className="mt-2">
-                  <p className="italic text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                    No results found.
-                  </p>
-                </div>
-              )}
-          </>
-        ) : (
-          <div className="mt-3 space-y-2">
-            <VocabularyCard
-              word={selectedWord.word}
-              meaning={selectedWord.meaning}
-              example={selectedWord.example}
-              translation={selectedWord.translation ?? undefined}
-              backgroundColor="var(--lv-card-bg)"
-              isMuted={false}
-              isPaused={false}
-              onToggleMute={() => {}}
-              onTogglePause={() => {}}
-              onCycleVoice={() => {}}
-              onSwitchCategory={() => {}}
-              onNextWord={() => {}}
-              currentCategory={selectedWord.category || ''}
-              nextCategory=""
-              selectedVoice={previewVoice}
-              nextVoiceLabel=""
-              searchPreview={true}
-            />
-          </div>
-        )}
+              );
+            })}
+          </ScrollArea>
+
+          {noResults && debouncedQuery.trim() && !loading && (
+            <div>
+              <p className="italic text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                No results found.
+              </p>
+            </div>
+          )}
+
+          {!loading && results.length > 0 && !selectedWord && (
+            <p className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+              Select a word to view its details.
+            </p>
+          )}
+
+          {selectedWord && (
+            <div className="space-y-2">
+              <VocabularyCard
+                word={selectedWord.word}
+                meaning={selectedWord.meaning}
+                example={selectedWord.example}
+                translation={selectedWord.translation ?? undefined}
+                backgroundColor="var(--lv-card-bg)"
+                isMuted={false}
+                isPaused={false}
+                onToggleMute={() => {}}
+                onTogglePause={() => {}}
+                onCycleVoice={() => {}}
+                onSwitchCategory={() => {}}
+                onNextWord={() => {}}
+                currentCategory={selectedWord.category || ''}
+                nextCategory=""
+                selectedVoice={previewVoice}
+                nextVoiceLabel=""
+                searchPreview={true}
+              />
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
