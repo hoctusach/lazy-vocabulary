@@ -18,7 +18,14 @@ const Index = () => {
           Master vocabulary with passive learning!
         </h2>
         <p className="slogan-note">
-          Just skim the word and speak it—let it stick naturally!
+          Just skim the word and practise it with AI — let it stick naturally!{' '}
+          <a
+            href="https://www.youtube.com/watch?v=KytjftF0M1s"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            How to do it?
+          </a>
         </p>
         {/* Removed "Are you new?" section */}
       </header>
