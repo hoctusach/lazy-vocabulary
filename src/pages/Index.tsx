@@ -18,7 +18,8 @@ const Index = () => {
           Master vocabulary with passive learning!
         </h2>
         <p className="slogan-note">
-          Just skim the word and practise it with AI — let it stick naturally!{' '}
+          Skim the word, then use AI for a quick mini-practice: repeat the word, meaning, and make few
+          examples about your life. Let the word stick naturally.{' '}
           <a
             href="https://www.youtube.com/watch?v=KytjftF0M1s"
             target="_blank"
