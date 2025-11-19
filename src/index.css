@@ -1039,6 +1039,16 @@ button:hover {
   font-size: 0.85em;
   transition: color 0.3s ease;
 }
+
+.slogan-note a {
+  color: var(--lv-accent);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.slogan-note a:hover {
+  color: var(--lv-text);
+}
 .app-name {
   color: var(--lv-text-secondary);
   font-size: 1.2em;
