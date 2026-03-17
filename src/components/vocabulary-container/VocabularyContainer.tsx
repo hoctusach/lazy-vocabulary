@@ -120,6 +120,12 @@ const VocabularyContainer: React.FC = () => {
         nextVoiceLabel={nextVoiceLabel}
         category={controllerState.currentWord.category}
       />
+      <p
+        className="mt-3 text-center italic text-sm"
+        style={{ color: 'var(--lv-text-secondary)' }}
+      >
+        Click Next to trigger voice if it is not played or stopped.
+      </p>
     </div>
   );
 };
