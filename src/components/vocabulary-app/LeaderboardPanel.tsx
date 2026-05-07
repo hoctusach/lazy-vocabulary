@@ -1,14 +1,18 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronDown, Medal, Trophy, Users } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, Medal, Trophy, Users } from "lucide-react";
 
-import { Card, CardContent } from '@/components/ui/card';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 import {
   getLeaderboardState,
   type LeaderboardEntry,
   type LeaderboardState,
-} from '@/lib/progress/leaderboard';
+} from "@/lib/progress/leaderboard";
 
 interface LeaderboardPanelProps {
   currentUserLearnedCount?: number;
@@ -18,7 +22,7 @@ interface LeaderboardPanelProps {
 }
 
 const initialState: LeaderboardState = {
-  timeframe: 'allTime',
+  timeframe: "allTime",
   entries: [],
   isLoading: true,
 };
@@ -31,28 +35,35 @@ function getMillisecondsUntilNextDailyRefresh(): number {
   nextRefresh.setDate(now.getDate() + 1);
   nextRefresh.setHours(0, 0, 0, 0);
 
-  return Math.max(LEADERBOARD_DAILY_REFRESH_MS, nextRefresh.getTime() - now.getTime());
+  return Math.max(
+    LEADERBOARD_DAILY_REFRESH_MS,
+    nextRefresh.getTime() - now.getTime(),
+  );
 }
 
-function formatTimeframeLabel(timeframe: LeaderboardState['timeframe']): string {
+function formatTimeframeLabel(
+  timeframe: LeaderboardState["timeframe"],
+): string {
   switch (timeframe) {
-    case 'today':
-      return 'Today';
-    case 'week':
-      return 'This week';
-    case 'allTime':
+    case "today":
+      return "Today";
+    case "week":
+      return "This week";
+    case "allTime":
     default:
-      return 'All time';
+      return "All time";
   }
 }
 
 function formatNumber(value: number | undefined): string {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return '0';
-  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(Math.max(0, value));
+  if (typeof value !== "number" || !Number.isFinite(value)) return "0";
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(
+    Math.max(0, value),
+  );
 }
 
 function formatMinutes(value: number | undefined): string | null {
-  if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value <= 0) {
     return null;
   }
 
@@ -65,25 +76,29 @@ function formatMinutes(value: number | undefined): string | null {
 }
 
 function rankIcon(rank: number): React.ReactNode {
-  if (rank === 1) return <Trophy className="h-4 w-4 text-yellow-500" aria-hidden="true" />;
-  if (rank <= 3) return <Medal className="h-4 w-4 text-orange-400" aria-hidden="true" />;
-  return <span className="text-xs font-semibold theme-muted-text">#{rank}</span>;
+  if (rank === 1)
+    return <Trophy className="h-4 w-4 text-yellow-500" aria-hidden="true" />;
+  if (rank <= 3)
+    return <Medal className="h-4 w-4 text-orange-400" aria-hidden="true" />;
+  return (
+    <span className="text-xs font-semibold theme-muted-text">#{rank}</span>
+  );
 }
 
-const LeaderboardRow: React.FC<{ entry: LeaderboardEntry; isStandaloneCurrentUser?: boolean }> = ({
-  entry,
-  isStandaloneCurrentUser = false,
-}) => {
+const LeaderboardRow: React.FC<{
+  entry: LeaderboardEntry;
+  isStandaloneCurrentUser?: boolean;
+}> = ({ entry, isStandaloneCurrentUser = false }) => {
   const minutes = formatMinutes(entry.learningMinutes);
 
   return (
     <div
       className={cn(
-        'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
+        "grid grid-cols-[auto_1fr] gap-x-2 gap-y-2 rounded-lg border px-3 py-2 text-sm transition-colors sm:flex sm:items-center",
         entry.isCurrentUser
-          ? 'border-[var(--lv-accent)]/60 bg-[var(--lv-accent)]/10'
-          : 'theme-border theme-card-highlight',
-        isStandaloneCurrentUser && 'border-dashed'
+          ? "border-[var(--lv-accent)]/60 bg-[var(--lv-accent)]/10"
+          : "theme-border theme-card-highlight",
+        isStandaloneCurrentUser && "border-dashed",
       )}
     >
       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full theme-card-surface">
@@ -91,7 +106,10 @@ const LeaderboardRow: React.FC<{ entry: LeaderboardEntry; isStandaloneCurrentUse
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="truncate font-medium" style={{ color: 'var(--lv-text)' }}>
+          <span
+            className="truncate font-medium"
+            style={{ color: "var(--lv-text)" }}
+          >
             {entry.nickname}
           </span>
           {entry.isCurrentUser && isStandaloneCurrentUser && (
@@ -101,15 +119,15 @@ const LeaderboardRow: React.FC<{ entry: LeaderboardEntry; isStandaloneCurrentUse
           )}
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs theme-muted-text">
-          {typeof entry.streakDays === 'number' && entry.streakDays > 0 && (
+          {typeof entry.streakDays === "number" && entry.streakDays > 0 && (
             <span>{formatNumber(entry.streakDays)} day streak</span>
           )}
           {minutes && <span>{minutes}</span>}
         </div>
       </div>
-      <div className="grid shrink-0 grid-cols-3 gap-2 text-right">
+      <div className="col-span-2 grid grid-cols-3 gap-2 text-right sm:col-span-1 sm:shrink-0">
         <div>
-          <div className="font-semibold" style={{ color: 'var(--lv-heading)' }}>
+          <div className="font-semibold" style={{ color: "var(--lv-heading)" }}>
             {formatNumber(entry.learnedWords)}
           </div>
           <div className="text-[11px] theme-muted-text">learned</div>
@@ -158,27 +176,33 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
     let dailyRefreshTimeout: ReturnType<typeof window.setTimeout> | undefined;
 
     const load = async () => {
-      setState((current) => ({ ...current, isLoading: true, error: undefined }));
+      setState((current) => ({
+        ...current,
+        isLoading: true,
+        error: undefined,
+      }));
       try {
-        const nextState = await getLeaderboardState(currentUserCountsRef.current);
+        const nextState = await getLeaderboardState(
+          currentUserCountsRef.current,
+        );
         if (isMounted) {
           setState(nextState);
         }
       } catch (error) {
-        console.warn('leaderboard:load', error);
+        console.warn("leaderboard:load", error);
         if (isMounted) {
           setState({
-            timeframe: 'allTime',
+            timeframe: "allTime",
             entries: [],
             isLoading: false,
-            error: 'Leaderboard is unavailable right now.',
+            error: "Leaderboard is unavailable right now.",
           });
         }
       }
     };
 
     const scheduleDailyRefresh = () => {
-      if (!isMounted || typeof window === 'undefined') return;
+      if (!isMounted || typeof window === "undefined") return;
 
       dailyRefreshTimeout = window.setTimeout(() => {
         void load().finally(scheduleDailyRefresh);
@@ -198,29 +222,41 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   const entries = state.entries;
   const currentUserOutsideTop = useMemo(() => {
     if (!state.currentUserEntry) return null;
-    const isAlreadyVisible = entries.some((entry) => entry.userKey === state.currentUserEntry?.userKey);
+    const isAlreadyVisible = entries.some(
+      (entry) => entry.userKey === state.currentUserEntry?.userKey,
+    );
     return isAlreadyVisible ? null : state.currentUserEntry;
   }, [entries, state.currentUserEntry]);
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
-      <Card className={cn('mx-auto mt-3 w-full max-w-2xl border-2 theme-card-surface theme-border', className)}>
+      <Card
+        className={cn(
+          "mt-3 w-full border-2 theme-card-surface theme-border",
+          className,
+        )}
+      >
         <CardContent className="p-3">
           <CollapsibleTrigger asChild>
             <button
               type="button"
               className="flex w-full items-center justify-between gap-3 rounded-lg text-left transition-colors hover:bg-[var(--lv-card-highlight)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lv-card-surface)]"
-              aria-label={`${isOpen ? 'Collapse' : 'Expand'} leaderboard`}
+              aria-label={`${isOpen ? "Collapse" : "Expand"} leaderboard`}
             >
               <span className="flex min-w-0 items-center gap-2">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
                   <Users className="h-4 w-4" aria-hidden="true" />
                 </span>
                 <span className="min-w-0">
-                  <span className="block text-sm font-semibold" style={{ color: 'var(--lv-heading)' }}>
+                  <span
+                    className="block text-sm font-semibold"
+                    style={{ color: "var(--lv-heading)" }}
+                  >
                     Leaderboard
                   </span>
-                  <span className="block text-xs theme-muted-text">Top 5 by learned words</span>
+                  <span className="block text-xs theme-muted-text">
+                    Top 5 by learned words
+                  </span>
                 </span>
               </span>
               <span className="flex shrink-0 items-center gap-2">
@@ -228,7 +264,10 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                   {formatTimeframeLabel(state.timeframe)}
                 </span>
                 <ChevronDown
-                  className={cn('h-4 w-4 theme-muted-text transition-transform', isOpen && 'rotate-180')}
+                  className={cn(
+                    "h-4 w-4 theme-muted-text transition-transform",
+                    isOpen && "rotate-180",
+                  )}
                   aria-hidden="true"
                 />
               </span>
@@ -239,7 +278,10 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
             {state.isLoading ? (
               <div className="space-y-2" aria-label="Loading leaderboard">
                 {[0, 1, 2].map((index) => (
-                  <div key={index} className="h-11 animate-pulse rounded-lg theme-card-highlight" />
+                  <div
+                    key={index}
+                    className="h-11 animate-pulse rounded-lg theme-card-highlight"
+                  />
                 ))}
               </div>
             ) : state.error ? (
@@ -253,16 +295,25 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                 ))}
                 {currentUserOutsideTop && (
                   <>
-                    <div className="px-2 text-center text-xs theme-muted-text">...</div>
-                    <LeaderboardRow entry={currentUserOutsideTop} isStandaloneCurrentUser />
+                    <div className="px-2 text-center text-xs theme-muted-text">
+                      ...
+                    </div>
+                    <LeaderboardRow
+                      entry={currentUserOutsideTop}
+                      isStandaloneCurrentUser
+                    />
                   </>
                 )}
               </div>
             ) : state.currentUserEntry ? (
               <div className="space-y-2">
-                <LeaderboardRow entry={state.currentUserEntry} isStandaloneCurrentUser />
+                <LeaderboardRow
+                  entry={state.currentUserEntry}
+                  isStandaloneCurrentUser
+                />
                 <p className="text-xs theme-muted-text">
-                  Sign in or sync progress to compare your score with other learners.
+                  Sign in or sync progress to compare your score with other
+                  learners.
                 </p>
               </div>
             ) : (
