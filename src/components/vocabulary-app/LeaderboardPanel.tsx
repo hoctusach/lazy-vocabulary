@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Medal, Trophy, Users } from 'lucide-react';
+import { ChevronDown, Medal, Trophy, Users } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { NICKNAME_EVENT_NAME } from '@/lib/nicknameEvents';
 import { USER_KEY_EVENT_NAME } from '@/lib/userKeyEvents';
@@ -128,6 +129,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   className,
 }) => {
   const [state, setState] = useState<LeaderboardState>(initialState);
+  const [isOpen, setIsOpen] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
@@ -188,61 +190,77 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   }, [entries, state.currentUserEntry]);
 
   return (
-    <Card className={cn('mx-auto mt-3 w-full max-w-2xl border-2 theme-card-surface theme-border', className)}>
-      <CardContent className="p-3">
-        <div className="mb-2 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
-              <Users className="h-4 w-4" aria-hidden="true" />
-            </div>
-            <div>
-              <h2 className="text-sm font-semibold" style={{ color: 'var(--lv-heading)' }}>
-                Leaderboard
-              </h2>
-              <p className="text-xs theme-muted-text">Top 5 by learned words</p>
-            </div>
-          </div>
-          <span className="shrink-0 rounded-full theme-card-highlight px-2.5 py-1 text-xs font-medium theme-muted-text border theme-border">
-            {formatTimeframeLabel(state.timeframe)}
-          </span>
-        </div>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
+      <Card className={cn('mx-auto mt-3 w-full max-w-2xl border-2 theme-card-surface theme-border', className)}>
+        <CardContent className="p-3">
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-3 rounded-lg text-left transition-colors hover:bg-[var(--lv-card-highlight)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lv-card-surface)]"
+              aria-label={`${isOpen ? 'Collapse' : 'Expand'} leaderboard`}
+            >
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
+                  <Users className="h-4 w-4" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold" style={{ color: 'var(--lv-heading)' }}>
+                    Leaderboard
+                  </span>
+                  <span className="block text-xs theme-muted-text">Top 5 by learned words</span>
+                </span>
+              </span>
+              <span className="flex shrink-0 items-center gap-2">
+                <span className="rounded-full theme-card-highlight px-2.5 py-1 text-xs font-medium theme-muted-text border theme-border">
+                  {formatTimeframeLabel(state.timeframe)}
+                </span>
+                <ChevronDown
+                  className={cn('h-4 w-4 theme-muted-text transition-transform', isOpen && 'rotate-180')}
+                  aria-hidden="true"
+                />
+              </span>
+            </button>
+          </CollapsibleTrigger>
 
-        {state.isLoading ? (
-          <div className="space-y-2" aria-label="Loading leaderboard">
-            {[0, 1, 2].map((index) => (
-              <div key={index} className="h-11 animate-pulse rounded-lg theme-card-highlight" />
-            ))}
-          </div>
-        ) : state.error ? (
-          <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-800 dark:text-yellow-100">
-            {state.error}
-          </div>
-        ) : entries.length > 0 ? (
-          <div className="space-y-1.5">
-            {entries.map((entry) => (
-              <LeaderboardRow key={entry.userKey} entry={entry} />
-            ))}
-            {currentUserOutsideTop && (
-              <>
-                <div className="px-2 text-center text-xs theme-muted-text">...</div>
-                <LeaderboardRow entry={currentUserOutsideTop} isStandaloneCurrentUser />
-              </>
+          <CollapsibleContent className="pt-2">
+            {state.isLoading ? (
+              <div className="space-y-2" aria-label="Loading leaderboard">
+                {[0, 1, 2].map((index) => (
+                  <div key={index} className="h-11 animate-pulse rounded-lg theme-card-highlight" />
+                ))}
+              </div>
+            ) : state.error ? (
+              <div className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-sm text-yellow-800 dark:text-yellow-100">
+                {state.error}
+              </div>
+            ) : entries.length > 0 ? (
+              <div className="space-y-1.5">
+                {entries.map((entry) => (
+                  <LeaderboardRow key={entry.userKey} entry={entry} />
+                ))}
+                {currentUserOutsideTop && (
+                  <>
+                    <div className="px-2 text-center text-xs theme-muted-text">...</div>
+                    <LeaderboardRow entry={currentUserOutsideTop} isStandaloneCurrentUser />
+                  </>
+                )}
+              </div>
+            ) : state.currentUserEntry ? (
+              <div className="space-y-2">
+                <LeaderboardRow entry={state.currentUserEntry} isStandaloneCurrentUser />
+                <p className="text-xs theme-muted-text">
+                  Sign in or sync progress to compare your score with other learners.
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg theme-card-highlight px-3 py-3 text-sm theme-muted-text border theme-border">
+                Start learning words to appear on the leaderboard.
+              </div>
             )}
-          </div>
-        ) : state.currentUserEntry ? (
-          <div className="space-y-2">
-            <LeaderboardRow entry={state.currentUserEntry} isStandaloneCurrentUser />
-            <p className="text-xs theme-muted-text">
-              Sign in or sync progress to compare your score with other learners.
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-lg theme-card-highlight px-3 py-3 text-sm theme-muted-text border theme-border">
-            Start learning words to appear on the leaderboard.
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          </CollapsibleContent>
+        </CardContent>
+      </Card>
+    </Collapsible>
   );
 };
 
