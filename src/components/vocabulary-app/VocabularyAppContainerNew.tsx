@@ -20,6 +20,7 @@ interface VocabularyAppContainerNewProps {
   onOpenSearch: (word?: string) => void;
   dailySelection?: DailySelection | null;
   isLoadingSelection?: boolean;
+  currentUserLearnedCount?: number;
 }
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
@@ -29,6 +30,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   onOpenSearch,
   dailySelection,
   isLoadingSelection = false,
+  currentUserLearnedCount,
 }) => {
   // Use stable state management
   const {
@@ -66,7 +68,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     return currentWord
       ? { word: currentWord.word, category: currentWord.category || currentCategory }
       : null;
-  }, [currentWord?.word, currentWord?.category, currentCategory]);
+  }, [currentWord, currentCategory]);
 
   const debugInfo = useMemo(() => ({
     isMuted,
@@ -172,6 +174,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
             onOpenSearch={onOpenSearch}
+            currentUserLearnedCount={currentUserLearnedCount}
           />
         </div>
       </VocabularyLayout>
