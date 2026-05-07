@@ -128,7 +128,8 @@ function learningMinutesFromHours(value: unknown): number | undefined {
 function sortLeaderboardEntries(entries: LeaderboardEntry[]): LeaderboardEntry[] {
   return [...entries].sort((a, b) => {
     if (b.learnedWords !== a.learnedWords) return b.learnedWords - a.learnedWords;
-    return (b.learningMinutes ?? 0) - (a.learningMinutes ?? 0);
+    if (b.learningWords !== a.learningWords) return b.learningWords - a.learningWords;
+    return a.nickname.localeCompare(b.nickname, undefined, { sensitivity: 'base' });
   });
 }
 
@@ -161,7 +162,7 @@ async function fetchLeaderboardRows(limit: number): Promise<LeaderboardRow[]> {
       .from('user_progress_summary')
       .select('user_unique_key, learned_count, learning_count, learning_due_count, learning_time, learned_days, updated_at')
       .order('learned_count', { ascending: false })
-      .order('learning_time', { ascending: false })
+      .order('learning_count', { ascending: false })
       .limit(limit);
 
     if (error) {
@@ -239,7 +240,7 @@ export async function getLeaderboardState(
   const limit = Math.max(1, Math.trunc(options.limit ?? DEFAULT_LIMIT));
   const { userKey, nickname } = await resolveCurrentIdentity();
   const rows = await fetchLeaderboardRows(limit);
-  const rankedEntries = applyRanks(rowsToEntries(rows, userKey));
+  let rankedEntries = applyRanks(rowsToEntries(rows, userKey));
 
   let currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser);
 
@@ -253,11 +254,10 @@ export async function getLeaderboardState(
       options.currentUserLearningCount,
       options.currentUserDueCount
     );
-
-    const entriesWithCurrentUser = applyRanks([...rankedEntries, currentUserEntry]);
-    currentUserEntry = entriesWithCurrentUser.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
+    rankedEntries = applyRanks([...rankedEntries, currentUserEntry]);
+    currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
   } else if (currentUserEntry && typeof options.currentUserLearnedCount === 'number') {
-    const entriesWithCurrentUser = applyRanks(
+    rankedEntries = applyRanks(
       rankedEntries.map((entry) =>
         entry.isCurrentUser
           ? {
@@ -269,13 +269,7 @@ export async function getLeaderboardState(
           : entry
       )
     );
-    currentUserEntry = entriesWithCurrentUser.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
-    return {
-      timeframe: 'allTime',
-      entries: entriesWithCurrentUser.slice(0, limit),
-      currentUserEntry,
-      isLoading: false,
-    };
+    currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
   }
 
   return {

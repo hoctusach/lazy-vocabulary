@@ -84,7 +84,7 @@ const LeaderboardRow: React.FC<{ entry: LeaderboardEntry; isStandaloneCurrentUse
           <span className="truncate font-medium" style={{ color: 'var(--lv-text)' }}>
             {entry.nickname}
           </span>
-          {entry.isCurrentUser && (
+          {entry.isCurrentUser && isStandaloneCurrentUser && (
             <span className="shrink-0 rounded-full bg-[var(--lv-accent)]/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--lv-accent)]">
               You
             </span>
@@ -224,7 +224,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
             ))}
             {currentUserOutsideTop && (
               <>
-                <div className="px-2 text-center text-xs theme-muted-text">•••</div>
+                <div className="px-2 text-center text-xs theme-muted-text">...</div>
                 <LeaderboardRow entry={currentUserOutsideTop} isStandaloneCurrentUser />
               </>
             )}
