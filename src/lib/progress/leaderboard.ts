@@ -25,6 +25,13 @@ export type LeaderboardState = {
   error?: string;
 };
 
+type LearnedWordsLeaderboardRow = {
+  user_unique_key?: unknown;
+  srs_state?: unknown;
+  in_review_queue?: unknown;
+  next_review_at?: unknown;
+};
+
 type LeaderboardRow = {
   user_unique_key?: unknown;
   nickname?: unknown;
@@ -155,22 +162,71 @@ async function resolveCurrentIdentity(): Promise<{ userKey: string | null; nickn
   return { userKey, nickname: nickname || null };
 }
 
+function isDueFromTimestamp(value: unknown, now = Date.now()): boolean {
+  if (typeof value !== 'string') return false;
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return false;
+  return parsed <= now;
+}
+
+function resolveLearningState(row: LearnedWordsLeaderboardRow): 'learned' | 'learning' | null {
+  const state = typeof row.srs_state === 'string' ? row.srs_state.trim().toLowerCase() : '';
+  if (state === 'learned' || state === 'learning') return state;
+  if (typeof row.in_review_queue === 'boolean') return row.in_review_queue ? 'learning' : 'learned';
+  return null;
+}
+
+function aggregateLearnedWordRows(rows: LearnedWordsLeaderboardRow[]): LeaderboardRow[] {
+  const byUser = new Map<string, { learned: number; learning: number; due: number }>();
+
+  rows.forEach((row) => {
+    const userKey = typeof row.user_unique_key === 'string' ? row.user_unique_key.trim() : '';
+    if (!userKey) return;
+
+    const state = resolveLearningState(row);
+    if (!state) return;
+
+    const counts = byUser.get(userKey) ?? { learned: 0, learning: 0, due: 0 };
+    if (state === 'learned') {
+      counts.learned += 1;
+    } else {
+      counts.learning += 1;
+      if (isDueFromTimestamp(row.next_review_at)) {
+        counts.due += 1;
+      }
+    }
+    byUser.set(userKey, counts);
+  });
+
+  return Array.from(byUser.entries()).map(([userKey, counts]) => ({
+    user_unique_key: userKey,
+    learned_count: counts.learned,
+    learning_count: counts.learning,
+    learning_due_count: counts.due,
+  }));
+}
+
 async function fetchLeaderboardRows(limit: number): Promise<LeaderboardRow[]> {
   try {
     const client = getSupabaseClient();
     const { data, error } = await client
-      .from('user_progress_summary')
-      .select('user_unique_key, learned_count, learning_count, learning_due_count, learning_time, learned_days, updated_at')
-      .order('learned_count', { ascending: false })
-      .order('learning_count', { ascending: false })
-      .limit(limit);
+      .from('learned_words')
+      .select('user_unique_key, srs_state, in_review_queue, next_review_at');
 
     if (error) {
       console.warn('leaderboard:fetchTop', error.message);
       return [];
     }
 
-    return Array.isArray(data) ? (data as LeaderboardRow[]) : [];
+    const learnedWordRows = Array.isArray(data) ? (data as LearnedWordsLeaderboardRow[]) : [];
+    return sortLeaderboardEntries(rowsToEntries(aggregateLearnedWordRows(learnedWordRows), null))
+      .slice(0, limit)
+      .map((entry) => ({
+        user_unique_key: entry.userKey,
+        learned_count: entry.learnedWords,
+        learning_count: entry.learningWords,
+        learning_due_count: entry.dueWords,
+      }));
   } catch (error) {
     console.warn('leaderboard:fetchTop', error);
     return [];
