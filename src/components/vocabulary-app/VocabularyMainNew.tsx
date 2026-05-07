@@ -4,6 +4,7 @@ import { ReadonlyWord } from '@/types/vocabulary';
 import VocabularyCardNew from './VocabularyCardNew';
 import { useBackgroundColor } from './useBackgroundColor';
 import VocabularyControlsColumn from './VocabularyControlsColumn';
+import LeaderboardPanel from './LeaderboardPanel';
 
 interface VocabularyMainNewProps {
   currentWord: ReadonlyWord | null;
@@ -20,6 +21,7 @@ interface VocabularyMainNewProps {
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
+  currentUserLearnedCount?: number;
   emptyState?: {
     word: string;
     meaning: string;
@@ -44,6 +46,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   playCurrentWord,
   onMarkWordLearned,
   onOpenSearch,
+  currentUserLearnedCount,
   emptyState
   }) => {
   const { backgroundColor } = useBackgroundColor();
@@ -69,6 +72,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             category={categoryToDisplay}
             showWordCount={shouldShowWordCount}
           />
+          <LeaderboardPanel currentUserLearnedCount={currentUserLearnedCount} />
         </div>
 
       {/* Controls column - positioned on the right side */}
