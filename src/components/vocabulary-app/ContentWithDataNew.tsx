@@ -1,7 +1,8 @@
-import React from 'react';
-import { Speaker } from 'lucide-react';
-import type { ReadonlyWord } from '@/types/vocabulary';
-import VocabularyMainNew from './VocabularyMainNew';
+import React from "react";
+import { Speaker } from "lucide-react";
+import type { ReadonlyWord } from "@/types/vocabulary";
+import VocabularyMainNew from "./VocabularyMainNew";
+import LeaderboardPanel from "./LeaderboardPanel";
 
 interface ContentWithDataNewProps {
   displayWord: ReadonlyWord | null;
@@ -48,7 +49,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   currentUserLearningCount,
   currentUserDueCount,
   additionalContent,
-  emptyState
+  emptyState,
 }) => {
   return (
     <>
@@ -68,6 +69,9 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         playCurrentWord={playCurrentWord}
         onMarkWordLearned={onMarkWordLearned}
         onOpenSearch={onOpenSearch}
+      />
+
+      <LeaderboardPanel
         currentUserLearnedCount={currentUserLearnedCount}
         currentUserLearningCount={currentUserLearningCount}
         currentUserDueCount={currentUserDueCount}
@@ -77,7 +81,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
 
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
-        <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
+        <p>
+          ⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or
+          any button (e.g. Next) to enable it.
+        </p>
         <p className="flex items-start gap-2 mt-1">
           <Speaker
             aria-hidden="true"
@@ -85,13 +92,11 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
             strokeWidth={2.4}
           />
           <span className="leading-snug">
-            As this is free app, there are some free voices by device and browser — please pick your preferred one!
+            As this is free app, there are some free voices by device and
+            browser — please pick your preferred one!
           </span>
         </p>
       </div>
-
-
-      
     </>
   );
 };
