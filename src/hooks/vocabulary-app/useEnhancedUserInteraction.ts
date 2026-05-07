@@ -6,7 +6,8 @@ import {
   setupUserInteractionListeners,
   markUserInteraction,
   resetUserInteraction,
-  loadUserInteractionState
+  loadUserInteractionState,
+  hasAudioUnlockedThisSession
 } from '@/utils/userInteraction';
 
 interface UseEnhancedUserInteractionProps {
@@ -29,16 +30,14 @@ export const useEnhancedUserInteraction = ({
   const handleInteraction = useCallback(async () => {
     setInteractionCount(c => c + 1);
     markUserInteraction();
-    if (!hasInitialized || !isAudioUnlocked) {
-      await initializeSpeechSystem();
-      if (!hasInitialized) {
-        setHasInitialized(true);
-      }
+    await initializeSpeechSystem();
+    if (!hasInitialized) {
+      setHasInitialized(true);
     }
     setIsAudioUnlocked(true);
     onUserInteraction?.();
     playCurrentWord?.();
-  }, [hasInitialized, isAudioUnlocked, onUserInteraction, playCurrentWord]);
+  }, [hasInitialized, onUserInteraction, playCurrentWord]);
 
   useEffect(() => {
     setupUserInteractionListeners();
@@ -54,12 +53,14 @@ export const useEnhancedUserInteraction = ({
     };
   }, [handleInteraction]);
 
-  // Detect prior interaction to optionally skip showing the prompt
+  // Detect prior interaction for UI state only. A browser audio unlock still
+  // requires a fresh gesture in the current page session.
   useEffect(() => {
     if (loadUserInteractionState()) {
-      setIsAudioUnlocked(true);
-      setHasInitialized(true);
-      console.log('[USER-INTERACTION] Previous interaction detected');
+      const unlockedThisSession = hasAudioUnlockedThisSession();
+      setIsAudioUnlocked(unlockedThisSession);
+      setHasInitialized(unlockedThisSession);
+      console.log('[USER-INTERACTION] Previous interaction detected; waiting for a fresh gesture to unlock audio');
     }
   }, []);
 
@@ -69,7 +70,6 @@ export const useEnhancedUserInteraction = ({
       setHasInitialized(false);
       resetUserInteraction();
     };
-    const resume = () => handleInteraction();
     window.addEventListener('speechblocked', blocked);
     return () => {
       window.removeEventListener('speechblocked', blocked);

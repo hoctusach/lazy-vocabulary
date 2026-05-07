@@ -1,4 +1,6 @@
 let userInteracted = false;
+let audioUnlockedThisSession = false;
+let interactionListenersRegistered = false;
 
 export const loadUserInteractionState = () => {
   try {
@@ -16,6 +18,8 @@ export const markUserInteraction = () => {
 
 export const resetUserInteraction = () => {
   userInteracted = false;
+  audioUnlockedThisSession = false;
+  interactionListenersRegistered = false;
   try {
     localStorage.setItem('speechUnlocked', 'false');
   } catch { /* ignore */ }
@@ -23,9 +27,15 @@ export const resetUserInteraction = () => {
 
 export const hasUserInteracted = () => userInteracted;
 
+export const hasAudioUnlockedThisSession = () => audioUnlockedThisSession;
+
 export const setupUserInteractionListeners = () => {
+  if (audioUnlockedThisSession || interactionListenersRegistered) return;
+
   const enableAudio = () => {
-    if (userInteracted) return;
+    interactionListenersRegistered = false;
+    if (audioUnlockedThisSession) return;
+    audioUnlockedThisSession = true;
     markUserInteraction();
     try {
       if (speechSynthesis.speaking) {
@@ -39,11 +49,7 @@ export const setupUserInteractionListeners = () => {
     }
   };
 
-  if (userInteracted) {
-    enableAudio();
-    return;
-  }
-
+  interactionListenersRegistered = true;
   const listenerOptions: AddEventListenerOptions = { once: true, capture: true };
   document.addEventListener('click', enableAudio, listenerOptions);
   document.addEventListener('keydown', enableAudio, listenerOptions);
