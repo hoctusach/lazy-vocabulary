@@ -21,6 +21,8 @@ interface VocabularyAppContainerNewProps {
   dailySelection?: DailySelection | null;
   isLoadingSelection?: boolean;
   currentUserLearnedCount?: number;
+  currentUserLearningCount?: number;
+  currentUserDueCount?: number;
 }
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
@@ -31,6 +33,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   dailySelection,
   isLoadingSelection = false,
   currentUserLearnedCount,
+  currentUserLearningCount,
+  currentUserDueCount,
 }) => {
   // Use stable state management
   const {
@@ -175,6 +179,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             additionalContent={additionalContent}
             onOpenSearch={onOpenSearch}
             currentUserLearnedCount={currentUserLearnedCount}
+            currentUserLearningCount={currentUserLearningCount}
+            currentUserDueCount={currentUserDueCount}
           />
         </div>
       </VocabularyLayout>

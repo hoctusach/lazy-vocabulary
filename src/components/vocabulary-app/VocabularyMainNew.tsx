@@ -22,6 +22,8 @@ interface VocabularyMainNewProps {
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
   currentUserLearnedCount?: number;
+  currentUserLearningCount?: number;
+  currentUserDueCount?: number;
   emptyState?: {
     word: string;
     meaning: string;
@@ -47,6 +49,8 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   onMarkWordLearned,
   onOpenSearch,
   currentUserLearnedCount,
+  currentUserLearningCount,
+  currentUserDueCount,
   emptyState
   }) => {
   const { backgroundColor } = useBackgroundColor();
@@ -72,7 +76,11 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
             category={categoryToDisplay}
             showWordCount={shouldShowWordCount}
           />
-          <LeaderboardPanel currentUserLearnedCount={currentUserLearnedCount} />
+          <LeaderboardPanel
+            currentUserLearnedCount={currentUserLearnedCount}
+            currentUserLearningCount={currentUserLearningCount}
+            currentUserDueCount={currentUserDueCount}
+          />
         </div>
 
       {/* Controls column - positioned on the right side */}

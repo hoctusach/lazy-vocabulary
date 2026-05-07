@@ -10,6 +10,8 @@ export type LeaderboardEntry = {
   nickname: string;
   rank: number;
   learnedWords: number;
+  learningWords: number;
+  dueWords: number;
   streakDays?: number;
   learningMinutes?: number;
   isCurrentUser?: boolean;
@@ -28,6 +30,8 @@ type LeaderboardRow = {
   nickname?: unknown;
   name?: unknown;
   learned_count?: unknown;
+  learning_count?: unknown;
+  learning_due_count?: unknown;
   learning_time?: unknown;
   learned_days?: unknown;
   updated_at?: unknown;
@@ -36,6 +40,8 @@ type LeaderboardRow = {
 type LeaderboardOptions = {
   limit?: number;
   currentUserLearnedCount?: number;
+  currentUserLearningCount?: number;
+  currentUserDueCount?: number;
 };
 
 const DEFAULT_LIMIT = 5;
@@ -153,7 +159,7 @@ async function fetchLeaderboardRows(limit: number): Promise<LeaderboardRow[]> {
     const client = getSupabaseClient();
     const { data, error } = await client
       .from('user_progress_summary')
-      .select('user_unique_key, learned_count, learning_time, learned_days, updated_at')
+      .select('user_unique_key, learned_count, learning_count, learning_due_count, learning_time, learned_days, updated_at')
       .order('learned_count', { ascending: false })
       .order('learning_time', { ascending: false })
       .limit(limit);
@@ -182,6 +188,8 @@ function rowsToEntries(rows: LeaderboardRow[], currentUserKey: string | null): L
         nickname: displayNameFromRow(row, userKey),
         rank: 0,
         learnedWords: toPositiveInteger(row.learned_count),
+        learningWords: toPositiveInteger(row.learning_count),
+        dueWords: toPositiveInteger(row.learning_due_count),
         streakDays: calculateCurrentStreak(learnedDays),
         learningMinutes: learningMinutesFromHours(row.learning_time),
         isCurrentUser: currentUserKey ? userKey === currentUserKey : false,
@@ -201,7 +209,9 @@ async function buildCurrentUserEntry(
   userKey: string,
   nickname: string | null,
   rank: number,
-  learnedOverride?: number
+  learnedOverride?: number,
+  learningOverride?: number,
+  dueOverride?: number
 ): Promise<LeaderboardEntry> {
   let summary: Awaited<ReturnType<typeof getProgressSummary>> = null;
   try {
@@ -215,6 +225,8 @@ async function buildCurrentUserEntry(
     nickname: nickname || userKey,
     rank,
     learnedWords: toPositiveInteger(learnedOverride ?? summary?.learned_count),
+    learningWords: toPositiveInteger(learningOverride ?? summary?.learning_count),
+    dueWords: toPositiveInteger(dueOverride ?? summary?.learning_due_count),
     streakDays: calculateCurrentStreak(learnedDays),
     learningMinutes: learningMinutesFromHours(summary?.learning_time),
     isCurrentUser: true,
@@ -237,7 +249,9 @@ export async function getLeaderboardState(
       userKey,
       nickname,
       optimisticRank,
-      options.currentUserLearnedCount
+      options.currentUserLearnedCount,
+      options.currentUserLearningCount,
+      options.currentUserDueCount
     );
 
     const entriesWithCurrentUser = applyRanks([...rankedEntries, currentUserEntry]);
@@ -246,7 +260,12 @@ export async function getLeaderboardState(
     const entriesWithCurrentUser = applyRanks(
       rankedEntries.map((entry) =>
         entry.isCurrentUser
-          ? { ...entry, learnedWords: toPositiveInteger(options.currentUserLearnedCount) }
+          ? {
+              ...entry,
+              learnedWords: toPositiveInteger(options.currentUserLearnedCount),
+              learningWords: toPositiveInteger(options.currentUserLearningCount, entry.learningWords),
+              dueWords: toPositiveInteger(options.currentUserDueCount, entry.dueWords),
+            }
           : entry
       )
     );
