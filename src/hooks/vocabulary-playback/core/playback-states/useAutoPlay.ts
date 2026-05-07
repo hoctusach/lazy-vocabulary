@@ -117,13 +117,14 @@ export const useAutoPlay = (
     };
   }, [currentWord, muted, paused, playCurrentWord, guard, delayMs]);
 
-  // Reset tracking when word actually changes
+  // Reset tracking when the word disappears so the same word can auto-play
+  // again after data is reloaded. Do not mark a visible word as played here:
+  // composed guards (audio unlock, data readiness, etc.) may be false on the
+  // first render and become true later for the same word. The word is only
+  // recorded once an auto-play attempt is actually scheduled.
   useEffect(() => {
-    if (currentWord) {
-      const currentWordId = currentWord.word;
-      if (lastWordRef.current !== currentWordId) {
-        lastWordRef.current = currentWordId;
-      }
+    if (!currentWord) {
+      lastWordRef.current = null;
     }
   }, [currentWord]);
 };
