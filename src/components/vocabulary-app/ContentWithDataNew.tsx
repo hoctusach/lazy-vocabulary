@@ -17,6 +17,9 @@ interface ContentWithDataNewProps {
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
+  currentUserLearnedCount?: number;
+  currentUserLearningCount?: number;
+  currentUserDueCount?: number;
   additionalContent?: React.ReactNode;
   emptyState?: {
     word: string;
@@ -41,6 +44,9 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   playCurrentWord,
   onMarkWordLearned,
   onOpenSearch,
+  currentUserLearnedCount,
+  currentUserLearningCount,
+  currentUserDueCount,
   additionalContent,
   emptyState
 }) => {
@@ -62,6 +68,9 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         playCurrentWord={playCurrentWord}
         onMarkWordLearned={onMarkWordLearned}
         onOpenSearch={onOpenSearch}
+        currentUserLearnedCount={currentUserLearnedCount}
+        currentUserLearningCount={currentUserLearningCount}
+        currentUserDueCount={currentUserDueCount}
       />
 
       {additionalContent}
