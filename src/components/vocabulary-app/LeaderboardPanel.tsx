@@ -13,6 +13,8 @@ import {
 
 interface LeaderboardPanelProps {
   currentUserLearnedCount?: number;
+  currentUserLearningCount?: number;
+  currentUserDueCount?: number;
   className?: string;
 }
 
@@ -95,17 +97,36 @@ const LeaderboardRow: React.FC<{ entry: LeaderboardEntry; isStandaloneCurrentUse
           {minutes && <span>{minutes}</span>}
         </div>
       </div>
-      <div className="text-right">
-        <div className="font-semibold" style={{ color: 'var(--lv-heading)' }}>
-          {formatNumber(entry.learnedWords)}
+      <div className="grid shrink-0 grid-cols-3 gap-2 text-right">
+        <div>
+          <div className="font-semibold" style={{ color: 'var(--lv-heading)' }}>
+            {formatNumber(entry.learnedWords)}
+          </div>
+          <div className="text-[11px] theme-muted-text">learned</div>
         </div>
-        <div className="text-[11px] theme-muted-text">learned</div>
+        <div>
+          <div className="font-semibold text-blue-600 dark:text-blue-300">
+            {formatNumber(entry.learningWords)}
+          </div>
+          <div className="text-[11px] theme-muted-text">learning</div>
+        </div>
+        <div>
+          <div className="font-semibold text-red-600 dark:text-red-300">
+            {formatNumber(entry.dueWords)}
+          </div>
+          <div className="text-[11px] theme-muted-text">due</div>
+        </div>
       </div>
     </div>
   );
 };
 
-const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({ currentUserLearnedCount, className }) => {
+const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
+  currentUserLearnedCount,
+  currentUserLearningCount,
+  currentUserDueCount,
+  className,
+}) => {
   const [state, setState] = useState<LeaderboardState>(initialState);
 
   useEffect(() => {
@@ -114,7 +135,11 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({ currentUserLearnedC
     const load = async () => {
       setState((current) => ({ ...current, isLoading: true, error: undefined }));
       try {
-        const nextState = await getLeaderboardState({ currentUserLearnedCount });
+        const nextState = await getLeaderboardState({
+          currentUserLearnedCount,
+          currentUserLearningCount,
+          currentUserDueCount,
+        });
         if (isMounted) {
           setState(nextState);
         }
@@ -153,7 +178,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({ currentUserLearnedC
         window.removeEventListener(USER_KEY_EVENT_NAME, handleRefresh);
       }
     };
-  }, [currentUserLearnedCount]);
+  }, [currentUserDueCount, currentUserLearnedCount, currentUserLearningCount]);
 
   const entries = state.entries;
   const currentUserOutsideTop = useMemo(() => {
@@ -174,7 +199,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({ currentUserLearnedC
               <h2 className="text-sm font-semibold" style={{ color: 'var(--lv-heading)' }}>
                 Leaderboard
               </h2>
-              <p className="text-xs theme-muted-text">Compare learned-word progress</p>
+              <p className="text-xs theme-muted-text">Top 5 by learned words</p>
             </div>
           </div>
           <span className="shrink-0 rounded-full theme-card-highlight px-2.5 py-1 text-xs font-medium theme-muted-text border theme-border">

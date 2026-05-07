@@ -316,6 +316,8 @@ const VocabularyAppWithLearning: React.FC = () => {
           additionalContent={learningSection}
           onOpenSearch={openSearch}
           currentUserLearnedCount={progressStats.learned}
+          currentUserLearningCount={progressStats.learning}
+          currentUserDueCount={progressStats.due}
         />
       </div>
       <MarkAsNewDialog
