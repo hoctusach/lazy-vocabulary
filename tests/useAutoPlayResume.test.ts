@@ -59,4 +59,27 @@ describe('useAutoPlay resume', () => {
     vi.advanceTimersByTime(500);
     expect(play).toHaveBeenCalledTimes(1);
   });
+
+  it('auto-plays current word when a composition guard becomes true', () => {
+    const play = vi.fn();
+    const guard = vi.fn((allowed: boolean) => allowed);
+    const { rerender } = renderHook(({ currentWord, allowed }) =>
+      useAutoPlay(currentWord, false, false, play, {
+        guard: () => guard(allowed),
+        delayMs: 100,
+      }),
+      { initialProps: { currentWord: word, allowed: false } }
+    );
+
+    vi.advanceTimersByTime(150);
+    expect(play).not.toHaveBeenCalled();
+
+    act(() => {
+      rerender({ currentWord: word, allowed: true });
+    });
+
+    vi.advanceTimersByTime(150);
+    expect(play).toHaveBeenCalledTimes(1);
+  });
+
 });
