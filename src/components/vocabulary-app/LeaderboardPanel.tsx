@@ -1,11 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, Medal, Trophy, Users } from 'lucide-react';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
-import { NICKNAME_EVENT_NAME } from '@/lib/nicknameEvents';
-import { USER_KEY_EVENT_NAME } from '@/lib/userKeyEvents';
 import {
   getLeaderboardState,
   type LeaderboardEntry,
@@ -24,6 +22,17 @@ const initialState: LeaderboardState = {
   entries: [],
   isLoading: true,
 };
+
+const LEADERBOARD_DAILY_REFRESH_MS = 24 * 60 * 60 * 1000;
+
+function getMillisecondsUntilNextDailyRefresh(): number {
+  const now = new Date();
+  const nextRefresh = new Date(now);
+  nextRefresh.setDate(now.getDate() + 1);
+  nextRefresh.setHours(0, 0, 0, 0);
+
+  return Math.max(LEADERBOARD_DAILY_REFRESH_MS, nextRefresh.getTime() - now.getTime());
+}
 
 function formatTimeframeLabel(timeframe: LeaderboardState['timeframe']): string {
   switch (timeframe) {
@@ -130,18 +139,28 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
 }) => {
   const [state, setState] = useState<LeaderboardState>(initialState);
   const [isOpen, setIsOpen] = useState(true);
+  const currentUserCountsRef = useRef({
+    currentUserLearnedCount,
+    currentUserLearningCount,
+    currentUserDueCount,
+  });
+
+  useEffect(() => {
+    currentUserCountsRef.current = {
+      currentUserLearnedCount,
+      currentUserLearningCount,
+      currentUserDueCount,
+    };
+  }, [currentUserDueCount, currentUserLearnedCount, currentUserLearningCount]);
 
   useEffect(() => {
     let isMounted = true;
+    let dailyRefreshTimeout: ReturnType<typeof window.setTimeout> | undefined;
 
     const load = async () => {
       setState((current) => ({ ...current, isLoading: true, error: undefined }));
       try {
-        const nextState = await getLeaderboardState({
-          currentUserLearnedCount,
-          currentUserLearningCount,
-          currentUserDueCount,
-        });
+        const nextState = await getLeaderboardState(currentUserCountsRef.current);
         if (isMounted) {
           setState(nextState);
         }
@@ -158,29 +177,23 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
       }
     };
 
-    void load();
+    const scheduleDailyRefresh = () => {
+      if (!isMounted || typeof window === 'undefined') return;
 
-    const handleRefresh = () => {
-      void load();
+      dailyRefreshTimeout = window.setTimeout(() => {
+        void load().finally(scheduleDailyRefresh);
+      }, getMillisecondsUntilNextDailyRefresh());
     };
 
-    if (typeof window !== 'undefined') {
-      window.addEventListener('focus', handleRefresh);
-      window.addEventListener('storage', handleRefresh);
-      window.addEventListener(NICKNAME_EVENT_NAME, handleRefresh);
-      window.addEventListener(USER_KEY_EVENT_NAME, handleRefresh);
-    }
+    void load().finally(scheduleDailyRefresh);
 
     return () => {
       isMounted = false;
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('focus', handleRefresh);
-        window.removeEventListener('storage', handleRefresh);
-        window.removeEventListener(NICKNAME_EVENT_NAME, handleRefresh);
-        window.removeEventListener(USER_KEY_EVENT_NAME, handleRefresh);
+      if (dailyRefreshTimeout) {
+        window.clearTimeout(dailyRefreshTimeout);
       }
     };
-  }, [currentUserDueCount, currentUserLearnedCount, currentUserLearningCount]);
+  }, []);
 
   const entries = state.entries;
   const currentUserOutsideTop = useMemo(() => {
