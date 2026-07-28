@@ -6,8 +6,12 @@ export function loadPracticeHistory(): PracticeAttempt[] {
   if (typeof localStorage === 'undefined') return [];
   const raw = localStorage.getItem(PRACTICE_HISTORY_KEY);
   if (!raw) return [];
-  const parsed = JSON.parse(raw);
-  return Array.isArray(parsed) ? parsed : [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
 }
 
 export function savePracticeAttempt(attempt: PracticeAttempt): PracticeAttempt[] {

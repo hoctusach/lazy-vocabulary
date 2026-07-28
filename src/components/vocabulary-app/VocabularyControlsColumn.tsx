@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Volume2,
@@ -11,6 +12,7 @@ import {
   Search,
   CheckCircle,
   Dumbbell,
+  ExternalLink,
 } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
@@ -200,6 +202,22 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Search size={16} />
       </Button>
 
+
+
+      {currentWord && (
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
+          title="Vocabulary Detail"
+          aria-label="Vocabulary Detail"
+        >
+          <Link to={`/vocabulary/${encodeURIComponent(currentWord.word)}`}>
+            <ExternalLink size={16} />
+          </Link>
+        </Button>
+      )}
 
       {onOpenPractice && (
         <Button
