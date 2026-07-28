@@ -7,6 +7,7 @@ import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Dev from "./pages/Dev";
+import VocabularyDetailPage from "./pages/vocabulary/VocabularyDetailPage";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import AuthGate from "./components/AuthGate";
@@ -49,6 +50,7 @@ const App = () => {
           <AnalyticsRouteTracker />
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/vocabulary/:word" element={<VocabularyDetailPage />} />
             {process.env.NODE_ENV !== "production" && (
               <Route path="/dev" element={<Dev />} />
             )}
