@@ -10,6 +10,7 @@ import {
   Speaker,
   Search,
   CheckCircle,
+  Dumbbell,
 } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
@@ -33,6 +34,7 @@ interface VocabularyControlsColumnProps {
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string) => void;
   onOpenSearch: (word?: string) => void;
+  onOpenPractice?: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -46,7 +48,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   selectedVoiceName,
   playCurrentWord,
   onMarkWordLearned,
-  onOpenSearch
+  onOpenSearch,
+  onOpenPractice
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -196,6 +199,26 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       >
         <Search size={16} />
       </Button>
+
+
+      {onOpenPractice && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => {
+            trackUiInteraction('practice_dialog_opened', {
+              label: currentWord?.word || '',
+            });
+            onOpenPractice();
+          }}
+          className="h-8 w-8 p-0 border border-purple-200 bg-purple-50 text-purple-700 hover:text-purple-900 dark:border-purple-700 dark:bg-purple-950/50 dark:text-purple-200 dark:hover:text-white"
+          title="Practice"
+          aria-label="Practice"
+          disabled={!currentWord}
+        >
+          <Dumbbell size={16} />
+        </Button>
+      )}
 
       {onMarkWordLearned && (
         <Button
