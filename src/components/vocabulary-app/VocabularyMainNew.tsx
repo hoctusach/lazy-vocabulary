@@ -3,6 +3,7 @@ import { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyCardNew from "./VocabularyCardNew";
 import { useBackgroundColor } from "./useBackgroundColor";
 import VocabularyControlsColumn from "./VocabularyControlsColumn";
+import PracticeDialog from "@/components/practice/PracticeDialog";
 
 interface VocabularyMainNewProps {
   currentWord: ReadonlyWord | null;
@@ -55,6 +56,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
     currentWord?.translation ?? emptyState?.translation;
   const categoryToDisplay = currentWord?.category ?? emptyState?.category ?? "";
   const shouldShowWordCount = showWordCount && Boolean(currentWord);
+  const [isPracticeOpen, setIsPracticeOpen] = React.useState(false);
 
   return (
     <div className="flex flex-row items-start gap-2 sm:gap-4 w-full max-w-5xl mx-auto">
@@ -86,8 +88,14 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           playCurrentWord={playCurrentWord}
           onMarkWordLearned={onMarkWordLearned}
           onOpenSearch={onOpenSearch}
+          onOpenPractice={() => setIsPracticeOpen(true)}
         />
       </div>
+      <PracticeDialog
+        word={currentWord ? { ...currentWord } : null}
+        isOpen={isPracticeOpen}
+        onClose={() => setIsPracticeOpen(false)}
+      />
     </div>
   );
 };
