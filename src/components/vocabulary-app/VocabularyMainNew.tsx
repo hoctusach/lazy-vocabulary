@@ -107,13 +107,13 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           playCurrentWord={playCurrentWord}
           onMarkWordLearned={onMarkWordLearned}
           onOpenSearch={onOpenSearch}
-          onOpenPractice={() => setIsPracticeOpen(true)}
+          onOpenPractice={handleOpenPractice}
         />
       </div>
       <PracticeDialog
         word={currentWord ? { ...currentWord } : null}
         isOpen={isPracticeOpen}
-        onClose={() => setIsPracticeOpen(false)}
+        onClose={handleClosePractice}
       />
     </div>
   );
