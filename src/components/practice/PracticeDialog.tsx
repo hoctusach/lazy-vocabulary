@@ -32,15 +32,18 @@ const PracticeDialog: React.FC<PracticeDialogProps> = ({
   const speechSupported = speechApi.isSupported();
 
   React.useEffect(() => {
-    if (!isOpen) {
-      sessionRef.current?.stop();
-      sessionRef.current = null;
-      setIsRecording(false);
-      setTranscript('');
-      setResult(null);
-      setRecordingError('');
-      setIsResultOpen(false);
+    if (isOpen) {
+      // Stop any ongoing vocabulary playback so recording is not disturbed
+      unifiedSpeechController.stop();
+      return;
     }
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+    setIsRecording(false);
+    setTranscript('');
+    setResult(null);
+    setRecordingError('');
+    setIsResultOpen(false);
   }, [isOpen]);
 
   if (!isOpen || !word) return null;
