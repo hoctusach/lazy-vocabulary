@@ -4,6 +4,7 @@ import VocabularyCardNew from "./VocabularyCardNew";
 import { useBackgroundColor } from "./useBackgroundColor";
 import VocabularyControlsColumn from "./VocabularyControlsColumn";
 import PracticeDialog from "@/components/practice/PracticeDialog";
+import { unifiedSpeechController } from "@/services/speech/unifiedSpeechController";
 
 interface VocabularyMainNewProps {
   currentWord: ReadonlyWord | null;
