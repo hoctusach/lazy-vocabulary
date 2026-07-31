@@ -7,6 +7,7 @@ import type { PracticeEvaluationResult } from '@/features/practice/types';
 import { browserSpeechRecognitionApi, type RecordingSession, type SpeechRecognitionApi } from '@/features/practice/api/speechRecognition';
 import { evaluateAndSavePractice } from '@/features/practice/services/practiceService';
 import ResultPopup from '@/features/practice/components/ResultPopup';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 interface PracticeDialogProps {
   word: VocabularyWord | null;
