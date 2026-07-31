@@ -7,6 +7,7 @@ import type { PracticeEvaluationResult } from '@/features/practice/types';
 import { browserSpeechRecognitionApi, type RecordingSession, type SpeechRecognitionApi } from '@/features/practice/api/speechRecognition';
 import { evaluateAndSavePractice } from '@/features/practice/services/practiceService';
 import ResultPopup from '@/features/practice/components/ResultPopup';
+import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 
 interface PracticeDialogProps {
   word: VocabularyWord | null;
@@ -32,15 +33,18 @@ const PracticeDialog: React.FC<PracticeDialogProps> = ({
   const speechSupported = speechApi.isSupported();
 
   React.useEffect(() => {
-    if (!isOpen) {
-      sessionRef.current?.stop();
-      sessionRef.current = null;
-      setIsRecording(false);
-      setTranscript('');
-      setResult(null);
-      setRecordingError('');
-      setIsResultOpen(false);
+    if (isOpen) {
+      // Stop any ongoing vocabulary playback so recording is not disturbed
+      unifiedSpeechController.stop();
+      return;
     }
+    sessionRef.current?.stop();
+    sessionRef.current = null;
+    setIsRecording(false);
+    setTranscript('');
+    setResult(null);
+    setRecordingError('');
+    setIsResultOpen(false);
   }, [isOpen]);
 
   if (!isOpen || !word) return null;

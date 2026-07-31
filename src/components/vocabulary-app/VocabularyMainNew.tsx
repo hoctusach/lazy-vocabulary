@@ -4,6 +4,7 @@ import VocabularyCardNew from "./VocabularyCardNew";
 import { useBackgroundColor } from "./useBackgroundColor";
 import VocabularyControlsColumn from "./VocabularyControlsColumn";
 import PracticeDialog from "@/components/practice/PracticeDialog";
+import { unifiedSpeechController } from "@/services/speech/unifiedSpeechController";
 
 interface VocabularyMainNewProps {
   currentWord: ReadonlyWord | null;
@@ -57,6 +58,24 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   const categoryToDisplay = currentWord?.category ?? emptyState?.category ?? "";
   const shouldShowWordCount = showWordCount && Boolean(currentWord);
   const [isPracticeOpen, setIsPracticeOpen] = React.useState(false);
+  const wasPlayingBeforePracticeRef = React.useRef(false);
+
+  const handleOpenPractice = React.useCallback(() => {
+    wasPlayingBeforePracticeRef.current = !isPaused;
+    if (!isPaused) {
+      handleTogglePause();
+    }
+    unifiedSpeechController.stop();
+    setIsPracticeOpen(true);
+  }, [isPaused, handleTogglePause]);
+
+  const handleClosePractice = React.useCallback(() => {
+    setIsPracticeOpen(false);
+    if (wasPlayingBeforePracticeRef.current && isPaused) {
+      handleTogglePause();
+    }
+    wasPlayingBeforePracticeRef.current = false;
+  }, [isPaused, handleTogglePause]);
 
   return (
     <div className="flex flex-row items-start gap-2 sm:gap-4 w-full max-w-5xl mx-auto">
@@ -88,13 +107,13 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           playCurrentWord={playCurrentWord}
           onMarkWordLearned={onMarkWordLearned}
           onOpenSearch={onOpenSearch}
-          onOpenPractice={() => setIsPracticeOpen(true)}
+          onOpenPractice={handleOpenPractice}
         />
       </div>
       <PracticeDialog
         word={currentWord ? { ...currentWord } : null}
         isOpen={isPracticeOpen}
-        onClose={() => setIsPracticeOpen(false)}
+        onClose={handleClosePractice}
       />
     </div>
   );
