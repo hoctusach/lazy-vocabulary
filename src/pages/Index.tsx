@@ -3,8 +3,13 @@ import React from 'react';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
+import NotificationManager from '@/components/NotificationManager';
+import { useDailyReminder } from '@/hooks/useDailyReminder';
+import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 
 const Index = () => {
+  useDailyReminder();
+
   return (
     <div className="min-h-screen py-2 transition-colors duration-300">
       <header className="relative mb-2 pt-4 sm:pt-1">
@@ -32,13 +37,15 @@ const Index = () => {
       </header>
 
       <main className="container mx-auto px-2">
+        <FriendCompareCard className="mb-2" />
         <VocabularyAppWithLearning />
       </main>
 
       <footer className="mt-4 text-center text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
         <UserGreeting />
-        <div className="mt-2 flex justify-center">
+        <div className="mt-2 flex justify-center items-center gap-2">
           <ThemeSwitcher />
+          <NotificationManager />
         </div>
         <p className="mt-2">© 2025 Lazy Vocabulary - hoctusach@gmail.com</p>
       </footer>

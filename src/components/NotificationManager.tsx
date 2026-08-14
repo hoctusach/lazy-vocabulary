@@ -1,186 +1,80 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { Bell, BellOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { VocabularyWord } from '@/types/vocabulary';
-import { speak, formatSpeechText } from '@/utils/speech';
 
-const requestNotificationPermission = async () => {
+async function requestNotificationPermission(): Promise<NotificationPermission | 'unsupported'> {
   if (!('Notification' in window)) {
     return 'unsupported';
   }
-  
-  if (Notification.permission === 'granted') {
-    return 'granted';
-  }
-  
-  if (Notification.permission === 'denied') {
-    return 'denied';
-  }
-  
-  const result = await Notification.requestPermission();
-  return result;
-};
 
-interface NotificationManagerProps {
-  onNotificationsEnabled: () => void;
-  currentWord?: VocabularyWord | null;
+  if (Notification.permission === 'granted' || Notification.permission === 'denied') {
+    return Notification.permission;
+  }
+
+  return Notification.requestPermission();
 }
 
-const NotificationManager: React.FC<NotificationManagerProps> = ({
-  onNotificationsEnabled,
-  currentWord
-}) => {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [permissionState, setPermissionState] = useState<string>('default');
+/**
+ * A small settings toggle that requests permission for the daily reminder
+ * (see useDailyReminder). It does not send notifications itself.
+ */
+const NotificationManager: React.FC<{ className?: string }> = ({ className }) => {
+  const [permissionState, setPermissionState] = useState<NotificationPermission | 'unsupported'>('default');
   const { toast } = useToast();
-  
+
   useEffect(() => {
-    const checkPermission = async () => {
-      if ('Notification' in window) {
-        const permission = Notification.permission;
-        setPermissionState(permission);
-        setNotificationsEnabled(permission === 'granted');
-      } else {
-        setPermissionState('unsupported');
-      }
-    };
-    
-    checkPermission();
+    if ('Notification' in window) {
+      setPermissionState(Notification.permission);
+    } else {
+      setPermissionState('unsupported');
+    }
   }, []);
-  
-  useEffect(() => {
-    if (notificationsEnabled) {
-      const registerServiceWorker = async () => {
-        if ('serviceWorker' in navigator) {
-          try {
-            const registration = await navigator.serviceWorker.register('/sw.js');
-            console.log('Service Worker registered with scope:', registration.scope);
-          } catch (error) {
-            console.error('Service Worker registration failed:', error);
-          }
-        }
-      };
-      
-      registerServiceWorker();
-    }
-  }, [notificationsEnabled]);
-  
-  const handleEnableNotifications = async () => {
-    const permission = await requestNotificationPermission();
-    
-    setPermissionState(permission);
-    
-    if (permission === 'granted') {
-      setNotificationsEnabled(true);
-      onNotificationsEnabled();
-      
-      const notification = new Notification('Vocabulary Notifications Enabled', {
-        body: 'You will now receive vocabulary notifications.',
-        icon: '/favicon.ico'
-      });
-      
-      setTimeout(() => notification.close(), 4000);
-      
-    } else if (permission === 'denied') {
+
+  if (permissionState === 'unsupported') return null;
+
+  const enabled = permissionState === 'granted';
+
+  const handleClick = async () => {
+    if (enabled) {
       toast({
-        title: "Notification Permission Denied",
-        description: "Please enable notifications in your browser settings to receive vocabulary reminders.",
-        variant: "destructive",
+        title: 'Notifications are on',
+        description: 'Manage this in your browser settings to turn it off.',
       });
-    } else if (permission === 'unsupported') {
+      return;
+    }
+
+    const result = await requestNotificationPermission();
+    setPermissionState(result);
+
+    if (result === 'granted') {
       toast({
-        title: "Notifications Not Supported",
-        description: "Your browser doesn't support notifications.",
-        variant: "destructive",
+        title: 'Reminders enabled',
+        description: "We'll nudge you if you haven't learned today's words yet.",
+      });
+    } else if (result === 'denied') {
+      toast({
+        title: 'Notifications blocked',
+        description: 'Enable notifications in your browser settings to get daily reminders.',
+        variant: 'destructive',
       });
     }
   };
-  
-  const handleDisableNotifications = () => {
-    setNotificationsEnabled(false);
-    toast({
-      title: "Notifications Disabled",
-      description: "You will no longer receive vocabulary notifications.",
-    });
-  };
-  
-  const showVocabularyNotification = () => {
-    if (!notificationsEnabled || !currentWord) return;
-    
-    const { word, meaning, example } = currentWord;
-    
-    const notification = new Notification(`Vocabulary: ${word}`, {
-      body: `${meaning}\n\nExample: ${example}`,
-      icon: '/favicon.ico',
-      silent: false
-    });
-    
-    notification.onclick = async () => {
-      notification.close();
-      const fullText = formatSpeechText({ word, meaning, example });
-      await speak(fullText, null);
-    };
-    
-    setTimeout(() => {
-      notification.close();
-    }, 10000);
-  };
-  
-  useEffect(() => {
-    if (currentWord && notificationsEnabled) {
-      const timer = setTimeout(() => {
-        showVocabularyNotification();
-      }, 1000);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [currentWord, notificationsEnabled]);
-  
+
   return (
-    <Card className="w-full max-w-xl mx-auto">
-      <CardContent className="p-2">
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Notifications</h3>
-          
-          <p className="text-sm text-gray-500">
-            {notificationsEnabled
-              ? "Vocabulary notifications are enabled. You'll receive notifications even when the browser is minimized."
-              : "Enable notifications to receive vocabulary reminders even when your browser is minimized."}
-          </p>
-          
-          <Button
-            variant={notificationsEnabled ? "outline" : "default"}
-            className="w-full flex justify-center items-center gap-2"
-            onClick={notificationsEnabled ? handleDisableNotifications : handleEnableNotifications}
-            disabled={permissionState === 'unsupported'}
-          >
-            {notificationsEnabled ? (
-              <>
-                <BellOff size={16} /> Disable Notifications
-              </>
-            ) : (
-              <>
-                <Bell size={16} /> Enable Notifications
-              </>
-            )}
-          </Button>
-          
-          {permissionState === 'unsupported' && (
-            <p className="text-xs text-red-500 mt-2">
-              Your browser doesn't support notifications.
-            </p>
-          )}
-          
-          {permissionState === 'denied' && (
-            <p className="text-xs text-amber-500 mt-2">
-              Notification permission was denied. You need to enable notifications in your browser settings.
-            </p>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <button
+      type="button"
+      onClick={handleClick}
+      className={`w-11 h-11 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${className ?? ''}`}
+      title={enabled ? 'Daily reminders on' : 'Enable daily reminders'}
+      aria-label={enabled ? 'Daily reminders on' : 'Enable daily reminders'}
+      aria-pressed={enabled}
+    >
+      {enabled ? (
+        <Bell className="h-5 w-5" style={{ color: 'var(--lv-accent)' }} />
+      ) : (
+        <BellOff className="h-5 w-5" style={{ color: 'var(--lv-text-secondary)' }} />
+      )}
+    </button>
   );
 };
 

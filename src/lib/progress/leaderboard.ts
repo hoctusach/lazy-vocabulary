@@ -2,6 +2,7 @@ import { getActiveSession } from '@/lib/auth';
 import { getNicknameLocal } from '@/lib/nickname';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { getProgressSummary } from './progressSummary';
+import { calculateCurrentStreak } from './streak';
 
 export type LeaderboardTimeframe = 'today' | 'week' | 'allTime';
 
@@ -106,24 +107,6 @@ function displayNameFromRow(row: LeaderboardRow, userKey: string): string {
     if (trimmed) return trimmed;
   }
   return 'Learner';
-}
-
-function calculateCurrentStreak(days: string[]): number {
-  if (days.length === 0) return 0;
-
-  const learnedDays = new Set(days);
-  const cursor = new Date();
-  cursor.setHours(0, 0, 0, 0);
-
-  let streak = 0;
-  while (streak < 366) {
-    const key = cursor.toISOString().slice(0, 10);
-    if (!learnedDays.has(key)) break;
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
 }
 
 function learningMinutesFromHours(value: unknown): number | undefined {

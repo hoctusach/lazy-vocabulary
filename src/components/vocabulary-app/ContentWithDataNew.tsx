@@ -3,6 +3,7 @@ import { Speaker } from "lucide-react";
 import type { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyMainNew from "./VocabularyMainNew";
 import LeaderboardPanel from "./LeaderboardPanel";
+import StreakPanel from "./StreakPanel";
 
 interface ContentWithDataNewProps {
   displayWord: ReadonlyWord | null;
@@ -70,6 +71,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onMarkWordLearned={onMarkWordLearned}
         onOpenSearch={onOpenSearch}
       />
+
+      <StreakPanel refreshKey={currentUserLearnedCount} />
 
       <LeaderboardPanel
         currentUserLearnedCount={currentUserLearnedCount}
