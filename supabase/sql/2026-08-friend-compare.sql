@@ -12,6 +12,15 @@ create table if not exists public.share_tokens (
   created_at timestamptz not null default now()
 );
 
+-- Deny direct table access entirely (both anon's default-privilege grants,
+-- if this project has any, and any future ones) — the only sanctioned way to
+-- read or write this table is through the SECURITY DEFINER functions below,
+-- which run as the function owner and so bypass RLS regardless. Without this,
+-- a client that can enumerate/select share_token values directly would
+-- defeat the whole point of gating them behind get_or_create_share_token.
+alter table public.share_tokens enable row level security;
+revoke all on public.share_tokens from anon, authenticated;
+
 -- Re-verifies nickname+passcode (same check as verify_nickname_passcode) before
 -- handing out — or lazily creating — that profile's share token. Deliberately
 -- does not rely on require_session_user_key/current_session_user_key: the
