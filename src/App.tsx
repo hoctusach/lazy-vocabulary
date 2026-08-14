@@ -11,6 +11,7 @@ import VocabularyDetailPage from "./pages/vocabulary/VocabularyDetailPage";
 import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import AuthGate from "./components/AuthGate";
+import InstallPrompt from "./components/InstallPrompt";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
@@ -59,6 +60,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
         <AuthGate />
+        <InstallPrompt />
       </TooltipProvider>
     </QueryClientProvider>
   );

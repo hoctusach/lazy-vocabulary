@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
+import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -152,6 +153,8 @@ const VocabularyAppWithLearning: React.FC = () => {
   const learningSection = (
     <TooltipProvider>
       <div className="space-y-3 mt-3">
+        <QuickQuizPanel targetWords={todayWords} />
+
         <LearningProgressPanel
           progressStats={progressStats}
           learnerId="default"

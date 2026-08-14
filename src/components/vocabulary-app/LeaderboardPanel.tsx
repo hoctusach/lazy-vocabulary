@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Medal, Trophy, Users } from "lucide-react";
+import { ChevronDown, Medal, Share2, Trophy, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,6 +15,8 @@ import {
   type LeaderboardEntry,
   type LeaderboardState,
 } from "@/lib/progress/leaderboard";
+import { ensureUserKey } from "@/lib/progress/srsSyncByUserKey";
+import { buildFriendShareUrl } from "@/lib/progress/friendCompare";
 
 interface LeaderboardPanelProps {
   currentUserLearnedCount?: number;
@@ -157,11 +161,52 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
 }) => {
   const [state, setState] = useState<LeaderboardState>(initialState);
   const [isOpen, setIsOpen] = useState(true);
+  const [ownUserKey, setOwnUserKey] = useState<string | null>(null);
   const currentUserCountsRef = useRef({
     currentUserLearnedCount,
     currentUserLearningCount,
     currentUserDueCount,
   });
+
+  useEffect(() => {
+    let isMounted = true;
+    void ensureUserKey().then((key) => {
+      if (isMounted) setOwnUserKey(key);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleShare = async () => {
+    if (!ownUserKey) {
+      toast.error("Sign in first so your friend has something to compare.");
+      return;
+    }
+
+    const url = buildFriendShareUrl(ownUserKey);
+    const shareData = {
+      title: "Compare vocabulary progress",
+      text: "See how our Lazy Vocabulary progress compares!",
+      url,
+    };
+
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // User cancelled or share failed — fall through to clipboard.
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Compare link copied — send it to a friend.");
+    } catch {
+      toast.error("Could not copy the link. Please copy it from the address bar.");
+    }
+  };
 
   useEffect(() => {
     currentUserCountsRef.current = {
@@ -275,6 +320,18 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="pt-2">
+            <div className="mb-2 flex justify-end">
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="h-7 gap-1.5 px-2 text-xs theme-muted-text"
+                onClick={handleShare}
+              >
+                <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
+                Compare with a friend
+              </Button>
+            </div>
             {state.isLoading ? (
               <div className="space-y-2" aria-label="Loading leaderboard">
                 {[0, 1, 2].map((index) => (
