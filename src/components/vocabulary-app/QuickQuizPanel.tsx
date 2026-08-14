@@ -120,12 +120,20 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
 
           {!isFinished && currentQuestion && (
             <div className="space-y-4">
-              <div>
-                <p className="text-xl font-bold" style={{ color: "var(--lv-word-title)" }}>
+              <div className="text-left">
+                <p
+                  className="text-xl font-bold break-words"
+                  style={{ color: "var(--lv-word-title)", whiteSpace: "pre-line" }}
+                >
                   {currentQuestion.word}
                 </p>
                 {currentQuestion.example && (
-                  <p className="mt-1 text-sm italic theme-muted-text">{currentQuestion.example}</p>
+                  <p
+                    className="mt-1 text-sm italic break-words"
+                    style={{ color: "var(--lv-example)", whiteSpace: "pre-line" }}
+                  >
+                    {currentQuestion.example}
+                  </p>
                 )}
               </div>
 
@@ -142,16 +150,18 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
                       onClick={() => handleSelect(option)}
                       disabled={showResult}
                       className={cn(
-                        "flex w-full items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
+                        "flex w-full items-start justify-between gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors",
                         "theme-border",
                         !showResult && "hover:bg-[var(--lv-card-highlight)]",
                         showResult && isCorrect && "border-green-500 bg-green-50 dark:bg-green-900/30",
                         showResult && isSelected && !isCorrect && "border-red-500 bg-red-50 dark:bg-red-900/30",
                       )}
                     >
-                      <span>{option}</span>
-                      {showResult && isCorrect && <Check className="h-4 w-4 shrink-0 text-green-600" />}
-                      {showResult && isSelected && !isCorrect && <X className="h-4 w-4 shrink-0 text-red-600" />}
+                      <span className="min-w-0 flex-1 break-words" style={{ whiteSpace: "pre-line" }}>
+                        {option}
+                      </span>
+                      {showResult && isCorrect && <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-600" />}
+                      {showResult && isSelected && !isCorrect && <X className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />}
                     </button>
                   );
                 })}
