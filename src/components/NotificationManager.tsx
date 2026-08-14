@@ -43,6 +43,7 @@ const NotificationManager: React.FC<{ className?: string }> = ({ className }) =>
       return;
     }
 
+    const wasAlreadyDecided = permissionState === 'denied';
     const result = await requestNotificationPermission();
     setPermissionState(result);
 
@@ -54,7 +55,9 @@ const NotificationManager: React.FC<{ className?: string }> = ({ className }) =>
     } else if (result === 'denied') {
       toast({
         title: 'Notifications blocked',
-        description: 'Enable notifications in your browser settings to get daily reminders.',
+        description: wasAlreadyDecided
+          ? "Your browser already has notifications blocked for this site. Open the site info (tap the icon next to the address bar) → Permissions → Notifications, then allow and try again."
+          : "You blocked the request. If that wasn't intentional, open the site info (tap the icon next to the address bar) → Permissions → Notifications to allow it.",
         variant: 'destructive',
       });
     }

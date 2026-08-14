@@ -20,13 +20,17 @@ function isStandaloneDisplay(): boolean {
   );
 }
 
-function isIosSafari(): boolean {
+function isIos(): boolean {
   if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent;
-  const isIos = /iphone|ipad|ipod/i.test(ua);
-  const isSafari = /safari/i.test(ua) && !/crios|fxios|edgios/i.test(ua);
-  return isIos && isSafari;
+  return /iphone|ipad|ipod/i.test(navigator.userAgent);
 }
+
+function isMobile(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent);
+}
+
+const FALLBACK_TIP_DELAY_MS = 2500;
 
 function wasDismissed(): boolean {
   try {
@@ -46,7 +50,7 @@ function dismiss() {
 
 const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showIosTip, setShowIosTip] = useState(false);
+  const [fallbackTip, setFallbackTip] = useState<'ios' | 'generic' | null>(null);
   const [dismissed, setDismissed] = useState(wasDismissed);
 
   useEffect(() => {
@@ -55,16 +59,25 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
     const handleBeforeInstall = (event: Event) => {
       event.preventDefault();
       setDeferredPrompt(event as BeforeInstallPromptEvent);
+      setFallbackTip(null);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
 
-    if (isIosSafari()) {
-      setShowIosTip(true);
-    }
+    // Chrome/Edge/Samsung Internet fire beforeinstallprompt when install
+    // criteria are met — but only sometimes, and never on iOS Safari or
+    // Firefox. Give it a moment, then fall back to a manual tip on any
+    // mobile browser so there's always something actionable on phones.
+    const fallbackTimer = window.setTimeout(() => {
+      setFallbackTip((current) => {
+        if (current || !isMobile()) return current;
+        return isIos() ? 'ios' : 'generic';
+      });
+    }, FALLBACK_TIP_DELAY_MS);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.clearTimeout(fallbackTimer);
     };
   }, []);
 
@@ -72,7 +85,7 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
     dismiss();
     setDismissed(true);
     setDeferredPrompt(null);
-    setShowIosTip(false);
+    setFallbackTip(null);
   };
 
   const handleInstall = async () => {
@@ -84,7 +97,7 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
     setDismissed(true);
   };
 
-  if (dismissed || (!deferredPrompt && !showIosTip)) return null;
+  if (dismissed || (!deferredPrompt && !fallbackTip)) return null;
 
   return (
     <div
@@ -108,7 +121,9 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
             <p className="text-xs" style={{ color: 'var(--lv-helper-text)' }}>
               {deferredPrompt
                 ? 'Add it to your home screen for one-tap access.'
-                : 'Tap Share, then "Add to Home Screen" for one-tap access.'}
+                : fallbackTip === 'ios'
+                ? 'Tap Share, then "Add to Home Screen" for one-tap access.'
+                : 'Open your browser menu and tap "Add to Home screen" or "Install app".'}
             </p>
           </div>
           {deferredPrompt && (
