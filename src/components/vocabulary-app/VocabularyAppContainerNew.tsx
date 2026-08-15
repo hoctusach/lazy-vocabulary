@@ -6,6 +6,7 @@ import ContentWithDataNew from "./ContentWithDataNew";
 import VocabularyCardNew from "./VocabularyCardNew";
 import LoadingCard from "./LoadingCard";
 import UserInteractionManager from "./UserInteractionManager";
+import AudioStatusIndicator from "./AudioStatusIndicator";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import { vocabularyService } from '@/services/vocabularyService';
@@ -159,6 +160,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             playCurrentWord={playCurrentWord}
             onInteractionUpdate={handleInteractionUpdate}
           />
+          <AudioStatusIndicator isAudioUnlocked={userInteractionState.isAudioUnlocked} />
 
           <ErrorDisplay jsonLoadError={false} />
 

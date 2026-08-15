@@ -3,48 +3,65 @@ import { toast } from 'sonner';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { getProgressSummary } from '@/lib/progress/progressSummary';
 import { calculateCurrentStreak, hasLearnedToday } from '@/lib/progress/streak';
+import { pickReminderMessage } from '@/lib/reminders/messages';
 
-const REMINDER_GUARD_KEY = 'lazyVoca.reminder.lastShownDay';
+const REMINDER_STATE_KEY = 'lazyVoca.reminder.state';
 const INITIAL_CHECK_DELAY_MS = 4000;
+const PERIODIC_CHECK_INTERVAL_MS = 60_000;
+const MIN_MINUTES_BETWEEN_REMINDERS = 10;
+const MIN_INTERVAL_MS = MIN_MINUTES_BETWEEN_REMINDERS * 60_000;
+const MAX_REMINDERS_PER_DAY = 3;
+
+type ReminderState = {
+  day: string;
+  count: number;
+  lastShownAt: number;
+};
 
 function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function wasAlreadyShownToday(): boolean {
+function readState(): ReminderState {
+  const fresh: ReminderState = { day: todayKey(), count: 0, lastShownAt: 0 };
   try {
-    return localStorage.getItem(REMINDER_GUARD_KEY) === todayKey();
+    const raw = localStorage.getItem(REMINDER_STATE_KEY);
+    if (!raw) return fresh;
+    const parsed = JSON.parse(raw) as Partial<ReminderState>;
+    if (parsed.day !== fresh.day) return fresh;
+    return {
+      day: fresh.day,
+      count: typeof parsed.count === 'number' ? parsed.count : 0,
+      lastShownAt: typeof parsed.lastShownAt === 'number' ? parsed.lastShownAt : 0,
+    };
   } catch {
-    return false;
+    return fresh;
   }
 }
 
-function markShownToday(): void {
+function writeState(state: ReminderState): void {
   try {
-    localStorage.setItem(REMINDER_GUARD_KEY, todayKey());
+    localStorage.setItem(REMINDER_STATE_KEY, JSON.stringify(state));
   } catch {
     // ignore storage failures
   }
 }
 
-function reminderMessage(streakDays: number): string {
-  return streakDays > 0
-    ? `Don't lose your ${streakDays}-day streak — learn today's words.`
-    : "You haven't learned today's words yet.";
-}
-
 /**
- * Nudges a returning user who hasn't done today's words yet: an in-app toast
- * while the tab is visible, or a plain browser Notification while it's hidden
- * (only if permission was already granted — see NotificationManager).
- * There is no server push here, so this only reaches an already-open tab.
+ * Nudges a returning user who hasn't done today's words yet, a few times a
+ * day rather than once — an in-app toast while the tab is visible, or a
+ * plain browser Notification while it's hidden (only if permission was
+ * already granted — see NotificationManager). There is no server push here,
+ * so this only reaches an already-open tab; it can't wake a closed one.
  */
 export function useDailyReminder(): void {
   useEffect(() => {
     let cancelled = false;
 
     const maybeRemind = async () => {
-      if (wasAlreadyShownToday()) return;
+      const state = readState();
+      if (state.count >= MAX_REMINDERS_PER_DAY) return;
+      if (state.lastShownAt && Date.now() - state.lastShownAt < MIN_INTERVAL_MS) return;
 
       let userKey: string | null = null;
       try {
@@ -58,7 +75,8 @@ export function useDailyReminder(): void {
       if (cancelled || !summary) return;
       if (hasLearnedToday(summary.learned_days)) return;
 
-      const message = reminderMessage(calculateCurrentStreak(summary.learned_days));
+      const streakDays = calculateCurrentStreak(summary.learned_days);
+      const message = pickReminderMessage(streakDays, summary.learned_count);
 
       if (document.visibilityState === 'hidden') {
         if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -71,7 +89,7 @@ export function useDailyReminder(): void {
             window.focus();
             notification.close();
           };
-          markShownToday();
+          writeState({ day: state.day, count: state.count + 1, lastShownAt: Date.now() });
         } catch {
           // Unsupported in this environment (e.g. iOS Safari) — the in-app
           // toast will still cover it once the tab becomes visible again.
@@ -80,12 +98,18 @@ export function useDailyReminder(): void {
       }
 
       toast(message, { duration: 8000 });
-      markShownToday();
+      writeState({ day: state.day, count: state.count + 1, lastShownAt: Date.now() });
     };
 
     const initialTimer = window.setTimeout(() => {
       void maybeRemind();
     }, INITIAL_CHECK_DELAY_MS);
+
+    const periodicInterval = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        void maybeRemind();
+      }
+    }, PERIODIC_CHECK_INTERVAL_MS);
 
     const onVisibilityChange = () => {
       void maybeRemind();
@@ -96,6 +120,7 @@ export function useDailyReminder(): void {
     return () => {
       cancelled = true;
       window.clearTimeout(initialTimer);
+      window.clearInterval(periodicInterval);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
