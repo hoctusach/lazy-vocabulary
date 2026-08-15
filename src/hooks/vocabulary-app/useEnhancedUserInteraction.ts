@@ -69,7 +69,6 @@ export const useEnhancedUserInteraction = ({
       setHasInitialized(false);
       resetUserInteraction();
     };
-    const resume = () => handleInteraction();
     window.addEventListener('speechblocked', blocked);
     return () => {
       window.removeEventListener('speechblocked', blocked);

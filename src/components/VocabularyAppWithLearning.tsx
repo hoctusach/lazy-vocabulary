@@ -20,7 +20,7 @@ import { trackUiInteraction } from '@/services/analyticsService';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
-  const [summaryOpen, setSummaryOpen] = useState(true);
+  const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<LearnedWordSummary | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -113,12 +113,6 @@ const VocabularyAppWithLearning: React.FC = () => {
     }
     return new Date(parsed).toISOString().slice(0, 10);
   };
-
-  useEffect(() => {
-    if (dailySelection) {
-      setSummaryOpen(true);
-    }
-  }, [dailySelection]);
 
   const openSearch = (word?: string) => {
     const nextQuery = word ?? '';
