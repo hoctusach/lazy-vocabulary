@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   prepareUserSession,
-  fetchProgressSummary as fetchProgressSummaryService,
-  fetchLearnedWordSummaries,
   getOrCreateTodayWords,
   fetchAndCommitTodaySelection,
   markWordReviewed,
@@ -47,9 +45,6 @@ const DEFAULT_STATS = {
   due: 0,
   learned: 0
 };
-
-const PROGRESS_UNAVAILABLE_MESSAGE =
-  'Progress data unavailable. Please check with your administrator.';
 
 function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   if (!summary) return DEFAULT_STATS;
@@ -139,60 +134,6 @@ export const useLearningProgress = () => {
     []
   );
 
-  const refreshStats = useCallback(async (key?: string) => {
-    const targetKey = key ?? userKey;
-    if (!targetKey) return;
-    try {
-      const { summary, error } = await fetchProgressSummaryService(targetKey);
-      if (error?.type === 'no-server') {
-        setProgressError(PROGRESS_UNAVAILABLE_MESSAGE);
-        setProgressStats(applyLearnedOverride(null));
-        return;
-      }
-      setProgressError(null);
-      if (summary?.source === 'server') {
-        learnedCountRef.current = null;
-      }
-      setProgressStats(applyLearnedOverride(summary));
-    } catch (error) {
-      console.warn('[useLearningProgress] Failed to load progress summary', error);
-      setProgressStats(applyLearnedOverride(null));
-    }
-  }, [applyLearnedOverride, userKey]);
-
-  const refreshLearnedWords = useCallback(async (key?: string) => {
-    const targetKey = key ?? userKey;
-    if (!targetKey) return;
-    try {
-      const {
-        learnedWords: learned,
-        newTodayWords,
-        dueTodayWords,
-        summary,
-        error,
-      } = await fetchLearnedWordSummaries(targetKey);
-      if (error?.type === 'no-server') {
-        setProgressError(PROGRESS_UNAVAILABLE_MESSAGE);
-        learnedCountRef.current = null;
-        setLearnedWords([]);
-        setNewTodayLearnedWords([]);
-        setDueTodayLearnedWords([]);
-        setProgressStats(applyLearnedOverride(null));
-        return;
-      }
-      setProgressError(null);
-      learnedCountRef.current = summary?.source === 'server' ? null : learned.length;
-      setLearnedWords(learned);
-      setNewTodayLearnedWords(newTodayWords);
-      setDueTodayLearnedWords(dueTodayWords);
-      setProgressStats(applyLearnedOverride(summary));
-    } catch (error) {
-      console.warn('[useLearningProgress] Failed to load learned words', error);
-      setLearnedWords([]);
-      setNewTodayLearnedWords([]);
-      setDueTodayLearnedWords([]);
-    }
-  }, [applyLearnedOverride, userKey]);
 
   useEffect(() => {
     if (!userKey) return;
@@ -529,27 +470,14 @@ export const useLearningProgress = () => {
         } else {
           setDueTodayLearnedWords([]);
         }
-        if (!result.learnedWords || !result.newTodayWords || !result.dueTodayWords) {
-          void refreshLearnedWords(userKey);
-        }
         if (result.summary) {
           setProgressStats(applyLearnedOverride(result.summary));
-        } else {
-          void refreshStats(userKey);
         }
       } catch (error) {
         console.warn('[useLearningProgress] Failed to mark word learned', error);
       }
     },
-    [
-      applyLearnedOverride,
-      buildCurrentTodayState,
-      refreshLearnedWords,
-      refreshStats,
-      severity,
-      todayWords,
-      userKey,
-    ]
+    [applyLearnedOverride, buildCurrentTodayState, severity, todayWords, userKey]
   );
 
   const markWordAsNew = useCallback(
@@ -558,8 +486,6 @@ export const useLearningProgress = () => {
       try {
         const result = await markWordAsNewService(userKey, wordId);
         if (!result) {
-          await refreshLearnedWords(userKey);
-          await refreshStats(userKey);
           return false;
         }
 
@@ -581,12 +507,10 @@ export const useLearningProgress = () => {
         return true;
       } catch (error) {
         console.warn('[useLearningProgress] Failed to reset word', error);
-        await refreshLearnedWords(userKey);
-        await refreshStats(userKey);
         return false;
       }
     },
-    [applyLearnedOverride, refreshLearnedWords, refreshStats, userKey]
+    [applyLearnedOverride, userKey]
   );
 
   const orderedTodayWords = useMemo(() => buildTodaysWords(todayWords, 'ALL'), [todayWords]);
@@ -626,8 +550,6 @@ export const useLearningProgress = () => {
     generateDailyWords,
     regenerateToday,
     markWordAsPlayed,
-    refreshStats,
-    refreshLearnedWords,
     learnedWords,
     newTodayLearnedWords,
     dueTodayLearnedWords,
