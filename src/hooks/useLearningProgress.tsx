@@ -462,13 +462,9 @@ export const useLearningProgress = () => {
         }
         if (result.newTodayWords) {
           setNewTodayLearnedWords(result.newTodayWords);
-        } else {
-          setNewTodayLearnedWords([]);
         }
         if (result.dueTodayWords) {
           setDueTodayLearnedWords(result.dueTodayWords);
-        } else {
-          setDueTodayLearnedWords([]);
         }
         if (result.summary) {
           setProgressStats(applyLearnedOverride(result.summary));
