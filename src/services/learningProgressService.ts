@@ -865,8 +865,6 @@ export async function markWordAsNew(
   }
 }
 
-type LearnedWordStatsPayload = ReturnType<typeof computeLearnedWordStats>;
-
 const isPlainObject = (value: unknown): value is Record<string, any> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -904,98 +902,6 @@ function normalizeLearnedWordRow(value: unknown): LearnedWordRow | null {
       typeof value.due_selected_today === 'boolean' ? value.due_selected_today : null,
     category: typeof value.category === 'string' ? value.category : null,
     word: typeof value.word === 'string' ? value.word : null,
-  };
-}
-
-type LoadLearnedWordStatsError = { type: 'no-server' };
-
-type LoadLearnedWordStatsResult = {
-  stats: LearnedWordStatsPayload | null;
-  error: LoadLearnedWordStatsError | null;
-};
-
-async function loadLearnedWordStats(userKey: string): Promise<LoadLearnedWordStatsResult> {
-  if (!userKey) {
-    return {
-      stats: null,
-      error: null,
-    };
-  }
-
-  const client = getSupabaseClient();
-  if (!client) {
-    return {
-      stats: null,
-      error: { type: 'no-server' },
-    };
-  }
-
-  console.warn('[LearningProgress] learned_words access disabled; skipping remote stats load.');
-  return {
-    stats: null,
-    error: { type: 'no-server' },
-  };
-}
-
-export async function fetchProgressSummary(
-  userKey: string
-): Promise<{ summary: DerivedProgressSummary | null; error: LoadLearnedWordStatsError | null }> {
-  const result = await loadLearnedWordStats(userKey);
-  return {
-    summary: result.stats?.summary ?? null,
-    error: result.error,
-  };
-}
-
-export async function fetchLearnedWordSummaries(
-  userKey: string
-): Promise<{
-  learnedWords: LearnedWordSummary[];
-  newTodayWords: TodayLearnedWordSummary[];
-  dueTodayWords: TodayLearnedWordSummary[];
-  summary: DerivedProgressSummary | null;
-  error: LoadLearnedWordStatsError | null;
-}> {
-  const result = await loadLearnedWordStats(userKey);
-
-  if (result.error) {
-    return {
-      learnedWords: [],
-      newTodayWords: [],
-      dueTodayWords: [],
-      summary: null,
-      error: result.error,
-    };
-  }
-
-  const stats = result.stats;
-  if (!stats) {
-    return {
-      learnedWords: [],
-      newTodayWords: [],
-      dueTodayWords: [],
-      summary: null,
-      error: null,
-    };
-  }
-
-  const { learnedWords: summaries, newTodayWords, dueTodayWords, summary } = stats;
-
-  if (process.env.DEBUG_PROGRESS) {
-    console.debug('[LearningProgress] Learned summary debug', {
-      totalRows: summary.learned + summary.learning,
-      summary,
-      newToday: newTodayWords,
-      dueToday: dueTodayWords,
-    });
-  }
-
-  return {
-    learnedWords: summaries,
-    newTodayWords,
-    dueTodayWords,
-    summary,
-    error: null,
   };
 }
 
