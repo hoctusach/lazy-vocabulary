@@ -8,6 +8,7 @@ import { directSpeechService } from '../directSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { cleanSpeechText } from '@/utils/speech';
 import { syllableTimingService } from '../syllableTimingService';
+import { canUseSpeechSynthesis, getSpeechSynthesis } from '@/lib/platform/speechSynthesis';
 
 /**
  * Manages platform-specific speech execution (mobile vs desktop)
@@ -86,6 +87,11 @@ export class SpeechPlatformManager {
     resetRetryCount: () => void,
     options?: SpeechOptions
   ): void {
+    if (!canUseSpeechSynthesis()) {
+      console.warn(`[SPEECH-PLATFORM-${speechId}] speechSynthesis is unavailable`);
+      resolve(false);
+      return;
+    }
     const rawSpeechText = this.voiceManager.createSpeechText(word);
     const speechText = cleanSpeechText(rawSpeechText) || rawSpeechText;
     const utterance = new SpeechSynthesisUtterance(speechText);
@@ -128,25 +134,30 @@ export class SpeechPlatformManager {
     
     console.log(`[SPEECH-PLATFORM-${speechId}] -> invoking window.speechSynthesis.speak`);
 
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    const synthesis = getSpeechSynthesis();
+    if (!synthesis) {
+      resolve(false);
+      return;
+    }
+    if (synthesis.speaking || synthesis.pending) {
       console.log(`[SPEECH-PLATFORM-${speechId}] Canceling existing speech before new utterance`);
-      window.speechSynthesis.cancel();
+      synthesis.cancel();
       setTimeout(() => {
         if (debugSpeech) {
           console.debug('[Speech] Speaking:', utterance.text);
         }
-        window.speechSynthesis.speak(utterance);
+        synthesis.speak(utterance);
       }, 300);
     } else {
       if (debugSpeech) {
         console.debug('[Speech] Speaking:', utterance.text);
       }
-      window.speechSynthesis.speak(utterance);
+      synthesis.speak(utterance);
     }
 
     setTimeout(() => {
       if (getState().currentUtterance === utterance && 
-          !window.speechSynthesis.speaking && 
+          !synthesis.speaking && 
           !getState().isActive) {
         console.warn(`[SPEECH-PLATFORM-${speechId}] Speech timeout, advancing`);
         this.handleSpeechTimeout(resolve, speechId, onReset, onStateUpdate, onScheduleAdvance, getState, resetRetryCount);

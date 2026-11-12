@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useSyncExternalStore } from "react";
 import confetti from "canvas-confetti";
 import { Check, Sparkles, X } from "lucide-react";
 
@@ -15,7 +15,7 @@ import type { VocabularyWord } from "@/types/vocabulary";
 import { buildQuiz, pickWordOfTheDay } from "@/features/quiz/quizEngine";
 import type { QuizQuestion } from "@/features/quiz/types";
 import { markQuizCompletedToday } from "@/features/quiz/quizService";
-import { loadAllWords } from "@/utils/allWords";
+import { getVocabularySourceRevision, loadAllWords, subscribeVocabularySource } from "@/utils/allWords";
 
 interface QuickQuizPanelProps {
   /** Today's due/new words, biased toward reinforcing spaced repetition. */
@@ -33,7 +33,15 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
   const [correctCount, setCorrectCount] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
 
-  const pool = useMemo(() => loadAllWords() ?? [], []);
+  const vocabularyRevision = useSyncExternalStore(
+    subscribeVocabularySource,
+    getVocabularySourceRevision,
+    getVocabularySourceRevision
+  );
+  const pool = useMemo(() => {
+    void vocabularyRevision;
+    return loadAllWords() ?? [];
+  }, [vocabularyRevision]);
   const wordOfTheDay = useMemo(() => pickWordOfTheDay(pool), [pool]);
 
   const startQuiz = (seedWord?: VocabularyWord) => {
