@@ -8,6 +8,7 @@ import { logSpeechEvent } from "@/utils/speechLogger";
 import { logAvailableVoices } from "@/utils/speech/debug/logVoices";
 import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 import { unifiedSpeechController } from "./unifiedSpeechController";
+import { canUseSpeechSynthesis, getSpeechSynthesis } from "@/lib/platform/speechSynthesis";
 
 const DEBUG_SPEECH = (window as any).DEBUG_SPEECH;
 
@@ -27,6 +28,11 @@ class RealSpeechService {
   private isActive = false;
 
   async speak(text: string, options: SpeechOptions): Promise<boolean> {
+    if (!canUseSpeechSynthesis()) {
+      console.warn('Speech synthesis is not available in this WebView.');
+      options.onError?.({ error: 'not-allowed' } as SpeechSynthesisErrorEvent);
+      return false;
+    }
     const epoch = options.epoch;
     if (!unifiedSpeechController.canAdvance(epoch)) {
       return false;
@@ -76,8 +82,10 @@ class RealSpeechService {
     this.stop();
 
     // Ensure no lingering utterances remain
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-      window.speechSynthesis.cancel();
+    const synthesis = getSpeechSynthesis();
+    if (!synthesis) return false;
+    if (synthesis.speaking || synthesis.pending) {
+      synthesis.cancel();
     }
 
     // Wait for voices to be loaded

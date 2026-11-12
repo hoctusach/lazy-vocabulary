@@ -24,7 +24,7 @@ const VocabularyDetailPage: React.FC = () => {
 
   if (!word) {
     return (
-      <main className="container mx-auto max-w-3xl px-4 py-8">
+      <main className="container mx-auto max-w-3xl px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(2rem,env(safe-area-inset-top))]">
         <Button asChild variant="ghost" className="mb-4">
           <Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back</Link>
         </Button>
@@ -37,7 +37,7 @@ const VocabularyDetailPage: React.FC = () => {
   }
 
   return (
-    <main className="container mx-auto max-w-4xl space-y-4 px-4 py-8">
+    <main className="container mx-auto max-w-4xl space-y-4 px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(2rem,env(safe-area-inset-top))]">
       <Button asChild variant="ghost">
         <Link to="/"><ArrowLeft className="mr-2 h-4 w-4" /> Back to vocabulary</Link>
       </Button>

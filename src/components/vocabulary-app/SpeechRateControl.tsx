@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverTrigger, PopoverContent, PopoverClose } from '@/components/ui/popover';
 import { Gauge } from 'lucide-react';
 import { trackUiInteraction } from '@/services/analyticsService';
+import { cn } from '@/lib/utils';
 
 interface SpeechRateControlProps {
   rate: number;
   onChange: (rate: number) => void;
+  buttonClassName?: string;
 }
 
 const RATE_OPTIONS = [
@@ -19,7 +21,7 @@ const RATE_OPTIONS = [
   { value: 2, label: '2x' },
 ];
 
-const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange }) => {
+const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange, buttonClassName }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleChange = (v: number) => {
@@ -38,13 +40,18 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
         <Button
           variant="outline"
           size="sm"
-          className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)] dark:text-gray-200 dark:hover:text-[var(--lv-accent)]"
+          className={cn(
+            'h-11 min-h-11 w-full flex-col gap-1 px-1 text-[11px] text-gray-700 hover:text-[var(--lv-accent)] dark:text-gray-200 dark:hover:text-[var(--lv-accent)] md:w-11',
+            buttonClassName
+          )}
           title="Speech Rate"
+          aria-label="Speech Rate"
         >
-          <Gauge size={16} />
+          <Gauge size={18} />
+          <span className="md:sr-only">Speed</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-44 p-2" side="right" align="start">
+      <PopoverContent className="w-64 p-3" side="top" align="center">
         <div className="grid grid-cols-4 gap-2">
           {RATE_OPTIONS.map(({ value, label }) => {
             const isActive = Math.abs(rate - value) < 0.001;
@@ -53,7 +60,7 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
                 <Button
                   size="sm"
                   variant={isActive ? 'default' : 'outline'}
-                  className="h-7 px-2 text-xs"
+                  className="min-h-11 px-2 text-xs"
                   onClick={() => handleChange(value)}
                 >
                   {label}

@@ -23,6 +23,7 @@ interface ContentWithDataNewProps {
   currentUserLearningCount?: number;
   currentUserDueCount?: number;
   additionalContent?: React.ReactNode;
+  variant?: 'full' | 'card';
   emptyState?: {
     word: string;
     meaning: string;
@@ -50,8 +51,10 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   currentUserLearningCount,
   currentUserDueCount,
   additionalContent,
+  variant = 'full',
   emptyState,
 }) => {
+  const cardOnly = variant === 'card';
   return (
     <>
       {/* Main vocabulary display */}
@@ -72,15 +75,17 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onOpenSearch={onOpenSearch}
       />
 
-      <StreakPanel refreshKey={currentUserLearnedCount} />
+      {!cardOnly && <StreakPanel refreshKey={currentUserLearnedCount} />}
 
-      <LeaderboardPanel
-        currentUserLearnedCount={currentUserLearnedCount}
-        currentUserLearningCount={currentUserLearningCount}
-        currentUserDueCount={currentUserDueCount}
-      />
+      {!cardOnly && (
+        <LeaderboardPanel
+          currentUserLearnedCount={currentUserLearnedCount}
+          currentUserLearningCount={currentUserLearningCount}
+          currentUserDueCount={currentUserDueCount}
+        />
+      )}
 
-      {additionalContent}
+      {!cardOnly && additionalContent}
 
       {/* Mobile speech note statically above debug panel */}
       <div className="mobile-note text-xs italic text-gray-500 text-left my-1">

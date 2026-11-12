@@ -2,6 +2,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
 import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
+import StreakPanel from './vocabulary-app/StreakPanel';
+import LeaderboardPanel from './vocabulary-app/LeaderboardPanel';
+import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
+import { wordKey } from '@/features/word-sets/vocabularySetStore';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -18,8 +22,14 @@ import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
 import { trackUiInteraction } from '@/services/analyticsService';
 
-const VocabularyAppWithLearning: React.FC = () => {
+interface VocabularyAppWithLearningProps {
+  /** `all` keeps the original stacked page. Mobile tabs pass `learn` or `progress`. */
+  view?: 'all' | 'learn' | 'progress';
+}
+
+const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ view = 'all' }) => {
   useDailyUsageTracker();
+  const wordSets = useVocabularySets();
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<LearnedWordSummary | null>(null);
@@ -82,9 +92,54 @@ const VocabularyAppWithLearning: React.FC = () => {
     };
   }, [markWordAsPlayed]);
 
-  const learnedWordsList = Array.isArray(learnedWords) ? learnedWords : [];
-  const newTodayList = Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : [];
-  const dueTodayList = Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : [];
+  const customLearned = Object.values(wordSets.progress.learned);
+  const todayStamp = new Date();
+  todayStamp.setHours(23, 59, 59, 999);
+  const customDue = customLearned.filter((entry) => {
+    const next = Date.parse(entry.nextReviewAt);
+    return !Number.isFinite(next) || next <= todayStamp.getTime();
+  });
+  const customNew = wordSets.isCustomSet
+    ? wordSets.todayWords
+        .filter((word) => !wordSets.progress.learned[wordKey(word.word, word.category)])
+        .map((word) => ({
+          word: word.word,
+          category: word.category,
+          reviewCount: 0,
+          nextReviewAt: undefined as string | undefined,
+          learnedDate: undefined as string | undefined,
+        }))
+    : [];
+  const customLearnedDisplay = customLearned.map((entry) => ({
+    word: entry.word,
+    category: entry.category,
+    reviewCount: entry.reviewCount,
+    nextReviewAt: entry.nextReviewAt,
+    learnedDate: entry.learnedAt,
+  }));
+  const customDueDisplay = customDue.map((entry) => ({
+    word: entry.word,
+    category: entry.category,
+    reviewCount: entry.reviewCount,
+    nextReviewAt: entry.nextReviewAt,
+    learnedDate: entry.learnedAt,
+  }));
+
+  const learnedWordsList = wordSets.isCustomSet
+    ? customLearnedDisplay
+    : Array.isArray(learnedWords)
+      ? learnedWords
+      : [];
+  const newTodayList = wordSets.isCustomSet
+    ? customNew
+    : Array.isArray(newTodayLearnedWords)
+      ? newTodayLearnedWords
+      : [];
+  const dueTodayList = wordSets.isCustomSet
+    ? customDueDisplay
+    : Array.isArray(dueTodayLearnedWords)
+      ? dueTodayLearnedWords
+      : [];
   const hasSelectionWords =
     newTodayList.length > 0 || dueTodayList.length > 0 || learnedWordsList.length > 0;
 
@@ -133,6 +188,13 @@ const VocabularyAppWithLearning: React.FC = () => {
       const category = (wordToReset.category ?? '').trim();
       const wordId = category ? `${wordToReset.word}::${category}` : wordToReset.word;
       trackUiInteraction('mark_as_new_confirm', { label: wordToReset.word });
+      if (wordSets.isCustomSet) {
+        wordSets.markNew(wordToReset.word, category);
+        toast.success('Moved back to Learning!');
+        setIsMarkAsNewDialogOpen(false);
+        setWordToReset(null);
+        return;
+      }
       const didReset = await markWordAsNew(wordId);
       if (didReset) {
         toast.success('Moved back to Learning!');
@@ -147,12 +209,12 @@ const VocabularyAppWithLearning: React.FC = () => {
   const learningSection = (
     <TooltipProvider>
       <div className="space-y-3 mt-3">
-        <QuickQuizPanel targetWords={todayWords} />
+        <QuickQuizPanel targetWords={wordSets.isCustomSet ? wordSets.todayWords : todayWords} />
 
         <LearningProgressPanel
-          progressStats={progressStats}
-          learnerId="default"
-          progressError={progressError}
+          progressStats={wordSets.isCustomSet ? wordSets.stats : progressStats}
+          learnerId={wordSets.activeSet.id}
+          progressError={wordSets.isCustomSet ? null : progressError}
         />
 
         <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
@@ -171,7 +233,7 @@ const VocabularyAppWithLearning: React.FC = () => {
           <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
         </Tooltip>
         <CollapsibleContent className="space-y-3">
-          {progressError ? (
+          {!wordSets.isCustomSet && progressError ? (
             <div className="rounded-md border border-yellow-500 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-200">
               {progressError}
             </div>
@@ -299,24 +361,52 @@ const VocabularyAppWithLearning: React.FC = () => {
     </TooltipProvider>
   );
 
+  const playbackWords = wordSets.isCustomSet ? wordSets.todayWords : todayWords;
+  const playbackStats = wordSets.isCustomSet ? wordSets.stats : progressStats;
+  const showCard = view !== 'progress';
+  const showProgress = view !== 'learn';
+
   return (
     <>
       <ToastProvider />
-      <div className="w-full max-w-6xl mx-auto p-4">
+      {showCard && (
+      <div className={view === 'all' ? 'w-full max-w-6xl mx-auto p-4' : 'w-full'}>
         <VocabularyAppContainerNew
-          initialWords={todayWords}
-          dailySelection={dailySelection}
-          isLoadingSelection={isDailySelectionLoading}
+          initialWords={playbackWords}
+          dailySelection={wordSets.isCustomSet ? null : dailySelection}
+          isLoadingSelection={wordSets.isCustomSet ? false : isDailySelectionLoading}
           onMarkWordLearned={(word) => {
+            if (wordSets.isCustomSet) {
+              const match =
+                wordSets.todayWords.find((item) => item.word === word) ??
+                wordSets.words.find((item) => item.word === word);
+              wordSets.markLearned(
+                match ?? { word, meaning: '', example: '', count: 0, category: '' }
+              );
+              return;
+            }
             markCurrentWordLearned(word);
           }}
-          additionalContent={learningSection}
+          additionalContent={view === 'all' ? learningSection : undefined}
           onOpenSearch={openSearch}
-          currentUserLearnedCount={progressStats.learned}
-          currentUserLearningCount={progressStats.learning}
-          currentUserDueCount={progressStats.due}
+          currentUserLearnedCount={playbackStats.learned}
+          currentUserLearningCount={playbackStats.learning}
+          currentUserDueCount={playbackStats.due}
+          variant={view === 'learn' ? 'card' : 'full'}
         />
       </div>
+      )}
+      {showProgress && view !== 'all' && (
+        <div className="space-y-3">
+          <StreakPanel refreshKey={playbackStats.learned} />
+          <LeaderboardPanel
+            currentUserLearnedCount={playbackStats.learned}
+            currentUserLearningCount={playbackStats.learning}
+            currentUserDueCount={playbackStats.due}
+          />
+          {learningSection}
+        </div>
+      )}
       <MarkAsNewDialog
         isOpen={isMarkAsNewDialogOpen}
         onClose={() => setIsMarkAsNewDialogOpen(false)}

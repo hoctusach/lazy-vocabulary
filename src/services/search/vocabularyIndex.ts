@@ -11,6 +11,10 @@ export interface IndexedWord {
 
 let cachedIndex: IndexedWord[] | null = null;
 
+export function invalidateVocabularyIndex(): void {
+  cachedIndex = null;
+}
+
 export const loadVocabularyIndex = (): IndexedWord[] => {
   if (cachedIndex) return cachedIndex;
 

@@ -78,9 +78,9 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   }, [isPaused, handleTogglePause]);
 
   return (
-    <div className="flex flex-row items-start gap-2 sm:gap-4 w-full max-w-5xl mx-auto">
-      {/* Main card - takes most of the space */}
-      <div className="flex-1 min-w-0">
+    <div className="flex w-full max-w-5xl flex-col gap-3 md:flex-row md:items-start md:gap-4 mx-auto">
+      {/* Main card - takes most of the space. Controls sit under it on phones. */}
+      <div className="min-w-0 flex-1">
         <VocabularyCardNew
           word={wordToDisplay}
           meaning={meaningToDisplay}
@@ -93,8 +93,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
         />
       </div>
 
-      {/* Controls column - positioned on the right side */}
-      <div className="flex-none flex flex-col justify-start items-end">
+      <div className="w-full md:w-auto md:flex-none">
         <VocabularyControlsColumn
           isMuted={mute}
           isPaused={isPaused}

@@ -234,6 +234,9 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       .join('. ');
     const sanitized = cleanSpeechText(text);
     const speechText = sanitized || text;
+    if (typeof window.speechSynthesis === 'undefined' || typeof window.SpeechSynthesisUtterance !== 'function') {
+      return;
+    }
     const utterance = new SpeechSynthesisUtterance(speechText);
     const voices = window.speechSynthesis.getVoices();
     const voice = findVoice(voices, previewVoice);

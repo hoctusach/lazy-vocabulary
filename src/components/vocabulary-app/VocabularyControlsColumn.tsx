@@ -125,14 +125,18 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     toast('Word marked as learned.');
   };
 
+  const controlClass =
+    'h-11 min-h-11 w-full flex-col gap-1 px-1 py-1 text-[11px] leading-none md:h-11 md:w-11 md:flex-row md:px-0';
+
   return (
-    <div className="flex flex-col gap-2 items-end">
+    <div className="grid w-full grid-cols-4 gap-2 md:flex md:w-auto md:flex-col md:items-end">
       <Button
         variant="outline"
         size="sm"
         onClick={handleToggleMute}
         className={cn(
-          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          controlClass,
+          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
           isMuted
             ? 'text-purple-700 border-purple-300 bg-purple-50 dark:text-purple-100 dark:border-purple-700 dark:bg-purple-900/40'
             : ''
@@ -140,7 +144,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         title={isMuted ? 'Unmute' : 'Mute'}
         aria-label={isMuted ? 'Unmute' : 'Mute'}
       >
-        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+        <span className="md:sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
       </Button>
 
       <Button
@@ -148,7 +153,8 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleTogglePause}
         className={cn(
-          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          controlClass,
+          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
           isPaused
             ? 'text-orange-500 border-orange-300 bg-orange-50 dark:text-orange-200 dark:border-orange-700 dark:bg-orange-900/40'
             : ''
@@ -156,18 +162,20 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         title={isPaused ? 'Play' : 'Pause'}
         aria-label={isPaused ? 'Play' : 'Pause'}
       >
-        {isPaused ? <Play size={16} /> : <Pause size={16} />}
+        {isPaused ? <Play size={18} /> : <Pause size={18} />}
+        <span className="md:sr-only">{isPaused ? 'Play' : 'Pause'}</span>
       </Button>
 
       <Button
         variant="outline"
         size="sm"
         onClick={handleNextWord}
-        className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
+        className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
         title="Next Word"
         aria-label="Next Word"
       >
-        <SkipForward size={16} />
+        <SkipForward size={18} />
+        <span className="md:sr-only">Next</span>
       </Button>
 
       <Button
@@ -175,17 +183,19 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         size="sm"
         onClick={handleCycleVoice}
         className={cn(
-          'h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
+          controlClass,
+          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
           allVoices.length < 2 ? 'cursor-not-allowed opacity-50' : ''
         )}
         title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
         disabled={allVoices.length < 2}
         aria-label="Change Voice"
       >
-        <Speaker size={16} />
+        <Speaker size={18} />
+        <span className="md:sr-only">Voice</span>
       </Button>
 
-      <SpeechRateControl rate={speechRate} onChange={handleRateChange} />
+      <SpeechRateControl rate={speechRate} onChange={handleRateChange} buttonClassName={controlClass} />
       <Button
         variant="outline"
         size="sm"
@@ -195,11 +205,12 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           });
           onOpenSearch();
         }}
-        className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
+        className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
         title="Quick Search"
         aria-label="Quick Search"
       >
-        <Search size={16} />
+        <Search size={18} />
+        <span className="md:sr-only">Search</span>
       </Button>
 
 
@@ -209,12 +220,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           asChild
           variant="outline"
           size="sm"
-          className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
+          className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
           title="Vocabulary Detail"
           aria-label="Vocabulary Detail"
         >
-          <Link to={`/vocabulary/${encodeURIComponent(currentWord.word)}`}>
-            <ExternalLink size={16} />
+          <Link to={`/vocabulary/${encodeURIComponent(currentWord.word)}`} className="flex flex-col items-center gap-1 md:flex-row">
+            <ExternalLink size={18} />
+            <span className="md:sr-only">Details</span>
           </Link>
         </Button>
       )}
@@ -229,12 +241,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
             });
             onOpenPractice();
           }}
-          className="h-8 w-8 p-0 border border-purple-200 bg-purple-50 text-purple-700 hover:text-purple-900 dark:border-purple-700 dark:bg-purple-950/50 dark:text-purple-200 dark:hover:text-white"
+          className={cn(controlClass, 'border border-purple-200 bg-purple-50 text-purple-700 hover:text-purple-900 dark:border-purple-700 dark:bg-purple-950/50 dark:text-purple-200 dark:hover:text-white')}
           title="Practice"
           aria-label="Practice"
           disabled={!currentWord}
         >
-          <Dumbbell size={16} />
+          <Dumbbell size={18} />
+          <span className="md:sr-only">Practice</span>
         </Button>
       )}
 
@@ -243,15 +256,16 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           variant="outline"
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="h-8 w-8 p-0 border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900"
+          className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
           title="Mark as Learned"
           aria-label="Mark as Learned"
           disabled={!currentWord}
         >
           <CheckCircle
-            size={16}
+            size={18}
             className="text-emerald-600 dark:text-emerald-400"
           />
+          <span className="md:sr-only">Learned</span>
         </Button>
       )}
 

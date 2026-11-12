@@ -26,6 +26,9 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        // json2csv@6 alpha publishes a "module" path that is not in the package.
+        // Import only the parser so the browser bundle does not load Node streams.
+        "@json2csv-parser": path.resolve(__dirname, "node_modules/json2csv/lib/JSON2CSVParser.js"),
       },
     },
     build: {

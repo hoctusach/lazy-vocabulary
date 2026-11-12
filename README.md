@@ -161,6 +161,127 @@ Quick Search now normalizes both query text and vocabulary entries so searches
 ignore case and diacritics. Results are ranked to prioritize exact matches
 before partial or fuzzy matches.
 
+## Mobile app (Android and iOS)
+
+The web app is wrapped with [Capacitor](https://capacitorjs.com/) so the same Vite build runs inside an Android or iOS WebView. The web build is unchanged: `npm run build` still writes the site to `docs/`, and `npx cap sync` copies that folder into the native projects.
+
+Vocabulary sets you import are stored in `localStorage` on the device (see [Word sets](#word-sets) below). Nickname and passcode sign-in does not use a browser OAuth redirect, so no Supabase redirect URL is required for the app. `localStorage` works in the WebView. Speech uses the Web Speech API that Android System WebView and iOS WKWebView provide; if a device has no voices, playback stops instead of crashing. Practice recording uses the WebView speech recognizer when it exists.
+
+### Run on an Android phone or emulator
+
+1. Install [Android Studio](https://developer.android.com/studio) (or the Android SDK command-line tools) and accept the SDK licenses.
+2. From the project root:
+
+   ```sh
+   npm install
+   npm run build:mobile
+   ```
+
+   `build:mobile` runs the web build, then `npx cap sync`.
+3. Open the Android project:
+
+   ```sh
+   npx cap open android
+   ```
+
+   Or open the `android/` folder in Android Studio.
+4. Pick a device or emulator and press Run.
+
+A debug APK is also produced with:
+
+```sh
+cd android
+./gradlew assembleDebug
+```
+
+The APK is `android/app/build/outputs/apk/debug/app-debug.apk`. Copy it to a phone (USB or `adb install -r app-debug.apk`) and open **Lazy Vocabulary**. Debug builds are signed with the automatic debug keystore.
+
+### Run on iOS (Mac + Xcode required)
+
+iOS builds cannot be made on Windows or Linux. On a Mac:
+
+1. Install Xcode from the App Store and open it once so it installs the command-line tools.
+2. Install CocoaPods if Xcode asks for it (`sudo gem install cocoapods`).
+3. From the project root:
+
+   ```sh
+   npm install
+   npm run build:mobile
+   npx cap open ios
+   ```
+
+4. In Xcode, select your Team under Signing & Capabilities, choose a simulator or a paired iPhone, and press Run.
+
+The `ios/` project is already in the repo. After you change the web app, run `npm run build:mobile` again before the next Xcode build.
+
+### Release APK and AAB
+
+Release builds must be signed with your own keystore. Debug builds are not accepted by Google Play.
+
+1. Create a keystore once (keep the file and passwords private):
+
+   ```sh
+   keytool -genkeypair -v -keystore lazy-vocabulary-release.keystore -alias lazyvocabulary -keyalg RSA -keysize 2048 -validity 10000
+   ```
+
+2. Create `android/keystore.properties` (do not commit it):
+
+   ```
+   storeFile=../../lazy-vocabulary-release.keystore
+   storePassword=YOUR_STORE_PASSWORD
+   keyAlias=lazyvocabulary
+   keyPassword=YOUR_KEY_PASSWORD
+   ```
+
+3. The Android project already reads that file when it exists and signs the release build with it.
+
+4. Build:
+
+   ```sh
+   npm run android:release
+   ```
+
+   - APK: `android/app/build/outputs/apk/release/app-release.apk` (sideload or other stores)
+   - Play Store bundle: `cd android && ./gradlew bundleRelease`  
+     AAB: `android/app/build/outputs/bundle/release/app-release.aab`
+
+You still need a Google Play Console account to ship the AAB, and an Apple Developer account plus a Mac to archive the iOS app in Xcode (Product → Archive).
+
+### Word sets
+
+The built-in list is the **Default** set. Its learning progress keeps using the existing account sync (Supabase). Sets you import are stored only on this device, and each set has its own learned-word progress. The Default set cannot be deleted or renamed.
+
+Why local storage: the word list already lives in the app (the bundled JSON plus anything saved in the browser). Supabase stores account progress for that built-in list, not arbitrary spreadsheets. Keeping imports on the device works offline in the WebView and does not require a new database table.
+
+Import CSV, Excel (`.xlsx` or `.xls`), or JSON from the **Sets** tab (or the Word sets section on a wide screen). The file picker is a normal `<input type="file">`, which the Capacitor WebView supports.
+
+**Columns**
+
+| Column | Required | Accepted header names |
+| --- | --- | --- |
+| word | yes | word, vocabulary, term |
+| meaning | yes | meaning, definition |
+| example | no | example, sentence, usage |
+| translation | no | translation |
+| category | no | category, topic, tag |
+
+In Excel, each sheet name is used as the category when a row does not set one. The first row must be the header.
+
+**JSON** can be a list of word objects, `{ "words": [ ... ] }`, or `{ "phrasal verbs": [ { "word", "meaning" } ] }`.
+
+Download a sample from the Sets screen, or use the files shipped with the app:
+
+- `public/vocabulary-set-template.csv`
+- `public/vocabulary-set-template.json`
+- the Excel button builds `vocabulary-set-template.xlsx` in the app (CSV and JSON templates are produced with `json2csv` and the Excel template with `xlsx`)
+
+Example CSV:
+
+```csv
+word,meaning,example,translation,category
+give up,to stop trying,Do not give up when a new word feels hard.,bỏ cuộc,phrasal verbs
+```
+
 ## What technologies are used for this project?
 
 This project is built with:
@@ -170,6 +291,7 @@ This project is built with:
 - React
 - shadcn-ui
 - Tailwind CSS
+- Capacitor (Android and iOS shells around the same web build)
 
 ## How can I deploy this project?
 

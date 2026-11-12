@@ -1,0 +1,26 @@
+{
+  "name": "Sample set",
+  "words": [
+    {
+      "word": "give up",
+      "meaning": "to stop trying",
+      "example": "Do not give up when a new word feels hard.",
+      "translation": "bỏ cuộc",
+      "category": "phrasal verbs"
+    },
+    {
+      "word": "break the ice",
+      "meaning": "to make people feel more comfortable",
+      "example": "A short story can break the ice in class.",
+      "translation": "phá vỡ sự ngại ngùng",
+      "category": "idioms"
+    },
+    {
+      "word": "spare",
+      "meaning": "extra; available to use",
+      "example": "I review new words in my spare time.",
+      "translation": "rảnh, thừa",
+      "category": "topic vocab"
+    }
+  ]
+}
