@@ -15,7 +15,7 @@ import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  onMarkWordLearned?: (word: string) => void;
+  onMarkWordLearned?: (word: string, category?: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;

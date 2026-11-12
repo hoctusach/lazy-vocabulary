@@ -6,6 +6,7 @@ import { DEFAULT_SET_ID } from '@/features/word-sets/types';
 import {
   buildTodayQueue,
   deleteVocabularySet,
+  findSetWord,
   getActiveSetId,
   getSetProgress,
   importVocabularySet,
@@ -90,5 +91,24 @@ describe('vocabulary set store', () => {
     expect(again.map((word) => word.word)).toEqual(first.map((word) => word.word));
     expect(buildTodayQueue(food, { learned: {} }, today).map((word) => word.word)).toEqual(['bread']);
     expect(setActiveSet('missing').ok).toBe(false);
+  });
+
+  it('records progress for the matching category when the spelling is shared', () => {
+    const words: VocabularyWord[] = [
+      { word: 'set', meaning: 'to place', example: 'Set the book down.', count: 0, category: 'topic vocab' },
+      { word: 'set', meaning: 'a group', example: 'A set of keys.', count: 0, category: 'idioms' },
+    ];
+    const imported = importVocabularySet('Homonyms', { imported: words });
+    expect(imported.ok).toBe(true);
+    if (!imported.ok) return;
+
+    const match = findSetWord(words, 'set', 'idioms');
+    expect(match?.meaning).toBe('a group');
+    markSetWordLearned(imported.set.id, match ?? words[1]);
+
+    const progress = getSetProgress(imported.set.id);
+    expect(progress.learned[wordKey('set', 'idioms')]?.reviewCount).toBe(1);
+    expect(progress.learned[wordKey('set', 'topic vocab')]).toBeUndefined();
+    expect(findSetWord(words, 'set')).toMatchObject({ category: 'topic vocab' });
   });
 });

@@ -61,6 +61,18 @@ export function wordKey(word: string, category?: string): string {
   return `${(category ?? '').trim()}::${word.trim()}`;
 }
 
+/** Prefer the entry whose category matches the card on screen. */
+export function findSetWord(
+  words: VocabularyWord[],
+  word: string,
+  category?: string
+): VocabularyWord | undefined {
+  if (category !== undefined) {
+    return words.find((item) => item.word === word && (item.category ?? '') === category);
+  }
+  return words.find((item) => item.word === word);
+}
+
 export function countSheetWords(sheets: SheetData): number {
   return Object.values(sheets).reduce((sum, words) => sum + (words?.length ?? 0), 0);
 }

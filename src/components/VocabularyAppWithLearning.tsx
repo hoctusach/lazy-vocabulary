@@ -5,7 +5,7 @@ import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
 import StreakPanel from './vocabulary-app/StreakPanel';
 import LeaderboardPanel from './vocabulary-app/LeaderboardPanel';
 import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
-import { wordKey } from '@/features/word-sets/vocabularySetStore';
+import { findSetWord, wordKey } from '@/features/word-sets/vocabularySetStore';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -375,13 +375,13 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           initialWords={playbackWords}
           dailySelection={wordSets.isCustomSet ? null : dailySelection}
           isLoadingSelection={wordSets.isCustomSet ? false : isDailySelectionLoading}
-          onMarkWordLearned={(word) => {
+          onMarkWordLearned={(word, category) => {
             if (wordSets.isCustomSet) {
               const match =
-                wordSets.todayWords.find((item) => item.word === word) ??
-                wordSets.words.find((item) => item.word === word);
+                findSetWord(wordSets.todayWords, word, category) ??
+                findSetWord(wordSets.words, word, category);
               wordSets.markLearned(
-                match ?? { word, meaning: '', example: '', count: 0, category: '' }
+                match ?? { word, meaning: '', example: '', count: 0, category: category ?? '' }
               );
               return;
             }
