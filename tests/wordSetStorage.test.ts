@@ -8,6 +8,7 @@ import {
   deleteWordSet,
   getActiveSetId,
   listStoredSets,
+  noteDisplayedWord,
   recordWordEvent,
   renameWordSet,
   saveImportedSet,
@@ -92,5 +93,27 @@ describe('word set storage and progress', () => {
       'embark',
       'jet lag',
     ]);
+  });
+
+  it('counts a displayed word as learning for the active set', () => {
+    const created = saveImportedSet({
+      name: 'Travel',
+      source: 'csv',
+      data: sampleData,
+      wordCount: 2,
+    });
+
+    noteDisplayedWord('embark');
+    noteDisplayedWord('jet lag');
+
+    expect(getActiveSetId()).toBe(created.id);
+    expect(summarizeSet(created.id, sampleData.travel)).toMatchObject({
+      learning: 2,
+      learned: 0,
+    });
+    expect(summarizeSet(DEFAULT_SET_ID, [{ word: 'embark' }, { word: 'jet lag' }])).toMatchObject({
+      learning: 0,
+      learned: 0,
+    });
   });
 });

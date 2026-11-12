@@ -227,6 +227,13 @@ export function buildStudyList(setId: string, words: VocabularyWord[], limit = S
   return [...due, ...fresh].slice(0, limit);
 }
 
+/** The card the learner is looking at counts as seen, even when the player index moves without a service event. */
+export function noteDisplayedWord(word: string | null | undefined): void {
+  const trimmed = word?.trim();
+  if (!trimmed) return;
+  recordWordEvent(getActiveSetId(), trimmed, 'seen', { silent: true });
+}
+
 export function recordWordEvent(
   setId: string,
   word: string,

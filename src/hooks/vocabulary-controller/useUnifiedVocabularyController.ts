@@ -12,6 +12,7 @@ import { saveLastWord, saveTodayLastWord } from '@/utils/lastWordStorage';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 import { resolvePlaybackPreferences } from '@/lib/preferences/playbackPreferences';
+import { noteDisplayedWord } from '@/lib/wordSets';
 import { setSpeechRate } from '@/utils/speech/core/speechSettings';
 
 /**
@@ -230,12 +231,13 @@ export const useUnifiedVocabularyController = (
     unifiedSpeechController.setMuted(isMuted);
   }, [isMuted]);
 
-  // Persist last viewed word for the current category
+  // Next and auto-advance only move this index. They do not emit a vocabularyService
+  // change, so the displayed word is recorded here for the active set.
   useEffect(() => {
-    if (currentWord) {
-      saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
-      saveTodayLastWord(currentIndex, currentWord.word, currentWord.category);
-    }
+    if (!currentWord?.word) return;
+    saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
+    saveTodayLastWord(currentIndex, currentWord.word, currentWord.category);
+    noteDisplayedWord(currentWord.word);
   }, [currentWord?.word, currentWord?.category, currentIndex]);
 
   // Cleanup on unmount

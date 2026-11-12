@@ -12,6 +12,7 @@ export {
   deleteWordSet,
   setActiveSetId,
   recordWordEvent,
+  noteDisplayedWord,
   summarizeSet,
   wordsForSet,
   buildStudyList,
