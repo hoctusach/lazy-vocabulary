@@ -13,6 +13,7 @@ const META_KEY = 'lv.vocabularySets.v1';
 const ACTIVE_KEY = 'lv.vocabularySets.active';
 const DATA_PREFIX = 'lv.vocabularySets.data.';
 const PROGRESS_PREFIX = 'lv.vocabularySets.progress.';
+const DISPLAYED_WORD_EVENT = 'lv:vocabulary-set-displayed';
 
 const DAILY_NEW = 8;
 const DAILY_CAP = 16;
@@ -128,14 +129,48 @@ export function getSetSheets(id: string): SheetData {
 }
 
 export function emptyProgress(): SetProgressState {
-  return { learned: {} };
+  return { learned: {}, learning: {} };
 }
 
 export function getSetProgress(id: string): SetProgressState {
   if (id === DEFAULT_SET_ID) return emptyProgress();
   const stored = readJson<SetProgressState>(progressKey(id));
   if (!stored || typeof stored !== 'object' || !stored.learned) return emptyProgress();
-  return stored;
+  return { ...stored, learning: stored.learning ?? {} };
+}
+
+export function subscribeDisplayedWords(listener: () => void): () => void {
+  if (typeof window === 'undefined') return () => undefined;
+  window.addEventListener(DISPLAYED_WORD_EVENT, listener);
+  return () => window.removeEventListener(DISPLAYED_WORD_EVENT, listener);
+}
+
+/**
+ * The card on screen counts as learning for the active imported set.
+ * The study queue is left untouched so Next and auto-advance do not jump.
+ * Returns true only the first time that word and category are seen.
+ */
+export function recordDisplayedWord(word: string, category?: string): boolean {
+  const id = getActiveSetId();
+  if (id === DEFAULT_SET_ID) return false;
+  const trimmed = word.trim();
+  if (!trimmed) return false;
+  const key = wordKey(trimmed, category);
+  const progress = getSetProgress(id);
+  if (progress.learned[key] || progress.learning?.[key]) return false;
+  const learning = {
+    ...(progress.learning ?? {}),
+    [key]: {
+      word: trimmed,
+      category: category ?? '',
+      seenAt: new Date().toISOString(),
+    },
+  };
+  saveProgress(id, { ...progress, learning });
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(DISPLAYED_WORD_EVENT));
+  }
+  return true;
 }
 
 function saveProgress(id: string, progress: SetProgressState): void {
@@ -323,9 +358,12 @@ export function markSetWordLearned(
     nextReviewAt: next.toISOString(),
   };
   const todayKeys = (progress.todayKeys ?? []).filter((item) => item !== key);
+  const learning = { ...(progress.learning ?? {}) };
+  delete learning[key];
   const nextState: SetProgressState = {
     ...progress,
     learned: { ...progress.learned, [key]: entry },
+    learning,
     todayKeys,
   };
   saveProgress(id, nextState);
@@ -339,7 +377,15 @@ export function markSetWordNew(id: string, word: string, category?: string): Set
   if (!progress.learned[key]) return progress;
   const learned = { ...progress.learned };
   delete learned[key];
-  const nextState: SetProgressState = { ...progress, learned, todayKeys: undefined, todayDate: undefined };
+  const learning = { ...(progress.learning ?? {}) };
+  delete learning[key];
+  const nextState: SetProgressState = {
+    ...progress,
+    learned,
+    learning,
+    todayKeys: undefined,
+    todayDate: undefined,
+  };
   saveProgress(id, nextState);
   return nextState;
 }
@@ -352,11 +398,13 @@ export function progressStatsFor(words: VocabularyWord[], progress: SetProgressS
     return !Number.isFinite(next) || next <= deadline;
   });
   const learned = learnedEntries.length;
+  const learnedKeys = new Set(Object.keys(progress.learned));
+  const learning = Object.keys(progress.learning ?? {}).filter((key) => !learnedKeys.has(key)).length;
   return {
     total: words.length,
     learned,
-    learning: 0,
-    new: Math.max(words.length - learned, 0),
+    learning,
+    new: Math.max(words.length - learned - learning, 0),
     due: due.length,
   };
 }

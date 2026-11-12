@@ -16,7 +16,7 @@ import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
-import { getSetProgress } from './vocabularySetStore';
+import { getSetProgress, progressStatsFor, flattenSheets, getSetSheets } from './vocabularySetStore';
 
 const ACCEPT = '.csv,.xlsx,.xls,.json,text/csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
@@ -31,8 +31,10 @@ const VocabularySetsScreen: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const learnedCount = (id: string) =>
-    id === DEFAULT_SET_ID ? null : Object.keys(getSetProgress(id).learned).length;
+  const setCounts = (id: string) => {
+    if (id === DEFAULT_SET_ID) return null;
+    return progressStatsFor(flattenSheets(getSetSheets(id)), getSetProgress(id));
+  };
 
   const onPickFile = async (file: File | undefined) => {
     if (!file) return;
@@ -168,7 +170,7 @@ const VocabularySetsScreen: React.FC = () => {
       <ul className="space-y-3">
         {sets.map((set) => {
           const active = set.id === activeSet.id;
-          const learned = learnedCount(set.id);
+          const counts = setCounts(set.id);
           return (
             <li
               key={set.id}
@@ -193,7 +195,7 @@ const VocabularySetsScreen: React.FC = () => {
                     {set.wordCount.toLocaleString()} words
                     {set.builtin
                       ? ' · built-in · progress syncs to your account'
-                      : ` · ${learned ?? 0} learned on this device`}
+                      : ` · ${counts?.learning ?? 0} learning · ${counts?.learned ?? 0} learned on this device`}
                     {set.fileName && !set.builtin ? ` · ${set.fileName}` : ''}
                   </p>
                 </div>

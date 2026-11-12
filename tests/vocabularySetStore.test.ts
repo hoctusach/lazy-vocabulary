@@ -9,9 +9,13 @@ import {
   findSetWord,
   getActiveSetId,
   getSetProgress,
+  ensureTodayQueue,
+  flattenSheets,
   importVocabularySet,
   listVocabularySets,
   markSetWordLearned,
+  progressStatsFor,
+  recordDisplayedWord,
   renameVocabularySet,
   setActiveSet,
   wordKey,
@@ -110,5 +114,40 @@ describe('vocabulary set store', () => {
     expect(progress.learned[wordKey('set', 'idioms')]?.reviewCount).toBe(1);
     expect(progress.learned[wordKey('set', 'topic vocab')]).toBeUndefined();
     expect(findSetWord(words, 'set')).toMatchObject({ category: 'topic vocab' });
+  });
+
+  it('counts each displayed card as learning without changing the study list', () => {
+    const imported = importVocabularySet('Travel', sheets);
+    expect(imported.ok).toBe(true);
+    if (!imported.ok) return;
+
+    const words = flattenSheets(sheets);
+    const queue = ensureTodayQueue(imported.set.id, words, '2026-11-12');
+    const queueKeys = [...(getSetProgress(imported.set.id).todayKeys ?? [])];
+    expect(queue.map((word) => word.word)).toEqual(['alpha', 'beta']);
+
+    expect(recordDisplayedWord(queue[0].word, queue[0].category)).toBe(true);
+    expect(recordDisplayedWord(queue[0].word, queue[0].category)).toBe(false);
+    let stats = progressStatsFor(words, getSetProgress(imported.set.id));
+    expect(stats.learning).toBe(1);
+    expect(stats.learned).toBe(0);
+    expect(getSetProgress(imported.set.id).todayKeys).toEqual(queueKeys);
+
+    expect(recordDisplayedWord(queue[1].word, queue[1].category)).toBe(true);
+    stats = progressStatsFor(words, getSetProgress(imported.set.id));
+    expect(stats.learning).toBe(2);
+    expect(ensureTodayQueue(imported.set.id, words, '2026-11-12').map((word) => word.word)).toEqual([
+      'alpha',
+      'beta',
+    ]);
+
+    markSetWordLearned(imported.set.id, queue[0]);
+    stats = progressStatsFor(words, getSetProgress(imported.set.id));
+    expect(stats.learned).toBe(1);
+    expect(stats.learning).toBe(1);
+
+    setActiveSet(DEFAULT_SET_ID);
+    expect(recordDisplayedWord('alpha', 'imported')).toBe(false);
+    expect(getSetProgress(DEFAULT_SET_ID).learning).toEqual({});
   });
 });

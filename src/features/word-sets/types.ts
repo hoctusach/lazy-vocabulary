@@ -24,8 +24,16 @@ export interface LearnedWordEntry {
   nextReviewAt: string;
 }
 
+/** A card the learner has seen, before they mark it learned. */
+export interface LearningWordEntry {
+  word: string;
+  category: string;
+  seenAt: string;
+}
+
 export interface SetProgressState {
   learned: Record<string, LearnedWordEntry>;
+  learning?: Record<string, LearningWordEntry>;
   todayDate?: string;
   todayKeys?: string[];
 }

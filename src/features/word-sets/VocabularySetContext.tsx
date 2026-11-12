@@ -21,6 +21,7 @@ import {
   progressStatsFor,
   renameVocabularySet,
   setActiveSet,
+  subscribeDisplayedWords,
 } from './vocabularySetStore';
 
 interface VocabularySetContextValue {
@@ -51,7 +52,10 @@ function applySearchSource(activeId: string, words: VocabularyWord[]) {
 
 export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [version, setVersion] = useState(0);
+  const [seenTick, setSeenTick] = useState(0);
   const refresh = useCallback(() => setVersion((value) => value + 1), []);
+
+  React.useEffect(() => subscribeDisplayedWords(() => setSeenTick((value) => value + 1)), []);
 
   const sets = useMemo(() => {
     void version;
@@ -69,8 +73,9 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
   const words = useMemo(() => flattenSheets(sheets), [sheets]);
   const progress = useMemo(() => {
     void version;
+    void seenTick;
     return getSetProgress(activeSet.id);
-  }, [activeSet.id, version]);
+  }, [activeSet.id, version, seenTick]);
   const todayWords = useMemo(() => {
     void version;
     return activeSet.id === DEFAULT_SET_ID ? [] : ensureTodayQueue(activeSet.id, words);
