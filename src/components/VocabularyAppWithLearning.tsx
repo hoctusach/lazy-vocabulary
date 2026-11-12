@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
 import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
@@ -9,14 +9,28 @@ import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, Eye } from 'lucide-react';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
-import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { MarkAsNewDialog } from './MarkAsNewDialog';
 import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { VocabularyWord } from '@/types/vocabulary';
+import type { DailySelection } from '@/types/learning';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
 import { trackUiInteraction } from '@/services/analyticsService';
+import { useAppTab } from '@/components/mobile/appTabContext';
+import StreakPanel from './vocabulary-app/StreakPanel';
+import LeaderboardPanel from './vocabulary-app/LeaderboardPanel';
+import { cn } from '@/lib/utils';
+import {
+  DEFAULT_SET_ID,
+  WORD_SETS_CHANGED_EVENT,
+  buildStudyList,
+  getActiveSetId,
+  listStoredSets,
+  recordWordEvent,
+  wordsForSet,
+} from '@/lib/wordSets';
+import { useImportedStudyWords } from '@/components/word-sets/useImportedStudyWords';
 
 const VocabularyAppWithLearning: React.FC = () => {
   useDailyUsageTracker();
@@ -25,6 +39,15 @@ const VocabularyAppWithLearning: React.FC = () => {
   const [wordToReset, setWordToReset] = useState<LearnedWordSummary | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchWord, setSearchWord] = useState('');
+  const [setRevision, setSetRevision] = useState(0);
+  const { tab, inShell } = useAppTab();
+  const imported = useImportedStudyWords(setRevision);
+
+  useEffect(() => {
+    const refresh = () => setSetRevision((value) => value + 1);
+    window.addEventListener(WORD_SETS_CHANGED_EVENT, refresh);
+    return () => window.removeEventListener(WORD_SETS_CHANGED_EVENT, refresh);
+  }, []);
 
   const {
     dailySelection,
@@ -72,6 +95,7 @@ const VocabularyAppWithLearning: React.FC = () => {
     const handleWordChange = () => {
       if (previousWordRef.current) {
         markWordAsPlayed(previousWordRef.current.word);
+        recordWordEvent(getActiveSetId(), previousWordRef.current.word, 'seen', { silent: true });
       }
       previousWordRef.current = vocabularyService.getCurrentWord();
     };
@@ -299,24 +323,75 @@ const VocabularyAppWithLearning: React.FC = () => {
     </TooltipProvider>
   );
 
+  const learnHidden = inShell && tab !== 'learn' && tab !== 'all';
+  const progressHidden = inShell && tab !== 'progress' && tab !== 'all';
+  const importedSelection: DailySelection | null = imported.usingImported
+    ? {
+        newWords: [],
+        reviewWords: [],
+        totalCount: imported.study.length,
+        severity: 'light',
+        date: new Date().toISOString().slice(0, 10),
+        mode: 'Light',
+        count: imported.study.length,
+        category: null,
+      }
+    : null;
+  const offlineDefaultWords = useMemo(() => {
+    if (imported.usingImported || todayWords.length > 0) return null;
+    const builtin = listStoredSets().find((set) => set.id === DEFAULT_SET_ID);
+    if (!builtin) return null;
+    return buildStudyList(DEFAULT_SET_ID, wordsForSet(builtin));
+  }, [imported.revision, imported.usingImported, todayWords.length]);
+  const studyWords = imported.usingImported ? imported.study : offlineDefaultWords ?? todayWords;
+
   return (
     <>
       <ToastProvider />
-      <div className="w-full max-w-6xl mx-auto p-4">
+      <div className={cn('mx-auto w-full max-w-6xl p-1 sm:p-4', learnHidden && 'max-md:hidden')}>
+        {imported.usingImported && (
+          <p className="mb-2 rounded-2xl bg-[var(--lv-accent-soft)] px-3 py-2 text-sm font-medium text-[var(--lv-heading)]">
+            Studying “{imported.name}”
+            {imported.study.length === 0 ? ' · every word in this set is learned for now' : ''}
+          </p>
+        )}
         <VocabularyAppContainerNew
-          initialWords={todayWords}
-          dailySelection={dailySelection}
-          isLoadingSelection={isDailySelectionLoading}
+          initialWords={studyWords}
+          dailySelection={imported.usingImported ? importedSelection : offlineDefaultWords ? {
+            newWords: [],
+            reviewWords: [],
+            totalCount: offlineDefaultWords.length,
+            severity: 'light',
+            mode: 'Light',
+            count: offlineDefaultWords.length,
+            category: null,
+          } : dailySelection}
+          isLoadingSelection={!imported.usingImported && !offlineDefaultWords?.length && isDailySelectionLoading}
+          showInsights={!inShell}
           onMarkWordLearned={(word) => {
-            markCurrentWordLearned(word);
+            recordWordEvent(getActiveSetId(), word, 'learned');
+            if (!imported.usingImported) {
+              markCurrentWordLearned(word);
+            }
           }}
-          additionalContent={learningSection}
+          additionalContent={inShell ? undefined : learningSection}
           onOpenSearch={openSearch}
           currentUserLearnedCount={progressStats.learned}
           currentUserLearningCount={progressStats.learning}
           currentUserDueCount={progressStats.due}
         />
       </div>
+      {inShell && (
+        <div className={cn('mx-auto w-full max-w-6xl space-y-3 px-1 sm:px-4', progressHidden && 'max-md:hidden')}>
+          <StreakPanel refreshKey={progressStats.learned} />
+          <LeaderboardPanel
+            currentUserLearnedCount={progressStats.learned}
+            currentUserLearningCount={progressStats.learning}
+            currentUserDueCount={progressStats.due}
+          />
+          {learningSection}
+        </div>
+      )}
       <MarkAsNewDialog
         isOpen={isMarkAsNewDialogOpen}
         onClose={() => setIsMarkAsNewDialogOpen(false)}

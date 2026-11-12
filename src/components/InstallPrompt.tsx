@@ -3,6 +3,7 @@ import { Download, Share, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Capacitor } from '@capacitor/core';
 
 const DISMISSED_KEY = 'lazyVoca.installPromptDismissed';
 
@@ -54,7 +55,7 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
   const [dismissed, setDismissed] = useState(wasDismissed);
 
   useEffect(() => {
-    if (isStandaloneDisplay() || wasDismissed()) return;
+    if (Capacitor.isNativePlatform() || isStandaloneDisplay() || wasDismissed()) return;
 
     const handleBeforeInstall = (event: Event) => {
       event.preventDefault();
@@ -97,12 +98,12 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
     setDismissed(true);
   };
 
-  if (dismissed || (!deferredPrompt && !fallbackTip)) return null;
+  if (Capacitor.isNativePlatform() || dismissed || (!deferredPrompt && !fallbackTip)) return null;
 
   return (
     <div
       className={cn(
-        'fixed inset-x-0 bottom-3 z-[60] flex justify-center px-3',
+        'fixed inset-x-0 z-[60] flex justify-center px-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:bottom-3',
         className,
       )}
     >

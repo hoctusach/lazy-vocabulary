@@ -1,6 +1,7 @@
 
 import { VocabularyWord, SheetData } from "@/types/vocabulary";
 import { VocabularyDataManager } from "./VocabularyDataManager";
+import { VocabularyDataProcessor } from "./VocabularyDataProcessor";
 import { VocabularySheetOperations } from "./VocabularySheetOperations";
 import { VocabularyOperations } from "./VocabularyOperations";
 
@@ -13,10 +14,11 @@ export class VocabularyService {
   private vocabularyOperations: VocabularyOperations;
   
   readonly sheetOptions: string[];
+  private readonly builtinSheetOptions: string[];
   
   constructor() {
     // Updated sheet options without "All words"
-    this.sheetOptions = [
+    this.builtinSheetOptions = [
       "phrasal verbs",
       "idioms",
       "topic vocab",
@@ -24,6 +26,7 @@ export class VocabularyService {
       "phrases, collocations",
       "word formation"
     ];
+    this.sheetOptions = [...this.builtinSheetOptions];
     
     // Initialize the components
     this.dataManager = new VocabularyDataManager();
@@ -66,9 +69,34 @@ export class VocabularyService {
   async loadDefaultVocabulary(data?: SheetData): Promise<boolean> {
     const result = await this.dataManager.loadDefaultVocabulary();
     if (result) {
+      this.restoreBuiltinSheets();
       this.sheetOperations.updateWordNavigation();
     }
     return result;
+  }
+
+  /** Replace the in-memory deck with an imported set. Categories come from the file. */
+  loadSheetData(data: SheetData): boolean {
+    const processed = new VocabularyDataProcessor().processDataTypes(data);
+    const names = Object.keys(processed).filter((name) => (processed[name]?.length ?? 0) > 0);
+    if (names.length === 0) return false;
+    this.dataManager.setData(processed);
+    this.sheetOptions.splice(0, this.sheetOptions.length, ...names);
+    const navigation = this.sheetOperations.getWordNavigation();
+    if (!names.includes(navigation.getCurrentSheetName())) {
+      navigation.setCurrentSheetName(names[0]);
+    }
+    this.sheetOperations.updateWordNavigation();
+    this.dataManager.notifyVocabularyChange();
+    return true;
+  }
+
+  restoreBuiltinSheets(): void {
+    this.sheetOptions.splice(0, this.sheetOptions.length, ...this.builtinSheetOptions);
+    const navigation = this.sheetOperations.getWordNavigation();
+    if (!this.builtinSheetOptions.includes(navigation.getCurrentSheetName())) {
+      navigation.setCurrentSheetName(this.builtinSheetOptions[0]);
+    }
   }
   
   getCurrentSheetName(): string {

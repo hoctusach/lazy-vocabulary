@@ -38,13 +38,13 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
         <Button
           variant="outline"
           size="sm"
-          className="h-8 w-8 p-0 text-gray-700 hover:text-[var(--lv-accent)] dark:text-gray-200 dark:hover:text-[var(--lv-accent)]"
+          className="h-11 w-11 p-0 text-gray-700 hover:text-[var(--lv-accent)] dark:text-gray-200 dark:hover:text-[var(--lv-accent)] md:h-8 md:w-8"
           title="Speech Rate"
         >
           <Gauge size={16} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-44 p-2" side="right" align="start">
+      <PopoverContent className="w-44 p-2" side="top" align="center">
         <div className="grid grid-cols-4 gap-2">
           {RATE_OPTIONS.map(({ value, label }) => {
             const isActive = Math.abs(rate - value) < 0.001;
@@ -53,7 +53,7 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange })
                 <Button
                   size="sm"
                   variant={isActive ? 'default' : 'outline'}
-                  className="h-7 px-2 text-xs"
+                  className="h-11 px-2 text-xs"
                   onClick={() => handleChange(value)}
                 >
                   {label}

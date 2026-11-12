@@ -3,6 +3,7 @@ import { SheetData } from "@/types/vocabulary";
 import { DEFAULT_VOCABULARY_DATA } from "@/data/defaultVocabulary";
 import { STORAGE_CONFIG } from "./vocabulary/storage/StorageConfig";
 import { DataValidator } from "./vocabulary/storage/DataValidator";
+import { readActiveSelection } from "@/lib/wordSets/repository";
 
 export class VocabularyStorage {
   private readonly config = STORAGE_CONFIG;
@@ -12,6 +13,19 @@ export class VocabularyStorage {
    * Loads vocabulary data from local storage
    */
   loadData(): SheetData {
+    // An explicit set choice wins. Until the learner picks one, keep the legacy deck.
+    try {
+      const selection = readActiveSelection();
+      if (selection.kind === 'builtin') {
+        return this.validator.getDefaultData();
+      }
+      if (selection.kind === 'imported') {
+        return this.validator.ensureDataTypes(selection.data as Record<string, Array<Record<string, unknown>>>);
+      }
+    } catch (error) {
+      console.warn('Failed to load the active word set, using the saved deck:', error);
+    }
+
     // Try to load last uploaded data first
     const lastUploadedData = localStorage.getItem(this.config.LAST_UPLOADED_KEY);
     if (lastUploadedData) {

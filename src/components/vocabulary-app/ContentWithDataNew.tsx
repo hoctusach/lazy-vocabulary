@@ -23,6 +23,7 @@ interface ContentWithDataNewProps {
   currentUserLearningCount?: number;
   currentUserDueCount?: number;
   additionalContent?: React.ReactNode;
+  showInsights?: boolean;
   emptyState?: {
     word: string;
     meaning: string;
@@ -50,6 +51,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   currentUserLearningCount,
   currentUserDueCount,
   additionalContent,
+  showInsights = true,
   emptyState,
 }) => {
   return (
@@ -72,13 +74,17 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onOpenSearch={onOpenSearch}
       />
 
-      <StreakPanel refreshKey={currentUserLearnedCount} />
+      {showInsights && (
+        <>
+          <StreakPanel refreshKey={currentUserLearnedCount} />
 
-      <LeaderboardPanel
-        currentUserLearnedCount={currentUserLearnedCount}
-        currentUserLearningCount={currentUserLearningCount}
-        currentUserDueCount={currentUserDueCount}
-      />
+          <LeaderboardPanel
+            currentUserLearnedCount={currentUserLearnedCount}
+            currentUserLearningCount={currentUserLearningCount}
+            currentUserDueCount={currentUserDueCount}
+          />
+        </>
+      )}
 
       {additionalContent}
 

@@ -11,6 +11,8 @@ import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { cleanSpeechText } from '@/utils/speech';
 import { trackUiInteraction, trackWordSearch } from '@/services/analyticsService';
+import { speakWithDeviceTts } from '@/lib/native/deviceTts';
+import { DEFAULT_SET_ID, getActiveSetId, hasChosenSet, searchImportedSet } from '@/lib/wordSets';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -132,6 +134,36 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setSelectedWord(null);
       setNoResults(false);
       try {
+        if (hasChosenSet() && getActiveSetId() !== DEFAULT_SET_ID) {
+          const local = searchImportedSet(getActiveSetId(), trimmed);
+          if (isCancelled) return;
+          const nextResults = local.map((word, index) => ({
+            word_id: `${word.category ?? 'set'}::${word.word}`,
+            word: word.word,
+            category: word.category ?? null,
+            meaning: word.meaning,
+            example: word.example,
+            translation: word.translation ?? null,
+            match_rank: index,
+          }));
+          if (nextResults.length === 0) {
+            setNoResults(true);
+          } else {
+            setResults(nextResults);
+            setNoResults(false);
+          }
+          trackWordSearch({
+            query: trimmed,
+            resultCount: nextResults.length,
+            source: 'imported-set',
+            durationMs:
+              startedAt != null && typeof performance !== 'undefined'
+                ? Math.round(performance.now() - startedAt)
+                : null,
+          });
+          return;
+        }
+
         const supabase = getSupabaseClient();
         const { data, error } = await supabase.rpc('search_vocabulary', {
           p_query: trimmed.toLowerCase(),
@@ -234,6 +266,11 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       .join('. ');
     const sanitized = cleanSpeechText(text);
     const speechText = sanitized || text;
+    if (typeof window.speechSynthesis === 'undefined') {
+      void speakWithDeviceTts(speechText);
+      trackUiInteraction('search_preview_play', { label: selectedWord.word });
+      return;
+    }
     const utterance = new SpeechSynthesisUtterance(speechText);
     const voices = window.speechSynthesis.getVoices();
     const voice = findVoice(voices, previewVoice);

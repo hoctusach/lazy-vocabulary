@@ -1066,6 +1066,22 @@ button:hover {
   white-space: nowrap;
 }
 
+.app-frame {
+  background: var(--lv-body-bg);
+}
+
+@media (max-width: 767px) {
+  .study-controls button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .mobile-note {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
 /* Medal styling */
 .medal-item {
   border: 2px solid var(--lv-accent-soft);

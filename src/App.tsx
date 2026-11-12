@@ -2,7 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, HashRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Capacitor } from "@capacitor/core";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -47,24 +48,37 @@ const App = () => {
         </Helmet>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
-          <AnalyticsRouteTracker />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/vocabulary/:word" element={<VocabularyDetailPage />} />
-            {process.env.NODE_ENV !== "production" && (
-              <Route path="/dev" element={<Dev />} />
-            )}
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        {/* HashRouter inside the native WebView survives reloads and custom-scheme
+            opens. The website keeps BrowserRouter so existing URLs stay clean. */}
+        {Capacitor.isNativePlatform() ? (
+          <HashRouter>
+            <AppRoutes />
+          </HashRouter>
+        ) : (
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        )}
         <AuthGate />
         <InstallPrompt />
       </TooltipProvider>
     </QueryClientProvider>
   );
 };
+
+const AppRoutes = () => (
+  <>
+    <AnalyticsRouteTracker />
+    <Routes>
+      <Route path="/" element={<Index />} />
+      <Route path="/vocabulary/:word" element={<VocabularyDetailPage />} />
+      {process.env.NODE_ENV !== "production" && (
+        <Route path="/dev" element={<Dev />} />
+      )}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  </>
+);
 
 const AnalyticsRouteTracker = () => {
   const location = useLocation();

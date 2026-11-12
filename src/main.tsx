@@ -5,6 +5,7 @@ import './index.css'
 import { loadSessionOnBoot } from '@/lib/customAuth'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { initTheme } from '@/lib/themeManager'
+import { initNativeShell } from '@/lib/native/initNativeShell'
 
 // Disable console logs in production for better performance
 if (import.meta.env.PROD) {
@@ -14,6 +15,7 @@ if (import.meta.env.PROD) {
 }
 
 loadSessionOnBoot();
+void initNativeShell();
 
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") {

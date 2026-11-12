@@ -8,6 +8,7 @@ import { logSpeechEvent } from "@/utils/speechLogger";
 import { logAvailableVoices } from "@/utils/speech/debug/logVoices";
 import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 import { unifiedSpeechController } from "./unifiedSpeechController";
+import { shouldPreferNativeTts, speakWithDeviceTts, stopDeviceTts } from "@/lib/native/deviceTts";
 
 const DEBUG_SPEECH = (window as any).DEBUG_SPEECH;
 
@@ -25,13 +26,15 @@ interface SpeechOptions {
 class RealSpeechService {
   private currentUtterance: SpeechSynthesisUtterance | null = null;
   private isActive = false;
+  private usingNative = false;
 
   async speak(text: string, options: SpeechOptions): Promise<boolean> {
     const epoch = options.epoch;
     if (!unifiedSpeechController.canAdvance(epoch)) {
       return false;
     }
-    if (!window.speechSynthesis) {
+    const preferNative = await shouldPreferNativeTts();
+    if (!preferNative && !window.speechSynthesis) {
       console.error("Speech synthesis not supported");
       return false;
     }
@@ -48,7 +51,7 @@ class RealSpeechService {
       }
     } catch {}
 
-    if (!speechInitialized) {
+    if (!preferNative && !speechInitialized) {
       await initializeSpeechSystem();
     }
 
@@ -58,6 +61,10 @@ class RealSpeechService {
 
     const sanitizedText = cleanSpeechText(text);
     const textForSpeech = sanitizedText || text;
+
+    if (preferNative) {
+      return this.speakWithDevice(textForSpeech, options);
+    }
 
     logSpeechEvent({
       timestamp: Date.now(),
@@ -259,7 +266,29 @@ class RealSpeechService {
     });
   }
 
+  private async speakWithDevice(text: string, options: SpeechOptions): Promise<boolean> {
+    this.usingNative = true;
+    if (!options.muted) {
+      options.onStart?.();
+    }
+    const spoken = await speakWithDeviceTts(text, {
+      rate: getSpeechRate(),
+      muted: options.muted,
+    });
+    this.usingNative = false;
+    if (!spoken) {
+      options.onError?.(new Event('error') as SpeechSynthesisErrorEvent);
+      return false;
+    }
+    options.onEnd?.();
+    return true;
+  }
+
   stop(): void {
+    if (this.usingNative) {
+      this.usingNative = false;
+      void stopDeviceTts();
+    }
     if (window.speechSynthesis) {
       if (this.currentUtterance) {
         this.currentUtterance.onend = null;
@@ -286,7 +315,7 @@ class RealSpeechService {
   }
 
   isCurrentlyActive(): boolean {
-    return this.isActive && window.speechSynthesis?.speaking;
+    return this.isActive && (this.usingNative || Boolean(window.speechSynthesis?.speaking));
   }
 
   getCurrentUtterance(): SpeechSynthesisUtterance | null {
