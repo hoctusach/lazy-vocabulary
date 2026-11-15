@@ -39,7 +39,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
       )}
       style={{ background: backgroundColor }}
     >
-      <CardContent className="p-2">
+      <CardContent className="p-4 sm:p-5">
         <div className="space-y-2">
           {/* Category and Word Count */}
           <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           <div className="text-left">
             <h1
               className="font-bold"
-              style={{ color: 'var(--lv-word-title)', fontSize: '1.25rem', textAlign: 'left' }}
+              style={{ color: 'var(--lv-word-title)', fontSize: 'clamp(1.5rem, 5vw, 2rem)', textAlign: 'left', lineHeight: 1.25 }}
             >
               {main}
               {annotations.map((t, i) => (

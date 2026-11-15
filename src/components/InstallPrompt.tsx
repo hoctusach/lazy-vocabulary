@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { Download, Share, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -97,12 +98,13 @@ const InstallPrompt: React.FC<{ className?: string }> = ({ className }) => {
     setDismissed(true);
   };
 
+  if (Capacitor.isNativePlatform()) return null;
   if (dismissed || (!deferredPrompt && !fallbackTip)) return null;
 
   return (
     <div
       className={cn(
-        'fixed inset-x-0 bottom-3 z-[60] flex justify-center px-3',
+        'fixed inset-x-0 bottom-3 z-[60] hidden justify-center px-3 md:flex',
         className,
       )}
     >

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">lazy-vocabulary</string>
-    <string name="title_activity_main">lazy-vocabulary</string>
+    <string name="app_name">Lazy Vocabulary</string>
+    <string name="title_activity_main">Lazy Vocabulary</string>
     <string name="package_name">com.lazy.vocabulary</string>
-    <string name="custom_url_scheme">com.lazy.vocabulary</string>
+    <string name="custom_url_scheme">lazyvocabulary</string>
 </resources>

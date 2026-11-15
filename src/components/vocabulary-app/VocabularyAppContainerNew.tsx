@@ -15,7 +15,7 @@ import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  onMarkWordLearned?: (word: string) => void;
+  onMarkWordLearned?: (word: string, category?: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;
@@ -24,6 +24,7 @@ interface VocabularyAppContainerNewProps {
   currentUserLearnedCount?: number;
   currentUserLearningCount?: number;
   currentUserDueCount?: number;
+  variant?: 'full' | 'card';
 }
 
 const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
@@ -36,6 +37,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   currentUserLearnedCount,
   currentUserLearningCount,
   currentUserDueCount,
+  variant = 'full',
 }) => {
   // Use stable state management
   const {
@@ -183,6 +185,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             currentUserLearnedCount={currentUserLearnedCount}
             currentUserLearningCount={currentUserLearningCount}
             currentUserDueCount={currentUserDueCount}
+            variant={variant}
           />
         </div>
       </VocabularyLayout>

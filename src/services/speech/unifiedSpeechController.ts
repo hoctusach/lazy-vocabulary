@@ -103,10 +103,15 @@ class UnifiedSpeechController {
       .filter(Boolean)
       .map(part => part.trim());
     const text = parts.join('. ');
-    if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    const synthesis = window.speechSynthesis;
+    if (!synthesis || typeof synthesis.speak !== 'function') {
+      resolve(false);
+      return;
+    }
+    if (synthesis.speaking || synthesis.pending) {
       if (DEBUG_SPEECH) console.log('Speech engine busy, waiting to speak');
       this.queue.unshift({ word, voiceName, resolve, epoch });
-      window.speechSynthesis.cancel();
+      synthesis.cancel();
       const id = window.setTimeout(() => {
         this.unregisterTimer(id);
         this.processQueue();

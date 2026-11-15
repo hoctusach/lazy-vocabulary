@@ -386,9 +386,12 @@ export default function AuthGate() {
       <form
         onSubmit={onSubmit}
         style={{
-          width: 360,
+          width: 'min(420px, calc(100vw - 24px))',
+          maxHeight: 'calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
+          overflowY: 'auto',
           padding: 20,
-          borderRadius: 12,
+          paddingBottom: 'max(20px, env(safe-area-inset-bottom))',
+          borderRadius: 16,
           background: 'var(--lv-card-bg)',
           boxShadow: 'var(--lv-shadow)',
           fontFamily: 'system-ui, sans-serif',
@@ -416,8 +419,9 @@ export default function AuthGate() {
           disabled={s.pending}
           style={{
             width: '100%',
+            minHeight: 44,
             padding: '10px 12px',
-            fontSize: 14,
+            fontSize: 16,
             borderRadius: 8,
             border: '1px solid var(--lv-field-border)',
             background: 'var(--lv-field-bg)',
@@ -443,8 +447,9 @@ export default function AuthGate() {
           ref={passcodeRef}
           style={{
             width: '100%',
+            minHeight: 44,
             padding: '10px 12px',
-            fontSize: 14,
+            fontSize: 16,
             borderRadius: 8,
             border: '1px solid var(--lv-field-border)',
             background: 'var(--lv-field-bg)',

@@ -48,7 +48,7 @@ const ThemeSwitcher: React.FC = () => {
             type="button"
             data-theme={option.name}
             onClick={() => handleQuickThemeChange(option.name)}
-            className={`w-9 h-9 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center text-lg transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${
+            className={`h-11 w-11 min-h-11 min-w-11 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center text-lg transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${
               isActive ? "ring-2 ring-[var(--lv-accent)] scale-110" : ""
             }`}
             title={option.label}

@@ -5,6 +5,7 @@ import React from 'react';
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
@@ -34,6 +35,7 @@ describe('VocabularyControlsColumn mark as learned', () => {
     const onMark = vi.fn();
 
     const { rerender } = render(
+      <MemoryRouter>
       <VocabularyControlsColumn
         isMuted={false}
         isPaused={false}
@@ -48,12 +50,14 @@ describe('VocabularyControlsColumn mark as learned', () => {
         playCurrentWord={() => {}}
         onMarkWordLearned={onMark}
       />
+      </MemoryRouter>
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Mark as Learned' }));
 
     // Simulate service advancing to a new word while dialog is open
     rerender(
+      <MemoryRouter>
       <VocabularyControlsColumn
         isMuted={false}
         isPaused={false}
@@ -68,6 +72,7 @@ describe('VocabularyControlsColumn mark as learned', () => {
         playCurrentWord={() => {}}
         onMarkWordLearned={onMark}
       />
+      </MemoryRouter>
     );
 
     // Confirm dialog displays original word
@@ -75,7 +80,7 @@ describe('VocabularyControlsColumn mark as learned', () => {
     expect(within(dialog).getByText(/apple/)).toBeInTheDocument();
 
     await userEvent.click(within(dialog).getByRole('button', { name: 'Mark as Learned' }));
-    expect(onMark).toHaveBeenCalledWith('apple');
+    expect(onMark).toHaveBeenCalledWith('apple', 'test');
   });
 });
 
