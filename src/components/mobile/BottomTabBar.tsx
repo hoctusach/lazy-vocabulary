@@ -29,6 +29,7 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({ tab, onChange, className })
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
       aria-label="Primary"
+      data-bottom-tab-bar
     >
       <ul className="mx-auto grid max-w-lg grid-cols-4">
         {TABS.map((item) => {

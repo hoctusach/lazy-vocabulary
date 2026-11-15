@@ -337,6 +337,22 @@ export function deleteVocabularySet(id: string): { ok: true } | { ok: false; err
   return { ok: true };
 }
 
+/** Removes every imported set and all per-set progress stored on this device. */
+export function clearAllVocabularySets(): void {
+  const store = storage();
+  if (!store) return;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < store.length; i += 1) {
+      const key = store.key(i);
+      if (key && key.startsWith('lv.vocabularySets.')) keys.push(key);
+    }
+    keys.forEach((key) => store.removeItem(key));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function markSetWordLearned(
   id: string,
   word: Pick<VocabularyWord, 'word' | 'category'>

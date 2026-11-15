@@ -245,6 +245,10 @@ Release builds must be signed with your own keystore. Debug builds are not accep
    - Play Store bundle: `cd android && ./gradlew bundleRelease`  
      AAB: `android/app/build/outputs/bundle/release/app-release.aab`
 
+> **Ads and release guard (Android only).** The Android app shows one light AdMob banner (Progress and Sets tabs only; never on the web). AdMob IDs live in one file, `src/config/ads.ts`, and ship as Google's TEST IDs. `bundleRelease` / `assembleRelease` **fail** until you replace them with your real IDs. Version overrides: `./gradlew bundleRelease -PversionCode=2 -PversionName=1.0.1`. Release builds use R8 minify + resource shrinking.
+>
+> Full Play Store checklist (AdMob IDs, `app-ads.txt`, GitHub secrets and the `Android release` workflow, privacy/deletion pages, account-deletion SQL, Data safety hints): see **[ANDROID.md](ANDROID.md)**.
+
 You still need a Google Play Console account to ship the AAB, and an Apple Developer account plus a Mac to archive the iOS app in Xcode (Product → Archive).
 
 ### Word sets

@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+// Release signing: put keystore.properties (storeFile, storePassword, keyAlias, keyPassword)
+// in android/ — it is gitignored, never commit it. See ANDROID.md.
+def keystoreProps = new Properties()
+def keystoreFile = rootProject.file('keystore.properties')
+if (keystoreFile.exists()) keystoreFile.withInputStream { keystoreProps.load(it) }
+
 android {
     namespace "com.lazy.vocabulary"
     compileSdk rootProject.ext.compileSdkVersion
@@ -7,8 +13,9 @@ android {
         applicationId "com.lazy.vocabulary"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Override with -PversionCode=12 -PversionName=1.2.0 (the release workflow does).
+        versionCode = ((project.findProperty("versionCode") ?: "1") as String).toInteger()
+        versionName = (project.findProperty("versionName") ?: "1.0.0") as String
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -18,27 +25,24 @@ android {
     }
     signingConfigs {
         release {
-            def propsFile = rootProject.file("keystore.properties")
-            if (propsFile.exists()) {
-                def props = new Properties()
-                props.load(new FileInputStream(propsFile))
-                storeFile rootProject.file(props['storeFile'])
-                storePassword props['storePassword']
-                keyAlias props['keyAlias']
-                keyPassword props['keyPassword']
+            if (keystoreFile.exists()) {
+                storeFile rootProject.file(keystoreProps['storeFile'])
+                storePassword keystoreProps['storePassword']
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keystoreProps['keyPassword']
             }
         }
     }
     buildTypes {
         release {
-            def propsFile = rootProject.file("keystore.properties")
-            if (propsFile.exists()) {
-                signingConfig signingConfigs.release
-            }
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (keystoreFile.exists()) signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    // admob_app_id (string resource used by the manifest) is generated from src/config/ads.ts.
+    sourceSets.main.res.srcDirs += "${buildDir}/generated/res/admob"
 }
 
 repositories {
@@ -60,6 +64,41 @@ dependencies {
 }
 
 apply from: 'capacitor.build.gradle'
+
+// ---- AdMob: single source of truth is src/config/ads.ts --------------------------------------
+def adsConfig = rootProject.file("../src/config/ads.ts")
+def admobXml = file("${buildDir}/generated/res/admob/values/admob_ids.xml")
+tasks.register("generateAdmobIds") {
+    inputs.file(adsConfig)
+    outputs.file(admobXml)
+    doLast {
+        if (!adsConfig.exists()) throw new GradleException("src/config/ads.ts is missing. It is the only AdMob config (appId + bannerId).")
+        def text = adsConfig.getText("UTF-8")
+        def m = (text =~ /appId:\s*['"]([^'"]+)['"]/)
+        if (!m.find()) throw new GradleException("src/config/ads.ts must contain appId: 'ca-app-pub-…~…' on one line. It is the only AdMob config.")
+        def id = m.group(1).replace("&", "&amp;").replace("<", "&lt;")
+        admobXml.parentFile.mkdirs()
+        admobXml.text = """<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Generated from src/config/ads.ts by generateAdmobIds. Do not edit. -->
+    <string name="admob_app_id" translatable="false">${id}</string>
+</resources>
+"""
+    }
+}
+afterEvaluate {
+    tasks.matching { it.name == "preBuild" || it.name ==~ /merge.*Resources/ || it.name ==~ /process.*Resources/ || it.name ==~ /lint.*/ }.configureEach {
+        dependsOn("generateAdmobIds")
+    }
+    // Debug builds may use Google's sample IDs. A release build must not.
+    tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+        doFirst {
+            if (adsConfig.getText("UTF-8").contains("3940256099942544")) {
+                throw new GradleException("src/config/ads.ts still contains Google sample AdMob IDs (3940256099942544). Replace appId and bannerId with your real AdMob IDs before a release build. Debug builds may keep the test IDs.")
+            }
+        }
+    }
+}
 
 try {
     def servicesJSON = file('google-services.json')
