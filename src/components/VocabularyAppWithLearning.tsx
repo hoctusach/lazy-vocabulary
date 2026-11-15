@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import VocabularyAppContainerNew from './vocabulary-app/VocabularyAppContainerNew';
 import { LearningProgressPanel } from './LearningProgressPanel';
 import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
@@ -361,7 +361,19 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     </TooltipProvider>
   );
 
-  const playbackWords = wordSets.isCustomSet ? wordSets.todayWords : todayWords;
+  // The daily list is account-backed. With no user key (fresh install, signed out) or a failed
+  // fetch it stays empty, so fall back to the local default sheet instead of an empty card.
+  const needsLocalFallback =
+    !wordSets.isCustomSet && todayWords.length === 0 && !isDailySelectionLoading;
+  const localFallbackWords = useMemo(
+    () => (needsLocalFallback ? vocabularyService.getWordList() : []),
+    [needsLocalFallback]
+  );
+  const playbackWords = wordSets.isCustomSet
+    ? wordSets.todayWords
+    : todayWords.length > 0
+      ? todayWords
+      : localFallbackWords;
   const playbackStats = wordSets.isCustomSet ? wordSets.stats : progressStats;
   const showCard = view !== 'progress';
   const showProgress = view !== 'learn';
