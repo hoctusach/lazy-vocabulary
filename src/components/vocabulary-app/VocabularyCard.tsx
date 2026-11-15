@@ -178,7 +178,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={handleMuteClick}
               className={cn(
                 "h-6 text-xs px-1.5",
-                isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
+                isMuted ? "text-[var(--lv-accent)] border-[var(--lv-accent)] bg-[var(--lv-accent-soft)]" : "text-[var(--lv-text-primary)]"
               )}
             >
               {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
@@ -191,7 +191,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={handlePauseClick}
               className={cn(
                 "h-6 text-xs px-1.5",
-                isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
+                isPaused ? "text-[var(--lv-example)] border-[var(--lv-example)] bg-[var(--lv-card-highlight)]" : "text-[var(--lv-text-primary)]"
               )}
             >
               {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}

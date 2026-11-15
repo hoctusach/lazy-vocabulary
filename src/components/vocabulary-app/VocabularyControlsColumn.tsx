@@ -158,7 +158,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           controlClass,
           'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
           isPaused
-            ? 'text-orange-500 border-orange-300 bg-orange-50 dark:text-orange-200 dark:border-orange-700 dark:bg-orange-900/40'
+            ? 'text-orange-700 border-orange-300 bg-orange-50 dark:text-orange-200 dark:border-orange-700 dark:bg-orange-900/40'
             : ''
         )}
         title={isPaused ? 'Play' : 'Pause'}

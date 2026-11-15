@@ -87,11 +87,11 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
                 {mainWord}
               </h2>
               {wordType && (
-                <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
+                <p className="text-sm text-[var(--lv-text-secondary)] font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
             </div>
             {isPaused && (
-              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+              <span className="text-xs bg-[var(--lv-accent-soft)] text-[var(--lv-example)] px-2 py-1 rounded-full font-medium">
                 Paused
               </span>
             )}

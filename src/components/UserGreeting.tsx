@@ -185,7 +185,7 @@ const UserGreeting = () => {
       <a
         href="#sign-out"
         onClick={handleSignOut}
-        className="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+        className="font-medium text-[var(--lv-accent)] hover:opacity-80 hover:underline"
       >
         Sign out
       </a>
@@ -194,7 +194,7 @@ const UserGreeting = () => {
         href="#reset-player"
         onClick={handleResetPlayer}
         aria-disabled={isResetting}
-        className={`font-medium text-blue-600 hover:text-blue-700 hover:underline ${
+        className={`font-medium text-[var(--lv-accent)] hover:opacity-80 hover:underline ${
           isResetting ? 'pointer-events-none opacity-60' : ''
         }`}
       >

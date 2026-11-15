@@ -63,7 +63,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                   </div>
                   <div className="text-center">
                     <div className="flex items-center justify-center gap-1">
-                      <div className="text-2xl font-bold text-red-600">{progressStats.due}</div>
+                      <div className="text-2xl font-bold text-[var(--lv-error)]">{progressStats.due}</div>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -94,19 +94,19 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{progressStats.learning}</div>
+                    <div className="text-2xl font-bold text-[var(--lv-success)]">{progressStats.learning}</div>
                     <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
                       Learning
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{progressStats.new}</div>
+                    <div className="text-2xl font-bold text-[var(--lv-warning)]">{progressStats.new}</div>
                     <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
                       New
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{progressStats.total}</div>
+                    <div className="text-2xl font-bold text-[var(--lv-accent)]">{progressStats.total}</div>
                     <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
                       Total
                     </div>

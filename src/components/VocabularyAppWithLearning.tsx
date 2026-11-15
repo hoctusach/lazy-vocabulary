@@ -240,11 +240,11 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           ) : (
             <>
               {!hasSelectionWords && (
-                <div className="text-sm text-gray-500 italic">No daily selection available yet.</div>
+                <div className="text-sm text-[var(--lv-text-secondary)] italic">No daily selection available yet.</div>
               )}
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="space-y-1.5">
-                  <h4 className="font-medium text-green-600">NEW TODAY ({newTodayList.length})</h4>
+                  <h4 className="font-medium text-[var(--lv-success)]">NEW TODAY ({newTodayList.length})</h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {newTodayList.length > 0 ? (
                       newTodayList.map((word, index) => (
@@ -281,7 +281,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
                 </div>
 
                 <div className="space-y-1.5">
-                  <h4 className="font-medium text-red-600">DUE TODAY ({dueTodayList.length})</h4>
+                  <h4 className="font-medium text-[var(--lv-error)]">DUE TODAY ({dueTodayList.length})</h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {dueTodayList.length > 0 ? (
                       dueTodayList.map((word, index) => (
@@ -318,7 +318,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
                 </div>
 
                 <div className="space-y-1.5">
-                  <h4 className="font-medium text-gray-600">LEARNED ({learnedWordsList.length})</h4>
+                  <h4 className="font-medium text-[var(--lv-text-secondary)]">LEARNED ({learnedWordsList.length})</h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {learnedWordsList.length > 0 ? (
                       learnedWordsList.map((word, index) => (
