@@ -32,11 +32,11 @@ export const useVoiceContext = (): VoiceContext => {
       }
     };
 
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoices);
     loadVoices();
 
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis?.removeEventListener?.('voiceschanged', loadVoices);
     };
   }, []);
 

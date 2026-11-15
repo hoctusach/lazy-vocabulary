@@ -30,13 +30,13 @@ export const useVoiceLoader = () => {
         if (newVoices.length > 0) {
           console.log(`Voices loaded via event: ${newVoices.length} voices`);
           voicesLoadedRef.current = true;
-          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          window.speechSynthesis?.removeEventListener?.('voiceschanged', voiceChangedHandler);
           resolve(true);
         }
       };
       
       // Listen for voices changed event
-      window.speechSynthesis.addEventListener('voiceschanged', voiceChangedHandler);
+      window.speechSynthesis?.addEventListener?.('voiceschanged', voiceChangedHandler);
       
       // Fallback timeout - try to get voices directly after a delay
       setTimeout(() => {
@@ -45,11 +45,11 @@ export const useVoiceLoader = () => {
         if (fallbackVoices.length > 0 && !voicesLoadedRef.current) {
           console.log(`Fallback voices loaded: ${fallbackVoices.length} voices`);
           voicesLoadedRef.current = true;
-          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          window.speechSynthesis?.removeEventListener?.('voiceschanged', voiceChangedHandler);
           resolve(true);
         } else if (!voicesLoadedRef.current) {
           console.warn('No voices available after timeout, continuing anyway');
-          window.speechSynthesis.removeEventListener('voiceschanged', voiceChangedHandler);
+          window.speechSynthesis?.removeEventListener?.('voiceschanged', voiceChangedHandler);
           resolve(false);
         }
       }, 2000);

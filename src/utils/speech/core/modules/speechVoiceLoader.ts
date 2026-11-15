@@ -34,12 +34,12 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
       
       if (voices.length > 0) {
         voicesLoaded = true;
-        window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+        window.speechSynthesis?.removeEventListener?.('voiceschanged', voicesChangedHandler);
         resolve(voices);
       }
     };
     
-    window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+    window.speechSynthesis?.addEventListener?.('voiceschanged', voicesChangedHandler);
     
     // Enhanced fallback with multiple checkpoints
     const checkpoints = [500, 1000, 1500, 2000, 3000];
@@ -55,7 +55,7 @@ export const loadVoicesAndWait = async (): Promise<SpeechSynthesisVoice[]> => {
           // Resolve if we found voices or this is our final attempt
           if (voices.length > 0 || index === checkpoints.length - 1) {
             if (!voicesLoaded) {
-              window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+              window.speechSynthesis?.removeEventListener?.('voiceschanged', voicesChangedHandler);
               console.log(`[ENGINE] ✓ Voice loading complete (${elapsed}ms): ${voices.length} voices`);
               logAvailableVoices(voices);
               voicesLoaded = true;

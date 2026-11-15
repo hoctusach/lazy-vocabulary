@@ -52,9 +52,9 @@ export const useVoiceManagement = () => {
     loadVoicesAndNotify();
 
     if (window.speechSynthesis) {
-      window.speechSynthesis.addEventListener('voiceschanged', loadVoicesAndNotify);
+      window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoicesAndNotify);
       return () => {
-        window.speechSynthesis.removeEventListener('voiceschanged', loadVoicesAndNotify);
+        window.speechSynthesis?.removeEventListener?.('voiceschanged', loadVoicesAndNotify);
       };
     }
   }, [allVoiceOptions]);

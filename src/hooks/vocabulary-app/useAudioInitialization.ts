@@ -27,11 +27,11 @@ export const useAudioInitialization = ({
       
       // Try to load immediately and also listen for the voiceschanged event
       loadVoices();
-      window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoices);
       
       // Clean up
       return () => {
-        window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+        window.speechSynthesis?.removeEventListener?.('voiceschanged', loadVoices);
         if (window.speechSynthesis.speaking) {
           window.speechSynthesis.cancel();
         }

@@ -1,4 +1,5 @@
 import './silenceConsole'
+import '@/services/speech/installSpeechShim'
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'

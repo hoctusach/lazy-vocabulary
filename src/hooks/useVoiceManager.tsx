@@ -42,6 +42,7 @@ export const useVoiceManager = () => {
   
   useEffect(() => {
     const synth = window.speechSynthesis;
+    if (!synth) return;
     
     // Initial load attempt
     loadVoices();

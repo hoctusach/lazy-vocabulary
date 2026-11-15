@@ -255,7 +255,7 @@ class RealSpeechService {
         }
       };
 
-      window.speechSynthesis.addEventListener("voiceschanged", loadVoices, {
+      window.speechSynthesis?.addEventListener?.("voiceschanged", loadVoices, {
         once: true,
       });
 

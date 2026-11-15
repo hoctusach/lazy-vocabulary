@@ -71,14 +71,14 @@ export const useVoiceSelection = () => {
     };
 
     loadVoices();
-    if ('onvoiceschanged' in window.speechSynthesis) {
+    if (window.speechSynthesis && 'onvoiceschanged' in window.speechSynthesis) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     } else {
       setTimeout(loadVoices, 500);
     }
 
     return () => {
-      if ('onvoiceschanged' in window.speechSynthesis) {
+      if (window.speechSynthesis && 'onvoiceschanged' in window.speechSynthesis) {
         window.speechSynthesis.onvoiceschanged = null;
       }
     };
