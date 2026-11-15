@@ -96,7 +96,7 @@ const VocabularySetsScreen: React.FC = () => {
           Word sets
         </h2>
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
-          Default is the built-in list and its progress syncs with your account. Imported sets stay on this
+          "Word Set: C1, C2" is the built-in list and its progress syncs with your account. Imported sets stay on this
           device, and each one keeps its own learned words.
         </p>
       </div>
@@ -287,7 +287,7 @@ const VocabularySetsScreen: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Delete this set?</DialogTitle>
             <DialogDescription>
-              The words and the learning progress for this set will be removed from this device. The Default set
+              The words and the learning progress for this set will be removed from this device. The "Word Set: C1, C2" set
               is not affected.
             </DialogDescription>
           </DialogHeader>

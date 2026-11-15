@@ -303,7 +303,7 @@ export function renameVocabularySet(
   name: string
 ): { ok: true } | { ok: false; error: string } {
   if (id === DEFAULT_SET_ID) {
-    return { ok: false, error: 'The Default set cannot be renamed.' };
+    return { ok: false, error: 'The "Word Set: C1, C2" set cannot be renamed.' };
   }
   const trimmed = name.trim();
   if (!trimmed) return { ok: false, error: 'Enter a name for this set.' };
@@ -319,7 +319,7 @@ export function renameVocabularySet(
 
 export function deleteVocabularySet(id: string): { ok: true } | { ok: false; error: string } {
   if (id === DEFAULT_SET_ID) {
-    return { ok: false, error: 'The Default set cannot be deleted.' };
+    return { ok: false, error: 'The "Word Set: C1, C2" set cannot be deleted.' };
   }
   const sets = readImportedMetas();
   if (!sets.some((set) => set.id === id)) {

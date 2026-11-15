@@ -3,7 +3,7 @@ import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 /** Built-in vocabulary. Progress for this set keeps the existing account sync. */
 export const DEFAULT_SET_ID = 'default';
 
-export const DEFAULT_SET_NAME = 'Default';
+export const DEFAULT_SET_NAME = 'Word Set: C1, C2';
 
 export interface VocabularySetMeta {
   id: string;

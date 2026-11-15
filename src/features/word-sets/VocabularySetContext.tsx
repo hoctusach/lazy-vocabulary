@@ -4,6 +4,7 @@ import { invalidateVocabularyIndex } from '@/services/search/vocabularyIndex';
 import { setAllWordsOverride } from '@/utils/allWords';
 import {
   DEFAULT_SET_ID,
+  DEFAULT_SET_NAME,
   type SetProgressState,
   type VocabularySetMeta,
 } from './types';
@@ -183,7 +184,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
 
 const FALLBACK_SET: VocabularySetMeta = {
   id: DEFAULT_SET_ID,
-  name: 'Default',
+  name: DEFAULT_SET_NAME,
   builtin: true,
   wordCount: 0,
   createdAt: '',

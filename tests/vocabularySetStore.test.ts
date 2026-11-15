@@ -38,11 +38,11 @@ describe('vocabulary set store', () => {
     expect(listVocabularySets()[0]?.id).toBe(DEFAULT_SET_ID);
     expect(deleteVocabularySet(DEFAULT_SET_ID)).toEqual({
       ok: false,
-      error: 'The Default set cannot be deleted.',
+      error: 'The "Word Set: C1, C2" set cannot be deleted.',
     });
     expect(renameVocabularySet(DEFAULT_SET_ID, 'Other')).toEqual({
       ok: false,
-      error: 'The Default set cannot be renamed.',
+      error: 'The "Word Set: C1, C2" set cannot be renamed.',
     });
     expect(listVocabularySets().some((set) => set.id === DEFAULT_SET_ID)).toBe(true);
   });
