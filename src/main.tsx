@@ -1,3 +1,4 @@
+import './silenceConsole'
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
@@ -6,12 +7,7 @@ import { loadSessionOnBoot } from '@/lib/customAuth'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { initTheme } from '@/lib/themeManager'
 
-// Disable console logs in production for better performance
-if (import.meta.env.PROD) {
-  console.log = () => {};
-  console.warn = () => {};
-  console.info = () => {};
-}
+// Production console silencing lives in ./silenceConsole (first import above).
 
 loadSessionOnBoot();
 

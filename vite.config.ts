@@ -46,6 +46,11 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
         }
       }
     },
+    // Strip noisy debug logging from production bundles (web and Android app).
+    // The vocabulary pipeline logs per word; leaving it in made app start-up slow.
+    esbuild: mode === 'production'
+      ? { pure: ['console.log', 'console.info', 'console.debug', 'console.warn', 'console.group', 'console.groupCollapsed', 'console.groupEnd'] }
+      : undefined,
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode)
     }

@@ -19,8 +19,10 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      launchShowDuration: 800,
-      launchAutoHide: true,
+      // Keep the splash until the app has rendered; initNativeShell() hides it
+      // after React mounts, so users never see an empty white WebView.
+      launchShowDuration: 3000,
+      launchAutoHide: false,
       backgroundColor: '#1e40af',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,

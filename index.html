@@ -25,6 +25,39 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@lovable_dev" />
     <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Boot watchdog (plain ES5 so it runs on any WebView): if the app has not
+         rendered after 12s, hide the native splash and show the startup error
+         instead of an empty white screen. -->
+    <script>
+      (function () {
+        var errors = [];
+        function note(msg) { if (errors.length < 5) errors.push(String(msg).slice(0, 300)); }
+        window.addEventListener('error', function (e) { note((e && e.message) || 'Script error'); });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e && e.reason; note('Unhandled: ' + ((r && (r.message || r)) || 'unknown'));
+        });
+        setTimeout(function () {
+          var root = document.getElementById('root');
+          if (!root || root.childElementCount > 0) return;
+          try {
+            var cap = window.Capacitor;
+            if (cap && cap.Plugins && cap.Plugins.SplashScreen) cap.Plugins.SplashScreen.hide();
+          } catch (err) { /* ignore */ }
+          var box = document.createElement('div');
+          box.setAttribute('style', 'font-family:sans-serif;padding:24px;color:#1e293b;line-height:1.5');
+          box.innerHTML = '<h2 style="margin:0 0 8px">Lazy Vocabulary could not start</h2>' +
+            '<p>Please close and reopen the app. If this keeps happening, send a screenshot of this page to hoctusach@gmail.com.</p>';
+          var pre = document.createElement('pre');
+          pre.setAttribute('style', 'white-space:pre-wrap;font-size:12px;background:#f1f5f9;padding:8px;border-radius:6px');
+          pre.textContent = (errors.join('\n') || 'No error reported (still loading?)') + '\n\n' + navigator.userAgent;
+          box.appendChild(pre);
+          document.body.appendChild(box);
+          var timer = setInterval(function () {
+            if (root.childElementCount > 0) { clearInterval(timer); if (box.parentNode) box.parentNode.removeChild(box); }
+          }, 1000);
+        }, 12000);
+      })();
+    </script>
     <!-- Google tag (gtag.js) -->
     <script>
       (function loadGoogleAnalytics() {
