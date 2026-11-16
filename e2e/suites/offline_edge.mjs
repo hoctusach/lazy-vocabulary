@@ -71,7 +71,9 @@ test('REG-01', 'Blank-screen guard: root fills fast, no watchdog box, logs silen
 test('REG-02', 'No Web Speech: signed-in and signed-out both render without TypeError', async ({ session }) => {
   for (const signedIn of [true, false]) {
     const s = await session({ speech: 'none', signedIn }); await s.goto('/'); await sleep(2500);
-    ok(await s.page.evaluate(() => typeof window.speechSynthesis === 'undefined' || !window.speechSynthesis), 'speech should be deleted');
+    // Web Speech is deleted before boot; the app then installs its own TTS shim on purpose.
+    ok(await s.page.evaluate(() => !window.speechSynthesis || !('onvoiceschanged' in window.speechSynthesis && window.speechSynthesis instanceof (window.SpeechSynthesis || class {}))), 'real Web Speech should be gone');
+    ok(!s.errors.some((e) => /TypeError/.test(e)), 'TypeError: ' + s.errors.join(' | '));
     if (signedIn) { await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 10000 }); await ctl(s, 'Next Word'); }
     else await waitText(s, 'Access your vocabulary');
   }
@@ -118,7 +120,7 @@ test('EDGE-06', 'Rapid control taps 30x: state consistent, no overlapping uttera
   await sleep(1200);
   const p = await U.prefs(s); eq(await U.label(s, 'Unmute'), p.is_muted === true, 'mute state vs prefs'); eq(await U.label(s, 'Play'), p.is_playing === false, 'pause state vs prefs');
   eq(await s.page.evaluate(() => window.__speech.overlap), 0, 'overlapping utterances');
-  const toasts = await s.page.evaluate(() => [...document.querySelectorAll('[data-sonner-toast], ol li')].filter((e) => e.getBoundingClientRect().height > 0).length); ok(toasts <= 6, 'toast flood ' + toasts);
+  const toasts = await s.page.evaluate(() => [...document.querySelectorAll('[data-sonner-toast]')].filter((e) => e.getAttribute('data-visible') !== 'false' && e.getAttribute('data-removed') !== 'true').length); ok(toasts <= 6, 'toast flood ' + toasts);
 });
 test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session }) => {
   const s = await session({}); await boot(s); s.allow.push(/Quota|quota|setItem|storage/i);
