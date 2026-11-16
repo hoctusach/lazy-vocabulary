@@ -12,6 +12,7 @@ import MorePanel from '@/components/mobile/MorePanel';
 import BottomTabBar, { type AppTab } from '@/components/mobile/BottomTabBar';
 import { useIsDesktop } from '@/components/mobile/useIsDesktop';
 import { useAndroidBackButton } from '@/components/mobile/useAndroidBackButton';
+import { useBannerAds } from '@/hooks/useBannerAds';
 
 const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { activeSet } = useVocabularySets();
@@ -51,13 +52,15 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
 const MobileHome: React.FC = () => {
   const [tab, setTab] = useState<AppTab>('learn');
   useAndroidBackButton(tab, setTab);
+  // Android app only: bottom banner on Progress/Sets. No-op on web.
+  useBannerAds(tab);
 
   return (
     <div className="min-h-screen" data-layout="mobile">
       <AppHeader compact />
       <main
         className="mx-auto w-full max-w-lg px-3 py-3"
-        style={{ paddingBottom: 'calc(4.75rem + env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'calc(4.75rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px))' }}
       >
         {tab === 'learn' && <VocabularyAppWithLearning view="learn" />}
         {tab === 'progress' && <VocabularyAppWithLearning view="progress" />}

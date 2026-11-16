@@ -2,6 +2,7 @@ import React from 'react';
 import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
+import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
 import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
 import ProCard from '@/components/mobile/ProCard';
@@ -34,6 +35,8 @@ const MorePanel: React.FC = () => {
           {!native && <NotificationManager />}
         </div>
       </div>
+
+      <PrivacyAndAccountCard />
 
       <div className="rounded-2xl border p-4 text-sm leading-relaxed theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
         <p className="slogan-note !text-left">
