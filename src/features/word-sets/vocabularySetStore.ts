@@ -190,7 +190,12 @@ export function getActiveSetId(): string {
   const stored = safeGet(ACTIVE_KEY);
   if (!stored || stored === DEFAULT_SET_ID) return DEFAULT_SET_ID;
   const known = readImportedMetas().some((set) => set.id === stored);
-  return known ? stored : DEFAULT_SET_ID;
+  if (!known) return DEFAULT_SET_ID;
+  // The list entry can outlive its words (data blob lost or unreadable). An active set with
+  // no words would show "No words in ... category" forever, so use the built-in set instead.
+  const data = readJson<SheetData>(dataKey(stored));
+  const hasWords = !!data && typeof data === 'object' && Object.values(data).some((rows) => Array.isArray(rows) && rows.length > 0);
+  return hasWords ? stored : DEFAULT_SET_ID;
 }
 
 export function getSetSheets(id: string): SheetData {
