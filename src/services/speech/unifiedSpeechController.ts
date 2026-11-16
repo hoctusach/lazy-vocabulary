@@ -130,7 +130,12 @@ class UnifiedSpeechController {
           resolve(false);
           return;
         }
-        this.finishWithMinDwell(epoch, startedAt, true, resolve);
+        this.isSpeaking = false;
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(true);
+        this.processQueue();
       }, estimateReadingTimeMs(text));
       this.registerTimer(id);
       return;
