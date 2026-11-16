@@ -23,7 +23,7 @@ const config: CapacitorConfig = {
       // after React mounts, so users never see an empty white WebView.
       launchShowDuration: 3000,
       launchAutoHide: false,
-      backgroundColor: '#1e40af',
+      backgroundColor: '#1a5488',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
       splashFullScreen: true,
