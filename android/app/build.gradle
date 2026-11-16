@@ -27,7 +27,7 @@ android {
     namespace "com.lazy.vocabulary"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.lazy.vocabulary"
+        applicationId "com.hoctusach.lazyvocabulary"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         // Override with -PversionCode=12 -PversionName=1.2.0 (the release workflow does).

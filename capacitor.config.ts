@@ -7,7 +7,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
  * index.html for client-side routes, so the app keeps BrowserRouter.
  */
 const config: CapacitorConfig = {
-  appId: 'com.lazy.vocabulary',
+  appId: 'com.hoctusach.lazyvocabulary',
   appName: 'Lazy Vocabulary',
   webDir: 'docs',
   server: {

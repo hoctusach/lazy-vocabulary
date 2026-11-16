@@ -1,6 +1,6 @@
 # Android release guide (Google Play)
 
-App id `com.lazy.vocabulary` · compile/target SDK 36 · Capacitor 8 · web build output `docs/` (also the GitHub Pages site, domain in `public/CNAME` → `www.lazyvoca.fun`).
+App id `com.hoctusach.lazyvocabulary` (Java namespace stays `com.lazy.vocabulary`) · compile/target SDK 36 · Capacitor 8 · web build output `docs/` (also the GitHub Pages site, domain in `public/CNAME` → `www.lazyvoca.fun`).
 
 ## 1. Ads (Android app only, light)
 
