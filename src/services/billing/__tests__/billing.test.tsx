@@ -35,9 +35,10 @@ const owned = (o: Record<string, unknown> = {}) => ({
   productIdentifier: 'pro_unlock', purchaseState: '1', isAcknowledged: true, purchaseToken: 'tok', orderId: 'GPA.1', ...o,
 });
 
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 
 beforeEach(() => {
+  vi.stubEnv('VITE_ENABLE_PRO', 'true');
   platform.native = true;
   platform.name = 'android';
   Object.values(plugin).forEach((f) => f.mockReset());

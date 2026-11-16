@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, useLocation } from "react-router-dom";
 import AppRouter from "@/lib/platform/AppRouter";
 import { initNativeShell } from "@/lib/platform/nativeShell";
+import { isProEnabled } from "@/config/features";
 import { initBilling } from "@/services/billing/billingService";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
@@ -27,7 +28,7 @@ const queryClient = new QueryClient();
 const App = () => {
   useEffect(() => {
     void initNativeShell();
-    void initBilling().catch(() => {});
+    if (isProEnabled()) void initBilling().catch(() => {});
   }, []);
   useEffect(() => {
     clearLegacyCustomWordKeys();

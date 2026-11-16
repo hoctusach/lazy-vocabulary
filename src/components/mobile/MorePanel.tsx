@@ -5,6 +5,7 @@ import NotificationManager from '@/components/NotificationManager';
 import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
 import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
+import { isProEnabled } from '@/config/features';
 import ProCard from '@/components/mobile/ProCard';
 import { isBillingSupported } from '@/services/billing/billingService';
 
@@ -24,7 +25,7 @@ const MorePanel: React.FC = () => {
 
       <FriendCompareCard />
 
-      {isBillingSupported() && <ProCard />}
+      {isProEnabled() && isBillingSupported() && <ProCard />}
 
       <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
         {/* Account & privacy group: Delete account / privacy links (feat/play-store-ads-release) slot in below the greeting. */}

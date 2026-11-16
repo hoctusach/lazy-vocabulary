@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useAdsAllowed } from '@/hooks/useAdsVisibility';
 import { adsEnabled, loadAdsService } from '@/services/ads';
 import { shouldShowBannerForTab, type AdTabId } from '@/services/ads/adsPolicy';
 
@@ -7,7 +8,8 @@ import { shouldShowBannerForTab, type AdTabId } from '@/services/ads/adsPolicy';
  * Strict no-op on web/PWA/iOS: nothing is imported and no CSS var is set.
  */
 export function useBannerAds(tab: AdTabId): void {
-  const show = shouldShowBannerForTab(tab);
+  const allowed = useAdsAllowed();
+  const show = allowed && shouldShowBannerForTab(tab);
   useEffect(() => {
     if (!adsEnabled()) return;
     let cancelled = false;

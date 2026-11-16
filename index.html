@@ -68,6 +68,10 @@
         if (!id) {
           return;
         }
+        // No Google Analytics inside the native Android app (Capacitor host); website only.
+        if (location.hostname === 'lazyvocabulary.local' || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())) {
+          return;
+        }
 
         const lowered = id.toLowerCase();
         if (lowered === '0' || lowered === 'false' || lowered === 'disabled' || lowered === 'none') {

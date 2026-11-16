@@ -16,6 +16,7 @@ import {
   BannerAdSize,
   type AdmobConsentInfo,
 } from '@capacitor-community/admob';
+import { adsAllowed, onAdsAllowedChange } from '@/hooks/useAdsVisibility';
 import { ADS_CONFIG } from '@/config/ads';
 import {
   DEFAULT_AD_SLOT_PX,
@@ -37,6 +38,34 @@ let slotPx = DEFAULT_AD_SLOT_PX;
 let attempts = 0;
 let listenersAttached = false;
 let queue: Promise<void> = Promise.resolve();
+let proSubscribed = false;
+
+function resetSlot(): void {
+  document.documentElement.style.setProperty(AD_SLOT_VAR, '0px');
+}
+
+/** Hide AND remove the banner view (Pro granted). Serialized with other calls. */
+function removeBannerNow(): void {
+  wanted = false;
+  resetSlot();
+  queue = queue
+    .then(async () => {
+      if (!bannerShown && bannerHidden) return;
+      try { await AdMob.removeBanner(); } catch { /* ignore */ }
+      bannerShown = false;
+      bannerHidden = true;
+    })
+    .catch((e) => console.warn('[ads]', e));
+}
+
+function subscribeOnce(): void {
+  if (proSubscribed) return;
+  proSubscribed = true;
+  onAdsAllowedChange((allowed) => {
+    if (!allowed) removeBannerNow();
+  });
+}
+subscribeOnce();
 
 function setSlot(px: number): void {
   document.documentElement.style.setProperty(AD_SLOT_VAR, `${px}px`);
@@ -73,6 +102,7 @@ function attachListeners(): void {
 
 /** UMP consent, then SDK init. Resolves true only if ads may be requested. */
 async function ensureReady(): Promise<boolean> {
+  if (!adsAllowed()) return false;
   if (ready) return true;
   if (!initializing) {
     initializing = (async () => {
@@ -98,6 +128,11 @@ async function ensureReady(): Promise<boolean> {
 }
 
 async function apply(): Promise<void> {
+  if (!adsAllowed()) {
+    wanted = false;
+    resetSlot();
+    return;
+  }
   if (!wanted) {
     if (bannerShown && !bannerHidden) {
       try { await AdMob.hideBanner(); } catch { /* ignore */ }
@@ -142,6 +177,7 @@ async function apply(): Promise<void> {
 
 /** Show (true) or hide (false) the bottom banner. Calls are serialized. */
 export function setBannerWanted(value: boolean): void {
+  if (value && !adsAllowed()) value = false;
   wanted = value;
   if (!value) document.documentElement.style.setProperty(AD_SLOT_VAR, '0px');
   else setSlot(slotPx);

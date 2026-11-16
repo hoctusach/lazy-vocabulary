@@ -13,18 +13,18 @@ App id `com.lazy.vocabulary` · compile/target SDK 36 · Capacitor 8 · web buil
 
 Edit **only** `src/config/ads.ts`:
 
-```ts
-export const ADS_CONFIG = {
-  appId: 'ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY',     // AdMob → Apps → App ID
-  bannerId: 'ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ',   // AdMob → Ad units → Banner
-};
+Set the IDs through env (shell, or `.env.production` at the repo root):
+
+```
+VITE_ADMOB_APP_ID=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY   # AdMob → Apps → App ID
+VITE_ADMOB_BANNER_ID=ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ # AdMob → Ad units → Banner
 ```
 
-Gradle (`generateAdmobIds` in `android/app/build.gradle`) reads `appId` from this file and generates the `admob_app_id` string used by the manifest `com.google.android.gms.ads.APPLICATION_ID`. Keep `appId: '…'` on one line (regex-parsed).
+Without them the app uses Google's test IDs (`src/config/ads.ts`). Gradle (`generateAdmobIds`) resolves the manifest app id from env `ADMOB_APP_ID` / `-PadmobAppId`, else `VITE_ADMOB_APP_ID=` in `.env.production` / `.env`, else the test id.
 
 ### Release guard
 
-The defaults are Google's **test IDs** (`3940256099942544`). `preReleaseBuild` (so `bundleRelease` and `assembleRelease`) **fails** while `src/config/ads.ts` contains that string. Debug builds are allowed. The release workflow checks this too and fails early.
+`preReleaseBuild` (so `bundleRelease` and `assembleRelease`) **fails** when the resolved app id is Google's test id (`3940256099942544`), unless `ALLOW_TEST_ADS=true` (or `-PallowTestAds=true`), which prints a loud warning. Debug builds are always allowed. The release workflow requires `ADMOB_APP_ID` / `ADMOB_BANNER_ID` secrets or variables.
 
 ## 2. Signing keystore
 
@@ -35,7 +35,14 @@ keytool -genkeypair -v -keystore lazy-vocabulary-release.keystore \
   -alias lazyvocabulary -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Local release build: create `android/keystore.properties` (gitignored; paths are relative to `android/`):
+Signing from env (preferred): `LAZYVOCA_UPLOAD_STORE_FILE`, `LAZYVOCA_UPLOAD_STORE_PASSWORD`, `LAZYVOCA_UPLOAD_KEY_ALIAS`, `LAZYVOCA_UPLOAD_KEY_PASSWORD`. Falls back to `keystore.properties`; with neither, the release stays unsigned.
+
+```bash
+set -a; . ~/.lazyvoca-secrets/keystore.env; set +a
+cd android && ALLOW_TEST_ADS=true ./gradlew bundleRelease
+```
+
+Or, with a file: create `android/keystore.properties` (gitignored; paths are relative to `android/`):
 
 ```
 storeFile=../../lazy-vocabulary-release.keystore

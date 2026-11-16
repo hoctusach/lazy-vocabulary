@@ -233,7 +233,7 @@ Release builds must be signed with your own keystore. Debug builds are not accep
    keyPassword=YOUR_KEY_PASSWORD
    ```
 
-3. The Android project already reads that file when it exists and signs the release build with it.
+3. The Android project signs the release build from env `LAZYVOCA_UPLOAD_STORE_FILE/_STORE_PASSWORD/_KEY_ALIAS/_KEY_PASSWORD` first, else that file; with neither it stays unsigned. e.g. `set -a; . ~/.lazyvoca-secrets/keystore.env; set +a; cd android && ALLOW_TEST_ADS=true ./gradlew bundleRelease`
 
 4. Build:
 
@@ -245,7 +245,7 @@ Release builds must be signed with your own keystore. Debug builds are not accep
    - Play Store bundle: `cd android && ./gradlew bundleRelease`  
      AAB: `android/app/build/outputs/bundle/release/app-release.aab`
 
-> **Ads and release guard (Android only).** The Android app shows one light AdMob banner (Progress and Sets tabs only; never on the web). AdMob IDs live in one file, `src/config/ads.ts`, and ship as Google's TEST IDs. `bundleRelease` / `assembleRelease` **fail** until you replace them with your real IDs. Version overrides: `./gradlew bundleRelease -PversionCode=2 -PversionName=1.0.1`. Release builds use R8 minify + resource shrinking.
+> **Ads and release guard (Android only).** The Android app shows one light AdMob banner (Progress and Sets tabs only; never on the web). AdMob IDs come from `VITE_ADMOB_APP_ID` / `VITE_ADMOB_BANNER_ID` (env or `.env.production`) and default to Google's TEST IDs. `bundleRelease` / `assembleRelease` **fail** with test IDs unless `ALLOW_TEST_ADS=true`. The Pro unlock is behind `VITE_ENABLE_PRO=true` (off by default). Version overrides: `./gradlew bundleRelease -PversionCode=2 -PversionName=1.0.1`. Release builds use R8 minify + resource shrinking.
 >
 > Full Play Store checklist (AdMob IDs, `app-ads.txt`, GitHub secrets and the `Android release` workflow, privacy/deletion pages, account-deletion SQL, Data safety hints): see **[ANDROID.md](ANDROID.md)**.
 

@@ -31,3 +31,14 @@
 # Cordova compatibility layer pulled in by Capacitor
 -keep public class * extends org.apache.cordova.** { *; }
 -keep class org.apache.cordova.** { *; }
+
+# @capacitor-community/text-to-speech (extends Plugin, already covered above; explicit for safety)
+-keep class com.getcapacitor.community.tts.** { *; }
+
+# @capgo/native-purchases + Google Play Billing (billing ships consumer rules; keep plugin + client API)
+-keep class ee.forgr.nativepurchases.** { *; }
+-keep class com.android.billingclient.api.** { *; }
+-dontwarn com.android.billingclient.**
+-dontwarn com.google.android.ump.**
+-dontwarn com.google.android.gms.internal.ads.**
+-dontwarn org.apache.cordova.**
