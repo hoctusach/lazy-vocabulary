@@ -23,8 +23,40 @@ interface MetaFile {
 }
 
 function storage(): Storage | null {
-  if (typeof localStorage === 'undefined') return null;
-  return localStorage;
+  // Merely touching localStorage can throw (blocked storage, privacy modes).
+  try {
+    if (typeof localStorage === 'undefined') return null;
+    return localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function safeGet(key: string): string | null {
+  try {
+    return storage()?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function safeRemove(key: string): void {
+  try {
+    storage()?.removeItem(key);
+  } catch {
+    /* nothing to clean up */
+  }
+}
+
+function safeSet(key: string, value: string): boolean {
+  try {
+    const store = storage();
+    if (!store) return false;
+    store.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function readJson<T>(key: string): T | null {
@@ -99,10 +131,51 @@ function defaultMeta(): VocabularySetMeta {
   };
 }
 
+/**
+ * The set list is unreadable (corrupt JSON or wrong shape). Rebuild entries for
+ * every imported data blob that still parses so the learner keeps their sets.
+ */
+function recoverMetasFromData(): VocabularySetMeta[] {
+  const store = storage();
+  if (!store) return [];
+  const ids: string[] = [];
+  try {
+    for (let i = 0; i < store.length; i += 1) {
+      const key = store.key(i);
+      if (key && key.startsWith(DATA_PREFIX)) ids.push(key.slice(DATA_PREFIX.length));
+    }
+  } catch {
+    return [];
+  }
+  const recovered: VocabularySetMeta[] = [];
+  for (const id of ids) {
+    const sheets = readJson<SheetData>(dataKey(id));
+    if (!sheets || typeof sheets !== 'object' || Array.isArray(sheets)) continue;
+    const wordCount = countSheetWords(sheets);
+    if (wordCount === 0) continue;
+    const now = new Date().toISOString();
+    recovered.push({
+      id,
+      name: `Recovered set ${recovered.length + 1}`,
+      builtin: false,
+      wordCount,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+  if (recovered.length > 0) writeImportedMetas(recovered);
+  return recovered;
+}
+
 function readImportedMetas(): VocabularySetMeta[] {
   const file = readJson<MetaFile>(META_KEY);
-  if (!file || !Array.isArray(file.sets)) return [];
-  return file.sets.filter((set) => set && set.id && set.id !== DEFAULT_SET_ID && set.builtin !== true);
+  if (!file || !Array.isArray(file.sets)) {
+    // Missing key is normal (nothing imported yet). Present but unusable is corruption.
+    return safeGet(META_KEY) === null ? [] : recoverMetasFromData();
+  }
+  return file.sets.filter(
+    (set) => set && typeof set.id === 'string' && set.id !== DEFAULT_SET_ID && set.builtin !== true
+  );
 }
 
 function writeImportedMetas(sets: VocabularySetMeta[]): string | null {
@@ -114,8 +187,7 @@ export function listVocabularySets(): VocabularySetMeta[] {
 }
 
 export function getActiveSetId(): string {
-  const store = storage();
-  const stored = store?.getItem(ACTIVE_KEY);
+  const stored = safeGet(ACTIVE_KEY);
   if (!stored || stored === DEFAULT_SET_ID) return DEFAULT_SET_ID;
   const known = readImportedMetas().some((set) => set.id === stored);
   return known ? stored : DEFAULT_SET_ID;
@@ -245,7 +317,7 @@ export function ensureTodayQueue(id: string, words: VocabularyWord[], today = lo
 
 function clearResumeCursor(): void {
   try {
-    storage()?.removeItem(LAST_TODAY_WORD_KEY);
+    safeRemove(LAST_TODAY_WORD_KEY);
   } catch {
     /* resume cursor is optional */
   }
@@ -254,9 +326,9 @@ function clearResumeCursor(): void {
 export function setActiveSet(id: string): { ok: true } | { ok: false; error: string } {
   const known = listVocabularySets().some((set) => set.id === id);
   if (!known) return { ok: false, error: 'That word set is no longer on this device.' };
-  const store = storage();
-  if (!store) return { ok: false, error: 'Storage is not available on this device.' };
-  store.setItem(ACTIVE_KEY, id);
+  if (!safeSet(ACTIVE_KEY, id)) {
+    return { ok: false, error: 'Could not switch sets because storage is not available on this device.' };
+  }
   clearResumeCursor();
   return { ok: true };
 }
@@ -284,14 +356,14 @@ export function importVocabularySet(
   if (dataError) return { ok: false, error: dataError };
   const progressError = writeJson(progressKey(id), emptyProgress());
   if (progressError) {
-    storage()?.removeItem(dataKey(id));
+    safeRemove(dataKey(id));
     return { ok: false, error: progressError };
   }
   const sets = readImportedMetas();
   const metaError = writeImportedMetas([...sets, meta]);
   if (metaError) {
-    storage()?.removeItem(dataKey(id));
-    storage()?.removeItem(progressKey(id));
+    safeRemove(dataKey(id));
+    safeRemove(progressKey(id));
     return { ok: false, error: metaError };
   }
   setActiveSet(id);
@@ -325,13 +397,13 @@ export function deleteVocabularySet(id: string): { ok: true } | { ok: false; err
   if (!sets.some((set) => set.id === id)) {
     return { ok: false, error: 'That word set is no longer on this device.' };
   }
-  const wasActive = storage()?.getItem(ACTIVE_KEY) === id;
+  const wasActive = safeGet(ACTIVE_KEY) === id;
   const error = writeImportedMetas(sets.filter((set) => set.id !== id));
   if (error) return { ok: false, error };
-  storage()?.removeItem(dataKey(id));
-  storage()?.removeItem(progressKey(id));
+  safeRemove(dataKey(id));
+  safeRemove(progressKey(id));
   if (wasActive) {
-    storage()?.setItem(ACTIVE_KEY, DEFAULT_SET_ID);
+    safeSet(ACTIVE_KEY, DEFAULT_SET_ID);
     clearResumeCursor();
   }
   return { ok: true };
