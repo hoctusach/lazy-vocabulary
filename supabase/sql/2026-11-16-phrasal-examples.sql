@@ -2,7 +2,7 @@
 -- Purpose: replace 66 example sentences in public.default_vocabulary_base that were
 --   verbatim copies of textbook sentences with original rewrites (and one corrected
 --   meaning for 'think up'). Mirrors the change made to src/data/defaultVocabulary.json.
--- STATUS: NOT APPLIED. Run manually (Supabase SQL editor) after review.
+-- STATUS: APPLIED to project vijvcojvemkzgpzpowzh on 2026-11-16 (order: backups, A, B, phrasal, vi-meaning, take-down, C, D)
 -- Roll back: restore from public.default_vocabulary_base_bak_20261116_phrasal using the
 --   commented block at the bottom (run it in its own transaction), then drop the backup.
 -- Note: rows 'for the time being' and 'lock up /lɒk ʌp/ 2' are also set by

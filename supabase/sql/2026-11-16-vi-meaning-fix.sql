@@ -1,9 +1,9 @@
 -- 2026-11-16 fix rows whose English "meaning" was written in Vietnamese
--- Purpose: for 453 rows in public.default_vocabulary_base, replace the Vietnamese
+-- Purpose: for 454 rows in public.default_vocabulary_base, replace the Vietnamese
 --   "meaning" with an English definition and move the Vietnamese gloss into "translation"
 --   (merged with the existing Vietnamese example translations). Mirrors the change made to
 --   12 entries in src/data/defaultVocabulary.json. Only meaning and translation are updated.
--- STATUS: NOT APPLIED. Run manually (Supabase SQL editor) after review.
+-- STATUS: APPLIED to project vijvcojvemkzgpzpowzh on 2026-11-16 (order: backups, A, B, phrasal, vi-meaning, take-down, C, D)
 -- Independent of the category-normalisation section C in 2026-11-16-default-vocab-cleanup.sql
 --   (it is safe to run before it, or after it).
 -- Roll back: restore meaning/translation from public.default_vocabulary_base_bak_20261116_vimeaning
@@ -2419,3 +2419,23 @@ COMMIT;
 --  WHERE d.word = b.word;
 -- COMMIT;
 -- DROP TABLE public.default_vocabulary_base_bak_20261116_vimeaning;  -- after confirming
+
+-- =====================================================================================
+-- ADDENDUM (applied 2026-11-16)
+-- One more server row had a Vietnamese meaning that the >=2-letter detector missed
+-- (454 server rows in total). Fixed live with the statements below.
+-- =====================================================================================
+BEGIN;
+
+INSERT INTO public.default_vocabulary_base_bak_20261116_vimeaning
+SELECT d.* FROM public.default_vocabulary_base d
+WHERE d.word = $q$measure the circumference$q$
+  AND NOT EXISTS (SELECT 1 FROM public.default_vocabulary_base_bak_20261116_vimeaning b WHERE b.word = d.word);
+
+UPDATE public.default_vocabulary_base
+   SET meaning = $q$to find the distance around the outside of a circle or a round object$q$,
+       translation = $q$đo chu vi$q$ || E'\n' || translation
+ WHERE word = $q$measure the circumference$q$
+   AND meaning = $q$đo chu vi$q$;
+
+COMMIT;

@@ -1,7 +1,7 @@
 -- =====================================================================================
 -- 2026-11-16  default_vocabulary_base cleanup
 --
--- *** NOT APPLIED. Review, then run manually in the Supabase SQL editor (or psql -f). ***
+-- *** STATUS: APPLIED to project vijvcojvemkzgpzpowzh on 2026-11-16 (order: backups, A, B, phrasal, vi-meaning, take-down, C, D) ***
 --
 -- How to run: execute each BEGIN..COMMIT block on its own. Read the pre-check output
 -- first and compare it with the expected numbers in the comments; if they differ,
@@ -11,7 +11,7 @@
 -- Contents:
 --   A. Rewrite 5 example sentences (originals were quotations).
 --   B. Delete 2 IELTS study-note rows (+ their learned_words rows) and refresh summaries.
---   C. (commented out) category normalisation - READ the warning there first.
+--   C. category normalisation - READ the warning there first.
 --   D. Refresh the stale "total _words" table.
 -- =====================================================================================
 
@@ -92,22 +92,23 @@ COMMIT;  -- or ROLLBACK;
 -- ------------------------------------------------------------------------------------
 -- C. Category normalisation  ('phrases, collocation' -> 'phrases, collocations')
 --
--- !!! READ BEFORE RUNNING !!!  Currently 448 rows have the singular category
+-- NOTE (applied): the 448 rows first had their Vietnamese meanings replaced with English
+-- ones (2026-11-16-vi-meaning-fix.sql) before this section ran; they are now eligible.
+-- !!! READ BEFORE RUNNING !!!  Before it was applied, 448 rows had the singular category
 -- 'phrases, collocation' and generate_daily_selection_v2 only filters
 -- category = 'phrases, collocations', so those 448 rows are NEVER shown to anyone and
 -- have no progress. Running this block makes ALL 448 eligible for daily selection.
 -- They look like IELTS / textbook collocations: review their content for copyright
 -- first, and run this block only AFTER section A/B and after that review/rewrite.
--- The statements are commented out on purpose; uncomment them to apply.
 -- The app also normalises the singular spelling client-side (src/data/defaultVocabulary.ts).
 -- ------------------------------------------------------------------------------------
--- BEGIN;
--- -- Pre-check: expect 448 / 0
--- SELECT (SELECT count(*) FROM public.default_vocabulary_base WHERE category = 'phrases, collocation') AS base_rows,
---        (SELECT count(*) FROM public.learned_words           WHERE category = 'phrases, collocation') AS learned_rows;
--- UPDATE public.default_vocabulary_base SET category = 'phrases, collocations' WHERE category = 'phrases, collocation';
--- UPDATE public.learned_words           SET category = 'phrases, collocations' WHERE category = 'phrases, collocation'; -- 0 rows expected
--- COMMIT;  -- or ROLLBACK;
+BEGIN;
+-- Pre-check: expect 448 / 0
+SELECT (SELECT count(*) FROM public.default_vocabulary_base WHERE category = 'phrases, collocation') AS base_rows,
+       (SELECT count(*) FROM public.learned_words           WHERE category = 'phrases, collocation') AS learned_rows;
+UPDATE public.default_vocabulary_base SET category = 'phrases, collocations' WHERE category = 'phrases, collocation';
+UPDATE public.learned_words           SET category = 'phrases, collocations' WHERE category = 'phrases, collocation'; -- 0 rows expected
+COMMIT;  -- or ROLLBACK;
 
 -- ------------------------------------------------------------------------------------
 -- D. Stale "total _words" table (note the space in the table name)

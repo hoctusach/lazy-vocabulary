@@ -5,7 +5,7 @@
 --   replace its example, and repoint public.learned_words (FK has no ON UPDATE CASCADE).
 -- Approved by user 2026-11-16. Mirrors the change in src/data/defaultVocabulary.json.
 -- Run AFTER 2026-11-16-phrasal-examples.sql.
--- STATUS: NOT APPLIED. Run manually (Supabase SQL editor) after review.
+-- STATUS: APPLIED to project vijvcojvemkzgpzpowzh on 2026-11-16 (order: backups, A, B, phrasal, vi-meaning, take-down, C, D)
 -- Roll back: see commented block at the bottom (run in its own transaction).
 
 BEGIN;
