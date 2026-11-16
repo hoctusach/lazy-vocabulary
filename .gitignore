@@ -25,3 +25,5 @@ android/local.properties
 *.njsproj
 *.sln
 *.sw?
+e2e/fixtures/*
+!e2e/fixtures/generate.mjs
