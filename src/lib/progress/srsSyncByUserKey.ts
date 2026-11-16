@@ -7,9 +7,6 @@ import type { LearnedWordRow } from './learnedWordStats';
 import { extractServerSummary, type ServerSummary } from './serverSummary';
 import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 
-// Hard-coded total number of vocabulary words used for progress calculations
-export const TOTAL_WORDS = 3261;
-
 function lsGet(key: string) {
   try {
     return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
