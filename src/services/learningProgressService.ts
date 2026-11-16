@@ -2,7 +2,8 @@ import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from 
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
 import { getDailySelectionV2, type DailySelectionV2Row } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
-import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
+import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
+import { getDefaultVocabularyTotal, normalizeCategory } from '@/data/defaultVocabulary';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { buildTodaysWords } from '@/utils/todayWords';
 import {
@@ -543,7 +544,7 @@ export async function loadDailySelectionSummary(
   }
 
   const fallback = computeLearnedWordStats(rows as unknown as LearnedWordRow[], {
-    totalWords: TOTAL_WORDS,
+    totalWords: getDefaultVocabularyTotal(),
     timezone: opts?.timezone ?? null,
   });
 
@@ -630,7 +631,7 @@ export async function fetchAndCommitTodaySelection(
         meaning: selection?.meaning ?? vocab?.meaning ?? '',
         example: selection?.example ?? vocab?.example ?? '',
         translation: selection?.translation ?? vocab?.translation ?? null,
-        category: selection?.category ?? vocab?.category ?? null,
+        category: normalizeCategory(selection?.category ?? vocab?.category ?? null),
         count: vocab?.count ?? 0,
       };
 
@@ -667,7 +668,7 @@ export async function fetchAndCommitTodaySelection(
   }
 
   const derived = computeLearnedWordStats(selectionRows as unknown as LearnedWordRow[], {
-    totalWords: TOTAL_WORDS,
+    totalWords: getDefaultVocabularyTotal(),
     timezone,
   });
 
@@ -777,7 +778,7 @@ export async function markWordReviewed(
       dueTodayWords: derivedDueToday,
       summary: derivedSummary,
     } = computeLearnedWordStats(rows, {
-      totalWords: TOTAL_WORDS,
+      totalWords: getDefaultVocabularyTotal(),
       timezone: currentState.timezone,
     });
     summary = derivedSummary;
@@ -849,7 +850,7 @@ export async function markWordAsNew(
       : [];
 
     const { learnedWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
-      totalWords: TOTAL_WORDS,
+      totalWords: getDefaultVocabularyTotal(),
       timezone,
     });
 
