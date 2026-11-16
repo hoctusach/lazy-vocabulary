@@ -100,4 +100,16 @@ describe('computed totals', () => {
       expect(text).toMatch(/getDefaultVocabularyTotal\(\)/);
     }
   });
+
+  it('has no verbatim textbook phrasal-verb examples left (64 rewritten)', () => {
+    const old: string[] = JSON.parse(
+      readFileSync(join(root, 'tests/fixtures/phrasalOldExamples.json'), 'utf8'),
+    );
+    expect(old).toHaveLength(64);
+    const examples = new Set(all.map((e) => e.example));
+    for (const s of old) expect(examples.has(s), s).toBe(false);
+    const think = find("think up /θɪŋk ʌp/");
+    expect(think).toHaveLength(1);
+    expect(think[0].meaning).toBe("to come up with a new idea, plan, story or reason using your mind");
+  });
 });
