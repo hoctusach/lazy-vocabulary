@@ -6,7 +6,7 @@
     { name: 'Stub GB', lang: 'en-GB', voiceURI: 'stub-gb', localService: true, default: false },
     { name: 'Stub AU', lang: 'en-AU', voiceURI: 'stub-au', localService: true, default: false },
   ];
-  const log = { calls: [], cancels: 0, pauses: 0, resumes: 0, current: null, throwOnSpeak: false };
+  const log = { overlap: 0, calls: [], cancels: 0, pauses: 0, resumes: 0, current: null, throwOnSpeak: false };
   class U {
     constructor(text) {
       this.text = text; this.rate = 1; this.pitch = 1; this.volume = 1; this.lang = 'en-US'; this.voice = null;
@@ -20,6 +20,7 @@
     getVoices: () => voices,
     speak(u) {
       if (log.throwOnSpeak) throw new Error('stub speak failure');
+      if (log.current) log.overlap++;
       log.calls.push({ text: u.text, rate: u.rate, volume: u.volume, voice: u.voice && u.voice.name, t: Date.now() });
       log.current = u; synth.speaking = true;
       setTimeout(() => { try { u.onstart && u.onstart({}); } catch (e) {} }, 0);

@@ -47,17 +47,20 @@ export function generate() {
   w('header_only.csv', 'word,meaning\n');
   w('semicolon.csv', 'word;meaning;example\ngamma;third letter;The gamma ray.\ndelta;fourth letter;A river delta.\n');
 
-  w('long_words.csv', toCsv([
-    { word: 'x'.repeat(100), meaning: 'm'.repeat(500), example: ('long example ' ).repeat(77).slice(0, 1000), translation: 't'.repeat(100), category: 'long' },
-    { word: 'normal', meaning: 'a normal meaning', example: 'A normal example.', translation: '', category: 'long' },
-    { word: 'other', meaning: 'another meaning', example: 'Another example.', translation: '', category: 'long' },
-    { word: 'fourth', meaning: 'fourth meaning', example: 'Fourth example.', translation: '', category: 'long' },
-  ]));
+  const filler = (n) => 'long example words '.repeat(80).slice(0, n).trim();
+  const rows = (word, meaning, example) => [
+    { word, meaning, example, translation: 't'.repeat(100), category: 'long' },
+    ...['normal', 'other', 'fourth', 'fifth', 'sixth'].map((x) => ({ word: x, meaning: 'a ' + x + ' meaning', example: 'A ' + x + ' example.', translation: '', category: 'long' })),
+  ];
+  w('long_word.csv', toCsv(rows('x'.repeat(100), 'a normal meaning', 'A normal example.')));   // 100-char single token word
+  w('long_words.csv', toCsv(rows('long text word', filler(500), filler(1000))));               // long meaning/example with spaces
   w('xss.json', JSON.stringify([
     { word: '<img src=x onerror=window.__xss=1>', meaning: '<script>window.__xss=2</script>meaning', example: '<b onmouseover=window.__xss=3>ex</b>', category: 'xss' },
     { word: 'safe', meaning: 'plain meaning', example: 'plain example', category: 'xss' },
     { word: 'safe two', meaning: 'plain meaning two', example: 'plain example two', category: 'xss' },
     { word: 'safe three', meaning: 'plain meaning three', example: 'plain example three', category: 'xss' },
+    { word: 'safe four', meaning: 'plain meaning four', example: 'plain example four', category: 'xss' },
+    { word: 'safe five', meaning: 'plain meaning five', example: 'plain example five', category: 'xss' },
   ]));
   w('unicode.csv', toCsv([
     { word: 'bỏ cuộc', meaning: 'to give up', example: 'Đừng bỏ cuộc.', translation: 'từ bỏ', category: 'viet' },
