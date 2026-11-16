@@ -6,6 +6,7 @@ import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-reac
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
+import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 
 interface VocabularyCardProps {
   word: string;
@@ -49,6 +50,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   nextVoiceLabel,
   searchPreview = false
 }) => {
+  const showTranslation = useIsVietnameseDevice();
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
     if (word) {
@@ -140,7 +142,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           >
             <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
           </div>
-          {translation && (
+          {showTranslation && translation && (
             <div
               style={{
                 fontStyle: 'italic',

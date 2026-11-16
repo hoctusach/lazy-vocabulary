@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PracticeDialog from '@/components/practice/PracticeDialog';
 import PracticeHistory from '@/features/practice/components/PracticeHistory';
 import { searchVocabulary } from '@/services/search/vocabularySearch';
+import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 import type { VocabularyWord } from '@/types/vocabulary';
 
 const findVocabularyWord = (slug?: string): VocabularyWord | null => {
@@ -18,6 +19,7 @@ const findVocabularyWord = (slug?: string): VocabularyWord | null => {
 
 const VocabularyDetailPage: React.FC = () => {
   const { word: wordSlug } = useParams();
+  const showTranslation = useIsVietnameseDevice();
   const word = React.useMemo(() => findVocabularyWord(wordSlug), [wordSlug]);
   const [isPracticeOpen, setIsPracticeOpen] = React.useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = React.useState(0);
@@ -64,7 +66,7 @@ const VocabularyDetailPage: React.FC = () => {
             <h2 className="font-semibold">Example</h2>
             <p className="mt-1 whitespace-pre-line italic text-slate-700 dark:text-slate-200">{word.example}</p>
           </section>
-          {word.translation && (
+          {showTranslation && word.translation && (
             <section>
               <h2 className="font-semibold">Translation</h2>
               <p className="mt-1 whitespace-pre-line text-slate-700 dark:text-slate-200">{word.translation}</p>
