@@ -8,6 +8,16 @@ import {
   type NicknameEventDetail,
 } from '@/lib/nicknameEvents';
 import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 function normalizeNickname(value: string | null | undefined): string | null {
   if (typeof value !== 'string') return null;
@@ -18,6 +28,7 @@ function normalizeNickname(value: string | null | undefined): string | null {
 const UserGreeting = () => {
   const [nickname, setNickname] = useState<string | null>(null);
   const [isResetting, setIsResetting] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -87,9 +98,13 @@ const UserGreeting = () => {
     [],
   );
 
+  const handleResetLinkClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    setConfirmResetOpen(true);
+  }, []);
+
   const handleResetPlayer = useCallback(
-    async (event: MouseEvent<HTMLAnchorElement>) => {
-      event.preventDefault();
+    async () => {
       if (isResetting) return;
 
       setIsResetting(true);
@@ -192,7 +207,7 @@ const UserGreeting = () => {
       {' · '}
       <a
         href="#reset-player"
-        onClick={handleResetPlayer}
+        onClick={handleResetLinkClick}
         aria-disabled={isResetting}
         className={`font-medium text-[var(--lv-accent)] hover:opacity-80 hover:underline ${
           isResetting ? 'pointer-events-none opacity-60' : ''
@@ -200,6 +215,21 @@ const UserGreeting = () => {
       >
         Reset player
       </a>
+      <AlertDialog open={confirmResetOpen} onOpenChange={setConfirmResetOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset player?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This clears the progress, saved position and cached data stored on this device and reloads the
+              app. Your word sets and sign-in details are kept. Progress saved to your account is not deleted.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void handleResetPlayer()}>Reset player</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </p>
   );
 };
