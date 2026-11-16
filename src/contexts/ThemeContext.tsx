@@ -30,12 +30,18 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    let savedTheme: string | null = null;
+    let savedDark: string | null = null;
+    try {
+      savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      savedDark = localStorage.getItem(DARK_STORAGE_KEY);
+    } catch {
+      /* blocked storage: use defaults instead of crashing the whole app */
+    }
     if (savedTheme === "playful" || savedTheme === "classic" || savedTheme === "default") {
       setTheme(savedTheme);
     }
 
-    const savedDark = localStorage.getItem(DARK_STORAGE_KEY);
     if (savedDark !== null) {
       setIsDark(savedDark === "true");
       return;
@@ -52,8 +58,12 @@ export const ThemeProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     document.documentElement.setAttribute("data-theme", themeKey);
     document.documentElement.classList.toggle("dark", isDark);
     document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-    localStorage.setItem(DARK_STORAGE_KEY, String(isDark));
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+      localStorage.setItem(DARK_STORAGE_KEY, String(isDark));
+    } catch {
+      /* blocked or full storage: the theme just will not persist */
+    }
   }, [theme, isDark]);
 
   const toggleDark = useCallback(() => {
