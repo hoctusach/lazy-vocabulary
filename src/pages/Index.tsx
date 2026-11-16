@@ -11,6 +11,7 @@ import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
 import MorePanel from '@/components/mobile/MorePanel';
 import BottomTabBar, { type AppTab } from '@/components/mobile/BottomTabBar';
 import { useIsDesktop } from '@/components/mobile/useIsDesktop';
+import { useAndroidBackButton } from '@/components/mobile/useAndroidBackButton';
 
 const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { activeSet } = useVocabularySets();
@@ -49,6 +50,7 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
 
 const MobileHome: React.FC = () => {
   const [tab, setTab] = useState<AppTab>('learn');
+  useAndroidBackButton(tab, setTab);
 
   return (
     <div className="min-h-screen" data-layout="mobile">
