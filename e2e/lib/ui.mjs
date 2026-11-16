@@ -87,7 +87,10 @@ export async function openDark(s, on = true) {
   if (isDark !== on) await click(s, { labelRe: '^Switch to (dark|light) mode$' });
 }
 
-export const POOL_ORDER = ['break the ice', 'ephemeral', 'give up', 'look forward to', 'meticulous', 'pragmatic', 'spare', 'ubiquitous']; // A-Z, as the card shows them
+import { POOL } from './fake.mjs';
+export const P = [...POOL].sort((a, b) => a.word.toLowerCase().localeCompare(b.word.toLowerCase()));   // A-Z, as the card shows them
+export const POOL_ORDER = P.map((w) => w.word);
+export const re0 = new RegExp(P[0].word); export const re1 = new RegExp(P[1].word);
 export const word = (s) => s.page.evaluate(() => document.querySelector('main h1')?.textContent.trim() || null);
 export async function waitWord(s, w, timeout = 8000) {
   try { await s.page.waitForFunction((w) => document.querySelector('main h1')?.textContent.trim() === w, { timeout }, w); }
@@ -97,7 +100,7 @@ export async function waitSpeech(s, re, timeout = 6000) {
   try { await s.page.waitForFunction((src) => window.__speech.calls.some((c) => new RegExp(src).test(c.text)), { timeout }, re.source || String(re)); }
   catch { throw new Assert(`no utterance matching ${re}. Calls: ${JSON.stringify((await speechCalls(s)).map((c) => c.text.slice(0, 30)))}`); }
 }
-export async function boot(s, path = '/') { await s.goto(path); await waitWord(s, POOL_ORDER[0], 12000); await waitSpeech(s, /break the ice/); await sleep(600); }
+export async function boot(s, path = '/') { await s.goto(path); await waitWord(s, POOL_ORDER[0], 12000); await waitSpeech(s, re0); await sleep(600); }
 export const label = (s, l) => s.page.evaluate((l) => !![...document.querySelectorAll('button')].find((b) => b.getAttribute('aria-label') === l && b.offsetParent), l);
 export const ctl = (s, l) => click(s, { label: l });
 

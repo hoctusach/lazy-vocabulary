@@ -2,16 +2,8 @@
 export const FAKE_HOST = 'fake-supabase.test';
 export const EDGE_HOST = 'vijvcojvemkzgpzpowzh.supabase.co'; // hard-coded in src/lib/edgeApi.ts
 
-export const POOL = [
-  { word: 'give up', category: 'phrasal verbs', meaning: 'to stop trying', example: 'I try to give up smoking every day.', translation: 'từ bỏ' },
-  { word: 'break the ice', category: 'idioms', meaning: 'to start a conversation in a tense setting', example: 'He told a joke to break the ice.', translation: 'phá vỡ sự ngượng ngùng' },
-  { word: 'spare', category: 'verbs', meaning: 'to give something that you can do without', example: 'Can you spare a minute?', translation: 'dành ra' },
-  { word: 'ubiquitous', category: 'adjectives', meaning: 'present everywhere', example: 'Smartphones are ubiquitous.', translation: 'phổ biến' },
-  { word: 'ephemeral', category: 'adjectives', meaning: 'lasting a very short time', example: 'Fame is ephemeral.', translation: 'phù du' },
-  { word: 'meticulous', category: 'adjectives', meaning: 'showing great attention to detail', example: 'She is meticulous about her notes.', translation: 'tỉ mỉ' },
-  { word: 'look forward to', category: 'phrasal verbs', meaning: 'to feel happy about something that will happen', example: 'I look forward to the weekend.', translation: 'mong chờ' },
-  { word: 'pragmatic', category: 'adjectives', meaning: 'dealing with things sensibly', example: 'We need a pragmatic approach.', translation: 'thực dụng' },
-];
+import fs from 'node:fs';
+export const POOL = JSON.parse(fs.readFileSync(new URL('./pool.json', import.meta.url), 'utf8'));
 
 const CORS = {
   'access-control-allow-origin': '*',

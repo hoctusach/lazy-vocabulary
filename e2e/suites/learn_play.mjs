@@ -58,8 +58,8 @@ test('TAB-07', 'Desktop layout has no tabs; resize across 768 keeps working', as
 test('LEARN-01', 'Card fields', async ({ session }) => {
   const s = await session({}); await boot(s);
   const c = await s.page.evaluate(() => { const m = document.querySelector('main'); return { pill: m.querySelector('h3')?.textContent, w: m.querySelector('h1')?.textContent, txt: m.innerText }; });
-  eq(c.pill, 'Idiom'); eq(c.w, 'break the ice');
-  ok(c.txt.includes('* to start a conversation') && c.txt.includes('* He told a joke') && c.txt.includes('* phá vỡ sự ngượng ngùng'));
+  eq(c.pill, 'Phrasal Verb'); eq(c.w, U.P[0].word);
+  ok(c.txt.includes('* ' + U.P[0].meaning) && c.txt.includes('* ' + U.P[0].example) && c.txt.includes('* ' + U.P[0].translation));
 });
 test('LEARN-02', 'Controls present with labels, 4-col grid, no Previous', async ({ session }) => {
   const s = await session({}); await boot(s);
@@ -73,20 +73,20 @@ test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ sess
   const s = await session({ storage: { speechUnlocked: 'false' } });
   await s.goto('/'); await waitWord(s, W[0], 12000);
   await waitText(s, 'Tap anywhere to turn the audio on');
-  eq((await U.speechCalls(s)).filter((c) => /break the ice/.test(c.text)).length, 0, 'spoke before unlock');
+  eq((await U.speechCalls(s)).filter((c) => U.re0.test(c.text)).length, 0, 'spoke before unlock');
   await s.page.touchscreen.tap(200, 700);
-  await U.waitGone(s, 'Tap anywhere to turn the audio on'); await waitSpeech(s, /break the ice/);
+  await U.waitGone(s, 'Tap anywhere to turn the audio on'); await waitSpeech(s, U.re0);
 });
 test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ session }) => {
   const s = await session({}); await boot(s);
   await ctl(s, 'Mark as Learned');
-  await waitText(s, 'Are you sure you want to mark "break the ice" as learned?');
+  await waitText(s, `Are you sure you want to mark "${U.P[0].word}" as learned?`);
   await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
   await U.waitGone(s, 'Are you sure you want to mark');
   await s.page.waitForFunction(() => true); await sleep(500);
   eq(s.fake.count('mark_word_learned_by_key'), 1);
-  eq(s.fake.calls.find((c) => c.name === 'mark_word_learned_by_key').body.p_word_id, 'break the ice');
+  eq(s.fake.calls.find((c) => c.name === 'mark_word_learned_by_key').body.p_word_id, U.P[0].word);
 });
 test('LEARN-06', 'Mark learned cancel: no RPC, no toast', async ({ session }) => {
   const s = await session({}); await boot(s);
@@ -123,7 +123,7 @@ test('LEARN-10', 'Due review word shows under DUE TODAY and in the Due tile', as
     }
     return r;
   };
-  await s.goto('/'); await waitWord(s, 'give up', 12000); await tab(s, 'Progress');
+  await s.goto('/'); await waitWord(s, U.P[0].word, 12000); await tab(s, 'Progress');
   await click(s, { textHas: 'Word Summary' }); await sleep(400);
   const t = await body(s);
   ok(/DUE TODAY\s*\(?1\)?/i.test(t.replace(/\n/g, ' ')), 'DUE TODAY (1) heading missing: ' + t.slice(t.indexOf('Word Summary'), t.indexOf('Word Summary') + 400).replace(/\n/g, ' / '));
@@ -137,8 +137,8 @@ test('LEARN-11', 'Resume position after reload', async ({ session }) => {
 // ---------- PLAY ----------
 test('PLAY-01', 'Auto-play after unlock speaks "word. meaning. example"', async ({ session }) => {
   const s = await session({}); await boot(s);
-  const c = (await U.speechCalls(s)).find((x) => /break the ice/.test(x.text));
-  eq(c.text, 'break the ice. to start a conversation in a tense setting. He told a joke to break the ice.');
+  const c = (await U.speechCalls(s)).find((x) => U.re0.test(x.text));
+  eq(c.text, `${U.P[0].word}. ${U.P[0].meaning}. ${U.P[0].example}`);
 });
 test('PLAY-02', 'Pause: Play button, toast, no auto-advance, pref saved', async ({ session }) => {
   const s = await session({}); await boot(s);
@@ -151,7 +151,7 @@ test('PLAY-03', 'Play after the paused utterance ended: word is repeated, then a
   await ctl(s, 'Pause'); await waitText(s, 'Playback paused');
   await sleep(300); await U.fireEnd(s); await sleep(600); eq(await word(s), W[0], 'advanced while paused');
   await ctl(s, 'Play'); await waitText(s, 'Playback resumed');
-  await s.page.waitForFunction(() => window.__speech.calls.filter((c) => /break the ice/.test(c.text)).length >= 2 && !!window.__speech.current, { timeout: 5000 });
+  await s.page.waitForFunction((w0) => window.__speech.calls.filter((c) => c.text.startsWith(w0)).length >= 2 && !!window.__speech.current, { timeout: 5000 }, U.P[0].word);
   ok(await label(s, 'Pause'), 'button back to Pause');
   await U.fireEnd(s); await waitWord(s, W[1]);
 });
@@ -159,7 +159,7 @@ skip('PLAY-04', 'Paused chip indicator', 'product gap');
 test('PLAY-05', 'Next: cancel, next word spoken, wraps after last', async ({ session }) => {
   const s = await session({}); await boot(s);
   const c0 = (await speechInfo(s)).cancels;
-  await ctl(s, 'Next Word'); await waitWord(s, W[1]); await waitSpeech(s, /ephemeral/);
+  await ctl(s, 'Next Word'); await waitWord(s, W[1]); await waitSpeech(s, U.re1);
   ok((await speechInfo(s)).cancels > c0, 'cancel');
   for (let i = 2; i <= 8; i++) { await sleep(450); await ctl(s, 'Next Word'); await waitWord(s, W[i % 8]); }
 });
@@ -168,13 +168,13 @@ test('PLAY-06', 'Next while paused shows next word but does not speak it', async
   await ctl(s, 'Pause'); const n = (await speechInfo(s)).calls;
   await ctl(s, 'Next Word'); await waitWord(s, W[1]); await sleep(1500);
   const calls = await U.speechCalls(s);
-  ok(!calls.slice(n).some((c) => /ephemeral/.test(c.text)), 'spoke while paused'); ok(await label(s, 'Play'));
+  ok(!calls.slice(n).some((c) => U.re1.test(c.text)), 'spoke while paused'); ok(await label(s, 'Play'));
 });
 test('PLAY-07', 'Rapid Next taps advance exactly one word', async ({ session }) => {
   const s = await session({}); await boot(s);
   await s.page.evaluate(() => { const b = document.querySelector('button[aria-label="Next Word"]'); for (let i = 0; i < 5; i++) b.click(); });
   await sleep(1000); eq(await word(s), W[1]);
-  const n = await s.page.evaluate(() => window.__speech.calls.filter((c) => /ephemeral/.test(c.text)).length); ok(n <= 1, 'overlapping utterances ' + n);
+  const n = await s.page.evaluate((w) => window.__speech.calls.filter((c) => c.text.startsWith(w)).length, U.P[1].word); ok(n <= 1, 'overlapping utterances ' + n);
 });
 test('PLAY-08', 'Mute: label, toast, speech cancelled, pref', async ({ session }) => {
   const s = await session({}); await boot(s);
@@ -186,12 +186,12 @@ test('PLAY-09', 'Unmute: toast and next word audible', async ({ session }) => {
   const s = await session({}); await boot(s);
   await ctl(s, 'Mute'); await waitText(s, 'Audio muted'); await ctl(s, 'Unmute');
   await waitText(s, 'Audio unmuted. Speech will resume from the next word.');
-  await sleep(400); await ctl(s, 'Next Word'); await waitSpeech(s, /ephemeral/);
-  const c = (await U.speechCalls(s)).filter((x) => /ephemeral/.test(x.text)).at(-1); eq(c.volume, 1, 'volume');
+  await sleep(400); await ctl(s, 'Next Word'); await waitSpeech(s, U.re1);
+  const c = (await U.speechCalls(s)).filter((x) => U.re1.test(x.text)).at(-1); eq(c.volume, 1, 'volume');
 });
 test('PLAY-10', 'Auto-advance on utterance end, not while paused', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await U.fireEnd(s); await waitWord(s, W[1]); await waitSpeech(s, /ephemeral/);
+  await U.fireEnd(s); await waitWord(s, W[1]); await waitSpeech(s, U.re1);
   await ctl(s, 'Pause'); await U.fireEnd(s); await sleep(1200); eq(await word(s), W[1]);
 });
 test('PLAY-11', 'Practice pauses audio and resumes only if it was playing', async ({ session }) => {
@@ -224,7 +224,7 @@ test('VOICE-03', 'Voice persists across reload', async ({ session }) => {
   await ctl(s, 'Change Voice'); await waitText(s, 'Voice changed to'); await sleep(300);
   const fav = (await prefs(s)).favorite_voice; ok(fav && fav !== 'Stub US', 'fav ' + fav);
   await s.reload(); await waitWord(s, W[0], 12000); await sleep(1800);
-  const calls = await U.speechCalls(s); const last = calls.filter((c) => /break the ice/.test(c.text)).at(-1);
+  const calls = await U.speechCalls(s); const last = calls.filter((c) => U.re0.test(c.text)).at(-1);
   eq(last && last.voice, fav, 'voice after reload');
 });
 test('VOICE-04', 'Speed has 7 options and closes after choosing', async ({ session }) => {
@@ -239,6 +239,6 @@ test('VOICE-05', 'Speed applied to utterance and persisted', async ({ session })
   const s = await session({}); await boot(s);
   await ctl(s, 'Speech Rate'); await sleep(300);
   await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click());
-  await s.page.waitForFunction(() => window.__speech.calls.some((c) => c.rate === 1.5), { timeout: 6000 });
+  await s.page.waitForFunction((w0) => window.__speech.calls.some((c) => c.rate === 1.5), { timeout: 6000 });
   eq((await prefs(s)).speech_rate, 1.5);
 });
