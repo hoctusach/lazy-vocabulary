@@ -27,7 +27,7 @@ describe('Learn controls', () => {
 });
 
 describe('speech hint lines', () => {
-  const hint = async (native: boolean) => {
+  const render_ = async (native: boolean) => {
     vi.resetModules();
     vi.doMock('@/services/speech/nativeTts', () => ({ isNativePlatform: () => native }));
     vi.doMock('@/utils/deviceLanguage', () => ({ useIsVietnameseDevice: () => false }));
@@ -40,9 +40,12 @@ describe('speech hint lines', () => {
     );
     return container.textContent ?? '';
   };
-  it('shows on web, hidden when native', async () => {
-    expect(await hint(false)).toContain('autoplay due to security');
-    document.body.innerHTML = '';
-    expect(await hint(true)).not.toContain('autoplay due to security');
+  it('are absent on web and native', async () => {
+    for (const native of [false, true]) {
+      document.body.innerHTML = '';
+      const t = await render_(native);
+      expect(t).not.toContain('autoplay due to security');
+      expect(t).not.toContain('free voices by device and browser');
+    }
   });
 });

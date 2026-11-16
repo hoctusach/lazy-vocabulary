@@ -1,10 +1,8 @@
 import React from "react";
-import { Speaker } from "lucide-react";
 import type { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyMainNew from "./VocabularyMainNew";
 import LeaderboardPanel from "./LeaderboardPanel";
 import StreakPanel from "./StreakPanel";
-import { isNativePlatform } from "@/services/speech/nativeTts";
 
 interface ContentWithDataNewProps {
   displayWord: ReadonlyWord | null;
@@ -87,27 +85,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       )}
 
       {!cardOnly && additionalContent}
-
-      {/* Mobile speech note statically above debug panel */}
-      {!isNativePlatform() && (
-      <div className="mobile-note text-xs italic text-[var(--lv-text-secondary)] text-left my-1">
-        <p>
-          ⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or
-          any button (e.g. Next) to enable it.
-        </p>
-        <p className="flex items-start gap-2 mt-1">
-          <Speaker
-            aria-hidden="true"
-            className="h-5 w-5 shrink-0 text-yellow-500"
-            strokeWidth={2.4}
-          />
-          <span className="leading-snug">
-            As this is free app, there are some free voices by device and
-            browser — please pick your preferred one!
-          </span>
-        </p>
-      </div>
-      )}
     </>
   );
 };

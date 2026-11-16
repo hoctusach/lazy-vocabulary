@@ -2,11 +2,10 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
-import { isNativePlatform } from '@/services/speech/nativeTts';
 import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 
 interface VocabularyCardProps {
@@ -154,21 +153,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               }}
             >
               <em>* {translation}</em>
-            </div>
-          )}
-          {/* Browser-only speech hints (not relevant in the native app) */}
-          {!searchPreview && !isNativePlatform() && (
-            <div
-              className="mobile-note text-left italic mt-2"
-              style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}
-            >
-              <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-              <p className="flex items-start gap-2 mt-1">
-                <Speaker size={16} aria-hidden="true" className="shrink-0 text-yellow-500" />
-                <span className="leading-snug">
-                  As this is free app, there are some free voices by device and browser — please pick your preferred one!
-                </span>
-              </p>
             </div>
           )}
         </div>

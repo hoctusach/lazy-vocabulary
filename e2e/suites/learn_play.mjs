@@ -85,12 +85,12 @@ test('LEARN-13', 'Mark as LEARNED is a prominent 2-column button in the controls
   ok(r, 'button missing'); eq(r.txt, 'Mark as LEARNED'); ok(/span 2/.test(r.span), 'span ' + r.span); eq(r.grid, 4); eq(r.h, r.oh);
   ok(r.w > r.ow * 1.8, 'width ' + r.w + ' vs ' + r.ow); ok(r.fw >= 700, 'bold ' + r.fw); ok(r.bg !== 'rgba(0, 0, 0, 0)' && r.bg !== 'rgb(255, 255, 255)', 'filled ' + r.bg);
 });
-test('LEARN-14', 'Speech hint lines show on web and are hidden in the native app', async ({ session }) => {
-  const HINT = /Speech won’t autoplay due to security|free voices by device and browser/;
+test('LEARN-14', 'Speech hint lines are absent on web and in the native app', async ({ session }) => {
+  const absent = (t) => ok(!/autoplay due to security/.test(t) && !/free voices by device and browser/.test(t), 'hints visible');
   let s = await session({}); await boot(s);
-  ok(HINT.test(await cardText(s)) || HINT.test(await body(s)), 'hints missing on web');
+  absent(await cardText(s)); absent(await body(s));
   s = await session({ initScript: 'window.androidBridge = { postMessage() {} };' }); await s.goto('/'); await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 12000 }); await sleep(800);
-  const t = await body(s); ok(!/autoplay due to security/.test(t) && !/free voices by device and browser/.test(t), 'hints visible in native');
+  absent(await body(s));
 });
 skip('LEARN-03', 'Previous button absent', 'product gap');
 test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ session }) => {
