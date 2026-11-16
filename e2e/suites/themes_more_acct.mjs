@@ -128,7 +128,8 @@ test('THEME-13', 'Theme and dark mode persist after reload (Ocean + dark)', asyn
 test('MORE-01', 'More panel content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'More');
   const t = await body(s);
-  for (const x of ['More', 'Learning Word Set: C1, C2', 'Hello e2e', 'Sign out', 'Reset player', 'How to do it?', 'Tap anywhere once if speech does not start', '© 2025 Lazy Vocabulary']) ok(t.includes(x), 'missing ' + x);
+  for (const x of ['More', 'Learning Word Set: C1, C2', 'Hello e2e', 'Sign out', 'How to do it?', 'Tap anywhere once if speech does not start', '© 2025 Lazy Vocabulary']) ok(t.includes(x), 'missing ' + x);
+  ok(!t.includes('Reset player'), 'Reset player should be absent');
   for (const [, label] of THEMES) ok(await s.page.$(`button[aria-label="${label}"]`), label);
   ok(await s.page.$('button[aria-label^="Switch to"]'), 'dark toggle');
   const a = await s.page.evaluate(() => { const l = [...document.querySelectorAll('a')].find((x) => x.textContent.trim() === 'How to do it?'); return { href: l.href, target: l.target, rel: l.rel }; });
@@ -163,24 +164,6 @@ test('ACCT-02', 'Sign out keeps sets, theme and preferences; sign-in again resto
 test('ACCT-03', 'After sign-out + reload the gate shows and no stale session remains', async ({ session }) => {
   const s = await session({}); await boot(s); await signOut(s); await waitText(s, 'Access your vocabulary');
   await s.reload(); await waitText(s, 'Access your vocabulary'); eq(await s.ls('lazyVoca.auth'), null);
-});
-test('ACCT-04', 'Reset player asks first; cancel does nothing; confirm clears caches, reloads, stays signed in', async ({ session }) => {
-  const s = await session({}); await boot(s); await tab(s, 'More');
-  await click(s, { text: 'Reset player' }); await waitText(s, 'Reset player?');
-  await click(s, { text: 'Cancel' }); await U.waitGone(s, 'Reset player?'); ok(!(await body(s)).includes('Player data cleared'), 'ran without confirm');
-  ok(await s.ls('todayWords'), 'caches wiped by cancel');
-  await click(s, { text: 'Reset player' }); await waitText(s, 'Reset player?');
-  const nav = s.page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 8000 }).catch(() => null);
-  await click(s, { text: 'Reset player', inDialog: true });
-  await waitText(s, 'Player data cleared').catch(() => {}); await nav; await U.waitText(s, 'Lazy Vocabulary');
-  eq(await s.ls('lazyVoca.nickname'), 'e2e', 'still signed in');
-  await s.page.waitForFunction(() => !document.body.innerText.includes('Access your vocabulary'), { timeout: 5000 });
-});
-test('ACCT-05', 'Reset player keeps imported sets and theme', async ({ session }) => {
-  const s = await session({ viewport: SHOT_VP }); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
-  await setTheme(s, 'ocean', 'Ocean Depth', false); await click(s, { text: 'Reset player' }); await click(s, { text: 'Reset player', inDialog: true });
-  await sleep(2500); await s.page.waitForFunction(() => (document.getElementById('root')?.children.length || 0) > 0);
-  ok(await s.ls('lv.vocabularySets.v1'), 'sets removed'); eq(await s.ls('user-theme'), 'ocean');
 });
 skip('ACCT-06', 'Delete account fails gracefully', 'product gap: no delete-account feature on this branch (ACCT-DEL-* belong to feat/play-store-ads-release)');
 

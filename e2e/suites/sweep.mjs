@@ -58,7 +58,7 @@ test('E2E-SWEEP-01', 'Click every visible control on each tab and in each dialog
   all.learn = await sweep(s, 'Learn', async () => { await go('Learn')(); await sleep(300); });
   all.progress = await sweep(s, 'Progress', go('Progress'));
   all.sets = await sweep(s, 'Sets', async () => { await go('Sets')(); if (!(await U.setNames(s)).includes('setA')) { await importFile(s, 'setA.csv'); await sleep(300); } }, { skip: (it) => /^(Delete)$/.test(it.name) });
-  all.more = await sweep(s, 'More', go('More'), { skip: (it) => /^Reset player$/.test(it.name) });
+  all.more = await sweep(s, 'More', go('More'));
   // dialogs: open each and click every control in it
   const openers = [
     ['Learned dialog', 'Learn', () => U.click(s, { label: 'Mark as Learned' })],
@@ -67,11 +67,10 @@ test('E2E-SWEEP-01', 'Click every visible control on each tab and in each dialog
     ['Quiz', 'Progress', () => U.click(s, { text: 'Quiz me' })],
     ['Rename', 'Sets', () => U.cardBtn(s, 'setA', 'Rename')],
     ['Delete', 'Sets', async () => { if (!(await U.setNames(s)).includes('setA')) await importFile(s, 'setA.csv'); await U.cardBtn(s, 'setA', 'Delete'); }],
-    ['Reset player', 'More', () => U.click(s, { text: 'Reset player' })],
   ];
   for (const [name, tabName, open] of openers) {
     const prep = async () => { await dismiss(s); await tab(s, tabName); await sleep(200); await open(); await sleep(300); };
-    // the reload-causing confirm of Reset/Delete runs last by index order; Cancel comes first
+    // the confirm of Delete runs last by index order; Cancel comes first
     all[name] = await sweep(s, name, prep, { max: 12 });
     await rootOk(s, name);
     await s.page.waitForFunction(() => (document.getElementById('root')?.children.length || 0) > 0);
