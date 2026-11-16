@@ -5,6 +5,8 @@ import React from 'react';
 import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { expect } from 'vitest';
 globalThis.expect = expect;
 beforeAll(async () => {
   await import('@testing-library/jest-dom');
@@ -33,6 +35,7 @@ describe('VocabularyControlsColumn voice toggle', () => {
       }, [voiceName]);
       const toggleVoice = () => setVoiceName(v => (v === voices[0] ? voices[1] : voices[0]));
       return (
+        <MemoryRouter>
           <VocabularyControlsColumn
             isMuted={false}
             isPaused={false}
@@ -48,6 +51,7 @@ describe('VocabularyControlsColumn voice toggle', () => {
             onOpenEditModal={() => {}}
             playCurrentWord={() => {}}
           />
+        </MemoryRouter>
       );
     };
 

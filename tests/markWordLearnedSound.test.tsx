@@ -5,6 +5,7 @@ import React from 'react';
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
@@ -26,15 +27,16 @@ beforeAll(async () => {
   };
 });
 
-describe('VocabularyControlsColumn mark as learned sound', () => {
-  it('plays a sound when marking a word as learned', async () => {
+// The success sound/confetti now plays from showCongratsEffect() once the server
+// confirms the word as learned (srsSyncByUserKey), not from this component. The
+// component's job is to confirm first and then report the word to its parent.
+describe('VocabularyControlsColumn mark as learned', () => {
+  it('asks for confirmation, then reports the word as learned', async () => {
     const word: VocabularyWord = { word: 'apple', meaning: '', example: '', category: 'test' };
-    const playMock = vi.fn().mockResolvedValue(undefined);
-    const playSpy = vi
-      .spyOn(window.HTMLMediaElement.prototype, 'play')
-      .mockImplementation(playMock);
+    const onMarkWordLearned = vi.fn();
 
     render(
+      <MemoryRouter>
       <VocabularyControlsColumn
         isMuted={false}
         isPaused={false}
@@ -47,16 +49,17 @@ describe('VocabularyControlsColumn mark as learned sound', () => {
         onOpenEditModal={() => {}}
         selectedVoiceName="Test"
         playCurrentWord={() => {}}
-        onMarkWordLearned={() => {}}
+        onMarkWordLearned={onMarkWordLearned}
       />
+      </MemoryRouter>
     );
 
     await userEvent.click(screen.getByRole('button', { name: 'Mark as Learned' }));
+    expect(onMarkWordLearned).not.toHaveBeenCalled();
     const dialog = screen.getByRole('alertdialog');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Mark as Learned' }));
 
-    expect(playMock).toHaveBeenCalled();
-    playSpy.mockRestore();
+    expect(onMarkWordLearned).toHaveBeenCalledWith('apple', 'test');
   });
 });
 

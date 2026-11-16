@@ -4,9 +4,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
-import type { VocabularyWord } from '@/types/vocabulary';
-import type { DailySelection } from '@/types/learning';
-import { learningProgressService } from '@/services/learningProgressService';
+import * as service from '@/services/learningProgressService';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
 
 vi.mock('@/lib/preferences/localPreferences', () => ({
@@ -15,30 +13,43 @@ vi.mock('@/lib/preferences/localPreferences', () => ({
     speech_rate: null,
     is_muted: false,
     is_playing: true,
-    daily_option: null
+    daily_option: null,
   }),
-  saveLocalPreferences: vi.fn().mockResolvedValue(undefined)
+  saveLocalPreferences: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('@/services/learningProgressService', () => ({
-  learningProgressService: {
-    getTodaySelection: vi.fn().mockReturnValue(null),
-    forceGenerateDailySelection: vi.fn(),
-    getProgressStats: vi.fn().mockReturnValue({
-      total: 0,
-      learning: 0,
-      new: 0,
-      due: 0,
-      learned: 0
-    }),
-    updateWordProgress: vi.fn(),
-    getWordProgress: vi.fn(),
-    getLearnedWords: vi.fn().mockReturnValue([]),
-    markWordLearned: vi.fn(),
-    markWordAsNew: vi.fn(),
-    syncServerDueWords: vi.fn().mockResolvedValue([])
-  }
+vi.mock('@/lib/progress/srsSyncByUserKey', () => ({
+  bootstrapLearnedFromServerByKey: vi.fn().mockResolvedValue(undefined),
+  markLearnedServerByKey: vi.fn().mockResolvedValue(null),
+  ensureUserKey: vi.fn().mockResolvedValue('user-key'),
+  TOTAL_WORDS: 0,
 }));
+
+vi.mock('@/services/analyticsService', () => ({
+  identifyUser: vi.fn(),
+  trackDailySelectionEvent: vi.fn(),
+  trackReviewDue: vi.fn(),
+  trackWordLearned: vi.fn(),
+  trackWordReset: vi.fn(),
+}));
+
+vi.mock('@/services/learningProgressService', async () => {
+  const actual = await vi.importActual<typeof import('@/services/learningProgressService')>(
+    '@/services/learningProgressService'
+  );
+  return {
+    ...actual,
+    prepareUserSession: vi.fn().mockResolvedValue('user-key'),
+    getOrCreateTodayWords: vi.fn().mockResolvedValue({
+      selection: { newWords: [], reviewWords: [], totalCount: 0, severity: 'light' },
+      words: [],
+      learnedWords: [],
+      newTodayWords: [],
+      dueTodayWords: [],
+      summary: null,
+    }),
+  };
+});
 
 describe('useLearningProgress daily option default', () => {
   beforeEach(() => {
@@ -46,24 +57,17 @@ describe('useLearningProgress daily option default', () => {
   });
 
   it('defaults to light when daily_option is missing', async () => {
-    const words: VocabularyWord[] = [
-      { word: 'apple', meaning: '', example: '', category: 'fruit' }
-    ];
-    const selection: DailySelection = {
-      newWords: [],
-      reviewWords: [],
-      totalCount: 0,
-      severity: 'light'
-    };
-    (learningProgressService.forceGenerateDailySelection as vi.Mock).mockReturnValue(selection);
-
-    renderHook(() => useLearningProgress(words));
+    renderHook(() => useLearningProgress());
 
     await waitFor(() => {
       expect(getLocalPreferences).toHaveBeenCalled();
-      expect(learningProgressService.forceGenerateDailySelection).toHaveBeenCalledWith(words, 'light');
       expect(saveLocalPreferences).toHaveBeenCalledWith({ daily_option: 'light' });
+      expect(service.getOrCreateTodayWords).toHaveBeenCalledWith(
+        'user-key',
+        service.getModeForSeverity('light'),
+        service.getCountForSeverity('light'),
+        null
+      );
     });
   });
 });
-

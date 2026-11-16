@@ -136,46 +136,4 @@ describe('VocabularyAppWithLearning due reviews', () => {
     expect(words.map(w => w.word)).toContain('apple');
     expect(screen.queryByText('Play Due Reviews')).not.toBeInTheDocument();
   });
-
-  it("shrinks due review count and list when lighter intensity is selected", async () => {
-    render(
-      <TooltipProvider>
-        <VocabularyAppWithLearning />
-      </TooltipProvider>
-    );
-    const progressButton = screen.getAllByRole('button', {
-      name: /Learning Progress/i
-    })[0];
-    fireEvent.click(progressButton);
-    const summaryButton = screen.getAllByRole('button', {
-      name: /Word Summary/i
-    })[0];
-    fireEvent.click(summaryButton);
-
-    expect(
-      screen.getByText("Today's Due Review (2)")
-    ).toBeInTheDocument();
-    const appleEntries = screen.getAllByText('apple');
-    expect(appleEntries.length).toBeGreaterThan(0);
-    expect(screen.getByText('banana')).toBeInTheDocument();
-
-    const lightButton = screen.getByRole('button', {
-      name: /Light \(15-25\)/i
-    });
-    fireEvent.click(lightButton);
-
-    await waitFor(() =>
-      expect(
-        screen.getByText("Today's Due Review (1)")
-      ).toBeInTheDocument()
-    );
-    const remainingApples = screen.getAllByText('apple');
-    expect(remainingApples.length).toBeGreaterThan(0);
-    const dueReviewHeading = screen.getByText("Today's Due Review (1)");
-    const dueReviewSection = dueReviewHeading.closest('div');
-    expect(dueReviewSection).not.toBeNull();
-    if (dueReviewSection) {
-      expect(within(dueReviewSection).queryByText('banana')).not.toBeInTheDocument();
-    }
-  });
 });

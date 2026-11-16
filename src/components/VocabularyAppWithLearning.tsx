@@ -11,6 +11,7 @@ import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, Eye } from 'lucide-react';
+import { normalizeQuery } from '@/utils/text/normalizeQuery';
 import WordSearchModal from './vocabulary-app/WordSearchModal';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
@@ -170,8 +171,8 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
   };
 
   const openSearch = (word?: string) => {
-    const nextQuery = word ?? '';
-    if (word && !word.trim()) {
+    const nextQuery = normalizeQuery(word ?? '');
+    if (word && !nextQuery) {
       toast.warning('Please enter a valid search query.');
       return;
     }
