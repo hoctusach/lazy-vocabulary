@@ -64,3 +64,16 @@ describe('slot / consent helpers', () => {
     expect(canProceedWithAds(null)).toBe(false);
   });
 });
+
+describe('ADS-01 banner placement policy', () => {
+  it('never shows on learn (where the sign-in popup lives) or more', () => {
+    for (const tab of ['learn', 'more', 'auth', 'signin', 'dialog', '', 'PROGRESS']) {
+      expect(shouldShowBannerForTab(tab)).toBe(false);
+    }
+  });
+
+  it('is a strict no-op off native Android (no banner over web dialogs)', () => {
+    expect(isAdsSupported({ isNative: false, platform: 'web' })).toBe(false);
+    expect(adsEnabled()).toBe(false);
+  });
+});
