@@ -4,6 +4,7 @@ import type { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyMainNew from "./VocabularyMainNew";
 import LeaderboardPanel from "./LeaderboardPanel";
 import StreakPanel from "./StreakPanel";
+import { isNativePlatform } from "@/services/speech/nativeTts";
 
 interface ContentWithDataNewProps {
   displayWord: ReadonlyWord | null;
@@ -88,6 +89,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       {!cardOnly && additionalContent}
 
       {/* Mobile speech note statically above debug panel */}
+      {!isNativePlatform() && (
       <div className="mobile-note text-xs italic text-[var(--lv-text-secondary)] text-left my-1">
         <p>
           ⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or
@@ -105,6 +107,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
           </span>
         </p>
       </div>
+      )}
     </>
   );
 };

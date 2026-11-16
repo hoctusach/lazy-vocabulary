@@ -61,9 +61,8 @@ test('E2E-SWEEP-01', 'Click every visible control on each tab and in each dialog
   all.more = await sweep(s, 'More', go('More'));
   // dialogs: open each and click every control in it
   const openers = [
-    ['Learned dialog', 'Learn', () => U.click(s, { label: 'Mark as Learned' })],
+    ['Learned dialog', 'Learn', () => U.click(s, { label: 'Mark as LEARNED' })],
     ['Search', 'Learn', () => U.click(s, { label: 'Quick Search' })],
-    ['Practice', 'Learn', () => U.click(s, { label: 'Practice' })],
     ['Quiz', 'Progress', () => U.click(s, { text: 'Quiz me' })],
     ['Rename', 'Sets', () => U.cardBtn(s, 'setA', 'Rename')],
     ['Delete', 'Sets', async () => { if (!(await U.setNames(s)).includes('setA')) await importFile(s, 'setA.csv'); await U.cardBtn(s, 'setA', 'Delete'); }],

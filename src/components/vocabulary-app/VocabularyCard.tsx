@@ -6,6 +6,7 @@ import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-reac
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
+import { isNativePlatform } from '@/services/speech/nativeTts';
 import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 
 interface VocabularyCardProps {
@@ -155,8 +156,8 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               <em>* {translation}</em>
             </div>
           )}
-          {/* Mobile note below example */}
-          {!searchPreview && (
+          {/* Browser-only speech hints (not relevant in the native app) */}
+          {!searchPreview && !isNativePlatform() && (
             <div
               className="mobile-note text-left italic mt-2"
               style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}

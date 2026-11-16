@@ -100,9 +100,8 @@ test('THEME-12', 'Overlays render readable in every theme (dark): dialogs, searc
     const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true', 'lv-theme': 'default' } }); await boot(s);
     await s.page.evaluate(() => document.documentElement.classList.add('dark'));
     for (const [open, ready, close] of [
-      [() => ctl(s, 'Mark as Learned'), 'Are you sure', () => click(s, { text: 'Cancel' })],
+      [() => ctl(s, 'Mark as LEARNED'), 'Are you sure', () => click(s, { text: 'Cancel' })],
       [() => ctl(s, 'Quick Search'), 'Quick Search', () => click(s, { text: 'Close' })],
-      [() => ctl(s, 'Practice'), 'Submit practice', () => ctl(s, 'Close practice')],
     ]) {
       await open(); await waitText(s, ready); await sleep(300);
       const bad = await invisibleText(s); ok(bad.length === 0, `${name}: invisible text in ${ready}: ${bad}`);
@@ -183,12 +182,12 @@ test('PERSIST-02', 'Active set persists; a set removed from storage falls back t
 test('PERSIST-03', 'Imported-set progress persists', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
   for (let i = 0; i < 2; i++) { await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 }); await sleep(500);
-    await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
+    await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
   await s.reload(); await tab(s, 'Sets'); await waitText(s, '2 learned on this device');
 });
 test('PERSIST-04', 'Built-in progress after reload comes back from the server + cache', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
   await s.reload(); await sleep(2000); await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   await click(s, { textHas: 'Word Summary' }); await sleep(400);
   ok(/LEARNED\s*\(1\)/i.test((await body(s)).replace(/\n/g, ' ')), 'LEARNED (1) lost after reload');

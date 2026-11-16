@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Volume2,
@@ -11,8 +10,6 @@ import {
   Speaker,
   Search,
   CheckCircle,
-  Dumbbell,
-  ExternalLink,
 } from 'lucide-react';
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
@@ -37,7 +34,6 @@ interface VocabularyControlsColumnProps {
   playCurrentWord: () => void;
   onMarkWordLearned?: (word: string, category?: string) => void;
   onOpenSearch: (word?: string) => void;
-  onOpenPractice?: () => void;
 }
 
 const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
@@ -51,8 +47,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   selectedVoiceName,
   playCurrentWord,
   onMarkWordLearned,
-  onOpenSearch,
-  onOpenPractice
+  onOpenSearch
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
@@ -218,57 +213,17 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
 
 
-      {currentWord && (
-        <Button
-          asChild
-          variant="outline"
-          size="sm"
-          className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
-          title="Vocabulary Detail"
-          aria-label="Vocabulary Detail"
-        >
-          <Link to={`/vocabulary/${encodeURIComponent(currentWord.word)}`} className="flex flex-col items-center gap-1 md:flex-row">
-            <ExternalLink size={18} />
-            <span className="md:sr-only">Details</span>
-          </Link>
-        </Button>
-      )}
-
-      {onOpenPractice && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            trackUiInteraction('practice_dialog_opened', {
-              label: currentWord?.word || '',
-            });
-            onOpenPractice();
-          }}
-          className={cn(controlClass, 'border border-purple-200 bg-purple-50 text-purple-700 hover:text-purple-900 dark:border-purple-700 dark:bg-purple-950/50 dark:text-purple-200 dark:hover:text-white')}
-          title="Practice"
-          aria-label="Practice"
-          disabled={!currentWord}
-        >
-          <Dumbbell size={18} />
-          <span className="md:sr-only">Practice</span>
-        </Button>
-      )}
-
       {onMarkWordLearned && (
         <Button
-          variant="outline"
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
-          title="Mark as Learned"
-          aria-label="Mark as Learned"
+          className="col-span-2 h-11 min-h-11 w-full gap-2 border border-transparent bg-[var(--lv-success)] px-2 text-sm font-bold text-[var(--lv-on-success)] hover:bg-[var(--lv-success)] hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-11"
+          title="Mark as LEARNED"
+          aria-label="Mark as LEARNED"
           disabled={!currentWord}
         >
-          <CheckCircle
-            size={18}
-            className="text-emerald-600 dark:text-emerald-400"
-          />
-          <span className="md:sr-only">Learned</span>
+          <CheckCircle size={20} aria-hidden="true" />
+          <span className="md:sr-only">Mark as LEARNED</span>
         </Button>
       )}
 

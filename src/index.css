@@ -444,6 +444,7 @@ body.theme-mint {
   --lv-info: var(--accent-color);
   --lv-error: #B91C1C;
   --lv-success: #15803D;
+  --lv-on-success: #FFFFFF;
   --lv-warning: #B45309;
   --lv-focus-ring: #0F766E;
   --lv-overlay: rgba(27, 43, 39, 0.45);
@@ -509,6 +510,7 @@ html.dark body.theme-mint {
   --lv-info: var(--accent-color);
   --lv-error: #F08C84;
   --lv-success: #6CCB8F;
+  --lv-on-success: #0B1F14;
   --lv-warning: #E0B062;
   --lv-focus-ring: #5EC4B6;
   --lv-overlay: rgba(18, 24, 22, 0.6);
@@ -575,6 +577,7 @@ body.theme-morning {
   --lv-info: var(--accent-color);
   --lv-error: #B42318;
   --lv-success: #2F7D4A;
+  --lv-on-success: #FFFFFF;
   --lv-warning: #A16207;
   --lv-focus-ring: #B4501F;
   --lv-overlay: rgba(43, 33, 28, 0.45);
@@ -640,6 +643,7 @@ html.dark body.theme-morning {
   --lv-info: var(--accent-color);
   --lv-error: #F29A8E;
   --lv-success: #7CC79A;
+  --lv-on-success: #0B1F14;
   --lv-warning: #E3B65E;
   --lv-focus-ring: #F0A272;
   --lv-overlay: rgba(26, 22, 19, 0.6);
@@ -706,6 +710,7 @@ body.theme-ocean {
   --lv-info: var(--accent-color);
   --lv-error: #B42318;
   --lv-success: #1E7F5C;
+  --lv-on-success: #FFFFFF;
   --lv-warning: #A15C07;
   --lv-focus-ring: #1D5FB8;
   --lv-overlay: rgba(20, 34, 51, 0.45);
@@ -771,6 +776,7 @@ html.dark body.theme-ocean {
   --lv-info: var(--accent-color);
   --lv-error: #F29A92;
   --lv-success: #6FCBA6;
+  --lv-on-success: #0B1F14;
   --lv-warning: #E5B566;
   --lv-focus-ring: #7DB4F0;
   --lv-overlay: rgba(16, 22, 29, 0.6);
@@ -837,6 +843,7 @@ body.theme-sakura {
   --lv-info: var(--accent-color);
   --lv-error: #B4232E;
   --lv-success: #2F7D55;
+  --lv-on-success: #FFFFFF;
   --lv-warning: #A15C07;
   --lv-focus-ring: #A8396B;
   --lv-overlay: rgba(45, 31, 38, 0.45);
@@ -902,6 +909,7 @@ html.dark body.theme-sakura {
   --lv-info: var(--accent-color);
   --lv-error: #F59A9A;
   --lv-success: #7CC79F;
+  --lv-on-success: #0B1F14;
   --lv-warning: #E3B65E;
   --lv-focus-ring: #F09BBF;
   --lv-overlay: rgba(26, 20, 23, 0.6);
@@ -968,6 +976,7 @@ body.theme-cyber {
   --lv-info: var(--accent-color);
   --lv-error: #B42345;
   --lv-success: #1F7A5A;
+  --lv-on-success: #FFFFFF;
   --lv-warning: #A15C07;
   --lv-focus-ring: #5B47C9;
   --lv-overlay: rgba(30, 27, 51, 0.45);
@@ -1033,6 +1042,7 @@ html.dark body.theme-cyber {
   --lv-info: var(--accent-color);
   --lv-error: #F59AB0;
   --lv-success: #6FD3B0;
+  --lv-on-success: #0B1F14;
   --lv-warning: #E6B866;
   --lv-focus-ring: #A99BFF;
   --lv-overlay: rgba(19, 18, 28, 0.6);

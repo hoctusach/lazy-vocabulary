@@ -31,7 +31,7 @@ test('OFFLINE-03', 'Local features work with the network down', async ({ session
   await click(s, { text: 'CSV template' }); await s.page.waitForFunction(() => window.__downloads.length === 1, { timeout: 4000 });
   await U.cardBtn(s, 'setB', 'Delete'); await click(s, { text: 'Delete set' }); await waitText(s, 'Set deleted.');
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await click(s, { text: 'Close' });
-  await tab(s, 'Learn'); await sleep(600); await ctl(s, 'Practice'); await waitText(s, 'Submit practice'); await s.page.click('textarea'); await s.page.keyboard.type('I like this word very much.'); await click(s, { text: 'Submit practice' }); await sleep(600);
+  await tab(s, 'Learn'); await sleep(600);
   await tab(s, 'More'); await click(s, { label: 'Ocean Depth' });
   eq(await s.page.evaluate(() => document.body.classList.contains('theme-ocean')), true);
 });
@@ -39,7 +39,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
   await ctl(s, 'Next Word'); await U.waitWord(s, U.POOL_ORDER[1]);
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await sleep(800);
   await tab(s, 'Learn'); await ctl(s, 'Quick Search'); await s.page.click('input[placeholder="Search word..."]'); await s.page.keyboard.type('lever'); await sleep(1500);
   ok(/No results found|offline|couldn|leverage|unavailable/i.test(await body(s)));
@@ -48,7 +48,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
 test('OFFLINE-05', 'Back online: reload converges with the server', async ({ session }) => {
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   s.fake.mode = 'ok'; await s.reload(); await sleep(3500);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   ok((await body(s)).length > 200); // converged: app renders; learned sync call count recorded for the report
@@ -126,7 +126,7 @@ test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session 
   const s = await session({}); await boot(s); s.allow.push(/Quota|quota|setItem|storage/i);
   await s.page.evaluate(() => { let n = 1 << 20; const f = 'x'.repeat(n); let i = 0; try { while (true) { localStorage.setItem('zz_fill' + i++, f); } } catch (e) {} for (const size of [65536, 4096, 256, 16, 1]) { const c = 'y'.repeat(size); for (;;) { try { localStorage.setItem('zz_fill' + i++, c); } catch (e) { break; } } } });
   await ctl(s, 'Next Word'); await sleep(400);
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
   await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   await tab(s, 'More'); await click(s, { label: 'Sakura Dream' });
   await importFile(s, 'vocab.csv'); await sleep(900);
@@ -152,7 +152,7 @@ test('EDGE-10', 'Missing speechSynthesis: controls render, Next works', async ({
   const s = await session({ speech: 'none' }); await s.goto('/');
   await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 12000 });
   const w0 = await word(s); await sleep(500); await ctl(s, 'Next Word'); await sleep(800); ok((await word(s)) !== w0, 'Next did not advance');
-  for (const l of ['Mute', 'Pause', 'Quick Search', 'Practice']) ok(await U.label(s, l), 'missing ' + l);
+  for (const l of ['Mute', 'Pause', 'Quick Search']) ok(await U.label(s, l), 'missing ' + l);
 });
 test('EDGE-13', 'HTML/script in imported text is inert in Learn, Quiz and Search', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'xss.json'); await waitText(s, 'Imported 6 words into “xss”.');

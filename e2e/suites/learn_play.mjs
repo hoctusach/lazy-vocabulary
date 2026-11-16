@@ -66,10 +66,31 @@ test('LEARN-01', 'Card fields (vi-VN device so the translation line shows)', asy
 });
 test('LEARN-02', 'Controls present with labels, 4-col grid, no Previous', async ({ session }) => {
   const s = await session({}); await boot(s);
-  for (const l of ['Mute', 'Pause', 'Next Word', 'Change Voice', 'Speech Rate', 'Quick Search', 'Vocabulary Detail', 'Practice', 'Mark as Learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
+  for (const l of ['Mute', 'Pause', 'Next Word', 'Change Voice', 'Speech Rate', 'Quick Search', 'Mark as LEARNED']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
   ok(await s.page.evaluate(() => !!document.querySelector('main .grid-cols-4')), '4 col grid');
+  ok(!(await U.label(s, 'Vocabulary Detail')) && !(await U.label(s, 'Practice')), 'Details/Practice buttons must be gone');
   const all = await U.controls(s);
   ok(!all.some((l) => /previous|prev\b/i.test(l)), 'a Previous control exists now: ' + all);
+});
+test('LEARN-12', 'Details and Practice buttons are absent from Learn', async ({ session }) => {
+  const s = await session({}); await boot(s);
+  const all = await U.controls(s);
+  ok(!all.some((l) => /vocabulary detail|^practice$|^details$/i.test(l)), 'found: ' + all);
+  eq(await s.page.evaluate(() => [...document.querySelectorAll('main button, main a')].filter((b) => /^(Details|Practice)$/.test(b.textContent.trim())).length), 0);
+});
+test('LEARN-13', 'Mark as LEARNED is a prominent 2-column button in the controls grid', async ({ session }) => {
+  const s = await session({}); await boot(s);
+  const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as LEARNED"]'); if (!b) return null; const o = document.querySelector('main button[aria-label="Quick Search"]'); const g = b.parentElement; const bb = b.getBoundingClientRect(), ob = o.getBoundingClientRect();
+    return { txt: b.textContent.trim(), span: getComputedStyle(b).gridColumnEnd, grid: getComputedStyle(g).gridTemplateColumns.split(' ').length, h: Math.round(bb.height), oh: Math.round(ob.height), w: bb.width, ow: ob.width, fw: +getComputedStyle(b).fontWeight, bg: getComputedStyle(b).backgroundColor }; });
+  ok(r, 'button missing'); eq(r.txt, 'Mark as LEARNED'); ok(/span 2/.test(r.span), 'span ' + r.span); eq(r.grid, 4); eq(r.h, r.oh);
+  ok(r.w > r.ow * 1.8, 'width ' + r.w + ' vs ' + r.ow); ok(r.fw >= 700, 'bold ' + r.fw); ok(r.bg !== 'rgba(0, 0, 0, 0)' && r.bg !== 'rgb(255, 255, 255)', 'filled ' + r.bg);
+});
+test('LEARN-14', 'Speech hint lines show on web and are hidden in the native app', async ({ session }) => {
+  const HINT = /Speech won’t autoplay due to security|free voices by device and browser/;
+  let s = await session({}); await boot(s);
+  ok(HINT.test(await cardText(s)) || HINT.test(await body(s)), 'hints missing on web');
+  s = await session({ initScript: 'window.androidBridge = { postMessage() {} };' }); await s.goto('/'); await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 12000 }); await sleep(800);
+  const t = await body(s); ok(!/autoplay due to security/.test(t) && !/free voices by device and browser/.test(t), 'hints visible in native');
 });
 skip('LEARN-03', 'Previous button absent', 'product gap');
 test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ session }) => {
@@ -82,7 +103,7 @@ test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ sess
 });
 test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as Learned');
+  await ctl(s, 'Mark as LEARNED');
   await waitText(s, `Are you sure you want to mark "${U.P[0].word}" as learned?`);
   await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
@@ -93,7 +114,7 @@ test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ se
 });
 test('LEARN-06', 'Mark learned cancel: no RPC, no toast', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as Learned'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
+  await ctl(s, 'Mark as LEARNED'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
   await U.waitGone(s, 'Are you sure'); await sleep(400);
   eq(s.fake.count('mark_word_learned_by_key'), 0); ok(!(await body(s)).includes('Word marked as learned.'));
   await waitWord(s, W[0]);
@@ -103,7 +124,7 @@ test('LEARN-07', 'Mark learned in imported set is local only and updates stats',
   await U.importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa\d/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   const w = await word(s);
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true });
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
   const id = (await U.metaSets(s))[0].id;
   const prog = JSON.parse(await s.ls('lv.vocabularySets.progress.' + id));
@@ -197,14 +218,7 @@ test('PLAY-10', 'Auto-advance on utterance end, not while paused', async ({ sess
   await U.fireEnd(s); await waitWord(s, W[1]); await waitSpeech(s, U.re1);
   await ctl(s, 'Pause'); await U.fireEnd(s); await sleep(1200); eq(await word(s), W[1]);
 });
-test('PLAY-11', 'Practice pauses audio and resumes only if it was playing', async ({ session }) => {
-  const s = await session({}); await boot(s);
-  const c0 = (await speechInfo(s)).cancels;
-  await ctl(s, 'Practice'); await waitText(s, 'Submit practice'); ok(await label(s, 'Play'), 'paused on open'); ok((await speechInfo(s)).cancels > c0);
-  await ctl(s, 'Close practice'); await U.waitGone(s, 'Submit practice'); await sleep(400); ok(await label(s, 'Pause'), 'resumed after close');
-  await ctl(s, 'Pause'); await ctl(s, 'Practice'); await waitText(s, 'Submit practice'); await ctl(s, 'Close practice'); await sleep(500);
-  ok(await label(s, 'Play'), 'must stay paused');
-});
+skip('PLAY-11', 'Practice pauses audio and resumes only if it was playing', 'removed: Practice button removed from Learn');
 
 // ---------- VOICE ----------
 test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence', async ({ session }) => {

@@ -22,7 +22,7 @@ test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
 test('PROG-05', 'Word Summary lists for an imported set', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
   await openProgress(s); await expand(s, 'Word Summary');
   const t = await flat(s);
   ok(/NEW TODAY\s*\((\d+)\)/i.test(t) && /DUE TODAY\s*\((\d+)\)/i.test(t) && /LEARNED\s*\(1\)/i.test(t), 'headings: ' + t.slice(t.indexOf('NEW TODAY') - 20, t.indexOf('NEW TODAY') + 300));
@@ -48,7 +48,7 @@ test('PROG-07', 'Eye button opens search pre-filled with the word', async ({ ses
 });
 test('PROG-08', 'Progress after learning a built-in word', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
+  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
   await openProgress(s); await expand(s, 'Word Summary');
   const t = await flat(s);
   ok(/LEARNED\s*\(1\)/i.test(t), 'LEARNED (1) ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
@@ -164,27 +164,11 @@ test('QUIZ-04', 'Quiz from an imported set uses only that set', async ({ session
   const q = await s.page.evaluate(() => document.querySelector('[role=dialog]').innerText);
   ok(/aaa\d/.test(q) && (await quizOptions(s)).every((o) => /meaning of aaa\d/.test(o)), q.slice(0, 300));
 });
-const openPractice = async (s) => { await ctl(s, 'Practice'); await waitText(s, 'Submit practice'); };
-test('PRACT-01', 'Practice overlay opens, speech stops, submit disabled when empty', async ({ session }) => {
-  const s = await session({}); await boot(s); const c = (await U.speechInfo(s)).cancels; await openPractice(s);
-  await waitText(s, `Use “${U.P[0].word}”`); await waitText(s, 'Meaning: ' + U.P[0].meaning);
-  ok((await U.speechInfo(s)).cancels > c, 'speech stopped');
-  eq(await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Submit practice').disabled), true);
-});
-test('PRACT-02', 'Type and submit: result popup and history saved', async ({ session }) => {
-  const s = await session({}); await boot(s); await openPractice(s);
-  await s.page.click('textarea'); await s.page.keyboard.type('I always try to bring back something nice for my friends.');
-  await click(s, { text: 'Submit practice' }); await sleep(800);
-  const t = await body(s); ok(/\b\d{1,3}\b/.test(t) && /score|Score|\/\s*100|Strong|Try|feedback/i.test(t), t.slice(0, 500));
-  const h = JSON.parse(await s.ls('lazyvoca.practice.history.v1') || '[]'); ok(h.length === 1, 'history ' + h.length);
-});
-test('PRACT-04', 'Speech recognition unavailable note; typing still works', async ({ session }) => {
-  const s = await session({ initScript: 'delete window.SpeechRecognition; delete window.webkitSpeechRecognition;' }); await boot(s); await openPractice(s);
-  await waitText(s, 'Speech recognition is unavailable. Type your sentence instead.');
-  eq(await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Start recording').disabled), true);
-});
-test('DETAIL-01', 'Details link opens the word page', async ({ session }) => {
-  const s = await session({}); await boot(s); await click(s, { label: 'Vocabulary Detail' }); await sleep(800);
+skip('PRACT-01', 'Practice overlay opens', 'removed: no Practice button on Learn any more');
+skip('PRACT-02', 'Type and submit practice', 'removed: no Practice entry point');
+skip('PRACT-04', 'Speech recognition unavailable note', 'removed: no Practice entry point');
+test('DETAIL-01', 'Word page opens by direct URL (Details button removed from Learn)', async ({ session }) => {
+  const s = await session({}); await boot(s); await s.goto('/vocabulary/' + encodeURIComponent(U.P[0].word)); await sleep(800);
   eq(new URL(s.page.url()).pathname, '/vocabulary/' + encodeURIComponent(U.P[0].word));
   await waitText(s, 'Practice history');
   const t = await body(s); ok(t.includes(U.P[0].word) && t.includes('Practice history') && t.includes(U.P[0].meaning), t.slice(0, 400));
