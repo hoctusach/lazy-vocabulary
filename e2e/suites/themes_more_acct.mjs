@@ -127,7 +127,8 @@ test('THEME-13', 'Theme and dark mode persist after reload (Ocean + dark)', asyn
 test('MORE-01', 'More panel content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'More');
   const t = await body(s);
-  for (const x of ['More', 'Learning Word Set: C1, C2', 'Hello e2e', 'Sign out', 'How to do it?', 'Tap anywhere once if speech does not start', '© 2025 Lazy Vocabulary']) ok(t.includes(x), 'missing ' + x);
+  for (const x of ['More', 'Hello e2e', 'Sign out', 'How to do it?', 'Tap anywhere once if speech does not start', 'Lazy Vocabulary v', '© 2025 Lazy Vocabulary']) ok(t.includes(x), 'missing ' + x);
+  ok(!t.includes('Learning Word Set') && !t.includes('Audio settings stay'), 'removed active-set blurb should be absent');
   ok(!t.includes('Reset player'), 'Reset player should be absent');
   for (const [, label] of THEMES) ok(await s.page.$(`button[aria-label="${label}"]`), label);
   ok(await s.page.$('button[aria-label^="Switch to"]'), 'dark toggle');

@@ -24,7 +24,7 @@ test('TAB-03', 'Sets tab content', async ({ session }) => {
 });
 test('TAB-04', 'More tab content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'More');
-  await waitText(s, 'Learning Word Set: C1, C2'); await waitText(s, 'Hello e2e'); ok(await label(s, 'Mint Breeze'), 'theme buttons');
+  await waitText(s, 'Hello e2e'); ok(await label(s, 'Mint Breeze'), 'theme buttons');
 });
 test('TAB-05', 'Tab round-trip keeps word and paused state', async ({ session }) => {
   const s = await session({}); await boot(s);

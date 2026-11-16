@@ -52,7 +52,8 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       ? { pure: ['console.log', 'console.info', 'console.debug', 'console.warn', 'console.group', 'console.groupCollapsed', 'console.groupEnd'] }
       : undefined,
     define: {
-      'process.env.NODE_ENV': JSON.stringify(mode)
+      'process.env.NODE_ENV': JSON.stringify(mode),
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version ?? '')
     }
   };
 });

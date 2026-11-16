@@ -3,10 +3,13 @@ import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
-import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
+import { isNativePlatform } from '@/services/speech/nativeTts';
+
+declare const __APP_VERSION__: string;
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
 
 const MorePanel: React.FC = () => {
-  const { activeSet } = useVocabularySets();
+  const native = isNativePlatform();
 
   return (
     <section className="space-y-4" data-screen="more">
@@ -14,19 +17,17 @@ const MorePanel: React.FC = () => {
         <h2 className="text-xl font-semibold" style={{ color: 'var(--lv-heading)' }}>
           More
         </h2>
-        <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
-          Learning <span className="font-medium">{activeSet.name}</span>. Audio settings stay on this device.
-          Speech uses the voices installed on your phone or browser.
-        </p>
       </div>
 
       <FriendCompareCard />
 
       <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
+        {/* Account & privacy group: Delete account / privacy links (feat/play-store-ads-release) slot in below the greeting. */}
         <UserGreeting />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <ThemeSwitcher />
-          <NotificationManager />
+          {/* Web Notification API is unavailable in the Android WebView and no native reminder plugin exists. */}
+          {!native && <NotificationManager />}
         </div>
       </div>
 
@@ -38,11 +39,13 @@ const MorePanel: React.FC = () => {
             How to do it?
           </a>
         </p>
-        <p className="mt-3" style={{ color: 'var(--lv-text-secondary)' }}>
-          Tap anywhere once if speech does not start. Phones block audio until you interact with the app.
-        </p>
+        {!native && (
+          <p className="mt-3" style={{ color: 'var(--lv-text-secondary)' }}>
+            Tap anywhere once if speech does not start. Browsers block audio until you interact with the page.
+          </p>
+        )}
         <p className="mt-4 text-xs" style={{ color: 'var(--lv-helper-text)' }}>
-          © 2025 Lazy Vocabulary - hoctusach@gmail.com
+          Lazy Vocabulary{APP_VERSION ? ` v${APP_VERSION}` : ''} · © 2025 Lazy Vocabulary - hoctusach@gmail.com
         </p>
       </div>
     </section>
