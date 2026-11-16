@@ -9,6 +9,7 @@ import UserInteractionManager from "./UserInteractionManager";
 import AudioStatusIndicator from "./AudioStatusIndicator";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
+import { usePlaybackService } from '@/hooks/usePlaybackService';
 import { vocabularyService } from '@/services/vocabularyService';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import type { DailySelection } from '@/types/learning';
@@ -68,6 +69,15 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
     playCurrentWord
+  });
+
+  // Android: keep playing (and show a notification) while the app is backgrounded.
+  usePlaybackService({
+    isPlaying: hasData && !isPaused && !!currentWord,
+    word: currentWord?.word,
+    detail: currentWord?.meaning || currentWord?.category || currentCategory,
+    onPause: togglePause,
+    onNext: goToNextAndSpeak,
   });
 
   // Memoize debug data
