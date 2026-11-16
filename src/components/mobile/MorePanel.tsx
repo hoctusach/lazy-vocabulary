@@ -4,6 +4,8 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
+import ProCard from '@/components/mobile/ProCard';
+import { isBillingSupported } from '@/services/billing/billingService';
 
 declare const __APP_VERSION__: string;
 const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
@@ -20,6 +22,8 @@ const MorePanel: React.FC = () => {
       </div>
 
       <FriendCompareCard />
+
+      {isBillingSupported() && <ProCard />}
 
       <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
         {/* Account & privacy group: Delete account / privacy links (feat/play-store-ads-release) slot in below the greeting. */}
