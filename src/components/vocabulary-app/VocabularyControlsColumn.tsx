@@ -17,6 +17,7 @@ import {
 import SpeechRateControl from './SpeechRateControl';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { toast } from 'sonner';
+import { CONTROL_TOAST } from './controlToast';
 import { ReadonlyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
@@ -62,9 +63,9 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       label: isMuted ? 'Unmute' : 'Mute',
     });
     if (isMuted) {
-      toast('Audio unmuted. Speech will resume from the next word.');
+      toast('Audio unmuted. Speech will resume from the next word.', CONTROL_TOAST);
     } else {
-      toast('Audio muted');
+      toast('Audio muted', CONTROL_TOAST);
     }
   };
 
@@ -73,7 +74,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     trackUiInteraction(isPaused ? 'play' : 'pause', {
       label: isPaused ? 'Play' : 'Pause',
     });
-    toast(isPaused ? 'Playback resumed' : 'Playback paused');
+    toast(isPaused ? 'Playback resumed' : 'Playback paused', CONTROL_TOAST);
   };
 
   const handleNextWord = () => {
@@ -124,7 +125,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     }
     if (onMarkWordLearned && wordToMark?.word) onMarkWordLearned(wordToMark.word, wordToMark.category);
     setIsMarkAsLearnedDialogOpen(false);
-    toast('Word marked as learned.');
+    toast('Word marked as learned.', CONTROL_TOAST);
   };
 
   const controlClass =
