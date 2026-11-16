@@ -152,7 +152,10 @@ function rowsToSheets(
     if (!word && !meaning) return;
     if (!word || !meaning) {
       if (errors.length < MAX_ERRORS) {
-        pushError(errors, `Row ${rowNumber} needs both a word and a meaning.`);
+        const detail = word
+          ? `"${word.slice(0, 40)}" is missing its meaning`
+          : `has a meaning ("${meaning.slice(0, 40)}") but no word`;
+        pushError(errors, `Row ${rowNumber} ${detail}. Each row needs both a word and a meaning.`);
       } else {
         hidden += 1;
       }
@@ -181,9 +184,13 @@ function rowsToSheets(
     if (!sheets[category]) sheets[category] = [];
     const list = sheets[category];
     const existing = list.findIndex((item) => item.word.toLowerCase() === word.toLowerCase());
-    if (existing >= 0) list[existing] = entry;
-    else list.push(entry);
-    valid += 1;
+    if (existing >= 0) {
+      list[existing] = entry;
+    } else {
+      list.push(entry);
+      // Only unique words count toward the cap, so a file full of repeats is not rejected.
+      valid += 1;
+    }
   });
 
   if (valid === 0) {
