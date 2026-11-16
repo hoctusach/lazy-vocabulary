@@ -146,14 +146,13 @@ test('PLAY-02', 'Pause: Play button, toast, no auto-advance, pref saved', async 
   eq((await prefs(s)).is_playing, false);
   await U.fireEnd(s); await sleep(1200); eq(await word(s), W[0], 'advanced while paused');
 });
-test('PLAY-03', 'Play after the paused utterance ended repeats the current word, then auto-advance resumes', async ({ session }) => {
+test('PLAY-03', 'Play after the paused utterance ended: word is repeated, then auto-advance resumes', async ({ session }) => {
   const s = await session({}); await boot(s);
   await ctl(s, 'Pause'); await waitText(s, 'Playback paused');
-  await U.fireEnd(s); await sleep(500); eq(await word(s), W[0], 'advanced while paused');
-  const n = (await speechInfo(s)).calls;
+  await sleep(300); await U.fireEnd(s); await sleep(600); eq(await word(s), W[0], 'advanced while paused');
   await ctl(s, 'Play'); await waitText(s, 'Playback resumed');
-  await s.page.waitForFunction((n) => window.__speech.calls.length > n, { timeout: 5000 }, n);
-  ok(/break the ice/.test((await speechInfo(s)).last.text), 'current word repeated');
+  await s.page.waitForFunction(() => window.__speech.calls.filter((c) => /break the ice/.test(c.text)).length >= 2 && !!window.__speech.current, { timeout: 5000 });
+  ok(await label(s, 'Pause'), 'button back to Pause');
   await U.fireEnd(s); await waitWord(s, W[1]);
 });
 skip('PLAY-04', 'Paused chip indicator', 'product gap');

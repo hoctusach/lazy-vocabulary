@@ -78,7 +78,8 @@ export async function importFile(s, fixture) {
 export async function setNames(s) {
   return s.page.evaluate(() => [...document.querySelectorAll('h3')].map((h) => h.textContent.trim()).filter((t) => t && t !== 'Import a set'));
 }
-export const metaSets = async (s) => JSON.parse((await s.ls('lv.vocabularySets.v1')) || '[]');
+export const metaSets = async (s) => (JSON.parse((await s.ls('lv.vocabularySets.v1')) || '{"sets":[]}').sets) || [];
+export const selectAll = async (s, sel) => { await s.page.focus(sel); await s.page.$eval(sel, (e) => e.select()); };
 
 export async function openDark(s, on = true) {
   await tab(s, 'More');
@@ -99,3 +100,34 @@ export async function waitSpeech(s, re, timeout = 6000) {
 export async function boot(s, path = '/') { await s.goto(path); await waitWord(s, POOL_ORDER[0], 12000); await waitSpeech(s, /break the ice/); await sleep(600); }
 export const label = (s, l) => s.page.evaluate((l) => !![...document.querySelectorAll('button')].find((b) => b.getAttribute('aria-label') === l && b.offsetParent), l);
 export const ctl = (s, l) => click(s, { label: l });
+
+/** Click a button inside the Sets-tab card whose title is `setName`. */
+export async function cardBtn(s, setName, btnText) {
+  const h = (await s.page.evaluateHandle((setName, btnText) => {
+    const li = [...document.querySelectorAll('li')].find((l) => l.querySelector('h3')?.textContent.trim() === setName);
+    return li ? [...li.querySelectorAll('button')].find((b) => b.textContent.trim() === btnText) || null : null;
+  }, setName, btnText)).asElement();
+  if (!h) throw new Assert(`no "${btnText}" button in card "${setName}"`);
+  await h.evaluate((e) => e.scrollIntoView({ block: 'center' })); await h.click(); await sleep(200);
+}
+export const cardHas = (s, setName, btnText) => s.page.evaluate((setName, btnText) => {
+  const li = [...document.querySelectorAll('li')].find((l) => l.querySelector('h3')?.textContent.trim() === setName);
+  return !!li && [...li.querySelectorAll('button')].some((b) => b.textContent.trim() === btnText);
+}, setName, btnText);
+export const cardText = (s, setName) => s.page.evaluate((setName) => [...document.querySelectorAll('li')].find((l) => l.querySelector('h3')?.textContent.trim() === setName)?.innerText || null, setName);
+export const alertText = (s) => s.page.evaluate(() => document.querySelector('[role=alert]')?.innerText || '');
+export async function waitAlert(s, re, timeout = 8000) {
+  try { await s.page.waitForFunction((src) => new RegExp(src, 'i').test(document.querySelector('[role=alert]')?.innerText || ''), { timeout }, re.source); }
+  catch { throw new Assert(`alert ${re} not shown. alert="${await alertText(s)}"`); }
+}
+export const DOWNLOAD_HOOK = `
+  window.__downloads = [];
+  const __orig = HTMLAnchorElement.prototype.click;
+  HTMLAnchorElement.prototype.click = function () {
+    if (this.download) { const name = this.download; fetch(this.href).then((r) => r.arrayBuffer()).then((b) => window.__downloads.push({ name, bytes: Array.from(new Uint8Array(b)) })); return; }
+    return __orig.call(this);
+  };`;
+export async function pickFile(s, absPath) {
+  const input = await s.page.$('input[type=file][aria-label="Import vocabulary file"]'); ok(input, 'no file input');
+  await input.uploadFile(absPath); await sleep(400);
+}
