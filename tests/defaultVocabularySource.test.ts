@@ -112,4 +112,14 @@ describe('computed totals', () => {
     expect(think).toHaveLength(1);
     expect(think[0].meaning).toBe("to come up with a new idea, plan, story or reason using your mind");
   });
+
+  it("keeps the write-down sense under 'take down', not 'take in'", () => {
+    const wd = 'to write down information or statements';
+    expect(find('take in /teɪk ɪn/').filter((e) => e.meaning === wd)).toHaveLength(0);
+    const down = find('take down /teɪk daʊn/').filter((e) => e.meaning === wd);
+    expect(down).toHaveLength(1);
+    expect(down[0].example).toBe(
+      "During the call, Priya took down the client's exact wording so nothing would be misquoted later.",
+    );
+  });
 });
