@@ -5,7 +5,7 @@ import { VocabularyWord } from '../src/types/vocabulary';
 describe('useContentValidation', () => {
   const { validateAndPrepareContent } = useContentValidation();
 
-  it('returns unfiltered speechable text', () => {
+  it('strips IPA and part-of-speech notes from the speechable text', () => {
     const word: VocabularyWord = {
       word: 'quick',
       meaning: '(adj) [kwiːk]',
@@ -14,10 +14,10 @@ describe('useContentValidation', () => {
     };
 
     const { speechableText } = validateAndPrepareContent(word);
-    expect(speechableText).toBe('quick<break time="300ms"/>(adj) [kwiːk]');
+    expect(speechableText).toBe('quick.');
   });
 
-  it('returns full text even if it contains IPA', () => {
+  it('returns empty text (skips speech) when the content is only IPA', () => {
     const word: VocabularyWord = {
       word: '[kwiːk]',
       meaning: '',
@@ -25,7 +25,8 @@ describe('useContentValidation', () => {
       count: 1,
     };
 
-    const { speechableText } = validateAndPrepareContent(word);
-    expect(speechableText).toBe('[kwiːk]');
+    const { speechableText, hasValidContent } = validateAndPrepareContent(word);
+    expect(speechableText).toBe('');
+    expect(hasValidContent).toBe(false);
   });
 });

@@ -1,26 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { cleanSpeechText, prepareTextForSpeech } from '../src/utils/speech/core/speechText';
 
+// Current intended behaviour: IPA, (pos) and [labels] are stripped, list numbers are
+// kept so they are read aloud, and a trailing full stop is added for a natural pause.
 const cases: Array<{ input: string; output: string }> = [
   {
     input: '/ˈækt/ (verb) [C] 1. to do something',
-    output: 'to do something',
+    output: '1. to do something.',
   },
   {
     input: '1. word 2. meaning',
-    output: 'word meaning',
+    output: '1. word 2. meaning.',
   },
   {
     input: '[formal] (noun) /təˈmeɪtoʊ/ tomato',
-    output: 'tomato',
+    output: 'tomato.',
   },
   {
     input: '/ən/ (adv.) quickly',
-    output: 'quickly',
+    output: 'quickly.',
   },
   {
     input: 'Meaning: 1. do X 2. do Y',
-    output: 'Meaning: do X do Y',
+    output: 'Meaning: 1. do X 2. do Y.',
   },
 ];
 
@@ -43,6 +45,6 @@ describe('cleanSpeechText', () => {
 describe('prepareTextForSpeech', () => {
   it('delegates to cleanSpeechText', () => {
     const input = '/ən/ [slang] 1. run';
-    expect(prepareTextForSpeech(input)).toBe('run');
+    expect(prepareTextForSpeech(input)).toBe('1. run.');
   });
 });
