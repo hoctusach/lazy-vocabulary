@@ -50,6 +50,8 @@ class ShimUtterance extends EventTarget {
   }
 }
 
+export const FAILED_SPEAK_DELAY_MS = 300;
+
 class ShimSynth extends EventTarget {
   speaking = false;
   pending = false;
@@ -121,6 +123,9 @@ class ShimSynth extends EventTarget {
     } catch (err) {
       errorType = String((err as Error)?.message) === 'not-supported' ? 'synthesis-unavailable' : 'synthesis-failed';
     }
+    // A failing engine rejects within microtasks. Settle on a real timer so a caller that
+    // re-speaks from onerror cannot starve the event loop (page freeze, REG-02/EDGE-10).
+    if (errorType) await new Promise((r) => setTimeout(r, FAILED_SPEAK_DELAY_MS));
     // cancel()/pause() already settled state and events for a superseded utterance
     if (my !== this.token) return;
     this.current = null;
@@ -139,7 +144,9 @@ class ShimSynth extends EventTarget {
     this.current = null;
     this.speaking = false;
     void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
-    if (had) had.emit('error', { error: 'canceled' });
+    // Browsers fire the cancel error asynchronously; doing it synchronously let
+    // onerror -> speak -> cancel recurse without yielding.
+    if (had) setTimeout(() => had.emit('error', { error: 'canceled' }), 0);
   }
 
   pause(): void {

@@ -16,6 +16,10 @@ let pluginPromise: Promise<NativeTtsHandle | null> | null = null;
 
 /** Lazily imports the native plugin so web bundles don't execute it eagerly. */
 export function loadNativeTts(): Promise<NativeTtsHandle | null> {
+  // Off-device the plugin's web implementation just calls window.speechSynthesis, which is
+  // our shim when Web Speech is missing: shim.cancel -> plugin.stop -> shim.cancel... froze
+  // the page (REG-02/EDGE-10). Only the native engine is useful here.
+  if (!isNativePlatform()) return Promise.resolve(null);
   if (!pluginPromise) {
     pluginPromise = import('@capacitor-community/text-to-speech')
       .then((m) => ({ tts: m.TextToSpeech as TextToSpeechPlugin }))

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const speak = vi.fn();
 const stop = vi.fn(async () => {});
@@ -9,6 +9,9 @@ const getSupportedVoices = vi.fn(async () => ({
     { voiceURI: 'b', name: 'UK Voice', lang: 'en-GB', localService: true, default: false },
   ],
 }));
+
+const native = { value: false };
+vi.mock('@capacitor/core', () => ({ Capacitor: { isNativePlatform: () => native.value } }));
 
 vi.mock('@capacitor-community/text-to-speech', () => ({
   TextToSpeech: { speak: (o: unknown) => speak(o), stop: () => stop(), getSupportedVoices: () => getSupportedVoices() },
@@ -60,7 +63,8 @@ describe('webSpeech helpers when speechSynthesis is missing', () => {
 });
 
 describe('native speech shim', () => {
-  beforeEach(() => { speak.mockReset(); stop.mockClear(); vi.resetModules(); });
+  afterEach(() => { native.value = false; });
+  beforeEach(() => { native.value = true; speak.mockReset(); stop.mockClear(); vi.resetModules(); });
 
   async function install() {
     const w = window as unknown as Record<string, unknown>;
@@ -102,7 +106,7 @@ describe('native speech shim', () => {
     await new Promise((r) => setTimeout(r, 10));
     expect(synth.speaking).toBe(true);
     synth.cancel();
-    await new Promise((r) => setTimeout(r, 5));
+    await new Promise((r) => setTimeout(r, 20));
     expect(stop).toHaveBeenCalled();
     expect(errors).toEqual(['canceled']);
     expect(synth.speaking).toBe(false);

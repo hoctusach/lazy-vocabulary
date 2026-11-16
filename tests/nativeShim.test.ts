@@ -61,14 +61,17 @@ describe('NATIVE-08: shim install rules', () => {
 
 describe('NATIVE-07: native TTS shim', () => {
   beforeEach(() => {
-    native.value = false;
+    native.value = true; // loadNativeTts() only returns the plugin on a native platform
     vi.clearAllMocks();
     plugin.getSupportedVoices.mockResolvedValue({ voices });
     plugin.speak.mockResolvedValue(undefined);
     plugin.stop.mockResolvedValue(undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    native.value = false;
+    vi.restoreAllMocks();
+  });
 
   const utter = (text = 'hello') => new window.SpeechSynthesisUtterance(text);
 
@@ -114,7 +117,8 @@ describe('NATIVE-07: native TTS shim', () => {
     synth.speak(u);
     await flush();
     synth.cancel();
-    expect(errors).toEqual(['canceled']);
+    expect(errors).toEqual([]); // cancel error is emitted asynchronously
+    await vi.waitFor(() => expect(errors).toEqual(['canceled']));
     await vi.waitFor(() => expect(plugin.stop).toHaveBeenCalled());
     expect(synth.speaking).toBe(false);
   });
@@ -147,7 +151,7 @@ describe('NATIVE-07: native TTS shim', () => {
     const u = utter();
     u.onerror = (e) => errors.push((e as unknown as { error: string }).error);
     synth.speak(u);
-    await vi.waitFor(() => expect(errors).toEqual(['synthesis-failed']));
+    await vi.waitFor(() => expect(errors).toEqual(['synthesis-failed']), { timeout: 2000 }); // after FAILED_SPEAK_DELAY_MS
     expect(synth.speaking).toBe(false);
   });
 
@@ -161,7 +165,7 @@ describe('NATIVE-07: native TTS shim', () => {
     good.onend = ended;
     synth.speak(bad);
     synth.speak(good);
-    await vi.waitFor(() => expect(ended).toHaveBeenCalled());
+    await vi.waitFor(() => expect(ended).toHaveBeenCalled(), { timeout: 2000 });
     expect(synth.speaking).toBe(false);
   });
 });
