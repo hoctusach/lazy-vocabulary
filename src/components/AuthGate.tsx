@@ -17,6 +17,7 @@ import { identifyUser } from '@/services/analyticsService';
 import { dispatchNicknameChange, NICKNAME_EVENT_NAME } from '@/lib/nicknameEvents';
 import type { NicknameEventDetail } from '@/lib/nicknameEvents';
 import { initializeSpeechSystem } from '@/utils/speech';
+import { friendlyAuthMessage, validatePasscode } from '@/lib/auth/authMessages';
 import { markUserInteraction } from '@/utils/userInteraction';
 
 function isSeverityLevel(value: unknown): value is SeverityLevel {
@@ -37,14 +38,6 @@ type UIState = {
   error?: string;
   info?: string;
 };
-
-function validatePasscode(passcode: string): string | null {
-  const trimmed = passcode.trim();
-  if (trimmed.length < 4) return 'Passcode must be at least 4 digits.';
-  if (trimmed.length > 10) return 'Passcode must be at most 10 digits.';
-  if (!/^\d+$/.test(trimmed)) return 'Passcode can only contain numbers.';
-  return null;
-}
 
 export default function AuthGate() {
   const [s, setS] = useState<UIState>({
@@ -300,10 +293,7 @@ export default function AuthGate() {
       } catch (error) {
         console.error('AuthGate:createProfile', error);
         if (handleExchangeError(error)) return;
-        const rawMessage = typeof (error as { message?: string })?.message === 'string'
-          ? (error as { message?: string }).message
-          : '';
-        const message = rawMessage.trim().length ? rawMessage.trim() : 'Failed to save nickname';
+        const message = friendlyAuthMessage(error, 'Failed to save nickname');
         const isTaken = /409|taken|exists|NICKNAME_TAKEN/i.test(message);
         setS((p) => ({
           ...p,
@@ -321,10 +311,7 @@ export default function AuthGate() {
       } catch (error) {
         console.error('AuthGate:signInAfterCreate', error);
         if (handleExchangeError(error)) return;
-        const rawMessage = typeof (error as { message?: string })?.message === 'string'
-          ? (error as { message?: string }).message
-          : '';
-        const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
+        const message = friendlyAuthMessage(error, 'Sign-in failed');
         setS((p) => ({
           ...p,
           pending: false,
@@ -341,10 +328,7 @@ export default function AuthGate() {
     } catch (error) {
       console.error('AuthGate:signIn', error);
       if (handleExchangeError(error)) return;
-      const rawMessage = typeof (error as { message?: string })?.message === 'string'
-        ? (error as { message?: string }).message
-        : '';
-      const message = rawMessage.trim().length ? rawMessage.trim() : 'Sign-in failed';
+      const message = friendlyAuthMessage(error, 'Sign-in failed');
       setS((p) => ({
         ...p,
         pending: false,
@@ -548,7 +532,7 @@ export default function AuthGate() {
           </button>
         )}
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--lv-helper-text)' }}>
-          Stored locally as “{NICKNAME_LS_KEY}”. You can update it later in Settings.
+          Your sign-in is remembered on this device.
         </div>
       </form>
     </div>
