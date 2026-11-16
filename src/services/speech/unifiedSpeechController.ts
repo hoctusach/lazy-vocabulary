@@ -2,6 +2,7 @@
 import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { estimateReadingTimeMs } from './readingTime';
 
 const DEBUG_SPEECH = (window as any).DEBUG_SPEECH;
 
@@ -17,6 +18,8 @@ class UnifiedSpeechController {
   private isSpeaking = false;
   private playbackEpoch = 0;
   private timers: Set<number> = new Set();
+  /** Resolver for a silent (no speech engine) card that is waiting out its reading time. */
+  private silentResolve: ((v: boolean) => void) | null = null;
 
   getMuted(): boolean {
     return this.isMutedState;
@@ -72,8 +75,16 @@ class UnifiedSpeechController {
     }
     this.playbackEpoch++;
     this.clearAllTimers();
+    this.settleSilentWait();
     this.queue = [];
     this.isSpeaking = false;
+  }
+
+  /** Drops a pending reading-time wait (its timer is cleared separately) so awaiting callers are released. */
+  private settleSilentWait(): void {
+    const resolve = this.silentResolve;
+    this.silentResolve = null;
+    resolve?.(false);
   }
 
   async speak(
@@ -105,7 +116,25 @@ class UnifiedSpeechController {
     const text = parts.join('. ');
     const synthesis = window.speechSynthesis;
     if (!synthesis || typeof synthesis.speak !== 'function') {
-      resolve(false);
+      // No speech engine on this device: show the card for a reading time, then
+      // advance as if the speech had finished, so auto-advance does not stall.
+      this.isSpeaking = true;
+      this.silentResolve = resolve;
+      const id = window.setTimeout(() => {
+        this.unregisterTimer(id);
+        this.silentResolve = null;
+        if (!this.canAdvance(epoch)) {
+          resolve(false);
+          return;
+        }
+        this.isSpeaking = false;
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(true);
+        this.processQueue();
+      }, estimateReadingTimeMs(text));
+      this.registerTimer(id);
       return;
     }
     if (synthesis.speaking || synthesis.pending) {
@@ -161,10 +190,19 @@ class UnifiedSpeechController {
         resolve(false);
         this.processQueue();
       }
+    }).catch((error) => {
+      // A throwing engine must not leave the controller stuck in "speaking".
+      console.warn('[speech] speak failed', error);
+      if (!this.canAdvance(epoch)) return;
+      this.isSpeaking = false;
+      resolve(false);
+      this.processQueue();
     });
   }
 
   stop(): void {
+    this.clearAllTimers();
+    this.settleSilentWait();
     realSpeechService.stop();
     this.isSpeaking = false;
     this.queue = [];
