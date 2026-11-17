@@ -1,4 +1,4 @@
-package com.lazy.vocabulary;
+package com.hoctusach.lazyvocabulary;
 
 import com.getcapacitor.BridgeActivity;
 

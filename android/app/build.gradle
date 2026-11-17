@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.lazy.vocabulary"
+    namespace "com.hoctusach.lazyvocabulary"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.lazy.vocabulary"
+        applicationId "com.hoctusach.lazyvocabulary"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
