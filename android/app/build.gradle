@@ -34,6 +34,8 @@ android {
             def propsFile = rootProject.file("keystore.properties")
             if (propsFile.exists()) {
                 signingConfig signingConfigs.release
+            } else {
+                logger.warn("WARNING: android/keystore.properties not found - release build will be UNSIGNED and Play Console will reject it.")
             }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

@@ -9,6 +9,7 @@
     "build:mobile": "npm run build && npx cap sync",
     "cap:sync": "npx cap sync",
     "android:debug": "npm run build:mobile && cd android && ./gradlew assembleDebug",
+    "android:bundle": "npm run build:mobile && cd android && ./gradlew bundleRelease",
     "android:release": "npm run build:mobile && cd android && ./gradlew assembleRelease",
     "serve": "vite preview",
     "test": "vitest run",
