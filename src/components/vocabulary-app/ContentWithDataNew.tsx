@@ -16,7 +16,7 @@ interface ContentWithDataNewProps {
   displayTime: number;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   onOpenSearch: (word?: string) => void;
   currentUserLearnedCount?: number;
   currentUserLearningCount?: number;

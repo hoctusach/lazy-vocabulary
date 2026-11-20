@@ -31,9 +31,9 @@ for (const [u, learned, learning] of users) {
 }
 const VIEW = { width: 360, height: 640, deviceScaleFactor: 3, isMobile: true, hasTouch: true };
 await H.setup();
-async function shot(name, { theme = 'ocean', tab = null, lang = 'en-US', after } = {}) {
+async function shot(name, { theme = 'ocean', tab = null, lang = 'en-US', after, extraStorage = {} } = {}) {
   const s = await H.newSession({ viewport: VIEW, fake: { pool, leaderboard: lb, summaryDays: days },
-    storage: { ...H.signedInStorage('MinhAnh'), 'user-theme': theme },
+    storage: { ...H.signedInStorage('MinhAnh'), 'user-theme': theme, ...extraStorage },
     initScript: `Object.defineProperty(navigator,'language',{get:()=>'${lang}'});Object.defineProperty(navigator,'languages',{get:()=>['${lang}']});` });
   await s.goto('/');
   await s.page.evaluate((t) => localStorage.setItem('user-theme', t), theme);
@@ -57,6 +57,30 @@ await shot('03-search.png', { theme: 'sakura', after: async (p) => {
   if (inp) { await inp.type('resilient', { delay: 30 }); await H.sleep(1500); }
 } });
 await shot('04-progress.png', { theme: 'ocean', tab: 'Progress' });
-await shot('05-sets.png', { theme: 'ocean', tab: 'Sets' });
+// Sets shot: a mix ticked (3 built-in groups + one imported set of ~40 words, seeded in localStorage).
+const IMPORT_ID = 'set_ielts_writing';
+const importWords = vocab['topic vocab'].slice(100, 140).map((e) => ({ word: e.word, meaning: e.meaning, example: e.example || '', count: 0, category: 'IELTS Writing' }));
+const nowIso = new Date().toISOString();
+const setsStorage = {
+  'lv.vocabularySets.v1': JSON.stringify({ sets: [{ id: IMPORT_ID, name: 'IELTS Writing — my list', builtin: false, wordCount: importWords.length, createdAt: nowIso, updatedAt: nowIso, fileName: 'ielts-writing.csv' }] }),
+  [`lv.vocabularySets.data.${IMPORT_ID}`]: JSON.stringify({ 'IELTS Writing': importWords }),
+  [`lv.vocabularySets.progress.${IMPORT_ID}`]: JSON.stringify({ learned: {}, learning: {} }),
+  'lazyVoca.selectedSources.v1': JSON.stringify(['default:topic vocab', 'default:phrasal verbs', 'default:idioms', IMPORT_ID]),
+};
+await shot('05-sets.png', { theme: 'ocean', tab: 'Sets', extraStorage: setsStorage, after: async (p) => {
+  await p.evaluate(() => {
+    // Hide transient toasts and the (tall) import card so the checklist + summary fit in one frame.
+    document.querySelectorAll('[data-sonner-toaster], [data-sonner-toast], ol[role="region"]').forEach((n) => { n.style.display = 'none'; });
+    const imp = [...document.querySelectorAll('h3')].find((x) => x.textContent.trim() === 'Import a set');
+    const card = imp?.closest('div.rounded-2xl');
+    if (card) card.style.display = 'none';
+    // Trim the built-in card's meta line so the imported set's checkbox also fits above the tab bar.
+    const meta = [...document.querySelectorAll('li > div p')].find((x) => /built-in · progress syncs/.test(x.textContent));
+    if (meta) meta.style.display = 'none';
+    document.querySelector('[data-testid="selection-summary"]')?.scrollIntoView({ block: 'start' });
+    window.scrollBy(0, -80); // clear the sticky header
+  });
+  await H.sleep(600);
+} });
 await shot('06-more-themes.png', { theme: 'cyber', tab: 'More' });
 await H.teardown();

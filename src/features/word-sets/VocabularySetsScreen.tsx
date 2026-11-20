@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Check, Download, FileSpreadsheet, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -16,12 +16,66 @@ import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
-import { getSetProgress, progressStatsFor, flattenSheets, getSetSheets } from './vocabularySetStore';
+import {
+  BUILTIN_GROUPS,
+  builtinDistinctWordCount,
+  builtinGroupCounts,
+  builtinSourceId,
+  getSetProgress,
+  progressStatsFor,
+  flattenSheets,
+  getSetSheets,
+} from './vocabularySetStore';
 
 const ACCEPT = '.csv,.xlsx,.xls,.json,text/csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
+/** Native checkbox with a real tri-state (indeterminate) for the "select all built-in" parent. */
+const Checkbox: React.FC<{
+  checked: boolean;
+  indeterminate?: boolean;
+  label: string;
+  onChange: () => void;
+}> = ({ checked, indeterminate = false, label, onChange }) => {
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (ref.current) ref.current.indeterminate = indeterminate;
+  }, [indeterminate]);
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      className="h-5 w-5 shrink-0 cursor-pointer accent-[var(--lv-accent)]"
+      checked={checked}
+      aria-checked={indeterminate ? 'mixed' : checked}
+      aria-label={label}
+      onChange={onChange}
+    />
+  );
+};
+
 const VocabularySetsScreen: React.FC = () => {
-  const { sets, activeSet, activate, importSet, rename, remove } = useVocabularySets();
+  const { sets, selectedSources, selectedBuiltinGroups, toggleSource, setBuiltinAll, importSet, rename, remove } =
+    useVocabularySets();
+  const [selectionNote, setSelectionNote] = useState<string | null>(null);
+  const groupCounts = builtinGroupCounts();
+  const builtinSelectedCount = selectedBuiltinGroups.length;
+  const selectedWordCount = sets.reduce((sum, set) => {
+    if (set.builtin) {
+      return sum + builtinDistinctWordCount(selectedBuiltinGroups);
+    }
+    return selectedSources.includes(set.id) ? sum + set.wordCount : sum;
+  }, 0);
+
+  const onToggle = (id: string) => {
+    const error = toggleSource(id);
+    setSelectionNote(error);
+    if (error) toast.error(error);
+  };
+  const onToggleBuiltinAll = () => {
+    const error = setBuiltinAll(builtinSelectedCount < BUILTIN_GROUPS.length);
+    setSelectionNote(error);
+    if (error) toast.error(error);
+  };
   const inputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -64,7 +118,9 @@ const VocabularySetsScreen: React.FC = () => {
       }
       setWarnings(parsed.warnings);
       setPendingName(parsed.nameSuggestion);
+      setSelectionNote(null);
       toast.success(`Imported ${parsed.wordCount} words into “${parsed.nameSuggestion}”.`);
+      toast.success(`“${parsed.nameSuggestion}” was added to your selection.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Could not read that file.';
       setErrors([message]);
@@ -96,9 +152,24 @@ const VocabularySetsScreen: React.FC = () => {
           Word sets
         </h2>
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
-          "Word Set: C1, C2" is the built-in list and its progress syncs with your account. Imported sets stay on this
-          device, and each one keeps its own learned words.
+          Tick any mix of the built-in groups and your imported sets: the Learn queue draws only from what is ticked.
+          "Word Set: C1, C2" is the built-in collection (six groups) and its progress syncs with your account. Imported
+          sets stay on this device, and each one keeps its own learned words.
         </p>
+        <p
+          role="status"
+          data-testid="selection-summary"
+          className="mt-2 text-sm font-medium"
+          style={{ color: 'var(--lv-heading)' }}
+        >
+          Selected: {selectedSources.length} {selectedSources.length === 1 ? 'set' : 'sets'} ·{' '}
+          {selectedWordCount.toLocaleString()} {selectedWordCount === 1 ? 'word' : 'words'}
+        </p>
+        {selectionNote && (
+          <p role="status" data-testid="selection-note" className="mt-1 text-sm text-amber-800 dark:text-amber-200">
+            {selectionNote}
+          </p>
+        )}
       </div>
 
       <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
@@ -162,32 +233,42 @@ const VocabularySetsScreen: React.FC = () => {
         )}
         {pendingName && errors.length === 0 && (
           <p className="mt-3 text-sm" style={{ color: 'var(--lv-meaning)' }}>
-            “{pendingName}” is now the active set.
+            “{pendingName}” was added to your selection.
           </p>
         )}
       </div>
 
       <ul className="space-y-3">
         {sets.map((set) => {
-          const active = set.id === activeSet.id;
           const counts = setCounts(set.id);
+          const selected = set.builtin ? builtinSelectedCount > 0 : selectedSources.includes(set.id);
           return (
             <li
               key={set.id}
               className="rounded-2xl border p-4 theme-card-surface"
               style={{
-                borderColor: active ? 'var(--lv-accent)' : 'var(--lv-border-color)',
-                boxShadow: active ? '0 0 0 1px var(--lv-accent)' : undefined,
+                borderColor: selected ? 'var(--lv-accent)' : 'var(--lv-border-color)',
+                boxShadow: selected ? '0 0 0 1px var(--lv-accent)' : undefined,
               }}
             >
-              <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-3">
+                {set.builtin ? (
+                  <Checkbox
+                    checked={builtinSelectedCount === BUILTIN_GROUPS.length}
+                    indeterminate={builtinSelectedCount > 0 && builtinSelectedCount < BUILTIN_GROUPS.length}
+                    label={`Select all groups of ${set.name}`}
+                    onChange={onToggleBuiltinAll}
+                  />
+                ) : (
+                  <Checkbox checked={selected} label={`Include ${set.name}`} onChange={() => onToggle(set.id)} />
+                )}
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="truncate text-lg font-semibold">{set.name}</h3>
-                    {active && (
+                    {selected && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--lv-accent-soft)] px-2 py-1 text-xs font-medium">
                         <Check className="h-3.5 w-3.5" />
-                        Active
+                        {set.builtin ? `${builtinSelectedCount} of ${BUILTIN_GROUPS.length} groups selected` : 'Selected'}
                       </span>
                     )}
                   </div>
@@ -200,46 +281,53 @@ const VocabularySetsScreen: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2 sm:flex">
-                <Button
-                  type="button"
-                  className="min-h-11"
-                  variant={active ? 'secondary' : 'default'}
-                  disabled={active}
-                  onClick={() => {
-                    const error = activate(set.id);
-                    if (error) toast.error(error);
-                    else toast.success(`Now learning ${set.name}.`);
-                  }}
-                >
-                  {active ? 'In use' : 'Use this set'}
-                </Button>
-                {!set.builtin && (
-                  <>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => {
-                        setRenameTarget({ id: set.id, name: set.name });
-                        setRenameValue(set.name);
-                      }}
-                    >
-                      <Pencil className="h-4 w-4" />
-                      Rename
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="col-span-2 min-h-11 text-red-700 sm:col-span-1 dark:text-red-300"
-                      onClick={() => setDeleteId(set.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </Button>
-                  </>
-                )}
-              </div>
+              {set.builtin && (
+                <ul className="mt-3 space-y-1 border-t pt-3" style={{ borderColor: 'var(--lv-border-color)' }}>
+                  {BUILTIN_GROUPS.map((group) => {
+                    const id = builtinSourceId(group);
+                    return (
+                      <li key={id}>
+                        <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm">
+                          <Checkbox
+                            checked={selectedSources.includes(id)}
+                            label={`Include ${group}`}
+                            onChange={() => onToggle(id)}
+                          />
+                          <span className="flex-1 capitalize">{group}</span>
+                          <span style={{ color: 'var(--lv-text-secondary)' }}>
+                            {(groupCounts[group] ?? 0).toLocaleString()} words
+                          </span>
+                        </label>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              {!set.builtin && (
+                <div className="mt-3 grid grid-cols-2 gap-2 sm:flex">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11"
+                    onClick={() => {
+                      setRenameTarget({ id: set.id, name: set.name });
+                      setRenameValue(set.name);
+                    }}
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Rename
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="min-h-11 text-red-700 dark:text-red-300"
+                    onClick={() => setDeleteId(set.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </Button>
+                </div>
+              )}
             </li>
           );
         })}

@@ -121,7 +121,7 @@ test('LEARN-06', 'Mark learned cancel: no RPC, no toast', async ({ session }) =>
 });
 test('LEARN-07', 'Mark learned in imported set is local only and updates stats', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await U.importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  await U.importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa\d/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   const w = await word(s);
   await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true });

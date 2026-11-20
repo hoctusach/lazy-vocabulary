@@ -154,7 +154,7 @@ test('ACCT-01', 'Sign out: toast, gate, keys removed', async ({ session }) => {
   ok(!(await body(s)).includes('Hello e2e'), 'greeting remains');
 });
 test('ACCT-02', 'Sign out keeps sets, theme and preferences; sign-in again restores them', async ({ session }) => {
-  const s = await session({ viewport: SHOT_VP }); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  const s = await session({ viewport: SHOT_VP }); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await setTheme(s, 'ocean', 'Ocean Depth', false); await signOut(s); await waitText(s, 'Access your vocabulary');
   ok(await s.ls('lv.vocabularySets.v1'), 'sets kept'); eq(await s.ls('user-theme'), 'ocean'); ok(await s.ls('lv_preferences'), 'prefs kept');
   await s.page.type('input[placeholder="e.g., Mi mi U"]', 'e2e'); await s.page.type('input[type=password]', '1234'); await click(s, { text: 'Sign in' });
@@ -173,7 +173,7 @@ test('PERSIST-01', 'Theme persists (Ocean + dark)', async ({ session }) => {
   ok(await s.page.evaluate(() => document.body.classList.contains('theme-ocean') && document.documentElement.classList.contains('dark')));
 });
 test('PERSIST-02', 'Active set persists; a set removed from storage falls back to built-in', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await s.reload(); await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 10000 });
   ok((await s.page.evaluate(() => document.querySelector('header').innerText)).includes('setA'), 'header');
   const id = (await U.metaSets(s))[0].id;
@@ -181,7 +181,7 @@ test('PERSIST-02', 'Active set persists; a set removed from storage falls back t
   await waitWord(s, U.POOL_ORDER[0], 12000);
 });
 test('PERSIST-03', 'Imported-set progress persists', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   for (let i = 0; i < 2; i++) { await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 }); await sleep(500);
     await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
   await s.reload(); await tab(s, 'Sets'); await waitText(s, '2 learned on this device');

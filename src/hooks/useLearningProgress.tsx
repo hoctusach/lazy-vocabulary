@@ -20,6 +20,8 @@ import {
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
+import { planBuiltinSelection } from '@/features/word-sets/mixQueue';
+import { BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
 import { buildTodaysWords } from '@/utils/todayWords';
 import {
   identifyUser,
@@ -58,10 +60,26 @@ function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   };
 }
 
-export const useLearningProgress = () => {
+export interface UseLearningProgressOptions {
+  /**
+   * Built-in groups the learner is mixing (multi-set selection). Omitted = all six, i.e. the
+   * original behaviour. One group -> p_category = that group. 2-5 groups -> RPC with NULL and the
+   * rows are filtered client-side. None -> the RPC is never called.
+   */
+  builtinGroups?: readonly string[];
+}
+
+export const useLearningProgress = (options: UseLearningProgressOptions = {}) => {
+  const groupsKey = (options.builtinGroups ?? BUILTIN_GROUPS).join('|');
+  const plan = useMemo(
+    () => planBuiltinSelection(groupsKey ? groupsKey.split('|') : []),
+    [groupsKey]
+  );
+  const category = plan.category;
+  const filterGroups = plan.filterGroups;
+  const filterKey = filterGroups ? filterGroups.join('|') : '';
   const [userKey, setUserKey] = useState<string | null>(null);
   const [severity, setSeverity] = useState<SeverityLevel>('light');
-  const [category] = useState<string | null>(null);
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [todayWords, setTodayWords] = useState<TodayWord[]>([]);
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
@@ -220,6 +238,15 @@ export const useLearningProgress = () => {
     let isActive = true;
 
     const initForUser = async () => {
+      if (!plan.call) {
+        // No built-in group selected: never touch the daily-selection RPC.
+        learnedCountRef.current = null;
+        setDailySelection(null);
+        setTodayWords([]);
+        setProgressError(null);
+        setIsDailySelectionLoading(false);
+        return;
+      }
       setIsDailySelectionLoading(true);
       try {
         await bootstrapLearnedFromServerByKey();
@@ -242,7 +269,9 @@ export const useLearningProgress = () => {
         const count = getCountForSeverity(preferredSeverity);
 
         try {
-          const result = await getOrCreateTodayWords(userKey, mode, count, category ?? null);
+          const result = filterGroups
+            ? await getOrCreateTodayWords(userKey, mode, count, category ?? null, filterGroups)
+            : await getOrCreateTodayWords(userKey, mode, count, category ?? null);
           if (!isActive) return;
           setDailySelection(result.selection);
           setTodayWords(result.words);
@@ -292,11 +321,11 @@ export const useLearningProgress = () => {
     return () => {
       isActive = false;
     };
-  }, [applyLearnedOverride, category, emitDailySelectionEvent, userKey]);
+  }, [applyLearnedOverride, category, emitDailySelectionEvent, filterKey, plan.call, userKey]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
-      if (!userKey) return;
+      if (!userKey || !plan.call) return;
       try {
         const mode = getModeForSeverity(level);
         const count = getCountForSeverity(level);
@@ -306,6 +335,7 @@ export const useLearningProgress = () => {
           mode,
           count,
           category: category ?? null,
+          filterGroups,
         });
         setSeverity(level);
         setDailySelection(result.selection);
@@ -330,11 +360,11 @@ export const useLearningProgress = () => {
         setIsDailySelectionLoading(false);
       }
     },
-    [applyLearnedOverride, category, emitDailySelectionEvent, userKey]
+    [applyLearnedOverride, category, emitDailySelectionEvent, filterGroups, plan.call, userKey]
   );
 
   const regenerateToday = useCallback(async () => {
-    if (!userKey) return;
+    if (!userKey || !plan.call) return;
     const mode = getModeForSeverity(severity);
     const count = getCountForSeverity(severity);
     try {
@@ -344,6 +374,7 @@ export const useLearningProgress = () => {
         mode,
         count,
         category: category ?? null,
+        filterGroups,
       });
       setDailySelection(result.selection);
       setTodayWords(result.words);
@@ -365,7 +396,7 @@ export const useLearningProgress = () => {
     } finally {
       setIsDailySelectionLoading(false);
     }
-  }, [applyLearnedOverride, category, emitDailySelectionEvent, severity, userKey]);
+  }, [applyLearnedOverride, category, emitDailySelectionEvent, filterGroups, plan.call, severity, userKey]);
 
   const markWordAsPlayed = useCallback((word: string) => {
     const nowIso = new Date().toISOString();

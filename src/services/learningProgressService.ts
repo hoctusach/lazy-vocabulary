@@ -5,6 +5,7 @@ import type { LearnedWordUpsert } from '@/lib/db/learned';
 import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
 import { getDefaultVocabularyTotal, normalizeCategory } from '@/data/defaultVocabulary';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import { filterByBuiltinGroups } from '@/features/word-sets/mixQueue';
 import { buildTodaysWords } from '@/utils/todayWords';
 import {
   DAILY_SELECTION_KEY,
@@ -28,6 +29,12 @@ export type GenerateParams = {
   mode: DailyMode;
   count: number;
   category?: string | null;
+  /**
+   * Multi-set mixing, 2-5 built-in groups: the RPC is called with `category` NULL and the rows are
+   * filtered to these groups client-side. The server quota is shared across all groups, so fewer
+   * built-in words than usual may arrive that day. Ignored when null/empty.
+   */
+  filterGroups?: string[] | null;
 };
 
 export type TodaySelectionState = {
@@ -589,14 +596,15 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
 export async function fetchAndCommitTodaySelection(
   params: GenerateParams
 ): Promise<TodaySelectionWithStats> {
-  const { userKey, mode, count, category = null } = params;
-  const [selectionRows, timezone] = await Promise.all([
+  const { userKey, mode, count, category = null, filterGroups = null } = params;
+  const [rawSelectionRows, timezone] = await Promise.all([
     generateDailySelectionV2(userKey, mode, count, category),
     resolveUserTimezone(userKey),
   ]);
-  if (!Array.isArray(selectionRows) || selectionRows.length === 0) {
+  if (!Array.isArray(rawSelectionRows) || rawSelectionRows.length === 0) {
     throw new Error('No daily selection rows returned');
   }
+  const selectionRows = rawSelectionRows;
 
   const selectionById = new Map(
     selectionRows
@@ -643,7 +651,18 @@ export async function fetchAndCommitTodaySelection(
     throw new Error('No vocabulary details available for selection');
   }
 
-  const today = normalizeToDailySelection(vocabRows, selectionRows, {
+  let scopedVocabRows = vocabRows;
+  let scopedSelectionRows: DailySelectionRow[] = selectionRows;
+  if (filterGroups && filterGroups.length > 0) {
+    scopedVocabRows = filterByBuiltinGroups(vocabRows, filterGroups);
+    if (scopedVocabRows.length === 0) {
+      throw new Error('No daily selection rows for the selected groups');
+    }
+    const keepIds = new Set(scopedVocabRows.map((row) => row.word_id));
+    scopedSelectionRows = selectionRows.filter((row) => keepIds.has(row.word_id));
+  }
+
+  const today = normalizeToDailySelection(scopedVocabRows, scopedSelectionRows, {
     mode,
     count,
     category: category ?? null,
@@ -704,7 +723,8 @@ export async function getOrCreateTodayWords(
   userKey: string,
   mode: DailyMode,
   count: number,
-  category?: string | null
+  category?: string | null,
+  filterGroups?: string[] | null
 ): Promise<TodaySelectionWithStats> {
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] getOrCreateTodayWords fetching selection', {
@@ -713,7 +733,13 @@ export async function getOrCreateTodayWords(
     });
   }
 
-  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+  return fetchAndCommitTodaySelection({
+    userKey,
+    mode,
+    count,
+    category: category ?? null,
+    filterGroups: filterGroups ?? null,
+  });
 }
 
 export async function prepareUserSession(): Promise<string | null> {

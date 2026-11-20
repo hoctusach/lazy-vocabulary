@@ -118,6 +118,51 @@ export const cardHas = (s, setName, btnText) => s.page.evaluate((setName, btnTex
   return !!li && [...li.querySelectorAll('button')].some((b) => b.textContent.trim() === btnText);
 }, setName, btnText);
 export const cardText = (s, setName) => s.page.evaluate((setName) => [...document.querySelectorAll('li')].find((l) => l.querySelector('h3')?.textContent.trim() === setName)?.innerText || null, setName);
+const BUILTIN_PARENT = 'Select all groups of Word Set: C1, C2';
+const boxHandle = async (s, label) => {
+  const h = (await s.page.evaluateHandle((label) => [...document.querySelectorAll('input[type=checkbox]')].find((i) => i.getAttribute('aria-label') === label) || null, label)).asElement();
+  if (!h) throw new Assert(`no checkbox "${label}"`);
+  return h;
+};
+/** Set a Sets-tab checkbox (by aria-label) to `want`. */
+export async function setBox(s, label, want) {
+  const h = await boxHandle(s, label);
+  if ((await h.evaluate((e) => e.checked)) !== want) { await h.evaluate((e) => e.scrollIntoView({ block: 'center' })); await h.click(); await sleep(200); }
+}
+export const boxChecked = async (s, label) => (await boxHandle(s, label)).evaluate((e) => e.checked);
+export const boxState = async (s, label) => (await boxHandle(s, label)).evaluate((e) => ({ checked: e.checked, indeterminate: e.indeterminate }));
+const GROUPS = ['topic vocab', 'phrasal verbs', 'idioms', 'grammar', 'phrases, collocations', 'word formation'];
+/** Untick every built-in group (needs at least one imported set selected). Leaves you on the Sets tab. */
+export async function builtinOff(s) {
+  await tab(s, 'Sets');
+  let st = await boxState(s, BUILTIN_PARENT);
+  if (st.indeterminate) { await setBox(s, BUILTIN_PARENT, true); st = await boxState(s, BUILTIN_PARENT); }
+  if (st.checked) await setBox(s, BUILTIN_PARENT, false);
+}
+/** Select exactly one source: an imported set by name, or null for the whole built-in set. */
+export async function useOnly(s, name) {
+  await tab(s, 'Sets');
+  const labels = await s.page.evaluate(() => [...document.querySelectorAll('input[type=checkbox]')].map((i) => i.getAttribute('aria-label')));
+  const imported = labels.filter((l) => l && l.startsWith('Include ') && !GROUPS.includes(l.slice(8)));
+  if (name) {
+    await setBox(s, `Include ${name}`, true);
+    for (const l of imported) if (l !== `Include ${name}`) await setBox(s, l, false);
+    await builtinOff(s);
+  } else {
+    await setBox(s, BUILTIN_PARENT, true);
+    for (const l of imported) await setBox(s, l, false);
+  }
+}
+/** Select exactly the given built-in groups plus the given imported sets. */
+export async function mix(s, groups, sets = []) {
+  await tab(s, 'Sets');
+  const labels = await s.page.evaluate(() => [...document.querySelectorAll('input[type=checkbox]')].map((i) => i.getAttribute('aria-label')));
+  const imported = labels.filter((l) => l && l.startsWith('Include ') && !GROUPS.includes(l.slice(8)));
+  for (const g of GROUPS) if (groups.includes(g)) await setBox(s, `Include ${g}`, true);
+  for (const n of sets) await setBox(s, `Include ${n}`, true);
+  for (const g of GROUPS) if (!groups.includes(g)) await setBox(s, `Include ${g}`, false);
+  for (const l of imported) if (!sets.includes(l.slice(8))) await setBox(s, l, false);
+}
 export const alertText = (s) => s.page.evaluate(() => document.querySelector('[role=alert]')?.innerText || '');
 export async function waitAlert(s, re, timeout = 8000) {
   try { await s.page.waitForFunction((src) => new RegExp(src, 'i').test(document.querySelector('[role=alert]')?.innerText || ''), { timeout }, re.source); }

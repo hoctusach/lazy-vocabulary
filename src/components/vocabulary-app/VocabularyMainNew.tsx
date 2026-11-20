@@ -19,7 +19,7 @@ interface VocabularyMainNewProps {
   selectedVoiceName: string;
   showWordCount?: boolean;
   playCurrentWord: () => void;
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   onOpenSearch: (word?: string) => void;
   emptyState?: {
     word: string;

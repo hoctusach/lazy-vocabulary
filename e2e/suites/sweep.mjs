@@ -52,7 +52,7 @@ async function sweep(s, label, prepare, { max = 45, skip = () => false } = {}) {
 
 test('E2E-SWEEP-01', 'Click every visible control on each tab and in each dialog', async ({ session }) => {
   const s = await session({ initScript: U.DOWNLOAD_HOOK }); await boot(s);
-  await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   const all = {};
   const go = (name) => async () => { await dismiss(s); if (s.page.url().includes('/vocabulary/')) await s.page.goBack(); await tab(s, name); await sleep(150); };
   all.learn = await sweep(s, 'Learn', async () => { await go('Learn')(); await sleep(300); });

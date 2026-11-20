@@ -27,7 +27,7 @@ test('OFFLINE-03', 'Local features work with the network down', async ({ session
   await importFile(s, 'setA.csv'); await waitText(s, 'Imported 6 words into “setA”.');
   await importFile(s, 'setB.csv'); await waitText(s, 'Imported 6 words into “setB”.');
   await U.cardBtn(s, 'setA', 'Rename'); await s.page.focus('input[aria-label="Set name"]'); await s.page.$eval('input[aria-label="Set name"]', (e) => e.select()); await s.page.keyboard.type('Offline A'); await click(s, { text: 'Save' }); await waitText(s, 'Set renamed.'); await sleep(600);
-  await U.cardBtn(s, 'Offline A', 'Use this set'); await waitText(s, 'Now learning Offline A.');
+  await U.useOnly(s, 'Offline A');
   await click(s, { text: 'CSV template' }); await s.page.waitForFunction(() => window.__downloads.length === 1, { timeout: 4000 });
   await U.cardBtn(s, 'setB', 'Delete'); await click(s, { text: 'Delete set' }); await waitText(s, 'Set deleted.');
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await click(s, { text: 'Close' });
@@ -86,25 +86,25 @@ test('REG-03', 'Signed-out Learn shows real words, never "No words in ..." ', as
 
 // ---------- EDGE ----------
 test('EDGE-01', 'Very long (100 char, no spaces) word does not overflow Learn / Progress / Sets', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'long_word.csv'); await waitText(s, 'is now the active set'); await noHScroll(s, 'Sets');
+  const s = await session({}); await boot(s); await importFile(s, 'long_word.csv'); await waitText(s, 'was added to your selection'); await noHScroll(s, 'Sets');
   await tab(s, 'Learn');
   for (let i = 0; i < 4; i++) { if (/^x{50}/.test((await word(s)) || '')) break; await sleep(500); await ctl(s, 'Next Word'); }
   ok(/^x{50}/.test((await word(s)) || ''), 'long word not shown'); await sleep(400); await noHScroll(s, 'Learn');
   await tab(s, 'Progress'); await click(s, { textHas: 'Word Summary' }); await sleep(500); await noHScroll(s, 'Progress');
 });
 test('EDGE-02', 'Very long meaning/example: Learn, Quiz, Detail do not overflow', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'long_words.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'long_words.csv'); await waitText(s, 'was added to your selection');
   await tab(s, 'Learn'); await sleep(600); await noHScroll(s, 'Learn');
   const long = await s.page.evaluate(() => document.querySelector('main').innerText.length); ok(long > 0);
   await tab(s, 'Progress'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await sleep(400); await noHScroll(s, 'Quiz');
   ok(await s.page.evaluate(() => { const d = document.querySelector('[role=dialog]'); return d.scrollWidth <= d.clientWidth + 1; }), 'quiz dialog overflow');
 });
 test('EDGE-03', 'Long set name: header subtitle and Sets card do not overflow', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'Word_Set_Sixty_characters_long_name_for_the_header_overflow_test_x.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'Word_Set_Sixty_characters_long_name_for_the_header_overflow_test_x.csv'); await waitText(s, 'was added to your selection');
   await noHScroll(s, 'Sets'); await tab(s, 'Learn'); await noHScroll(s, 'Learn header'); await tab(s, 'More'); await noHScroll(s, 'More');
 });
 test('EDGE-04', 'Unicode / Vietnamese / emoji words import and display intact', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'unicode.csv'); await waitText(s, 'Imported 4 words into “unicode”.');
+  const s = await session({}); await boot(s); await importFile(s, 'unicode.csv'); await waitText(s, 'Imported 4 words into “unicode”.'); await U.useOnly(s, 'unicode');
   const ws = []; await tab(s, 'Learn');
   for (let i = 0; i < 4; i++) { await sleep(500); ws.push(await word(s)); await ctl(s, 'Next Word'); }
   ok(['bỏ cuộc', 'Đà Nẵng', 'rocket 🚀', 'café'].every((w) => ws.includes(w)), 'words shown: ' + ws);
@@ -155,7 +155,7 @@ test('EDGE-10', 'Missing speechSynthesis: controls render, Next works', async ({
   for (const l of ['Mute', 'Pause', 'Quick Search']) ok(await U.label(s, l), 'missing ' + l);
 });
 test('EDGE-13', 'HTML/script in imported text is inert in Learn, Quiz and Search', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'xss.json'); await waitText(s, 'Imported 6 words into “xss”.');
+  const s = await session({}); await boot(s); await importFile(s, 'xss.json'); await waitText(s, 'Imported 6 words into “xss”.'); await U.useOnly(s, 'xss');
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /<img src=x/.test(document.querySelector('main')?.innerText || ''), { timeout: 10000 }).catch(async () => { for (let i = 0; i < 4; i++) { await ctl(s, 'Next Word'); await sleep(450); if (/<img/.test(await body(s))) break; } });
   ok(/<img src=x/.test(await body(s)), 'text rendered literally');
   eq(await s.page.evaluate(() => window.__xss), undefined, 'script ran');

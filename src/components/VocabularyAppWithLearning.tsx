@@ -5,7 +5,17 @@ import QuickQuizPanel from './vocabulary-app/QuickQuizPanel';
 import StreakPanel from './vocabulary-app/StreakPanel';
 import LeaderboardPanel from './vocabulary-app/LeaderboardPanel';
 import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
-import { findSetWord, wordKey } from '@/features/word-sets/vocabularySetStore';
+import { findSetWord } from '@/features/word-sets/vocabularySetStore';
+import {
+  buildMixedQueue,
+  filterByBuiltinGroups,
+  interleaveBuiltinGroups,
+  sumStats,
+  type SourcedWord,
+} from '@/features/word-sets/mixQueue';
+import { BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
+import { DEFAULT_SET_ID } from '@/features/word-sets/types';
+import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
@@ -51,7 +61,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     dueTodayLearnedWords,
     isDailySelectionLoading,
     progressError,
-  } = useLearningProgress();
+  } = useLearningProgress({ builtinGroups: wordSets.selectedBuiltinGroups });
   const [didTriggerFirstTimeLoad, setDidTriggerFirstTimeLoad] = useState(false);
 
   useEffect(() => {
@@ -94,54 +104,53 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     };
   }, [markWordAsPlayed]);
 
-  const customLearned = Object.values(wordSets.progress.learned);
-  const todayStamp = new Date();
-  todayStamp.setHours(23, 59, 59, 999);
-  const customDue = customLearned.filter((entry) => {
-    const next = Date.parse(entry.nextReviewAt);
-    return !Number.isFinite(next) || next <= todayStamp.getTime();
-  });
-  const customNew = wordSets.isCustomSet
-    ? wordSets.todayWords
-        .filter((word) => !wordSets.progress.learned[wordKey(word.word, word.category)])
-        .map((word) => ({
-          word: word.word,
-          category: word.category,
-          reviewCount: 0,
-          nextReviewAt: undefined as string | undefined,
-          learnedDate: undefined as string | undefined,
-        }))
-    : [];
-  const customLearnedDisplay = customLearned.map((entry) => ({
-    word: entry.word,
-    category: entry.category,
-    reviewCount: entry.reviewCount,
-    nextReviewAt: entry.nextReviewAt,
-    learnedDate: entry.learnedAt,
-  }));
-  const customDueDisplay = customDue.map((entry) => ({
-    word: entry.word,
-    category: entry.category,
-    reviewCount: entry.reviewCount,
-    nextReviewAt: entry.nextReviewAt,
-    learnedDate: entry.learnedAt,
-  }));
+  // Built-in part of the mix. With only some groups selected the server lists still cover the whole
+  // built-in set, so they are narrowed to the selected groups here.
+  const groups = wordSets.selectedBuiltinGroups;
+  const partialBuiltin = groups.length > 0 && groups.length < BUILTIN_GROUPS.length;
+  const scopeBuiltin = <T extends { category?: string | null }>(list: T[]): T[] =>
+    !wordSets.hasBuiltin ? [] : partialBuiltin ? filterByBuiltinGroups(list, groups) : list;
 
-  const learnedWordsList = wordSets.isCustomSet
-    ? customLearnedDisplay
-    : Array.isArray(learnedWords)
-      ? learnedWords
-      : [];
-  const newTodayList = wordSets.isCustomSet
-    ? customNew
-    : Array.isArray(newTodayLearnedWords)
-      ? newTodayLearnedWords
-      : [];
-  const dueTodayList = wordSets.isCustomSet
-    ? customDueDisplay
-    : Array.isArray(dueTodayLearnedWords)
-      ? dueTodayLearnedWords
-      : [];
+  const importedLearnedDisplay = wordSets.importedLearned.map((entry) => ({
+    word: entry.word,
+    category: entry.category,
+    reviewCount: entry.reviewCount,
+    nextReviewAt: entry.nextReviewAt as string | undefined,
+    learnedDate: entry.learnedAt as string | undefined,
+    sourceId: entry.sourceId,
+  }));
+  const importedDueDisplay = wordSets.importedDue.map((entry) => ({
+    word: entry.word,
+    category: entry.category,
+    reviewCount: entry.reviewCount,
+    nextReviewAt: entry.nextReviewAt as string | undefined,
+    learnedDate: entry.learnedAt as string | undefined,
+    sourceId: entry.sourceId,
+  }));
+  const importedNewDisplay = wordSets.importedQueues.flatMap((queue) => {
+    const learnedKeys = new Set(
+      wordSets.importedLearned
+        .filter((entry) => entry.sourceId === queue.sourceId)
+        .map((entry) => `${entry.category}::${entry.word}`)
+    );
+    return queue.words
+      .filter((word) => !learnedKeys.has(`${word.category ?? ''}::${word.word}`))
+      .map((word) => ({
+        word: word.word,
+        category: word.category,
+        reviewCount: 0,
+        nextReviewAt: undefined as string | undefined,
+        learnedDate: undefined as string | undefined,
+        sourceId: queue.sourceId,
+      }));
+  });
+
+  const builtinLearnedList = scopeBuiltin(Array.isArray(learnedWords) ? learnedWords : []);
+  const builtinNewList = scopeBuiltin(Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : []);
+  const builtinDueList = scopeBuiltin(Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : []);
+  const learnedWordsList = [...builtinLearnedList, ...importedLearnedDisplay];
+  const newTodayList = [...builtinNewList, ...importedNewDisplay];
+  const dueTodayList = [...builtinDueList, ...importedDueDisplay];
   const hasSelectionWords =
     newTodayList.length > 0 || dueTodayList.length > 0 || learnedWordsList.length > 0;
 
@@ -190,8 +199,9 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
       const category = (wordToReset.category ?? '').trim();
       const wordId = category ? `${wordToReset.word}::${category}` : wordToReset.word;
       trackUiInteraction('mark_as_new_confirm', { label: wordToReset.word });
-      if (wordSets.isCustomSet) {
-        wordSets.markNew(wordToReset.word, category);
+      const resetSource = (wordToReset as { sourceId?: string }).sourceId;
+      if (resetSource && resetSource !== DEFAULT_SET_ID) {
+        wordSets.markNew(wordToReset.word, category, resetSource);
         toast.success('Moved back to Learning!');
         setIsMarkAsNewDialogOpen(false);
         setWordToReset(null);
@@ -208,15 +218,77 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     setWordToReset(null);
   };
 
+  // The built-in daily list is account-backed. With no user key (fresh install, signed out) or a
+  // failed fetch it stays empty, so fall back to the local built-in groups instead of an empty card.
+  const builtinToday = useMemo(
+    () => (wordSets.hasBuiltin ? scopeBuiltin(todayWords) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todayWords, wordSets.hasBuiltin, groups.join('|')]
+  );
+  const needsLocalFallback =
+    wordSets.hasBuiltin && builtinToday.length === 0 && !isDailySelectionLoading;
+  const localFallbackWords = useMemo(
+    () => (needsLocalFallback ? interleaveBuiltinGroups(DEFAULT_VOCABULARY_DATA, groups) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [needsLocalFallback, groups.join('|')]
+  );
+  const builtinPlayback: VocabularyWord[] = builtinToday.length > 0 ? builtinToday : localFallbackWords;
+
+  // Union of the selected sources: the built-in part plus each imported set, round-robin.
+  const playbackWords = useMemo<SourcedWord[]>(
+    () =>
+      buildMixedQueue<VocabularyWord>([
+        { sourceId: DEFAULT_SET_ID, words: builtinPlayback },
+        ...wordSets.importedQueues.map((queue) => ({ sourceId: queue.sourceId, words: queue.words })),
+      ]),
+    [builtinPlayback, wordSets.importedQueues]
+  );
+  const quizWords = useMemo(
+    () =>
+      buildMixedQueue<VocabularyWord>([
+        { sourceId: DEFAULT_SET_ID, words: builtinToday },
+        ...wordSets.importedQueues.map((queue) => ({ sourceId: queue.sourceId, words: queue.words })),
+      ]),
+    [builtinToday, wordSets.importedQueues]
+  );
+
+  const builtinStats = wordSets.hasBuiltin ? progressStats : null;
+  const playbackStats = sumStats([
+    ...(builtinStats ? [builtinStats] : []),
+    ...(wordSets.importedQueues.length > 0 ? [wordSets.stats] : []),
+  ]);
+
+  const handleMarkWordLearned = (word: string, category?: string, sourceId?: string) => {
+    const routed =
+      sourceId ??
+      playbackWords.find((item) => item.word === word && (category === undefined || item.category === category))
+        ?.sourceId;
+    if (routed && routed !== DEFAULT_SET_ID) {
+      const queue = wordSets.importedQueues.find((item) => item.sourceId === routed);
+      const match =
+        (queue ? findSetWord(queue.words, word, category) : undefined) ??
+        findSetWord(
+          wordSets.words.filter((item) => item.sourceId === routed),
+          word,
+          category
+        );
+      wordSets.markLearned({
+        ...(match ?? { word, meaning: '', example: '', count: 0, category: category ?? '' }),
+        sourceId: routed,
+      });
+      return;
+    }
+    markCurrentWordLearned(word);
+  };
   const learningSection = (
     <TooltipProvider>
       <div className="space-y-3 mt-3">
-        <QuickQuizPanel targetWords={wordSets.isCustomSet ? wordSets.todayWords : todayWords} />
+        <QuickQuizPanel targetWords={quizWords} />
 
         <LearningProgressPanel
-          progressStats={wordSets.isCustomSet ? wordSets.stats : progressStats}
+          progressStats={playbackStats}
           learnerId={wordSets.activeSet.id}
-          progressError={wordSets.isCustomSet ? null : progressError}
+          progressError={wordSets.hasBuiltin ? progressError : null}
         />
 
         <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
@@ -235,7 +307,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
         </Tooltip>
         <CollapsibleContent className="space-y-3">
-          {!wordSets.isCustomSet && progressError ? (
+          {wordSets.hasBuiltin && progressError && wordSets.importedQueues.length === 0 ? (
             <div className="rounded-md border border-yellow-500 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-200">
               {progressError}
             </div>
@@ -363,20 +435,6 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     </TooltipProvider>
   );
 
-  // The daily list is account-backed. With no user key (fresh install, signed out) or a failed
-  // fetch it stays empty, so fall back to the local default sheet instead of an empty card.
-  const needsLocalFallback =
-    !wordSets.isCustomSet && todayWords.length === 0 && !isDailySelectionLoading;
-  const localFallbackWords = useMemo(
-    () => (needsLocalFallback ? vocabularyService.getWordList() : []),
-    [needsLocalFallback]
-  );
-  const playbackWords = wordSets.isCustomSet
-    ? wordSets.todayWords
-    : todayWords.length > 0
-      ? todayWords
-      : localFallbackWords;
-  const playbackStats = wordSets.isCustomSet ? wordSets.stats : progressStats;
   const showCard = view !== 'progress';
   const showProgress = view !== 'learn';
 
@@ -390,20 +448,9 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
         )}
         <VocabularyAppContainerNew
           initialWords={playbackWords}
-          dailySelection={wordSets.isCustomSet ? null : dailySelection}
-          isLoadingSelection={wordSets.isCustomSet ? false : isDailySelectionLoading}
-          onMarkWordLearned={(word, category) => {
-            if (wordSets.isCustomSet) {
-              const match =
-                findSetWord(wordSets.todayWords, word, category) ??
-                findSetWord(wordSets.words, word, category);
-              wordSets.markLearned(
-                match ?? { word, meaning: '', example: '', count: 0, category: category ?? '' }
-              );
-              return;
-            }
-            markCurrentWordLearned(word);
-          }}
+          dailySelection={wordSets.hasBuiltin ? dailySelection : null}
+          isLoadingSelection={wordSets.hasBuiltin && isDailySelectionLoading && playbackWords.length === 0}
+          onMarkWordLearned={handleMarkWordLearned}
           additionalContent={view === 'all' ? learningSection : undefined}
           onOpenSearch={openSearch}
           currentUserLearnedCount={playbackStats.learned}

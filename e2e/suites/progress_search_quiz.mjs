@@ -20,7 +20,7 @@ test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
   ok(/\d+(\.\d+)?\s?%/.test(t), 'percentage');
 });
 test('PROG-05', 'Word Summary lists for an imported set', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
   await openProgress(s); await expand(s, 'Word Summary');
@@ -40,7 +40,7 @@ test('PROG-06', 'Empty summaries', async ({ session }) => {
   ok(/No new words assigned today/.test(t) && /No due reviews today/.test(t) && /No learned words/.test(t), t.slice(-500));
 });
 test('PROG-07', 'Eye button opens search pre-filled with the word', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set');
+  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await openProgress(s); await expand(s, 'Word Summary');
   await s.page.evaluate(() => document.querySelector('button[aria-label^="View"]').click()); await sleep(600);
   await waitText(s, 'Quick Search');
@@ -115,7 +115,7 @@ test('SEARCH-06', 'Backend down: no crash and an offline hint', async ({ session
 });
 test('SEARCH-07', 'Imported set words are found even when the server does not know them', async ({ session }) => {
   const s = await session({ fake: { pool: [] } }); s.allow.push(/./);
-  await s.goto('/'); await sleep(1500); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set'); await tab(s, 'Learn');
+  await s.goto('/'); await sleep(1500); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s); await tab(s, 'Learn');
   await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 10000 });
   await openSearch(s); await typeQ(s, 'aaa3'); await waitText(s, 'aaa3'); await clickResult(s, 'aaa3'); await waitText(s, 'meaning of aaa3');
 });
@@ -123,7 +123,7 @@ skip('SEARCH-08', 'Preview play', 'product gap: the search preview has no Play c
 
 // ---------- QUIZ / PRACTICE / DETAIL ----------
 async function startQuizOnSetA(s) {
-  await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'is now the active set'); await openProgress(s);
+  await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s); await openProgress(s);
   await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5');
 }
 const quizOptions = (s) => s.page.evaluate(() => [...document.querySelectorAll('[role=dialog] button')].map((b) => b.textContent.trim()).filter((t) => /^(✓|✗)?\s*meaning of /.test(t) || /meaning of/.test(t)));

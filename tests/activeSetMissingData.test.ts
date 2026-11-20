@@ -19,6 +19,7 @@ describe('getActiveSetId with missing set data', () => {
 
   it('keeps an imported set that has words', () => {
     const id = imported();
+    expect(setActiveSet(id)).toEqual({ ok: true });
     expect(getActiveSetId()).toBe(id);
   });
 

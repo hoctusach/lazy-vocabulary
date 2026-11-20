@@ -8,6 +8,7 @@ import {
   deleteVocabularySet,
   findSetWord,
   getActiveSetId,
+  getSelectedSources,
   getSetProgress,
   ensureTodayQueue,
   flattenSheets,
@@ -52,6 +53,10 @@ describe('vocabulary set store', () => {
     expect(imported.ok).toBe(true);
     if (!imported.ok) return;
 
+    // Importing adds to the mix; the built-in groups stay selected.
+    expect(getSelectedSources()).toContain(imported.set.id);
+    expect(getSelectedSources()).toContain('default:idioms');
+    expect(setActiveSet(imported.set.id)).toEqual({ ok: true });
     expect(getActiveSetId()).toBe(imported.set.id);
     expect(getSetProgress(DEFAULT_SET_ID).learned).toEqual({});
 
@@ -149,5 +154,14 @@ describe('vocabulary set store', () => {
     setActiveSet(DEFAULT_SET_ID);
     expect(recordDisplayedWord('alpha', 'imported')).toBe(false);
     expect(getSetProgress(DEFAULT_SET_ID).learning).toEqual({});
+  });
+});
+
+describe('builtinDistinctWordCount', () => {
+  it('counts distinct word keys, matching getDefaultVocabularyTotal for all groups', async () => {
+    const { builtinDistinctWordCount, BUILTIN_GROUPS } = await import('@/features/word-sets/vocabularySetStore');
+    const { getDefaultVocabularyTotal } = await import('@/data/defaultVocabulary');
+    expect(builtinDistinctWordCount(BUILTIN_GROUPS)).toBe(getDefaultVocabularyTotal());
+    expect(builtinDistinctWordCount([])).toBe(0);
   });
 });

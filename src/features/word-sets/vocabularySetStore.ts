@@ -11,6 +11,8 @@ import {
 
 const META_KEY = 'lv.vocabularySets.v1';
 const ACTIVE_KEY = 'lv.vocabularySets.active';
+/** Multi-set selection: array of source ids ('default:<group>' or an imported set id). */
+export const SELECTED_SOURCES_KEY = 'lazyVoca.selectedSources.v1';
 const DATA_PREFIX = 'lv.vocabularySets.data.';
 const PROGRESS_PREFIX = 'lv.vocabularySets.progress.';
 const DISPLAYED_WORD_EVENT = 'lv:vocabulary-set-displayed';
@@ -198,6 +200,145 @@ export function getActiveSetId(): string {
   return hasWords ? stored : DEFAULT_SET_ID;
 }
 
+/** The six built-in groups, in the order the Sets screen lists them. */
+export const BUILTIN_GROUPS: readonly string[] = [
+  'topic vocab',
+  'phrasal verbs',
+  'idioms',
+  'grammar',
+  'phrases, collocations',
+  'word formation',
+];
+
+const BUILTIN_PREFIX = `${DEFAULT_SET_ID}:`;
+
+export function builtinSourceId(group: string): string {
+  return `${BUILTIN_PREFIX}${group}`;
+}
+
+/** 'default:idioms' -> 'idioms'; anything else -> null. */
+export function builtinGroupOf(sourceId: string): string | null {
+  if (!sourceId.startsWith(BUILTIN_PREFIX)) return null;
+  const group = sourceId.slice(BUILTIN_PREFIX.length);
+  return BUILTIN_GROUPS.includes(group) ? group : null;
+}
+
+export function allBuiltinSourceIds(): string[] {
+  return BUILTIN_GROUPS.map(builtinSourceId);
+}
+
+/** Word count per built-in group (bundled data). */
+export function builtinGroupCounts(): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const group of BUILTIN_GROUPS) out[group] = DEFAULT_VOCABULARY_DATA[group]?.length ?? 0;
+  return out;
+}
+
+/**
+ * Distinct built-in words in the given groups. Progress (and the Learn banner via getDefaultVocabularyTotal)
+ * keys one row per word text, so duplicates inside or across groups count once.
+ */
+export function builtinDistinctWordCount(groups: readonly string[]): number {
+  const keys = new Set<string>();
+  for (const group of groups) {
+    for (const w of DEFAULT_VOCABULARY_DATA[group] ?? []) {
+      if (w && typeof w.word === 'string' && w.word.trim()) keys.add(w.word);
+    }
+  }
+  return keys.size;
+}
+
+function setHasWords(id: string): boolean {
+  const data = readJson<SheetData>(dataKey(id));
+  return !!data && typeof data === 'object' && Object.values(data).some((rows) => Array.isArray(rows) && rows.length > 0);
+}
+
+/** Canonical order: built-in groups first, then imported sets in list order. Unknown ids are dropped. */
+function normalizeSelection(ids: readonly string[]): string[] {
+  const wanted = new Set(ids);
+  const out: string[] = [];
+  for (const group of BUILTIN_GROUPS) {
+    if (wanted.has(builtinSourceId(group))) out.push(builtinSourceId(group));
+  }
+  for (const set of readImportedMetas()) {
+    if (wanted.has(set.id) && setHasWords(set.id)) out.push(set.id);
+  }
+  return out;
+}
+
+/** The set id to keep in ACTIVE_KEY for older code: first selected set ('default' if any built-in group). */
+function activeIdForSelection(selection: readonly string[]): string {
+  const first = selection[0];
+  if (!first) return DEFAULT_SET_ID;
+  return builtinGroupOf(first) !== null ? DEFAULT_SET_ID : first;
+}
+
+function writeSelection(selection: string[]): boolean {
+  const ok = safeSet(SELECTED_SOURCES_KEY, JSON.stringify(selection));
+  safeSet(ACTIVE_KEY, activeIdForSelection(selection));
+  return ok;
+}
+
+/**
+ * Sources the learner is mixing. Never empty. When the key is absent it is derived from the old
+ * single active set (default -> all six groups, imported id -> [id]) and persisted.
+ */
+export function getSelectedSources(): string[] {
+  const raw = safeGet(SELECTED_SOURCES_KEY);
+  if (raw !== null) {
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const kept = normalizeSelection(parsed.filter((item): item is string => typeof item === 'string'));
+        if (kept.length > 0) return kept;
+      }
+    } catch {
+      /* fall through to the default */
+    }
+    return allBuiltinSourceIds();
+  }
+  const legacy = getActiveSetId();
+  const migrated = legacy === DEFAULT_SET_ID ? allBuiltinSourceIds() : [legacy];
+  writeSelection(migrated);
+  return migrated;
+}
+
+export function selectedBuiltinGroups(selection: readonly string[] = getSelectedSources()): string[] {
+  return selection.map(builtinGroupOf).filter((group): group is string => group !== null);
+}
+
+export function selectedImportedIds(selection: readonly string[] = getSelectedSources()): string[] {
+  return selection.filter((id) => builtinGroupOf(id) === null);
+}
+
+export const KEEP_ONE_SOURCE_MESSAGE = 'Keep at least one set selected. Tick another set before unticking this one.';
+
+export function setSelectedSources(ids: readonly string[]): { ok: true } | { ok: false; error: string } {
+  const next = normalizeSelection(ids);
+  if (next.length === 0) return { ok: false, error: KEEP_ONE_SOURCE_MESSAGE };
+  const before = getSelectedSources();
+  if (before.length === next.length && before.every((id, index) => id === next[index])) return { ok: true };
+  if (!writeSelection(next)) {
+    return { ok: false, error: 'Could not save your selection because storage is not available on this device.' };
+  }
+  clearResumeCursor();
+  return { ok: true };
+}
+
+export function toggleSource(id: string): { ok: true; selected: boolean } | { ok: false; error: string } {
+  const current = getSelectedSources();
+  const isOn = current.includes(id);
+  const result = setSelectedSources(isOn ? current.filter((item) => item !== id) : [...current, id]);
+  if (result.ok === false) return { ok: false, error: result.error };
+  return { ok: true, selected: !isOn };
+}
+
+/** Select or clear every built-in group at once. Clearing is refused if nothing else would stay selected. */
+export function setBuiltinGroupsSelected(on: boolean): { ok: true } | { ok: false; error: string } {
+  const rest = getSelectedSources().filter((id) => builtinGroupOf(id) === null);
+  return setSelectedSources(on ? [...allBuiltinSourceIds(), ...rest] : rest);
+}
+
 export function getSetSheets(id: string): SheetData {
   if (id === DEFAULT_SET_ID) return DEFAULT_VOCABULARY_DATA;
   const stored = readJson<SheetData>(dataKey(id));
@@ -223,12 +364,12 @@ export function subscribeDisplayedWords(listener: () => void): () => void {
 }
 
 /**
- * The card on screen counts as learning for the active imported set.
+ * The card on screen counts as learning for the imported set it came from (`sourceId`).
  * The study queue is left untouched so Next and auto-advance do not jump.
  * Returns true only the first time that word and category are seen.
  */
-export function recordDisplayedWord(word: string, category?: string): boolean {
-  const id = getActiveSetId();
+export function recordDisplayedWord(word: string, category?: string, sourceId?: string): boolean {
+  const id = sourceId ?? (selectedImportedIds().length === 1 ? selectedImportedIds()[0] : getActiveSetId());
   if (id === DEFAULT_SET_ID) return false;
   const trimmed = word.trim();
   if (!trimmed) return false;
@@ -331,7 +472,10 @@ function clearResumeCursor(): void {
 export function setActiveSet(id: string): { ok: true } | { ok: false; error: string } {
   const known = listVocabularySets().some((set) => set.id === id);
   if (!known) return { ok: false, error: 'That word set is no longer on this device.' };
-  if (!safeSet(ACTIVE_KEY, id)) {
+  // Back-compat: choosing one set means "only this set" (default -> all six built-in groups).
+  const selection = normalizeSelection(id === DEFAULT_SET_ID ? allBuiltinSourceIds() : [id]);
+  if (selection.length === 0) return { ok: false, error: 'That word set has no words on this device.' };
+  if (!writeSelection(selection)) {
     return { ok: false, error: 'Could not switch sets because storage is not available on this device.' };
   }
   clearResumeCursor();
@@ -371,7 +515,10 @@ export function importVocabularySet(
     safeRemove(progressKey(id));
     return { ok: false, error: metaError };
   }
-  setActiveSet(id);
+  // Add to the mix; other selected sources stay selected.
+  const selection = normalizeSelection([...getSelectedSources(), id]);
+  writeSelection(selection);
+  clearResumeCursor();
   return { ok: true, set: meta };
 }
 
@@ -402,13 +549,15 @@ export function deleteVocabularySet(id: string): { ok: true } | { ok: false; err
   if (!sets.some((set) => set.id === id)) {
     return { ok: false, error: 'That word set is no longer on this device.' };
   }
-  const wasActive = safeGet(ACTIVE_KEY) === id;
+  const wasSelected = getSelectedSources().includes(id);
   const error = writeImportedMetas(sets.filter((set) => set.id !== id));
   if (error) return { ok: false, error };
   safeRemove(dataKey(id));
   safeRemove(progressKey(id));
-  if (wasActive) {
-    safeSet(ACTIVE_KEY, DEFAULT_SET_ID);
+  if (wasSelected) {
+    // Drop it from the mix; if nothing is left, fall back to every built-in group.
+    const remaining = normalizeSelection(getSelectedSources().filter((item) => item !== id));
+    writeSelection(remaining.length > 0 ? remaining : allBuiltinSourceIds());
     clearResumeCursor();
   }
   return { ok: true };
@@ -425,6 +574,7 @@ export function clearAllVocabularySets(): void {
       if (key && key.startsWith('lv.vocabularySets.')) keys.push(key);
     }
     keys.forEach((key) => store.removeItem(key));
+    store.removeItem(SELECTED_SOURCES_KEY);
   } catch {
     /* ignore */
   }

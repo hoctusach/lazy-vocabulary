@@ -32,7 +32,7 @@ interface VocabularyControlsColumnProps {
   currentWord: ReadonlyWord | null;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   onOpenSearch: (word?: string) => void;
 }
 
@@ -103,11 +103,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
-  const [wordToMark, setWordToMark] = React.useState<{ word: string; category?: string } | null>(null);
+  const [wordToMark, setWordToMark] = React.useState<{ word: string; category?: string; sourceId?: string } | null>(null);
 
   const handleMarkAsLearnedClick = () => {
     setWordToMark(
-      currentWord ? { word: currentWord.word, category: currentWord.category } : null
+      currentWord
+        ? { word: currentWord.word, category: currentWord.category, sourceId: currentWord.sourceId }
+        : null
     );
     trackUiInteraction('mark_as_learned_dialog_opened', {
       label: currentWord?.word || '',
@@ -118,7 +120,10 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     if (wordToMark?.word) {
       trackUiInteraction('mark_as_learned_confirm', { label: wordToMark.word });
     }
-    if (onMarkWordLearned && wordToMark?.word) onMarkWordLearned(wordToMark.word, wordToMark.category);
+    if (onMarkWordLearned && wordToMark?.word) {
+      if (wordToMark.sourceId) onMarkWordLearned(wordToMark.word, wordToMark.category, wordToMark.sourceId);
+      else onMarkWordLearned(wordToMark.word, wordToMark.category);
+    }
     setIsMarkAsLearnedDialogOpen(false);
     toast('Word marked as learned.', CONTROL_TOAST);
   };
