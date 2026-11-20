@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy · Chính sách quyền riêng tư — Lazy Vocabulary</title>
+<meta name="description" content="Privacy policy for the Lazy Vocabulary website and Android app: what we store, ads in the Android app, and how to delete your data.">
+<link rel="canonical" href="https://www.lazyvoca.fun/privacy.html">
+<meta name="robots" content="index,follow">
+<style>
+:root{--bg:#f8fafc;--txt:#0f172a;--muted:#475569;--accent:#1e40af;--line:#cbd5e1}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--txt:#e2e8f0;--muted:#94a3b8;--accent:#93c5fd;--line:#334155}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:780px;margin:0 auto;padding:28px 16px 64px}a{color:var(--accent)}h1{font-size:1.6rem;margin:.2em 0}h2{font-size:1.15rem;margin:1.8em 0 .4em;color:var(--accent)}
+.muted{color:var(--muted);font-size:.9rem}table{border-collapse:collapse;width:100%;font-size:.92rem;margin:.6em 0}th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+hr{border:0;border-top:1px solid var(--line);margin:2.4em 0}nav a{margin-right:14px}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="./">← Lazy Vocabulary</a> <a href="#vi">Tiếng Việt</a> <a href="delete-account.html">Delete your account</a></nav>
+
+<h1>Privacy Policy</h1>
+<p class="muted">Lazy Vocabulary — website <a href="https://www.lazyvoca.fun/">www.lazyvoca.fun</a> and Android app <code>com.hoctusach.lazyvocabulary</code> · Effective 17 November 2026</p>
+
+<p><b>Summary:</b> You can use Lazy Vocabulary without an account. If you create a profile, we store a nickname and a numeric passcode plus your learning progress so it can sync. Word sets you import stay on your device. The <b>Android app</b> shows one Google AdMob banner on some screens; the <b>website shows no ads</b>. We do not sell your data.</p>
+
+<h2>1. Who we are</h2>
+<p>Lazy Vocabulary is an independent vocabulary-learning app. Contact: <a href="mailto:hoctusach@gmail.com">hoctusach@gmail.com</a>.</p>
+
+<h2>2. Account data (optional)</h2>
+<p>If you create a profile, you choose a <b>nickname</b> and a numeric <b>passcode</b> (4–10 digits). There is no email, phone number or password. We store the nickname, a canonical form of it (lower-case, no spaces) used as your profile key, your passcode, your time zone (to schedule daily reviews) and the creation time. <b>The passcode is currently stored as the number you chose; it is not hashed.</b> Do not reuse a passcode you use anywhere else. To keep you signed in, the app also keeps your nickname, passcode and a session token in the browser/app local storage on your device.</p>
+
+<h2>3. Learning progress sync (Supabase)</h2>
+<p>When you are signed in, progress is stored on <a href="https://supabase.com/privacy">Supabase</a> (our database/hosting provider) in these tables:</p>
+<table>
+<tr><th>Table</th><th>What it contains</th></tr>
+<tr><td><code>nicknames</code></td><td>Nickname, canonical profile key, passcode, time zone, created time.</td></tr>
+<tr><td><code>learned_words</code></td><td>For each word you learned: the word id, whether it is in your review queue, learned/last-review/next-review timestamps, review count and spaced-repetition values (interval, ease, state).</td></tr>
+<tr><td><code>user_progress_summary</code></td><td>Counts of learning / learned / due / remaining words, total learning time, the dates you studied, last update time.</td></tr>
+<tr><td><code>user_sessions</code></td><td>A temporary sign-in token (valid about 24 hours), your nickname and expiry time.</td></tr>
+<tr><td><code>share_tokens</code></td><td>A random token created if you use "compare with a friend" links.</td></tr>
+</table>
+<p>Your nickname and learned-word counts may be visible to other users, for example on the leaderboard, and your nickname, learned-word count and streak are visible to anyone you give your friend-compare link to. Choose a nickname that does not identify you. Do not use your real name.</p>
+
+<h2>4. Imported word sets (stored only on your device)</h2>
+<p>Word sets you import from CSV/JSON files, their per-set progress and your settings (theme, speech voice and speed) are stored <b>only on your device</b> in local storage (<code>localStorage</code>). They are not uploaded to our servers. Clearing app data, uninstalling the app, or deleting the sets removes them. Text-to-speech uses the voices installed on your device or browser.</p>
+
+<h2>5. Ads — Android app only</h2>
+<p>The Android app shows a single Google AdMob banner at the bottom of the <b>Progress</b> and <b>Sets</b> screens. There are no full-screen or rewarded ads, and no ads on the word-card screen. <b>The website/PWA contains no ads and no ad code.</b></p>
+<p>AdMob (Google) may collect and use your device's <b>advertising ID</b>, IP address, device and app information and ad interaction data to serve and measure ads, prevent fraud and, where you allow it, personalise ads. Where required (for example in the EEA, UK and some other regions) the app first asks for your consent using Google's consent form (User Messaging Platform) and only requests ads once you have made a choice. You can change your choice anytime from <b>More → Privacy / ad choices</b> in the app. You can also reset or limit the advertising ID in Android <i>Settings → Google → Ads</i>. See <a href="https://policies.google.com/technologies/partner-sites">How Google uses information from sites or apps that use its services</a> and <a href="https://policies.google.com/privacy">Google's Privacy Policy</a>.</p>
+
+<h2>6. Other data</h2>
+<p>The Android app does not request microphone access and does not record audio. The <b>website</b> uses Google Analytics to count visits and see which pages are used (pages viewed, approximate location from IP, browser and device type, via cookies); the <b>Android app does not include Google Analytics</b>. There are no ads on the website. Hosting providers (GitHub Pages for the website, Supabase for sync) may log technical data such as IP addresses under their own policies.</p>
+
+<h2>7. Retention</h2>
+<p>Account and progress data are kept until you delete your account. Sign-in session tokens expire after about 24 hours. Local-only data stays on your device until you remove it. Ad data held by Google is governed by Google's policies.</p>
+
+<h2>8. How to delete your data</h2>
+<p>In the app: <b>More → Delete account</b> (enter your nickname and passcode). This permanently deletes your profile and all synced progress. You can also ask us by email — see <a href="delete-account.html">Delete your account</a>. Imported word sets are on your device only; remove them in the Sets screen, via the optional checkbox in the delete dialog, or by clearing app data.</p>
+
+<h2>9. Children</h2>
+<p>Lazy Vocabulary is not directed to children under 13 (or under the minimum age in your country). We do not knowingly collect personal data from children. If you believe a child has created a profile, contact us and we will delete it. Ads in the Android app are requested with Google's standard settings for a general audience.</p>
+
+<h2>10. Your rights</h2>
+<p>Depending on where you live you may have the right to access, correct, delete or export your data, or object to processing. Email <a href="mailto:hoctusach@gmail.com">hoctusach@gmail.com</a>.</p>
+
+<h2>11. Changes</h2>
+<p>We may update this policy; the effective date above will change. Material changes will be noted in the app or on this page.</p>
+
+<hr>
+
+<section id="vi" lang="vi">
+<h1>Chính sách quyền riêng tư (Tiếng Việt)</h1>
+<p><b>Tóm tắt:</b> Bạn dùng được Lazy Vocabulary mà không cần tài khoản. Nếu tạo hồ sơ, chúng tôi lưu biệt danh, mã số (passcode) và tiến độ học để đồng bộ. Bộ từ bạn nhập chỉ nằm trên thiết bị của bạn. <b>App Android</b> hiện một banner quảng cáo Google AdMob ở một số màn hình; <b>website không có quảng cáo</b>. Chúng tôi không bán dữ liệu.</p>
+<p><b>Tài khoản:</b> biệt danh + mã số 4–10 chữ số (không có email/mật khẩu). Chúng tôi lưu biệt danh, khoá hồ sơ (biệt danh viết thường, bỏ khoảng trắng), mã số, múi giờ và thời điểm tạo. Mã số hiện được lưu đúng như bạn chọn (chưa băm), vì vậy đừng dùng lại mã số của nơi khác. Tiến độ (từ đã học, lịch ôn, thống kê, ngày học) được đồng bộ lên Supabase. Biệt danh và số từ đã học có thể hiển thị cho người dùng khác (bảng xếp hạng, liên kết so sánh với bạn bè).</p>
+<p><b>Chỉ trên thiết bị:</b> bộ từ nhập từ tệp, tiến độ theo bộ từ và cài đặt được lưu trong localStorage của thiết bị, không tải lên máy chủ.</p>
+<p><b>Quảng cáo (chỉ app Android):</b> AdMob có thể dùng mã định danh quảng cáo, địa chỉ IP, thông tin thiết bị/ứng dụng. Ở nơi pháp luật yêu cầu, app hỏi sự đồng ý bằng biểu mẫu của Google (UMP) trước khi yêu cầu quảng cáo; bạn đổi lựa chọn bất cứ lúc nào ở <b>More → Privacy / ad choices</b>. Xem <a href="https://policies.google.com/privacy">Chính sách của Google</a>.</p>
+<p><b>Thống kê truy cập:</b> website dùng Google Analytics để đếm lượt xem trang (trang đã xem, vị trí gần đúng theo IP, loại trình duyệt/thiết bị, qua cookie). App Android không dùng Google Analytics và không xin quyền micro.</p>
+<p><b>Xoá dữ liệu:</b> trong app chọn <b>More → Delete account</b>, hoặc xem <a href="delete-account.html">hướng dẫn xoá tài khoản</a>, hoặc gửi email tới <a href="mailto:hoctusach@gmail.com">hoctusach@gmail.com</a>. <b>Trẻ em:</b> app không dành cho trẻ dưới 13 tuổi.</p>
+</section>
+</main>
+</body>
+</html>
