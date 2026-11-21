@@ -58,18 +58,58 @@ test('PROG-09', 'Streak card with 3 recent learned days', async ({ session }) =>
   const s = await session({ fake: { summaryDays: days } }); await boot(s); await openProgress(s); await sleep(800);
   await waitText(s, '3-day streak');
 });
-test('PROG-11', 'Leaderboard rows, current user highlighted, collapse/expand', async ({ session }) => {
-  const rows = [];
-  for (const [u, n] of [['alice', 5], ['bob', 3], ['e2e', 1]]) for (let i = 0; i < n; i++) rows.push({ user_unique_key: u, srs_state: 'learned', in_review_queue: false, next_review_at: null });
-  const s = await session({ fake: { leaderboard: rows } }); await boot(s); await openProgress(s); await sleep(1200);
-  const t = await flat(s); ok(/alice/.test(t) && /bob/.test(t), 'rows: ' + t.slice(0, 400));
-  await click(s, { label: 'Collapse leaderboard' }); await sleep(300); ok(!/\balice\b/.test(await flat(s)), 'collapsed');
-  await click(s, { labelRe: 'expand leaderboard' }); await sleep(300); ok(/\balice\b/.test(await flat(s)), 'expanded');
+const lbRows = async (s) => s.page.evaluate(() => [...document.querySelectorAll('[data-testid=leaderboard-row]')].map((r) => r.textContent.replace(/\s+/g, ' ').trim()));
+const addFriend = async (s, name) => {
+  await s.page.$eval('input[aria-label="Friend\'s nickname"]', (i) => { i.focus(); i.select(); }); await s.page.keyboard.press('Backspace');
+  await s.page.type('input[aria-label="Friend\'s nickname"]', name);
+  await click(s, { text: 'Add' }); await sleep(600);
+};
+test('PROG-11', 'Leaderboard: signed in, no friends -> only me, add field + share visible, collapse/expand', async ({ session }) => {
+  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+  const rows = await lbRows(s); eq(rows.length, 1, 'only me: ' + rows.join(' | ')); ok(/e2e/i.test(rows[0]) && /You/.test(rows[0]), 'me row');
+  const t = await flat(s); ok(!/alice|bob|carol/i.test(t), 'no other users listed');
+  ok(await s.page.$('input[aria-label="Friend\'s nickname"]'), 'add field'); ok(t.includes('Share my nickname'), 'share control');
+  ok(s.fake.calls.every((c) => c.name !== 'learned_words'), 'never downloads learned_words');
+  await click(s, { label: 'Collapse leaderboard' }); await sleep(300); ok(!/No friends yet/.test(await flat(s)), 'collapsed');
+  await click(s, { labelRe: 'expand leaderboard' }); await sleep(300); ok(/No friends yet/.test(await flat(s)), 'expanded');
+});
+test('PROG-13', 'Add friend by nickname (case/spaces), ranked board, unknown nick, add self, remove', async ({ session }) => {
+  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+  await addFriend(s, 'nobody'); await waitText(s, 'No learner with that nickname was found.'); eq((await lbRows(s)).length, 1, 'board unchanged');
+  await addFriend(s, '  E2E '); await waitText(s, "That's you");
+  await addFriend(s, ' bOB sMiTh '); await sleep(500);
+  let rows = await lbRows(s); eq(rows.length, 2, rows.join(' | ')); ok(/Bob Smith/.test(rows[0]) && /8/.test(rows[0]), 'friend ranked first (8 > 6): ' + rows[0]); ok(/e2e/i.test(rows[1]), 'me second');
+  ok(!/alice|carol/i.test(await flat(s)), 'non-friends not listed');
+  await click(s, { label: 'Remove Bob Smith' }); await waitText(s, 'Remove friend?'); await click(s, { text: 'Remove', inDialog: true }); await sleep(700);
+  rows = await lbRows(s); eq(rows.length, 1, 'only me again: ' + rows.join(' | ')); await waitText(s, 'No friends yet');
+});
+test('PROG-14', 'Periods Today / This week / All time follow the server counts', async ({ session }) => {
+  const s = await session({ fake: { friends: { e2e: ['alice', 'carol'] } } }); await boot(s); await openProgress(s); await sleep(1000);
+  const first = async () => (await lbRows(s)).map((r) => r.replace(/\s+(learned|learning|due)/g, '').slice(0, 40));
+  let r = await lbRows(s); ok(/Alice/.test(r[0]) && /20/.test(r[0]), 'all time: ' + r.join(' | '));
+  await click(s, { text: 'Today' }); await sleep(700); r = await lbRows(s);
+  ok(/Carol/.test(r[0]) && /4/.test(r[0]) && /Alice/.test(r[1]), 'today: ' + r.join(' | '));
+  await click(s, { text: 'This week' }); await sleep(700); r = await lbRows(s);
+  ok(/Alice/.test(r[0]) && /5/.test(r[0]), 'week: ' + r.join(' | '));
+  const periods = s.fake.calls.filter((c) => c.name === 'get_friends_leaderboard').map((c) => c.body.p_period);
+  ok(['allTime', 'today', 'week'].every((p) => periods.includes(p)), 'periods requested: ' + periods);
+});
+test('PROG-15', 'Signed out: sign-in prompt, no board, no friends calls, no other users', async ({ session }) => {
+  const s = await session({ signedIn: false }); s.allow.push(/AuthGate|auth:/); await s.goto('/'); await sleep(1500);
+  await s.page.evaluate(() => localStorage.clear()); await s.reload(); await sleep(1200);
+  await openProgress(s).catch(() => {}); await tab(s, 'Progress'); await sleep(800);
+  const t = await flat(s); ok(!/alice|bob smith|carol/i.test(t), 'no other users');
+  eq(s.fake.calls.filter((c) => /friend/.test(c.name)).length, 0, 'no friends RPC without a session');
+});
+test('PROG-16', 'Expired server session: renews via exchange; if still rejected shows sign-in prompt', async ({ session }) => {
+  const s = await session({ fake: { sessionValid: false } }); s.allow.push(/friends:|leaderboard/i);
+  await boot(s); await openProgress(s); await waitText(s, 'Sign in to add friends');
+  ok(!/alice|bob smith|carol/i.test(await flat(s)), 'no other users');
 });
 test('PROG-12', 'Leaderboard with backend down: no crash, rest of the page works', async ({ session }) => {
-  // The code swallows the failure (fetchLeaderboardRows returns []), so the "unavailable" text from the plan never shows.
   const s = await session({ fake: { mode: 'down' } }); s.allow.push(/Failed to fetch|NetworkError|leaderboard/i);
   await s.goto('/'); await sleep(2500); await openProgress(s); await waitText(s, 'Leaderboard');
+  await waitText(s, 'Friends are unavailable');
   await expand(s, 'Learning Progress'); await waitText(s, 'Due Review');
 });
 

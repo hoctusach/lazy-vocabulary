@@ -42,7 +42,7 @@ export function signedInStorage(nick = 'e2e') {
   const key = nick.toLowerCase();
   return {
     'lazyVoca.nickname': nick, 'lazyVoca.passcode': '1234', 'lazyVoca.userKey': key,
-    'lazyVoca.auth': JSON.stringify({ session_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 3600, expires_at: NOW() + 3600, user_unique_key: key, nickname: nick }),
+    'lazyVoca.auth': JSON.stringify({ session_token: `e2e-session~${key}~0`, token_type: 'bearer', expires_in: 3600, expires_at: NOW() + 3600, user_unique_key: key, nickname: nick }),
     'lazyVoca.authState': JSON.stringify({ version: 4, session: { user_unique_key: key, nickname: nick, authenticated_at: new Date().toISOString(), user: { id: key, nickname: nick, email: null } } }),
     speechUnlocked: 'true',
   };
@@ -71,7 +71,7 @@ export async function newSession(opts = {}) {
     requests.push(req.url());
     const host = url.hostname;
     if (host === FAKE_HOST || host === EDGE_HOST) {
-      let r; try { r = fake.handle(req.url(), req.method(), req.postData()); } catch (e) { r = { status: 500, headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ error: 'fake handler crashed: ' + e.message }) }; }
+      let r; try { r = fake.handle(req.url(), req.method(), req.postData(), req.headers()); } catch (e) { r = { status: 500, headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify({ error: 'fake handler crashed: ' + e.message }) }; }
       NETWORK.faked.push(`${req.method()} ${url.origin}${url.pathname}`);
       if (r === 'abort') return req.abort('internetdisconnected');
       if (r === 'hang') return; // never answers

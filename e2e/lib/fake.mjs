@@ -23,13 +23,22 @@ export function createFake(opts = {}) {
     create: 'ok',               // ok | taken
     pool: opts.pool || POOL,
     searchRows: null,           // override rows for search_vocabulary
-    leaderboard: [],            // learned_words rows
+    // Friends backend. users: canonical key -> { nick, today, week, all, learning, due }.
+    users: {
+      alice: { nick: 'Alice', today: 2, week: 5, all: 20, learning: 3, due: 1 },
+      bob: { nick: 'Bob Smith', today: 0, week: 1, all: 8, learning: 2, due: 0 },
+      carol: { nick: 'Carol', today: 4, week: 4, all: 4, learning: 0, due: 0 },
+    },
+    me: { today: 1, week: 2, all: 6, learning: 1, due: 0 },
+    friends: {},                // user key -> Set of friend keys (per fake, i.e. per test)
+    sessionValid: true,         // false => friends RPCs answer 28000
     summaryDays: null,          // learned_days for user_progress_summary
     learned: new Set(),
     dueIds: new Set(),
     calls: [],                  // {kind, name, body}
     ...opts,
   };
+  for (const k of Object.keys(f.friends)) f.friends[k] = new Set(f.friends[k]); // allow arrays in opts
   const rec = (kind, name, body) => f.calls.push({ kind, name, body });
   f.count = (name) => f.calls.filter((c) => c.name === name).length;
 
@@ -39,7 +48,11 @@ export function createFake(opts = {}) {
     review_count: 0, srs_state: null, ...extra,
   });
 
-  f.handle = (url, method, postData) => {
+  const canon = (x) => String(x || '').toLowerCase().replace(/\s+/g, '');
+  let tokenSeq = 0;
+  const pgErr = (code, message) => json(400, { code, message, details: null, hint: null });
+
+  f.handle = (url, method, postData, headers = {}) => {
     const u = new URL(url);
     const isEdge = u.hostname === EDGE_HOST;
     if (method === 'OPTIONS') return { status: 204, headers: CORS, body: '' };
@@ -56,9 +69,9 @@ export function createFake(opts = {}) {
         if (f.exchange === 'INCORRECT_PASSCODE') return json(401, { error: 'bad', code: 'INCORRECT_PASSCODE' });
         if (f.exchange === 'NICKNAME_NOT_FOUND') return json(404, { error: 'nf', code: 'NICKNAME_NOT_FOUND' });
         return json(200, {
-          session_token: 'aaa.bbb.ccc', token_type: 'bearer', expires_in: 3600,
+          session_token: `e2e-session~${canon(body.nickname || 'e2e')}~${++tokenSeq}`, token_type: 'bearer', expires_in: 3600,
           expires_at: Math.floor(Date.now() / 1000) + 3600,
-          user_unique_key: String(body.nickname || 'e2e').toLowerCase().replace(/\s+/g, ''), nickname: body.nickname,
+          user_unique_key: canon(body.nickname || 'e2e'), nickname: body.nickname,
         });
       }
       if (name === 'set_nickname_passcode') {
@@ -93,15 +106,45 @@ export function createFake(opts = {}) {
           }]);
         }
         case 'mark_word_new_by_key': f.learned.delete(body.p_word_id); return json(200, []);
-        case 'get_public_progress_by_token': return json(200, []);
-        case 'get_or_create_share_token': return json(200, 'tok-e2e');
+        case 'add_friend_by_nickname':
+        case 'remove_friend':
+        case 'list_friends':
+        case 'get_friends_leaderboard': {
+          // Session-gated like the SQL: needs X-Session-Token (never the anon Authorization).
+          const token = headers['x-session-token'];
+          const me = f.sessionValid && /^e2e-session~[^~]+~/.test(token || '') ? token.split('~')[1] : null;
+          if (!me) return pgErr('28000', 'invalid or expired session');
+          const mine = (f.friends[me] ||= new Set());
+          const nickOf = (k) => (k === me ? (f.users[me]?.nick || k) : f.users[k]?.nick || k);
+          if (name === 'list_friends') return json(200, [...mine].reverse().map((k) => ({ friend_key: k, nickname: nickOf(k), created_at: new Date().toISOString() })));
+          if (name === 'get_friends_leaderboard') {
+            const period = body.p_period ?? 'allTime';
+            if (!['today', 'week', 'allTime'].includes(period)) return pgErr('22023', 'invalid period');
+            const col = { today: 'today', week: 'week', allTime: 'all' }[period];
+            const stat = (k) => (k === me ? f.me : f.users[k]);
+            const rows = [me, ...mine].map((k) => ({ user_key: k, nickname: nickOf(k), learned_words: stat(k)[col], learning_words: stat(k).learning, due_words: stat(k).due, is_current_user: k === me }));
+            rows.sort((a, b) => b.learned_words - a.learned_words || a.nickname.localeCompare(b.nickname));
+            return json(200, rows.map((r, i) => ({ ...r, rank: i + 1 })));
+          }
+          const input = canon(body.p_nickname);
+          if (!input) return pgErr('22023', 'invalid nickname');
+          const key = Object.keys(f.users).find((k) => k === input || canon(f.users[k].nick) === input) || (input === me ? me : null);
+          if (name === 'remove_friend') {
+            const had = key ? mine.delete(key) : false;
+            return json(200, [{ removed: had, friend_key: key || input }]);
+          }
+          if (!key) return pgErr('P0002', 'nickname not found');
+          if (key === me) return pgErr('P0001', 'cannot add yourself');
+          mine.add(key);
+          return json(200, [{ friend_key: key, nickname: nickOf(key), created_at: new Date().toISOString() }]);
+        }
         default: return json(200, []);
       }
     }
     const table = path.split('?')[0];
     rec('table', table, null);
     const wantsObject = /pgrst\.object/.test(u.searchParams.get('x') || '') || true;
-    if (table === 'learned_words') return json(200, f.leaderboard);
+    if (table === 'learned_words') return json(200, []);
     if (table === 'user_progress_summary') {
       if (!f.summaryDays) return json(406, { code: 'PGRST116', message: 'no rows', details: '0 rows' });
       return json(200, { learning_count: 0, learned_count: f.summaryDays.length, learning_due_count: 0,
