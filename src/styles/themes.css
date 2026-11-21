@@ -450,9 +450,7 @@ body[class*="theme-"] .lv-popup .lv-btn-danger:hover:not(:disabled) { background
 body.theme-sloth .lv-popup .lv-btn-primary, body.theme-sloth .lv-popup .lv-btn-danger { border-color: transparent; }
 body.theme-sloth .lv-popup .lv-btn-primary, body.theme-sloth .lv-popup .lv-btn-secondary, body.theme-sloth .lv-popup .lv-btn-danger { border-radius: 16px; }
 body.theme-blocks .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); box-shadow: var(--lv-shadow-sm); }
-body.theme-blocks .lv-popup button { text-transform: uppercase; }
 body.theme-pixel .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); }
-body.theme-pixel .lv-popup button { text-transform: uppercase; letter-spacing: .5px; }
 body.theme-riso .lv-popup .lv-btn-primary { border-color: var(--lv-ink); }
 body.theme-riso .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); }
 body.theme-notes .lv-popup .lv-btn-primary { border-radius: 4px 10px 6px 12px; box-shadow: 2px 3px 0 rgba(0,0,0,.35); }
