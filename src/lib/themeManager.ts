@@ -1,28 +1,20 @@
 const THEME_KEY = "user-theme";
-const DEFAULT_THEME = "mint";
+
+/** The 5 real style themes (each has a light and a dark variant; dark is html.dark). */
+export const THEME_IDS = ["notes", "sloth", "blocks", "pixel", "riso"] as const;
+export type ThemeName = (typeof THEME_IDS)[number];
+export const DEFAULT_THEME: ThemeName = "notes";
 
 const THEME_CLASS_PREFIX = "theme-";
-const AVAILABLE_THEMES = [
-  "mint",
-  "morning",
-  "ocean",
-  "sakura",
-  "cyber",
-  "default",
-  "dark",
-  "light"
-] as const;
-
-const THEME_CLASSES = AVAILABLE_THEMES.map((theme) => `${THEME_CLASS_PREFIX}${theme}`);
-
-type ThemeName = (typeof AVAILABLE_THEMES)[number];
+const THEME_CLASSES = THEME_IDS.map((theme) => `${THEME_CLASS_PREFIX}${theme}`);
 
 function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
-function normalizeTheme(themeName: string): ThemeName {
-  if ((AVAILABLE_THEMES as readonly string[]).includes(themeName)) {
+/** Legacy values (mint/morning/ocean/sakura/cyber/default/dark/light) and anything unknown migrate to the default. */
+export function normalizeTheme(themeName: string | null | undefined): ThemeName {
+  if (themeName && (THEME_IDS as readonly string[]).includes(themeName)) {
     return themeName as ThemeName;
   }
   return DEFAULT_THEME;
@@ -50,16 +42,8 @@ export function initTheme() {
   if (!isBrowser()) {
     return;
   }
-
-  let savedTheme: string | null = null;
-  try {
-    savedTheme = window.localStorage.getItem(THEME_KEY);
-  } catch (error) {
-    console.warn("Unable to read persisted theme", error);
-  }
-
-  const normalized = normalizeTheme(savedTheme ?? DEFAULT_THEME);
-  applyTheme(normalized);
+  // applyTheme also rewrites a legacy/unknown stored value as the migrated one.
+  applyTheme(getActiveTheme());
 }
 
 export function getActiveTheme(): ThemeName {
@@ -68,12 +52,11 @@ export function getActiveTheme(): ThemeName {
   }
 
   try {
-    const stored = window.localStorage.getItem(THEME_KEY);
-    return normalizeTheme(stored ?? DEFAULT_THEME);
+    return normalizeTheme(window.localStorage.getItem(THEME_KEY));
   } catch (error) {
     console.warn("Unable to read persisted theme", error);
     return DEFAULT_THEME;
   }
 }
 
-export const userThemes = AVAILABLE_THEMES.slice(0, 5);
+export const userThemes: readonly ThemeName[] = THEME_IDS;
