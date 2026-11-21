@@ -76,7 +76,7 @@ export async function importFile(s, fixture) {
   await sleep(400);
 }
 export async function setNames(s) {
-  return s.page.evaluate(() => [...document.querySelectorAll('h3')].map((h) => h.textContent.trim()).filter((t) => t && t !== 'Import a set'));
+  return s.page.evaluate(() => [...document.querySelectorAll('h3')].filter((h) => !h.closest('[hidden]')).map((h) => h.textContent.trim()).filter((t) => t && t !== 'Import a set'));
 }
 export const metaSets = async (s) => (JSON.parse((await s.ls('lv.vocabularySets.v1')) || '{"sets":[]}').sets) || [];
 export const selectAll = async (s, sel) => { await s.page.focus(sel); await s.page.$eval(sel, (e) => e.select()); };

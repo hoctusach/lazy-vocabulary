@@ -16,7 +16,8 @@ test('TAB-01', 'Four tabs present, >=44px, Learn current', async ({ session }) =
 test('TAB-02', 'Learn -> Progress shows progress panels and hides card/controls', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'Progress');
   for (const t of ['Leaderboard', 'Quiz me', 'Learning Progress', 'Word Summary']) await waitText(s, t);
-  ok(!(await label(s, 'Next Word')) && (await word(s)) === null, 'learn card still visible');
+  // The Learn player stays mounted (so speech continues) but is hidden off-tab.
+  ok(await s.page.evaluate(() => { const h = document.querySelector('[data-testid="learn-host"]'); return !!h && h.hidden && h.getBoundingClientRect().height === 0; }), 'learn card still visible');
 });
 test('TAB-03', 'Sets tab content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'Sets');
@@ -34,14 +35,27 @@ test('TAB-05', 'Tab round-trip keeps word and paused state', async ({ session })
   await waitWord(s, W[2]);
   ok(await label(s, 'Play'), 'should still be paused');
 });
-test('TAB-06', 'Audio stops when leaving Learn', async ({ session }) => {
+test('TAB-06', 'Auto-play keeps speaking across tab switches (no cancel, keeps advancing)', async ({ session }) => {
   const s = await session({}); await boot(s);
+  const cur = () => s.page.evaluate(() => !!window.__speech.current);
   const before = await speechInfo(s);
-  await tab(s, 'Progress'); await sleep(300);
-  const mid = await speechInfo(s);
-  ok(mid.cancels > before.cancels, 'cancel not called');
-  await sleep(1500);
-  eq((await speechInfo(s)).calls, mid.calls, 'new utterance while off-tab');
+  ok(await cur(), 'should be speaking before switching');
+  for (const t of ['Progress', 'Sets', 'More', 'Learn', 'Progress', 'Learn', 'More', 'Sets', 'Progress', 'Learn']) {
+    await tab(s, t); await sleep(120);
+    const i = await speechInfo(s);
+    eq(i.cancels, before.cancels, `speech cancelled when switching to ${t}`);
+    ok(await cur(), `utterance dropped when switching to ${t}`);
+  }
+  eq((await speechInfo(s)).calls, before.calls, 'tab switching re-spoke the word');
+  eq((await prefs(s)).is_playing, true, 'is_playing was cleared by tab switch');
+  // Off-tab the player must keep advancing words.
+  await tab(s, 'Progress');
+  await U.fireEnd(s);
+  await waitSpeech(s, new RegExp('^' + W[1]));
+  await U.fireEnd(s);
+  await waitSpeech(s, new RegExp('^' + W[2]));
+  await tab(s, 'Learn'); await waitWord(s, W[2]);
+  ok(await label(s, 'Pause'), 'should still be playing (Pause button) after returning');
 });
 test('TAB-07', 'Desktop layout has no tabs; resize across 768 keeps working', async ({ session }) => {
   const s = await session({ viewport: { width: 1024, height: 768, deviceScaleFactor: 1 } });

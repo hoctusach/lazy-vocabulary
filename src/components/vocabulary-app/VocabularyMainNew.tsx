@@ -1,3 +1,4 @@
+import { stopSpeechForUserIntent } from '@/services/speech/stopSpeechForUserIntent';
 import React from "react";
 import { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyCardNew from "./VocabularyCardNew";
@@ -65,7 +66,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
     if (!isPaused) {
       handleTogglePause();
     }
-    unifiedSpeechController.stop();
+    stopSpeechForUserIntent('practice');
     setIsPracticeOpen(true);
   }, [isPaused, handleTogglePause]);
 

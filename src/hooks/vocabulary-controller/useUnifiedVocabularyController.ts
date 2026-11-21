@@ -243,11 +243,10 @@ export const useUnifiedVocabularyController = (
     }
   }, [currentWord?.word, currentWord?.category, currentIndex]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount: timers only. Never stop speech here (see stopSpeechForUserIntent).
   useEffect(() => {
     return () => {
       clearAutoAdvanceTimer();
-      unifiedSpeechController.stop();
     };
   }, [clearAutoAdvanceTimer]);
 

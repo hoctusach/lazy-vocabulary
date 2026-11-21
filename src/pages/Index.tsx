@@ -12,7 +12,6 @@ import MorePanel from '@/components/mobile/MorePanel';
 import BottomTabBar, { type AppTab } from '@/components/mobile/BottomTabBar';
 import { useIsDesktop } from '@/components/mobile/useIsDesktop';
 import { useAndroidBackButton } from '@/components/mobile/useAndroidBackButton';
-import { usePauseOnLeaveLearn } from '@/components/mobile/usePauseOnLeaveLearn';
 import { useBannerAds } from '@/hooks/useBannerAds';
 
 const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
@@ -54,7 +53,6 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
 const MobileHome: React.FC = () => {
   const [tab, setTab] = useState<AppTab>('learn');
   useAndroidBackButton(tab, setTab);
-  usePauseOnLeaveLearn(tab);
   // Android app only: bottom banner on Progress/Sets. No-op on web.
   useBannerAds(tab);
 
@@ -65,7 +63,11 @@ const MobileHome: React.FC = () => {
         className="mx-auto w-full max-w-lg px-3 py-3"
         style={{ paddingBottom: 'calc(4.75rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px))' }}
       >
-        {tab === 'learn' && <VocabularyAppWithLearning view="learn" />}
+        {/* The Learn player owns auto-play/speech. It stays mounted and is only hidden on other tabs,
+            so switching tabs never stops speech (see stopSpeechForUserIntent). Do not make this conditional. */}
+        <div hidden={tab !== 'learn'} data-testid="learn-host">
+          <VocabularyAppWithLearning view="learn" />
+        </div>
         {tab === 'progress' && <VocabularyAppWithLearning view="progress" />}
         {tab === 'sets' && <VocabularySetsScreen />}
         {tab === 'more' && <MorePanel />}
