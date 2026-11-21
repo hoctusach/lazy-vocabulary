@@ -9,11 +9,12 @@ export interface KokoroVoice {
 }
 
 export const KOKORO_VOICES: KokoroVoice[] = [
-  { id: 'af_heart', sid: 3, name: 'Kokoro Heart (US female)', gender: 'female', baseSpeed: 0.75 },
-  { id: 'am_michael', sid: 16, name: 'Kokoro Michael (US male)', gender: 'male', baseSpeed: 0.85 },
+  { id: 'af_heart', sid: 3, name: 'Kokoro Heart (US female)', gender: 'female', baseSpeed: 0.95 },
+  { id: 'am_michael', sid: 16, name: 'Kokoro Michael (US male)', gender: 'male', baseSpeed: 1.0 },
 ];
 
-export const KOKORO_DOWNLOAD_BYTES = 121205045;
+/** Fallback size of the fp32 model download; the real size comes from the native status (downloadSize). */
+export const KOKORO_DOWNLOAD_BYTES = 332562608;
 
 export function getKokoroVoiceByName(name: string | null | undefined): KokoroVoice | undefined {
   if (!name) return undefined;

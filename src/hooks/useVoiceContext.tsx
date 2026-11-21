@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
+import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 import { isKokoroVoiceName } from '@/services/speech/kokoro/kokoroVoices';
 import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
@@ -60,6 +61,7 @@ export const useVoiceContext = (): VoiceContext => {
     const index = allVoices.findIndex(v => v.name === selectedVoiceName);
     const nextIndex = (index + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
+    markVoiceExplicit();
     setSelectedVoiceName(nextVoice.name);
     setFavoriteVoice(nextVoice.name);
   };

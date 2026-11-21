@@ -80,14 +80,15 @@ class ShimSynth extends EventTarget {
     }
   }
 
-  /** System voices first, Kokoro voices (only when downloaded) appended at the end. */
+  /** Kokoro voices first (only when downloaded; Heart is the default), then the device's system voices. */
   private rebuildVoices(): void {
     const withKokoro = isKokoroSupported() && getKokoroState().downloaded;
     this.kokoroListed = withKokoro;
     const extra = withKokoro
-      ? KOKORO_VOICES.map((v, i) => new ShimVoice(`kokoro:${v.id}`, v.name, 'en-US', true, false, this.systemVoices.length + i))
+      ? KOKORO_VOICES.map((v, i) => new ShimVoice(`kokoro:${v.id}`, v.name, 'en-US', true, false, -1 - i))
       : [];
-    this.voices = [...this.systemVoices, ...extra];
+    // system voices keep their native index (used to select them when speaking), whatever their list position
+    this.voices = [...extra, ...this.systemVoices];
     this.fireVoicesChanged();
   }
 

@@ -2,7 +2,7 @@ import React from 'react';
 import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
-import NaturalVoicesCard from '@/components/mobile/NaturalVoicesCard';
+import NaturalVoiceRow from '@/components/mobile/NaturalVoiceRow';
 import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
 import { isProEnabled } from '@/config/features';
@@ -16,7 +16,8 @@ const OPEN_SOURCE_LICENSES = [
   { name: 'Kokoro-82M by hexgrad', url: 'https://huggingface.co/hexgrad/Kokoro-82M', license: 'Apache-2.0' },
   { name: 'sherpa-onnx by k2-fsa (Next-gen Kaldi)', url: 'https://github.com/k2-fsa/sherpa-onnx', license: 'Apache-2.0', note: 'includes OpenFst, kaldi-native-fbank (Apache-2.0) and nlohmann/json (MIT)' },
   { name: 'ONNX Runtime by Microsoft', url: 'https://github.com/microsoft/onnxruntime', license: 'MIT', note: 'statically linked in sherpa-onnx' },
-  { name: 'Kokoro English lexicon (misaki-style, from the k2-fsa model package)', url: 'https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0', license: 'Apache-2.0' },
+  { name: 'Kokoro model files and English lexicon (k2-fsa model package, fp32)', url: 'https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0', license: 'Apache-2.0' },
+  { name: 'Kokoro model files (k2-fsa model package, int8, for low-memory devices)', url: 'https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0', license: 'Apache-2.0' },
   { name: 'CMU Pronouncing Dictionary', url: 'https://github.com/cmusphinx/cmudict', license: 'BSD-2-Clause', note: 'Copyright (C) 1993-2015 Carnegie Mellon University' },
   { name: 'Kotlin standard library', url: 'https://github.com/JetBrains/kotlin', license: 'Apache-2.0' },
 ];
@@ -44,7 +45,7 @@ const MorePanel: React.FC = () => {
         </div>
       </div>
 
-      <NaturalVoicesCard />
+      <NaturalVoiceRow />
 
       <PrivacyAndAccountCard />
 

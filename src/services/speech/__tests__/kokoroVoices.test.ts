@@ -4,10 +4,15 @@ import { KOKORO_VOICES, getKokoroVoiceByName, isKokoroVoiceName, mapRateToKokoro
 const [heart, michael] = KOKORO_VOICES;
 
 describe('kokoroVoices', () => {
+  it('lists Heart (female, default) first, then Michael', () => {
+    expect(KOKORO_VOICES.map((v) => v.id)).toEqual(['af_heart', 'am_michael']);
+    expect(heart.baseSpeed).toBe(0.95);
+    expect(michael.baseSpeed).toBe(1.0);
+  });
   it('maps the default rate to the base speed and scales linearly', () => {
-    expect(mapRateToKokoroSpeed(0.8, heart)).toBeCloseTo(0.75);
-    expect(mapRateToKokoroSpeed(0.8, michael)).toBeCloseTo(0.85);
-    expect(mapRateToKokoroSpeed(1.6, heart)).toBeCloseTo(1.5);
+    expect(mapRateToKokoroSpeed(0.8, heart)).toBeCloseTo(0.95);
+    expect(mapRateToKokoroSpeed(0.8, michael)).toBeCloseTo(1.0);
+    expect(mapRateToKokoroSpeed(1.6, heart)).toBeCloseTo(1.9);
   });
   it('clamps to 0.5..2.0 and handles non-finite rates', () => {
     expect(mapRateToKokoroSpeed(0.1, heart)).toBe(0.5);
@@ -21,6 +26,6 @@ describe('kokoroVoices', () => {
     expect(isKokoroVoiceName('Google US English')).toBe(false);
     expect(isKokoroVoiceName(null)).toBe(false);
     expect(getKokoroVoiceByName('Kokoro Michael (US male)')?.sid).toBe(16);
-    expect(KOKORO_DOWNLOAD_BYTES).toBe(121205045);
+    expect(KOKORO_DOWNLOAD_BYTES).toBe(332562608);
   });
 });

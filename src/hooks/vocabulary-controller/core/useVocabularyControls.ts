@@ -5,6 +5,7 @@ import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { toast } from 'sonner';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 
 export const useVocabularyControls = (
   isPaused: boolean,
@@ -35,6 +36,7 @@ export const useVocabularyControls = (
     const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
     const nextIndex = (currentIndex + 1) % allVoices.length;
     const nextVoice = allVoices[nextIndex];
+    markVoiceExplicit();
     setSelectedVoiceName(nextVoice.name);
     setFavoriteVoice(nextVoice.name);
     unifiedSpeechController.stop();

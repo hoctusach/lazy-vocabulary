@@ -9,10 +9,18 @@ export interface KokoroStatus {
   bytesOnDisk: number;
   downloadSize: number;
   version: string;
+  variant?: 'fp32' | 'int8';
+  upgradeAvailable?: boolean;
+}
+
+export interface KokoroNetwork {
+  connected: boolean;
+  metered: boolean;
 }
 
 export interface KokoroTtsPlugin {
   getStatus(): Promise<KokoroStatus>;
+  getNetwork(): Promise<KokoroNetwork>;
   download(): Promise<KokoroStatus>;
   cancelDownload(): Promise<void>;
   deleteModel(): Promise<KokoroStatus>;
@@ -53,10 +61,11 @@ export interface KokoroState {
   downloading: boolean;
   downloadedBytes: number;
   totalBytes: number;
+  upgradeAvailable: boolean;
   error: string | null;
 }
 
-let state: KokoroState = { downloaded: false, downloading: false, downloadedBytes: 0, totalBytes: KOKORO_DOWNLOAD_BYTES, error: null };
+let state: KokoroState = { downloaded: false, downloading: false, downloadedBytes: 0, totalBytes: KOKORO_DOWNLOAD_BYTES, upgradeAvailable: false, error: null };
 const listeners = new Set<() => void>();
 let wired = false;
 
@@ -84,7 +93,7 @@ async function wire(): Promise<void> {
     await h.plugin.addListener('downloadProgress', (e) => set({ downloadedBytes: e.downloaded, totalBytes: e.total || KOKORO_DOWNLOAD_BYTES }));
     await h.plugin.addListener('downloadState', (e) => {
       if (e.state === 'downloading') set({ downloading: true, error: null });
-      else if (e.state === 'done') set({ downloading: false, downloaded: true });
+      else if (e.state === 'done') set({ downloading: false, downloaded: true, upgradeAvailable: false });
       else set({ downloading: false, error: e.error || 'NETWORK' });
     });
   } catch {
@@ -94,7 +103,12 @@ async function wire(): Promise<void> {
 
 function applyStatus(s: KokoroStatus | undefined) {
   if (!s) return;
-  set({ downloaded: !!s.downloaded, downloading: !!s.downloading });
+  set({
+    downloaded: !!s.downloaded,
+    downloading: !!s.downloading,
+    upgradeAvailable: !!s.upgradeAvailable,
+    ...(s.downloadSize > 1 ? { totalBytes: s.downloadSize } : {}),
+  });
 }
 
 export async function refreshKokoroStatus(): Promise<KokoroState> {
@@ -112,7 +126,7 @@ export async function downloadKokoro(): Promise<void> {
   set({ downloading: true, error: null, downloadedBytes: 0 });
   try {
     applyStatus(await h.plugin.download());
-    set({ downloading: false, downloaded: true });
+    set({ downloading: false, downloaded: true, upgradeAvailable: false });
   } catch (e) {
     const code = (e as { code?: string })?.code || 'NETWORK';
     set({ downloading: false, error: code === 'CANCELLED' ? null : code });
@@ -127,7 +141,19 @@ export async function deleteKokoro(): Promise<void> {
   const h = getKokoro();
   if (!h) return;
   try { applyStatus(await h.plugin.deleteModel()); } catch (e) { console.warn('[kokoro] delete failed', e); }
-  set({ downloaded: false, downloading: false, downloadedBytes: 0 });
+  set({ downloaded: false, downloading: false, downloadedBytes: 0, upgradeAvailable: false });
+}
+
+/** Connectivity as seen by the OS. Unknown (plugin failure) is reported as offline. */
+export async function getKokoroNetwork(): Promise<KokoroNetwork> {
+  const h = getKokoro();
+  if (!h) return { connected: false, metered: true };
+  try {
+    const n = await h.plugin.getNetwork();
+    return { connected: !!n?.connected, metered: n?.metered !== false };
+  } catch {
+    return { connected: false, metered: true };
+  }
 }
 
 /** Test helper. */
@@ -135,5 +161,5 @@ export function __resetKokoroForTests() {
   handle = null;
   wired = false;
   listeners.clear();
-  state = { downloaded: false, downloading: false, downloadedBytes: 0, totalBytes: KOKORO_DOWNLOAD_BYTES, error: null };
+  state = { downloaded: false, downloading: false, downloadedBytes: 0, totalBytes: KOKORO_DOWNLOAD_BYTES, upgradeAvailable: false, error: null };
 }

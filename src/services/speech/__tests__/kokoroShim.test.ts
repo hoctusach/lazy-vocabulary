@@ -59,9 +59,9 @@ describe('shim + Kokoro', () => {
     return events;
   };
 
-  it('lists Kokoro voices last, only when downloaded', async () => {
+  it('lists Kokoro voices first, only when downloaded', async () => {
     let synth = await install();
-    expect(synth.getVoices().map((v) => v.name)).toEqual(['US Voice', 'Kokoro Heart (US female)', 'Kokoro Michael (US male)']);
+    expect(synth.getVoices().map((v) => v.name)).toEqual(['Kokoro Heart (US female)', 'Kokoro Michael (US male)', 'US Voice']);
     vi.resetModules(); kStatus.downloaded = false;
     synth = await install();
     expect(synth.getVoices().map((v) => v.name)).toEqual(['US Voice']);
@@ -75,9 +75,9 @@ describe('shim + Kokoro', () => {
 
   it('speaks a Kokoro voice via the plugin with mapped speed', async () => {
     const synth = await install();
-    const events = speakText(synth, 2);
+    const events = speakText(synth, 1);
     await wait();
-    expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'am_michael', speed: expect.closeTo(0.85) });
+    expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'am_michael', speed: expect.closeTo(1.0) });
     expect(ttsSpeak).not.toHaveBeenCalled();
     expect(events).toEqual(['end']);
   });
@@ -85,7 +85,7 @@ describe('shim + Kokoro', () => {
   it('falls back to the system voice on rejection without an error event', async () => {
     kSpeak.mockRejectedValue({ code: 'OOV' });
     const synth = await install();
-    const events = speakText(synth, 1);
+    const events = speakText(synth, 0);
     await wait(400);
     expect(ttsSpeak).toHaveBeenCalledTimes(1);
     expect(ttsSpeak).toHaveBeenCalledWith(expect.objectContaining({ text: 'hello', voice: 0 }));
@@ -95,7 +95,7 @@ describe('shim + Kokoro', () => {
   it('cancel and pause stop Kokoro', async () => {
     kSpeak.mockImplementation(() => new Promise(() => {}));
     const synth = await install();
-    speakText(synth, 1);
+    speakText(synth, 0);
     await wait();
     synth.pause();
     expect(kStop).toHaveBeenCalledTimes(1);
@@ -105,11 +105,11 @@ describe('shim + Kokoro', () => {
 
   it('releases Kokoro once when a system voice speaks afterwards', async () => {
     const synth = await install();
-    speakText(synth, 1);
+    speakText(synth, 0);
     await wait();
-    speakText(synth, 0, 'one');
+    speakText(synth, 2, 'one');
     await wait();
-    speakText(synth, 0, 'two');
+    speakText(synth, 2, 'two');
     await wait();
     expect(kRelease).toHaveBeenCalledTimes(1);
     expect(ttsSpeak).toHaveBeenCalledTimes(2);
