@@ -128,9 +128,9 @@ Deno.serve(async (req) => {
   const expiresAtIso = new Date(expiresAtUnix * 1000).toISOString();
 
   const { error: profileError } = await admin.rpc("upsert_or_verify_profile", {
-    user_unique_key: userKey,
-    nickname,
-    passcode,
+    p_user_unique_key: userKey,
+    p_nickname: nickname,
+    p_passcode: passcode,
     // Ensure timezone changes are reflected for existing profiles without duplicating rows.
     p_timezone: timezone,
   });
