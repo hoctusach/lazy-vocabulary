@@ -1,5 +1,4 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { buildQuiz, buildQuizQuestion } from '@/features/quiz/quizEngine';
 import { evaluatePracticeSentence } from '@/features/practice/ruleEngine';
@@ -89,9 +88,8 @@ describe('PRACT-03: practice rule engine', () => {
 });
 
 describe('REG-04: theme contrast (WCAG AA)', () => {
-  const script = '/workspace/theme-shots/check_contrast.mjs';
-  it.skipIf(!existsSync(script))('check_contrast.mjs passes for every theme', () => {
-    const out = execFileSync(process.execPath, [script], { encoding: 'utf8' });
-    expect(out).toContain('ALL PASS');
+  it('gen-tokens.mjs contrast report passes for every theme x mode', () => {
+    const out = execFileSync(process.execPath, ['scripts/themes/gen-tokens.mjs'], { encoding: 'utf8' });
+    expect(out).toContain('all contrast checks pass');
   });
 });

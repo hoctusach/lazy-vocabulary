@@ -59,26 +59,26 @@ describe('PERSIST-10: corrupt auth JSON', () => {
 });
 
 describe('THEME-11: unknown or unreadable stored theme', () => {
-  it('falls back to mint for an unknown value', () => {
+  it('falls back to notes for an unknown value', () => {
     localStorage.setItem('user-theme', 'bogus');
     initTheme();
-    expect(document.body.classList.contains('theme-mint')).toBe(true);
-    expect(getActiveTheme()).toBe('mint');
-    expect(localStorage.getItem('user-theme')).toBe('mint');
+    expect(document.body.classList.contains('theme-notes')).toBe(true);
+    expect(getActiveTheme()).toBe('notes');
+    expect(localStorage.getItem('user-theme')).toBe('notes');
   });
 
   it('keeps a valid theme', () => {
-    applyTheme('ocean');
-    expect(document.body.classList.contains('theme-ocean')).toBe(true);
-    expect(document.body.classList.contains('theme-mint')).toBe(false);
+    applyTheme('blocks');
+    expect(document.body.classList.contains('theme-blocks')).toBe(true);
+    expect(document.body.classList.contains('theme-notes')).toBe(false);
   });
 
-  it('blocked storage still applies mint without crashing', () => {
+  it('blocked storage still applies notes without crashing', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('denied'); });
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied'); });
     expect(() => initTheme()).not.toThrow();
-    expect(document.body.classList.contains('theme-mint')).toBe(true);
-    expect(getActiveTheme()).toBe('mint');
+    expect(document.body.classList.contains('theme-notes')).toBe(true);
+    expect(getActiveTheme()).toBe('notes');
   });
 });
 
