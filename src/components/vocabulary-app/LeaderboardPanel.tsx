@@ -399,7 +399,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                       className={cn(
                         "rounded-md px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)]",
                         period === p.value
-                          ? "bg-[var(--lv-accent)] text-[var(--lv-button-primary-text)]"
+                          ? "bg-[var(--lv-button-primary-bg)] text-[var(--lv-button-primary-text)]"
                           : "theme-muted-text hover:bg-[var(--lv-card-highlight)]",
                       )}
                     >
