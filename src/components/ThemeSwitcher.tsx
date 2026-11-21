@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
-import { type ThemeName } from "@/lib/themeManager";
+import { FREE_THEME, type ThemeName } from "@/lib/themeManager";
+import { useProFeature } from "@/services/billing/proFeatures";
+import { openProUpgrade } from "@/services/billing/proUpgradeStore";
+import ProBadge from "@/components/pro/ProBadge";
 import { useIsVietnameseDevice } from "@/utils/deviceLanguage";
 
 type ThemeOption = {
@@ -22,21 +25,24 @@ export const themeOptions: ThemeOption[] = [
 const ThemeSwitcher: React.FC = () => {
   const { theme, setTheme, toggleDark, isDark } = useTheme();
   const isVi = useIsVietnameseDevice();
+  const allThemes = useProFeature("allThemes");
 
   const buttons = useMemo(
     () =>
       themeOptions.map((option) => {
         const isActive = theme === option.name;
+        const locked = !allThemes && option.name !== FREE_THEME;
         return (
           <button
             key={option.name}
             type="button"
             data-theme-option={option.name}
             data-active={isActive ? "true" : "false"}
-            onClick={() => setTheme(option.name)}
+            data-locked={locked ? "true" : "false"}
+            onClick={() => (locked ? openProUpgrade("allThemes") : setTheme(option.name))}
             className="lv-theme-card flex min-h-11 w-full items-center gap-3 rounded-xl border p-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)]"
             title={option.label}
-            aria-label={option.label}
+            aria-label={locked ? `${option.label} (Pro feature)` : option.label}
             aria-pressed={isActive}
           >
             <span className="lv-swatch" data-swatch={option.name} aria-hidden="true">
@@ -51,10 +57,11 @@ const ThemeSwitcher: React.FC = () => {
             <span className="lv-theme-check shrink-0 text-xs font-bold" aria-hidden="true">
               {isActive ? "✓" : ""}
             </span>
+            {locked && <ProBadge />}
           </button>
         );
       }),
-    [theme, setTheme, isVi]
+    [theme, setTheme, isVi, allThemes]
   );
 
   return (
