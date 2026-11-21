@@ -484,3 +484,12 @@ body[class*="theme-"] [data-sonner-toast] {
 }
 body[class*="theme-"] [data-sonner-toast] [data-close-button] { background: var(--lv-card-bg); color: var(--lv-text-primary); border: var(--lv-border-w) solid var(--lv-border-color); }
 body[class*="theme-"] [data-sonner-toast] [data-description] { color: inherit; opacity: .9; }
+
+/* "You nailed it" celebration popup (created in lib/utils/congratsEffect.ts) */
+.lv-congrats { background: #fff; color: #1f2440; font-size: 1.3rem; font-weight: 700; text-align: center; padding: 20px 26px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,.2); max-width: min(86vw, 22rem); }
+body[class*="theme-"] .lv-congrats {
+  background: var(--lv-card-bg); color: var(--lv-text-primary);
+  border: var(--lv-border-w) solid var(--lv-border-color); border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow); font-family: var(--lv-font-display);
+}
+body.theme-blocks .lv-congrats { text-transform: uppercase; font-weight: 900; }

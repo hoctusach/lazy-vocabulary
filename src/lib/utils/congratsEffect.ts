@@ -30,19 +30,14 @@ export function showCongratsEffect() {
   ];
   const randomMessage = messages[Math.floor(Math.random() * messages.length)];
   popup.textContent = `🎉🎉🎉 ${randomMessage} ✨✨✨`;
+  popup.className = "lv-congrats"; // surface/colours/fonts come from CSS (themes.css) so it follows the active theme
+  popup.setAttribute("role", "status");
   popup.style.position = "fixed";
   popup.style.top = "50%";
   popup.style.left = "50%";
   popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "rgba(255, 255, 255, 0.95)";
-  popup.style.color = "#333";
-  popup.style.fontSize = "1.4rem";
-  popup.style.fontWeight = "bold";
-  popup.style.textAlign = "center";
-  popup.style.padding = "20px 30px";
-  popup.style.borderRadius = "16px";
-  popup.style.boxShadow = "0 4px 20px rgba(0,0,0,0.2)";
-  popup.style.zIndex = "9999";
+                  popup.style.zIndex = "9999";
+  popup.style.pointerEvents = "none";
   popup.style.opacity = "1";
   popup.style.transition = "opacity 0.6s ease";
 
