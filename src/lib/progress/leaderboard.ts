@@ -19,6 +19,8 @@ export type LeaderboardState = {
   isLoading: boolean;
   /** True when there is no live session; no board is shown. */
   signedOut?: boolean;
+  /** True when this device is signed in but the server session could not be renewed. */
+  sessionExpired?: boolean;
   error?: string;
 };
 
@@ -69,6 +71,9 @@ export async function getLeaderboardState(
   } catch (error) {
     if (error instanceof FriendsError && error.kind === 'signed_out') {
       return { timeframe, entries: [], isLoading: false, signedOut: true };
+    }
+    if (error instanceof FriendsError && error.kind === 'session_expired') {
+      return { timeframe, entries: [], isLoading: false, sessionExpired: true };
     }
     const message = error instanceof FriendsError ? error.message : friendsErrorMessage('unavailable');
     return { timeframe, entries: [], isLoading: false, error: message };

@@ -101,10 +101,32 @@ test('PROG-15', 'Signed out: sign-in prompt, no board, no friends calls, no othe
   const t = await flat(s); ok(!/alice|bob smith|carol/i.test(t), 'no other users');
   eq(s.fake.calls.filter((c) => /friend/.test(c.name)).length, 0, 'no friends RPC without a session');
 });
-test('PROG-16', 'Expired server session: renews via exchange; if still rejected shows sign-in prompt', async ({ session }) => {
+test('PROG-16', 'Server rejects session even after re-exchange: session-expired prompt + Sign in again', async ({ session }) => {
   const s = await session({ fake: { sessionValid: false } }); s.allow.push(/friends:|leaderboard/i);
-  await boot(s); await openProgress(s); await waitText(s, 'Sign in to add friends');
+  await boot(s); await openProgress(s); await waitText(s, 'Your session expired');
+  ok(await s.page.evaluate(() => [...document.querySelectorAll('button')].some((b) => b.textContent.trim() === 'Sign in again')), 'sign-in-again button');
   ok(!/alice|bob smith|carol/i.test(await flat(s)), 'no other users');
+});
+test('PROG-17', 'Stale server token (28000 once): transparent re-exchange then board loads, add box present', async ({ session }) => {
+  const s = await session({ fake: { staleToken: true } }); s.allow.push(/friends:|leaderboard/i);
+  await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+  ok(!/session expired|Sign in to add/i.test(await flat(s)), 'no sign-in prompt');
+  ok(await s.page.$('input[aria-label="Friend\'s nickname"]'), 'add field');
+  ok(s.fake.count('nickname-passcode-exchange') >= 1, 're-exchanged');
+  const lb = s.fake.calls.filter((c) => c.name === 'get_friends_leaderboard');
+  ok(lb.length >= 2, 'rejected once then retried: ' + lb.length);
+});
+test('PROG-18', 'Stale token and no stored passcode: session-expired text + Sign in again opens sign-in prefilled', async ({ session }) => {
+  const s = await session({ fake: { staleToken: true } }); s.allow.push(/friends:|leaderboard|AuthGate|auth:/i);
+  await s.goto('/'); await sleep(1500);
+  await s.page.evaluate(() => localStorage.removeItem('lazyVoca.passcode')); await s.reload(); await sleep(1500);
+  await openProgress(s).catch(() => {}); await tab(s, 'Progress');
+  await waitText(s, 'Your session expired');
+  ok(!(await s.page.$('input[aria-label="Friend\'s nickname"]')), 'no add field while expired');
+  // The gate may already overlay the page (no passcode stored), so dispatch a DOM click.
+  await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => b.textContent.trim() === 'Sign in again').click()); await sleep(800);
+  ok(/Access your vocabulary/.test(await flat(s)), 'sign-in screen shown');
+  const vals = await s.page.evaluate(() => [...document.querySelectorAll('input')].map((i) => i.type + ':' + i.value)); ok(vals.includes('text:e2e'), 'nickname prefilled: ' + vals);
 });
 test('PROG-12', 'Leaderboard with backend down: no crash, rest of the page works', async ({ session }) => {
   const s = await session({ fake: { mode: 'down' } }); s.allow.push(/Failed to fetch|NetworkError|leaderboard/i);

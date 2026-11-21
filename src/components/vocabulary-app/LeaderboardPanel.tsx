@@ -35,6 +35,8 @@ import {
   type Friend,
 } from "@/lib/progress/friends";
 import { getNicknameLocal } from "@/lib/nickname";
+import { clearStoredAuth, getStoredSignInNickname } from "@/lib/auth";
+import { dispatchNicknameChange } from "@/lib/nicknameEvents";
 
 interface LeaderboardPanelProps {
   currentUserLearnedCount?: number;
@@ -228,12 +230,13 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
         isLoading: true,
         error: undefined,
         signedOut: false,
+        sessionExpired: false,
       }));
       try {
         const nextState = await getLeaderboardState({ period });
         if (!isCurrent()) return;
         setState(nextState);
-        if (nextState.signedOut) {
+        if (nextState.signedOut || nextState.sessionExpired) {
           setFriends([]);
           return;
         }
@@ -295,7 +298,11 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           ? error.message
           : friendsErrorMessage("unavailable"),
       );
-      if (error instanceof FriendsError && error.kind === "signed_out") reload();
+      if (
+        error instanceof FriendsError &&
+        (error.kind === "signed_out" || error.kind === "session_expired")
+      )
+        reload();
     } finally {
       setIsAdding(false);
     }
@@ -331,6 +338,13 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   const entries = state.entries;
   const onlyMe = entries.length > 0 && entries.every((e) => e.isCurrentUser);
   const signedOut = state.signedOut === true;
+  const sessionExpired = state.sessionExpired === true;
+
+  const handleSignInAgain = () => {
+    const nickname = getStoredSignInNickname() ?? undefined;
+    clearStoredAuth();
+    dispatchNicknameChange(null, nickname);
+  };
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
@@ -379,9 +393,17 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
           </CollapsibleTrigger>
 
           <CollapsibleContent className="pt-2">
-            {signedOut ? (
-              <div className="rounded-lg theme-card-highlight px-3 py-3 text-sm theme-muted-text border theme-border">
-                {friendsErrorMessage("signed_out")}
+            {signedOut || sessionExpired ? (
+              <div
+                data-testid={sessionExpired ? "leaderboard-session-expired" : "leaderboard-signed-out"}
+                className="flex flex-col items-start gap-2 rounded-lg theme-card-highlight px-3 py-3 text-sm theme-muted-text border theme-border"
+              >
+                <span>
+                  {friendsErrorMessage(sessionExpired ? "session_expired" : "signed_out")}
+                </span>
+                <Button type="button" size="sm" onClick={handleSignInAgain}>
+                  {sessionExpired ? "Sign in again" : "Sign in"}
+                </Button>
               </div>
             ) : (
               <>

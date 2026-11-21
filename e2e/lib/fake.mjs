@@ -31,6 +31,7 @@ export function createFake(opts = {}) {
     },
     me: { today: 1, week: 2, all: 6, learning: 1, due: 0 },
     friends: {},                // user key -> Set of friend keys (per fake, i.e. per test)
+    staleToken: false,          // true => the pre-seeded token (…~0) is unknown to the server; only exchange-issued tokens work
     sessionValid: true,         // false => friends RPCs answer 28000
     summaryDays: null,          // learned_days for user_progress_summary
     learned: new Set(),
@@ -112,7 +113,7 @@ export function createFake(opts = {}) {
         case 'get_friends_leaderboard': {
           // Session-gated like the SQL: needs X-Session-Token (never the anon Authorization).
           const token = headers['x-session-token'];
-          const me = f.sessionValid && /^e2e-session~[^~]+~/.test(token || '') ? token.split('~')[1] : null;
+          const me = f.sessionValid && /^e2e-session~[^~]+~/.test(token || '') && !(f.staleToken && /~0$/.test(token)) ? token.split('~')[1] : null;
           if (!me) return pgErr('28000', 'invalid or expired session');
           const mine = (f.friends[me] ||= new Set());
           const nickOf = (k) => (k === me ? (f.users[me]?.nick || k) : f.users[k]?.nick || k);

@@ -1,4 +1,10 @@
-import { ensureSupabaseAuthSession } from '@/lib/auth';
+import {
+  ensureSupabaseAuthSession,
+  forceRefreshSession,
+  getStoredPasscode,
+  hasStoredSignIn,
+  isCredentialRejection,
+} from '@/lib/auth';
 import { getSupabaseClient } from '@/lib/supabaseClient';
 
 export type Friend = {
@@ -9,6 +15,7 @@ export type Friend = {
 
 export type FriendsErrorKind =
   | 'signed_out'
+  | 'session_expired'
   | 'not_found'
   | 'cannot_add_self'
   | 'friend_limit'
@@ -29,6 +36,8 @@ export function friendsErrorMessage(kind: FriendsErrorKind): string {
   switch (kind) {
     case 'signed_out':
       return 'Sign in to add friends and see your friends board.';
+    case 'session_expired':
+      return 'Your session expired — please sign in again.';
     case 'not_found':
       return 'No learner with that nickname was found.';
     case 'cannot_add_self':
@@ -69,9 +78,21 @@ export function mapFriendsError(error: PgError): FriendsError {
 
 export type LeaderboardPeriod = 'today' | 'week' | 'allTime';
 
+async function runRpc(fn: string, args?: Record<string, unknown>): Promise<{ data: unknown; error: PgError }> {
+  try {
+    return await getSupabaseClient().rpc(fn, args);
+  } catch (error) {
+    console.warn(`friends:${fn}`, error);
+    throw new FriendsError('unavailable');
+  }
+}
+
 /**
- * Runs a session-gated RPC. Renews an expired edge session first; if there is
- * still no session, throws signed_out without calling the backend.
+ * Runs a session-gated RPC. Renews an expired edge session first. If the server
+ * still rejects the token (28000, e.g. a token issued before user_sessions
+ * existed), forces one fresh passcode exchange and retries exactly once.
+ * Throws signed_out only for a truly signed-out device and session_expired
+ * when this device is signed in but the session cannot be renewed.
  */
 export async function callFriendsRpc(fn: string, args?: Record<string, unknown>): Promise<unknown> {
   let session: Awaited<ReturnType<typeof ensureSupabaseAuthSession>> = null;
@@ -80,14 +101,23 @@ export async function callFriendsRpc(fn: string, args?: Record<string, unknown>)
   } catch (error) {
     console.warn('friends:ensureSession', error);
   }
-  if (!session) throw new FriendsError('signed_out');
+  if (!session) throw new FriendsError(hasStoredSignIn() ? 'session_expired' : 'signed_out');
 
-  let result: { data: unknown; error: PgError };
-  try {
-    result = await getSupabaseClient().rpc(fn, args);
-  } catch (error) {
-    console.warn(`friends:${fn}`, error);
-    throw new FriendsError('unavailable');
+  let result = await runRpc(fn, args);
+  if (result.error && mapFriendsError(result.error).kind === 'signed_out') {
+    if (!getStoredPasscode()) throw new FriendsError('session_expired');
+    try {
+      const refreshed = await forceRefreshSession();
+      if (!refreshed) throw new FriendsError('session_expired');
+    } catch (error) {
+      if (error instanceof FriendsError) throw error;
+      console.warn('friends:refreshSession', (error as Error)?.message);
+      throw new FriendsError(isCredentialRejection(error) ? 'session_expired' : 'unavailable');
+    }
+    result = await runRpc(fn, args);
+    if (result.error && mapFriendsError(result.error).kind === 'signed_out') {
+      throw new FriendsError('session_expired');
+    }
   }
   if (result.error) {
     console.warn(`friends:${fn}`, result.error.message);

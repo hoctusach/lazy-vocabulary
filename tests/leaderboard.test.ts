@@ -6,7 +6,13 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
 }));
 
-vi.mock('@/lib/auth', () => ({ ensureSupabaseAuthSession: vi.fn(async () => mocks.session) }));
+vi.mock('@/lib/auth', () => ({
+  ensureSupabaseAuthSession: vi.fn(async () => mocks.session),
+  getStoredPasscode: vi.fn(() => null),
+  hasStoredSignIn: vi.fn(() => false),
+  forceRefreshSession: vi.fn(async () => null),
+  isCredentialRejection: vi.fn(() => false),
+}));
 vi.mock('@/lib/supabaseClient', () => ({ getSupabaseClient: vi.fn(() => ({ rpc: mocks.rpc, from: mocks.from })) }));
 
 import { getLeaderboardState } from '@/lib/progress/leaderboard';
@@ -52,9 +58,9 @@ describe('friends leaderboard state', () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
-  it('expired server session (28000) reads as signed out', async () => {
+  it('rejected server session (28000, no passcode) reads as session expired', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { code: '28000', message: 'invalid session' } });
-    expect(await getLeaderboardState()).toMatchObject({ signedOut: true, entries: [] });
+    expect(await getLeaderboardState()).toMatchObject({ sessionExpired: true, entries: [] });
   });
 
   it('backend failure gives an error message, not a crash', async () => {

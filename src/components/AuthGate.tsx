@@ -89,6 +89,7 @@ export default function AuthGate() {
     function onNicknameChange(event: Event) {
       const detail = (event as CustomEvent<NicknameEventDetail>).detail;
       syncVisibility({ nickname: detail?.nickname ?? null });
+      if (detail?.prefill) setS((p) => ({ ...p, nickname: detail.prefill ?? '', passcode: '', mode: 'signin' }));
     }
 
     window.addEventListener('storage', onStorage);

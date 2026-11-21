@@ -3,9 +3,19 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   session: { user_unique_key: 'me' } as null | Record<string, unknown>,
   rpc: vi.fn(),
+  passcode: '1234' as string | null,
+  signedInLocally: true,
+  refresh: vi.fn(),
 }));
 
-vi.mock('@/lib/auth', () => ({ ensureSupabaseAuthSession: vi.fn(async () => mocks.session) }));
+vi.mock('@/lib/auth', () => ({
+  ensureSupabaseAuthSession: vi.fn(async () => mocks.session),
+  getStoredPasscode: vi.fn(() => mocks.passcode),
+  hasStoredSignIn: vi.fn(() => mocks.signedInLocally),
+  forceRefreshSession: (...a: unknown[]) => mocks.refresh(...a),
+  isCredentialRejection: (e: { code?: string; status?: number } | null) =>
+    e?.code === 'INCORRECT_PASSCODE' || e?.status === 401,
+}));
 vi.mock('@/lib/supabaseClient', () => ({ getSupabaseClient: vi.fn(() => ({ rpc: mocks.rpc })) }));
 
 import {
@@ -22,6 +32,10 @@ describe('friends helpers', () => {
   beforeEach(() => {
     mocks.session = { user_unique_key: 'me' };
     mocks.rpc.mockReset();
+    mocks.passcode = '1234';
+    mocks.signedInLocally = true;
+    mocks.refresh.mockReset();
+    mocks.refresh.mockResolvedValue({ user_unique_key: 'me' });
   });
 
   it('adds by trimmed nickname and maps the row', async () => {
@@ -57,12 +71,12 @@ describe('friends helpers', () => {
 
   it('does not call the backend and reports signed_out with no session', async () => {
     mocks.session = null;
+    mocks.signedInLocally = false;
     await expect(listFriends()).rejects.toMatchObject({ kind: 'signed_out' });
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
   it.each([
-    ['28000', '', 'signed_out'],
     ['P0002', 'nickname not found', 'not_found'],
     ['P0001', 'cannot add yourself', 'cannot_add_self'],
     ['P0001', 'friend limit reached', 'friend_limit'],
@@ -77,8 +91,59 @@ describe('friends helpers', () => {
     expect(err.kind).toBe(kind);
   });
 
+  it('maps 28000 to signed_out at the mapper level', () => {
+    expect(mapFriendsError({ code: '28000' }).kind).toBe('signed_out');
+  });
+
   it('treats a thrown network error as unavailable', async () => {
     mocks.rpc.mockRejectedValue(new TypeError('Failed to fetch'));
     await expect(listFriends()).rejects.toMatchObject({ kind: 'unavailable' });
+  });
+
+  describe('rejected session token (28000)', () => {
+    it('refreshes with the stored passcode and retries exactly once', async () => {
+      mocks.rpc
+        .mockResolvedValueOnce(fail('28000', 'invalid or expired session'))
+        .mockResolvedValueOnce({ data: [{ friend_key: 'a', nickname: 'A', created_at: null }], error: null });
+      expect(await listFriends()).toEqual([{ friendKey: 'a', nickname: 'A', createdAt: null }]);
+      expect(mocks.refresh).toHaveBeenCalledTimes(1);
+      expect(mocks.rpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('28000 twice -> session_expired, no third call', async () => {
+      mocks.rpc.mockResolvedValue(fail('28000'));
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'session_expired' });
+      expect(mocks.refresh).toHaveBeenCalledTimes(1);
+      expect(mocks.rpc).toHaveBeenCalledTimes(2);
+    });
+
+    it('no stored passcode -> session_expired without a refresh', async () => {
+      mocks.passcode = null;
+      mocks.rpc.mockResolvedValue(fail('28000'));
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'session_expired' });
+      expect(mocks.refresh).not.toHaveBeenCalled();
+      expect(mocks.rpc).toHaveBeenCalledTimes(1);
+    });
+
+    it('credential rejection during refresh -> session_expired', async () => {
+      mocks.rpc.mockResolvedValue(fail('28000'));
+      mocks.refresh.mockRejectedValue(Object.assign(new Error('bad'), { code: 'INCORRECT_PASSCODE' }));
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'session_expired' });
+      expect(mocks.rpc).toHaveBeenCalledTimes(1);
+    });
+
+    it('network error during refresh -> unavailable (not signed out)', async () => {
+      mocks.rpc.mockResolvedValue(fail('28000'));
+      mocks.refresh.mockRejectedValue(new TypeError('Failed to fetch'));
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'unavailable' });
+      expect(mocks.rpc).toHaveBeenCalledTimes(1);
+    });
+
+    it('no session but locally signed in -> session_expired; not signed in -> signed_out', async () => {
+      mocks.session = null;
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'session_expired' });
+      mocks.signedInLocally = false;
+      await expect(listFriends()).rejects.toMatchObject({ kind: 'signed_out' });
+    });
   });
 });

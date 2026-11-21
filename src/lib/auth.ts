@@ -272,6 +272,40 @@ export async function ensureSupabaseAuthSession(): Promise<Session | null> {
   return ensuringSupabaseSession;
 }
 
+/** True when the device holds a stored sign-in (auth payload or nickname), regardless of server state. */
+export function hasStoredSignIn(): boolean {
+  return loadStoredAuthPayload() !== null || !!readFromStorage(NICKNAME_LS_KEY)?.trim();
+}
+
+/** The nickname this device is signed in as, if any. */
+export function getStoredSignInNickname(): string | null {
+  const nick = loadStoredAuthPayload()?.session.nickname?.trim() || readFromStorage(NICKNAME_LS_KEY)?.trim();
+  return nick || null;
+}
+
+let forcingRefresh: Promise<Session | null> | null = null;
+
+/**
+ * Re-runs the passcode exchange even when the local edge session looks valid
+ * (the server may not know the token, e.g. it predates user_sessions). Returns
+ * null when there is no stored sign-in or passcode to exchange. Throws the
+ * exchange error (network or credential rejection) so callers can tell them
+ * apart with isCredentialRejection. Never signs the user out.
+ */
+export function forceRefreshSession(): Promise<Session | null> {
+  if (!forcingRefresh) {
+    forcingRefresh = (async () => {
+      const nickname = getStoredSignInNickname();
+      const passcode = getStoredPasscode();
+      if (!nickname || !passcode) return null;
+      return signInWithPasscode(nickname, passcode, { rememberPasscode: false });
+    })().finally(() => {
+      forcingRefresh = null;
+    });
+  }
+  return forcingRefresh;
+}
+
 export async function getActiveSession(): Promise<Session | null> {
   const ensured = await ensureSupabaseAuthSession();
   if (ensured) {
