@@ -388,3 +388,99 @@ body.theme-pixel .lv-authgate-mascot { image-rendering: pixelated; width: 72px; 
 body.theme-sloth .lv-authgate-mascot { width: 72px; border-radius: 50%; background: #F3D9B1; padding: 4px; }
 html.dark body.theme-notes .lv-authgate-form, body.theme-notes .lv-authgate-form { transform: rotate(-.4deg); }
 body.theme-pixel .leading-relaxed, body.theme-pixel .leading-7, body.theme-pixel .leading-6 { line-height: 1.3; }
+
+/* ================= Popups: dialogs, alert dialogs, sheets, popovers, menus, tooltips, toasts =================
+   Radix portals render under <body>, so body.theme-* / html.dark tokens apply to everything below. */
+body[class*="theme-"] {
+  --lv-shadow-up: 0 -10px 24px -10px rgba(31,36,64,.35);
+}
+html.dark body[class*="theme-"] { --lv-shadow-up: 0 -10px 24px -10px rgba(0,0,0,.7); }
+body.theme-blocks { --lv-shadow-up: 0 -5px 0 var(--lv-ink); }
+html.dark body.theme-blocks { --lv-shadow-up: 0 -5px 0 #FF5A36; }
+body.theme-pixel { --lv-shadow-up: 0 -4px 0 color-mix(in srgb, var(--lv-ink) 35%, transparent); }
+body.theme-riso { --lv-shadow-up: 0 -4px 0 var(--lv-pink); }
+
+body[class*="theme-"] .lv-popup,
+body[class*="theme-"] .lv-popup[role="dialog"],
+body[class*="theme-"] .lv-popup[role="alertdialog"] {
+  background-color: var(--lv-card-bg);
+  color: var(--lv-text-primary);
+  font-family: var(--lv-font-body);
+  border: var(--lv-border-w) solid var(--lv-border-color);
+  border-bottom-width: 0;
+  border-radius: var(--lv-radius) var(--lv-radius) 0 0;
+  box-shadow: var(--lv-shadow-up);
+}
+body[class*="theme-"] .lv-popup-side,
+body[class*="theme-"] .lv-popup-side[role="dialog"] { border-radius: 0; border-bottom-width: var(--lv-border-w); box-shadow: var(--lv-shadow); }
+@media (min-width: 640px) {
+  body[class*="theme-"] .lv-popup:not(.lv-popup-side),
+  body[class*="theme-"] .lv-popup[role="dialog"]:not(.lv-popup-side),
+  body[class*="theme-"] .lv-popup[role="alertdialog"] {
+    border-bottom-width: var(--lv-border-w);
+    border-radius: var(--lv-radius);
+    box-shadow: var(--lv-shadow);
+  }
+}
+body[class*="theme-"] .lv-popup h2 { font-family: var(--lv-font-display); color: var(--lv-text-primary); }
+body[class*="theme-"] .lv-popup p,
+body[class*="theme-"] .lv-popup .text-muted-foreground { color: var(--lv-text-secondary); }
+body[class*="theme-"] .lv-popup-close { opacity: 1; color: var(--lv-text-primary); }
+body[class*="theme-"] .lv-popup-close:hover { background: var(--lv-card-highlight); }
+
+/* Action buttons inside popups */
+body[class*="theme-"] .lv-popup .lv-btn-primary {
+  background: var(--lv-button-primary-bg); color: var(--lv-button-primary-text);
+  border: var(--lv-border-w) solid var(--lv-ink); box-shadow: var(--lv-shadow-sm);
+  font-family: var(--lv-font-ui); font-weight: 800;
+}
+body[class*="theme-"] .lv-popup .lv-btn-primary:hover:not(:disabled) { background: var(--lv-button-primary-bg); filter: brightness(1.06); }
+body[class*="theme-"] .lv-popup .lv-btn-secondary {
+  background: var(--lv-button-secondary-bg); color: var(--lv-button-secondary-text);
+  border: var(--lv-border-w) solid var(--lv-field-border); box-shadow: none;
+  font-family: var(--lv-font-ui); font-weight: 700;
+}
+body[class*="theme-"] .lv-popup .lv-btn-secondary:hover:not(:disabled) { background: var(--lv-card-highlight); color: var(--lv-text-primary); }
+body[class*="theme-"] .lv-popup .lv-btn-danger {
+  background: hsl(var(--destructive)); color: hsl(var(--destructive-foreground));
+  border: var(--lv-border-w) solid var(--lv-ink); box-shadow: var(--lv-shadow-sm);
+  font-family: var(--lv-font-ui); font-weight: 800;
+}
+body[class*="theme-"] .lv-popup .lv-btn-danger:hover:not(:disabled) { background: hsl(var(--destructive)); filter: brightness(1.06); }
+body.theme-sloth .lv-popup .lv-btn-primary, body.theme-sloth .lv-popup .lv-btn-danger { border-color: transparent; }
+body.theme-sloth .lv-popup .lv-btn-primary, body.theme-sloth .lv-popup .lv-btn-secondary, body.theme-sloth .lv-popup .lv-btn-danger { border-radius: 16px; }
+body.theme-blocks .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); box-shadow: var(--lv-shadow-sm); }
+body.theme-blocks .lv-popup button { text-transform: uppercase; }
+body.theme-pixel .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); }
+body.theme-pixel .lv-popup button { text-transform: uppercase; letter-spacing: .5px; }
+body.theme-riso .lv-popup .lv-btn-primary { border-color: var(--lv-ink); }
+body.theme-riso .lv-popup .lv-btn-secondary { border-color: var(--lv-ink); }
+body.theme-notes .lv-popup .lv-btn-primary { border-radius: 4px 10px 6px 12px; box-shadow: 2px 3px 0 rgba(0,0,0,.35); }
+
+/* Floating layers: popover, select, dropdown, tooltip, hover card, menus, Radix toast */
+body[class*="theme-"] .lv-pop {
+  background-color: var(--lv-card-bg); color: var(--lv-text-primary);
+  border: var(--lv-border-w) solid var(--lv-border-color);
+  border-radius: var(--lv-radius-sm); box-shadow: var(--lv-shadow-sm);
+  font-family: var(--lv-font-ui);
+}
+body[class*="theme-"] .lv-pop [role="option"]:focus,
+body[class*="theme-"] .lv-pop [role="menuitem"]:focus,
+body[class*="theme-"] .lv-pop [data-highlighted] { background: var(--lv-card-highlight); color: var(--lv-text-primary); }
+body[class*="theme-"] .lv-pop [data-state="checked"] { font-weight: 800; }
+
+/* sonner toasts (shadcn Toaster + the app ToastProvider) */
+body[class*="theme-"] [data-sonner-toaster] {
+  --normal-bg: var(--lv-card-bg); --normal-text: var(--lv-text-primary); --normal-border: var(--lv-border-color);
+  --success-bg: var(--lv-success); --success-text: var(--lv-on-success); --success-border: var(--lv-ink);
+  --error-bg: hsl(var(--destructive)); --error-text: hsl(var(--destructive-foreground)); --error-border: var(--lv-ink);
+  --info-bg: var(--lv-card-bg); --info-text: var(--lv-text-primary); --info-border: var(--lv-border-color);
+  --warning-bg: var(--lv-card-highlight); --warning-text: var(--lv-text-primary); --warning-border: var(--lv-border-color);
+  --border-radius: var(--lv-radius-sm);
+  font-family: var(--lv-font-ui);
+}
+body[class*="theme-"] [data-sonner-toast] {
+  border-width: var(--lv-border-w); box-shadow: var(--lv-shadow-sm); font-family: var(--lv-font-ui); font-weight: 600;
+}
+body[class*="theme-"] [data-sonner-toast] [data-close-button] { background: var(--lv-card-bg); color: var(--lv-text-primary); border: var(--lv-border-w) solid var(--lv-border-color); }
+body[class*="theme-"] [data-sonner-toast] [data-description] { color: inherit; opacity: .9; }
