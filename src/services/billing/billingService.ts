@@ -59,6 +59,20 @@ async function queryOwned(api: Plugin['NativePurchases'], PURCHASE_TYPE: Plugin[
   return (purchases ?? []) as OwnedTx[];
 }
 
+/** Resolves to `fallback` if `p` neither settles nor throws within `ms` (a hung Play/plugin call must not hang the UI). */
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise<T>((resolve) => {
+    const timer = setTimeout(() => resolve(fallback), ms);
+    p.then(
+      (v) => { clearTimeout(timer); resolve(v); },
+      () => { clearTimeout(timer); resolve(fallback); },
+    );
+  });
+}
+
+export const PRODUCT_TIMEOUT_MS = 8000;
+export const RESTORE_TIMEOUT_MS = 20000;
+
 let initStarted = false;
 
 /** Call once at launch. Never throws. Only clears the cache after a successful query without pro_unlock. */
@@ -80,7 +94,12 @@ export async function initBilling(): Promise<void> {
 
 let cachedProduct: ProProduct | null = null;
 
-export async function getProProduct(): Promise<ProProduct | null> {
+/** Play product details, or null when billing/product is unavailable (never throws, never hangs). */
+export function getProProduct(): Promise<ProProduct | null> {
+  return withTimeout(loadProProduct(), PRODUCT_TIMEOUT_MS, null);
+}
+
+async function loadProProduct(): Promise<ProProduct | null> {
   if (!isBillingSupported()) return null;
   if (cachedProduct) return cachedProduct;
   try {
@@ -158,7 +177,10 @@ let restoreInFlight: Promise<PurchaseResult> | null = null;
 export function restorePro(): Promise<PurchaseResult> {
   if (!isBillingSupported()) return Promise.resolve({ status: 'error', message: 'Purchases are not available on this device.' });
   if (restoreInFlight) return restoreInFlight;
-  restoreInFlight = doRestore().finally(() => {
+  restoreInFlight = withTimeout<PurchaseResult>(doRestore(), RESTORE_TIMEOUT_MS, {
+    status: 'error',
+    message: 'Could not reach Google Play. Please try again.',
+  }).finally(() => {
     restoreInFlight = null;
   });
   return restoreInFlight;

@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, useLocation } from "react-router-dom";
 import AppRouter from "@/lib/platform/AppRouter";
 import { initNativeShell } from "@/lib/platform/nativeShell";
-import { isProEnabled } from "@/config/features";
 import { initBilling } from "@/services/billing/billingService";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
@@ -17,6 +16,8 @@ import { useEffect } from "react";
 import AuthGate from "./components/AuthGate";
 import InstallPrompt from "./components/InstallPrompt";
 import KokoroAutoDownload from "./components/KokoroAutoDownload";
+import ProUpgradeSheet from "./components/pro/ProUpgradeSheet";
+import { isProEnabled } from "./config/features";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
@@ -71,6 +72,7 @@ const App = () => {
         <AuthGate />
         <InstallPrompt />
         <KokoroAutoDownload />
+        {isProEnabled() && <ProUpgradeSheet />}
       </TooltipProvider>
     </QueryClientProvider>
   );

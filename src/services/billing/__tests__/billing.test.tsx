@@ -29,6 +29,8 @@ import * as ent from '../entitlement';
 import * as billing from '../billingService';
 import { adsAllowed, onAdsAllowedChange } from '@/hooks/useAdsVisibility';
 import MorePanel from '@/components/mobile/MorePanel';
+import ProUpgradeSheet from '@/components/pro/ProUpgradeSheet';
+import { __resetProUpgradeForTests } from '../proUpgradeStore';
 
 const owned = (o: Record<string, unknown> = {}) => ({
   productIdentifier: 'pro_unlock', purchaseState: '1', isAcknowledged: true, purchaseToken: 'tok', orderId: 'GPA.1', ...o,
@@ -46,6 +48,7 @@ beforeEach(() => {
   plugin.acknowledgePurchase.mockResolvedValue(undefined);
   ent.__resetEntitlementForTests();
   billing.__resetBillingForTests();
+  __resetProUpgradeForTests();
 });
 
 describe('entitlement', () => {
@@ -177,37 +180,37 @@ describe('web / ios no-op', () => {
     expect(plugin.getPurchases).not.toHaveBeenCalled();
     expect(plugin.purchaseProduct).not.toHaveBeenCalled();
   });
-  it('MorePanel hides the card on web', () => {
+  it('MorePanel still shows the Pro card on web (sheet says coming soon)', () => {
     platform.native = false; platform.name = 'web';
     render(<MorePanel />);
-    expect(screen.queryByTestId('pro-card')).toBeNull();
+    expect(screen.getByTestId('pro-card')).toBeTruthy();
   });
 });
 
-describe('MorePanel Pro card', () => {
-  it('shows localised price from Play', async () => {
-    render(<MorePanel />);
-    expect(screen.getByText('Loading price…')).toBeTruthy();
+describe('MorePanel Pro card + upgrade sheet', () => {
+  const open = async () => {
+    render(<><MorePanel /><ProUpgradeSheet /></>);
+    await act(async () => { fireEvent.click(screen.getByTestId('pro-open')); });
+  };
+  it('opens the sheet with the localised Play price', async () => {
+    await open();
     await waitFor(() => expect(screen.getByTestId('pro-buy').textContent).toContain('49.000 ₫'));
     expect((screen.getByTestId('pro-buy') as HTMLButtonElement).disabled).toBe(false);
   });
-  it('shows unavailable when product cannot load', async () => {
-    plugin.getProducts.mockResolvedValue({ products: [] });
-    render(<MorePanel />);
-    await waitFor(() => expect(screen.getByTestId('pro-buy').textContent).toContain('Not available right now'));
-    expect((screen.getByTestId('pro-buy') as HTMLButtonElement).disabled).toBe(true);
-  });
-  it('shows Pro-active state and no buy button', async () => {
+  it('shows Pro unlocked and no buy button for owners', () => {
     ent.setProEntitlement();
     render(<MorePanel />);
-    expect(screen.getByTestId('pro-active').textContent).toContain('Pro active');
-    expect(screen.queryByTestId('pro-buy')).toBeNull();
+    expect(screen.getByTestId('pro-active')).toBeTruthy();
+    expect(screen.getByText('Pro unlocked ✓')).toBeTruthy();
+    expect(screen.queryByTestId('pro-open')).toBeNull();
   });
-  it('buy flips to Pro-active', async () => {
+  it('buy unlocks and closes the sheet', async () => {
     plugin.purchaseProduct.mockResolvedValue(owned());
-    render(<MorePanel />);
+    await open();
     await waitFor(() => expect((screen.getByTestId('pro-buy') as HTMLButtonElement).disabled).toBe(false));
     await act(async () => { fireEvent.click(screen.getByTestId('pro-buy')); });
     await waitFor(() => expect(screen.getByTestId('pro-active')).toBeTruthy());
+    expect(ent.isProActive()).toBe(true);
+    await waitFor(() => expect(screen.queryByTestId('pro-upgrade-sheet')).toBeNull());
   });
 });
