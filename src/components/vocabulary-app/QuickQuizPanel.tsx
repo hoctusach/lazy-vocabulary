@@ -14,7 +14,9 @@ import { cn } from "@/lib/utils";
 import type { VocabularyWord } from "@/types/vocabulary";
 import { buildQuiz, pickWordOfTheDay } from "@/features/quiz/quizEngine";
 import type { QuizQuestion } from "@/features/quiz/types";
-import { markQuizCompletedToday } from "@/features/quiz/quizService";
+import { canStartQuiz, markQuizCompletedToday, recordQuizStart } from "@/features/quiz/quizService";
+import { hasFeature } from "@/services/billing/proFeatures";
+import { openProUpgrade } from "@/services/billing/proUpgradeStore";
 import { getVocabularySourceRevision, loadAllWords, subscribeVocabularySource } from "@/utils/allWords";
 
 interface QuickQuizPanelProps {
@@ -45,10 +47,15 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
   const wordOfTheDay = useMemo(() => pickWordOfTheDay(pool), [pool]);
 
   const startQuiz = (seedWord?: VocabularyWord) => {
+    if (!canStartQuiz(hasFeature("unlimitedQuiz"))) {
+      openProUpgrade("unlimitedQuiz");
+      return;
+    }
     const targets = targetWords && targetWords.length > 0 ? targetWords : pool;
     const seeded = seedWord ? [seedWord, ...targets.filter((w) => w.word !== seedWord.word)] : targets;
     const built = buildQuiz(seeded, pool, QUESTION_COUNT);
 
+    if (built.length > 0) recordQuizStart();
     setQuestions(built);
     setQuestionIndex(0);
     setSelected(null);

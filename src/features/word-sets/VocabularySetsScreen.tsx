@@ -12,6 +12,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useVocabularySets } from './VocabularySetContext';
+import { useProFeature } from '@/services/billing/proFeatures';
+import { openProUpgrade } from '@/services/billing/proUpgradeStore';
+import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
@@ -84,6 +87,7 @@ const VocabularySetsScreen: React.FC = () => {
   const [renameValue, setRenameValue] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const canImport = useProFeature('importSets');
 
   const setCounts = (id: string) => {
     if (id === DEFAULT_SET_ID) return null;
@@ -92,6 +96,11 @@ const VocabularySetsScreen: React.FC = () => {
 
   const onPickFile = async (file: File | undefined) => {
     if (!file) return;
+    if (!canImport) {
+      openProUpgrade('importSets');
+      if (inputRef.current) inputRef.current.value = '';
+      return;
+    }
     setBusy(true);
     setErrors([]);
     setWarnings([]);
@@ -184,10 +193,13 @@ const VocabularySetsScreen: React.FC = () => {
             type="button"
             className="min-h-11 w-full sm:w-auto"
             disabled={busy}
-            onClick={() => inputRef.current?.click()}
+            data-locked={canImport ? 'false' : 'true'}
+            aria-label={canImport ? undefined : 'Choose file (Pro feature)'}
+            onClick={() => (canImport ? inputRef.current?.click() : openProUpgrade('importSets'))}
           >
             <Upload className="h-4 w-4" />
             {busy ? 'Reading file…' : 'Choose file'}
+            {!canImport && <ProBadge />}
           </Button>
           <input
             ref={inputRef}
