@@ -20,15 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * voices.bin is assembled locally from two HTTP Range slices (af_heart, am_michael); the rest is zeros.
  */
 public final class KokoroModelStore {
-    public static final String VERSION = "kokoro-v1.0-int8";
-    public static final long TOTAL_BYTES = 121205045L;
-
-    static final String BASE = "https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0/resolve/57adb37fc0e8d4bd430cfc1b8f8c2294945b9af2/";
-    static final String DIR_NAME = "kokoro-int8-multi-lang-v1_0";
-
-    static final String MODEL = "model.int8.onnx";
-    static final String TOKENS = "tokens.txt";
-    static final String LEXICON = "lexicon-us-en.txt";
+    static final String TOKENS = KokoroVariant.TOKENS_NAME;
+    static final String LEXICON = KokoroVariant.LEXICON_NAME;
     static final String VOICES = "voices.bin";
     static final String READY = "ready";
 
@@ -48,11 +41,13 @@ public final class KokoroModelStore {
         }
     }
 
-    private static final Entry[] FILES = {
-            new Entry(MODEL, 114202993L, "75635ea3b85a32d00094dcdd61a258aba87c160f7c264c304a7b3ae9d734195e"),
-            new Entry(TOKENS, 687L, "6ebb6bb288f20f3ae8d004d3c2ca27697da27c037d75e81a60e2a6a663f95425"),
-            new Entry(LEXICON, 5956885L, "7daaab53a181be9885b853a8582bf1838186317e5dadacbcef9c426d6fa0da14"),
-    };
+    private static Entry[] filesOf(KokoroVariant v) {
+        return new Entry[]{
+                new Entry(v.modelName, v.modelSize, v.modelSha),
+                new Entry(TOKENS, KokoroVariant.TOKENS_SIZE, KokoroVariant.TOKENS_SHA),
+                new Entry(LEXICON, KokoroVariant.LEXICON_SIZE, KokoroVariant.LEXICON_SHA),
+        };
+    }
 
     private static final class Slice {
         final String id;
@@ -90,6 +85,10 @@ public final class KokoroModelStore {
         }
     }
 
+    private final KokoroVariant variant;
+    private final Entry[] FILES;
+    private final String BASE;
+    private final long TOTAL_BYTES;
     private final File dir;
     private CompletableFuture<Void> inflight;
     private volatile boolean downloading;
@@ -99,16 +98,23 @@ public final class KokoroModelStore {
     private long lastEmit;
     private Listener listener;
 
-    public KokoroModelStore(Context context) {
-        this(new File(new File(context.getFilesDir(), "kokoro"), DIR_NAME));
+    public KokoroModelStore(Context context, KokoroVariant variant) {
+        this(new File(new File(context.getFilesDir(), "kokoro"), variant.dirName), variant);
     }
 
-    public KokoroModelStore(File dir) {
+    public KokoroModelStore(File dir, KokoroVariant variant) {
         this.dir = dir;
+        this.variant = variant;
+        this.FILES = filesOf(variant);
+        this.BASE = variant.base;
+        this.TOTAL_BYTES = variant.totalBytes();
     }
+
+    public KokoroVariant variant() { return variant; }
+    public long totalBytes() { return TOTAL_BYTES; }
 
     public File dir() { return dir; }
-    public File modelFile() { return new File(dir, MODEL); }
+    public File modelFile() { return new File(dir, variant.modelName); }
     public File tokensFile() { return new File(dir, TOKENS); }
     public File lexiconFile() { return new File(dir, LEXICON); }
     public File voicesFile() { return new File(dir, VOICES); }

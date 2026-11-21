@@ -7,6 +7,11 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @CapacitorPlugin(name = "KokoroTts")
 public class KokoroTtsPlugin extends Plugin {
-    private KokoroModelStore store;
+    private KokoroModels models;
     private KokoroEngine engine;
     private final ExecutorService io = Executors.newCachedThreadPool(r -> {
         Thread t = new Thread(r, "kokoro-io");
@@ -25,19 +30,42 @@ public class KokoroTtsPlugin extends Plugin {
 
     @Override
     public void load() {
-        store = new KokoroModelStore(getContext());
-        engine = KokoroEngine.get(getContext(), store);
+        models = new KokoroModels(getContext());
+        engine = KokoroEngine.get(getContext(), models);
     }
 
     private JSObject status() {
+        KokoroModelStore ready = models.ready();
+        KokoroModelStore shown = ready != null ? ready : models.preferredStore();
         JSObject o = new JSObject();
         o.put("supported", true);
-        o.put("downloaded", store.isReady());
-        o.put("downloading", store.isDownloading());
-        o.put("bytesOnDisk", store.bytesOnDisk());
-        o.put("downloadSize", KokoroModelStore.TOTAL_BYTES);
-        o.put("version", KokoroModelStore.VERSION);
+        o.put("downloaded", ready != null);
+        o.put("downloading", models.isDownloading());
+        o.put("bytesOnDisk", models.bytesOnDisk());
+        o.put("downloadSize", models.preferredStore().totalBytes());
+        o.put("version", shown.variant().version);
+        o.put("variant", shown.variant().id);
+        o.put("upgradeAvailable", models.upgradeAvailable());
         return o;
+    }
+
+    @PluginMethod
+    public void getNetwork(final PluginCall call) {
+        JSObject o = new JSObject();
+        boolean connected = false;
+        boolean metered = true;
+        try {
+            ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            Network n = cm == null ? null : cm.getActiveNetwork();
+            NetworkCapabilities caps = n == null ? null : cm.getNetworkCapabilities(n);
+            connected = caps != null && caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+            metered = cm == null || cm.isActiveNetworkMetered();
+        } catch (Throwable ignored) {
+            // unknown: treat as offline-ish / metered
+        }
+        o.put("connected", connected);
+        o.put("metered", metered);
+        call.resolve(o);
     }
 
     @PluginMethod
@@ -52,13 +80,22 @@ public class KokoroTtsPlugin extends Plugin {
         io.execute(() -> {
             state("downloading", null);
             try {
-                store.download((done, total, file) -> {
+                final KokoroModelStore target = models.preferredStore();
+                if (!target.isReady()) target.download((done, total, file) -> {
                     JSObject p = new JSObject();
                     p.put("downloaded", done);
                     p.put("total", total);
                     p.put("file", file);
                     notifyListeners("downloadProgress", p);
                 }, cancel);
+                if (target.isReady() && target.variant() == KokoroVariant.FP32) {
+                    // fp32 is complete and verified: drop the superseded int8 model
+                    KokoroModelStore old = models.store(KokoroVariant.INT8);
+                    if (old.bytesOnDisk() > 0) {
+                        engine.releaseBlocking();
+                        old.delete();
+                    }
+                }
                 state("done", null);
                 call.resolve(status());
             } catch (KokoroModelStore.DownloadException e) {
@@ -89,7 +126,7 @@ public class KokoroTtsPlugin extends Plugin {
         io.execute(() -> {
             cancelFlag.set(true);
             engine.releaseBlocking();
-            store.delete();
+            models.deleteAll();
             call.resolve(status());
         });
     }
@@ -101,7 +138,7 @@ public class KokoroTtsPlugin extends Plugin {
         final Double speedD = call.getDouble("speed", 1.0);
         final float speed = (float) Math.max(0.5, Math.min(2.0, speedD == null ? 1.0 : speedD));
         final int sid = "am_michael".equals(voice) ? 16 : 3;
-        if (!store.isReady()) {
+        if (!models.isReady()) {
             call.reject("Kokoro voices are not downloaded", "NOT_DOWNLOADED");
             return;
         }

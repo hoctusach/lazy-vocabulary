@@ -43,7 +43,7 @@ public final class KokoroEngine {
 
     private static KokoroEngine instance;
 
-    public static synchronized KokoroEngine get(Context ctx, KokoroModelStore store) {
+    public static synchronized KokoroEngine get(Context ctx, KokoroModels store) {
         if (instance == null) instance = new KokoroEngine(ctx.getApplicationContext(), store);
         return instance;
     }
@@ -58,7 +58,8 @@ public final class KokoroEngine {
     }
 
     private final Context context;
-    private final KokoroModelStore store;
+    private final KokoroModels models;
+    private KokoroModelStore loadedFrom;
     private final ExecutorService worker = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "kokoro-engine");
         t.setDaemon(true);
@@ -78,9 +79,9 @@ public final class KokoroEngine {
     private final Object jobLock = new Object();
     private Job current;
 
-    private KokoroEngine(Context context, KokoroModelStore store) {
+    private KokoroEngine(Context context, KokoroModels models) {
         this.context = context;
-        this.store = store;
+        this.models = models;
     }
 
     public boolean isSpeaking() {
@@ -162,6 +163,7 @@ public final class KokoroEngine {
             tts = null;
         }
         g2p = null;
+        loadedFrom = null;
     }
 
     private synchronized void cancelIdleTimer() {
@@ -180,8 +182,22 @@ public final class KokoroEngine {
     }
 
     private void ensureLoaded() throws Exception {
-        if (tts != null && g2p != null) return;
+        final KokoroModelStore store = models.ready();
+        if (store == null) throw new IllegalStateException("Kokoro voices are not downloaded");
+        if (tts != null && g2p != null && loadedFrom == store) return;
         doRelease();
+        try {
+            load(store);
+        } catch (OutOfMemoryError e) {
+            doRelease();
+            throw new IllegalStateException("Out of memory while loading the voice model", e);
+        } catch (LinkageError e) { // native library missing / failed to load
+            doRelease();
+            throw new IllegalStateException("Voice engine unavailable: " + e.getMessage(), e);
+        }
+    }
+
+    private void load(KokoroModelStore store) throws Exception {
         Map<String, String> main;
         Set<Integer> tokens;
         try (BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(store.lexiconFile()), StandardCharsets.UTF_8))) {
@@ -208,6 +224,7 @@ public final class KokoroEngine {
         cfg.setMaxNumSentences(1);
         tts = new OfflineTts(null, cfg);
         g2p = new KokoroG2P(main, extra, tokens);
+        loadedFrom = store;
     }
 
     private final class Job {
@@ -251,7 +268,7 @@ public final class KokoroEngine {
         void run(String text, int sid, float speed) {
             if (cancelled.get()) return;
             try {
-                if (!store.isReady()) {
+                if (!models.isReady()) {
                     finish(false, "NOT_DOWNLOADED", "Kokoro voices are not downloaded", null);
                     return;
                 }
@@ -344,13 +361,15 @@ public final class KokoroEngine {
                 GenerationConfig gc = new GenerationConfig();
                 gc.setSid(sid);
                 gc.setSpeed(speed);
-                float[] gap = new float[SAMPLE_RATE * 120 / 1000];
+                float[] gap = new float[SAMPLE_RATE * 150 / 1000];
+                KokoroPostFx fx = new KokoroPostFx(SAMPLE_RATE); // fresh filter state per utterance
                 for (int i = 0; i < sentences.size() && !cancelled.get(); i++) {
                     String s = sentences.get(i);
                     int[] cps = s.codePoints().toArray();
                     gc.setPhonemeCodepoints(new int[][]{cps});
                     GeneratedAudio a = tts.generateWithConfig("x", gc);
                     float[] samples = a.getSamples();
+                    fx.process(samples);
                     if (i < sentences.size() - 1) {
                         float[] withGap = new float[samples.length + gap.length];
                         System.arraycopy(samples, 0, withGap, 0, samples.length);
