@@ -12,6 +12,7 @@ import MorePanel from '@/components/mobile/MorePanel';
 import BottomTabBar, { type AppTab } from '@/components/mobile/BottomTabBar';
 import { useIsDesktop } from '@/components/mobile/useIsDesktop';
 import { useAndroidBackButton } from '@/components/mobile/useAndroidBackButton';
+import { usePauseOnLeaveLearn } from '@/components/mobile/usePauseOnLeaveLearn';
 import { useBannerAds } from '@/hooks/useBannerAds';
 
 const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
@@ -52,6 +53,7 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
 const MobileHome: React.FC = () => {
   const [tab, setTab] = useState<AppTab>('learn');
   useAndroidBackButton(tab, setTab);
+  usePauseOnLeaveLearn(tab);
   // Android app only: bottom banner on Progress/Sets. No-op on web.
   useBannerAds(tab);
 
