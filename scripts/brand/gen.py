@@ -95,9 +95,9 @@ while True:
     if d.textlength('Lazy Vocabulary',font=t1)<=1024-x-40: break
     sz-=2
 t2=font(NUN,max(26,int(sz*0.42)),700)
-while d.textlength('Hands-free C1-C2 vocabulary',font=t2)>1024-x-40: t2=font(NUN,t2.size-1,700)
+while d.textlength('Master vocabulary in 15 minutes a day',font=t2)>1024-x-40: t2=font(NUN,t2.size-1,700)
 d.text((x,170),'Lazy Vocabulary',font=t1,fill=(255,255,255))
-d.text((x+3,180+sz+22),'Hands-free C1-C2 vocabulary',font=t2,fill=(255,214,153))
+d.text((x+3,180+sz+22),'Master vocabulary in 15 minutes a day',font=t2,fill=(255,214,153))
 fgw.convert('RGB').save('/workspace/logo/feature-graphic.png')
 # --- preview
 prev=Image.new('RGB',(1560,520),(236,239,244)); pd=ImageDraw.Draw(prev)

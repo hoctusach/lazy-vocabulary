@@ -30,7 +30,7 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
           Lazy Vocabulary
         </h1>
         <p className="mt-0.5 text-center text-sm font-medium" style={{ color: 'var(--lv-subheading)' }}>
-          {compact ? activeSet.name : 'Master vocabulary with passive learning!'}
+          {compact ? activeSet.name : 'Just 15 minutes a day with spaced repetition!'}
         </p>
         {!compact && (
           <p className="slogan-note">

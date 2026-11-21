@@ -45,11 +45,11 @@ const App = () => {
       <TooltipProvider>
         <Helmet>
           <title>
-            Lazy Vocabulary – Master English Vocabulary with Passive Learning
+            Lazy Vocabulary – Just 15 minutes a day with spaced repetition
           </title>
           <meta
             name="description"
-            content="Learn English vocabulary easily. Passive learning with audio, examples, and categorized words. Improve fluency by skimming and listening."
+            content="Just 15 minutes a day with spaced repetition to master English vocabulary."
           />
           <link rel="canonical" href="https://your-domain.com/" />
         </Helmet>
