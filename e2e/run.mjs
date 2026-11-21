@@ -16,13 +16,17 @@ process.env.E2E_DIST = DIST;
 const OUT = process.env.E2E_RESULTS || '/workspace/qa/e2e-results.json';
 const JOBS = Number(process.env.E2E_JOBS || 4);
 
-if (args.includes('--build') || !fs.existsSync(path.join(DIST, 'index.html'))) {
+// The bundle is always built with the Pro split enabled (VITE_ENABLE_PRO=true, the 1.0.2 configuration). The harness
+// seeds a Pro entitlement by default so older suites keep their expectations; tests pass { pro: false } for a free user.
+const MARKER = path.join(DIST, '.e2e-pro-flag');
+if (args.includes('--build') || !fs.existsSync(path.join(DIST, 'index.html')) || !fs.existsSync(MARKER)) {
   // Fake backend config only: never the repo .env values. Shell env wins over .env in Vite.
   const r = spawnSync('npx', ['vite', 'build', '--outDir', DIST, '--emptyOutDir'], {
     cwd: ROOT, stdio: 'inherit',
-    env: { ...process.env, VITE_SUPABASE_URL: 'http://fake-supabase.test', VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiJ9.e30.dummy', VITE_GA_MEASUREMENT_ID: 'G-FAKE' },
+    env: { ...process.env, VITE_SUPABASE_URL: 'http://fake-supabase.test', VITE_SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiJ9.e30.dummy', VITE_GA_MEASUREMENT_ID: 'G-FAKE', VITE_ENABLE_PRO: 'true' },
   });
   if (r.status !== 0) { console.error('build failed'); process.exit(2); }
+  fs.writeFileSync(MARKER, 'VITE_ENABLE_PRO=true\n');
 }
 // Guard: the bundle must point at the fake backend only (the hard-coded edge URL is intercepted at runtime).
 {

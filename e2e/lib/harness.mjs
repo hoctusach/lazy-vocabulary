@@ -50,7 +50,7 @@ export function signedInStorage(nick = 'e2e') {
 
 /**
  * Open a fresh incognito context + page.
- * opts: { signedIn=true, speech='stub'|'none'|'real', storage:{}, fake:{...}, viewport, noAutoEnd }
+ * opts: { pro=true (seed a Pro entitlement; pass false for a free user), signedIn=true, speech='stub'|'none'|'real', storage:{}, fake:{...}, viewport, noAutoEnd }
  */
 export async function newSession(opts = {}) {
   const { signedIn = true, speech = 'stub', storage = {}, viewport = VIEWPORT } = opts;
@@ -85,7 +85,8 @@ export async function newSession(opts = {}) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push('console.error: ' + m.text()); });
   page.on('requestfailed', () => {});
 
-  const store = { ...(signedIn ? signedInStorage() : {}), ...storage };
+  const proSeed = opts.pro === false ? {} : { 'lazyVoca.pro.v1': JSON.stringify({ active: true, productId: 'pro_unlock', updatedAt: 1 }) };
+  const store = { ...(signedIn ? signedInStorage() : {}), ...proSeed, ...storage };
   const init = `
     window.addEventListener('unhandledrejection', (e) => { (window.__rejections = window.__rejections || []).push(String(e.reason && (e.reason.stack || e.reason.message) || e.reason)); });
     try { if (!sessionStorage.getItem('__e2e_seeded')) {

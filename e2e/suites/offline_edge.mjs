@@ -127,6 +127,7 @@ test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session 
   await s.page.evaluate(() => { let n = 1 << 20; const f = 'x'.repeat(n); let i = 0; try { while (true) { localStorage.setItem('zz_fill' + i++, f); } } catch (e) {} for (const size of [65536, 4096, 256, 16, 1]) { const c = 'y'.repeat(size); for (;;) { try { localStorage.setItem('zz_fill' + i++, c); } catch (e) { break; } } } });
   await ctl(s, 'Next Word'); await sleep(400);
   await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
+  await sleep(2300); // the 2 s congrats popup covers the Speed button in the Cozy Sloth layout (new default theme)
   await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   await tab(s, 'More'); await click(s, { label: 'Pixel Quest' });
   await importFile(s, 'vocab.csv'); await sleep(900);

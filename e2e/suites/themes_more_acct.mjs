@@ -95,15 +95,15 @@ test('THEME-VARS', 'Theme CSS variables differ between the 5 themes', async ({ s
   eq(seen.size, 5, 'themes share identical variables');
 });
 skip('THEME-11', 'Unknown stored theme falls back to notes', 'covered by unit tests (tests/themes.test.tsx, tests/persistPlan.test.ts)');
-test('THEME-14', 'New users get Margin Notes (light); legacy stored themes migrate to notes, dark preference kept', async ({ session }) => {
+test('THEME-14', 'New users get Cozy Sloth (light, Pro split on); legacy stored themes migrate to sloth, dark preference kept', async ({ session }) => {
   const s = await session({ viewport: SHOT_VP }); await boot(s);
   const st = await s.page.evaluate(() => ({ cls: [...document.body.classList].filter((c) => c.startsWith('theme-')), dark: document.documentElement.classList.contains('dark') }));
-  eq(st.cls.join(), 'theme-notes'); eq(st.dark, false);
+  eq(st.cls.join(), 'theme-sloth'); eq(st.dark, false);
   await tab(s, 'More'); eq(await s.page.evaluate(() => document.querySelectorAll('[data-theme-option]').length), 5);
   for (const legacy of ['mint', 'morning', 'ocean', 'sakura', 'cyber', 'bogus']) {
     const g = await session({ viewport: SHOT_VP, storage: { 'user-theme': legacy, 'lv-dark': 'true' } }); await boot(g);
     const r = await g.page.evaluate(() => ({ cls: [...document.body.classList].filter((c) => c.startsWith('theme-')), dark: document.documentElement.classList.contains('dark'), ut: localStorage.getItem('user-theme') }));
-    eq(r.cls.join(), 'theme-notes', legacy); eq(r.dark, true, legacy + ' dark kept'); eq(r.ut, 'notes', legacy);
+    eq(r.cls.join(), 'theme-sloth', legacy); eq(r.dark, true, legacy + ' dark kept'); eq(r.ut, 'sloth', legacy);
     await g.close();
   }
 });
