@@ -34,7 +34,19 @@ export function getReminderPlugin(): Promise<ReminderPlugin | null> {
   }
   if (!Capacitor.isNativePlatform()) return Promise.resolve(null);
   cached ??= import('@capacitor/local-notifications')
-    .then((m) => m.LocalNotifications as unknown as ReminderPlugin)
+    // Wrap in a plain object: resolving a promise with the Capacitor proxy itself would
+    // probe `.then` on it and throw "not implemented".
+    .then((m): ReminderPlugin => {
+      const ln = m.LocalNotifications;
+      return {
+        checkPermissions: () => ln.checkPermissions(),
+        requestPermissions: () => ln.requestPermissions(),
+        getPending: () => ln.getPending(),
+        cancel: (o) => ln.cancel(o),
+        schedule: (o) => ln.schedule(o as never),
+        addListener: (e, cb) => ln.addListener(e as 'localNotificationActionPerformed', cb as never),
+      };
+    })
     .catch(() => null);
   return cached;
 }

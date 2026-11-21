@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 import type { VocabularyWord } from "@/types/vocabulary";
 import { buildQuiz, pickWordOfTheDay } from "@/features/quiz/quizEngine";
 import type { QuizQuestion } from "@/features/quiz/types";
+import { markStudiedToday } from "@/lib/reminders/studySignal";
 import { canStartQuiz, markQuizCompletedToday, recordQuizStart } from "@/features/quiz/quizService";
 import { hasFeature } from "@/services/billing/proFeatures";
 import { openProUpgrade } from "@/services/billing/proUpgradeStore";
@@ -69,6 +70,7 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
   const handleSelect = (option: string) => {
     if (selected) return;
     setSelected(option);
+    markStudiedToday('quiz');
     if (option === currentQuestion.correctMeaning) {
       setCorrectCount((count) => count + 1);
     }

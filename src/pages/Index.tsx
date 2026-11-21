@@ -1,10 +1,12 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import VocabularyAppWithLearning from '@/components/VocabularyAppWithLearning';
 import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import { useDailyReminder } from '@/hooks/useDailyReminder';
+import { useStudyReminders } from '@/hooks/useStudyReminders';
+import { OPEN_LEARN_EVENT } from '@/lib/reminders/localReminders';
 import { VocabularySetProvider, useVocabularySets } from '@/features/word-sets/VocabularySetContext';
 import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
 import ThemeMascot from '@/components/ThemeMascot';
@@ -53,6 +55,11 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
 const MobileHome: React.FC = () => {
   const [tab, setTab] = useState<AppTab>('learn');
   useAndroidBackButton(tab, setTab);
+  useEffect(() => {
+    const open = () => setTab('learn');
+    window.addEventListener(OPEN_LEARN_EVENT, open);
+    return () => window.removeEventListener(OPEN_LEARN_EVENT, open);
+  }, []);
   // Android app only: bottom banner on Progress/Sets. No-op on web.
   useBannerAds(tab);
 
@@ -101,6 +108,7 @@ const DesktopHome: React.FC = () => {
 
 const IndexBody: React.FC = () => {
   useDailyReminder();
+  useStudyReminders();
   const desktop = useIsDesktop();
   return desktop ? <DesktopHome /> : <MobileHome />;
 };

@@ -3,6 +3,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { estimateReadingTimeMs } from './readingTime';
+import { markStudiedToday } from '@/lib/reminders/studySignal';
 
 /** Shortest time a card stays up before auto-advance, even if speech ends or fails at once. */
 export const MIN_WORD_DWELL_MS = 1500;
@@ -167,6 +168,7 @@ class UnifiedSpeechController {
       epoch,
       onStart: () => {
         if (!this.canAdvance(epoch)) return;
+        if (!this.isMutedState) markStudiedToday('play');
         if (DEBUG_SPEECH) console.log('Word speech started:', word.word, 'epoch', epoch);
       },
       onEnd: () => {

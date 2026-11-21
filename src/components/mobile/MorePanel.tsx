@@ -7,6 +7,7 @@ import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
 import { isProEnabled } from '@/config/features';
 import ProCard from '@/components/mobile/ProCard';
+import RemindersCard from '@/components/mobile/RemindersCard';
 
 declare const __APP_VERSION__: string;
 const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
@@ -39,10 +40,12 @@ const MorePanel: React.FC = () => {
         <UserGreeting />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <ThemeSwitcher />
-          {/* Web Notification API is unavailable in the Android WebView and no native reminder plugin exists. */}
+          {/* Web Notification API is unavailable in the Android WebView; native uses RemindersCard below. */}
           {!native && <NotificationManager />}
         </div>
       </div>
+
+      <RemindersCard />
 
       <NaturalVoiceRow />
 

@@ -22,6 +22,7 @@ import {
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
+import { markStudiedToday } from '@/lib/reminders/studySignal';
 import { extractServerSummary } from '@/lib/progress/serverSummary';
 
 export type GenerateParams = {
@@ -771,6 +772,7 @@ export async function markWordReviewed(
     throw new Error('Word not found in today cache');
   }
 
+  markStudiedToday('mark');
   const { payload, progress } = applyReviewToWord(currentState.words[index]);
   const words = [...currentState.words];
 
@@ -852,6 +854,7 @@ export async function markWordAsNew(
   wordId: string
 ): Promise<MarkWordAsNewResult | null> {
   if (!userKey || !wordId) return null;
+  markStudiedToday('mark');
 
   const client = getSupabaseClient();
   if (!client) return null;
