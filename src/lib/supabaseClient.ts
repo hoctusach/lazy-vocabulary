@@ -3,33 +3,30 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { getAuthHeader } from './auth';
 import { resolveSupabaseConfig } from './db/supabase';
 
-function isValidJwt(token: string): boolean {
-  const parts = token.split('.');
-  return parts.length === 3 && parts.every((part) => part.length > 0);
-}
+export const SESSION_TOKEN_HEADER = 'X-Session-Token';
 
-function getSessionAuthorization(): string | null {
+/**
+ * The nickname+passcode session token is NOT a Supabase JWT. PostgREST needs
+ * the anon JWT in Authorization (set by supabase-js, left untouched here), so
+ * the session travels in its own header, which the SQL helpers look up in
+ * user_sessions.
+ */
+function getSessionToken(): string | null {
   const auth = getAuthHeader();
-  const raw = auth.Authorization ?? auth.authorization;
-  const normalized = raw?.trim();
-  if (!normalized) return null;
-
-  const token = normalized.split(/\s+/).slice(-1)[0] ?? '';
-  if (!isValidJwt(token)) return null;
-
-  return normalized;
+  const raw = (auth.Authorization ?? auth.authorization)?.trim();
+  if (!raw) return null;
+  const token = raw.split(/\s+/).slice(-1)[0] ?? '';
+  return token || null;
 }
 
-const authorizedFetch: typeof fetch = (input, init = {}) => {
-  const authHeader = getSessionAuthorization();
-  if (!authHeader) {
+export const authorizedFetch: typeof fetch = (input, init = {}) => {
+  const token = getSessionToken();
+  if (!token) {
     return fetch(input, init);
   }
 
-  const headers = new Headers(init.headers ?? {});
-  if (!headers.has('authorization')) {
-    headers.set('Authorization', authHeader);
-  }
+  const headers = new Headers(init.headers ?? (input instanceof Request ? input.headers : {}));
+  headers.set(SESSION_TOKEN_HEADER, token);
 
   return fetch(input, { ...init, headers });
 };
