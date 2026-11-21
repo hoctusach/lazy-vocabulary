@@ -6,7 +6,7 @@ const { ok, eq, waitText, click, body, boot, tab, importFile, waitWord, ctl } = 
 
 const SHOTS = '/workspace/qa/e2e-shots';
 fs.mkdirSync(SHOTS, { recursive: true });
-const THEMES = [['mint', 'Mint Breeze'], ['morning', 'Morning Glow'], ['ocean', 'Ocean Depth'], ['sakura', 'Sakura Dream'], ['cyber', 'Cyber Night']];
+const THEMES = [['notes', 'Margin Notes'], ['sloth', 'Cozy Sloth'], ['blocks', 'Bold Blocks'], ['pixel', 'Pixel Quest'], ['riso', 'Riso Zine']];
 const SHOT_VP = { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true, hasTouch: true };
 
 // ---- in-page colour helpers (injected per call) ----
@@ -94,33 +94,45 @@ test('THEME-VARS', 'Theme CSS variables differ between the 5 themes', async ({ s
   for (const [name, label] of THEMES) { await setTheme(s, name, label, false); await s.page.evaluate(PAGE_FNS); seen.add((await varContrast(s)).vars.join('|')); }
   eq(seen.size, 5, 'themes share identical variables');
 });
-skip('THEME-11', 'Unknown stored theme falls back to mint', 'covered by unit tests (tests/themeManager*.test.ts)');
+skip('THEME-11', 'Unknown stored theme falls back to notes', 'covered by unit tests (tests/themes.test.tsx, tests/persistPlan.test.ts)');
+test('THEME-14', 'New users get Margin Notes (light); legacy stored themes migrate to notes, dark preference kept', async ({ session }) => {
+  const s = await session({ viewport: SHOT_VP }); await boot(s);
+  const st = await s.page.evaluate(() => ({ cls: [...document.body.classList].filter((c) => c.startsWith('theme-')), dark: document.documentElement.classList.contains('dark') }));
+  eq(st.cls.join(), 'theme-notes'); eq(st.dark, false);
+  await tab(s, 'More'); eq(await s.page.evaluate(() => document.querySelectorAll('[data-theme-option]').length), 5);
+  for (const legacy of ['mint', 'morning', 'ocean', 'sakura', 'cyber', 'bogus']) {
+    const g = await session({ viewport: SHOT_VP, storage: { 'user-theme': legacy, 'lv-dark': 'true' } }); await boot(g);
+    const r = await g.page.evaluate(() => ({ cls: [...document.body.classList].filter((c) => c.startsWith('theme-')), dark: document.documentElement.classList.contains('dark'), ut: localStorage.getItem('user-theme') }));
+    eq(r.cls.join(), 'theme-notes', legacy); eq(r.dark, true, legacy + ' dark kept'); eq(r.ut, 'notes', legacy);
+    await g.close();
+  }
+});
 test('THEME-12', 'Overlays render readable in every theme (dark): dialogs, search, practice, AuthGate', async ({ session }) => {
   for (const [name] of THEMES) {
-    const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true', 'lv-theme': 'default' } }); await boot(s);
+    const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true' } }); await boot(s);
     await s.page.evaluate(() => document.documentElement.classList.add('dark'));
     for (const [open, ready, close] of [
       [() => ctl(s, 'Mark as LEARNED'), 'Are you sure', () => click(s, { text: 'Cancel' })],
       [() => ctl(s, 'Quick Search'), 'Quick Search', () => click(s, { text: 'Close' })],
     ]) {
-      await open(); await waitText(s, ready); await sleep(300);
+      await open(); await s.page.waitForFunction((t) => document.body.innerText.toLowerCase().includes(t.toLowerCase()), { timeout: 8000 }, ready); await sleep(300); // headings may be upper-cased by a theme
       const bad = await invisibleText(s); ok(bad.length === 0, `${name}: invisible text in ${ready}: ${bad}`);
       await close(); await sleep(250);
     }
     await s.close();
     const g = await session({ signedIn: false, viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true' } });
-    await g.goto('/'); await waitText(g, 'Access your vocabulary'); await sleep(400);
+    await g.goto('/'); await g.page.waitForFunction(() => document.body.innerText.toLowerCase().includes('access your vocabulary'), { timeout: 8000 }); await sleep(1200);
     const bad = await invisibleText(g); ok(bad.length === 0, `${name}: AuthGate invisible text: ${bad}`);
     await g.page.screenshot({ path: path.join(SHOTS, `${name}-dark-authgate.png`) });
     await g.close();
   }
 });
-test('THEME-13', 'Theme and dark mode persist after reload (Ocean + dark)', async ({ session }) => {
-  const s = await session({ viewport: SHOT_VP }); await boot(s); await setTheme(s, 'ocean', 'Ocean Depth', true);
+test('THEME-13', 'Theme and dark mode persist after reload (Pixel Quest + dark)', async ({ session }) => {
+  const s = await session({ viewport: SHOT_VP }); await boot(s); await setTheme(s, 'pixel', 'Pixel Quest', true);
   await s.reload();
   const st = await s.page.evaluate(() => ({ cls: [...document.body.classList], dark: document.documentElement.classList.contains('dark') }));
-  ok(st.cls.includes('theme-ocean') && st.dark, JSON.stringify(st));
-  await tab(s, 'More'); eq(await s.page.evaluate(() => document.querySelector('button[aria-label="Ocean Depth"]').getAttribute('aria-pressed')), 'true');
+  ok(st.cls.includes('theme-pixel') && st.dark, JSON.stringify(st));
+  await tab(s, 'More'); eq(await s.page.evaluate(() => document.querySelector('button[aria-label="Pixel Quest"]').getAttribute('aria-pressed')), 'true');
 });
 
 // ---------- MORE ----------
@@ -155,8 +167,8 @@ test('ACCT-01', 'Sign out: toast, gate, keys removed', async ({ session }) => {
 });
 test('ACCT-02', 'Sign out keeps sets, theme and preferences; sign-in again restores them', async ({ session }) => {
   const s = await session({ viewport: SHOT_VP }); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
-  await setTheme(s, 'ocean', 'Ocean Depth', false); await signOut(s); await waitText(s, 'Access your vocabulary');
-  ok(await s.ls('lv.vocabularySets.v1'), 'sets kept'); eq(await s.ls('user-theme'), 'ocean'); ok(await s.ls('lv_preferences'), 'prefs kept');
+  await setTheme(s, 'pixel', 'Pixel Quest', false); await signOut(s); await waitText(s, 'Access your vocabulary');
+  ok(await s.ls('lv.vocabularySets.v1'), 'sets kept'); eq(await s.ls('user-theme'), 'pixel'); ok(await s.ls('lv_preferences'), 'prefs kept');
   await s.page.type('input[placeholder="e.g., Mi mi U"]', 'e2e'); await s.page.type('input[type=password]', '1234'); await click(s, { text: 'Sign in' });
   await s.page.waitForFunction(() => localStorage.getItem('lazyVoca.nickname') === 'e2e', { timeout: 8000 }); await sleep(1800);
   await tab(s, 'Sets'); await waitText(s, 'setA');
@@ -168,9 +180,9 @@ test('ACCT-03', 'After sign-out + reload the gate shows and no stale session rem
 skip('ACCT-06', 'Delete account fails gracefully', 'product gap: no delete-account feature on this branch (ACCT-DEL-* belong to feat/play-store-ads-release)');
 
 // ---------- PERSIST ----------
-test('PERSIST-01', 'Theme persists (Ocean + dark)', async ({ session }) => {
-  const s = await session({ viewport: SHOT_VP }); await boot(s); await setTheme(s, 'ocean', 'Ocean Depth', true); await s.reload();
-  ok(await s.page.evaluate(() => document.body.classList.contains('theme-ocean') && document.documentElement.classList.contains('dark')));
+test('PERSIST-01', 'Theme persists (Pixel Quest + dark)', async ({ session }) => {
+  const s = await session({ viewport: SHOT_VP }); await boot(s); await setTheme(s, 'pixel', 'Pixel Quest', true); await s.reload();
+  ok(await s.page.evaluate(() => document.body.classList.contains('theme-pixel') && document.documentElement.classList.contains('dark')));
 });
 test('PERSIST-02', 'Active set persists; a set removed from storage falls back to built-in', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);

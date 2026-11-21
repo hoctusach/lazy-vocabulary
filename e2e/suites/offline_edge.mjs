@@ -32,8 +32,8 @@ test('OFFLINE-03', 'Local features work with the network down', async ({ session
   await U.cardBtn(s, 'setB', 'Delete'); await click(s, { text: 'Delete set' }); await waitText(s, 'Set deleted.');
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await click(s, { text: 'Close' });
   await tab(s, 'Learn'); await sleep(600);
-  await tab(s, 'More'); await click(s, { label: 'Ocean Depth' });
-  eq(await s.page.evaluate(() => document.body.classList.contains('theme-ocean')), true);
+  await tab(s, 'More'); await click(s, { label: 'Pixel Quest' });
+  eq(await s.page.evaluate(() => document.body.classList.contains('theme-pixel')), true);
 });
 test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do not crash', async ({ session }) => {
   const s = await session({}); s.allow.push(NET); await boot(s);
@@ -128,7 +128,7 @@ test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session 
   await ctl(s, 'Next Word'); await sleep(400);
   await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
   await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
-  await tab(s, 'More'); await click(s, { label: 'Sakura Dream' });
+  await tab(s, 'More'); await click(s, { label: 'Pixel Quest' });
   await importFile(s, 'vocab.csv'); await sleep(900);
   ok(await s.page.evaluate(() => (document.getElementById('root')?.children.length || 0) > 0), 'blank root');
   ok(/too large|Imported|could not|Could not|store/i.test(await body(s)), 'import gave no feedback: ' + (await body(s)).slice(0, 200));
@@ -159,8 +159,8 @@ test('EDGE-13', 'HTML/script in imported text is inert in Learn, Quiz and Search
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /<img src=x/.test(document.querySelector('main')?.innerText || ''), { timeout: 10000 }).catch(async () => { for (let i = 0; i < 4; i++) { await ctl(s, 'Next Word'); await sleep(450); if (/<img/.test(await body(s))) break; } });
   ok(/<img src=x/.test(await body(s)), 'text rendered literally');
   eq(await s.page.evaluate(() => window.__xss), undefined, 'script ran');
-  eq(await s.page.evaluate(() => document.querySelectorAll('main img, main script, [role=dialog] img').length), 0, 'injected elements');
+  eq(await s.page.evaluate(() => document.querySelectorAll('main img:not([data-mascot]), main script, [role=dialog] img:not([data-mascot])').length), 0, 'injected elements');
   await tab(s, 'Progress'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); eq(await s.page.evaluate(() => window.__xss), undefined);
-  await click(s, { text: 'Close' }); await tab(s, 'Learn'); await ctl(s, 'Quick Search'); await s.page.click('input[placeholder="Search word..."]'); await s.page.keyboard.type('img'); await sleep(1200);
+  await click(s, { text: 'Close' }); await tab(s, 'Learn'); await sleep(600); await s.page.evaluate(() => document.querySelector('button[aria-label="Quick Search"]').click()); await sleep(600); await s.page.click('input[placeholder="Search word..."]'); await s.page.keyboard.type('img'); await sleep(1200);
   eq(await s.page.evaluate(() => window.__xss), undefined, 'script ran in search'); eq(await s.page.evaluate(() => document.querySelectorAll('[role=dialog] img').length), 0);
 });

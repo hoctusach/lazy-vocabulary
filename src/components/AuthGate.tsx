@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import ThemeMascot from '@/components/ThemeMascot';
 import { toast } from 'sonner';
 import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
 import { sanitizeNickname } from '@/services/nicknameService';
@@ -369,6 +370,7 @@ export default function AuthGate() {
     >
       <form
         onSubmit={onSubmit}
+        className="lv-authgate-form"
         style={{
           width: 'min(420px, calc(100vw - 24px))',
           maxHeight: 'calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))',
@@ -382,6 +384,7 @@ export default function AuthGate() {
           position: 'relative',
         }}
       >
+        <ThemeMascot className="lv-authgate-mascot" />
         <h3 style={{ margin: 0 }}>{isCreateMode ? 'Create your profile' : 'Access your vocabulary'}</h3>
         <p style={{ marginTop: 6, color: 'var(--lv-helper-text)', fontSize: 14 }}>{modeDescription}</p>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>

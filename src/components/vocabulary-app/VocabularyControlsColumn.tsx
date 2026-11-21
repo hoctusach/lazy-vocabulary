@@ -129,17 +129,17 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   };
 
   const controlClass =
-    'h-11 min-h-11 w-full flex-col gap-1 px-1 py-1 text-[11px] leading-none md:h-11 md:w-11 md:flex-row md:px-0';
+    'lv-ctl h-11 min-h-11 w-full flex-col gap-1 px-1 py-1 text-[11px] leading-none md:h-11 md:w-11 md:flex-row md:px-0';
 
   return (
-    <div className="grid w-full grid-cols-4 gap-2 md:flex md:w-auto md:flex-col md:items-end">
+    <div className="lv-controls grid w-full grid-cols-4 gap-2 md:flex md:w-auto md:flex-col md:items-end">
       <Button
         variant="outline"
         size="sm"
         onClick={handleToggleMute}
         className={cn(
           controlClass,
-          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          'lv-ctl-mute border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
           isMuted
             ? 'text-purple-700 border-purple-300 bg-purple-50 dark:text-purple-100 dark:border-purple-700 dark:bg-purple-900/40'
             : ''
@@ -157,7 +157,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleTogglePause}
         className={cn(
           controlClass,
-          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
+          'lv-ctl-pause border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
           isPaused
             ? 'text-orange-700 border-orange-300 bg-orange-50 dark:text-orange-200 dark:border-orange-700 dark:bg-orange-900/40'
             : ''
@@ -173,7 +173,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         variant="outline"
         size="sm"
         onClick={handleNextWord}
-        className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
+        className={cn(controlClass, 'lv-ctl-next border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
         title="Next Word"
         aria-label="Next Word"
       >
@@ -187,7 +187,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         onClick={handleCycleVoice}
         className={cn(
           controlClass,
-          'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
+          'lv-ctl-voice border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
           allVoices.length < 2 ? 'cursor-not-allowed opacity-50' : ''
         )}
         title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
@@ -198,7 +198,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <span className="md:sr-only">Voice</span>
       </Button>
 
-      <SpeechRateControl rate={speechRate} onChange={handleRateChange} buttonClassName={controlClass} />
+      <SpeechRateControl rate={speechRate} onChange={handleRateChange} buttonClassName={cn(controlClass, 'lv-ctl-rate')} />
       <Button
         variant="outline"
         size="sm"
@@ -208,7 +208,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           });
           onOpenSearch();
         }}
-        className={cn(controlClass, 'border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
+        className={cn(controlClass, 'lv-ctl-search border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900')}
         title="Quick Search"
         aria-label="Quick Search"
       >
@@ -222,7 +222,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Button
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="col-span-2 h-11 min-h-11 w-full gap-2 border border-transparent bg-[var(--lv-success)] px-2 text-sm font-bold text-[var(--lv-on-success)] hover:bg-[var(--lv-success)] hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-11"
+          className="lv-ctl-mark col-span-2 h-11 min-h-11 w-full gap-2 border border-transparent bg-[var(--lv-success)] px-2 text-sm font-bold text-[var(--lv-on-success)] hover:bg-[var(--lv-success)] hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-11"
           title="Mark as LEARNED"
           aria-label="Mark as LEARNED"
           disabled={!currentWord}

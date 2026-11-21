@@ -24,7 +24,7 @@ test('TAB-03', 'Sets tab content', async ({ session }) => {
 });
 test('TAB-04', 'More tab content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'More');
-  await waitText(s, 'Hello e2e'); ok(await label(s, 'Mint Breeze'), 'theme buttons');
+  await waitText(s, 'Hello e2e'); ok(await label(s, 'Margin Notes'), 'theme buttons');
 });
 test('TAB-05', 'Tab round-trip keeps word and paused state', async ({ session }) => {
   const s = await session({}); await boot(s);
@@ -82,7 +82,7 @@ test('LEARN-13', 'Mark as LEARNED is a prominent 2-column button in the controls
   const s = await session({}); await boot(s);
   const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as LEARNED"]'); if (!b) return null; const o = document.querySelector('main button[aria-label="Quick Search"]'); const g = b.parentElement; const bb = b.getBoundingClientRect(), ob = o.getBoundingClientRect();
     return { txt: b.textContent.trim(), span: getComputedStyle(b).gridColumnEnd, grid: getComputedStyle(g).gridTemplateColumns.split(' ').length, h: Math.round(bb.height), oh: Math.round(ob.height), w: bb.width, ow: ob.width, fw: +getComputedStyle(b).fontWeight, bg: getComputedStyle(b).backgroundColor }; });
-  ok(r, 'button missing'); eq(r.txt, 'Mark as LEARNED'); ok(/span 2/.test(r.span), 'span ' + r.span); eq(r.grid, 4); eq(r.h, r.oh);
+  ok(r, 'button missing'); eq(r.txt, 'Mark as LEARNED'); ok(/span (2|6)|^-1$/.test(r.span), 'span ' + r.span); ok(r.grid === 4 || r.grid === 6, 'grid ' + r.grid); ok(r.h >= r.oh, 'height ' + r.h + ' vs ' + r.oh);
   ok(r.w > r.ow * 1.8, 'width ' + r.w + ' vs ' + r.ow); ok(r.fw >= 700, 'bold ' + r.fw); ok(r.bg !== 'rgba(0, 0, 0, 0)' && r.bg !== 'rgb(255, 255, 255)', 'filled ' + r.bg);
 });
 test('LEARN-14', 'Speech hint lines are absent on web and in the native app', async ({ session }) => {

@@ -7,6 +7,7 @@ import NotificationManager from '@/components/NotificationManager';
 import { useDailyReminder } from '@/hooks/useDailyReminder';
 import { VocabularySetProvider, useVocabularySets } from '@/features/word-sets/VocabularySetContext';
 import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
+import ThemeMascot from '@/components/ThemeMascot';
 import MorePanel from '@/components/mobile/MorePanel';
 import BottomTabBar, { type AppTab } from '@/components/mobile/BottomTabBar';
 import { useIsDesktop } from '@/components/mobile/useIsDesktop';
@@ -18,15 +19,16 @@ const AppHeader: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { activeSet } = useVocabularySets();
   return (
     <header
-      className="sticky top-0 z-30 border-b bg-[var(--lv-body-bg)]/95 backdrop-blur"
+      className="lv-header sticky top-0 z-30 border-b bg-[var(--lv-body-bg)]"
       style={{
         borderColor: 'var(--lv-border-color)',
         paddingTop: 'env(safe-area-inset-top)',
       }}
     >
       <div className={compact ? 'px-4 py-3' : 'px-4 pb-3 pt-4'}>
-        <h1 className="text-center text-xl font-bold" style={{ color: 'var(--lv-heading)' }}>
-          Lazy Vocabulary
+        <h1 className="lv-brand text-center text-xl font-bold" style={{ color: 'var(--lv-heading)' }}>
+          <ThemeMascot className="lv-header-mascot" />
+          <span className="lv-brand-text">Lazy Vocabulary</span>
         </h1>
         <p className="mt-0.5 text-center text-sm font-medium" style={{ color: 'var(--lv-subheading)' }}>
           {compact ? activeSet.name : 'Just 15 minutes a day with spaced repetition!'}
