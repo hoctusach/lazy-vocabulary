@@ -23,7 +23,6 @@ vi.mock('sonner', () => ({ toast: Object.assign(vi.fn(), { success: vi.fn(), err
 vi.mock('@/components/UserGreeting', () => ({ default: () => null }));
 vi.mock('@/components/ThemeSwitcher', () => ({ default: () => null }));
 vi.mock('@/components/NotificationManager', () => ({ default: () => null }));
-vi.mock('@/components/vocabulary-app/FriendCompareCard', () => ({ default: () => null }));
 vi.mock('@/services/speech/nativeTts', () => ({ isNativePlatform: () => platform.native }));
 
 import * as ent from '../entitlement';

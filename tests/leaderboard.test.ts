@@ -1,132 +1,66 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
-  rows: [] as Array<Record<string, unknown>>,
-  fromCalls: [] as string[],
-  activeSession: null as null | Record<string, unknown>,
-  progressSummary: null as null | Record<string, unknown>,
+  session: { user_unique_key: 'me' } as null | Record<string, unknown>,
+  rpc: vi.fn(),
+  from: vi.fn(),
 }));
 
-vi.mock('@/lib/auth', () => ({
-  getActiveSession: vi.fn(async () => mocks.activeSession),
-}));
-
-vi.mock('@/lib/nickname', () => ({
-  getNicknameLocal: vi.fn(() => 'Local You'),
-}));
-
-vi.mock('@/lib/supabaseClient', () => ({
-  getSupabaseClient: vi.fn(() => ({
-    from: vi.fn((table: string) => {
-      mocks.fromCalls.push(table);
-      return {
-        select: vi.fn(async () => ({ data: mocks.rows, error: null })),
-      };
-    }),
-  })),
-}));
-
-vi.mock('@/lib/progress/progressSummary', () => ({
-  getProgressSummary: vi.fn(async () => mocks.progressSummary),
-}));
+vi.mock('@/lib/auth', () => ({ ensureSupabaseAuthSession: vi.fn(async () => mocks.session) }));
+vi.mock('@/lib/supabaseClient', () => ({ getSupabaseClient: vi.fn(() => ({ rpc: mocks.rpc, from: mocks.from })) }));
 
 import { getLeaderboardState } from '@/lib/progress/leaderboard';
 
-describe('leaderboard state', () => {
-  beforeEach(() => {
-    mocks.rows = [];
-    mocks.fromCalls = [];
-    mocks.activeSession = null;
-    mocks.progressSummary = null;
-  });
-
-  it('ranks the top five from learned_words counts by learned words and then learning count', async () => {
-    mocks.rows = [
-      ...rows('beta', 8, 1),
-      ...rows('alpha', 10, 2),
-      ...rows('charlie', 10, 7),
-      ...rows('delta', 9, 9),
-      ...rows('echo', 7, 20),
-      ...rows('foxtrot', 6, 50),
-    ];
-
-    const state = await getLeaderboardState();
-
-    expect(mocks.fromCalls).toEqual(['learned_words']);
-    expect(state.entries.map((entry) => [entry.rank, entry.userKey, entry.learnedWords, entry.learningWords])).toEqual([
-      [1, 'charlie', 10, 7],
-      [2, 'alpha', 10, 2],
-      [3, 'delta', 9, 9],
-      [4, 'beta', 8, 1],
-      [5, 'echo', 7, 20],
-    ]);
-  });
-
-  it('keeps an outside current user separate with current local counts', async () => {
-    mocks.activeSession = { user_unique_key: 'you', name: 'You' };
-    mocks.progressSummary = { learned_count: 1, learning_count: 1, learning_due_count: 0, learned_days: [] };
-    mocks.rows = [
-      ...rows('first', 10, 1),
-      ...rows('second', 9, 1),
-      ...rows('third', 8, 1),
-      ...rows('fourth', 7, 1),
-      ...rows('fifth', 6, 1),
-    ];
-
-    const state = await getLeaderboardState({
-      currentUserLearnedCount: 3,
-      currentUserLearningCount: 4,
-      currentUserDueCount: 2,
-    });
-
-    expect(state.entries).toHaveLength(5);
-    expect(state.entries.some((entry) => entry.userKey === 'you')).toBe(false);
-    expect(state.currentUserEntry).toMatchObject({
-      userKey: 'you',
-      rank: 6,
-      learnedWords: 3,
-      learningWords: 4,
-      dueWords: 2,
-      isCurrentUser: true,
-    });
-  });
-
-  it('moves the current user into the top five when current counts qualify', async () => {
-    mocks.activeSession = { user_unique_key: 'you', name: 'You' };
-    mocks.rows = [
-      ...rows('first', 10, 1),
-      ...rows('second', 9, 1),
-      ...rows('third', 8, 1),
-      ...rows('fourth', 7, 1),
-      ...rows('fifth', 6, 1),
-    ];
-
-    const state = await getLeaderboardState({
-      currentUserLearnedCount: 11,
-      currentUserLearningCount: 4,
-      currentUserDueCount: 2,
-    });
-
-    expect(state.entries).toHaveLength(5);
-    expect(state.entries[0]).toMatchObject({ userKey: 'you', rank: 1, learnedWords: 11, learningWords: 4 });
-    expect(state.entries.filter((entry) => entry.userKey === 'you')).toHaveLength(1);
-    expect(state.currentUserEntry?.rank).toBe(1);
-  });
+const row = (user_key: string, rank: number, learned: number, me = false) => ({
+  user_key, nickname: user_key.toUpperCase(), rank, learned_words: learned, learning_words: 1, due_words: 0, is_current_user: me,
 });
 
-function rows(userKey: string, learnedCount: number, learningCount: number, dueCount = 0) {
-  return [
-    ...Array.from({ length: learnedCount }, (_, index) => ({
-      user_unique_key: userKey,
-      word_id: `${userKey}-learned-${index}`,
-      srs_state: 'learned',
-      next_review_at: null,
-    })),
-    ...Array.from({ length: learningCount }, (_, index) => ({
-      user_unique_key: userKey,
-      word_id: `${userKey}-learning-${index}`,
-      srs_state: 'learning',
-      next_review_at: index < dueCount ? '2020-01-01T00:00:00Z' : '2999-01-01T00:00:00Z',
-    })),
-  ];
-}
+describe('friends leaderboard state', () => {
+  beforeEach(() => {
+    mocks.session = { user_unique_key: 'me' };
+    mocks.rpc.mockReset();
+    mocks.from.mockReset();
+  });
+
+  it('calls get_friends_leaderboard (never selects learned_words) and maps ranked rows', async () => {
+    mocks.rpc.mockResolvedValue({ data: [row('amy', 1, 9), row('me', 2, 4, true)], error: null });
+    const state = await getLeaderboardState();
+    expect(mocks.rpc).toHaveBeenCalledWith('get_friends_leaderboard', { p_period: 'allTime' });
+    expect(mocks.from).not.toHaveBeenCalled();
+    expect(state.entries.map((e) => [e.rank, e.userKey, e.learnedWords])).toEqual([[1, 'amy', 9], [2, 'me', 4]]);
+    expect(state.currentUserEntry).toMatchObject({ userKey: 'me', isCurrentUser: true, nickname: 'ME' });
+  });
+
+  it.each(['today', 'week', 'allTime'] as const)('passes period %s through', async (period) => {
+    mocks.rpc.mockResolvedValue({ data: [row('me', 1, 0, true)], error: null });
+    const state = await getLeaderboardState({ period });
+    expect(mocks.rpc).toHaveBeenCalledWith('get_friends_leaderboard', { p_period: period });
+    expect(state.timeframe).toBe(period);
+  });
+
+  it('empty friends: only me', async () => {
+    mocks.rpc.mockResolvedValue({ data: [row('me', 1, 3, true)], error: null });
+    const state = await getLeaderboardState();
+    expect(state.entries).toHaveLength(1);
+    expect(state.entries[0].isCurrentUser).toBe(true);
+  });
+
+  it('signed out: no backend call, no entries', async () => {
+    mocks.session = null;
+    const state = await getLeaderboardState();
+    expect(state).toMatchObject({ signedOut: true, entries: [] });
+    expect(mocks.rpc).not.toHaveBeenCalled();
+  });
+
+  it('expired server session (28000) reads as signed out', async () => {
+    mocks.rpc.mockResolvedValue({ data: null, error: { code: '28000', message: 'invalid session' } });
+    expect(await getLeaderboardState()).toMatchObject({ signedOut: true, entries: [] });
+  });
+
+  it('backend failure gives an error message, not a crash', async () => {
+    mocks.rpc.mockRejectedValue(new TypeError('Failed to fetch'));
+    const state = await getLeaderboardState();
+    expect(state.entries).toEqual([]);
+    expect(state.error).toMatch(/unavailable/i);
+  });
+});

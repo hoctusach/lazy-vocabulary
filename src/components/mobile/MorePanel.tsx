@@ -4,7 +4,6 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import NaturalVoicesCard from '@/components/mobile/NaturalVoicesCard';
 import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
-import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
 import { isProEnabled } from '@/config/features';
 import ProCard from '@/components/mobile/ProCard';
@@ -32,8 +31,6 @@ const MorePanel: React.FC = () => {
           More
         </h2>
       </div>
-
-      <FriendCompareCard />
 
       {isProEnabled() && isBillingSupported() && <ProCard />}
 

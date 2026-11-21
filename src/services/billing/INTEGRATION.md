@@ -38,7 +38,7 @@ useEffect(() => { void setBannerWanted(show); }, [show]);
 ## Merge order / conflicts
 1. Merge this branch (billing) first, then the ads branch (or vice versa; the integration is only the three imports above).
 2. Likely conflict files:
-   - `src/components/mobile/MorePanel.tsx` – this branch adds `<ProCard />` (gated by `isBillingSupported()`) under `FriendCompareCard`; ads branch adds account/privacy links under `UserGreeting`. Keep both.
+   - `src/components/mobile/MorePanel.tsx` – this branch adds `<ProCard />` (gated by `isBillingSupported()`); ads branch adds account/privacy links under `UserGreeting`. Keep both.
    - `android/app/src/main/AndroidManifest.xml` – this adds `com.android.vending.BILLING`; ads branch adds `AD_ID` permission and AdMob `<meta-data>`. Keep both.
    - `package.json` / `package-lock.json` – both add a dependency; resolve package.json by hand, then `npm install` to regenerate the lock.
    - `src/App.tsx` – this adds `initBilling()` next to `initNativeShell()`; ads init may land nearby.

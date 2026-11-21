@@ -5,7 +5,6 @@ import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import { useDailyReminder } from '@/hooks/useDailyReminder';
-import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
 import { VocabularySetProvider, useVocabularySets } from '@/features/word-sets/VocabularySetContext';
 import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
 import MorePanel from '@/components/mobile/MorePanel';
@@ -79,7 +78,6 @@ const DesktopHome: React.FC = () => {
     <div className="min-h-screen transition-colors duration-300" data-layout="desktop">
       <AppHeader />
       <main className="container mx-auto px-4">
-        <FriendCompareCard className="mb-2" />
         <VocabularyAppWithLearning />
         <div className="mx-auto mt-6 max-w-6xl px-4">
           <VocabularySetsScreen />
