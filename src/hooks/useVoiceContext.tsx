@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
+import { nextAllowedVoice, sanitizeVoiceName } from '@/services/speech/voiceAccess';
 import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 import { isKokoroVoiceName } from '@/services/speech/kokoro/kokoroVoices';
 import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
@@ -26,7 +27,7 @@ export const useVoiceContext = (): VoiceContext => {
       logAvailableVoices(voices);
       setAllVoices(voices);
 
-      const favorite = getFavoriteVoice();
+      const favorite = sanitizeVoiceName(getFavoriteVoice());
       const preferred = favorite
         ? voices.find(v => v.name === favorite)
         : undefined;
@@ -58,9 +59,8 @@ export const useVoiceContext = (): VoiceContext => {
 
   const cycleVoice = () => {
     if (allVoices.length < 2) return;
-    const index = allVoices.findIndex(v => v.name === selectedVoiceName);
-    const nextIndex = (index + 1) % allVoices.length;
-    const nextVoice = allVoices[nextIndex];
+    const nextVoice = nextAllowedVoice(allVoices, selectedVoiceName);
+    if (!nextVoice) return;
     markVoiceExplicit();
     setSelectedVoiceName(nextVoice.name);
     setFavoriteVoice(nextVoice.name);

@@ -1,4 +1,6 @@
 import { getKokoro, getKokoroState, isKokoroSupported, refreshKokoroStatus, subscribeKokoro } from './kokoro/kokoroTts';
+import { freeKokoroVoice, isProVoice } from './voiceAccess';
+import { hasFeature } from '@/services/billing/proFeatures';
 import { KOKORO_VOICES, getKokoroVoiceByName, mapRateToKokoroSpeed } from './kokoro/kokoroVoices';
 import { buildSpeakOptions, loadNativeTts, pickVoiceIndex, shouldUseNativeTts, type NativeVoice } from './nativeTts';
 
@@ -139,7 +141,9 @@ class ShimSynth extends EventTarget {
     u.emit('start');
     let errorType: string | null = null;
     try {
-      const kv = getKokoroVoiceByName(u.voice?.name);
+      let kv = getKokoroVoiceByName(u.voice?.name);
+      // Never speak a Pro voice for a free user (stale selection, saved favorite): Heart if ready, else the system voice.
+      if (kv && isProVoice(kv) && !hasFeature('maleVoice')) kv = getKokoroState().downloaded ? freeKokoroVoice() : undefined;
       let spoken = false;
       if (kv) {
         this.kokoroUsed = true;

@@ -6,6 +6,7 @@ import { unifiedSpeechController } from '@/services/speech/unifiedSpeechControll
 import { stopSpeechForUserIntent } from '@/services/speech/stopSpeechForUserIntent';
 import { toast } from 'sonner';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { nextAllowedVoice } from '@/services/speech/voiceAccess';
 import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 
 export const useVocabularyControls = (
@@ -34,9 +35,8 @@ export const useVocabularyControls = (
 
   const toggleVoice = useCallback(() => {
     if (allVoices.length < 2) return;
-    const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
-    const nextIndex = (currentIndex + 1) % allVoices.length;
-    const nextVoice = allVoices[nextIndex];
+    const nextVoice = nextAllowedVoice(allVoices, selectedVoiceName);
+    if (!nextVoice) return;
     markVoiceExplicit();
     setSelectedVoiceName(nextVoice.name);
     setFavoriteVoice(nextVoice.name);
