@@ -417,7 +417,7 @@ export default function AuthGate() {
           }}
         />
         <div style={{ marginTop: 4, fontSize: 12, color: 'var(--lv-helper-text)' }}>
-          Names match case-insensitively and ignore spaces. Allowed: most characters; blocked: {BLOCKED_CHARS_HELP}
+          {/[<>"'`$\\{}|;]/.test(s.nickname) ? `Can't use: ${BLOCKED_CHARS_HELP}` : 'Not case-sensitive; spaces are ignored.'}
         </div>
         <label style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
           Passcode

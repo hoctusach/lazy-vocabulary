@@ -110,10 +110,10 @@ skip('LEARN-03', 'Previous button absent', 'product gap');
 test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ session }) => {
   const s = await session({ storage: { speechUnlocked: 'false' } });
   await s.goto('/'); await waitWord(s, W[0], 12000);
-  await waitText(s, 'Tap anywhere to turn the audio on');
+  await waitText(s, 'Tap anywhere to start listening');
   eq((await U.speechCalls(s)).filter((c) => U.re0.test(c.text)).length, 0, 'spoke before unlock');
   await s.page.touchscreen.tap(200, 700);
-  await U.waitGone(s, 'Tap anywhere to turn the audio on'); await waitSpeech(s, U.re0);
+  await U.waitGone(s, 'Tap anywhere to start listening'); await waitSpeech(s, U.re0);
 });
 test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ session }) => {
   const s = await session({}); await boot(s);

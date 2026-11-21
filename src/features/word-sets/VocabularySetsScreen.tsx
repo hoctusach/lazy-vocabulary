@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Check, Download, FileSpreadsheet, Pencil, Trash2, Upload } from 'lucide-react';
+import { Check, Pencil, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -161,9 +161,17 @@ const VocabularySetsScreen: React.FC = () => {
           Word sets
         </h2>
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
-          Tick any mix of the built-in groups and your imported sets: the Learn queue draws only from what is ticked.
-          "Word Set: C1, C2" is the built-in collection (six groups) and its progress syncs with your account. Imported
-          sets stay on this device, and each one keeps its own learned words.
+          Tick what you want to learn. Learn only plays ticked sets.{' '}
+          <details className="inline" data-testid="sets-how">
+            <summary className="inline cursor-pointer underline" style={{ color: 'var(--lv-link, var(--lv-heading))' }}>
+              How?
+            </summary>
+            <span className="mt-1 block">
+              Mix the built-in groups and your imported sets. "Word Set: C1, C2" is the built-in collection (six groups)
+              and its progress syncs with your account. Imported sets stay on this device, and each one keeps its own
+              learned words.
+            </span>
+          </details>
         </p>
         <p
           role="status"
@@ -186,7 +194,7 @@ const VocabularySetsScreen: React.FC = () => {
           <div>
             <h3 className="text-base font-semibold">Import a set</h3>
             <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
-              CSV, Excel (.xlsx), or JSON. Required columns: word and meaning.
+              CSV, Excel or JSON with word and meaning columns.
             </p>
           </div>
           <Button
@@ -212,17 +220,14 @@ const VocabularySetsScreen: React.FC = () => {
             }}
           />
         </div>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <Button type="button" variant="outline" className="min-h-11 flex-1" onClick={() => void downloadCsv()}>
-            <Download className="h-4 w-4" />
+        <div className="mt-2 flex flex-wrap items-center gap-x-1">
+          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadCsv()}>
             CSV template
           </Button>
-          <Button type="button" variant="outline" className="min-h-11 flex-1" onClick={() => void downloadXlsx()}>
-            <FileSpreadsheet className="h-4 w-4" />
+          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadXlsx()}>
             Excel template
           </Button>
-          <Button type="button" variant="outline" className="min-h-11 flex-1" onClick={() => void downloadJson()}>
-            <Download className="h-4 w-4" />
+          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadJson()}>
             JSON template
           </Button>
         </div>

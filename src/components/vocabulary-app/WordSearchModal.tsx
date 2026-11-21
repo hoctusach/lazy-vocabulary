@@ -339,6 +339,11 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                 <Loader className="h-4 w-4 animate-spin" />
               </div>
             )}
+            {!loading && results.length === 0 && !debouncedQuery.trim() && (
+              <p className="p-3 text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                Type a word to look it up.
+              </p>
+            )}
             {results.map((item) => {
               const isSelected = selectedWord?.word_id === item.word_id;
               return (

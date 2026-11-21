@@ -59,11 +59,6 @@ const MorePanel: React.FC = () => {
             How to do it?
           </a>
         </p>
-        {!native && (
-          <p className="mt-3" style={{ color: 'var(--lv-text-secondary)' }}>
-            Tap anywhere once if speech does not start. Browsers block audio until you interact with the page.
-          </p>
-        )}
         <p className="mt-4 text-xs" style={{ color: 'var(--lv-helper-text)' }}>
           Lazy Vocabulary{APP_VERSION ? ` v${APP_VERSION}` : ''} · © 2025 Lazy Vocabulary - hoctusach@gmail.com
         </p>
