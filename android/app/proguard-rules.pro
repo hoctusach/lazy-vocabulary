@@ -42,3 +42,6 @@
 -dontwarn com.google.android.ump.**
 -dontwarn com.google.android.gms.internal.ads.**
 -dontwarn org.apache.cordova.**
+
+# sherpa-onnx (Kokoro on-device TTS): the JNI layer reflects on Kotlin fields/classes
+-keep class com.k2fsa.sherpa.onnx.** { *; }

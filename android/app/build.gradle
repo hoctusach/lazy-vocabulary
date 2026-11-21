@@ -34,6 +34,8 @@ android {
         versionCode = ((project.findProperty("versionCode") ?: "1") as String).toInteger()
         versionName = (project.findProperty("versionName") ?: "1.0.0") as String
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        // sherpa-onnx ships no 32-bit x86 build we want to carry (saves ~10 MB).
+        ndk { abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64' }
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
              // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
@@ -74,6 +76,9 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
+    // sherpa-onnx (Kokoro on-device TTS): fetched + sha256-verified by the downloadSherpaAar task below. Not committed.
+    implementation files('libs-sherpa/sherpa-onnx-static-link-onnxruntime-2.0.2.aar')
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:2.2.20' // the sherpa-onnx AAR is written in Kotlin
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
@@ -129,6 +134,47 @@ afterEvaluate {
         }
     }
 }
+
+// Debug APKs are sideloaded for testing: compress native libs (sherpa-onnx ~70 MB raw for 3 ABIs -> ~28 MB).
+// Release/AAB keeps the default (uncompressed, page-aligned); Play splits per ABI and compresses the download.
+androidComponents {
+    onVariants(selector().withBuildType("debug")) { variant ->
+        variant.packaging.jniLibs.useLegacyPackaging.set(true)
+    }
+}
+
+// ---- sherpa-onnx AAR (not committed): download once, verify sha256, fail the build on mismatch ----
+def SHERPA_AAR_NAME = "sherpa-onnx-static-link-onnxruntime-2.0.2.aar"
+def SHERPA_AAR_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/v2.0.2/${SHERPA_AAR_NAME}"
+def SHERPA_AAR_SHA256 = "cb73564809268c8b96bf98f1a32b0b3b611e01d028d22f10beb57ef55418c0cb"
+def sherpaAar = file("libs-sherpa/${SHERPA_AAR_NAME}")
+def sha256Of = { File f ->
+    def md = java.security.MessageDigest.getInstance("SHA-256")
+    f.withInputStream { is ->
+        byte[] buf = new byte[1 << 16]
+        int n
+        while ((n = is.read(buf)) > 0) md.update(buf, 0, n)
+    }
+    md.digest().collect { String.format("%02x", it) }.join()
+}
+tasks.register("downloadSherpaAar") {
+    outputs.file(sherpaAar)
+    doLast {
+        if (!sherpaAar.exists()) {
+            sherpaAar.parentFile.mkdirs()
+            def tmp = new File(sherpaAar.parentFile, SHERPA_AAR_NAME + ".part")
+            logger.lifecycle("Downloading ${SHERPA_AAR_URL} ...")
+            new URL(SHERPA_AAR_URL).openStream().withCloseable { is -> tmp.withOutputStream { os -> os << is } }
+            if (!tmp.renameTo(sherpaAar)) throw new GradleException("Could not move ${tmp} to ${sherpaAar}")
+        }
+        def actual = sha256Of(sherpaAar)
+        if (actual != SHERPA_AAR_SHA256) {
+            sherpaAar.delete()
+            throw new GradleException("sherpa-onnx AAR sha256 mismatch: expected ${SHERPA_AAR_SHA256}, got ${actual}. The file was deleted.")
+        }
+    }
+}
+tasks.matching { it.name == "preBuild" }.configureEach { dependsOn("downloadSherpaAar") }
 
 try {
     def servicesJSON = file('google-services.json')

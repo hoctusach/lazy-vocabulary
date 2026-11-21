@@ -124,3 +124,21 @@ Verify against the final app; these are starting points, not legal advice.
 - Passcodes are stored unhashed in `nicknames.passcode` and in device `localStorage` (existing behaviour; the privacy policy says so). Consider hashing + rate limiting.
 - On a real device, confirm the banner sits exactly above the tab bar with edge-to-edge (target SDK 36); if there is a gap/overlap adjust `margin` in `src/services/ads/adsService.ts`.
 - Wide screens (desktop layout, e.g. large tablets) use the desktop layout and show no banner.
+
+## Kokoro voices (on-device neural TTS)
+
+- **Engine**: sherpa-onnx v2.0.2 AAR (static-linked onnxruntime). It is not committed: the `downloadSherpaAar` Gradle task in
+  `android/app/build.gradle` fetches it into `android/app/libs-sherpa/` (gitignored), verifies sha256
+  `cb73564809268c8b96bf98f1a32b0b3b611e01d028d22f10beb57ef55418c0cb` and fails the build on mismatch. ABIs: arm64-v8a, armeabi-v7a, x86_64.
+- **Model**: downloaded by the user at runtime (about 121 MB, resumable) from Hugging Face, pinned revision
+  `57adb37fc0e8d4bd430cfc1b8f8c2294945b9af2` of `csukuangfj/kokoro-int8-multi-lang-v1_0`: `model.int8.onnx` (75635ea3...195e),
+  `tokens.txt` (6ebb6bb2...5425), `lexicon-us-en.txt` (7daaab53...da14), and two HTTP Range slices of `voices.bin`
+  (af_heart sid 3, am_michael sid 16; the rest of the 28200960-byte file is zeros). Every file is sha256-verified
+  (see `KokoroModelStore.java`). Stored in the app's private `files/kokoro/`.
+- **G2P**: sherpa-onnx >= 2.0 skips unknown words, so `KokoroG2P.java` phonemizes in Java (main lexicon + bundled
+  `assets/kokoro/cmudict-extra-us.txt`) and passes phonemes via `GenerationConfig.phonemeCodepoints`. Words it cannot resolve make
+  the plugin reject with `OOV`, and JS falls back to the system voice. **espeak-ng (GPL) is NOT used.**
+- **Regenerate the extra lexicon**: `python3 scripts/kokoro/build_extra_lexicon.py /path/to/lexicon-us-en.txt` (see the script header for the CMUdict input).
+- Tests: `KOKORO_LEXICON=/path/to/lexicon-us-en.txt ./gradlew :app:testDebugUnitTest` also runs the coverage test over
+  `src/data/defaultVocabulary.json`; set `KOKORO_PHONEME_OUT=file` to dump phonemes for a sample text.
+- Licenses: see `THIRD_PARTY_NOTICES.md` and the "Open-source licenses" section in the More tab.

@@ -1,3 +1,5 @@
+import { getKokoro, getKokoroState, isKokoroSupported, refreshKokoroStatus, subscribeKokoro } from './kokoro/kokoroTts';
+import { KOKORO_VOICES, getKokoroVoiceByName, mapRateToKokoroSpeed } from './kokoro/kokoroVoices';
 import { buildSpeakOptions, loadNativeTts, pickVoiceIndex, shouldUseNativeTts, type NativeVoice } from './nativeTts';
 
 /**
@@ -58,6 +60,9 @@ class ShimSynth extends EventTarget {
   paused = false;
   onvoiceschanged: ((e: Event) => void) | null = null;
   private voices: ShimVoice[] = [];
+  private systemVoices: ShimVoice[] = [];
+  private kokoroListed = false;
+  private kokoroUsed = false;
   private raw: NativeVoice[] = [];
   private queue: ShimUtterance[] = [];
   private current: ShimUtterance | null = null;
@@ -67,6 +72,23 @@ class ShimSynth extends EventTarget {
   constructor() {
     super();
     void this.loadVoices(3);
+    if (isKokoroSupported()) {
+      subscribeKokoro(() => {
+        if (getKokoroState().downloaded !== this.kokoroListed) this.rebuildVoices();
+      });
+      void refreshKokoroStatus();
+    }
+  }
+
+  /** System voices first, Kokoro voices (only when downloaded) appended at the end. */
+  private rebuildVoices(): void {
+    const withKokoro = isKokoroSupported() && getKokoroState().downloaded;
+    this.kokoroListed = withKokoro;
+    const extra = withKokoro
+      ? KOKORO_VOICES.map((v, i) => new ShimVoice(`kokoro:${v.id}`, v.name, 'en-US', true, false, this.systemVoices.length + i))
+      : [];
+    this.voices = [...this.systemVoices, ...extra];
+    this.fireVoicesChanged();
   }
 
   private async loadVoices(retries: number): Promise<void> {
@@ -78,8 +100,8 @@ class ShimSynth extends EventTarget {
       const list = (res?.voices ?? []) as NativeVoice[];
       if (list.length) {
         this.raw = list;
-        this.voices = list.map((v, i) => new ShimVoice(v.voiceURI || v.name, v.name, v.lang, v.localService, v.default, i));
-        this.fireVoicesChanged();
+        this.systemVoices = list.map((v, i) => new ShimVoice(v.voiceURI || v.name, v.name, v.lang, v.localService, v.default, i));
+        this.rebuildVoices();
       } else if (retries > 0) {
         setTimeout(() => { this.loading = false; void this.loadVoices(retries - 1); }, 1000);
         return;
@@ -116,10 +138,30 @@ class ShimSynth extends EventTarget {
     u.emit('start');
     let errorType: string | null = null;
     try {
-      const h = await loadNativeTts();
-      if (!h) throw new Error('not-supported');
-      const voiceIdx = pickVoiceIndex(this.raw, u.lang, u.voice?.name);
-      await h.tts.speak(buildSpeakOptions(u, u.voice ? u.voice.index : voiceIdx));
+      const kv = getKokoroVoiceByName(u.voice?.name);
+      let spoken = false;
+      if (kv) {
+        this.kokoroUsed = true;
+        try {
+          const k = getKokoro();
+          if (!k) throw new Error('kokoro-missing');
+          await k.plugin.speak({ text: u.text, voice: kv.id, speed: mapRateToKokoroSpeed(u.rate, kv) });
+          spoken = true;
+        } catch (err) {
+          console.warn('[nativeTts] Kokoro failed, using the system voice', (err as { code?: string })?.code || (err as Error)?.message);
+          if ((err as { code?: string })?.code === 'NOT_DOWNLOADED') void refreshKokoroStatus();
+          if (my !== this.token) return; // cancelled meanwhile
+        }
+      } else if (this.kokoroUsed) {
+        this.kokoroUsed = false;
+        try { void getKokoro()?.plugin.release().catch(() => {}); } catch { /* ignore */ }
+      }
+      if (!spoken) {
+        const h = await loadNativeTts();
+        if (!h) throw new Error('not-supported');
+        const voiceIdx = kv ? pickVoiceIndex(this.raw, 'en-US') : pickVoiceIndex(this.raw, u.lang, u.voice?.name);
+        await h.tts.speak(buildSpeakOptions(u, kv ? voiceIdx : u.voice ? u.voice.index : voiceIdx));
+      }
     } catch (err) {
       errorType = String((err as Error)?.message) === 'not-supported' ? 'synthesis-unavailable' : 'synthesis-failed';
     }
@@ -144,9 +186,15 @@ class ShimSynth extends EventTarget {
     this.current = null;
     this.speaking = false;
     void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
+    this.stopKokoro();
     // Browsers fire the cancel error asynchronously; doing it synchronously let
     // onerror -> speak -> cancel recurse without yielding.
     if (had) setTimeout(() => had.emit('error', { error: 'canceled' }), 0);
+  }
+
+  private stopKokoro(): void {
+    if (!this.kokoroUsed) return;
+    try { void getKokoro()?.plugin.stop().catch(() => {}); } catch { /* ignore */ }
   }
 
   pause(): void {
@@ -159,6 +207,7 @@ class ShimSynth extends EventTarget {
     this.current = null;
     this.speaking = false;
     void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
+    this.stopKokoro();
     u.emit('pause');
   }
 
