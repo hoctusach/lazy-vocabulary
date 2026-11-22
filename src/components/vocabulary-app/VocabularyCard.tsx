@@ -7,6 +7,7 @@ import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
 import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
+import EditableTranslation from './EditableTranslation';
 
 interface VocabularyCardProps {
   word: string;
@@ -142,18 +143,14 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           >
             <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
           </div>
-          {showTranslation && translation && (
-            <div
-              style={{
-                fontStyle: 'italic',
-                fontSize: '0.9em',
-                textAlign: 'left',
-                whiteSpace: 'pre-line',
-                color: 'var(--lv-text-primary)',
-              }}
-            >
-              <em>* {translation}</em>
-            </div>
+          {showTranslation && (
+            <EditableTranslation
+              word={word}
+              category={currentCategory}
+              translation={translation}
+              editable={false}
+              color="var(--lv-text-primary)"
+            />
           )}
         </div>
         {/* Control buttons wrapper - optimized spacing */}

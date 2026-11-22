@@ -6,6 +6,7 @@ import ThemeMascot from '@/components/ThemeMascot';
 import WordCountDisplay from './WordCountDisplay';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
+import EditableTranslation from './EditableTranslation';
 
 interface VocabularyCardNewProps {
   word: string;
@@ -15,6 +16,7 @@ interface VocabularyCardNewProps {
   backgroundColor: string;
   isSpeaking: boolean;
   category: string;
+  sourceId?: string;
   showWordCount?: boolean;
 }
 
@@ -26,6 +28,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   backgroundColor,
   isSpeaking,
   category,
+  sourceId,
   showWordCount = false
 }) => {
   const showTranslation = useIsVietnameseDevice();
@@ -103,10 +106,8 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
-          {showTranslation && translation && (
-            <div className="lv-translation" style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
-              <em>* {translation}</em>
-            </div>
+          {showTranslation && (
+            <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} isVi />
           )}
         </div>
       </CardContent>

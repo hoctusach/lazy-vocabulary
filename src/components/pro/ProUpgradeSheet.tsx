@@ -17,6 +17,7 @@ const BENEFITS: Record<ProFeature, { en: string; vi: string }> = {
   unlimitedQuiz: { en: 'Unlimited “Quiz me”', vi: '“Quiz me” không giới hạn' },
   allThemes: { en: 'All 5 themes', vi: 'Cả 5 giao diện' },
   maleVoice: { en: 'Natural male voice (Michael)', vi: 'Giọng nam tự nhiên (Michael)' },
+  editTranslation: { en: 'Edit translations on your word cards', vi: 'Sửa bản dịch trên thẻ từ của bạn' },
 };
 
 const LEAD: Partial<Record<ProFeature, { en: string; vi: string }>> = {
@@ -35,6 +36,10 @@ const LEAD: Partial<Record<ProFeature, { en: string; vi: string }>> = {
   maleVoice: {
     en: 'The natural male voice is part of Pro.',
     vi: 'Giọng nam tự nhiên thuộc về Pro.',
+  },
+  editTranslation: {
+    en: 'Editing translations on word cards is part of Pro.',
+    vi: 'Sửa bản dịch trên thẻ từ thuộc về Pro.',
   },
   noAds: { en: 'Pro removes all ads.', vi: 'Pro loại bỏ toàn bộ quảng cáo.' },
 };

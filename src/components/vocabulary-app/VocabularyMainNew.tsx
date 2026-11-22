@@ -90,6 +90,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           backgroundColor={backgroundColor}
           isSpeaking={isSoundPlaying && Boolean(currentWord)}
           category={categoryToDisplay}
+          sourceId={currentWord?.sourceId}
           showWordCount={shouldShowWordCount}
         />
       </div>
