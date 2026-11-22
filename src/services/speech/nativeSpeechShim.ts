@@ -2,6 +2,7 @@ import { getKokoro, getKokoroState, isKokoroSupported, refreshKokoroStatus, subs
 import { freeKokoroVoice, isProVoice } from './voiceAccess';
 import { hasFeature } from '@/services/billing/proFeatures';
 import { KOKORO_VOICES, getKokoroVoiceByName, mapRateToKokoroSpeed } from './kokoro/kokoroVoices';
+import { estimateReadingTimeMs } from './readingTime';
 import { buildSpeakOptions, loadNativeTts, pickVoiceIndex, shouldUseNativeTts, type NativeVoice } from './nativeTts';
 
 /**
@@ -70,6 +71,8 @@ class ShimSynth extends EventTarget {
   private current: ShimUtterance | null = null;
   private token = 0;
   private loading = false;
+  private silentTimer: ReturnType<typeof setTimeout> | null = null;
+  private silentRelease: (() => void) | null = null;
 
   constructor() {
     super();
@@ -139,6 +142,17 @@ class ShimSynth extends EventTarget {
     this.speaking = true;
     const my = ++this.token;
     u.emit('start');
+    // FB-30: the Kokoro plugin (and some Android engines) ignore `volume`, so a muted utterance (volume 0) must never
+    // reach an engine. Keep the reading time silently so auto-advance continues, then end as usual.
+    if (u.volume === 0) {
+      await this.silentWait(estimateReadingTimeMs(u.text));
+      if (my !== this.token) return;
+      this.current = null;
+      this.speaking = false;
+      u.emit('end');
+      if (!this.paused) void this.next();
+      return;
+    }
     let errorType: string | null = null;
     try {
       let kv = getKokoroVoiceByName(u.voice?.name);
@@ -150,6 +164,7 @@ class ShimSynth extends EventTarget {
         try {
           const k = getKokoro();
           if (!k) throw new Error('kokoro-missing');
+          if (my !== this.token) return;
           await k.plugin.speak({ text: u.text, voice: kv.id, speed: mapRateToKokoroSpeed(u.rate, kv) });
           spoken = true;
         } catch (err) {
@@ -164,6 +179,7 @@ class ShimSynth extends EventTarget {
       if (!spoken) {
         const h = await loadNativeTts();
         if (!h) throw new Error('not-supported');
+        if (my !== this.token) return; // cancelled/muted while the plugin loaded: never start late audio
         const voiceIdx = kv ? pickVoiceIndex(this.raw, 'en-US') : pickVoiceIndex(this.raw, u.lang, u.voice?.name);
         await h.tts.speak(buildSpeakOptions(u, kv ? voiceIdx : u.voice ? u.voice.index : voiceIdx));
       }
@@ -182,6 +198,19 @@ class ShimSynth extends EventTarget {
     if (!this.paused) void this.next();
   }
 
+  private silentWait(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      const done = () => {
+        if (this.silentTimer) clearTimeout(this.silentTimer);
+        this.silentTimer = null;
+        this.silentRelease = null;
+        resolve();
+      };
+      this.silentRelease = done;
+      this.silentTimer = setTimeout(done, ms);
+    });
+  }
+
   cancel(): void {
     const had = this.current;
     this.queue = [];
@@ -190,6 +219,7 @@ class ShimSynth extends EventTarget {
     this.token++;
     this.current = null;
     this.speaking = false;
+    this.silentRelease?.();
     void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
     this.stopKokoro();
     // Browsers fire the cancel error asynchronously; doing it synchronously let
@@ -211,6 +241,7 @@ class ShimSynth extends EventTarget {
     this.token++;
     this.current = null;
     this.speaking = false;
+    this.silentRelease?.();
     void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
     this.stopKokoro();
     u.emit('pause');
