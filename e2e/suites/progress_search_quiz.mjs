@@ -22,7 +22,7 @@ test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
 test('PROG-05', 'Word Summary lists for an imported set', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
   await openProgress(s); await expand(s, 'Word Summary');
   const t = await flat(s);
   ok(/NEW TODAY\s*\((\d+)\)/i.test(t) && /DUE TODAY\s*\((\d+)\)/i.test(t) && /LEARNED\s*\(1\)/i.test(t), 'headings: ' + t.slice(t.indexOf('NEW TODAY') - 20, t.indexOf('NEW TODAY') + 300));
@@ -48,7 +48,7 @@ test('PROG-07', 'Eye button opens search pre-filled with the word', async ({ ses
 });
 test('PROG-08', 'Progress after learning a built-in word', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
   await openProgress(s); await expand(s, 'Word Summary');
   const t = await flat(s);
   ok(/LEARNED\s*\(1\)/i.test(t), 'LEARNED (1) ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));

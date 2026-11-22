@@ -112,7 +112,7 @@ test('THEME-12', 'Overlays render readable in every theme (dark): dialogs, searc
     const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true' } }); await boot(s);
     await s.page.evaluate(() => document.documentElement.classList.add('dark'));
     for (const [open, ready, close] of [
-      [() => ctl(s, 'Mark as LEARNED'), 'Are you sure', () => click(s, { text: 'Cancel' })],
+      [() => ctl(s, 'Mark as learned'), 'Are you sure', () => click(s, { text: 'Cancel' })],
       [() => ctl(s, 'Quick Search'), 'Quick Search', () => click(s, { text: 'Close' })],
     ]) {
       await open(); await s.page.waitForFunction((t) => document.body.innerText.toLowerCase().includes(t.toLowerCase()), { timeout: 8000 }, ready); await sleep(300); // headings may be upper-cased by a theme
@@ -195,24 +195,24 @@ test('PERSIST-02', 'Active set persists; a set removed from storage falls back t
 test('PERSIST-03', 'Imported-set progress persists', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   for (let i = 0; i < 2; i++) { await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 }); await sleep(500);
-    await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
+    await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
   await s.reload(); await tab(s, 'Sets'); await waitText(s, '2 learned on this device');
 });
 test('PERSIST-04', 'Built-in progress after reload comes back from the server + cache', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
   await s.reload(); await sleep(2000); await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   await click(s, { textHas: 'Word Summary' }); await sleep(400);
   ok(/LEARNED\s*\(1\)/i.test((await body(s)).replace(/\n/g, ' ')), 'LEARNED (1) lost after reload');
 });
 test('PERSIST-05', 'Muted, paused, 1.5x and GB voice persist', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Change Voice'); await sleep(400); await ctl(s, 'Mute'); await ctl(s, 'Pause'); await sleep(300);
-  await ctl(s, 'Speech Rate'); await sleep(300); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
+  await U.openAudio(s); await ctl(s, 'Change Voice'); await sleep(400); await ctl(s, 'Mute'); await U.closeAudio(s); await ctl(s, 'Pause'); await sleep(300);
+  await U.openAudio(s); await ctl(s, 'Speech Rate'); await sleep(300); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   const before = await U.prefs(s);
   await s.reload(); await waitWord(s, U.POOL_ORDER[0], 12000); await sleep(1500);
   const p = await U.prefs(s); eq([p.is_muted, p.is_playing, p.speech_rate, p.favorite_voice], [true, false, 1.5, 'Stub GB'], JSON.stringify(before));
-  ok(await U.label(s, 'Unmute') && await U.label(s, 'Play'), 'buttons');
+  ok(await U.label(s, 'Play'), 'Play button'); await U.openAudio(s); ok(await U.label(s, 'Unmute'), 'Unmute button'); await U.closeAudio(s);
 });
 test('PERSIST-06', 'Last word restored same day; new day starts at list start', async ({ session }) => {
   const s = await session({}); await boot(s);

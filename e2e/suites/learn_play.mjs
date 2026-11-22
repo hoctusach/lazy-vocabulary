@@ -78,9 +78,10 @@ test('LEARN-01', 'Card fields (vi-VN device so the translation line shows)', asy
   eq(c.pill, 'Phrasal Verb'); eq(c.w, U.P[0].word);
   ok(c.txt.includes('* ' + U.P[0].meaning) && c.txt.includes('* ' + U.P[0].example) && c.txt.includes('* ' + U.P[0].translation));
 });
-test('LEARN-02', 'Controls present with labels, 4-col grid, no Previous', async ({ session }) => {
+test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as learned (no Mute/Voice/Rate), 4-col grid, no Previous', async ({ session }) => {
   const s = await session({}); await boot(s);
-  for (const l of ['Mute', 'Pause', 'Next Word', 'Change Voice', 'Speech Rate', 'Quick Search', 'Mark as LEARNED']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
+  for (const l of ['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
+  for (const l of ['Mute', 'Unmute', 'Change Voice', 'Speech Rate', 'Mark as LEARNED']) ok(!(await U.label(s, l)), 'should not be on the dock: ' + l);
   ok(await s.page.evaluate(() => !!document.querySelector('main .grid-cols-4')), '4 col grid');
   ok(!(await U.label(s, 'Vocabulary Detail')) && !(await U.label(s, 'Practice')), 'Details/Practice buttons must be gone');
   const all = await U.controls(s);
@@ -92,12 +93,15 @@ test('LEARN-12', 'Details and Practice buttons are absent from Learn', async ({ 
   ok(!all.some((l) => /vocabulary detail|^practice$|^details$/i.test(l)), 'found: ' + all);
   eq(await s.page.evaluate(() => [...document.querySelectorAll('main button, main a')].filter((b) => /^(Details|Practice)$/.test(b.textContent.trim())).length), 0);
 });
-test('LEARN-13', 'Mark as LEARNED is a prominent 2-column button in the controls grid', async ({ session }) => {
+test('LEARN-13', 'Mark as learned is present, sentence case, and not more prominent than Pause', async ({ session }) => {
   const s = await session({}); await boot(s);
-  const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as LEARNED"]'); if (!b) return null; const o = document.querySelector('main button[aria-label="Quick Search"]'); const g = b.parentElement; const bb = b.getBoundingClientRect(), ob = o.getBoundingClientRect();
-    return { txt: b.textContent.trim(), span: getComputedStyle(b).gridColumnEnd, grid: getComputedStyle(g).gridTemplateColumns.split(' ').length, h: Math.round(bb.height), oh: Math.round(ob.height), w: bb.width, ow: ob.width, fw: +getComputedStyle(b).fontWeight, bg: getComputedStyle(b).backgroundColor }; });
-  ok(r, 'button missing'); eq(r.txt, 'Mark as LEARNED'); ok(/span (2|6)|^-1$/.test(r.span), 'span ' + r.span); ok(r.grid === 4 || r.grid === 6, 'grid ' + r.grid); ok(r.h >= r.oh, 'height ' + r.h + ' vs ' + r.oh);
-  ok(r.w > r.ow * 1.8, 'width ' + r.w + ' vs ' + r.ow); ok(r.fw >= 700, 'bold ' + r.fw); ok(r.bg !== 'rgba(0, 0, 0, 0)' && r.bg !== 'rgb(255, 255, 255)', 'filled ' + r.bg);
+  const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as learned"]'); const p = document.querySelector('main button[aria-label="Pause"]'); if (!b || !p) return null;
+    const bb = b.getBoundingClientRect(), pb = p.getBoundingClientRect(); const cs = getComputedStyle(b), ps = getComputedStyle(p);
+    return { txt: b.textContent.trim(), title: b.title, h: Math.round(bb.height), ph: Math.round(pb.height), fw: +cs.fontWeight, tt: cs.textTransform, bg: cs.backgroundColor, pbg: ps.backgroundColor, fs: parseFloat(cs.fontSize), ps: parseFloat(ps.fontSize), after: getComputedStyle(b, '::after').content }; });
+  ok(r, 'button missing'); eq(r.txt, 'Mark as learned'); eq(r.title, 'Mark as learned'); eq(r.tt, 'none', 'no uppercase');
+  ok(r.h < r.ph, 'height ' + r.h + ' vs Pause ' + r.ph); ok(r.fw < 700, 'weight ' + r.fw);
+  ok(r.bg !== r.pbg, 'mark must not share the Pause fill: ' + r.bg); ok(r.fs <= r.ps + 2, 'font ' + r.fs + ' vs Pause ' + r.ps);
+  ok(!/XP/.test(r.after), 'no +1 XP badge: ' + r.after);
 });
 test('LEARN-14', 'Speech hint lines are absent on web and in the native app', async ({ session }) => {
   const absent = (t) => ok(!/autoplay due to security/.test(t) && !/free voices by device and browser/.test(t), 'hints visible');
@@ -117,7 +121,7 @@ test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ sess
 });
 test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as LEARNED');
+  await ctl(s, 'Mark as learned');
   await waitText(s, `Are you sure you want to mark "${U.P[0].word}" as learned?`);
   await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
@@ -128,7 +132,7 @@ test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ se
 });
 test('LEARN-06', 'Mark learned cancel: no RPC, no toast', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as LEARNED'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
+  await ctl(s, 'Mark as learned'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
   await U.waitGone(s, 'Are you sure'); await sleep(400);
   eq(s.fake.count('mark_word_learned_by_key'), 0); ok(!(await body(s)).includes('Word marked as learned.'));
   await waitWord(s, W[0]);
@@ -138,7 +142,7 @@ test('LEARN-07', 'Mark learned in imported set is local only and updates stats',
   await U.importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa\d/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   const w = await word(s);
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true });
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
   const id = (await U.metaSets(s))[0].id;
   const prog = JSON.parse(await s.ls('lv.vocabularySets.progress.' + id));
@@ -217,12 +221,12 @@ test('PLAY-07', 'Rapid Next taps advance exactly one word', async ({ session }) 
 test('PLAY-08', 'Mute: label, toast, speech cancelled, pref', async ({ session }) => {
   const s = await session({}); await boot(s);
   const c0 = (await speechInfo(s)).cancels;
-  await ctl(s, 'Mute'); await waitText(s, 'Audio muted'); ok(await label(s, 'Unmute'));
+  await U.openAudio(s); await ctl(s, 'Mute'); await waitText(s, 'Audio muted'); ok(await label(s, 'Unmute')); await U.closeAudio(s);
   ok((await speechInfo(s)).cancels > c0); eq((await prefs(s)).is_muted, true);
 });
 test('PLAY-09', 'Unmute: toast and next word audible', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mute'); await waitText(s, 'Audio muted'); await ctl(s, 'Unmute');
+  await U.openAudio(s); await ctl(s, 'Mute'); await waitText(s, 'Audio muted'); await ctl(s, 'Unmute'); await U.closeAudio(s);
   await waitText(s, 'Audio unmuted. Speech will resume from the next word.');
   await sleep(400); await ctl(s, 'Next Word'); await waitSpeech(s, U.re1);
   const c = (await U.speechCalls(s)).filter((x) => U.re1.test(x.text)).at(-1); eq(c.volume, 1, 'volume');
@@ -239,7 +243,7 @@ test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence',
   const s = await session({}); await boot(s);
   const seen = [];
   for (let i = 0; i < 3; i++) {
-    await ctl(s, 'Change Voice');
+    await U.audioCtl(s, 'Change Voice');
     await s.page.waitForFunction(() => /Voice changed to/.test(document.body.innerText), { timeout: 4000 });
     seen.push(((await body(s)).match(/Voice changed to ([^\n]+)/) || [])[1]);
     await sleep(700);
@@ -252,23 +256,24 @@ test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence',
 skip('VOICE-02', 'No US/UK/AU region picker', 'product gap');
 test('VOICE-03', 'Voice persists across reload', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Change Voice'); await waitText(s, 'Voice changed to'); await sleep(300);
+  await U.audioCtl(s, 'Change Voice'); await waitText(s, 'Voice changed to'); await sleep(300);
   const fav = (await prefs(s)).favorite_voice; ok(fav && fav !== 'Stub US', 'fav ' + fav);
   await s.reload(); await waitWord(s, W[0], 12000); await sleep(1800);
   const calls = await U.speechCalls(s); const last = calls.filter((c) => U.re0.test(c.text)).at(-1);
   eq(last && last.voice, fav, 'voice after reload');
 });
-test('VOICE-04', 'Speed has 7 options and closes after choosing', async ({ session }) => {
+test('VOICE-04', 'Speed (inside Audio) has 7 options and the sheet closes after choosing', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Speech Rate'); await sleep(300);
-  const opts = await s.page.evaluate(() => [...document.querySelectorAll('[role=dialog] button, [data-radix-popper-content-wrapper] button')].map((b) => b.textContent.trim()).filter((t) => /×|x/.test(t) && /\d/.test(t)));
-  eq(opts, ['0.5×', '0.75×', '1×', '1.25×', '1.5×', '1.75×', '2×'].map((x) => opts.find((o) => o.replace('x', '×') === x) || x));
+  await U.openAudio(s); await ctl(s, 'Speech Rate'); await sleep(300);
+  const opts = await s.page.evaluate(() => [...document.querySelectorAll('[data-testid="speech-rate-options"] button')].map((b) => b.textContent.trim()));
+  eq(opts.map((o) => o.replace('×', 'x')), ['0.5x', '0.75x', '1x', '1.25x', '1.5x', '1.75x', '2x']);
   await click(s, { text: opts[4] }); await sleep(400);
-  eq(await s.page.evaluate(() => !![...document.querySelectorAll('[data-radix-popper-content-wrapper]')].length), false, 'popover still open');
+  eq(await s.page.evaluate(() => !!document.querySelector('[data-testid="speech-rate-options"]')), false, 'rate option list still open');
+  eq(await s.page.evaluate(() => !!document.querySelector('.lv-audio-sheet')), false, 'audio sheet still open');
 });
 test('VOICE-05', 'Speed applied to utterance and persisted', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Speech Rate'); await sleep(300);
+  await U.openAudio(s); await ctl(s, 'Speech Rate'); await sleep(300);
   await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click());
   await s.page.waitForFunction((w0) => window.__speech.calls.some((c) => c.rate === 1.5), { timeout: 6000 });
   eq((await prefs(s)).speech_rate, 1.5);

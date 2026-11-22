@@ -39,7 +39,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
   await ctl(s, 'Next Word'); await U.waitWord(s, U.POOL_ORDER[1]);
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await sleep(800);
   await tab(s, 'Learn'); await ctl(s, 'Quick Search'); await s.page.click('input[placeholder="Search word..."]'); await s.page.keyboard.type('lever'); await sleep(1500);
   ok(/No results found|offline|couldn|leverage|unavailable/i.test(await body(s)));
@@ -48,7 +48,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
 test('OFFLINE-05', 'Back online: reload converges with the server', async ({ session }) => {
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   s.fake.mode = 'ok'; await s.reload(); await sleep(3500);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   ok((await body(s)).length > 200); // converged: app renders; learned sync call count recorded for the report
@@ -116,9 +116,10 @@ test('EDGE-05', 'Rapid tab tapping 20x', async ({ session }) => {
 });
 test('EDGE-06', 'Rapid control taps 30x: state consistent, no overlapping utterances', async ({ session }) => {
   const s = await session({}); await boot(s);
+  await U.openAudio(s); // Mute / Change Voice live in the Audio sheet; Pause stays on the dock
   await s.page.evaluate(async () => { const L = ['Pause', 'Play', 'Mute', 'Unmute', 'Change Voice']; for (let i = 0; i < 30; i++) { const b = [...document.querySelectorAll('button')].find((x) => ['Pause', 'Play', 'Mute', 'Unmute', 'Change Voice'].includes(x.getAttribute('aria-label')) && x.getAttribute('aria-label') === (['Pause', 'Mute', 'Change Voice'][i % 3] === 'Pause' ? (document.querySelector('button[aria-label="Pause"]') ? 'Pause' : 'Play') : ['Pause', 'Mute', 'Change Voice'][i % 3] === 'Mute' ? (document.querySelector('button[aria-label="Mute"]') ? 'Mute' : 'Unmute') : 'Change Voice')); b && b.click(); await new Promise((r) => setTimeout(r, 20)); } });
   await sleep(1200);
-  const p = await U.prefs(s); eq(await U.label(s, 'Unmute'), p.is_muted === true, 'mute state vs prefs'); eq(await U.label(s, 'Play'), p.is_playing === false, 'pause state vs prefs');
+  const p = await U.prefs(s); eq(await U.label(s, 'Unmute'), p.is_muted === true, 'mute state vs prefs'); eq(await U.label(s, 'Play'), p.is_playing === false, 'pause state vs prefs'); await U.closeAudio(s);
   eq(await s.page.evaluate(() => window.__speech.overlap), 0, 'overlapping utterances');
   const toasts = await s.page.evaluate(() => [...document.querySelectorAll('[data-sonner-toast]')].filter((e) => e.getAttribute('data-visible') !== 'false' && e.getAttribute('data-removed') !== 'true').length); ok(toasts <= 6, 'toast flood ' + toasts);
 });
@@ -126,9 +127,9 @@ test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session 
   const s = await session({}); await boot(s); s.allow.push(/Quota|quota|setItem|storage/i);
   await s.page.evaluate(() => { let n = 1 << 20; const f = 'x'.repeat(n); let i = 0; try { while (true) { localStorage.setItem('zz_fill' + i++, f); } } catch (e) {} for (const size of [65536, 4096, 256, 16, 1]) { const c = 'y'.repeat(size); for (;;) { try { localStorage.setItem('zz_fill' + i++, c); } catch (e) { break; } } } });
   await ctl(s, 'Next Word'); await sleep(400);
-  await ctl(s, 'Mark as LEARNED'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
+  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
   await sleep(2300); // the 2 s congrats popup covers the Speed button in the Cozy Sloth layout (new default theme)
-  await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
+  await U.openAudio(s); await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   await tab(s, 'More'); await click(s, { label: 'Pixel Quest' });
   await importFile(s, 'vocab.csv'); await sleep(900);
   ok(await s.page.evaluate(() => (document.getElementById('root')?.children.length || 0) > 0), 'blank root');
@@ -153,7 +154,8 @@ test('EDGE-10', 'Missing speechSynthesis: controls render, Next works', async ({
   const s = await session({ speech: 'none' }); await s.goto('/');
   await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 12000 });
   const w0 = await word(s); await sleep(500); await ctl(s, 'Next Word'); await sleep(800); ok((await word(s)) !== w0, 'Next did not advance');
-  for (const l of ['Mute', 'Pause', 'Quick Search']) ok(await U.label(s, l), 'missing ' + l);
+  for (const l of ['Audio', 'Pause', 'Quick Search']) ok(await U.label(s, l), 'missing ' + l);
+  await U.openAudio(s); ok(await U.label(s, 'Mute'), 'missing Mute in Audio sheet'); await U.closeAudio(s);
 });
 test('EDGE-13', 'HTML/script in imported text is inert in Learn, Quiz and Search', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'xss.json'); await waitText(s, 'Imported 6 words into “xss”.'); await U.useOnly(s, 'xss');

@@ -53,7 +53,7 @@ describe('VocabularyControlsColumn mark as learned', () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Mark as LEARNED' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Mark as learned' }));
 
     // Simulate service advancing to a new word while dialog is open
     rerender(

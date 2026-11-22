@@ -120,27 +120,29 @@ body[class*="theme-"] .lv-theme-card {
   border-radius: var(--lv-radius-sm);
   box-shadow: var(--lv-shadow-sm);
 }
+/* "Mark as learned" is a quiet secondary action: outlined, normal weight. Pause is the only primary. */
 body[class*="theme-"] button.lv-ctl-mark {
-  background: var(--lv-success);
-  color: var(--lv-on-success);
+  background: transparent;
+  color: var(--lv-text-secondary);
   border: var(--lv-border-w) solid var(--lv-border-color);
-  font-weight: 800;
+  border-radius: var(--lv-radius-sm);
+  box-shadow: none;
+  font-weight: 500;
+  text-transform: none;
 }
 body[class*="theme-"] button.lv-ctl.lv-ctl-pause { background: var(--lv-button-primary-bg); color: var(--lv-button-primary-text); }
-body[class*="theme-"] button.lv-ctl-mark:hover { background: var(--lv-success); opacity: .92; }
+body[class*="theme-"] button.lv-ctl-mark:hover:not(:disabled) { background: var(--lv-card-highlight); color: var(--lv-text-primary); }
 body[class*="theme-"] button.lv-ctl.lv-ctl-pause:hover { background: var(--lv-button-primary-bg); color: var(--lv-button-primary-text); }
 body[class*="theme-"] button:active:not(:disabled) { transform: translateY(1px) scale(.985); }
 
-/* Learn control dock (mobile): big Pause in the middle, secondary row, full-width mark */
+/* Learn control dock (mobile): Audio | Pause (hero) | Next, then Search + a quiet "Mark as learned" */
 @media (max-width: 767px) {
   body[class*="theme-"] .lv-controls { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 14px; align-items: center; }
-  body[class*="theme-"] .lv-ctl-mute { grid-column: span 2; order: 1; height: 56px; min-height: 56px; }
+  body[class*="theme-"] .lv-ctl-audio { grid-column: span 2; order: 1; height: 56px; min-height: 56px; }
   body[class*="theme-"] button.lv-ctl.lv-ctl-pause { grid-column: span 2; order: 2; height: 72px; min-height: 72px; font-size: 13px; font-weight: 700; }
   body[class*="theme-"] .lv-ctl-next { grid-column: span 2; order: 3; height: 56px; min-height: 56px; }
-  body[class*="theme-"] .lv-ctl-voice { grid-column: span 2; order: 4; }
-  body[class*="theme-"] .lv-ctl-rate { grid-column: span 2; order: 5; }
-  body[class*="theme-"] .lv-ctl-search { grid-column: span 2; order: 6; }
-  body[class*="theme-"] button.lv-ctl-mark { grid-column: 1 / -1; order: 7; height: 52px; min-height: 52px; font-size: 16px; }
+  body[class*="theme-"] .lv-ctl-search { grid-column: span 2; order: 4; height: 44px; min-height: 44px; }
+  body[class*="theme-"] button.lv-ctl-mark { grid-column: span 4; order: 5; height: 44px; min-height: 44px; font-size: 13px; }
   body[class*="theme-"] .lv-ctl-pause svg { width: 28px; height: 28px; }
 }
 
@@ -215,10 +217,10 @@ body.theme-notes .lv-card-mascot { display: block; width: 64px; right: -10px; bo
 body.theme-notes .lv-word-card .space-y-2 { padding-bottom: 14px; }
 body.theme-notes h2, body.theme-notes h3 { font-weight: 700; letter-spacing: -.3px; }
 body.theme-notes button.lv-ctl { border-width: 2px; border-color: var(--lv-ink); border-radius: 50% 46% 52% 48% / 48% 52% 46% 50%; font-family: var(--lv-font-hand); font-size: 15px; }
-body.theme-notes button.lv-ctl-voice, body.theme-notes button.lv-ctl-rate, body.theme-notes button.lv-ctl-search { border: 1.5px dashed var(--lv-text-secondary); border-radius: 6px; font-family: var(--lv-font-mono); }
+body.theme-notes button.lv-ctl-audio, body.theme-notes button.lv-ctl-search { border: 1.5px dashed var(--lv-text-secondary); border-radius: 6px; font-family: var(--lv-font-mono); }
 body.theme-notes button.lv-ctl.lv-ctl-pause { background: var(--lv-ink); color: var(--lv-bg); border-color: var(--lv-ink); }
 body.theme-notes button.lv-ctl.lv-ctl-pause:hover { background: var(--lv-ink); color: var(--lv-bg); }
-body.theme-notes button.lv-ctl-mark { border-radius: 4px 10px 6px 12px; background: var(--lv-success); color: var(--lv-on-success); box-shadow: 2px 3px 0 rgba(0,0,0,.35); border-color: transparent; font-family: var(--lv-font-ui); }
+body.theme-notes button.lv-ctl-mark { border-radius: 4px 10px 6px 12px; border: 1.5px dashed var(--lv-text-secondary); font-family: var(--lv-font-ui); }
 
 /* ================= 2. Cozy Sloth ================= */
 body.theme-sloth {
@@ -248,8 +250,8 @@ body.theme-sloth .lv-card-mascot { display: block; width: 44px; height: 44px; ri
 body.theme-sloth h2, body.theme-sloth h3 { font-weight: 800; }
 body.theme-sloth button.lv-ctl { border-radius: 18px; font-weight: 700; }
 body.theme-sloth button.lv-ctl.lv-ctl-pause { border-radius: 999px; box-shadow: 0 10px 22px -8px rgb(242 154 46 / .65); border-color: transparent; }
-body.theme-sloth .lv-ctl-mute, body.theme-sloth .lv-ctl-next { border-radius: 999px; }
-body.theme-sloth button.lv-ctl-mark { border-radius: 18px; border-color: transparent; box-shadow: 0 8px 18px -8px rgb(242 154 46 / .6); }
+body.theme-sloth .lv-ctl-audio, body.theme-sloth .lv-ctl-next { border-radius: 999px; }
+body.theme-sloth button.lv-ctl-mark { border-radius: 999px; }
 @media (max-width: 767px) { body.theme-sloth main { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)) !important; } }
 
 /* ================= 3. Bold Blocks ================= */
@@ -283,8 +285,7 @@ body.theme-blocks .lv-card-mascot { display: block; width: 62px; height: 62px; r
 body.theme-blocks button.lv-ctl { border-width: 3px; border-color: var(--lv-ink); box-shadow: 4px 4px 0 var(--lv-ink); font-weight: 700; border-radius: 16px; }
 html.dark body.theme-blocks button.lv-ctl { box-shadow: 4px 4px 0 #FF5A36; }
 body.theme-blocks button.lv-ctl.lv-ctl-pause { background: #FF5A36; color: #111; border-radius: 50%; }
-body.theme-blocks button.lv-ctl-mark { text-transform: uppercase; font-weight: 900; border-radius: 14px; box-shadow: 5px 5px 0 var(--lv-ink); border-color: var(--lv-ink); }
-html.dark body.theme-blocks button.lv-ctl-mark { box-shadow: 5px 5px 0 #FF5A36; }
+body.theme-blocks button.lv-ctl-mark { font-weight: 700; border-width: 2px; border-radius: 12px; border-color: var(--lv-ink); }
 body.theme-blocks button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lv-ink); }
 @media (max-width: 767px) { body.theme-blocks main { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom)) !important; } }
 
@@ -328,8 +329,7 @@ body.theme-pixel .lv-card-mascot { display: block; width: 52px; height: 52px; ri
 body.theme-pixel button.lv-ctl { border: 4px solid var(--lv-ink); box-shadow: 3px 3px 0 color-mix(in srgb, var(--lv-ink) 35%, transparent); font-size: 17px; text-transform: uppercase; }
 body.theme-pixel button.lv-ctl.lv-ctl-pause { background: var(--lv-deco); color: #111; }
 html.dark body.theme-pixel button.lv-ctl.lv-ctl-pause { color: #111; }
-body.theme-pixel button.lv-ctl-mark { text-transform: uppercase; font-size: 20px !important; letter-spacing: 1px; border: 4px solid var(--lv-ink); box-shadow: 4px 4px 0 color-mix(in srgb, var(--lv-ink) 35%, transparent); }
-body.theme-pixel .lv-ctl-mark::after { content: "+1 XP"; font: 700 13px/1 "Pixelify Sans", monospace; background: #111; color: #6EE86A; padding: 3px 5px; margin-left: 4px; }
+body.theme-pixel button.lv-ctl-mark { font-size: 15px; border: 3px solid var(--lv-ink); }
 body.theme-pixel .progress-bar { background: repeating-linear-gradient(90deg, #3FAE4A 0 10px, #2d8a37 10px 12px); animation: none; }
 html.dark body.theme-pixel::after { content: ""; position: fixed; inset: 0; background: repeating-linear-gradient(to bottom, rgba(0,0,0,.18) 0 1px, transparent 1px 3px); pointer-events: none; z-index: 60; }
 
@@ -366,9 +366,9 @@ body.theme-riso .lv-ipa { font-family: var(--lv-font-mono); font-size: 12px !imp
 body.theme-riso .lv-card-mascot { display: block; width: 92px; right: -6px; top: -14px; transform: rotate(-6deg); mix-blend-mode: multiply; }
 html.dark body.theme-riso .lv-card-mascot { mix-blend-mode: screen; }
 body.theme-riso button.lv-ctl { border: 2px solid var(--lv-ink); border-radius: 50% !important; font-family: var(--lv-font-mono); text-transform: uppercase; font-size: 10px; }
-body.theme-riso .lv-ctl-voice, body.theme-riso .lv-ctl-rate, body.theme-riso .lv-ctl-search { border-radius: 0 !important; }
+body.theme-riso .lv-ctl-audio, body.theme-riso .lv-ctl-search { border-radius: 0 !important; }
 body.theme-riso button.lv-ctl.lv-ctl-pause { background: var(--lv-pink); color: #18171C; border: 0; box-shadow: 4px 3px 0 var(--lv-accent); }
-body.theme-riso button.lv-ctl-mark { text-transform: uppercase; font-weight: 800; letter-spacing: .3px; box-shadow: 4px 4px 0 var(--lv-pink); border: 0; }
+body.theme-riso button.lv-ctl-mark { font-family: var(--lv-font-mono); border: 2px solid var(--lv-ink); border-radius: 0; }
 
 /* ---------- motion ---------- */
 @media (prefers-reduced-motion: reduce) {

@@ -57,7 +57,8 @@ describe('VocabularyControlsColumn voice toggle', () => {
 
     render(<Wrapper />);
 
-    const toggleBtn = screen.getByRole('button', { name: 'Change Voice' });
+    await userEvent.click(screen.getByRole('button', { name: 'Audio' }));
+    const toggleBtn = await screen.findByRole('button', { name: 'Change Voice' });
     expect(controllerState.voiceName).toBe(voices[0]);
 
     await userEvent.click(toggleBtn);

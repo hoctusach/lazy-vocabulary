@@ -103,6 +103,12 @@ export async function waitSpeech(s, re, timeout = 6000) {
 export async function boot(s, path = '/') { await s.goto(path); await waitWord(s, POOL_ORDER[0], 12000); await waitSpeech(s, re0); await sleep(600); }
 export const label = (s, l) => s.page.evaluate((l) => !![...document.querySelectorAll('button')].find((b) => b.getAttribute('aria-label') === l && b.offsetParent), l);
 export const ctl = (s, l) => click(s, { label: l });
+/** Open the Learn "Audio" sheet (Mute / Change Voice / Speech Rate live inside it). */
+export async function openAudio(s) { await ctl(s, 'Audio'); await s.page.waitForSelector('.lv-audio-sheet', { visible: true, timeout: 4000 }); await sleep(250); }
+/** Close the Audio sheet (Escape) and wait until it is gone, so Pause/Next are clickable again. */
+export async function closeAudio(s) { await s.page.keyboard.press('Escape'); await s.page.waitForFunction(() => !document.querySelector('.lv-audio-sheet'), { timeout: 4000 }); await sleep(150); }
+/** open Audio, click one in-sheet control, close the sheet. */
+export async function audioCtl(s, l) { await openAudio(s); await ctl(s, l); await closeAudio(s); }
 
 /** Click a button inside the Sets-tab card whose title is `setName`. */
 export async function cardBtn(s, setName, btnText) {

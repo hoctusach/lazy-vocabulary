@@ -1,24 +1,12 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Volume2,
-  VolumeX,
-  Pause,
-  Play,
-  SkipForward,
-  Speaker,
-  Search,
-  CheckCircle,
-} from 'lucide-react';
-import SpeechRateControl from './SpeechRateControl';
-import { useSpeechRate } from '@/hooks/useSpeechRate';
+import { Pause, Play, SkipForward, Search, CheckCircle } from 'lucide-react';
+import AudioSheet from './AudioSheet';
 import { toast } from 'sonner';
 import { CONTROL_TOAST } from './controlToast';
 import { ReadonlyWord } from '@/types/vocabulary';
 import { cn } from '@/lib/utils';
-import { useVoiceContext } from '@/hooks/useVoiceContext';
-import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
 import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
 import { trackUiInteraction } from '@/services/analyticsService';
 
@@ -49,21 +37,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
   onMarkWordLearned,
   onOpenSearch
 }) => {
-  const { speechRate, setSpeechRate } = useSpeechRate();
-  const { allVoices } = useVoiceContext();
-  
-  const handleToggleMute = () => {
-    onToggleMute();
-    trackUiInteraction(isMuted ? 'unmute' : 'mute', {
-      label: isMuted ? 'Unmute' : 'Mute',
-    });
-    if (isMuted) {
-      toast('Audio unmuted. Speech will resume from the next word.', CONTROL_TOAST);
-    } else {
-      toast('Audio muted', CONTROL_TOAST);
-    }
-  };
-
   const handleTogglePause = () => {
     onTogglePause();
     trackUiInteraction(isPaused ? 'play' : 'pause', {
@@ -79,27 +52,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     }
     onNextWord();
     trackUiInteraction('next_word', { label: 'Next Word' });
-  };
-
-  const handleCycleVoice = () => {
-    if (allVoices.length === 0) {
-      toast.warning('No voices available');
-      return;
-    }
-    onCycleVoice();
-    trackUiInteraction('cycle_voice', { label: selectedVoiceName });
-  };
-
-  const handleRateChange = (r: number) => {
-    setSpeechRate(r);
-    trackUiInteraction('speech_rate_change', {
-      label: `${r}x`,
-      value: r,
-    });
-    unifiedSpeechController.stop();
-    if (!isMuted && !isPaused) {
-      playCurrentWord();
-    }
   };
 
   const [isMarkAsLearnedDialogOpen, setIsMarkAsLearnedDialogOpen] = React.useState(false);
@@ -133,23 +85,14 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   return (
     <div className="lv-controls grid w-full grid-cols-4 gap-2 md:flex md:w-auto md:flex-col md:items-end">
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleToggleMute}
-        className={cn(
-          controlClass,
-          'lv-ctl-mute border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)]',
-          isMuted
-            ? 'text-purple-700 border-purple-300 bg-purple-50 dark:text-purple-100 dark:border-purple-700 dark:bg-purple-900/40'
-            : ''
-        )}
-        title={isMuted ? 'Unmute' : 'Mute'}
-        aria-label={isMuted ? 'Unmute' : 'Mute'}
-      >
-        {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-        <span className="md:sr-only">{isMuted ? 'Unmute' : 'Mute'}</span>
-      </Button>
+      <AudioSheet
+        isMuted={isMuted}
+        isPaused={isPaused}
+        onToggleMute={onToggleMute}
+        onCycleVoice={onCycleVoice}
+        selectedVoiceName={selectedVoiceName}
+        playCurrentWord={playCurrentWord}
+      />
 
       <Button
         variant="outline"
@@ -184,24 +127,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
       <Button
         variant="outline"
         size="sm"
-        onClick={handleCycleVoice}
-        className={cn(
-          controlClass,
-          'lv-ctl-voice border border-slate-200 bg-background text-gray-700 hover:text-[var(--lv-accent)] dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-100 dark:hover:text-[var(--lv-accent)] dark:hover:bg-slate-900',
-          allVoices.length < 2 ? 'cursor-not-allowed opacity-50' : ''
-        )}
-        title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
-        disabled={allVoices.length < 2}
-        aria-label="Change Voice"
-      >
-        <Speaker size={18} />
-        <span className="md:sr-only">Voice</span>
-      </Button>
-
-      <SpeechRateControl rate={speechRate} onChange={handleRateChange} buttonClassName={cn(controlClass, 'lv-ctl-rate')} />
-      <Button
-        variant="outline"
-        size="sm"
         onClick={() => {
           trackUiInteraction('search_modal_opened', {
             label: currentWord?.word || '',
@@ -222,13 +147,14 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         <Button
           size="sm"
           onClick={handleMarkAsLearnedClick}
-          className="lv-ctl-mark col-span-2 h-11 min-h-11 w-full gap-2 border border-transparent bg-[var(--lv-success)] px-2 text-sm font-bold text-[var(--lv-on-success)] hover:bg-[var(--lv-success)] hover:opacity-90 disabled:opacity-60 md:w-auto md:min-w-11"
-          title="Mark as LEARNED"
-          aria-label="Mark as LEARNED"
+          variant="outline"
+          className="lv-ctl-mark col-span-4 h-11 min-h-11 w-full gap-1.5 border border-slate-200 bg-transparent px-2 text-xs font-medium text-[var(--lv-text-secondary)] hover:bg-[var(--lv-card-highlight)] hover:text-[var(--lv-text-primary)] disabled:opacity-60 dark:border-slate-700 md:w-auto md:min-w-11"
+          title="Mark as learned"
+          aria-label="Mark as learned"
           disabled={!currentWord}
         >
-          <CheckCircle size={20} aria-hidden="true" />
-          <span className="md:sr-only">Mark as LEARNED</span>
+          <CheckCircle size={16} aria-hidden="true" />
+          <span className="md:sr-only">Mark as learned</span>
         </Button>
       )}
 
