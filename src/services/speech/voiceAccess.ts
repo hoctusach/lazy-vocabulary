@@ -1,5 +1,4 @@
 import { hasFeature } from '@/services/billing/proFeatures';
-import { openProUpgrade } from '@/services/billing/proUpgradeStore';
 import { KOKORO_VOICES, getKokoroVoiceByName, type KokoroVoice } from './kokoro/kokoroVoices';
 
 /** Kokoro Michael (male) is a Pro voice; Heart and every system voice are free. */
@@ -26,21 +25,21 @@ export function sanitizeVoiceName<T extends string | null | undefined>(name: T):
 }
 
 /**
- * Next voice in the cycle that the user may use. Locked voices are skipped; passing over one opens the
- * upgrade sheet so the Pro voice stays discoverable.
+ * Next voice in the cycle that the user may use. Locked voices (only Kokoro Michael, for free users) are skipped
+ * silently: landing on a free voice must never open the upgrade sheet (FB-29: it made system voices feel locked).
+ * Michael stays discoverable through a locked row in the Audio sheet, which opens the upgrade sheet on tap.
  */
 export function nextAllowedVoice<T extends { name: string }>(voices: T[], currentName: string): T | null {
   if (voices.length < 2) return null;
   const start = voices.findIndex((v) => v.name === currentName);
-  let skipped = false;
   for (let step = 1; step <= voices.length; step++) {
     const candidate = voices[(start + step + voices.length) % voices.length];
-    if (isVoiceLocked(candidate.name)) {
-      skipped = true;
-      continue;
-    }
-    if (skipped) openProUpgrade('maleVoice');
-    return candidate;
+    if (!isVoiceLocked(candidate.name)) return candidate;
   }
   return null;
+}
+
+/** The locked Pro voice a free user should see as a locked row (Michael), or null when nothing is locked/listed. */
+export function lockedProVoiceIn<T extends { name: string }>(voices: T[]): T | null {
+  return voices.find((v) => isVoiceLocked(v.name)) ?? null;
 }

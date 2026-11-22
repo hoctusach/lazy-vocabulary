@@ -107,7 +107,7 @@ describe('[FB-04][FB-06] Pro voice gating (Kokoro Michael)', () => {
     expect(resolvePlaybackPreferences([{ name: 'US Voice' }] as unknown as SpeechSynthesisVoice[]).resolvedVoice).toBeNull();
 
     expect(nextAllowedVoice(voices, HEART)?.name).toBe('US Voice');
-    expect(getProUpgradeState()).toMatchObject({ open: true, feature: 'maleVoice' });
+    expect(getProUpgradeState().open).toBe(false); // [FB-29] landing on a free voice never opens the sheet
   });
 
   it('Pro: cycling reaches Michael and no sheet opens', async () => {

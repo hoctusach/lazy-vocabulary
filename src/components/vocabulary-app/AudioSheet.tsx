@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gauge, Speaker, Volume2, VolumeX } from 'lucide-react';
+import { Gauge, Lock, Speaker, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,9 @@ import { cn } from '@/lib/utils';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { lockedProVoiceIn } from '@/services/speech/voiceAccess';
+import { openProUpgrade } from '@/services/billing/proUpgradeStore';
+import { useProFeature } from '@/services/billing/proFeatures';
 import { trackUiInteraction } from '@/services/analyticsService';
 import { CONTROL_TOAST } from './controlToast';
 import { SPEECH_RATE_OPTIONS } from './SpeechRateControl';
@@ -43,6 +46,8 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
 }) => {
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
+  useProFeature('maleVoice'); // re-render when the entitlement changes
+  const lockedVoice = lockedProVoiceIn(allVoices);
   const [open, setOpen] = React.useState(false);
   const [showRates, setShowRates] = React.useState(false);
 
@@ -129,6 +134,20 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
               <span className="ml-auto max-w-[55%] truncate text-xs text-muted-foreground">{selectedVoiceName}</span>
             )}
           </Button>
+
+          {lockedVoice && (
+            <Button
+              variant="outline"
+              className={rowClass}
+              onClick={() => openProUpgrade('maleVoice')}
+              aria-label="Pro voice (locked)"
+              data-testid="locked-pro-voice"
+            >
+              <Lock size={18} aria-hidden="true" />
+              <span className="truncate">{lockedVoice.name}</span>
+              <span className="ml-auto text-xs font-semibold text-[var(--lv-accent)]">Pro</span>
+            </Button>
+          )}
 
           <Button
             variant="outline"
