@@ -80,8 +80,8 @@ const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number 
   intense: { min: 50, max: 100 },
 };
 
-const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
-const MASTER_INTERVAL_DAYS = 60;
+export const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
+export const MASTER_INTERVAL_DAYS = 60;
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 

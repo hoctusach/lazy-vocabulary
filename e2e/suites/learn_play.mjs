@@ -290,48 +290,31 @@ test('LANG-02', 'vi-VN device shows the Vietnamese translation', async ({ sessio
   ok((await cardText(s)).includes('* ' + U.P[0].translation), 'translation should show on vi-VN');
 });
 
-// ---------- SRS tip card ----------
-const TIP_KEY = 'lv.srsTip.dismissedOn';
-const localDay = (offset = 0) => { const d = new Date(); d.setDate(d.getDate() + offset); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
-const tipText = (s) => s.page.evaluate(() => document.querySelector('[data-testid="srs-tip"]')?.innerText ?? null);
-test('SRS-01', 'Spaced-repetition tip card shows on Learn with English copy (en-US)', async ({ session }) => {
+// ---------- SRS principle line [FB-34] ----------
+const LINE_EN = 'Review right before you forget \u2014 remember it for good';
+const LINE_VI = 'Nghe l\u1ea1i \u0111\u00fang l\u00fac s\u1eafp qu\u00ean \u2014 nh\u1edb l\u00e2u h\u01a1n';
+const lineText = (s) => s.page.evaluate(() => document.querySelector('[data-testid="srs-principle"]')?.innerText?.trim() ?? null);
+const oldTip = (s) => s.page.evaluate(() => !!document.querySelector('[data-testid="srs-tip"]'));
+test('SRS-01', 'Always-visible SRS principle line, English copy (en-US) [FB-34]', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' }); await boot(s);
-  await waitText(s, '20 words a day. Never forget them.');
-  const t = await tipText(s);
-  ok(t.includes("Lazy Vocabulary brings each word back right before you'd forget it: 2, 3, 5, 7… then every 60 days."), t);
-  const r = await s.page.evaluate(() => ({ h: document.querySelector('[data-testid="srs-tip"]').getBoundingClientRect().height }));
-  ok(r.h < 120, 'tip too tall ' + r.h);
+  await waitText(s, LINE_EN);
+  eq(await lineText(s), LINE_EN);
+  ok(!(await oldTip(s)), 'old collapsible tip must be gone');
+  const t = await s.page.evaluate(() => document.body.innerText);
+  ok(!/Never forget|months|20 words/.test(t), 'no unverifiable numeric claims: ' + t);
 });
-test('SRS-02', 'Tip card uses Vietnamese copy on a vi-VN device', async ({ session }) => {
+test('SRS-02', 'Principle line uses Vietnamese copy on a vi-VN device [FB-34]', async ({ session }) => {
   const s = await session({ initScript: VI_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'vi-VN,vi;q=0.9' }); await boot(s);
-  await waitText(s, 'Mỗi ngày 20 từ. Nhớ mãi không quên.');
-  ok((await tipText(s)).includes('App nhắc lại từng từ đúng lúc bạn sắp quên'), 'body');
+  await waitText(s, LINE_VI);
+  eq(await lineText(s), LINE_VI);
 });
-test('SRS-03', 'Dismiss hides the tip for the day; it returns when the stored date is yesterday; layout stays above the fold', async ({ session }) => {
+test('SRS-03', 'Line sits above the tab bar without overlapping; tap opens the explanation [FB-34]', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await boot(s);
-  ok(await tipText(s), 'tip missing');
-  const fold = await s.page.evaluate(() => { const g = document.querySelector('main .grid-cols-4'); const h1 = document.querySelector('main h1'); return { grid: g.getBoundingClientRect().bottom, h1: h1.getBoundingClientRect().top, vh: innerHeight }; });
-  ok(fold.grid <= fold.vh, 'controls grid below the fold with tip: ' + JSON.stringify(fold));
-  await click(s, { label: 'Dismiss' });
-  await s.page.waitForFunction(() => !document.querySelector('[data-testid="srs-tip"]'), { timeout: 3000 });
-  eq(await s.ls(TIP_KEY), localDay());
-  await s.reload(); await waitWord(s, W[0]);
-  eq(await tipText(s), null, 'tip came back after reload on the same day');
-  await s.page.evaluate((k, v) => localStorage.setItem(k, v), TIP_KEY, localDay(-1));
-  await s.reload(); await waitWord(s, W[0]);
-  ok(await tipText(s), 'tip should reappear the next day');
-});
-test('SRS-05', 'After day 1 the intro collapses to title + Why?; Why? expands it for the session only [FB-11]', async ({ session }) => {
-  const s = await session({ initScript: EN_INIT }); await boot(s);
-  await s.page.evaluate((k, v) => localStorage.setItem(k, v), 'lv.srsTip.firstSeenOn', localDay(-1));
-  await s.reload(); await waitWord(s, W[0]);
-  let t = await tipText(s);
-  ok(t && t.includes('20 words a day. Never forget them.') && t.includes('Why?'), 'collapsed tip: ' + t);
-  ok(!t.includes('brings each word back'), 'body should be hidden: ' + t);
-  await click(s, { text: 'Why?' });
-  t = await tipText(s);
-  ok(t.includes('brings each word back'), 'body after Why?: ' + t);
-  await s.reload(); await waitWord(s, W[0]);
-  ok(!(await tipText(s)).includes('brings each word back'), 'should re-collapse after reload');
+  const r = await s.page.evaluate(() => { const l = document.querySelector('[data-testid="srs-principle"]').getBoundingClientRect(); const bar = document.querySelector('[data-bottom-tab-bar]').getBoundingClientRect(); return { lineBottom: l.bottom, barTop: bar.top, lineTop: l.top }; });
+  ok(r.lineBottom <= r.barTop + 1, 'line overlaps tab bar: ' + JSON.stringify(r));
+  await s.page.click('[data-testid="srs-principle"]');
+  await s.page.waitForSelector('[data-testid="srs-principle-intervals"]', { timeout: 3000 });
+  const t = await s.page.evaluate(() => document.querySelector('[data-testid="srs-principle-intervals"]').innerText);
+  ok(/1, 2, 3, 5, 7/.test(t), t);
 });
 skip('SRS-04', 'Due-review variant', 'fake backend reports no due words; covered by unit tests');

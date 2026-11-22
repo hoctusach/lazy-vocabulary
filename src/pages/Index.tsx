@@ -68,7 +68,7 @@ const MobileHome: React.FC = () => {
       <AppHeader compact />
       <main
         className="mx-auto w-full max-w-lg px-3 py-3"
-        style={{ paddingBottom: 'calc(4.75rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px))' }}
+        style={{ paddingBottom: `calc(${tab === 'learn' ? '7.25rem' : '4.75rem'} + env(safe-area-inset-bottom) + var(--ad-slot, 0px))` }}
       >
         {/* The Learn player owns auto-play/speech. It stays mounted and is only hidden on other tabs,
             so switching tabs never stops speech (see stopSpeechForUserIntent). Do not make this conditional. */}

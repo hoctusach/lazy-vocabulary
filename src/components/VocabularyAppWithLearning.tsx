@@ -31,7 +31,7 @@ import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
-import SrsTipCard from '@/features/srs-tip/SrsTipCard';
+import SrsPrincipleLine from '@/features/srs-principle/SrsPrincipleLine';
 import { trackUiInteraction } from '@/services/analyticsService';
 
 interface VocabularyAppWithLearningProps {
@@ -443,9 +443,6 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
       <ToastProvider />
       {showCard && (
       <div className={view === 'all' ? 'w-full max-w-6xl mx-auto p-4' : 'w-full'}>
-        {view !== 'progress' && (
-          <SrsTipCard total={playbackStats.total ?? 0} due={playbackStats.due ?? 0} />
-        )}
         <VocabularyAppContainerNew
           initialWords={playbackWords}
           dailySelection={wordSets.hasBuiltin ? dailySelection : null}
@@ -458,6 +455,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           currentUserDueCount={playbackStats.due}
           variant={view === 'learn' ? 'card' : 'full'}
         />
+        <SrsPrincipleLine fixed={view === 'learn'} />
       </div>
       )}
       {showProgress && view !== 'all' && (
