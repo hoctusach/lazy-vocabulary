@@ -316,4 +316,17 @@ test('SRS-03', 'Dismiss hides the tip for the day; it returns when the stored da
   await s.reload(); await waitWord(s, W[0]);
   ok(await tipText(s), 'tip should reappear the next day');
 });
+test('SRS-05', 'After day 1 the intro collapses to title + Why?; Why? expands it for the session only', async ({ session }) => {
+  const s = await session({ initScript: EN_INIT }); await boot(s);
+  await s.page.evaluate((k, v) => localStorage.setItem(k, v), 'lv.srsTip.firstSeenOn', localDay(-1));
+  await s.reload(); await waitWord(s, W[0]);
+  let t = await tipText(s);
+  ok(t && t.includes('20 words a day. Never forget them.') && t.includes('Why?'), 'collapsed tip: ' + t);
+  ok(!t.includes('brings each word back'), 'body should be hidden: ' + t);
+  await click(s, { text: 'Why?' });
+  t = await tipText(s);
+  ok(t.includes('brings each word back'), 'body after Why?: ' + t);
+  await s.reload(); await waitWord(s, W[0]);
+  ok(!(await tipText(s)).includes('brings each word back'), 'should re-collapse after reload');
+});
 skip('SRS-04', 'Due-review variant', 'fake backend reports no due words; covered by unit tests');
