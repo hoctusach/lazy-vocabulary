@@ -13,7 +13,8 @@
     "serve": "vite preview",
     "test": "vitest run",
     "lint": "eslint --ext .ts,.tsx src",
-    "test:e2e": "node e2e/run.mjs"
+    "test:e2e": "node e2e/run.mjs",
+    "test:regression": "vitest run -t FB- && node e2e/run.mjs --grep FB-"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.3.0",
