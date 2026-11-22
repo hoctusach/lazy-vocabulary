@@ -53,7 +53,7 @@ keyPassword=…
 
 ```sh
 VITE_ENABLE_PRO=true npm run build:mobile   # vite build -> capacitor-www/ (relative ./assets paths) + cap sync
-cd android && ./gradlew bundleRelease assembleRelease -PversionCode=4 -PversionName=1.0.3
+cd android && ./gradlew bundleRelease assembleRelease -PversionCode=5 -PversionName=1.0.4
 ```
 
 **Never** `git checkout docs/` (or otherwise restore the website) between the build and `cap sync`, and never point Capacitor at `docs/`: that is how 1.0.2 (3) shipped the stale Nov 15 website bundle with no boot watchdog (blank white screen, FB-28). `tests/regression/packagedBundle.test.ts` checks `capacitor-www/` (and can check an AAB) before release.
