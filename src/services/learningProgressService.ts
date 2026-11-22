@@ -74,11 +74,12 @@ type SelectionNormalizationMeta = {
   timezone: string | null;
 };
 
-const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
-  light: { min: 15, max: 25 },
-  moderate: { min: 30, max: 50 },
-  intense: { min: 50, max: 100 },
-};
+/**
+ * FB-35 (Option A): one daily target, 20 words TOTAL (new + review). If few reviews are due the rest is filled
+ * with new words up to 20. The old Light/Medium/Hard sizes (25/50/100) contradicted that, so every severity now
+ * maps to the same total; the severity type stays only so stored preferences keep parsing.
+ */
+export const DAILY_TOTAL_WORDS = 20;
 
 export const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
 export const MASTER_INTERVAL_DAYS = 60;
@@ -263,9 +264,8 @@ function deriveWordFromId(wordId: string): string {
   return candidate || wordId;
 }
 
-function getDailyCount(severity: SeverityLevel): number {
-  const config = DEFAULT_SEVERITY_CONFIG[severity] ?? DEFAULT_SEVERITY_CONFIG.light;
-  return config.max;
+function getDailyCount(_severity: SeverityLevel): number {
+  return DAILY_TOTAL_WORDS;
 }
 
 function buildSrsFromSelection(selectionRow: DailySelectionRow | null | undefined): TodayWordSrs | undefined {

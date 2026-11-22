@@ -17,8 +17,8 @@ const DATA_PREFIX = 'lv.vocabularySets.data.';
 const PROGRESS_PREFIX = 'lv.vocabularySets.progress.';
 const DISPLAYED_WORD_EVENT = 'lv:vocabulary-set-displayed';
 
-const DAILY_NEW = 8;
-const DAILY_CAP = 16;
+/** FB-35 (Option A): 20 words per day TOTAL for imported sets too: due/reviews first, fill with new words. */
+export const DAILY_TOTAL = 20;
 
 interface MetaFile {
   sets: VocabularySetMeta[];
@@ -440,8 +440,8 @@ export function buildTodayQueue(
     const next = Date.parse(learned.nextReviewAt);
     if (!Number.isFinite(next) || next <= deadline) due.push(word);
   }
-  const chosen = [...due, ...fresh.slice(0, DAILY_NEW)].slice(0, DAILY_CAP);
-  if (chosen.length === 0 && words.length > 0) return words.slice(0, DAILY_NEW);
+  const chosen = [...due, ...fresh].slice(0, DAILY_TOTAL);
+  if (chosen.length === 0 && words.length > 0) return words.slice(0, DAILY_TOTAL);
   return chosen;
 }
 

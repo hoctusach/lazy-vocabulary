@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
-import { getCountForSeverity } from '@/services/learningProgressService';
+import { getCountForSeverity, DAILY_TOTAL_WORDS } from '@/services/learningProgressService';
 import { computeLearnedWordStats, type LearnedWordRow } from '@/lib/progress/learnedWordStats';
-import { buildTodayQueue, emptyProgress, BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
+import { buildTodayQueue, emptyProgress, BUILTIN_GROUPS, DAILY_TOTAL } from '@/features/word-sets/vocabularySetStore';
 import { filterByBuiltinGroups, planBuiltinSelection } from '@/features/word-sets/mixQueue';
 
-// FB-32 locks today's selection math so a future quota change is a visible, deliberate test edit.
+// FB-32 / FB-35 lock today's selection math so a future quota change is a visible, deliberate test edit.
 // The body of generate_daily_selection_v2 is NOT in this repo: server-side behaviour is not asserted here.
 const NOW = new Date('2026-11-22T05:00:00Z');
 const row = (id: string, over: Partial<LearnedWordRow> = {}): LearnedWordRow => ({
@@ -14,11 +14,12 @@ const row = (id: string, over: Partial<LearnedWordRow> = {}): LearnedWordRow => 
   srs_ease: null, is_today_selection: true, due_selected_today: false, category: 'Phrasal Verb', ...over,
 });
 
-describe('[FB-32] signed-in daily request size', () => {
-  it('Light requests 25 words from the server (moderate 50, intense 100)', () => {
-    expect(getCountForSeverity('light')).toBe(25);
-    expect(getCountForSeverity('moderate')).toBe(50);
-    expect(getCountForSeverity('intense')).toBe(100);
+describe('[FB-35] signed-in daily request size: 20 words TOTAL (Option A)', () => {
+  it('every severity requests 20 (no 25/50/100); p_count is the daily total', () => {
+    expect(DAILY_TOTAL_WORDS).toBe(20);
+    expect(getCountForSeverity('light')).toBe(20);
+    expect(getCountForSeverity('moderate')).toBe(20);
+    expect(getCountForSeverity('intense')).toBe(20);
   });
 });
 
@@ -36,14 +37,14 @@ describe('[FB-32] Progress labels: NEW TODAY / DUE TODAY are learning rows of to
     expect(r.learnedWords).toHaveLength(1);
   });
 
-  it('marking a word learned shrinks NEW TODAY: 25 selected, 18 marked learned => 7 new left', () => {
+  it('marking a word learned shrinks NEW TODAY: 20 selected, 13 marked learned => 7 new left', () => {
     const rows = [
       ...Array.from({ length: 7 }, (_, i) => row(`n${i}`)),
-      ...Array.from({ length: 18 }, (_, i) => row(`x${i}`, { srs_state: 'learned' })),
+      ...Array.from({ length: 13 }, (_, i) => row(`x${i}`, { srs_state: 'learned' })),
     ];
     const r = computeLearnedWordStats(rows, { now: NOW });
     expect(r.newTodayWords).toHaveLength(7);
-    expect(r.learnedWords).toHaveLength(18);
+    expect(r.learnedWords).toHaveLength(13);
   });
 
   it('without server flags, today is derived from last_review_at in the user timezone and due from next_review_at', () => {
@@ -58,24 +59,31 @@ describe('[FB-32] Progress labels: NEW TODAY / DUE TODAY are learning rows of to
   });
 });
 
-describe('[FB-32] imported-set daily queue: up to 8 new, hard cap 16 (due first)', () => {
+describe('[FB-35] imported-set daily queue: 20 TOTAL, due first, fill with new', () => {
   const words = (n: number, p = 'w') => Array.from({ length: n }, (_, i) => ({ word: `${p}${i}`, category: 'c', meaning: 'm', example: 'e' })) as never[];
-  it('50 fresh, nothing due => 8 words', () => {
-    expect(buildTodayQueue(words(50), emptyProgress(), '2026-11-22')).toHaveLength(8);
+  const due = (progress: ReturnType<typeof emptyProgress>, n: number) => {
+    for (let i = 0; i < n; i++) progress.learned[`c::w${i}`] = { nextReviewAt: '2026-11-21T00:00:00Z' } as never;
+  };
+  it('constant is 20', () => expect(DAILY_TOTAL).toBe(20));
+  it('50 fresh, nothing due => 20 new words (no separate new-cap of 8)', () => {
+    expect(buildTodayQueue(words(50), emptyProgress(), '2026-11-22')).toHaveLength(20);
   });
-  it('20 due + 50 fresh => capped at 16, all due first', () => {
-    const ws = words(70);
+  it('30 due + 50 fresh => capped at 20, all due first', () => {
     const progress = emptyProgress();
-    for (let i = 0; i < 20; i++) progress.learned[`c::w${i}`] = { nextReviewAt: '2026-11-21T00:00:00Z' } as never;
-    const q = buildTodayQueue(ws, progress, '2026-11-22') as { word: string }[];
-    expect(q).toHaveLength(16);
-    expect(q.every((w) => Number(w.word.slice(1)) < 20)).toBe(true);
+    due(progress, 30);
+    const q = buildTodayQueue(words(80), progress, '2026-11-22') as { word: string }[];
+    expect(q).toHaveLength(20);
+    expect(q.every((w) => Number(w.word.slice(1)) < 30)).toBe(true);
   });
-  it('4 due + 50 fresh => 12 (4 due + 8 new)', () => {
-    const ws = words(54);
+  it('4 due + 50 fresh => 20 (4 due + 16 new)', () => {
     const progress = emptyProgress();
-    for (let i = 0; i < 4; i++) progress.learned[`c::w${i}`] = { nextReviewAt: '2026-11-21T00:00:00Z' } as never;
-    expect(buildTodayQueue(ws, progress, '2026-11-22')).toHaveLength(12);
+    due(progress, 4);
+    const q = buildTodayQueue(words(54), progress, '2026-11-22') as { word: string }[];
+    expect(q).toHaveLength(20);
+    expect(q.slice(0, 4).map((w) => w.word)).toEqual(['w0', 'w1', 'w2', 'w3']);
+  });
+  it('only 12 words in the set => all 12 (never pads)', () => {
+    expect(buildTodayQueue(words(12), emptyProgress(), '2026-11-22')).toHaveLength(12);
   });
 });
 
@@ -88,11 +96,11 @@ describe('[FB-32] mixing 2-5 built-in groups: server called with NULL, rows filt
     expect(two.category).toBeNull();
     expect(two.filterGroups).toEqual([g[0], g[1]]);
   });
-  it('the filter drops rows outside the picked groups, so a 25-word server quota shrinks', () => {
+  it('the filter drops rows outside the picked groups, so a 20-word server quota shrinks', () => {
     const g = [...BUILTIN_GROUPS];
-    const rows = Array.from({ length: 25 }, (_, i) => ({ category: g[i % g.length] }));
+    const rows = Array.from({ length: 20 }, (_, i) => ({ category: g[i % g.length] }));
     const kept = filterByBuiltinGroups(rows, [g[0], g[1]]);
-    expect(kept.length).toBeLessThan(25);
+    expect(kept.length).toBeLessThan(20);
     expect(kept.every((r) => r.category === g[0] || r.category === g[1])).toBe(true);
   });
 });

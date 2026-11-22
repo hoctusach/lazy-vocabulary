@@ -17,7 +17,7 @@ import { BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
 import { DEFAULT_SET_ID } from '@/features/word-sets/types';
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
-import { hasCachedTodaySelection } from '@/services/learningProgressService';
+import { DAILY_TOTAL_WORDS, hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
 import { ChevronDown, Eye } from 'lucide-react';
@@ -316,6 +316,12 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
               {!hasSelectionWords && (
                 <div className="text-sm text-[var(--lv-text-secondary)] italic">No daily selection available yet.</div>
               )}
+              <p className="text-sm font-medium" data-testid="today-total">
+                Today: {newTodayList.length + dueTodayList.length}/{DAILY_TOTAL_WORDS}
+                <span className="font-normal text-[var(--lv-text-secondary)]">
+                  {' '}({newTodayList.length} new + {dueTodayList.length} due; words you mark learned leave the list)
+                </span>
+              </p>
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="space-y-1.5">
                   <h4 className="font-medium text-[var(--lv-success)]">NEW TODAY ({newTodayList.length})</h4>
