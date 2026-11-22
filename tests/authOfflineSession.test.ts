@@ -17,7 +17,7 @@ const stored = {
   session: { user_unique_key: 'tester', nickname: 'Tester', authenticated_at: new Date().toISOString(), user: { id: 'tester', nickname: 'Tester', email: null } },
 };
 
-describe('ensureSupabaseAuthSession with an expired edge session', () => {
+describe('[FB-26] ensureSupabaseAuthSession with an expired edge session', () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem('lazyVoca.authState', JSON.stringify(stored));

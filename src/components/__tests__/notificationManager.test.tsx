@@ -10,7 +10,7 @@ const setNotification = (permission: string | null) => {
 
 afterEach(() => { cleanup(); delete (window as unknown as Record<string, unknown>).Notification; });
 
-describe('NotificationManager (web reminders toggle)', () => {
+describe('[FB-13] NotificationManager (web reminders toggle)', () => {
   it('shows a visible "Reminders: off" label when permission is not granted', () => {
     setNotification('default');
     render(<NotificationManager />);

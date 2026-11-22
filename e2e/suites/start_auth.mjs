@@ -98,7 +98,7 @@ test('AUTH-09', 'Nickname taken message; stays in create mode', async ({ session
   await waitText(s, 'That nickname is already taken. Try another.');
   await waitText(s, 'Create your profile');
 });
-test('AUTH-10', 'Backend unreachable: friendly message, button re-enabled, no crash', async ({ session }) => {
+test('AUTH-10', 'Backend unreachable: friendly message, button re-enabled, no crash [FB-19]', async ({ session }) => {
   const s = await session({ signedIn: false, fake: { mode: 'down' } }); s.allow.push(/Failed to fetch|NetworkError/);
   await gate(s); await fill(s, 'Tester', '1234'); await submit(s);
   await waitText(s, "Can't reach the server");
@@ -106,7 +106,7 @@ test('AUTH-10', 'Backend unreachable: friendly message, button re-enabled, no cr
   eq(dis, false, 'sign in button should be enabled again');
   ok(!(await body(s)).includes('Failed to fetch'), 'raw browser message leaked');
 });
-test('AUTH-12', 'Expired session with stored passcode: no gate, app still shows local words with backend down', async ({ session }) => {
+test('AUTH-12', 'Expired session with stored passcode: no gate, app still shows local words with backend down [FB-26]', async ({ session }) => {
   const s = await session({ fake: { mode: 'down' }, storage: { 'lazyVoca.auth': JSON.stringify({ session_token: 'a.b.c', expires_at: 1, user_unique_key: 'e2e', nickname: 'e2e' }) } });
   await s.goto('/'); await sleep(2500);
   ok(!(await body(s)).includes('Access your vocabulary'), 'gate shown for expired session');

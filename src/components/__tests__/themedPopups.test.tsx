@@ -9,7 +9,7 @@ import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 
 vi.mock('canvas-confetti', () => ({ default: vi.fn() }));
 
-describe('theme-consistent popups', () => {
+describe('[FB-08] theme-consistent popups', () => {
   it('Mark as Learned dialog uses the shared themed surface and buttons (no hard-coded palette)', () => {
     render(<MarkAsLearnedDialog isOpen onClose={() => {}} onConfirm={() => {}} word="resilient" />);
     const dlg = screen.getByRole('alertdialog');

@@ -14,7 +14,7 @@ import { usePlaybackService } from '../usePlaybackService';
 const base = { onPause: vi.fn(), onNext: vi.fn() };
 beforeEach(() => vi.clearAllMocks());
 
-describe('usePlaybackService', () => {
+describe('[FB-16] usePlaybackService', () => {
   it('starts on play, updates on word change, stops on pause', () => {
     const { rerender } = renderHook((p) => usePlaybackService(p), {
       initialProps: { ...base, isPlaying: true, word: 'a', detail: 'x' },

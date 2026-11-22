@@ -14,7 +14,7 @@ const renderCard = () => render(
   <VocabularyCardNew word="give up" meaning="to stop" example="Never give up." translation="từ bỏ" backgroundColor="#fff" isSpeaking={false} category="phrases" />,
 );
 
-describe('translation line visibility', () => {
+describe('[FB-14] translation line visibility', () => {
   afterEach(() => { cleanup(); setLocale('en-US'); });
   it('shows on vi-VN', () => { setLocale('vi-VN'); renderCard(); expect(screen.queryByText('* từ bỏ')).not.toBeNull(); });
   it('hidden on en-US', () => { setLocale('en-US'); renderCard(); expect(screen.queryByText('* từ bỏ')).toBeNull(); });

@@ -62,7 +62,7 @@ const setSheets = {
   ],
 };
 
-describe('mixed learning queue', () => {
+describe('[FB-18] mixed learning queue', () => {
   afterEach(cleanup);
   beforeEach(() => {
     localStorage.clear();
@@ -171,7 +171,7 @@ describe('header label for a mix', () => {
     return text;
   };
 
-  it('built-in collection name by default, "Mixed: N sets" for several', () => {
+  it('[FB-24] built-in collection name by default, "Mixed: N sets" for several', () => {
     expect(label()).toBe('Word Set: C1, C2');
     setSelectedSources(['default:idioms', 'default:grammar']);
     expect(label()).toBe('Mixed: 2 sets');

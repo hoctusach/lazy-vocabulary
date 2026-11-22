@@ -28,11 +28,11 @@ const renderScreen = () =>
 
 const box = (name: string) => screen.getByRole('checkbox', { name }) as HTMLInputElement;
 
-describe('Sets screen: multi-source checkboxes', () => {
+describe('[FB-18] Sets screen: multi-source checkboxes', () => {
   beforeEach(() => localStorage.clear());
   afterEach(cleanup);
 
-  it('renders the six groups with word counts, all checked by default, plus a summary', () => {
+  it('[FB-24] renders the six groups with word counts, all checked by default, plus a summary', () => {
     renderScreen();
     const counts = builtinGroupCounts();
     for (const group of BUILTIN_GROUPS) {

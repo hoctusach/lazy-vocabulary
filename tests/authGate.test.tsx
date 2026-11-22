@@ -41,7 +41,7 @@ describe('AUTH-04: passcode validation', () => {
   });
 });
 
-describe('AUTH-05: friendly sign-in errors', () => {
+describe('[FB-19] AUTH-05: friendly sign-in errors', () => {
   it('maps "Failed to fetch" to the offline message', () => {
     expect(friendlyAuthMessage(new TypeError('Failed to fetch'), 'Sign-in failed')).toBe(OFFLINE_MESSAGE);
     expect(friendlyAuthMessage(new TypeError('Load failed'), 'x')).toBe(OFFLINE_MESSAGE);
@@ -78,7 +78,7 @@ describe('AuthGate component', () => {
     await screen.findByText('Access your vocabulary');
   }
 
-  it('AUTH-05: shows a friendly message when the network call fails', async () => {
+  it('[FB-19] AUTH-05: shows a friendly message when the network call fails', async () => {
     const fetchMock = vi.fn().mockRejectedValue(new TypeError('Failed to fetch'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     await openGate();

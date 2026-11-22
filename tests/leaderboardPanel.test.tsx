@@ -58,7 +58,7 @@ vi.mock('@/lib/supabaseClient', () => ({
 
 import LeaderboardPanel from '@/components/vocabulary-app/LeaderboardPanel';
 
-describe('LeaderboardPanel (friends)', () => {
+describe('[FB-25] LeaderboardPanel (friends)', () => {
   afterEach(cleanup);
   beforeEach(() => {
     mocks.signedOut = false;
@@ -75,7 +75,7 @@ describe('LeaderboardPanel (friends)', () => {
     await screen.findByText(/No friends yet/);
   };
 
-  it('empty state collapses to one "Add a friend" button; the form appears after clicking it', async () => {
+  it('[FB-12] empty state collapses to one "Add a friend" button; the form appears after clicking it', async () => {
     render(<LeaderboardPanel />);
     await screen.findByRole('button', { name: 'Add a friend' });
     expect(screen.queryByLabelText("Friend's nickname")).toBeNull();
@@ -103,7 +103,7 @@ describe('LeaderboardPanel (friends)', () => {
     expect(screen.getByRole('group', { name: 'Leaderboard period' })).toBeTruthy();
   });
 
-  it('signed out: prompts sign in, lists nobody, no add form', async () => {
+  it('[FB-02] signed out: prompts sign in, lists nobody, no add form', async () => {
     mocks.signedOut = true;
     render(<LeaderboardPanel />);
     await screen.findByText(/Sign in to add friends/);
@@ -120,7 +120,7 @@ describe('LeaderboardPanel (friends)', () => {
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeTruthy();
   });
 
-  it('signed in locally but session cannot be renewed: expired text + Sign in again, no add form', async () => {
+  it('[FB-02] signed in locally but session cannot be renewed: expired text + Sign in again, no add form', async () => {
     mocks.expired = true;
     mocks.localSignIn = true;
     render(<LeaderboardPanel />);

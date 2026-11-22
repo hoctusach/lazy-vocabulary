@@ -3,7 +3,7 @@ import { KOKORO_VOICES, getKokoroVoiceByName, isKokoroVoiceName, mapRateToKokoro
 
 const [heart, michael] = KOKORO_VOICES;
 
-describe('kokoroVoices', () => {
+describe('[FB-03][FB-04] kokoroVoices', () => {
   it('lists Heart (female, default) first, then Michael', () => {
     expect(KOKORO_VOICES.map((v) => v.id)).toEqual(['af_heart', 'am_michael']);
     expect(heart.baseSpeed).toBe(0.95);

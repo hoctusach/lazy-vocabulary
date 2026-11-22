@@ -35,7 +35,7 @@ async function freshShim() {
 
 const flush = () => new Promise((r) => setTimeout(r, 0));
 
-describe('NATIVE-08: shim install rules', () => {
+describe('[FB-15] NATIVE-08: shim install rules', () => {
   afterEach(() => {
     native.value = false;
   });
@@ -59,7 +59,7 @@ describe('NATIVE-08: shim install rules', () => {
   });
 });
 
-describe('NATIVE-07: native TTS shim', () => {
+describe('[FB-15] NATIVE-07: native TTS shim', () => {
   beforeEach(() => {
     native.value = true; // loadNativeTts() only returns the plugin on a native platform
     vi.clearAllMocks();

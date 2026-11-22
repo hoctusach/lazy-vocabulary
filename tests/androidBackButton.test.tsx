@@ -31,7 +31,7 @@ import {
 } from '@/components/mobile/useAndroidBackButton';
 import type { AppTab } from '@/components/mobile/BottomTabBar';
 
-describe('NATIVE-01..04: decideBackAction (pure)', () => {
+describe('[FB-21] NATIVE-01..04: decideBackAction (pure)', () => {
   it('closes an open dialog first, whatever the tab', () => {
     for (const tab of ['learn', 'progress', 'sets', 'more'] as AppTab[]) {
       expect(decideBackAction({ hasOpenDialog: true, tab })).toBe('close-dialog');
@@ -47,7 +47,7 @@ describe('NATIVE-01..04: decideBackAction (pure)', () => {
   });
 });
 
-describe('NATIVE-01..04: useAndroidBackButton', () => {
+describe('[FB-21] NATIVE-01..04: useAndroidBackButton', () => {
   beforeEach(() => {
     native.value = true;
     backHandler = null;

@@ -27,7 +27,7 @@ beforeEach(() => {
   plugin.addListener.mockImplementation(async (_e: string, cb: typeof actionCb) => { actionCb = cb; return { remove: vi.fn() }; });
 });
 
-describe('playbackService', () => {
+describe('[FB-16] playbackService', () => {
   it('starts on play and asks notification permission only once (denied is fine)', async () => {
     await startPlaybackService({ title: 'run', text: 'chạy' });
     expect(plugin.requestNotificationPermission).toHaveBeenCalledTimes(1);

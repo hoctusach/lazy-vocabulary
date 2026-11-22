@@ -21,7 +21,7 @@ const renderControls = (props: Record<string, unknown> = {}) =>
   );
 
 describe('Learn controls', () => {
-  it('has no Details/Practice buttons and a quiet, sentence-case Mark as learned button', () => {
+  it('[FB-09] has no Details/Practice buttons and a quiet, sentence-case Mark as learned button', () => {
     renderControls();
     expect(screen.queryByLabelText('Vocabulary Detail')).toBeNull();
     expect(screen.queryByLabelText('Practice')).toBeNull();
@@ -37,7 +37,7 @@ describe('Learn controls', () => {
     expect(b.className).toContain('lv-ctl-mark');
   });
 
-  it('top level is Audio, Pause, Next, Search, Mark as learned; no Mute/Voice/Rate until Audio opens', async () => {
+  it('[FB-10] top level is Audio, Pause, Next, Search, Mark as learned; no Mute/Voice/Rate until Audio opens', async () => {
     renderControls();
     const labels = screen.getAllByRole('button').map((b) => b.getAttribute('aria-label'));
     expect(labels).toEqual(['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']);
@@ -50,7 +50,7 @@ describe('Learn controls', () => {
     expect(screen.getByLabelText('Speech Rate')).toBeTruthy();
   });
 
-  it('Audio sheet: mute toggles, voice cycles, rate offers 7 options and closes after choosing', async () => {
+  it('[FB-10] Audio sheet: mute toggles, voice cycles, rate offers 7 options and closes after choosing', async () => {
     const onToggleMute = vi.fn(); const onCycleVoice = vi.fn();
     renderControls({ onToggleMute, onCycleVoice });
     await userEvent.click(screen.getByLabelText('Audio'));

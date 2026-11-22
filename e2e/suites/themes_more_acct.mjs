@@ -107,7 +107,7 @@ test('THEME-14', 'New users get Cozy Sloth (light, Pro split on); legacy stored 
     await g.close();
   }
 });
-test('THEME-12', 'Overlays render readable in every theme (dark): dialogs, search, practice, AuthGate', async ({ session }) => {
+test('THEME-12', 'Overlays render readable in every theme (dark): dialogs, search, practice, AuthGate [FB-08]', async ({ session }) => {
   for (const [name] of THEMES) {
     const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': 'true' } }); await boot(s);
     await s.page.evaluate(() => document.documentElement.classList.add('dark'));
@@ -148,7 +148,7 @@ test('MORE-01', 'More panel content', async ({ session }) => {
   ok(/youtube\.com|youtu\.be/.test(a.href) && a.target === '_blank' && /noopener/.test(a.rel), JSON.stringify(a));
 });
 for (const [perm, expect] of [['default', 'false'], ['granted', 'true'], ['denied', 'false'], [null, null]]) {
-  test(`MORE-02-${perm}`, `Notification permission ${perm}: toggle ${perm ? 'aria-pressed=' + expect : 'hidden'}`, async ({ session }) => {
+  test(`MORE-02-${perm}`, `Notification permission ${perm}: toggle ${perm ? 'aria-pressed=' + expect : 'hidden'} [FB-13]`, async ({ session }) => {
     const init = perm ? `window.Notification = function(){}; window.Notification.permission='${perm}'; window.Notification.requestPermission = async () => '${perm}';` : 'delete window.Notification;';
     const s = await session({ initScript: init }); await boot(s); await tab(s, 'More');
     const b = await s.page.evaluate(() => { const e = [...document.querySelectorAll('button')].find((x) => /reminder|notification/i.test(x.getAttribute('aria-label') || '')); return e ? e.getAttribute('aria-pressed') : undefined; });

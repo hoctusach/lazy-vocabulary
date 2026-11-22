@@ -21,7 +21,7 @@ const row = (user_key: string, rank: number, learned: number, me = false) => ({
   user_key, nickname: user_key.toUpperCase(), rank, learned_words: learned, learning_words: 1, due_words: 0, is_current_user: me,
 });
 
-describe('friends leaderboard state', () => {
+describe('[FB-25] friends leaderboard state', () => {
   beforeEach(() => {
     mocks.session = { user_unique_key: 'me' };
     mocks.rpc.mockReset();
@@ -58,7 +58,7 @@ describe('friends leaderboard state', () => {
     expect(mocks.rpc).not.toHaveBeenCalled();
   });
 
-  it('rejected server session (28000, no passcode) reads as session expired', async () => {
+  it('[FB-02] rejected server session (28000, no passcode) reads as session expired', async () => {
     mocks.rpc.mockResolvedValue({ data: null, error: { code: '28000', message: 'invalid session' } });
     expect(await getLeaderboardState()).toMatchObject({ sessionExpired: true, entries: [] });
   });

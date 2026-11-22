@@ -24,7 +24,7 @@ test('REM-01', 'Web without the plugin: no reminders card, no errors', async ({ 
   ok(!(await s.page.$('[data-testid=reminders-card]')), 'card must be hidden without plugin');
 });
 
-test('REM-02', 'Granted: toggle on schedules 3 slots/day, edit time and slot-off re-plan, toggle off cancels all', async ({ session }) => {
+test('REM-02', 'Granted: toggle on schedules 3 slots/day, edit time and slot-off re-plan, toggle off cancels all [FB-07]', async ({ session }) => {
   const s = await session({ initScript: mock('granted') }); await boot(s); await tab(s, 'More');
   await s.page.waitForSelector('[data-testid=reminders-card]');
   eq(await s.page.$('[data-testid=reminders-slots]'), null, 'slots hidden while off');

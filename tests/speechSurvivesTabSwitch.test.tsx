@@ -63,7 +63,7 @@ afterEach(() => {
 
 const go = (name: string) => fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}$`, 'i') }));
 
-describe('tab switching never stops speech', () => {
+describe('[FB-01] tab switching never stops speech', () => {
   it('keeps the Learn player mounted and calls no stop/cancel through every tab round trip', () => {
     render(<Index />);
     expect(mounts.mount).toBe(1);
@@ -89,7 +89,7 @@ describe('tab switching never stops speech', () => {
   });
 });
 
-describe('stop is reserved for user intent', () => {
+describe('[FB-01] stop is reserved for user intent', () => {
   it('stopSpeechForUserIntent is the explicit stop path', () => {
     stopSpeechForUserIntent('user-pause');
     expect(stops.controllerStop).toHaveBeenCalledTimes(1);

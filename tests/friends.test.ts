@@ -28,7 +28,7 @@ import {
 
 const fail = (code: string, message = '') => ({ data: null, error: { code, message } });
 
-describe('friends helpers', () => {
+describe('[FB-25] friends helpers', () => {
   beforeEach(() => {
     mocks.session = { user_unique_key: 'me' };
     mocks.rpc.mockReset();
@@ -100,7 +100,7 @@ describe('friends helpers', () => {
     await expect(listFriends()).rejects.toMatchObject({ kind: 'unavailable' });
   });
 
-  describe('rejected session token (28000)', () => {
+  describe('[FB-02] rejected session token (28000)', () => {
     it('refreshes with the stored passcode and retries exactly once', async () => {
       mocks.rpc
         .mockResolvedValueOnce(fail('28000', 'invalid or expired session'))
@@ -139,7 +139,7 @@ describe('friends helpers', () => {
       expect(mocks.rpc).toHaveBeenCalledTimes(1);
     });
 
-    it('no session but locally signed in -> session_expired; not signed in -> signed_out', async () => {
+    it('[FB-02] no session but locally signed in -> session_expired; not signed in -> signed_out', async () => {
       mocks.session = null;
       await expect(listFriends()).rejects.toMatchObject({ kind: 'session_expired' });
       mocks.signedInLocally = false;

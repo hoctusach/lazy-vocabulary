@@ -8,7 +8,7 @@ function isoDaysAgo(daysAgo: number, from = new Date("2024-06-15T12:00:00")): st
   return `${d.getFullYear()}-${m}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-describe('calculateCurrentStreak', () => {
+describe('[FB-17] calculateCurrentStreak', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -45,7 +45,7 @@ describe('calculateCurrentStreak', () => {
   });
 });
 
-describe('hasLearnedToday', () => {
+describe('[FB-17] hasLearnedToday', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -65,7 +65,7 @@ describe('hasLearnedToday', () => {
   });
 });
 
-describe('getRecentDays', () => {
+describe('[FB-17] getRecentDays', () => {
   afterEach(() => {
     vi.useRealTimers();
   });

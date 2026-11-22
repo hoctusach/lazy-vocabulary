@@ -19,7 +19,7 @@ vi.mock('@capacitor-community/text-to-speech', () => {
 
 type AnyWin = Window & Record<string, unknown>;
 
-describe('REG-02: shim and plugin web fallback must not call each other forever', () => {
+describe('[FB-20] REG-02: shim and plugin web fallback must not call each other forever', () => {
   beforeEach(() => {
     native.value = false;
     vi.resetModules();

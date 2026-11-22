@@ -9,7 +9,7 @@ import { ThemeProvider } from '@/contexts/ThemeContext';
 
 afterEach(() => vi.restoreAllMocks());
 
-describe('ThemeProvider with blocked storage', () => {
+describe('[FB-22] ThemeProvider with blocked storage', () => {
   it('renders its children when localStorage throws', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new DOMException('denied', 'SecurityError'); });
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('denied', 'SecurityError'); });

@@ -23,7 +23,7 @@ import * as auto from '../kokoro/kokoroAutoDownload';
 import * as prefs from '../kokoro/kokoroPrefs';
 import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
-describe('kokoro auto download', () => {
+describe('[FB-04] kokoro auto download', () => {
   beforeEach(() => {
     tts.__resetKokoroForTests();
     window.localStorage.clear();

@@ -5,7 +5,7 @@ import SrsTipCard from '../SrsTipCard';
 
 afterEach(() => { cleanup(); localStorage.clear(); vi.restoreAllMocks(); });
 
-describe('SrsTipCard', () => {
+describe('[FB-11] SrsTipCard', () => {
   it('shows the intro, dismisses with X and stays hidden on remount', () => {
     vi.spyOn(navigator, 'languages', 'get').mockReturnValue(['en-US']);
     const { unmount } = render(<SrsTipCard total={3000} due={0} />);

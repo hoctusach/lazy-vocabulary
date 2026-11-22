@@ -6,7 +6,7 @@ import {
 
 afterEach(() => { localStorage.clear(); vi.restoreAllMocks(); });
 
-describe('buildSrsTip', () => {
+describe('[FB-11] buildSrsTip', () => {
   it('English intro copy with plan line', () => {
     const t = buildSrsTip({ isVietnamese: false, total: 3000, due: 0 });
     expect(t.kind).toBe('intro');
@@ -46,7 +46,7 @@ describe('once-a-day dismissal', () => {
     expect(isDismissedToday(new Date(2026, 10, 17, 0, 1))).toBe(false);
     expect(localDateKey(new Date(2026, 0, 5))).toBe('2026-01-05');
   });
-  it('survives broken localStorage', () => {
+  it('[FB-22] survives broken localStorage', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('denied'); });
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('denied'); });
     expect(isDismissedToday()).toBe(false);

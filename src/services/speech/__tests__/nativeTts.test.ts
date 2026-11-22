@@ -43,14 +43,14 @@ describe('buildSpeakOptions', () => {
   });
 });
 
-describe('shouldUseNativeTts', () => {
+describe('[FB-15] shouldUseNativeTts', () => {
   it('uses native when Web Speech is absent', () => {
     expect(shouldUseNativeTts(false)).toBe(true);
     expect(shouldUseNativeTts(true)).toBe(false); // jsdom is not native
   });
 });
 
-describe('webSpeech helpers when speechSynthesis is missing', () => {
+describe('[FB-15] webSpeech helpers when speechSynthesis is missing', () => {
   it('never throws', () => {
     const w = window as unknown as Record<string, unknown>;
     const saved = Object.getOwnPropertyDescriptor(w, 'speechSynthesis');
@@ -62,7 +62,7 @@ describe('webSpeech helpers when speechSynthesis is missing', () => {
   });
 });
 
-describe('native speech shim', () => {
+describe('[FB-15] native speech shim', () => {
   afterEach(() => { native.value = false; });
   beforeEach(() => { native.value = true; speak.mockReset(); stop.mockClear(); vi.resetModules(); });
 

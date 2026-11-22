@@ -65,7 +65,7 @@ const addFriend = async (s, name) => {
   await click(s, { text: 'Add' }); await sleep(600);
 };
 const quizTop = (s) => s.page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /quiz me/i.test(x.textContent || '')); return b ? Math.round(b.getBoundingClientRect().top + scrollY) : null; });
-test('PROG-11', 'Leaderboard: signed in, no friends -> single "Add a friend" CTA; click reveals only-me board, add field + share; collapse/expand', async ({ session }) => {
+test('PROG-11', 'Leaderboard: signed in, no friends -> single "Add a friend" CTA; click reveals only-me board, add field + share; collapse/expand [FB-12]', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'Add a friend'); await sleep(400);
   let t = await flat(s);
   ok(!/No friends yet/.test(t) && !t.includes('Share my nickname'), 'form must be hidden until Add a friend: ' + t.slice(0, 200));
@@ -82,7 +82,7 @@ test('PROG-11', 'Leaderboard: signed in, no friends -> single "Add a friend" CTA
   await click(s, { label: 'Collapse leaderboard' }); await sleep(300); ok(!/No friends yet/.test(await flat(s)), 'collapsed'); ok(await U.label(s, 'Add a friend'), 'CTA remains');
   await click(s, { label: 'Add a friend' }); await sleep(300); ok(/No friends yet/.test(await flat(s)), 'expanded');
 });
-test('PROG-13', 'Add friend by nickname (case/spaces), ranked board, unknown nick, add self, remove', async ({ session }) => {
+test('PROG-13', 'Add friend by nickname (case/spaces), ranked board, unknown nick, add self, remove [FB-25]', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s); await click(s, { label: 'Add a friend' }); await waitText(s, 'No friends yet');
   await addFriend(s, 'nobody'); await waitText(s, 'No learner with that nickname was found.'); eq((await lbRows(s)).length, 1, 'board unchanged');
   await addFriend(s, '  E2E '); await waitText(s, "That's you");
@@ -92,7 +92,7 @@ test('PROG-13', 'Add friend by nickname (case/spaces), ranked board, unknown nic
   await click(s, { label: 'Remove Bob Smith' }); await waitText(s, 'Remove friend?'); await click(s, { text: 'Remove', inDialog: true }); await sleep(700);
   rows = await lbRows(s); eq(rows.length, 1, 'only me again: ' + rows.join(' | ')); await waitText(s, 'No friends yet');
 });
-test('PROG-14', 'Periods Today / This week / All time follow the server counts', async ({ session }) => {
+test('PROG-14', 'Periods Today / This week / All time follow the server counts [FB-25]', async ({ session }) => {
   const s = await session({ fake: { friends: { e2e: ['alice', 'carol'] } } }); await boot(s); await openProgress(s); await sleep(1000);
   const first = async () => (await lbRows(s)).map((r) => r.replace(/\s+(learned|learning|due)/g, '').slice(0, 40));
   let r = await lbRows(s); ok(/Alice/.test(r[0]) && /20/.test(r[0]), 'all time: ' + r.join(' | '));
@@ -103,20 +103,20 @@ test('PROG-14', 'Periods Today / This week / All time follow the server counts',
   const periods = s.fake.calls.filter((c) => c.name === 'get_friends_leaderboard').map((c) => c.body.p_period);
   ok(['allTime', 'today', 'week'].every((p) => periods.includes(p)), 'periods requested: ' + periods);
 });
-test('PROG-15', 'Signed out: sign-in prompt, no board, no friends calls, no other users', async ({ session }) => {
+test('PROG-15', 'Signed out: sign-in prompt, no board, no friends calls, no other users [FB-02]', async ({ session }) => {
   const s = await session({ signedIn: false }); s.allow.push(/AuthGate|auth:/); await s.goto('/'); await sleep(1500);
   await s.page.evaluate(() => localStorage.clear()); await s.reload(); await sleep(1200);
   await openProgress(s).catch(() => {}); await tab(s, 'Progress'); await sleep(800);
   const t = await flat(s); ok(!/alice|bob smith|carol/i.test(t), 'no other users');
   eq(s.fake.calls.filter((c) => /friend/.test(c.name)).length, 0, 'no friends RPC without a session');
 });
-test('PROG-16', 'Server rejects session even after re-exchange: session-expired prompt + Sign in again', async ({ session }) => {
+test('PROG-16', 'Server rejects session even after re-exchange: session-expired prompt + Sign in again [FB-02]', async ({ session }) => {
   const s = await session({ fake: { sessionValid: false } }); s.allow.push(/friends:|leaderboard/i);
   await boot(s); await openProgress(s); await waitText(s, 'Your session expired');
   ok(await s.page.evaluate(() => [...document.querySelectorAll('button')].some((b) => b.textContent.trim() === 'Sign in again')), 'sign-in-again button');
   ok(!/alice|bob smith|carol/i.test(await flat(s)), 'no other users');
 });
-test('PROG-17', 'Stale server token (28000 once): transparent re-exchange then board loads, add box present', async ({ session }) => {
+test('PROG-17', 'Stale server token (28000 once): transparent re-exchange then board loads, add box present [FB-02]', async ({ session }) => {
   const s = await session({ fake: { staleToken: true } }); s.allow.push(/friends:|leaderboard/i);
   await boot(s); await openProgress(s); await waitText(s, 'Add a friend'); await click(s, { label: 'Add a friend' }); await waitText(s, 'No friends yet');
   ok(!/session expired|Sign in to add/i.test(await flat(s)), 'no sign-in prompt');
@@ -125,7 +125,7 @@ test('PROG-17', 'Stale server token (28000 once): transparent re-exchange then b
   const lb = s.fake.calls.filter((c) => c.name === 'get_friends_leaderboard');
   ok(lb.length >= 2, 'rejected once then retried: ' + lb.length);
 });
-test('PROG-18', 'Stale token and no stored passcode: session-expired text + Sign in again opens sign-in prefilled', async ({ session }) => {
+test('PROG-18', 'Stale token and no stored passcode: session-expired text + Sign in again opens sign-in prefilled [FB-02]', async ({ session }) => {
   const s = await session({ fake: { staleToken: true } }); s.allow.push(/friends:|leaderboard|AuthGate|auth:/i);
   await s.goto('/'); await sleep(1500);
   await s.page.evaluate(() => localStorage.removeItem('lazyVoca.passcode')); await s.reload(); await sleep(1500);

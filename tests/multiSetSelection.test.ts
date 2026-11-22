@@ -91,7 +91,7 @@ describe('multi-set selection', () => {
     expect(selectedImportedIds()).toEqual([id]);
   });
 
-  it('importing adds to the selection without deselecting anything', () => {
+  it('[FB-18] importing adds to the selection without deselecting anything', () => {
     setSelectedSources(['default:idioms']);
     const id = mk();
     expect(getSelectedSources()).toEqual(['default:idioms', id]);
@@ -116,7 +116,7 @@ describe('multi-set selection', () => {
   });
 });
 
-describe('multi-set selection: storage failures and header label', () => {
+describe('[FB-22] multi-set selection: storage failures and header label', () => {
   beforeEach(() => localStorage.clear());
 
   it('reads fall back to all groups when localStorage.getItem throws', () => {

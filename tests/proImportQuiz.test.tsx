@@ -24,7 +24,7 @@ beforeEach(() => {
 });
 afterEach(() => { cleanup(); vi.unstubAllEnvs(); vi.useRealTimers(); });
 
-describe('word-set import gating', () => {
+describe('[FB-06] word-set import gating', () => {
   const sheets = { General: [{ word: 'alpha', meaning: 'first', example: 'alpha ex', translation: '', category: 'General' }] };
   const mount = () => render(<VocabularySetProvider><VocabularySetsScreen /></VocabularySetProvider>);
 
@@ -87,7 +87,7 @@ describe('word-set import gating', () => {
   });
 });
 
-describe('Quiz me: 1 per local day for free', () => {
+describe('[FB-06] Quiz me: 1 per local day for free', () => {
   it('local day key uses the device-local date, not UTC', () => {
     const d = new Date(2026, 10, 21, 23, 59, 0); // local 23:59
     expect(localDayKey(d)).toBe('2026-11-21');
@@ -104,7 +104,7 @@ describe('Quiz me: 1 per local day for free', () => {
     expect(quizSessionsToday(new Date(2026, 10, 22, 0, 1))).toBe(0);
   });
 
-  it('service tolerates corrupt / blocked storage', () => {
+  it('[FB-22] service tolerates corrupt / blocked storage', () => {
     localStorage.setItem('lazyVoca.quiz.daily.v1', '{not json');
     expect(canStartQuiz(false)).toBe(true);
     const s = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw new Error('blocked'); });

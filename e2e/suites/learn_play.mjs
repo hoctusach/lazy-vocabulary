@@ -35,7 +35,7 @@ test('TAB-05', 'Tab round-trip keeps word and paused state', async ({ session })
   await waitWord(s, W[2]);
   ok(await label(s, 'Play'), 'should still be paused');
 });
-test('TAB-06', 'Auto-play keeps speaking across tab switches (no cancel, keeps advancing)', async ({ session }) => {
+test('TAB-06', 'Auto-play keeps speaking across tab switches (no cancel, keeps advancing) [FB-01]', async ({ session }) => {
   const s = await session({}); await boot(s);
   const cur = () => s.page.evaluate(() => !!window.__speech.current);
   const before = await speechInfo(s);
@@ -72,13 +72,13 @@ test('TAB-07', 'Desktop layout has no tabs; resize across 768 keeps working', as
 const VI_INIT = "(() => { const L = ['vi-VN', 'vi']; Object.defineProperty(navigator, 'language', { get: () => L[0], configurable: true }); Object.defineProperty(navigator, 'languages', { get: () => L, configurable: true }); })();";
 const EN_INIT = "(() => { const L = ['en-US', 'en']; Object.defineProperty(navigator, 'language', { get: () => L[0], configurable: true }); Object.defineProperty(navigator, 'languages', { get: () => L, configurable: true }); })();";
 const cardText = (s) => s.page.evaluate(() => document.querySelector('main').innerText);
-test('LEARN-01', 'Card fields (vi-VN device so the translation line shows)', async ({ session }) => {
+test('LEARN-01', 'Card fields (vi-VN device so the translation line shows) [FB-14]', async ({ session }) => {
   const s = await session({ initScript: VI_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'vi-VN,vi;q=0.9' }); await boot(s);
   const c = await s.page.evaluate(() => { const m = document.querySelector('main'); return { pill: m.querySelector('h3')?.textContent, w: m.querySelector('h1')?.textContent, txt: m.innerText }; });
   eq(c.pill, 'Phrasal Verb'); eq(c.w, U.P[0].word);
   ok(c.txt.includes('* ' + U.P[0].meaning) && c.txt.includes('* ' + U.P[0].example) && c.txt.includes('* ' + U.P[0].translation));
 });
-test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as learned (no Mute/Voice/Rate), 4-col grid, no Previous', async ({ session }) => {
+test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as learned (no Mute/Voice/Rate), 4-col grid, no Previous [FB-10]', async ({ session }) => {
   const s = await session({}); await boot(s);
   for (const l of ['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
   for (const l of ['Mute', 'Unmute', 'Change Voice', 'Speech Rate', 'Mark as LEARNED']) ok(!(await U.label(s, l)), 'should not be on the dock: ' + l);
@@ -93,7 +93,7 @@ test('LEARN-12', 'Details and Practice buttons are absent from Learn', async ({ 
   ok(!all.some((l) => /vocabulary detail|^practice$|^details$/i.test(l)), 'found: ' + all);
   eq(await s.page.evaluate(() => [...document.querySelectorAll('main button, main a')].filter((b) => /^(Details|Practice)$/.test(b.textContent.trim())).length), 0);
 });
-test('LEARN-13', 'Mark as learned is present, sentence case, and not more prominent than Pause', async ({ session }) => {
+test('LEARN-13', 'Mark as learned is present, sentence case, and not more prominent than Pause [FB-09]', async ({ session }) => {
   const s = await session({}); await boot(s);
   const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as learned"]'); const p = document.querySelector('main button[aria-label="Pause"]'); if (!b || !p) return null;
     const bb = b.getBoundingClientRect(), pb = p.getBoundingClientRect(); const cs = getComputedStyle(b), ps = getComputedStyle(p);
@@ -239,7 +239,7 @@ test('PLAY-10', 'Auto-advance on utterance end, not while paused', async ({ sess
 skip('PLAY-11', 'Practice pauses audio and resumes only if it was playing', 'removed: Practice button removed from Learn');
 
 // ---------- VOICE ----------
-test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence', async ({ session }) => {
+test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence [FB-10]', async ({ session }) => {
   const s = await session({}); await boot(s);
   const seen = [];
   for (let i = 0; i < 3; i++) {
@@ -262,7 +262,7 @@ test('VOICE-03', 'Voice persists across reload', async ({ session }) => {
   const calls = await U.speechCalls(s); const last = calls.filter((c) => U.re0.test(c.text)).at(-1);
   eq(last && last.voice, fav, 'voice after reload');
 });
-test('VOICE-04', 'Speed (inside Audio) has 7 options and the sheet closes after choosing', async ({ session }) => {
+test('VOICE-04', 'Speed (inside Audio) has 7 options and the sheet closes after choosing [FB-10]', async ({ session }) => {
   const s = await session({}); await boot(s);
   await U.openAudio(s); await ctl(s, 'Speech Rate'); await sleep(300);
   const opts = await s.page.evaluate(() => [...document.querySelectorAll('[data-testid="speech-rate-options"] button')].map((b) => b.textContent.trim()));
@@ -279,7 +279,7 @@ test('VOICE-05', 'Speed applied to utterance and persisted', async ({ session })
   eq((await prefs(s)).speech_rate, 1.5);
 });
 
-test('LANG-01', 'en-US device hides the Vietnamese translation', async ({ session }) => {
+test('LANG-01', 'en-US device hides the Vietnamese translation [FB-14]', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' }); await boot(s);
   const t = await cardText(s);
   ok(t.includes('* ' + U.P[0].meaning), 'meaning missing');
@@ -321,7 +321,7 @@ test('SRS-03', 'Dismiss hides the tip for the day; it returns when the stored da
   await s.reload(); await waitWord(s, W[0]);
   ok(await tipText(s), 'tip should reappear the next day');
 });
-test('SRS-05', 'After day 1 the intro collapses to title + Why?; Why? expands it for the session only', async ({ session }) => {
+test('SRS-05', 'After day 1 the intro collapses to title + Why?; Why? expands it for the session only [FB-11]', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await boot(s);
   await s.page.evaluate((k, v) => localStorage.setItem(k, v), 'lv.srsTip.firstSeenOn', localDay(-1));
   await s.reload(); await waitWord(s, W[0]);

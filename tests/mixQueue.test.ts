@@ -13,7 +13,7 @@ import type { VocabularyWord } from '@/types/vocabulary';
 
 const w = (word: string, category = 'c'): VocabularyWord => ({ word, meaning: 'm', example: 'e', count: 0, category });
 
-describe('planBuiltinSelection', () => {
+describe('[FB-18] planBuiltinSelection', () => {
   it('six groups -> RPC with NULL, no client filter', () => {
     expect(planBuiltinSelection(BUILTIN_GROUPS)).toEqual({ call: true, category: null, filterGroups: null });
   });
@@ -33,7 +33,7 @@ describe('planBuiltinSelection', () => {
   });
 });
 
-describe('interleave / dedupe / mixed queue', () => {
+describe('[FB-18] interleave / dedupe / mixed queue', () => {
   it('round-robins and skips exhausted lists', () => {
     expect(interleave([['a1', 'a2', 'a3'], ['b1'], ['c1', 'c2']])).toEqual(['a1', 'b1', 'c1', 'a2', 'c2', 'a3']);
     expect(interleave([[], []])).toEqual([]);

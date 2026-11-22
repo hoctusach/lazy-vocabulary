@@ -27,7 +27,7 @@ const wait = (ms = 30) => new Promise((r) => setTimeout(r, ms));
 const HEART = 'Kokoro Heart (US female)';
 const MICHAEL = 'Kokoro Michael (US male)';
 
-describe('Pro voice gating (Kokoro Michael)', () => {
+describe('[FB-04][FB-06] Pro voice gating (Kokoro Michael)', () => {
   beforeEach(() => {
     vi.resetModules();
     vi.stubEnv('VITE_ENABLE_PRO', 'true');

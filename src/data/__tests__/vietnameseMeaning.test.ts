@@ -5,7 +5,7 @@ import data from '../defaultVocabulary.json';
 // ê/ô and plain é/è/à/á/ó/ò/ú/ù/í/ì/ý are left out: English loanwords (café, naïve) use them.
 const VI = /[ăâđơưĂÂĐƠƯảãạằắẳẵặầấẩẫậẻẽẹềếểễệỉĩịỏõọồốổỗộờớởỡợủũụừứửữựỳỷỹỵ]/;
 
-describe('bundled vocabulary', () => {
+describe('[FB-23] bundled vocabulary', () => {
   it('has no Vietnamese text in the English meaning field', () => {
     const bad: string[] = [];
     for (const [cat, items] of Object.entries(data as Record<string, { word: string; meaning?: string }[]>)) {

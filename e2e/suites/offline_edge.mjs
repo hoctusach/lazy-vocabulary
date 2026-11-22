@@ -59,7 +59,7 @@ test('OFFLINE-07-local', 'Static: no non-local request escaped during this test'
 });
 
 // ---------- REG ----------
-test('REG-01', 'Blank-screen guard: root fills fast, no watchdog box, logs silenced', async ({ session }) => {
+test('REG-01', 'Blank-screen guard: root fills fast, no watchdog box, logs silenced [FB-15]', async ({ session }) => {
   const s = await session({}); const logs = []; s.page.on('console', (m) => { if (['log', 'info', 'debug', 'warning'].includes(m.type())) logs.push(m.text()); });
   const t0 = Date.now(); await s.page.goto(s.base + '/', { waitUntil: 'domcontentloaded' });
   await s.page.waitForFunction(() => (document.getElementById('root')?.children.length || 0) > 0, { timeout: 3000 });

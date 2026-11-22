@@ -26,7 +26,7 @@ function mockPlugin(display = 'granted', pending: { id: number; extra?: unknown 
 beforeEach(() => { localStorage.clear(); delete window.__LV_LOCAL_NOTIFICATIONS__; });
 
 describe('planReminders', () => {
-  it('plans 3 slots a day for 7 days at the default times', () => {
+  it('[FB-07] plans 3 slots a day for 7 days at the default times', () => {
     const plan = planReminders(on(), at(6), false, 'en');
     expect(plan).toHaveLength(21);
     expect(plan.slice(0, 3).map((r) => `${r.at.getHours()}:${r.at.getMinutes()}`)).toEqual(['8:0', '12:30', '20:30']);
@@ -37,13 +37,13 @@ describe('planReminders', () => {
     expect(plan.filter((r) => r.at.getDate() === 21)).toHaveLength(1);
     expect(plan).toHaveLength(19);
   });
-  it('never exceeds 3 per day even if settings carry more slots', () => {
+  it('[FB-07] never exceeds 3 per day even if settings carry more slots', () => {
     const s = on();
     s.slots = [...s.slots, { on: true, time: '10:00' }, { on: true, time: '11:00' }];
     const perDay = planReminders(s, at(6), false, 'en').filter((r) => r.at.getDate() === 22);
     expect(perDay).toHaveLength(3);
   });
-  it('skips only today once studied; tomorrow onward stays', () => {
+  it('[FB-07] skips only today once studied; tomorrow onward stays', () => {
     const plan = planReminders(on(), at(6), true, 'en');
     expect(plan.some((r) => r.at.getDate() === 21)).toBe(false);
     expect(plan).toHaveLength(18);
@@ -83,7 +83,7 @@ describe('replanReminders', () => {
     expect(first.smallIcon).toBe('ic_stat_notify');
     expect(first.extra.route).toBe('learn');
   });
-  it('after studying, reschedules from tomorrow', async () => {
+  it('[FB-07] after studying, reschedules from tomorrow', async () => {
     const { p } = mockPlugin();
     await replanReminders(p, on(), at(6), false, 'en');
     const n = await replanReminders(p, on(), at(9), true, 'en');
@@ -162,7 +162,7 @@ describe('study signal', () => {
     expect(hasStudiedToday()).toBe(true);
     expect(seen).toEqual([true, false]);
   });
-  it('replanNow skips today once studied', async () => {
+  it('[FB-07] replanNow skips today once studied', async () => {
     const { p } = mockPlugin(); window.__LV_LOCAL_NOTIFICATIONS__ = p;
     saveSettings(on());
     markStudiedToday('mark');

@@ -9,7 +9,7 @@ const importOk = async (s, f, n) => { await importFile(s, f); await waitText(s, 
 const noSets = async (s) => eq((await metaSets(s)).length, 0, 'a set was created');
 const dataOf = async (s, i = 0) => { const m = await metaSets(s); return Object.values(JSON.parse(await s.ls('lv.vocabularySets.data.' + m[i].id))).flat(); };
 
-test('SET-01', 'Initial list: built-in with six checked groups, no Rename/Delete', async ({ session }) => {
+test('SET-01', 'Initial list: built-in with six checked groups, no Rename/Delete [FB-24]', async ({ session }) => {
   const s = await session({}); await start(s);
   eq(await setNames(s), ['Word Set: C1, C2']);
   const t = await cardText(s, 'Word Set: C1, C2');
@@ -196,7 +196,7 @@ test('SET-26', 'The last selected source cannot be unticked (message shown)', as
   eq(await U.boxChecked(s, 'Include idioms'), true);
   eq(JSON.parse(await s.ls('lazyVoca.selectedSources.v1')), ['default:idioms']);
 });
-test('SET-27', 'Selection persists across a reload and is mixed with imported sets', async ({ session }) => {
+test('SET-27', 'Selection persists across a reload and is mixed with imported sets [FB-18]', async ({ session }) => {
   const s = await session({}); await start(s);
   await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection');
   await U.mix(s, ['idioms', 'grammar'], ['setA']);
@@ -206,7 +206,7 @@ test('SET-27', 'Selection persists across a reload and is mixed with imported se
   eq(await U.boxChecked(s, 'Include setA'), true); eq(await U.boxChecked(s, 'Include grammar'), true); eq(await U.boxChecked(s, 'Include topic vocab'), false);
   const st = await U.boxState(s, 'Select all groups of Word Set: C1, C2'); eq(st.indeterminate, true);
 });
-test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only from those sources', async ({ session }) => {
+test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only from those sources [FB-18]', async ({ session }) => {
   const s = await session({}); await start(s);
   await importFile(s, 'setA.csv'); await waitText(s, 'Imported 6 words into “setA”.');
   await U.mix(s, ['idioms'], ['setA']);
@@ -223,7 +223,7 @@ test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only f
   const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
   ok(calls.length >= 2 && calls.at(-1).body.p_category === 'idioms', 'last p_category must be idioms: ' + JSON.stringify(calls.map((c) => c.body)));
 });
-test('SET-MIX-02', 'Two built-in groups: every card over ~10 Next presses belongs to them', async ({ session }) => {
+test('SET-MIX-02', 'Two built-in groups: every card over ~10 Next presses belongs to them [FB-18]', async ({ session }) => {
   const s = await session({}); await start(s);
   await U.mix(s, ['phrasal verbs', 'idioms']);
   const pool = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'e2e/lib/pool.json'), 'utf8'));
@@ -237,7 +237,7 @@ test('SET-MIX-02', 'Two built-in groups: every card over ~10 Next presses belong
   const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
   ok(calls.length >= 1 && calls.at(-1).body.p_category == null, 'two groups -> p_category NULL: ' + JSON.stringify(calls.map((c) => c.body)));
 });
-test('SET-MIX-03', 'Deleting a selected imported set keeps the rest of the selection; survives reload', async ({ session }) => {
+test('SET-MIX-03', 'Deleting a selected imported set keeps the rest of the selection; survives reload [FB-18]', async ({ session }) => {
   const s = await session({}); await start(s);
   await importFile(s, 'setA.csv'); await waitText(s, 'Imported 6 words into “setA”.');
   await importFile(s, 'setB.csv'); await waitText(s, 'Imported 6 words into “setB”.');

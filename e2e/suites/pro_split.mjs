@@ -15,7 +15,7 @@ const noBuy = (s) => s.page.evaluate(() => !document.querySelector('[data-testid
 const closeSheet = async (s) => { await s.page.keyboard.press('Escape'); await s.page.waitForFunction(() => !document.querySelector('[data-testid=pro-upgrade-sheet]'), { timeout: 5000 }); };
 const theme = (s) => s.page.evaluate(() => ({ cls: [...document.body.classList].filter((c) => c.startsWith('theme-')).join(), dark: document.documentElement.classList.contains('dark'), ut: localStorage.getItem('user-theme') }));
 
-test('PRO-01', 'Free: other themes are locked; tapping opens the sheet with "Pro is coming soon" (no billing on web)', async ({ session }) => {
+test('PRO-01', 'Free: other themes are locked; tapping opens the sheet with "Pro is coming soon" (no billing on web) [FB-06]', async ({ session }) => {
   const s = await session({ ...FREE }); await boot(s);
   eq((await theme(s)).cls, 'theme-sloth');
   await tab(s, 'More');
@@ -35,7 +35,7 @@ test('PRO-01', 'Free: other themes are locked; tapping opens the sheet with "Pro
   await closeSheet(s);
 });
 
-test('PRO-02', 'Free with a stored non-sloth theme: moved to Cozy Sloth, dark kept, one-time toast', async ({ session }) => {
+test('PRO-02', 'Free with a stored non-sloth theme: moved to Cozy Sloth, dark kept, one-time toast [FB-06]', async ({ session }) => {
   const s = await session({ ...FREE, storage: { 'user-theme': 'riso', 'lv-dark': 'true' } }); await boot(s);
   await waitText(s, 'Your theme is now Cozy Sloth — other themes are part of Pro.');
   const r = await theme(s); eq(r.cls, 'theme-sloth'); eq(r.dark, true); eq(r.ut, 'sloth');
@@ -44,7 +44,7 @@ test('PRO-02', 'Free with a stored non-sloth theme: moved to Cozy Sloth, dark ke
   eq((await theme(s)).cls, 'theme-sloth');
 });
 
-test('PRO-03', 'Pro owner keeps a stored theme and sees "Pro unlocked ✓" in More', async ({ session }) => {
+test('PRO-03', 'Pro owner keeps a stored theme and sees "Pro unlocked ✓" in More [FB-06]', async ({ session }) => {
   const s = await session({ storage: { 'user-theme': 'riso' } }); await boot(s);
   eq((await theme(s)).cls, 'theme-riso');
   await tab(s, 'More');
@@ -52,7 +52,7 @@ test('PRO-03', 'Pro owner keeps a stored theme and sees "Pro unlocked ✓" in Mo
   eq(await s.page.evaluate(() => document.querySelectorAll('[data-theme-option] [aria-label="Pro feature"]').length), 0);
 });
 
-test('PRO-04', 'Free: Quiz me works once per day, the second attempt opens the sheet', async ({ session }) => {
+test('PRO-04', 'Free: Quiz me works once per day, the second attempt opens the sheet [FB-06]', async ({ session }) => {
   const s = await session({ ...FREE }); await boot(s);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5');
@@ -66,14 +66,14 @@ test('PRO-04', 'Free: Quiz me works once per day, the second attempt opens the s
   await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5');
 });
 
-test('PRO-05', 'Pro: Quiz me is unlimited', async ({ session }) => {
+test('PRO-05', 'Pro: Quiz me is unlimited [FB-06]', async ({ session }) => {
   const s = await session({}); await boot(s);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   for (let i = 0; i < 3; i++) { await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await click(s, { text: 'Close' }); await sleep(300); }
   ok(!(await s.page.$('[data-testid=pro-upgrade-sheet]')), 'sheet must not open for Pro');
 });
 
-test('PRO-06', 'Free: import is locked (badge → sheet); sets imported earlier stay listed and usable', async ({ session }) => {
+test('PRO-06', 'Free: import is locked (badge → sheet); sets imported earlier stay listed and usable [FB-06]', async ({ session }) => {
   // import while Pro, then lose Pro (refund) and reload
   const s = await session({}); await boot(s); await tab(s, 'Sets'); await U.waitText(s, 'Word sets');
   await importFile(s, 'vocab.csv'); await waitText(s, 'Imported 10 words into “vocab”.');
@@ -93,7 +93,7 @@ test('PRO-06', 'Free: import is locked (badge → sheet); sets imported earlier 
   ok(await U.cardHas(s, 'vocab', 'Delete'), 'delete stays available');
 });
 
-test('PRO-07', 'Free: More shows the Pro card and its sheet opens without errors', async ({ session }) => {
+test('PRO-07', 'Free: More shows the Pro card and its sheet opens without errors [FB-06]', async ({ session }) => {
   const s = await session({ ...FREE }); await boot(s); await tab(s, 'More');
   await click(s, { text: 'See Pro' });
   await waitSheet(s, /Pro is coming soon/);

@@ -31,7 +31,7 @@ afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 
 const mount = () => render(<ThemeProvider><ThemeSwitcher /></ThemeProvider>);
 
-describe('Pro theme gating', () => {
+describe('[FB-06] Pro theme gating', () => {
   it('flag off: default stays Margin Notes, any theme selectable, no badges', () => {
     vi.stubEnv('VITE_ENABLE_PRO', 'false');
     expect(getDefaultTheme()).toBe('notes');
