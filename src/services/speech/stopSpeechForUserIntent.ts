@@ -3,7 +3,7 @@ import { unifiedSpeechController } from './unifiedSpeechController';
 /**
  * Why speech is being stopped on purpose. Only user-intent reasons belong here.
  */
-export type SpeechStopReason = 'user-pause' | 'user-mute' | 'user-voice-change' | 'practice' | 'sign-out' | 'app-teardown';
+export type SpeechStopReason = 'user-pause' | 'user-mute' | 'user-voice-change' | 'practice' | 'translation-edit' | 'sign-out' | 'app-teardown';
 
 /**
  * THE ONLY place allowed to stop speech because of user intent.

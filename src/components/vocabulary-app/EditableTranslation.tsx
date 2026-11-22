@@ -9,6 +9,7 @@ import {
   setTranslationOverride,
   type WordIdentity,
 } from '@/lib/translations/translationOverrides';
+import { emitTranslationEdit, SAVED_CONFIRM_MS } from '@/lib/translations/translationEditSignal';
 
 interface Props extends WordIdentity {
   /** The shared (default / imported) translation. Never modified. */
@@ -29,6 +30,7 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   const idKey = `${sourceId ?? ''}|${category ?? ''}|${word}`;
   const [override, setOverride] = React.useState<string | undefined>(() => getTranslationOverride(identity));
   const [editing, setEditing] = React.useState(false);
+  const [saved, setSaved] = React.useState(false);
   const [draft, setDraft] = React.useState('');
   const pending = React.useRef<{ identity: WordIdentity; draft: string; base: string } | null>(null);
 
@@ -46,16 +48,26 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
     return () => {
       const p = pending.current;
       if (p && p.draft.trim() !== p.base.trim()) setTranslationOverride(p.identity, p.draft);
+      if (p) emitTranslationEdit('cancel');
       pending.current = null;
       setEditing(false);
+      setSaved(false);
     };
   }, [idKey]);
+
+  React.useEffect(() => {
+    if (!saved) return;
+    const t = setTimeout(() => setSaved(false), SAVED_CONFIRM_MS + 400);
+    return () => clearTimeout(t);
+  }, [saved]);
 
   const start = () => {
     const base = effective;
     setDraft(base);
     pending.current = { identity, draft: base, base };
+    setSaved(false);
     setEditing(true);
+    emitTranslationEdit('start');
   };
   const onChange = (v: string) => {
     setDraft(v);
@@ -65,15 +77,20 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
     setTranslationOverride(identity, draft);
     pending.current = null;
     setEditing(false);
+    setSaved(true);
+    emitTranslationEdit('save');
   };
   const cancel = () => {
     pending.current = null;
     setEditing(false);
+    emitTranslationEdit('cancel');
   };
   const reset = () => {
     setTranslationOverride(identity, '');
     pending.current = null;
     setEditing(false);
+    setSaved(true);
+    emitTranslationEdit('save');
   };
 
   if (!editing && !effective && !(editable && canEdit)) return null;
@@ -107,6 +124,11 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   return (
     <div className="lv-translation flex items-start gap-1" style={textStyle}>
       <em className="min-w-0 flex-1" data-testid="translation-text">* {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}</em>
+      {saved && (
+        <span role="status" data-testid="translation-saved" className="shrink-0 self-center text-xs font-medium not-italic" style={{ color: 'var(--lv-accent)' }}>
+          {isVi ? 'Đã lưu' : 'Saved'}
+        </span>
+      )}
       {editable && (canEdit ? (
         <button type="button" className="shrink-0 p-1 opacity-70 hover:opacity-100" aria-label={isVi ? 'Sửa bản dịch' : 'Edit translation'} data-testid="translation-edit" onClick={start}>
           <Pencil size={14} aria-hidden="true" />
