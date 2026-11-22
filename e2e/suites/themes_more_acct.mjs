@@ -153,6 +153,10 @@ for (const [perm, expect] of [['default', 'false'], ['granted', 'true'], ['denie
     const s = await session({ initScript: init }); await boot(s); await tab(s, 'More');
     const b = await s.page.evaluate(() => { const e = [...document.querySelectorAll('button')].find((x) => /reminder|notification/i.test(x.getAttribute('aria-label') || '')); return e ? e.getAttribute('aria-pressed') : undefined; });
     if (perm) eq(b, expect, 'aria-pressed'); else eq(b, undefined, 'toggle should be hidden');
+    if (perm) {
+      const vis = await s.page.evaluate(() => { const e = [...document.querySelectorAll('button')].find((x) => /reminder|notification/i.test(x.getAttribute('aria-label') || '')); const r = e.getBoundingClientRect(); return { t: e.innerText.trim(), w: r.width, over: document.documentElement.scrollWidth > innerWidth }; });
+      eq(vis.t, perm === 'granted' ? 'Reminders: on' : 'Reminders: off', 'visible label'); ok(vis.w > 60, 'must be a labeled control, not an icon-only circle: ' + vis.w); ok(!vis.over, 'horizontal overflow on More');
+    }
   });
 }
 skip('MORE-04', 'Delete account absent', 'product gap');
