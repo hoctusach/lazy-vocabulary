@@ -70,12 +70,37 @@ describe('LeaderboardPanel (friends)', () => {
     mocks.rpcCalls = [];
   });
 
-  it('empty state shows only me with add + share controls', async () => {
+  const openAddForm = async () => {
+    fireEvent.click(await screen.findByRole('button', { name: 'Add a friend' }));
+    await screen.findByText(/No friends yet/);
+  };
+
+  it('empty state collapses to one "Add a friend" button; the form appears after clicking it', async () => {
     render(<LeaderboardPanel />);
+    await screen.findByRole('button', { name: 'Add a friend' });
+    expect(screen.queryByLabelText("Friend's nickname")).toBeNull();
+    expect(screen.queryByText(/No friends yet/)).toBeNull();
+    expect(screen.queryByText('Share my nickname')).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Leaderboard period' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Add a friend' }));
     await screen.findByText(/No friends yet/);
     expect(screen.getAllByTestId('leaderboard-row')).toHaveLength(1);
     expect(screen.getByLabelText("Friend's nickname")).toBeTruthy();
     expect(screen.getByText('Share my nickname')).toBeTruthy();
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText("Friend's nickname")));
+    // collapsing returns to the single CTA
+    fireEvent.click(screen.getByRole('button', { name: 'Collapse leaderboard' }));
+    await screen.findByRole('button', { name: 'Add a friend' });
+    expect(screen.queryByLabelText("Friend's nickname")).toBeNull();
+  });
+
+  it('with friends the full board is open by default (no CTA)', async () => {
+    mocks.friends = [{ key: 'bob', nick: 'Bob', learned: 7 }];
+    render(<LeaderboardPanel />);
+    await waitFor(() => expect(screen.getAllByTestId('leaderboard-row')).toHaveLength(2));
+    expect(screen.queryByRole('button', { name: 'Add a friend' })).toBeNull();
+    expect(screen.getByLabelText("Friend's nickname")).toBeTruthy();
+    expect(screen.getByRole('group', { name: 'Leaderboard period' })).toBeTruthy();
   });
 
   it('signed out: prompts sign in, lists nobody, no add form', async () => {
@@ -84,6 +109,7 @@ describe('LeaderboardPanel (friends)', () => {
     await screen.findByText(/Sign in to add friends/);
     expect(screen.queryAllByTestId('leaderboard-row')).toHaveLength(0);
     expect(screen.queryByLabelText("Friend's nickname")).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Add a friend' })).toBeNull();
     expect(mocks.rpcCalls).toEqual([]);
   });
 
@@ -109,13 +135,14 @@ describe('LeaderboardPanel (friends)', () => {
     mocks.failAll = true;
     render(<LeaderboardPanel />);
     await screen.findByText(/Friends are unavailable/);
+    expect(screen.queryByRole('button', { name: 'Add a friend' })).toBeNull();
     expect(screen.getByLabelText("Friend's nickname")).toBeTruthy();
     expect(screen.getByRole('button', { name: /^Add$/ })).toBeTruthy();
   });
 
   it('adds a friend (case/space-insensitive), shows errors, and removes with confirm', async () => {
     render(<LeaderboardPanel />);
-    await screen.findByText(/No friends yet/);
+    await openAddForm();
     const input = screen.getByLabelText("Friend's nickname");
 
     fireEvent.change(input, { target: { value: 'nobody' } });
@@ -140,7 +167,7 @@ describe('LeaderboardPanel (friends)', () => {
 
   it('period buttons request today / week / allTime', async () => {
     render(<LeaderboardPanel />);
-    await screen.findByText(/No friends yet/);
+    await openAddForm();
     fireEvent.click(screen.getByRole('button', { name: 'Today' }));
     await waitFor(() => expect(mocks.rpcCalls).toContainEqual(['get_friends_leaderboard', { p_period: 'today' }]));
     fireEvent.click(screen.getByRole('button', { name: 'This week' }));

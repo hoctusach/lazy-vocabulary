@@ -205,7 +205,13 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   const [state, setState] = useState<LeaderboardState>(initialState);
   const [period, setPeriod] = useState<LeaderboardTimeframe>("allTime");
   const [friends, setFriends] = useState<Friend[]>([]);
-  const [isOpen, setIsOpen] = useState(true);
+  // null = follow the default (open, except an empty friends list collapses to one "Add a friend" button).
+  // Once the user opens/closes the panel their choice sticks across period changes and reloads.
+  const [userOpen, setUserOpen] = useState<boolean | null>(null);
+  // Decided once per finished load (never while loading) so reloads don't flash the board open.
+  const [noFriendsDefault, setNoFriendsDefault] = useState(false);
+  const nicknameInputRef = useRef<HTMLInputElement>(null);
+  const focusNicknameRef = useRef(false);
   const [nicknameInput, setNicknameInput] = useState("");
   const [isAdding, setIsAdding] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -238,13 +244,22 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
         setState(nextState);
         if (nextState.signedOut || nextState.sessionExpired) {
           setFriends([]);
+          setNoFriendsDefault(false);
           return;
         }
         try {
           const list = await listFriends();
-          if (isCurrent()) setFriends(list);
+          if (isCurrent()) {
+            setFriends(list);
+            setNoFriendsDefault(
+              !nextState.error &&
+                list.length === 0 &&
+                nextState.entries.every((e) => e.isCurrentUser),
+            );
+          }
         } catch (error) {
           console.warn("leaderboard:listFriends", error);
+          if (isCurrent()) setNoFriendsDefault(false);
         }
       } catch (error) {
         console.warn("leaderboard:load", error);
@@ -255,6 +270,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
             isLoading: false,
             error: friendsErrorMessage("unavailable"),
           });
+          setNoFriendsDefault(false); // keep the board (error + add form) reachable
         }
       }
     };
@@ -340,6 +356,17 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   const signedOut = state.signedOut === true;
   const sessionExpired = state.sessionExpired === true;
 
+  // Signed-in with nobody to compete against: collapse to a single "Add a friend" CTA.
+  const isOpen = userOpen ?? !noFriendsDefault;
+  const showAddCta = noFriendsDefault && !isOpen;
+
+  useEffect(() => {
+    if (isOpen && focusNicknameRef.current) {
+      focusNicknameRef.current = false;
+      nicknameInputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   const handleSignInAgain = () => {
     const nickname = getStoredSignInNickname() ?? undefined;
     clearStoredAuth();
@@ -347,7 +374,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
   };
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen} asChild>
+    <Collapsible open={isOpen} onOpenChange={setUserOpen} asChild>
       <Card
         className={cn(
           "mt-3 w-full border-2 theme-card-surface theme-border",
@@ -356,40 +383,60 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
       >
         <CardContent className="p-3">
           <CollapsibleTrigger asChild>
-            <button
-              type="button"
-              className="flex w-full items-center justify-between gap-3 rounded-lg text-left transition-colors hover:bg-[var(--lv-card-highlight)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lv-card-surface)]"
-              aria-label={`${isOpen ? "Collapse" : "Expand"} leaderboard`}
-            >
-              <span className="flex min-w-0 items-center gap-2">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
-                  <Users className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span className="min-w-0">
-                  <span
-                    className="block text-sm font-semibold"
-                    style={{ color: "var(--lv-heading)" }}
-                  >
-                    Leaderboard
-                  </span>
-                  <span className="block text-xs theme-muted-text">
-                    You and your friends
+            {showAddCta ? (
+              <button
+                type="button"
+                data-testid="leaderboard-add-friend-cta"
+                onClick={() => {
+                  focusNicknameRef.current = true;
+                }}
+                className="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg border theme-border bg-[var(--lv-button-primary-bg)] px-3 py-2 text-left text-[var(--lv-button-primary-text)] transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lv-card-surface)]"
+                aria-label="Add a friend"
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <UserPlus className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="min-w-0">
+                    <span className="block text-sm font-semibold">Add a friend</span>
+                    <span className="block text-xs opacity-80">Compete on the leaderboard</span>
                   </span>
                 </span>
-              </span>
-              <span className="flex shrink-0 items-center gap-2">
-                <span className="rounded-full theme-card-highlight px-2.5 py-1 text-xs font-medium theme-muted-text border theme-border">
-                  {formatTimeframeLabel(period)}
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="flex w-full items-center justify-between gap-3 rounded-lg text-left transition-colors hover:bg-[var(--lv-card-highlight)]/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lv-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lv-card-surface)]"
+                aria-label={`${isOpen ? "Collapse" : "Expand"} leaderboard`}
+              >
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
+                    <Users className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span
+                      className="block text-sm font-semibold"
+                      style={{ color: "var(--lv-heading)" }}
+                    >
+                      Leaderboard
+                    </span>
+                    <span className="block text-xs theme-muted-text">
+                      You and your friends
+                    </span>
+                  </span>
                 </span>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 theme-muted-text transition-transform",
-                    isOpen && "rotate-180",
-                  )}
-                  aria-hidden="true"
-                />
-              </span>
-            </button>
+                <span className="flex shrink-0 items-center gap-2">
+                  <span className="rounded-full theme-card-highlight px-2.5 py-1 text-xs font-medium theme-muted-text border theme-border">
+                    {formatTimeframeLabel(period)}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 theme-muted-text transition-transform",
+                      isOpen && "rotate-180",
+                    )}
+                    aria-hidden="true"
+                  />
+                </span>
+              </button>
+            )}
           </CollapsibleTrigger>
 
           <CollapsibleContent className="pt-2">
@@ -466,6 +513,7 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                   className="mt-3 flex items-center gap-2"
                 >
                   <input
+                    ref={nicknameInputRef}
                     type="text"
                     value={nicknameInput}
                     onChange={(e) => {

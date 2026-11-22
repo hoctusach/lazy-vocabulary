@@ -10,7 +10,7 @@ const flat = async (s) => (await body(s)).replace(/\s+/g, ' ');
 
 test('PROG-03', 'Progress tab panels; Learning Progress closed by default', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s);
-  for (const t of ['Leaderboard', 'Learning Progress', 'Word Summary']) await waitText(s, t);
+  for (const t of ['Add a friend', 'Learning Progress', 'Word Summary']) await waitText(s, t);
   ok(!(await body(s)).includes('Due Review'), 'Learning Progress should be collapsed');
 });
 test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
@@ -64,17 +64,26 @@ const addFriend = async (s, name) => {
   await s.page.type('input[aria-label="Friend\'s nickname"]', name);
   await click(s, { text: 'Add' }); await sleep(600);
 };
-test('PROG-11', 'Leaderboard: signed in, no friends -> only me, add field + share visible, collapse/expand', async ({ session }) => {
-  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+const quizTop = (s) => s.page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /quiz me/i.test(x.textContent || '')); return b ? Math.round(b.getBoundingClientRect().top + scrollY) : null; });
+test('PROG-11', 'Leaderboard: signed in, no friends -> single "Add a friend" CTA; click reveals only-me board, add field + share; collapse/expand', async ({ session }) => {
+  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'Add a friend'); await sleep(400);
+  let t = await flat(s);
+  ok(!/No friends yet/.test(t) && !t.includes('Share my nickname'), 'form must be hidden until Add a friend: ' + t.slice(0, 200));
+  ok(!(await s.page.$('input[aria-label="Friend\'s nickname"]')), 'add field hidden');
+  eq((await lbRows(s)).length, 0, 'no board rows while collapsed');
+  const qCollapsed = await quizTop(s);
+  await click(s, { label: 'Add a friend' }); await waitText(s, 'No friends yet');
   const rows = await lbRows(s); eq(rows.length, 1, 'only me: ' + rows.join(' | ')); ok(/e2e/i.test(rows[0]) && /You/.test(rows[0]), 'me row');
-  const t = await flat(s); ok(!/alice|bob|carol/i.test(t), 'no other users listed');
+  t = await flat(s); ok(!/alice|bob|carol/i.test(t), 'no other users listed');
   ok(await s.page.$('input[aria-label="Friend\'s nickname"]'), 'add field'); ok(t.includes('Share my nickname'), 'share control');
+  ok(await s.page.evaluate(() => document.activeElement?.getAttribute('aria-label') === "Friend's nickname"), 'nickname field focused');
+  if (qCollapsed != null) { const qOpen = await quizTop(s); ok(qOpen == null || qCollapsed < qOpen, `Quiz me should sit higher when collapsed: ${qCollapsed} vs ${qOpen}`); }
   ok(s.fake.calls.every((c) => c.name !== 'learned_words'), 'never downloads learned_words');
-  await click(s, { label: 'Collapse leaderboard' }); await sleep(300); ok(!/No friends yet/.test(await flat(s)), 'collapsed');
-  await click(s, { labelRe: 'expand leaderboard' }); await sleep(300); ok(/No friends yet/.test(await flat(s)), 'expanded');
+  await click(s, { label: 'Collapse leaderboard' }); await sleep(300); ok(!/No friends yet/.test(await flat(s)), 'collapsed'); ok(await U.label(s, 'Add a friend'), 'CTA remains');
+  await click(s, { label: 'Add a friend' }); await sleep(300); ok(/No friends yet/.test(await flat(s)), 'expanded');
 });
 test('PROG-13', 'Add friend by nickname (case/spaces), ranked board, unknown nick, add self, remove', async ({ session }) => {
-  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+  const s = await session({}); await boot(s); await openProgress(s); await click(s, { label: 'Add a friend' }); await waitText(s, 'No friends yet');
   await addFriend(s, 'nobody'); await waitText(s, 'No learner with that nickname was found.'); eq((await lbRows(s)).length, 1, 'board unchanged');
   await addFriend(s, '  E2E '); await waitText(s, "That's you");
   await addFriend(s, ' bOB sMiTh '); await sleep(500);
@@ -109,7 +118,7 @@ test('PROG-16', 'Server rejects session even after re-exchange: session-expired 
 });
 test('PROG-17', 'Stale server token (28000 once): transparent re-exchange then board loads, add box present', async ({ session }) => {
   const s = await session({ fake: { staleToken: true } }); s.allow.push(/friends:|leaderboard/i);
-  await boot(s); await openProgress(s); await waitText(s, 'No friends yet');
+  await boot(s); await openProgress(s); await waitText(s, 'Add a friend'); await click(s, { label: 'Add a friend' }); await waitText(s, 'No friends yet');
   ok(!/session expired|Sign in to add/i.test(await flat(s)), 'no sign-in prompt');
   ok(await s.page.$('input[aria-label="Friend\'s nickname"]'), 'add field');
   ok(s.fake.count('nickname-passcode-exchange') >= 1, 're-exchanged');
