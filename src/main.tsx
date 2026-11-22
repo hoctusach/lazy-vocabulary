@@ -10,10 +10,11 @@ import './styles/themes.css'
 import { loadSessionOnBoot } from '@/lib/customAuth'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { initTheme } from '@/lib/themeManager'
+import { AppErrorBoundary } from '@/components/AppErrorBoundary'
 
 // Production console silencing lives in ./silenceConsole (first import above).
 
-loadSessionOnBoot();
+try { loadSessionOnBoot(); } catch (e) { console.error('[boot] session', e); }
 
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -29,7 +30,9 @@ if (!rootElement) {
 }
 
 createRoot(rootElement).render(
-  <ThemeProvider>
-    <App />
-  </ThemeProvider>
+  <AppErrorBoundary>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </AppErrorBoundary>
 );

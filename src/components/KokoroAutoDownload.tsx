@@ -41,10 +41,11 @@ const KokoroAutoDownloadInner: React.FC = () => {
 
   // start + every resume
   useEffect(() => {
-    void runAutoDownloadCheck();
+    const safeCheck = () => { try { void Promise.resolve(runAutoDownloadCheck()).catch(() => {}); } catch { /* ignore */ } };
+    safeCheck();
     let handle: { remove: () => Promise<void> } | null = null;
     let disposed = false;
-    CapApp.addListener('resume', () => { void runAutoDownloadCheck(); })
+    Promise.resolve().then(() => CapApp.addListener('resume', safeCheck))
       .then((h) => { if (disposed) void h.remove(); else handle = h; })
       .catch(() => {});
     return () => { disposed = true; void handle?.remove(); };

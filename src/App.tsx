@@ -29,16 +29,19 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    void initNativeShell();
-    if (isProEnabled()) void initBilling().catch(() => {});
+    // Plugin failures must never block first paint.
+    try { void initNativeShell().catch(() => {}); } catch { /* ignore */ }
+    try { if (isProEnabled()) void initBilling().catch(() => {}); } catch { /* ignore */ }
   }, []);
   useEffect(() => {
-    clearLegacyCustomWordKeys();
-    clearLegacyStreakKeys();
-    void autoBackfillOnReload();
+    try {
+      clearLegacyCustomWordKeys();
+      clearLegacyStreakKeys();
+      void Promise.resolve(autoBackfillOnReload()).catch(() => {});
+    } catch { /* ignore */ }
   }, []);
   useEffect(() => {
-    void bootstrapLearnedFromServerByKey();
+    try { void Promise.resolve(bootstrapLearnedFromServerByKey()).catch(() => {}); } catch { /* ignore */ }
   }, []);
   useSessionTracker();
   useDailyUsageTracker();
