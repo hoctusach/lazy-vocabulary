@@ -41,6 +41,7 @@ const SrsPrincipleLine: React.FC<{ fixed?: boolean }> = ({ fixed = false }) => {
         className={fixed ? 'fixed inset-x-0 z-30 mx-auto w-full max-w-lg px-3' : 'mt-3'}
         style={fixed ? { bottom } : undefined}
         data-testid="srs-principle-wrap"
+        data-srs-principle-line
       >
         <button
           type="button"

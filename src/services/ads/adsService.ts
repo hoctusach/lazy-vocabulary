@@ -20,8 +20,8 @@ import { adsAllowed, onAdsAllowedChange } from '@/hooks/useAdsVisibility';
 import { ADS_CONFIG } from '@/config/ads';
 import {
   DEFAULT_AD_SLOT_PX,
-  FALLBACK_TAB_BAR_PX,
   canProceedWithAds,
+  computeBannerMarginDp,
   isGoogleTestId,
   normalizeSlotHeight,
 } from './adsPolicy';
@@ -71,10 +71,20 @@ function setSlot(px: number): void {
   document.documentElement.style.setProperty(AD_SLOT_VAR, `${px}px`);
 }
 
-function measureTabBarDp(): number {
+function measureBannerMarginDp(): number {
   const nav = document.querySelector('[data-bottom-tab-bar]');
-  const h = nav ? Math.round(nav.getBoundingClientRect().height) : 0;
-  return h > 0 ? h : FALLBACK_TAB_BAR_PX;
+  const srsEl = document.querySelector('[data-srs-principle-line]');
+  const rect = (el: Element | null) => {
+    const r = el?.getBoundingClientRect();
+    return r && r.height > 0 ? { top: r.top, bottom: r.bottom, height: r.height } : null;
+  };
+  const bar = rect(nav);
+  return computeBannerMarginDp({
+    viewportHeight: window.innerHeight,
+    barTop: bar ? bar.top : null,
+    srs: rect(srsEl),
+    slotPx,
+  });
 }
 
 function attachListeners(): void {
@@ -153,8 +163,9 @@ async function apply(): Promise<void> {
         adId: ADS_CONFIG.bannerId,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
-        // margin is dp and sits above the bottom tab bar (which already includes safe-area padding).
-        margin: measureTabBarDp(),
+        // margin (dp) = distance from the screen bottom to the TOP of the tab bar (floating bars + safe area
+        // included), and above the SRS line if that would otherwise be covered. See computeBannerMarginDp.
+        margin: measureBannerMarginDp(),
         isTesting: isGoogleTestId(ADS_CONFIG.bannerId),
       });
       bannerShown = true;

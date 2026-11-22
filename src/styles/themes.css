@@ -252,7 +252,7 @@ body.theme-sloth button.lv-ctl { border-radius: 18px; font-weight: 700; }
 body.theme-sloth button.lv-ctl.lv-ctl-pause { border-radius: 999px; box-shadow: 0 10px 22px -8px rgb(242 154 46 / .65); border-color: transparent; }
 body.theme-sloth .lv-ctl-audio, body.theme-sloth .lv-ctl-next { border-radius: 999px; }
 body.theme-sloth button.lv-ctl-mark { border-radius: 999px; }
-@media (max-width: 767px) { body.theme-sloth main { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom)) !important; } }
+@media (max-width: 767px) { body.theme-sloth main { padding-bottom: calc(6.5rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px)) !important; } body.theme-sloth main[data-tab="learn"] { padding-bottom: calc(8.75rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px)) !important; } }
 
 /* ================= 3. Bold Blocks ================= */
 body.theme-blocks {
@@ -287,7 +287,7 @@ html.dark body.theme-blocks button.lv-ctl { box-shadow: 4px 4px 0 #FF5A36; }
 body.theme-blocks button.lv-ctl.lv-ctl-pause { background: #FF5A36; color: #111; border-radius: 50%; }
 body.theme-blocks button.lv-ctl-mark { font-weight: 700; border-width: 2px; border-radius: 12px; border-color: var(--lv-ink); }
 body.theme-blocks button:active:not(:disabled) { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lv-ink); }
-@media (max-width: 767px) { body.theme-blocks main { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom)) !important; } }
+@media (max-width: 767px) { body.theme-blocks main { padding-bottom: calc(6.75rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px)) !important; } body.theme-blocks main[data-tab="learn"] { padding-bottom: calc(9rem + env(safe-area-inset-bottom) + var(--ad-slot, 0px)) !important; } }
 
 /* ================= 4. Pixel Quest ================= */
 body.theme-pixel {
