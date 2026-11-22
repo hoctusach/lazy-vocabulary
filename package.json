@@ -1,12 +1,12 @@
 {
   "name": "lazy-vocabulary",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Vocabulary learning app",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:mobile": "npm run build && npx cap sync",
+    "build:mobile": "vite build --outDir capacitor-www --emptyOutDir --base ./ && npx cap sync",
     "cap:sync": "npx cap sync",
     "android:debug": "npm run build:mobile && cd android && ./gradlew assembleDebug",
     "android:release": "npm run build:mobile && cd android && ./gradlew assembleRelease",

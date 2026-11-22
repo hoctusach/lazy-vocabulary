@@ -1,15 +1,17 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 /**
- * The Vite production build writes to `docs` (also used for GitHub Pages).
- * Capacitor copies that folder into the native projects on `npx cap sync`.
+ * `docs/` is the live GitHub Pages website and must NEVER be Capacitor's webDir
+ * (1.0.2 shipped a stale website bundle that way: blank white screen). The app is
+ * built into the gitignored `capacitor-www/` by `npm run build:mobile`, and
+ * `npx cap sync` copies that folder into the native projects.
  * Android uses https://localhost; iOS uses the capacitor scheme. Both serve
  * index.html for client-side routes, so the app keeps BrowserRouter.
  */
 const config: CapacitorConfig = {
   appId: 'com.hoctusach.lazyvocabulary',
   appName: 'Lazy Vocabulary',
-  webDir: 'docs',
+  webDir: 'capacitor-www',
   server: {
     androidScheme: 'https',
     hostname: 'lazyvocabulary.local',

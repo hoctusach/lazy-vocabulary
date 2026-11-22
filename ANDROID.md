@@ -1,6 +1,6 @@
 # Android release guide (Google Play)
 
-App id `com.hoctusach.lazyvocabulary` (Java namespace stays `com.lazy.vocabulary`) · compile/target SDK 36 · Capacitor 8 · web build output `docs/` (also the GitHub Pages site, domain in `public/CNAME` → `www.lazyvoca.fun`).
+App id `com.hoctusach.lazyvocabulary` (Java namespace stays `com.lazy.vocabulary`) · compile/target SDK 36 · Capacitor 8 · website build output `docs/` (the GitHub Pages site, never packaged into the app; the app is built into the gitignored `capacitor-www/`; domain in `public/CNAME` → `www.lazyvoca.fun`).
 
 ## 1. Ads (Android app only, light)
 
@@ -52,9 +52,11 @@ keyPassword=…
 ```
 
 ```sh
-npm run build:mobile
-cd android && ./gradlew bundleRelease assembleRelease -PversionCode=2 -PversionName=1.0.1
+VITE_ENABLE_PRO=true npm run build:mobile   # vite build -> capacitor-www/ (relative ./assets paths) + cap sync
+cd android && ./gradlew bundleRelease assembleRelease -PversionCode=4 -PversionName=1.0.3
 ```
+
+**Never** `git checkout docs/` (or otherwise restore the website) between the build and `cap sync`, and never point Capacitor at `docs/`: that is how 1.0.2 (3) shipped the stale Nov 15 website bundle with no boot watchdog (blank white screen, FB-28). `tests/regression/packagedBundle.test.ts` checks `capacitor-www/` (and can check an AAB) before release.
 
 Outputs: `android/app/build/outputs/bundle/release/app-release.aab`, `…/apk/release/app-release.apk`, `…/mapping/release/mapping.txt` (upload mapping.txt to Play Console → App bundle explorer → Deobfuscation file). Defaults: `versionCode 1`, `versionName 1.0.0`. `versionCode` must increase on every Play upload.
 

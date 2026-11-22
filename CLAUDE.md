@@ -7,3 +7,4 @@
 - **Never** push to Production / use live Supabase or Play Console without the owner. Never print or commit secrets.
 - Don't bump the version (1.0.2 / versionCode 3) unless asked. Keep EN/VI strings consistent.
 - Pro gating, all 5 themes and speech-across-tabs behavior must stay intact.
+- **Mobile builds never use `docs/`.** Android/iOS are built with `npm run build:mobile` into the gitignored `capacitor-www/` (Capacitor `webDir`). Never `cap sync` from `docs/` or restore `docs/` between build and sync (FB-28: 1.0.2 shipped the stale website bundle, blank screen).
