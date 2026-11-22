@@ -1,13 +1,14 @@
 -- 2026-11-22  Per-user translation overrides (Pro "Edit translation", FB-33)
 --
 -- ============================================================================
--- STATUS: NOT APPLIED. Written for owner review. Do NOT run against live
--- Supabase without approval. The app does NOT depend on it: overrides are
--- stored locally (src/lib/translations/translationOverrides.ts) and the client
--- makes no call to these functions yet. Nothing breaks if this table is absent.
+-- STATUS: APPLIED 2026-11-22 to the live project (migration name
+-- user_translation_overrides_2026_11_22). DO NOT RE-RUN. Kept for reference.
+-- The client syncs through list/set/clear RPCs (src/lib/translations/
+-- translationOverridesSync.ts) and keeps working from local storage if any
+-- call fails, so a missing table is never fatal.
 -- ============================================================================
 --
--- What applying it would do (additive, idempotent):
+-- What applying it did (additive, idempotent):
 --   * creates public.user_translation_overrides (user_key, word_id) -> translation
 --     (one row per user per word; the shared vocabulary tables are NOT touched);
 --   * enables + forces RLS and revokes all direct table access from
@@ -22,7 +23,7 @@
 --
 -- Prerequisite: 2026-11-21-friends.sql section 0 (user_sessions + session helpers).
 --
--- Client follow-up once applied (not done here): push on save, pull on sign-in,
+-- Client follow-up (done): push on save/clear, pull on sign-in/start/online,
 -- merge with last-write-wins on updated_at.
 
 set search_path = public;

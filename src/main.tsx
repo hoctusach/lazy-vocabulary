@@ -16,6 +16,11 @@ import { AppErrorBoundary } from '@/components/AppErrorBoundary'
 
 try { loadSessionOnBoot(); } catch (e) { console.error('[boot] session', e); }
 
+// Cloud sync of per-user translation overrides (Pro). Lazy and failure-proof: never blocks first paint.
+void import('@/lib/translations/translationOverridesSync')
+  .then((m) => m.startTranslationOverridesSync())
+  .catch((e) => console.warn('[boot] translation sync', e));
+
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initTheme, { once: true });

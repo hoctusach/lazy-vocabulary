@@ -104,10 +104,11 @@ describe('[FB-33] Pro per-user translation edit (local storage)', () => {
     expect(src).not.toMatch(/defaultVocabulary|default_vocabulary_base/);
   });
 
-  it('cloud migration is a NOT APPLIED draft with forced RLS and no anon table grants', async () => {
+  it('cloud migration is marked APPLIED (do not re-run), with with forced RLS and no anon table grants', async () => {
     const { readFileSync } = await import('node:fs');
     const sql = readFileSync('supabase/sql/2026-11-22-user-translation-overrides.sql', 'utf8');
-    expect(sql).toMatch(/STATUS: NOT APPLIED/);
+    expect(sql).toMatch(/STATUS: APPLIED 2026-11-22/);
+    expect(sql).toMatch(/user_translation_overrides_2026_11_22/);
     expect(sql).toMatch(/enable row level security/);
     expect(sql).toMatch(/force row level security/);
     expect(sql).toMatch(/revoke all on table public\.user_translation_overrides from public, anon, authenticated/);
