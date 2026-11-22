@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.media.session.MediaSession;
+import android.media.session.PlaybackState;
 import android.os.PowerManager;
 
 /** Foreground (mediaPlayback) service that keeps the app process, WebView and TTS alive in the background. */
@@ -28,6 +30,7 @@ public class PlaybackService extends Service {
     static volatile boolean running = false;
 
     private PowerManager.WakeLock wakeLock;
+    private MediaSession mediaSession;
     private String title = "Lazy Vocabulary";
     private String text = "";
 
@@ -39,19 +42,26 @@ public class PlaybackService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent != null ? intent.getAction() : null;
+        if (intent == null && !PlaybackServicePlugin.isLoaded()) {
+            // START_STICKY restart after the whole process died: the WebView (and the playback) is gone, so an
+            // orphan notification would be misleading. Only a service-only kill (JS still alive) is resumed.
+            shutdown();
+            return START_NOT_STICKY;
+        }
         if (ACTION_STOP.equals(action)) {
             shutdown();
             return START_NOT_STICKY;
         }
         if (ACTION_PAUSE.equals(action) || ACTION_NEXT.equals(action)) {
             PlaybackServicePlugin.emitAction(ACTION_PAUSE.equals(action) ? "pause" : "next");
-            return START_NOT_STICKY;
+            return START_STICKY;
         }
         if (intent != null) {
             if (intent.hasExtra(EXTRA_TITLE)) title = intent.getStringExtra(EXTRA_TITLE);
             if (intent.hasExtra(EXTRA_TEXT)) text = intent.getStringExtra(EXTRA_TEXT);
         }
         ensureChannel();
+        ensureMediaSession();
         Notification n = buildNotification();
         try {
             if (Build.VERSION.SDK_INT >= 29) {
@@ -66,7 +76,31 @@ public class PlaybackService extends Service {
         }
         running = true;
         acquireWakeLock();
-        return START_NOT_STICKY;
+        // Sticky: if the system kills only the service while the app process lives, it is restarted (FB-31).
+        return START_STICKY;
+    }
+
+    /** An active media session with a PLAYING state: Android 13/14+ treat a mediaPlayback FGS without one as idle. */
+    private void ensureMediaSession() {
+        if (mediaSession == null) {
+            mediaSession = new MediaSession(this, "LazyVocabularyPlayback");
+            mediaSession.setCallback(new MediaSession.Callback() {
+                @Override public void onPause() { PlaybackServicePlugin.emitAction("pause"); }
+                @Override public void onSkipToNext() { PlaybackServicePlugin.emitAction("next"); }
+            });
+        }
+        PlaybackState state = new PlaybackState.Builder()
+                .setActions(PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_SKIP_TO_NEXT)
+                .setState(PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+                .build();
+        mediaSession.setPlaybackState(state);
+        if (!mediaSession.isActive()) mediaSession.setActive(true);
+    }
+
+    private void releaseMediaSession() {
+        if (mediaSession == null) return;
+        try { mediaSession.setActive(false); mediaSession.release(); } catch (RuntimeException ignored) { }
+        mediaSession = null;
     }
 
     private void ensureChannel() {
@@ -102,6 +136,11 @@ public class PlaybackService extends Service {
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .addAction(new Notification.Action.Builder(null, "Pause", servicePi(ACTION_PAUSE, 1)).build())
                 .addAction(new Notification.Action.Builder(null, "Next", servicePi(ACTION_NEXT, 2)).build());
+        if (mediaSession != null) {
+            b.setStyle(new Notification.MediaStyle()
+                    .setMediaSession(mediaSession.getSessionToken())
+                    .setShowActionsInCompactView(0, 1));
+        }
         if (Build.VERSION.SDK_INT >= 31) {
             b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
         }
@@ -125,6 +164,7 @@ public class PlaybackService extends Service {
     private void shutdown() {
         running = false;
         releaseWakeLock();
+        releaseMediaSession();
         stopForeground(true);
         stopSelf();
     }
@@ -133,6 +173,7 @@ public class PlaybackService extends Service {
     public void onDestroy() {
         running = false;
         releaseWakeLock();
+        releaseMediaSession();
         super.onDestroy();
     }
 }

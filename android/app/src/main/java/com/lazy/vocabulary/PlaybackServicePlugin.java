@@ -27,6 +27,9 @@ public class PlaybackServicePlugin extends Plugin {
         instance = this;
     }
 
+    /** True while the plugin (hence the WebView/JS) is alive in this process. */
+    static boolean isLoaded() { return instance != null; }
+
     static void emitAction(String action) {
         PlaybackServicePlugin p = instance;
         if (p == null) return;
