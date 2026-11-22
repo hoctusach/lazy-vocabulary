@@ -15,7 +15,7 @@ test('TAB-01', 'Four tabs present, >=44px, Learn current', async ({ session }) =
 });
 test('TAB-02', 'Learn -> Progress shows progress panels and hides card/controls', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'Progress');
-  for (const t of ['Leaderboard', 'Quiz me', 'Learning Progress', 'Word Summary']) await waitText(s, t);
+  for (const t of ['Add a friend', 'Quiz me', 'Learning Progress', 'Word Summary']) await waitText(s, t);
   // The Learn player stays mounted (so speech continues) but is hidden off-tab.
   ok(await s.page.evaluate(() => { const h = document.querySelector('[data-testid="learn-host"]'); return !!h && h.hidden && h.getBoundingClientRect().height === 0; }), 'learn card still visible');
 });
