@@ -1,6 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
-import type { WordInput } from './wordValidation';
 import { invalidateVocabularyIndex } from '@/services/search/vocabularyIndex';
 import { setAllWordsOverride } from '@/utils/allWords';
 import {
@@ -9,8 +8,6 @@ import {
   type VocabularySetMeta,
 } from './types';
 import {
-  addWordToSet,
-  createVocabularySet,
   deleteVocabularySet,
   ensureTodayQueue,
   flattenSheets,
@@ -40,8 +37,6 @@ interface VocabularySetContextValue {
   activate: (id: string) => string | null;
   importSet: (name: string, sheets: SheetData, fileName?: string) => string | null;
   rename: (id: string, name: string) => string | null;
-  createSet: (name: string) => string | null;
-  addWord: (id: string, input: WordInput) => Record<string, string> | null;
   remove: (id: string) => string | null;
   markLearned: (word: VocabularyWord) => void;
   markNew: (word: string, category?: string) => void;
@@ -111,26 +106,6 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     [refresh]
   );
 
-  const createSet = useCallback(
-    (name: string) => {
-      const result = createVocabularySet(name);
-      if (!result.ok) return result.error;
-      refresh();
-      return null;
-    },
-    [refresh]
-  );
-
-  const addWord = useCallback(
-    (id: string, input: WordInput) => {
-      const result = addWordToSet(id, input);
-      if (!result.ok) return result.errors;
-      refresh();
-      return null;
-    },
-    [refresh]
-  );
-
   const rename = useCallback(
     (id: string, name: string) => {
       const result = renameVocabularySet(id, name);
@@ -180,8 +155,6 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       refresh,
       activate,
       importSet,
-      createSet,
-      addWord,
       rename,
       remove,
       markLearned,
@@ -198,8 +171,6 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       refresh,
       activate,
       importSet,
-      createSet,
-      addWord,
       rename,
       remove,
       markLearned,
@@ -234,8 +205,6 @@ export function useVocabularySets(): VocabularySetContextValue {
     refresh: () => undefined,
     activate: () => null,
     importSet: () => 'Word sets are unavailable.',
-    createSet: () => 'Word sets are unavailable.',
-    addWord: () => ({ form: 'Word sets are unavailable.' }),
     rename: () => 'Word sets are unavailable.',
     remove: () => 'Word sets are unavailable.',
     markLearned: () => undefined,

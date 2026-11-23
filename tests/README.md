@@ -4,12 +4,12 @@ Run everything: `npm test` (Vitest). All suites should pass; a failure means a r
 
 | Area | Files |
 | --- | --- |
-| Word sets and import | `vocabularySetStore`, `parseVocabularyImport`, `sampleTemplate`, `wordValidation`, `translationOverrides` |
+| Word sets and import | `vocabularySetStore`, `parseVocabularyImport` |
 | Input safety | `validation`, `sanitization`, `contentFilters` |
 | Search | `normalizeQuery`, `vocabularySearchRanking`, `vocabularySheetOperations` |
 | Progress and stats | `computeLearnedWordStats`, `LearningProgressPanel`, `markWordLearnedCapture`, `markWordReviewed`, `streak`, `leaderboard`, `nickname` |
 | Time tracking | `dailyUsageTracker`, `learningTimeService`, `learningTimeTotalRoute` |
-| Speech and playback | `speechText`, `speechSettings`, `voiceUtils`, `resolvePlaybackPreferences`, `localPreferencesStorage`, `realSpeechServiceMute`, `unifiedSpeechControllerMute`, `useSimpleVocabularyPlaybackMuteToggle`, `useVocabularyControlsVoiceToggle`, `useSpeechIntegrationVoiceChange`, `useAutoPlayResume`, `wordNavigationStop`, `useContentProcessor`, `backgroundPlayback` |
+| Speech and playback | `speechText`, `speechSettings`, `voiceUtils`, `resolvePlaybackPreferences`, `localPreferencesStorage`, `realSpeechServiceMute`, `unifiedSpeechControllerMute`, `useSimpleVocabularyPlaybackMuteToggle`, `useVocabularyControlsVoiceToggle`, `useSpeechIntegrationVoiceChange`, `useAutoPlayResume`, `wordNavigationStop`, `useContentProcessor` |
 | Data loading | `useVocabularyDataLoaderInitialWordsIndex`, `useVocabularyDataLoaderVoicePersistence` |
 | Quiz, practice, reminders | `quizEngine`, `practiceRuleEngine`, `reminderMessages`, `fetchLatestMessage`, `parseWordAnnotations` |
 
