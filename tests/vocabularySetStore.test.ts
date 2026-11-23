@@ -151,3 +151,20 @@ describe('vocabulary set store', () => {
     expect(getSetProgress(DEFAULT_SET_ID).learning).toEqual({});
   });
 });
+
+describe('manual word sets', () => {
+  beforeEach(() => localStorage.clear());
+
+  it('creates an empty set and adds validated words', async () => {
+    const { createVocabularySet, addWordToSet, getSetSheets } = await import('@/features/word-sets/vocabularySetStore');
+    const created = createVocabularySet('Mine');
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    expect(createVocabularySet('mine').ok).toBe(false);
+    expect(addWordToSet(created.set.id, { word: 'cat', meaning: 'mèo', translation: 'แมว' }).ok).toBe(true);
+    expect(addWordToSet(created.set.id, { word: 'cat', meaning: 'again' }).ok).toBe(false);
+    expect(addWordToSet(created.set.id, { word: '', meaning: '' }).ok).toBe(false);
+    expect(addWordToSet('default', { word: 'x', meaning: 'y' }).ok).toBe(false);
+    expect(getSetSheets(created.set.id).imported[0].translation).toBe('แมว');
+  });
+});

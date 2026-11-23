@@ -1,4 +1,10 @@
-word,meaning,example,translation,category
-give up,to stop trying,Do not give up when a new word feels hard.,bỏ cuộc,phrasal verbs
-break the ice,to make people feel more comfortable,A short story can break the ice in class.,phá vỡ sự ngại ngùng,idioms
-spare,extra; available to use,I review new words in my spare time.,rảnh thừa,topic vocab
+# word (required): the word or phrase, up to 100 characters.
+# meaning (required): the definition, up to 500 characters.
+# example (optional): an example sentence, up to 1000 characters.
+# translation (optional): your own translation in ANY language or script, up to 500 characters.
+# category (optional, up to 40 characters): a group name. Known values: phrasal verbs | idioms | topic vocab | grammar | phrases, collocations | word formation. Any other text is kept as your own custom category. If blank, the Excel sheet name is used, otherwise "imported".
+# Save the file as UTF-8 so every language displays correctly. Lines starting with # in CSV are ignored.
+"word","meaning","example","translation","category"
+"give up","to stop trying","Do not give up when a new word feels hard.","bỏ cuộc","phrasal verbs"
+"break the ice","to make people feel more comfortable","A short story can break the ice in class.","phá vỡ sự ngại ngùng","idioms"
+"spare","extra; available to use","I review new words in my spare time.","rảnh, thừa","topic vocab"

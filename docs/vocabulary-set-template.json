@@ -1,5 +1,13 @@
 {
   "name": "Sample set",
+  "notes": [
+    "word (required): the word or phrase, up to 100 characters.",
+    "meaning (required): the definition, up to 500 characters.",
+    "example (optional): an example sentence, up to 1000 characters.",
+    "translation (optional): your own translation in ANY language or script, up to 500 characters.",
+    "category (optional, up to 40 characters): a group name. Known values: phrasal verbs | idioms | topic vocab | grammar | phrases, collocations | word formation. Any other text is kept as your own custom category. If blank, the Excel sheet name is used, otherwise \"imported\".",
+    "Save the file as UTF-8 so every language displays correctly. Lines starting with # in CSV are ignored."
+  ],
   "words": [
     {
       "word": "give up",

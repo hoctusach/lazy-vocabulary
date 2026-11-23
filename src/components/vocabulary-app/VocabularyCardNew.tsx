@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel } from '@/utils/categoryLabels';
 import WordCountDisplay from './WordCountDisplay';
+import TranslationLine from './TranslationLine';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 
 interface VocabularyCardNewProps {
@@ -97,11 +98,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
-          {translation && (
-            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
-              <em>* {translation}</em>
-            </div>
-          )}
+          <TranslationLine word={word} category={category} defaultTranslation={translation} />
         </div>
       </CardContent>
     </Card>

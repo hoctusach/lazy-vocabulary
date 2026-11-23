@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Check, Download, FileSpreadsheet, Pencil, Trash2, Upload } from 'lucide-react';
+import { Check, Download, FileSpreadsheet, Pencil, Plus, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,13 +15,14 @@ import { useVocabularySets } from './VocabularySetContext';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
+import { KNOWN_CATEGORIES, WORD_LIMITS } from './wordValidation';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import { getSetProgress, progressStatsFor, flattenSheets, getSetSheets } from './vocabularySetStore';
 
 const ACCEPT = '.csv,.xlsx,.xls,.json,text/csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 const VocabularySetsScreen: React.FC = () => {
-  const { sets, activeSet, activate, importSet, rename, remove } = useVocabularySets();
+  const { sets, activeSet, activate, importSet, createSet, addWord, rename, remove } = useVocabularySets();
   const inputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -30,6 +31,14 @@ const VocabularySetsScreen: React.FC = () => {
   const [renameValue, setRenameValue] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createName, setCreateName] = useState('');
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [addTarget, setAddTarget] = useState<{ id: string; name: string } | null>(null);
+  const emptyForm = { word: '', meaning: '', example: '', translation: '', category: '' };
+  const [form, setForm] = useState(emptyForm);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [addedCount, setAddedCount] = useState(0);
 
   const setCounts = (id: string) => {
     if (id === DEFAULT_SET_ID) return null;
@@ -167,6 +176,30 @@ const VocabularySetsScreen: React.FC = () => {
         )}
       </div>
 
+      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-base font-semibold">Create your own set</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
+              Start an empty set, then type in words one by one.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full sm:w-auto"
+            onClick={() => {
+              setCreateName('');
+              setCreateError(null);
+              setCreateOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            New set
+          </Button>
+        </div>
+      </div>
+
       <ul className="space-y-3">
         {sets.map((set) => {
           const active = set.id === activeSet.id;
@@ -221,6 +254,20 @@ const VocabularySetsScreen: React.FC = () => {
                       variant="outline"
                       className="min-h-11"
                       onClick={() => {
+                        setForm(emptyForm);
+                        setFormErrors({});
+                        setAddedCount(0);
+                        setAddTarget({ id: set.id, name: set.name });
+                      }}
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add words
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="min-h-11"
+                      onClick={() => {
                         setRenameTarget({ id: set.id, name: set.name });
                         setRenameValue(set.name);
                       }}
@@ -244,6 +291,120 @@ const VocabularySetsScreen: React.FC = () => {
           );
         })}
       </ul>
+
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New word set</DialogTitle>
+            <DialogDescription>Give your set a name. You can add words right after.</DialogDescription>
+          </DialogHeader>
+          <Input
+            value={createName}
+            onChange={(event) => setCreateName(event.target.value)}
+            maxLength={WORD_LIMITS.setName}
+            className="min-h-11 text-base"
+            aria-label="New set name"
+          />
+          {createError && <p role="alert" className="text-sm text-red-700 dark:text-red-300">{createError}</p>}
+          <DialogFooter>
+            <Button type="button" variant="outline" className="min-h-11" onClick={() => setCreateOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="min-h-11"
+              onClick={() => {
+                const error = createSet(createName);
+                if (error) {
+                  setCreateError(error);
+                  return;
+                }
+                toast.success(`Created “${createName.trim()}”.`);
+                setCreateOpen(false);
+              }}
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(addTarget)} onOpenChange={(open) => !open && setAddTarget(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add a word to {addTarget?.name}</DialogTitle>
+            <DialogDescription>
+              Word and meaning are required. The dialog stays open so you can add the next word.
+              {addedCount > 0 ? ` ${addedCount} added so far.` : ''}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            {(
+              [
+                ['word', 'Word *', WORD_LIMITS.word],
+                ['meaning', 'Meaning *', WORD_LIMITS.meaning],
+                ['example', 'Example', WORD_LIMITS.example],
+                ['translation', 'Translation (any language)', WORD_LIMITS.translation],
+                ['category', 'Category', WORD_LIMITS.category],
+              ] as const
+            ).map(([key, label, max]) => (
+              <div key={key}>
+                <label className="text-sm font-medium" htmlFor={`add-${key}`}>
+                  {label}
+                </label>
+                <Input
+                  id={`add-${key}`}
+                  value={form[key]}
+                  maxLength={max}
+                  list={key === 'category' ? 'known-categories' : undefined}
+                  placeholder={key === 'category' ? 'Leave blank for “imported”' : undefined}
+                  className="mt-1 min-h-11 text-base"
+                  aria-invalid={Boolean(formErrors[key])}
+                  onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))}
+                />
+                {formErrors[key] && (
+                  <p role="alert" className="mt-1 text-sm text-red-700 dark:text-red-300">
+                    {formErrors[key]}
+                  </p>
+                )}
+              </div>
+            ))}
+            <datalist id="known-categories">
+              {KNOWN_CATEGORIES.map((category) => (
+                <option key={category} value={category} />
+              ))}
+            </datalist>
+            {formErrors.form && (
+              <p role="alert" className="text-sm text-red-700 dark:text-red-300">
+                {formErrors.form}
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" className="min-h-11" onClick={() => setAddTarget(null)}>
+              Done
+            </Button>
+            <Button
+              type="button"
+              className="min-h-11"
+              onClick={() => {
+                if (!addTarget) return;
+                const errors = addWord(addTarget.id, form);
+                if (errors) {
+                  setFormErrors(errors);
+                  return;
+                }
+                setFormErrors({});
+                setAddedCount((count) => count + 1);
+                setForm({ ...emptyForm, category: form.category });
+                toast.success('Word added.');
+              }}
+            >
+              Add word
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={Boolean(renameTarget)} onOpenChange={(open) => !open && setRenameTarget(null)}>
         <DialogContent>
