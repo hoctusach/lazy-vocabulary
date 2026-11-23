@@ -8,7 +8,6 @@ import { useSpeechIntegration } from './core/useSpeechIntegration';
 import { useWordNavigation } from './core/useWordNavigation';
 import { useVocabularyControls } from './core/useVocabularyControls';
 import { useVocabularyDataLoader } from './core/useVocabularyDataLoader';
-import { useBackgroundPlayback } from './core/useBackgroundPlayback';
 import { saveLastWord, saveTodayLastWord } from '@/utils/lastWordStorage';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -132,20 +131,6 @@ export const useUnifiedVocabularyController = (
     initialWords,
     selection
   );
-
-  // Android: keep playing when the app is in the background or the screen is off.
-  useBackgroundPlayback({
-    wordList,
-    currentIndex,
-    setCurrentIndex,
-    isPaused,
-    setIsPaused,
-    isMuted,
-    selectedVoiceName,
-    allVoices,
-    clearAutoAdvanceTimer,
-    playCurrentWord,
-  });
 
   const preferencesRestoredRef = useRef(false);
 

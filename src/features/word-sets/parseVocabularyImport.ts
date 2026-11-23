@@ -260,12 +260,7 @@ function detectDelimiter(headerLine: string): ',' | ';' | '\t' {
   return ',';
 }
 
-function parseCsv(rawText: string, warnings: string[]): ImportParseResult | { sheets: SheetData } {
-  const text = rawText
-    .replace(/^\uFEFF/, '')
-    .split(/\r?\n/)
-    .filter((line, index, lines) => !(line.startsWith('#') && lines.slice(0, index).every((l) => l.startsWith('#'))))
-    .join('\n');
+function parseCsv(text: string, warnings: string[]): ImportParseResult | { sheets: SheetData } {
   const headerLine = text.replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0] ?? '';
   const table = parseDelimited(text, detectDelimiter(headerLine));
   if (table.length === 0) {
@@ -390,7 +385,6 @@ function parseWorkbook(data: ArrayBuffer | Uint8Array, warnings: string[]): { sh
   const sheets: SheetData = {};
   const errors: string[] = [];
   for (const sheetName of workbook.SheetNames) {
-    if (['readme', 'notes', 'instructions'].includes(sheetName.trim().toLowerCase())) continue;
     const worksheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { defval: '' });
     if (rows.length === 0) continue;
