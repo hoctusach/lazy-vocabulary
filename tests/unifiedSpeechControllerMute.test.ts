@@ -12,6 +12,7 @@ describe('unifiedSpeechController mute handling', () => {
     (window as any).speechSynthesis = {
       cancel: vi.fn(),
       pause: vi.fn(),
+      speak: vi.fn(),
       speaking: false,
       pending: false,
     };
