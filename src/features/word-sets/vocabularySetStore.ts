@@ -16,8 +16,8 @@ const DATA_PREFIX = 'lv.vocabularySets.data.';
 const PROGRESS_PREFIX = 'lv.vocabularySets.progress.';
 const DISPLAYED_WORD_EVENT = 'lv:vocabulary-set-displayed';
 
-const DAILY_NEW = 8;
-const DAILY_CAP = 16;
+const DAILY_CAP = 20;
+const DAILY_NEW = DAILY_CAP;
 
 interface MetaFile {
   sets: VocabularySetMeta[];
@@ -223,7 +223,7 @@ export function buildTodayQueue(
     const next = Date.parse(learned.nextReviewAt);
     if (!Number.isFinite(next) || next <= deadline) due.push(word);
   }
-  const chosen = [...due, ...fresh.slice(0, DAILY_NEW)].slice(0, DAILY_CAP);
+  const chosen = [...due, ...fresh.slice(0, Math.max(0, DAILY_CAP - due.length))].slice(0, DAILY_CAP);
   if (chosen.length === 0 && words.length > 0) return words.slice(0, DAILY_NEW);
   return chosen;
 }

@@ -148,7 +148,7 @@ describe('VocabularyAppWithLearning due reviews', () => {
     })[0];
     fireEvent.click(progressButton);
     const summaryButton = screen.getAllByRole('button', {
-      name: /Word Summary/i
+      name: /Words Today/i
     })[0];
     fireEvent.click(summaryButton);
 

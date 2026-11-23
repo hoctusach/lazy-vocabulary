@@ -30,7 +30,7 @@ interface VocabularyAppWithLearningProps {
 const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ view = 'all' }) => {
   useDailyUsageTracker();
   const wordSets = useVocabularySets();
-  const [summaryOpen, setSummaryOpen] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(true);
   const [isMarkAsNewDialogOpen, setIsMarkAsNewDialogOpen] = useState(false);
   const [wordToReset, setWordToReset] = useState<LearnedWordSummary | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -209,19 +209,11 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
   const learningSection = (
     <TooltipProvider>
       <div className="space-y-3 mt-3">
-        <QuickQuizPanel targetWords={wordSets.isCustomSet ? wordSets.todayWords : todayWords} />
-
-        <LearningProgressPanel
-          progressStats={wordSets.isCustomSet ? wordSets.stats : progressStats}
-          learnerId={wordSets.activeSet.id}
-          progressError={wordSets.isCustomSet ? null : progressError}
-        />
-
         <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
         <Tooltip>
           <TooltipTrigger asChild>
             <CollapsibleTrigger className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold">Word Summary</h3>
+              <h3 className="text-lg font-semibold">Words Today</h3>
               <span className="text-xs text-muted-foreground hidden sm:inline">
                 Tap to show or hide details
               </span>
@@ -230,7 +222,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
               />
             </CollapsibleTrigger>
           </TooltipTrigger>
-          <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
+          <TooltipContent side="top">Click to expand or collapse today's words.</TooltipContent>
         </Tooltip>
         <CollapsibleContent className="space-y-3">
           {!wordSets.isCustomSet && progressError ? (
@@ -245,7 +237,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
               <div className="grid gap-3 md:grid-cols-3">
                 <div className="space-y-1.5">
                   <h4 className="font-medium text-green-600">NEW TODAY ({newTodayList.length})</h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                  <div className="space-y-1 max-h-[28rem] overflow-y-auto">
                     {newTodayList.length > 0 ? (
                       newTodayList.map((word, index) => (
                         <div
@@ -282,7 +274,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
 
                 <div className="space-y-1.5">
                   <h4 className="font-medium text-red-600">DUE TODAY ({dueTodayList.length})</h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                  <div className="space-y-1 max-h-[28rem] overflow-y-auto">
                     {dueTodayList.length > 0 ? (
                       dueTodayList.map((word, index) => (
                         <div
@@ -319,7 +311,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
 
                 <div className="space-y-1.5">
                   <h4 className="font-medium text-gray-600">LEARNED ({learnedWordsList.length})</h4>
-                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                  <div className="space-y-1 max-h-[28rem] overflow-y-auto">
                     {learnedWordsList.length > 0 ? (
                       learnedWordsList.map((word, index) => (
                         <div
@@ -357,6 +349,15 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           )}
         </CollapsibleContent>
         </Collapsible>
+
+        <QuickQuizPanel targetWords={wordSets.isCustomSet ? wordSets.todayWords : todayWords} />
+
+        <LearningProgressPanel
+          progressStats={wordSets.isCustomSet ? wordSets.stats : progressStats}
+          learnerId={wordSets.activeSet.id}
+          progressError={wordSets.isCustomSet ? null : progressError}
+        />
+
       </div>
     </TooltipProvider>
   );

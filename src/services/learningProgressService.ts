@@ -66,7 +66,7 @@ type SelectionNormalizationMeta = {
 };
 
 const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
-  light: { min: 15, max: 25 },
+  light: { min: 15, max: 20 },
   moderate: { min: 30, max: 50 },
   intense: { min: 50, max: 100 },
 };
