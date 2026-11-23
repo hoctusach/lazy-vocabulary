@@ -8,6 +8,7 @@ import {
   type SetProgressState,
   type VocabularySetMeta,
 } from './types';
+import { validateSetName, validateWordInput, type WordInput } from './wordValidation';
 
 const META_KEY = 'lv.vocabularySets.v1';
 const ACTIVE_KEY = 'lv.vocabularySets.active';
@@ -296,6 +297,67 @@ export function importVocabularySet(
   }
   setActiveSet(id);
   return { ok: true, set: meta };
+}
+
+/** Create an empty set so the learner can type words in one by one. */
+export function createVocabularySet(
+  name: string
+): { ok: true; set: VocabularySetMeta } | { ok: false; error: string } {
+  const nameError = validateSetName(name, listVocabularySets().map((set) => set.name));
+  if (nameError) return { ok: false, error: nameError };
+  const id = `set_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+  const now = new Date().toISOString();
+  const meta: VocabularySetMeta = {
+    id,
+    name: name.trim(),
+    builtin: false,
+    wordCount: 0,
+    createdAt: now,
+    updatedAt: now,
+  };
+  const dataError = writeJson(dataKey(id), {});
+  if (dataError) return { ok: false, error: dataError };
+  const progressError = writeJson(progressKey(id), emptyProgress());
+  if (progressError) {
+    storage()?.removeItem(dataKey(id));
+    return { ok: false, error: progressError };
+  }
+  const metaError = writeImportedMetas([...readImportedMetas(), meta]);
+  if (metaError) {
+    storage()?.removeItem(dataKey(id));
+    storage()?.removeItem(progressKey(id));
+    return { ok: false, error: metaError };
+  }
+  setActiveSet(id);
+  return { ok: true, set: meta };
+}
+
+/** Add one hand-typed word to a custom set after validating it. */
+export function addWordToSet(
+  id: string,
+  input: WordInput
+): { ok: true; word: VocabularyWord } | { ok: false; errors: Record<string, string> } {
+  if (id === DEFAULT_SET_ID) {
+    return { ok: false, errors: { form: 'Words cannot be added to the Default set. Create your own set first.' } };
+  }
+  const metas = readImportedMetas();
+  const index = metas.findIndex((set) => set.id === id);
+  if (index < 0) return { ok: false, errors: { form: 'That word set is no longer on this device.' } };
+  const sheets = getSetSheets(id);
+  const result = validateWordInput(input, flattenSheets(sheets));
+  if (result.ok === false) return { ok: false, errors: result.errors };
+  const word = result.value;
+  const category = word.category || 'imported';
+  const next: SheetData = { ...sheets, [category]: [...(sheets[category] ?? []), word] };
+  const dataError = writeJson(dataKey(id), next);
+  if (dataError) return { ok: false, errors: { form: dataError } };
+  metas[index] = { ...metas[index], wordCount: countSheetWords(next), updatedAt: new Date().toISOString() };
+  const metaError = writeImportedMetas(metas);
+  if (metaError) {
+    writeJson(dataKey(id), sheets);
+    return { ok: false, errors: { form: metaError } };
+  }
+  return { ok: true, word };
 }
 
 export function renameVocabularySet(
