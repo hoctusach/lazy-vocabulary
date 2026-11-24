@@ -2,6 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Pause, Play, SkipForward, Search, CheckCircle } from 'lucide-react';
+import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 import AudioSheet from './AudioSheet';
 import { toast } from 'sonner';
 import { CONTROL_TOAST } from './controlToast';
@@ -72,6 +73,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
     if (wordToMark?.word) {
       trackUiInteraction('mark_as_learned_confirm', { label: wordToMark.word });
     }
+    if (wordToMark?.word) showCongratsEffect(); // [FB-47] immediately, inside the tap (audio gesture), for every word set
     if (onMarkWordLearned && wordToMark?.word) {
       if (wordToMark.sourceId) onMarkWordLearned(wordToMark.word, wordToMark.category, wordToMark.sourceId);
       else onMarkWordLearned(wordToMark.word, wordToMark.category);

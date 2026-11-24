@@ -5,7 +5,6 @@ import { getSupabaseClient } from '@/lib/supabaseClient';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
 import { extractServerSummary, type ServerSummary } from './serverSummary';
-import { showCongratsEffect } from '@/lib/utils/congratsEffect';
 
 function lsGet(key: string) {
   try {
@@ -170,9 +169,7 @@ export async function markLearnedServerByKey(
 
   console.log('✅ Marked learned:', data);
 
-  if (typeof window !== 'undefined') {
-    showCongratsEffect();
-  }
+  // [FB-47] The celebration fires from the tap itself (VocabularyControlsColumn), not after this round trip.
 
   const rawRows = Array.isArray(data) ? (data as Record<string, unknown>[]) : [];
   const serverSummary = extractServerSummary(rawRows);

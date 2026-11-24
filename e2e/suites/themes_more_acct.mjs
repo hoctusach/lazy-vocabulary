@@ -225,3 +225,35 @@ test('PERSIST-06', 'Last word restored same day; new day starts at list start', 
   const lw = JSON.parse(await s.ls('lazyVoca.todayLastWord')); lw.date = '2000-01-01';
   await s.setLs('lazyVoca.todayLastWord', JSON.stringify(lw)); await s.reload(); await waitWord(s, U.POOL_ORDER[0], 12000);
 });
+
+// ---------- [FB-47] Congratulations popup + sound on every theme, light and dark ----------
+THEMES.forEach(([name, label]) => {
+  [false, true].forEach((dark) => {
+    test(`CONGRATS-${name}-${dark ? 'dark' : 'light'}`, `[FB-47] ${label} · ${dark ? 'dark' : 'light'}: popup appears promptly on mark-as-learned and requests a sound`, async ({ session }) => {
+      const s = await session({ viewport: SHOT_VP, storage: { 'user-theme': name, 'lv-dark': dark ? 'true' : 'false' } }); await boot(s);
+      await s.page.evaluate(() => {
+        window.__audioSrcs = [];
+        window.Audio = class { constructor(src) { this.src = src; this.volume = 1; window.__audioSrcs.push(src); } play() { return Promise.resolve(); } pause() {} };
+      });
+      await ctl(s, 'Mark as learned');
+      await s.page.waitForFunction(() => /Are you sure/i.test(document.body.innerText), { timeout: 8000 });
+      const t0 = Date.now();
+      await click(s, { text: 'Mark as Learned', inDialog: true });
+      await s.page.waitForSelector('.lv-congrats', { visible: true, timeout: 1500 });
+      ok(Date.now() - t0 < 1500, 'popup took ' + (Date.now() - t0) + 'ms');
+      const info = await s.page.evaluate(() => {
+        const el = document.querySelector('.lv-congrats'); const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+        return { w: r.width, h: r.height, inView: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+          op: Number(cs.opacity), disp: cs.display, vis: cs.visibility, z: Number(cs.zIndex), text: el.textContent, srcs: window.__audioSrcs,
+          bg: cs.backgroundColor, color: cs.color };
+      });
+      ok(info.w > 80 && info.h > 20, `popup size ${info.w}x${info.h} (${name}${dark ? '-dark' : ''})`);
+      ok(info.inView, `popup inside viewport (${name}${dark ? '-dark' : ''})`);
+      ok(info.op > 0.9 && info.disp !== 'none' && info.vis === 'visible', JSON.stringify(info));
+      ok(info.z > 9999, 'z-index ' + info.z);
+      ok(info.bg !== info.color && info.bg !== 'rgba(0, 0, 0, 0)', `popup contrast surface ${info.bg} vs ${info.color}`);
+      ok(info.srcs.length >= 1 && /songs\/sound[123]\.mp3$/.test(info.srcs[0]), 'sound requested: ' + info.srcs);
+      await s.page.screenshot({ path: path.join(SHOTS, `congrats-${name}-${dark ? 'dark' : 'light'}.png`) });
+    });
+  });
+});
