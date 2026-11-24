@@ -16,7 +16,7 @@ import { useProFeature } from '@/services/billing/proFeatures';
 import { openProUpgrade } from '@/services/billing/proUpgradeStore';
 import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
-import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from './sampleTemplate';
+import { buildSampleCsv, buildSampleJson, buildSampleXlsx, BUILTIN_CATEGORY_NAMES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
@@ -231,6 +231,11 @@ const VocabularySetsScreen: React.FC = () => {
             JSON template
           </Button>
         </div>
+        <p className="mt-1 text-xs text-muted-foreground" data-testid="template-category-help">
+          Columns: word, meaning (required); example, translation, category (optional). Built-in category names:{' '}
+          {BUILTIN_CATEGORY_NAMES.map((n) => `"${n}"`).join(', ')}. Any other category text is allowed and becomes its own group
+          (blank = "imported"). The JSON and Excel templates include these notes.
+        </p>
         {errors.length > 0 && (
           <div
             role="alert"

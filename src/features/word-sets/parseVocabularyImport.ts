@@ -392,6 +392,7 @@ function parseWorkbook(data: ArrayBuffer | Uint8Array, warnings: string[]): { sh
   const sheets: SheetData = {};
   const errors: string[] = [];
   for (const sheetName of workbook.SheetNames) {
+    if (['readme', '_help'].includes(sheetName.trim().toLowerCase())) continue; // [FB-44] template notes sheet
     const worksheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { defval: '' });
     if (rows.length === 0) continue;
