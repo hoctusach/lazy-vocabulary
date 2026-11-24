@@ -19,8 +19,10 @@ type ReminderState = {
   lastShownAt: number;
 };
 
+import { todayKey as localTodayKey } from '@/lib/progress/streak';
+
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localTodayKey(); // local calendar day [FB-40]
 }
 
 function readState(): ReminderState {

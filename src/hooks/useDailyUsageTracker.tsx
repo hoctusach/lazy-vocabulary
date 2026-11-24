@@ -1,11 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
-import { ensureLearnedDay, setLearningTimeForDay } from '@/lib/progress/progressSummary';
+import { setLearningTimeForDay } from '@/lib/progress/progressSummary';
 import { trackSessionEnd, trackSessionStart } from '@/services/analyticsService';
 
-function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+import { todayKey } from '@/lib/progress/streak';
+import { tickStudyToday } from '@/lib/progress/studyTick';
 
 function getLocalMs(key: string): number {
   try {
@@ -51,14 +50,8 @@ async function ensureTrackedDay(
   const safeDay = dayKey.slice(0, 10);
   if (!safeDay) return;
 
-  if (!userKeyRef.current) {
-    userKeyRef.current = await ensureUserKey();
-  }
-  const userKey = userKeyRef.current;
-  if (!userKey) return;
-
   try {
-    await ensureLearnedDay(userKey, safeDay);
+    tickStudyToday(); // [FB-40] local calendar day, immediate, idempotent
   } catch (error) {
     console.warn('[useDailyUsageTracker] Failed to ensure learned day', error);
   }

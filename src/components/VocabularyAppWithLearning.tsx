@@ -32,6 +32,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
 import SrsPrincipleLine from '@/features/srs-principle/SrsPrincipleLine';
+import { tickStudyToday } from '@/lib/progress/studyTick';
 import { trackUiInteraction } from '@/services/analyticsService';
 
 interface VocabularyAppWithLearningProps {
@@ -92,6 +93,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     previousWordRef.current = vocabularyService.getCurrentWord();
 
     const handleWordChange = () => {
+      tickStudyToday(); // [FB-40] studying started: tick today's local date now
       if (previousWordRef.current) {
         markWordAsPlayed(previousWordRef.current.word);
       }
@@ -261,6 +263,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
   );
 
   const handleMarkWordLearned = (word: string, category?: string, sourceId?: string) => {
+    tickStudyToday(); // [FB-40]
     const routed =
       sourceId ??
       playbackWords.find((item) => item.word === word && (category === undefined || item.category === category))

@@ -46,7 +46,7 @@ function toStringArray(value: unknown): string[] | null {
   return value.filter((entry): entry is string => typeof entry === 'string');
 }
 
-function readProgressSummaryLocal(): SummaryRow | null {
+export function readProgressSummaryLocal(): SummaryRow | null {
   if (typeof localStorage === 'undefined') return null;
   try {
     const raw = localStorage.getItem('progressSummary');
@@ -156,6 +156,11 @@ export async function refreshProgressSummary(
   const remote = await fetchSummaryFromServer(userKey);
   const summary = toProgressSummary(remote) ?? toProgressSummary(await fetchExistingSummary(userKey));
   if (!summary) return null;
+  // [FB-40] Keep days ticked locally (study started today) that the server has not seen yet.
+  const localDays = readProgressSummaryLocal()?.learned_days;
+  if (remote && Array.isArray(localDays)) {
+    summary.learned_days = normaliseDays([...summary.learned_days, ...localDays]);
+  }
 
   persistProgressSummaryLocal(summary);
   return summary;

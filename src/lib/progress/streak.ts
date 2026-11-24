@@ -1,12 +1,13 @@
 /** Local calendar date as YYYY-MM-DD (not UTC, which is off by a day east of Greenwich). */
-function localKey(date: Date): string {
+export function localKey(date: Date): string {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, '0');
   const d = String(date.getDate()).padStart(2, '0');
   return `${y}-${m}-${d}`;
 }
 
-function todayKey(date = new Date()): string {
+/** Today's local calendar date (YYYY-MM-DD). Use this, never toISOString(), for learned_days. [FB-40] */
+export function todayKey(date = new Date()): string {
   return localKey(date);
 }
 
