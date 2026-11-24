@@ -89,7 +89,6 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
         isMuted={isMuted}
         isPaused={isPaused}
         onToggleMute={onToggleMute}
-        onCycleVoice={onCycleVoice}
         selectedVoiceName={selectedVoiceName}
         playCurrentWord={playCurrentWord}
       />

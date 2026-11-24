@@ -3,6 +3,8 @@ import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { nextAllowedVoice, sanitizeVoiceName } from '@/services/speech/voiceAccess';
 import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 import { isKokoroVoiceName } from '@/services/speech/kokoro/kokoroVoices';
+import { loadNativeSystemVoices, mergeSystemVoices } from '@/services/speech/voiceCatalog';
+import { VOICE_SELECTED_EVENT } from '@/services/speech/voiceSelection';
 import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
 
 export interface VoiceContext {
@@ -20,12 +22,23 @@ export const useVoiceContext = (): VoiceContext => {
   const skipPersist = useRef(false);
 
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis
-        .getVoices()
-        .filter(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+    let alive = true;
+    let retries = 3;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const loadVoices = async () => {
+      // [FB-41] merge the web list with the device's native voices: an empty WebView list cannot hide them.
+      let web: SpeechSynthesisVoice[] = [];
+      try { web = window.speechSynthesis?.getVoices?.() ?? []; } catch { web = []; }
+      const native = await loadNativeSystemVoices();
+      if (!alive) return;
+      const voices = mergeSystemVoices(web, native);
       logAvailableVoices(voices);
       setAllVoices(voices);
+
+      if (voices.length === 0 && retries-- > 0) {
+        retryTimer = setTimeout(() => void loadVoices(), 1500);
+      }
 
       const favorite = sanitizeVoiceName(getFavoriteVoice());
       const preferred = favorite
@@ -38,12 +51,24 @@ export const useVoiceContext = (): VoiceContext => {
         setSelectedVoiceName(voices[0].name);
       }
     };
+    const reload = () => void loadVoices();
+    const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
+    const onSelected = (e: Event) => {
+      const name = (e as CustomEvent<{ name?: string }>).detail?.name;
+      if (name) setSelectedVoiceName(name);
+    };
 
-    window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoices);
-    loadVoices();
+    window.speechSynthesis?.addEventListener?.('voiceschanged', reload);
+    window.addEventListener(VOICE_SELECTED_EVENT, onSelected);
+    document.addEventListener('visibilitychange', onVisible);
+    reload();
 
     return () => {
-      window.speechSynthesis?.removeEventListener?.('voiceschanged', loadVoices);
+      alive = false;
+      if (retryTimer) clearTimeout(retryTimer);
+      window.speechSynthesis?.removeEventListener?.('voiceschanged', reload);
+      window.removeEventListener(VOICE_SELECTED_EVENT, onSelected);
+      document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
 

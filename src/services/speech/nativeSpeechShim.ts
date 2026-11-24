@@ -76,7 +76,7 @@ class ShimSynth extends EventTarget {
 
   constructor() {
     super();
-    void this.loadVoices(3);
+    void this.loadVoices(6);
     if (isKokoroSupported()) {
       subscribeKokoro(() => {
         if (getKokoroState().downloaded !== this.kokoroListed) this.rebuildVoices();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Gauge, Lock, Speaker, Volume2, VolumeX } from 'lucide-react';
+import { Gauge, Speaker, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +14,9 @@ import { cn } from '@/lib/utils';
 import { useSpeechRate } from '@/hooks/useSpeechRate';
 import { useVoiceContext } from '@/hooks/useVoiceContext';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
-import { lockedProVoiceIn } from '@/services/speech/voiceAccess';
+import { isVoiceLocked } from '@/services/speech/voiceAccess';
+import { groupVoices } from '@/services/speech/voiceCatalog';
+import { selectVoiceByName } from '@/services/speech/voiceSelection';
 import { openProUpgrade } from '@/services/billing/proUpgradeStore';
 import { useProFeature } from '@/services/billing/proFeatures';
 import { trackUiInteraction } from '@/services/analyticsService';
@@ -25,7 +27,6 @@ interface AudioSheetProps {
   isMuted: boolean;
   isPaused: boolean;
   onToggleMute: () => void;
-  onCycleVoice: () => void;
   selectedVoiceName: string;
   playCurrentWord: () => void;
   triggerClassName?: string;
@@ -39,7 +40,6 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
   isMuted,
   isPaused,
   onToggleMute,
-  onCycleVoice,
   selectedVoiceName,
   playCurrentWord,
   triggerClassName,
@@ -47,7 +47,7 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
   const { speechRate, setSpeechRate } = useSpeechRate();
   const { allVoices } = useVoiceContext();
   useProFeature('maleVoice'); // re-render when the entitlement changes
-  const lockedVoice = lockedProVoiceIn(allVoices);
+  const groups = groupVoices(allVoices);
   const [open, setOpen] = React.useState(false);
   const [showRates, setShowRates] = React.useState(false);
 
@@ -62,13 +62,17 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
     toast(isMuted ? 'Audio unmuted. Speech will resume from the next word.' : 'Audio muted', CONTROL_TOAST);
   };
 
-  const handleCycleVoice = () => {
-    if (allVoices.length === 0) {
-      toast.warning('No voices available');
+  // [FB-48] Direct choice from a grouped dropdown (replaces the slow one-by-one cycle).
+  const handleSelectVoice = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const name = e.target.value;
+    if (!name) return;
+    const result = selectVoiceByName(name);
+    if (result === 'locked') {
+      e.target.value = selectedVoiceName; // stay on the current voice; the upgrade sheet is open
       return;
     }
-    onCycleVoice();
-    trackUiInteraction('cycle_voice', { label: selectedVoiceName });
+    toast.success(`Voice changed to ${name}`);
+    trackUiInteraction('select_voice', { label: name });
   };
 
   const handleRateChange = (r: number) => {
@@ -120,34 +124,36 @@ const AudioSheet: React.FC<AudioSheetProps> = ({
             <span>{isMuted ? 'Unmute' : 'Mute'}</span>
           </Button>
 
-          <Button
-            variant="outline"
-            className={cn(rowClass, allVoices.length < 2 && 'cursor-not-allowed opacity-50')}
-            onClick={handleCycleVoice}
-            disabled={allVoices.length < 2}
-            title={allVoices.length < 2 ? 'No other voices available' : 'Change Voice'}
-            aria-label="Change Voice"
-          >
+          <label className={cn(rowClass, 'flex items-center rounded-md border bg-background')}>
             <Speaker size={18} aria-hidden="true" />
             <span>Voice</span>
-            {selectedVoiceName && (
-              <span className="ml-auto max-w-[55%] truncate text-xs text-muted-foreground">{selectedVoiceName}</span>
-            )}
-          </Button>
-
-          {lockedVoice && (
-            <Button
-              variant="outline"
-              className={rowClass}
-              onClick={() => openProUpgrade('maleVoice')}
-              aria-label="Pro voice (locked)"
-              data-testid="locked-pro-voice"
+            <select
+              aria-label="Voice"
+              data-testid="voice-select"
+              className="ml-auto h-9 min-w-0 max-w-[60%] truncate rounded border bg-background px-2 text-xs"
+              value={selectedVoiceName}
+              onChange={handleSelectVoice}
             >
-              <Lock size={18} aria-hidden="true" />
-              <span className="truncate">{lockedVoice.name}</span>
-              <span className="ml-auto text-xs font-semibold text-[var(--lv-accent)]">Pro</span>
-            </Button>
-          )}
+              {groups.natural.length > 0 && (
+                <optgroup label="Natural voices">
+                  {groups.natural.map((v) => (
+                    <option key={v.name} value={v.name}>
+                      {isVoiceLocked(v.name) ? `🔒 ${v.name} (Pro)` : v.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {groups.system.length > 0 && (
+                <optgroup label="Device / system voices">
+                  {groups.system.map((v) => (
+                    <option key={v.name} value={v.name}>
+                      {v.name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+            </select>
+          </label>
 
           <Button
             variant="outline"

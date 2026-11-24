@@ -23,45 +23,32 @@ beforeAll(async () => {
 import VocabularyControlsColumn from '../src/components/vocabulary-app/VocabularyControlsColumn';
 import { VocabularyWord } from '../src/types/vocabulary';
 
-describe('VocabularyControlsColumn voice toggle', () => {
-  it('cycles voice label and updates state', async () => {
+describe('VocabularyControlsColumn voice picker', () => {
+  it('[FB-48] the Audio sheet offers a voice dropdown (no one-by-one cycle button)', async () => {
     const word: VocabularyWord = { word: 'water', meaning: 'H2O', example: 'Drink', category: 'general' };
-    const voices = ['Voice 1', 'Voice 2'];
-    const controllerState = { voiceName: voices[0] };
-    const Wrapper: React.FC = () => {
-      const [voiceName, setVoiceName] = React.useState(controllerState.voiceName);
-      React.useEffect(() => {
-        controllerState.voiceName = voiceName;
-      }, [voiceName]);
-      const toggleVoice = () => setVoiceName(v => (v === voices[0] ? voices[1] : voices[0]));
-      return (
-        <MemoryRouter>
-          <VocabularyControlsColumn
-            isMuted={false}
-            isPaused={false}
-            onToggleMute={() => {}}
-            onTogglePause={() => {}}
-            onNextWord={() => {}}
-            onSwitchCategory={() => {}}
-            onCycleVoice={toggleVoice}
-            nextCategory="next"
-            selectedVoiceName={voiceName}
-            currentWord={word}
-            onOpenAddModal={() => {}}
-            onOpenEditModal={() => {}}
-            playCurrentWord={() => {}}
-          />
-        </MemoryRouter>
-      );
-    };
-
-    render(<Wrapper />);
+    render(
+      <MemoryRouter>
+        <VocabularyControlsColumn
+          isMuted={false}
+          isPaused={false}
+          onToggleMute={() => {}}
+          onTogglePause={() => {}}
+          onNextWord={() => {}}
+          onSwitchCategory={() => {}}
+          onCycleVoice={() => {}}
+          nextCategory="next"
+          selectedVoiceName="Test 1"
+          currentWord={word}
+          onOpenAddModal={() => {}}
+          onOpenEditModal={() => {}}
+          playCurrentWord={() => {}}
+        />
+      </MemoryRouter>
+    );
 
     await userEvent.click(screen.getByRole('button', { name: 'Audio' }));
-    const toggleBtn = await screen.findByRole('button', { name: 'Change Voice' });
-    expect(controllerState.voiceName).toBe(voices[0]);
-
-    await userEvent.click(toggleBtn);
-    expect(controllerState.voiceName).toBe(voices[1]);
+    const select = await screen.findByTestId('voice-select');
+    expect([...select.querySelectorAll('option')].map((o) => o.textContent)).toEqual(expect.arrayContaining(['Test 1', 'Test 2']));
+    expect(screen.queryByRole('button', { name: 'Change Voice' })).toBeNull();
   });
 });

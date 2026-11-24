@@ -9,6 +9,8 @@ vi.mock('@/hooks/useSpeechRate', () => ({ useSpeechRate: () => ({ speechRate: 1,
 vi.mock('@/hooks/useVoiceContext', () => ({ useVoiceContext: () => ({ allVoices: [{ name: 'a' }, { name: 'b' }] }) }));
 afterEach(cleanup);
 vi.mock('@/services/analyticsService', () => ({ trackUiInteraction: vi.fn() }));
+const selectVoiceByName = vi.fn(() => 'applied');
+vi.mock('@/services/speech/voiceSelection', () => ({ selectVoiceByName: (n: string) => selectVoiceByName(n) }));
 
 const word = { word: 'give up', meaning: 'stop', example: 'x', category: 'Phrasal Verb' } as never;
 const noop = () => {};
@@ -46,18 +48,19 @@ describe('Learn controls', () => {
 
     await userEvent.click(screen.getByLabelText('Audio'));
     expect(await screen.findByLabelText('Mute')).toBeTruthy();
-    expect(screen.getByLabelText('Change Voice')).toBeTruthy();
+    expect(screen.getByTestId('voice-select')).toBeTruthy(); // [FB-48] dropdown, not a cycle button
     expect(screen.getByLabelText('Speech Rate')).toBeTruthy();
   });
 
-  it('[FB-10] Audio sheet: mute toggles, voice cycles, rate offers 7 options and closes after choosing', async () => {
+  it('[FB-10] Audio sheet: mute toggles, voice dropdown, rate offers 7 options and closes after choosing', async () => {
     const onToggleMute = vi.fn(); const onCycleVoice = vi.fn();
     renderControls({ onToggleMute, onCycleVoice });
     await userEvent.click(screen.getByLabelText('Audio'));
     await userEvent.click(await screen.findByLabelText('Mute'));
     expect(onToggleMute).toHaveBeenCalledTimes(1);
-    await userEvent.click(screen.getByLabelText('Change Voice'));
-    expect(onCycleVoice).toHaveBeenCalledTimes(1);
+    await userEvent.selectOptions(screen.getByTestId('voice-select'), 'b');
+    expect(selectVoiceByName).toHaveBeenCalledWith('b');
+    expect(onCycleVoice).not.toHaveBeenCalled();
     await userEvent.click(screen.getByLabelText('Speech Rate'));
     const opts = screen.getByTestId('speech-rate-options').querySelectorAll('button');
     expect([...opts].map((o) => o.textContent)).toEqual(['0.5x', '0.75x', '1x', '1.25x', '1.5x', '1.75x', '2x']);

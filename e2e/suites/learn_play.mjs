@@ -82,7 +82,7 @@ test('LEARN-01', 'Card fields (vi-VN device so the translation line shows) [FB-1
 test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as learned (no Mute/Voice/Rate), 4-col grid, no Previous [FB-10]', async ({ session }) => {
   const s = await session({}); await boot(s);
   for (const l of ['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
-  for (const l of ['Mute', 'Unmute', 'Change Voice', 'Speech Rate', 'Mark as LEARNED']) ok(!(await U.label(s, l)), 'should not be on the dock: ' + l);
+  for (const l of ['Mute', 'Unmute', 'Change Voice', 'Voice', 'Speech Rate', 'Mark as LEARNED']) ok(!(await U.label(s, l)), 'should not be on the dock: ' + l);
   ok(await s.page.evaluate(() => !!document.querySelector('main .grid-cols-4')), '4 col grid');
   ok(!(await U.label(s, 'Vocabulary Detail')) && !(await U.label(s, 'Practice')), 'Details/Practice buttons must be gone');
   const all = await U.controls(s);
@@ -240,24 +240,24 @@ test('PLAY-10', 'Auto-advance on utterance end, not while paused', async ({ sess
 skip('PLAY-11', 'Practice pauses audio and resumes only if it was playing', 'removed: Practice button removed from Learn');
 
 // ---------- VOICE ----------
-test('VOICE-01', 'Voice cycles US -> GB -> AU -> US with toast and persistence [FB-10]', async ({ session }) => {
+test('VOICE-01', 'Voice dropdown: pick US / GB / AU directly with toast and persistence [FB-10][FB-48]', async ({ session }) => {
   const s = await session({}); await boot(s);
-  const seen = [];
-  for (let i = 0; i < 3; i++) {
-    await U.audioCtl(s, 'Change Voice');
-    await s.page.waitForFunction(() => /Voice changed to/.test(document.body.innerText), { timeout: 4000 });
-    seen.push(((await body(s)).match(/Voice changed to ([^\n]+)/) || [])[1]);
-    await sleep(700);
-    await s.page.evaluate(() => { document.querySelectorAll('[role=status] li, li[data-state]').forEach(() => {}); });
+  for (const n of ['Stub GB', 'Stub AU', 'Stub US']) {
+    await U.selectVoice(s, n);
+    await waitText(s, 'Voice changed to ' + n, 4000);
+    eq((await prefs(s)).favorite_voice, n);
+    await sleep(600);
   }
-  ok(/Stub GB \(en-GB\)/.test(seen[0]) || /Stub GB/.test(seen.join('|')), 'sequence ' + seen);
-  ok(seen.join('|').includes('Stub AU') && seen.join('|').includes('Stub US'), 'sequence ' + seen);
-  eq((await prefs(s)).favorite_voice, 'Stub US');
+  await U.openAudio(s);
+  ok(await s.page.evaluate(() => !document.querySelector('button[aria-label="Change Voice"]')), 'cycle-only control must be gone');
+  const opts = await s.page.$$eval('[data-testid="voice-select"] option', (o) => o.map((x) => x.value));
+  ok(['Stub US', 'Stub GB', 'Stub AU'].every((n) => opts.includes(n)), 'system voices listed: ' + opts);
+  await U.closeAudio(s);
 });
 skip('VOICE-02', 'No US/UK/AU region picker', 'product gap');
 test('VOICE-03', 'Voice persists across reload', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await U.audioCtl(s, 'Change Voice'); await waitText(s, 'Voice changed to'); await sleep(300);
+  await U.selectVoice(s, 'Stub GB'); await sleep(300);
   const fav = (await prefs(s)).favorite_voice; ok(fav && fav !== 'Stub US', 'fav ' + fav);
   await s.reload(); await waitWord(s, W[0], 12000); await sleep(1800);
   const calls = await U.speechCalls(s); const last = calls.filter((c) => U.re0.test(c.text)).at(-1);

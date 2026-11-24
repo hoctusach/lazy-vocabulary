@@ -211,7 +211,7 @@ test('PERSIST-04', 'Built-in progress after reload comes back from the server + 
 });
 test('PERSIST-05', 'Muted, paused, 1.5x and GB voice persist', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await U.openAudio(s); await ctl(s, 'Change Voice'); await sleep(400); await ctl(s, 'Mute'); await U.closeAudio(s); await ctl(s, 'Pause'); await sleep(300);
+  await U.openAudio(s); await s.page.select('[data-testid="voice-select"]', 'Stub GB'); await sleep(400); await ctl(s, 'Mute'); await U.closeAudio(s); await ctl(s, 'Pause'); await sleep(300);
   await U.openAudio(s); await ctl(s, 'Speech Rate'); await sleep(300); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   const before = await U.prefs(s);
   await s.reload(); await waitWord(s, U.POOL_ORDER[0], 12000); await sleep(1500);

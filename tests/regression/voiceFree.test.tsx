@@ -58,18 +58,20 @@ describe('[FB-29] system voices are free; only Kokoro Michael is Pro', () => {
     expect(nextAllowedVoice(voices, SYSTEM[4])?.name).toBe(SYSTEM[0]);
   });
 
-  it('Audio sheet keeps Michael discoverable as a locked row that opens Pro, without blocking system voices', async () => {
+  it('Audio sheet: Michael is a locked option that opens Pro; Heart/system voices apply without paywall [FB-48]', async () => {
     listed = [HEART, MICHAEL, ...SYSTEM].map((name) => ({ name }));
     const { default: AudioSheet } = await import('@/components/vocabulary-app/AudioSheet');
     const { getProUpgradeState } = await import('@/services/billing/proUpgradeStore');
-    const onCycleVoice = vi.fn();
-    render(<AudioSheet isMuted={false} isPaused={false} onToggleMute={() => {}} onCycleVoice={onCycleVoice}
-      selectedVoiceName={HEART} playCurrentWord={() => {}} />);
+    render(<AudioSheet isMuted={false} isPaused={false} onToggleMute={() => {}}
+      selectedVoiceName={SYSTEM[0]} playCurrentWord={() => {}} />);
     await userEvent.click(screen.getByLabelText('Audio'));
-    await userEvent.click(screen.getByLabelText('Change Voice'));
-    expect(onCycleVoice).toHaveBeenCalledTimes(1);
+    const select = screen.getByTestId('voice-select') as HTMLSelectElement;
+    await userEvent.selectOptions(select, HEART); // system -> Heart, free
     expect(getProUpgradeState().open).toBe(false);
-    await userEvent.click(screen.getByTestId('locked-pro-voice'));
+    expect(JSON.stringify(localStorage)).toContain(HEART);
+    await userEvent.selectOptions(select, SYSTEM[3]);
+    expect(getProUpgradeState().open).toBe(false);
+    await userEvent.selectOptions(select, MICHAEL);
     expect(getProUpgradeState()).toMatchObject({ open: true, feature: 'maleVoice' });
   });
 });

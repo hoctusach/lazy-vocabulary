@@ -185,3 +185,11 @@ export async function pickFile(s, absPath) {
   const input = await s.page.$('input[type=file][aria-label="Import vocabulary file"]'); ok(input, 'no file input');
   await input.uploadFile(absPath); await sleep(400);
 }
+
+/** [FB-48] Pick a voice from the Audio sheet dropdown (replaces the one-by-one cycle). */
+export async function selectVoice(s, name) {
+  await openAudio(s);
+  await s.page.select('[data-testid="voice-select"]', name);
+  await sleep(300);
+  await closeAudio(s);
+}
