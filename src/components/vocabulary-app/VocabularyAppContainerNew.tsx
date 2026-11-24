@@ -76,9 +76,12 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   // Android: keep playing (and show a notification) while the app is backgrounded.
   usePlaybackService({
     isPlaying: hasData && !isPaused && !!currentWord,
+    active: hasData && !!currentWord,
     word: currentWord?.word,
     detail: currentWord?.meaning || currentWord?.category || currentCategory,
-    onPause: togglePause,
+    // Explicit directions: a stale notification tap must never flip the wrong way.
+    onPause: () => { if (!isPaused) togglePause(); },
+    onPlay: () => { if (isPaused) togglePause(); },
     onNext: goToNextAndSpeak,
   });
 

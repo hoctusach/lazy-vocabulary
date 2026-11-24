@@ -1,7 +1,12 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 
-export interface PlaybackInfo { title: string; text: string }
-export type PlaybackAction = 'pause' | 'next';
+export interface PlaybackInfo {
+  title: string;
+  text: string;
+  /** True while words advance; false = paused (the notification stays, with a Play button). Default true. */
+  playing?: boolean;
+}
+export type PlaybackAction = 'play' | 'pause' | 'next';
 
 interface PlaybackServicePlugin {
   start(info: PlaybackInfo): Promise<void>;
@@ -25,7 +30,7 @@ export function isBackgroundPlaybackSupported(): boolean {
   }
 }
 
-export interface PlaybackHandlers { onPause: () => void; onNext: () => void }
+export interface PlaybackHandlers { onPlay?: () => void; onPause: () => void; onNext: () => void }
 
 let running = false;
 let askedPermission = false;
@@ -42,7 +47,8 @@ async function ensureListener(): Promise<void> {
   listenerPending = true;
   try {
     listener = await Native.addListener('action', ({ action }) => {
-      if (action === 'pause') handlers?.onPause();
+      if (action === 'play') handlers?.onPlay?.();
+      else if (action === 'pause') handlers?.onPause();
       else if (action === 'next') handlers?.onNext();
     });
   } catch {
@@ -55,6 +61,7 @@ async function ensureListener(): Promise<void> {
 /** Start (or refresh) the foreground service. Asks for notification permission once; denial is fine. */
 export async function startPlaybackService(info: PlaybackInfo): Promise<void> {
   if (!isBackgroundPlaybackSupported()) return;
+  syncWebMediaSession({ ...info, playing: info.playing !== false });
   try {
     if (!askedPermission) {
       askedPermission = true;
@@ -73,8 +80,34 @@ export async function startPlaybackService(info: PlaybackInfo): Promise<void> {
   }
 }
 
+/**
+ * Web Media Session API in addition to the native session (a WebView/Chrome that supports it shows the same now-playing
+ * metadata and routes hardware/Bluetooth media keys to the same handlers). Never replaces the native notification.
+ */
+export function syncWebMediaSession(info: PlaybackInfo | null): void {
+  try {
+    const ms = typeof navigator !== 'undefined' ? (navigator as Navigator & { mediaSession?: MediaSession }).mediaSession : undefined;
+    if (!ms) return;
+    if (!info) {
+      ms.metadata = null;
+      ms.playbackState = 'none';
+      return;
+    }
+    if (typeof MediaMetadata !== 'undefined') {
+      ms.metadata = new MediaMetadata({ title: info.title, artist: info.text, album: 'Lazy Vocabulary' });
+    }
+    ms.playbackState = info.playing === false ? 'paused' : 'playing';
+    ms.setActionHandler('play', () => handlers?.onPlay?.());
+    ms.setActionHandler('pause', () => handlers?.onPause());
+    ms.setActionHandler('nexttrack', () => handlers?.onNext());
+  } catch {
+    /* unsupported handler/action: the native session still works */
+  }
+}
+
 export async function updatePlaybackService(info: PlaybackInfo): Promise<void> {
   if (!isBackgroundPlaybackSupported() || !running) return;
+  syncWebMediaSession(info);
   try {
     await Native.update(info);
   } catch (e) {
@@ -85,6 +118,7 @@ export async function updatePlaybackService(info: PlaybackInfo): Promise<void> {
 export async function stopPlaybackService(): Promise<void> {
   if (!isBackgroundPlaybackSupported() || !running) return;
   running = false;
+  syncWebMediaSession(null);
   try {
     await Native.stop();
   } catch (e) {

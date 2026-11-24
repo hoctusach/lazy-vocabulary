@@ -10,8 +10,12 @@ import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
+import android.graphics.drawable.Icon;
+import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PowerManager;
 
 /** Foreground (mediaPlayback) service that keeps the app process, WebView and TTS alive in the background. */
@@ -22,17 +26,50 @@ public class PlaybackService extends Service {
     static final String ACTION_UPDATE = "com.lazy.vocabulary.playback.UPDATE";
     static final String ACTION_STOP = "com.lazy.vocabulary.playback.STOP";
     static final String ACTION_PAUSE = "com.lazy.vocabulary.playback.PAUSE";
+    static final String ACTION_PLAY = "com.lazy.vocabulary.playback.PLAY";
     static final String ACTION_NEXT = "com.lazy.vocabulary.playback.NEXT";
     static final String EXTRA_TITLE = "title";
     static final String EXTRA_TEXT = "text";
+    static final String EXTRA_PLAYING = "playing";
 
     /** Set while the service is running so MainActivity can keep the WebView alive. */
     static volatile boolean running = false;
+    /** The live service instance (same process as the WebView), so JS state changes need no start-service intent. */
+    private static volatile PlaybackService current;
+    private final Handler main = new Handler(Looper.getMainLooper());
 
     private PowerManager.WakeLock wakeLock;
     private MediaSession mediaSession;
     private String title = "Lazy Vocabulary";
     private String text = "";
+    /** True while words are advancing; false = paused (the card stays so Play can be tapped from the lock screen). */
+    private boolean playing = true;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        current = this;
+    }
+
+    /** JS -> native state change (word / playing). Runs on the main thread; no-op if the service is gone. */
+    static void applyState(final String title, final String text, final boolean playing) {
+        final PlaybackService svc = current;
+        if (svc == null) return;
+        svc.main.post(new Runnable() {
+            @Override public void run() { svc.updateState(title, text, playing); }
+        });
+    }
+
+    private void updateState(String newTitle, String newText, boolean isPlaying) {
+        if (!running) return;
+        if (newTitle != null) title = newTitle;
+        if (newText != null) text = newText;
+        playing = isPlaying;
+        ensureMediaSession();
+        if (playing) acquireWakeLock(); else releaseWakeLock();
+        NotificationManager nm = getSystemService(NotificationManager.class);
+        if (nm != null) nm.notify(NOTIFICATION_ID, buildNotification());
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -52,13 +89,15 @@ public class PlaybackService extends Service {
             shutdown();
             return START_NOT_STICKY;
         }
-        if (ACTION_PAUSE.equals(action) || ACTION_NEXT.equals(action)) {
-            PlaybackServicePlugin.emitAction(ACTION_PAUSE.equals(action) ? "pause" : "next");
+        if (ACTION_PAUSE.equals(action) || ACTION_PLAY.equals(action) || ACTION_NEXT.equals(action)) {
+            // Notification buttons: tell the app (JS owns the player). JS answers with a state update that flips the card.
+            PlaybackServicePlugin.emitAction(ACTION_PAUSE.equals(action) ? "pause" : ACTION_PLAY.equals(action) ? "play" : "next");
             return START_STICKY;
         }
         if (intent != null) {
             if (intent.hasExtra(EXTRA_TITLE)) title = intent.getStringExtra(EXTRA_TITLE);
             if (intent.hasExtra(EXTRA_TEXT)) text = intent.getStringExtra(EXTRA_TEXT);
+            playing = intent.getBooleanExtra(EXTRA_PLAYING, true);
         }
         ensureChannel();
         ensureMediaSession();
@@ -75,7 +114,7 @@ public class PlaybackService extends Service {
             return START_NOT_STICKY;
         }
         running = true;
-        acquireWakeLock();
+        if (playing) acquireWakeLock(); else releaseWakeLock();
         // Sticky: if the system kills only the service while the app process lives, it is restarted (FB-31).
         return START_STICKY;
     }
@@ -85,13 +124,22 @@ public class PlaybackService extends Service {
         if (mediaSession == null) {
             mediaSession = new MediaSession(this, "LazyVocabularyPlayback");
             mediaSession.setCallback(new MediaSession.Callback() {
+                @Override public void onPlay() { PlaybackServicePlugin.emitAction("play"); }
                 @Override public void onPause() { PlaybackServicePlugin.emitAction("pause"); }
                 @Override public void onSkipToNext() { PlaybackServicePlugin.emitAction("next"); }
             });
         }
+        // Now-playing card (lock screen / shade): title = the current word, subtitle = its meaning.
+        mediaSession.setMetadata(new MediaMetadata.Builder()
+                .putString(MediaMetadata.METADATA_KEY_TITLE, title)
+                .putString(MediaMetadata.METADATA_KEY_ARTIST, text)
+                .putString(MediaMetadata.METADATA_KEY_ALBUM, "Lazy Vocabulary")
+                .build());
         PlaybackState state = new PlaybackState.Builder()
-                .setActions(PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_SKIP_TO_NEXT)
-                .setState(PlaybackState.STATE_PLAYING, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+                .setActions(PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE
+                        | PlaybackState.ACTION_SKIP_TO_NEXT)
+                .setState(playing ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED,
+                        PlaybackState.PLAYBACK_POSITION_UNKNOWN, playing ? 1.0f : 0.0f)
                 .build();
         mediaSession.setPlaybackState(state);
         if (!mediaSession.isActive()) mediaSession.setActive(true);
@@ -130,12 +178,14 @@ public class PlaybackService extends Service {
                 .setContentTitle(title)
                 .setContentText(text)
                 .setContentIntent(contentPi)
-                .setOngoing(true)
+                .setOngoing(playing)
                 .setOnlyAlertOnce(true)
                 .setCategory(Notification.CATEGORY_TRANSPORT)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .addAction(new Notification.Action.Builder(null, "Pause", servicePi(ACTION_PAUSE, 1)).build())
-                .addAction(new Notification.Action.Builder(null, "Next", servicePi(ACTION_NEXT, 2)).build());
+                .addAction(playing
+                        ? new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_pause), "Pause", servicePi(ACTION_PAUSE, 1)).build()
+                        : new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_play), "Play", servicePi(ACTION_PLAY, 3)).build())
+                .addAction(new Notification.Action.Builder(Icon.createWithResource(this, android.R.drawable.ic_media_next), "Next", servicePi(ACTION_NEXT, 2)).build());
         if (mediaSession != null) {
             b.setStyle(new Notification.MediaStyle()
                     .setMediaSession(mediaSession.getSessionToken())
@@ -172,6 +222,7 @@ public class PlaybackService extends Service {
     @Override
     public void onDestroy() {
         running = false;
+        if (current == this) current = null;
         releaseWakeLock();
         releaseMediaSession();
         super.onDestroy();

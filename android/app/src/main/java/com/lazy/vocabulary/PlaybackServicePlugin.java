@@ -44,8 +44,10 @@ public class PlaybackServicePlugin extends Plugin {
         if (call != null) {
             String title = call.getString("title");
             String text = call.getString("text");
+            Boolean playing = call.getBoolean("playing", true);
             if (title != null) i.putExtra(PlaybackService.EXTRA_TITLE, title);
             if (text != null) i.putExtra(PlaybackService.EXTRA_TEXT, text);
+            i.putExtra(PlaybackService.EXTRA_PLAYING, playing == null || playing);
         }
         try {
             if (PlaybackService.ACTION_STOP.equals(action)) {
@@ -68,7 +70,11 @@ public class PlaybackServicePlugin extends Plugin {
     public void update(PluginCall call) {
         // Only refresh an already-running service; don't resurrect it after stop().
         if (!PlaybackService.running) { call.resolve(); return; }
-        send(PlaybackService.ACTION_UPDATE, call);
+        // Direct call into the running service (same process): works with the app backgrounded / screen off, no
+        // start-service restrictions (the service is running, so its instance exists).
+        Boolean playing = call.getBoolean("playing", true);
+        PlaybackService.applyState(call.getString("title"), call.getString("text"), playing == null || playing);
+        call.resolve();
     }
 
     @PluginMethod

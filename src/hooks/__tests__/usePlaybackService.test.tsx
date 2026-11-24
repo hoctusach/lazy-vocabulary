@@ -6,6 +6,8 @@ const svc = vi.hoisted(() => ({
   startPlaybackService: vi.fn().mockResolvedValue(undefined),
   stopPlaybackService: vi.fn().mockResolvedValue(undefined),
   setPlaybackHandlers: vi.fn(),
+  updatePlaybackService: vi.fn().mockResolvedValue(undefined),
+  isPlaybackServiceRunning: vi.fn().mockReturnValue(true),
 }));
 vi.mock('@/services/background/playbackService', () => svc);
 
@@ -19,11 +21,26 @@ describe('[FB-16] usePlaybackService', () => {
     const { rerender } = renderHook((p) => usePlaybackService(p), {
       initialProps: { ...base, isPlaying: true, word: 'a', detail: 'x' },
     });
-    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'a', text: 'x' });
+    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'a', text: 'x', playing: true });
     rerender({ ...base, isPlaying: true, word: 'b', detail: 'y' });
-    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'b', text: 'y' });
+    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'b', text: 'y', playing: true });
     rerender({ ...base, isPlaying: false, word: 'b', detail: 'y' });
     expect(svc.stopPlaybackService).toHaveBeenCalled();
+  });
+
+  it('[FB-49] paused with a word: keeps the card (update playing:false) instead of stopping; Play handler routes', () => {
+    const onPlay = vi.fn();
+    const { rerender } = renderHook((p) => usePlaybackService(p), {
+      initialProps: { ...base, onPlay, isPlaying: true, active: true, word: 'a', detail: 'x' },
+    });
+    svc.stopPlaybackService.mockClear();
+    rerender({ ...base, onPlay, isPlaying: false, active: true, word: 'a', detail: 'x' });
+    expect(svc.updatePlaybackService).toHaveBeenLastCalledWith({ title: 'a', text: 'x', playing: false });
+    expect(svc.stopPlaybackService).not.toHaveBeenCalled();
+    svc.setPlaybackHandlers.mock.calls[0][0].onPlay();
+    expect(onPlay).toHaveBeenCalled();
+    rerender({ ...base, onPlay, isPlaying: true, active: true, word: 'a', detail: 'x' });
+    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'a', text: 'x', playing: true });
   });
 
   it('stops on unmount and routes actions to latest handlers', () => {
