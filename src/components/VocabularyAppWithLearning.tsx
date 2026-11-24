@@ -282,17 +282,17 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     }
     markCurrentWordLearned(word);
   };
-  const learningSection = (
+  const learningProgressPanel = (
+    <LearningProgressPanel
+      progressStats={playbackStats}
+      learnerId={wordSets.activeSet.id}
+      progressError={wordSets.hasBuiltin ? progressError : null}
+    />
+  );
+  // [FB-50] Word Summary lives on the Learn tab, directly under the card player.
+  const wordSummarySection = (
     <TooltipProvider>
-      <div className="space-y-3 mt-3">
-        <QuickQuizPanel targetWords={quizWords} />
-
-        <LearningProgressPanel
-          progressStats={playbackStats}
-          learnerId={wordSets.activeSet.id}
-          progressError={wordSets.hasBuiltin ? progressError : null}
-        />
-
+      <div className="mt-3" data-testid="word-summary-section">
         <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -443,6 +443,8 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     </TooltipProvider>
   );
 
+  const quizSection = <QuickQuizPanel targetWords={quizWords} />;
+
   const showCard = view !== 'progress';
   const showProgress = view !== 'learn';
 
@@ -456,7 +458,15 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           dailySelection={wordSets.hasBuiltin ? dailySelection : null}
           isLoadingSelection={wordSets.hasBuiltin && isDailySelectionLoading && playbackWords.length === 0}
           onMarkWordLearned={handleMarkWordLearned}
-          additionalContent={view === 'all' ? learningSection : undefined}
+          underPlayerContent={view !== 'progress' ? wordSummarySection : undefined}
+          additionalContent={
+            view === 'all' ? (
+              <div className="space-y-3 mt-3">
+                {quizSection}
+                {learningProgressPanel}
+              </div>
+            ) : undefined
+          }
           onOpenSearch={openSearch}
           currentUserLearnedCount={playbackStats.learned}
           currentUserLearningCount={playbackStats.learning}
@@ -469,12 +479,14 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
       {showProgress && view !== 'all' && (
         <div className="space-y-3">
           <StreakPanel refreshKey={playbackStats.learned} />
+          {/* [FB-39] Learning Progress sits directly under Streak, open by default. */}
+          {learningProgressPanel}
           <LeaderboardPanel
             currentUserLearnedCount={playbackStats.learned}
             currentUserLearningCount={playbackStats.learning}
             currentUserDueCount={playbackStats.due}
           />
-          {learningSection}
+          {quizSection}
         </div>
       )}
       <MarkAsNewDialog

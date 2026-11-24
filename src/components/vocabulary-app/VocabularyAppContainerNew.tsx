@@ -19,6 +19,7 @@ interface VocabularyAppContainerNewProps {
   onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
+  underPlayerContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;
   dailySelection?: DailySelection | null;
   isLoadingSelection?: boolean;
@@ -32,6 +33,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   onMarkWordLearned,
   initialWords,
   additionalContent,
+  underPlayerContent,
   onOpenSearch,
   dailySelection,
   isLoadingSelection = false,
@@ -191,6 +193,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             playCurrentWord={playCurrentWord}
             onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
+            underPlayerContent={underPlayerContent}
             onOpenSearch={onOpenSearch}
             currentUserLearnedCount={currentUserLearnedCount}
             currentUserLearningCount={currentUserLearningCount}

@@ -12,8 +12,9 @@ import type { VocabularyWord } from '@/types/vocabulary';
 (globalThis as unknown as { expect: typeof expect }).expect = expect;
 
 vi.mock('@/components/vocabulary-app/VocabularyAppContainerNew', () => ({
-  default: ({ additionalContent }: { additionalContent?: React.ReactNode }) => (
+  default: ({ additionalContent, underPlayerContent }: { additionalContent?: React.ReactNode; underPlayerContent?: React.ReactNode }) => (
     <div>
+      {underPlayerContent}
       {additionalContent}
     </div>
   )

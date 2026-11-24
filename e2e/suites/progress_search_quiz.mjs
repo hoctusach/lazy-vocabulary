@@ -6,15 +6,29 @@ const { ok, eq, waitText, click, body, boot, tab, importFile, waitWord, ctl, wor
 const ymd = (d) => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
 const openProgress = async (s) => { await tab(s, 'Progress'); await waitText(s, 'Quiz me'); };
 const expand = async (s, name) => { await click(s, { textHas: name }); await sleep(400); };
+// [FB-50] Word Summary is on the Learn tab, under the card player.
+const openSummary = async (s) => { await tab(s, 'Learn'); await expand(s, 'Word Summary'); };
 const flat = async (s) => (await body(s)).replace(/\s+/g, ' ');
 
-test('PROG-03', 'Progress tab panels; Learning Progress closed by default', async ({ session }) => {
+test('PROG-03', '[FB-39][FB-50] Progress tab: Streak, then Learning Progress (open); no Word Summary', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s);
-  for (const t of ['Add a friend', 'Learning Progress', 'Word Summary']) await waitText(s, t);
-  ok(!(await body(s)).includes('Due Review'), 'Learning Progress should be collapsed');
+  for (const t of ['Add a friend', 'Learning Progress', 'Due Review']) await waitText(s, t);
+  const t = await body(s);
+  ok(!t.includes('Word Summary'), 'Word Summary must not be on Progress');
+  ok(t.indexOf('Streak') >= 0 && t.indexOf('Streak') < t.indexOf('Learning Progress'), 'Streak must come before Learning Progress');
+  ok(t.indexOf('Learning Progress') < t.indexOf('Add a friend'), 'Learning Progress directly under Streak');
+});
+test('LEARN-WS', '[FB-50] Word Summary sits on Learn, below the card player', async ({ session }) => {
+  const s = await session({}); await boot(s);
+  await waitText(s, 'Word Summary');
+  const below = await s.page.evaluate(() => {
+    const h = document.querySelector('main h1'); const ws = document.querySelector('[data-testid="word-summary-section"]');
+    return !!h && !!ws && (h.compareDocumentPosition(ws) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+  });
+  ok(below, 'Word Summary not below the card');
 });
 test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
-  const s = await session({}); await boot(s); await openProgress(s); await expand(s, 'Learning Progress');
+  const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'Due Review');
   const t = await flat(s);
   for (const k of ['Learned', 'Due Review', 'Learning', 'New', 'Total']) ok(t.includes(k), 'tile ' + k);
   ok(/\d+(\.\d+)?\s?%/.test(t), 'percentage');
@@ -23,7 +37,7 @@ test('PROG-05', 'Word Summary lists for an imported set', async ({ session }) =>
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
-  await openProgress(s); await expand(s, 'Word Summary');
+  await openSummary(s);
   const t = await flat(s);
   ok(/NEW TODAY\s*\((\d+)\)/i.test(t) && /DUE TODAY\s*\((\d+)\)/i.test(t) && /LEARNED\s*\(1\)/i.test(t), 'headings: ' + t.slice(t.indexOf('NEW TODAY') - 20, t.indexOf('NEW TODAY') + 300));
   const n = Number(t.match(/NEW TODAY\s*\((\d+)\)/i)[1]);
@@ -35,13 +49,13 @@ test('PROG-06', 'Empty summaries', async ({ session }) => {
   // Gate blocks the UI; use a signed-in user with a server that has no selection instead.
   await s.close();
   const s2 = await session({ fake: { pool: [] } }); await s2.goto('/'); await sleep(2500);
-  await openProgress(s2); await expand(s2, 'Word Summary');
+  await openSummary(s2);
   const t = await flat(s2);
   ok(/No new words assigned today/.test(t) && /No due reviews today/.test(t) && /No learned words/.test(t), t.slice(-500));
 });
 test('PROG-07', 'Eye button opens search pre-filled with the word', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
-  await openProgress(s); await expand(s, 'Word Summary');
+  await openSummary(s);
   await s.page.evaluate(() => document.querySelector('button[aria-label^="View"]').click()); await sleep(600);
   await waitText(s, 'Quick Search');
   const v = await s.page.$eval('input[placeholder="Search word..."]', (e) => e.value); ok(/aaa\d/.test(v), 'prefilled: ' + v);
@@ -49,7 +63,7 @@ test('PROG-07', 'Eye button opens search pre-filled with the word', async ({ ses
 test('PROG-08', 'Progress after learning a built-in word', async ({ session }) => {
   const s = await session({}); await boot(s);
   await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
-  await openProgress(s); await expand(s, 'Word Summary');
+  await openSummary(s);
   const t = await flat(s);
   ok(/LEARNED\s*\(1\)/i.test(t), 'LEARNED (1) ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
 });
@@ -141,7 +155,7 @@ test('PROG-12', 'Leaderboard with backend down: no crash, rest of the page works
   const s = await session({ fake: { mode: 'down' } }); s.allow.push(/Failed to fetch|NetworkError|leaderboard/i);
   await s.goto('/'); await sleep(2500); await openProgress(s); await waitText(s, 'Leaderboard');
   await waitText(s, 'Friends are unavailable');
-  await expand(s, 'Learning Progress'); await waitText(s, 'Due Review');
+  await waitText(s, 'Due Review');
 });
 
 // ---------- SEARCH ----------

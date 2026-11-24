@@ -205,7 +205,7 @@ test('PERSIST-03', 'Imported-set progress persists', async ({ session }) => {
 test('PERSIST-04', 'Built-in progress after reload comes back from the server + cache', async ({ session }) => {
   const s = await session({}); await boot(s);
   await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
-  await s.reload(); await sleep(2000); await tab(s, 'Progress'); await waitText(s, 'Quiz me');
+  await s.reload(); await sleep(2000); await tab(s, 'Learn');
   await click(s, { textHas: 'Word Summary' }); await sleep(400);
   ok(/LEARNED\s*\(1\)/i.test((await body(s)).replace(/\n/g, ' ')), 'LEARNED (1) lost after reload');
 });

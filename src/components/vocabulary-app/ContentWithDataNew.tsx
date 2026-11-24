@@ -22,6 +22,8 @@ interface ContentWithDataNewProps {
   currentUserLearningCount?: number;
   currentUserDueCount?: number;
   additionalContent?: React.ReactNode;
+  /** Rendered directly under the card player in every variant (Word Summary, FB-50). */
+  underPlayerContent?: React.ReactNode;
   variant?: 'full' | 'card';
   emptyState?: {
     word: string;
@@ -50,6 +52,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   currentUserLearningCount,
   currentUserDueCount,
   additionalContent,
+  underPlayerContent,
   variant = 'full',
   emptyState,
 }) => {
@@ -73,6 +76,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onMarkWordLearned={onMarkWordLearned}
         onOpenSearch={onOpenSearch}
       />
+
+      {underPlayerContent}
 
       {!cardOnly && <StreakPanel refreshKey={currentUserLearnedCount} />}
 

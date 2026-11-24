@@ -134,7 +134,7 @@ test('SET-19', 'Per-set progress isolation', async ({ session }) => {
   ok((await cardText(s, 'setB')).includes('0 learned'), await cardText(s, 'setB'));
   ok(!(await cardText(s, 'Word Set: C1, C2')).includes('learned on this device'));
   await U.useOnly(s, 'setB'); await tab(s, 'Progress'); await waitText(s, 'Quiz me');
-  await click(s, { textHas: 'Learning Progress' }); await sleep(500);
+  await waitText(s, 'Due Review'); await sleep(300); // [FB-39] open by default
   const t = (await body(s)).replace(/\n+/g, ' ');
   ok(/Learned\s*0\b/i.test(t) || /0\s*Learned/i.test(t), 'B learned should be 0: ' + t.slice(t.indexOf('Learning Progress'), t.indexOf('Learning Progress') + 200));
 });

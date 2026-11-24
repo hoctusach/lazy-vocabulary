@@ -26,7 +26,7 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
   const learnedPercentage = progressStats.total > 0
     ? ((progressStats.learning + progressStats.learned) / progressStats.total) * 100
     : 0;
-  const [open, setOpen] = useState(Boolean(progressError));
+  const [open, setOpen] = useState(true) // [FB-39] open by default;
 
   useEffect(() => {
     if (progressError) {

@@ -90,7 +90,8 @@ test('EDGE-01', 'Very long (100 char, no spaces) word does not overflow Learn / 
   await tab(s, 'Learn');
   for (let i = 0; i < 4; i++) { if (/^x{50}/.test((await word(s)) || '')) break; await sleep(500); await ctl(s, 'Next Word'); }
   ok(/^x{50}/.test((await word(s)) || ''), 'long word not shown'); await sleep(400); await noHScroll(s, 'Learn');
-  await tab(s, 'Progress'); await click(s, { textHas: 'Word Summary' }); await sleep(500); await noHScroll(s, 'Progress');
+  await click(s, { textHas: 'Word Summary' }); await sleep(500); await noHScroll(s, 'Learn (summary)');
+  await tab(s, 'Progress'); await sleep(300); await noHScroll(s, 'Progress');
 });
 test('EDGE-02', 'Very long meaning/example: Learn, Quiz, Detail do not overflow', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'long_words.csv'); await waitText(s, 'was added to your selection');
