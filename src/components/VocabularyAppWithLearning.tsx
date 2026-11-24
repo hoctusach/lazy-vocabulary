@@ -10,10 +10,10 @@ import {
   buildMixedQueue,
   filterByBuiltinGroups,
   interleaveBuiltinGroups,
-  sumStats,
+  activeProgressStats,
   type SourcedWord,
 } from '@/features/word-sets/mixQueue';
-import { BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
+import { BUILTIN_GROUPS, builtinSelectedWordCount } from '@/features/word-sets/vocabularySetStore';
 import { DEFAULT_SET_ID } from '@/features/word-sets/types';
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
@@ -252,11 +252,13 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     [builtinToday, wordSets.importedQueues]
   );
 
-  const builtinStats = wordSets.hasBuiltin ? progressStats : null;
-  const playbackStats = sumStats([
-    ...(builtinStats ? [builtinStats] : []),
-    ...(wordSets.importedQueues.length > 0 ? [wordSets.stats] : []),
-  ]);
+  // [FB-38] Total/New come from the active selection (same count as the Word Set card), never from
+  // the server's 4000-row table or remaining_count.
+  const playbackStats = activeProgressStats(
+    wordSets.hasBuiltin ? builtinSelectedWordCount(groups) : 0,
+    wordSets.hasBuiltin ? progressStats : null,
+    wordSets.importedQueues.length > 0 ? wordSets.stats : null
+  );
 
   const handleMarkWordLearned = (word: string, category?: string, sourceId?: string) => {
     const routed =

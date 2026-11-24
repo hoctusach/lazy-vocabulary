@@ -213,7 +213,7 @@ export function computeLearnedWordStats(
   const summary: DerivedProgressSummary = {
     learned: learnedCount,
     learning: learningCount,
-    new: Math.max(totalWords - learningCount, 0),
+    new: remainingCount,
     due: dueRows.length,
     remaining: remainingCount,
     total: learnedCount + learningCount + remainingCount,

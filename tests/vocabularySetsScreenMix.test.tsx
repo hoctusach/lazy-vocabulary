@@ -7,7 +7,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() } }));
 
-import { getDefaultVocabularyTotal } from '@/data/defaultVocabulary';
 import { VocabularySetProvider } from '@/features/word-sets/VocabularySetContext';
 import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
 import {
@@ -40,7 +39,7 @@ describe('[FB-18] Sets screen: multi-source checkboxes', () => {
       expect(screen.getAllByText(`${counts[group].toLocaleString()} words`).length).toBeGreaterThan(0);
     }
     expect(box('Select all groups of Word Set: C1, C2').checked).toBe(true);
-    const total = getDefaultVocabularyTotal(); // distinct words, same as the Learn banner
+    const total = Object.values(counts).reduce((a, b) => a + b, 0); // [FB-38] row count, same as the cards + Progress Total
     expect(screen.getByTestId('selection-summary').textContent).toBe(
       `Selected: 6 sets · ${total.toLocaleString()} words`
     );

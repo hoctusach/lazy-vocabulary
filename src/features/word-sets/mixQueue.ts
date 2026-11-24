@@ -119,3 +119,23 @@ export function sumStats(parts: readonly MixStats[]): MixStats {
     { total: 0, learned: 0, learning: 0, new: 0, due: 0 }
   );
 }
+
+/**
+ * Learning Progress numbers for the ACTIVE selection. [FB-38]
+ * Total = selected built-in rows (same count as the Word Set card) + selected imported words. Any server
+ * `remaining_count` / server total is ignored for the UI. Learned + Learning + New = Total; Due is a
+ * subset of Learning. Built-in learned/learning come from progress (possibly account-wide), so they are
+ * clamped into the active total.
+ */
+export function activeProgressStats(
+  builtinTotal: number,
+  builtin: { learned: number; learning: number; due: number } | null,
+  imported: MixStats | null
+): MixStats {
+  const total = Math.max(builtinTotal, 0);
+  const learned = Math.min(Math.max(builtin?.learned ?? 0, 0), total);
+  const learning = Math.min(Math.max(builtin?.learning ?? 0, 0), total - learned);
+  const due = Math.min(Math.max(builtin?.due ?? 0, 0), learning);
+  const part: MixStats = { total, learned, learning, due, new: total - learned - learning };
+  return sumStats([part, ...(imported ? [imported] : [])]);
+}

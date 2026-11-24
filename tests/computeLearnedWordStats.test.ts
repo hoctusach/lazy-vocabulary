@@ -54,7 +54,7 @@ describe('computeLearnedWordStats', () => {
 
     expect(summary.learning).toBe(3);
     expect(summary.due).toBe(2);
-    expect(summary.new).toBe(7);
+    expect(summary.new).toBe(6);
     expect(summary.remaining).toBe(6);
   });
 

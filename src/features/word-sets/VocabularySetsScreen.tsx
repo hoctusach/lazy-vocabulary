@@ -21,7 +21,7 @@ import { DEFAULT_SET_ID } from './types';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
   BUILTIN_GROUPS,
-  builtinDistinctWordCount,
+  builtinSelectedWordCount,
   builtinGroupCounts,
   builtinSourceId,
   getSetProgress,
@@ -64,7 +64,7 @@ const VocabularySetsScreen: React.FC = () => {
   const builtinSelectedCount = selectedBuiltinGroups.length;
   const selectedWordCount = sets.reduce((sum, set) => {
     if (set.builtin) {
-      return sum + builtinDistinctWordCount(selectedBuiltinGroups);
+      return sum + builtinSelectedWordCount(selectedBuiltinGroups);
     }
     return selectedSources.includes(set.id) ? sum + set.wordCount : sum;
   }, 0);

@@ -248,6 +248,17 @@ export function builtinDistinctWordCount(groups: readonly string[]): number {
   return keys.size;
 }
 
+/**
+ * Words in the given built-in groups, counted exactly like the Word Set card (`countSheetWords` over the
+ * bundled data: one per row). [FB-38] This is the single source of the selected built-in total, shared by
+ * the Word Set screen and Learning Progress so the two numbers cannot drift.
+ */
+export function builtinSelectedWordCount(groups: readonly string[]): number {
+  let sum = 0;
+  for (const group of groups) sum += DEFAULT_VOCABULARY_DATA[group]?.length ?? 0;
+  return sum;
+}
+
 function setHasWords(id: string): boolean {
   const data = readJson<SheetData>(dataKey(id));
   return !!data && typeof data === 'object' && Object.values(data).some((rows) => Array.isArray(rows) && rows.length > 0);
