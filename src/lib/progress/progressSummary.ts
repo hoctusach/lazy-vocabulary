@@ -1,5 +1,6 @@
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { getDefaultVocabularyTotal } from '@/data/defaultVocabulary';
+import { readStudyDays } from '@/lib/progress/studyDays';
 
 export type ProgressSummaryFields = {
   learning_count: number;
@@ -46,7 +47,7 @@ function toStringArray(value: unknown): string[] | null {
   return value.filter((entry): entry is string => typeof entry === 'string');
 }
 
-export function readProgressSummaryLocal(): SummaryRow | null {
+function readProgressSummaryLocal(): SummaryRow | null {
   if (typeof localStorage === 'undefined') return null;
   try {
     const raw = localStorage.getItem('progressSummary');
@@ -156,11 +157,7 @@ export async function refreshProgressSummary(
   const remote = await fetchSummaryFromServer(userKey);
   const summary = toProgressSummary(remote) ?? toProgressSummary(await fetchExistingSummary(userKey));
   if (!summary) return null;
-  // [FB-40] Keep days ticked locally (study started today) that the server has not seen yet.
-  const localDays = readProgressSummaryLocal()?.learned_days;
-  if (remote && Array.isArray(localDays)) {
-    summary.learned_days = normaliseDays([...summary.learned_days, ...localDays]);
-  }
+  summary.learned_days = normaliseDays([...summary.learned_days, ...readStudyDays()]); // [FB-40]
 
   persistProgressSummaryLocal(summary);
   return summary;
@@ -170,7 +167,9 @@ export async function getProgressSummary(
   userKey: string
 ): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
-  return toProgressSummary(await fetchExistingSummary(userKey));
+  const summary = toProgressSummary(await fetchExistingSummary(userKey));
+  if (summary) summary.learned_days = normaliseDays([...summary.learned_days, ...readStudyDays()]); // [FB-40]
+  return summary;
 }
 
 function normaliseDays(days: string[] | null | undefined): string[] {

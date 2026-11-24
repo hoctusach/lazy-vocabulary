@@ -15,7 +15,6 @@ test('PROG-03', '[FB-39][FB-50] Progress tab: Streak, then Learning Progress (op
   for (const t of ['Add a friend', 'Learning Progress', 'Due Review']) await waitText(s, t);
   const t = await body(s);
   ok(!t.includes('Word Summary'), 'Word Summary must not be on Progress');
-  ok(t.indexOf('Streak') >= 0 && t.indexOf('Streak') < t.indexOf('Learning Progress'), 'Streak must come before Learning Progress');
   ok(t.indexOf('Learning Progress') < t.indexOf('Add a friend'), 'Learning Progress directly under Streak');
 });
 test('LEARN-WS', '[FB-50] Word Summary sits on Learn, below the card player', async ({ session }) => {
@@ -67,10 +66,12 @@ test('PROG-08', 'Progress after learning a built-in word', async ({ session }) =
   const t = await flat(s);
   ok(/LEARNED\s*\(1\)/i.test(t), 'LEARNED (1) ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
 });
-test('PROG-09', 'Streak card with 3 recent learned days', async ({ session }) => {
+test('PROG-09', 'Streak card with 3 recent learned days; Learning Progress sits under it [FB-39][FB-40]', async ({ session }) => {
   const days = [0, 1, 2].map((i) => ymd(Date.now() - i * 86400000));
   const s = await session({ fake: { summaryDays: days } }); await boot(s); await openProgress(s); await sleep(800);
   await waitText(s, '3-day streak');
+  const t = await body(s); // [FB-39] Streak first, Learning Progress directly under it
+  ok(t.indexOf('3-day streak') < t.indexOf('Learning Progress') && t.indexOf('Learning Progress') < t.indexOf('Add a friend'), 'order Streak > Learning Progress > friends');
 });
 const lbRows = async (s) => s.page.evaluate(() => [...document.querySelectorAll('[data-testid=leaderboard-row]')].map((r) => r.textContent.replace(/\s+/g, ' ').trim()));
 const addFriend = async (s, name) => {

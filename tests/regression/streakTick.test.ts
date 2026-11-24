@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 // vitest runs this file under the machine TZ; the date math below is TZ-independent (compares to local getters).
 const local = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-const days = () => JSON.parse(localStorage.getItem('progressSummary') || '{}').learned_days as string[];
+const days = () => JSON.parse(localStorage.getItem('lv.studyDays.v1') || '[]') as string[];
 
 describe('[FB-40] streak tick', () => {
   beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); });
@@ -38,10 +38,22 @@ describe('[FB-40] streak tick', () => {
 
   it('keeps earlier days and today joins the streak immediately', () => {
     vi.setSystemTime(new Date(2026, 10, 24, 8, 0));
-    localStorage.setItem('progressSummary', JSON.stringify({ learned_days: ['2026-11-22', '2026-11-23'] }));
+    localStorage.setItem('lv.studyDays.v1', JSON.stringify(['2026-11-22', '2026-11-23']));
     expect(calculateCurrentStreak(days())).toBe(0); // before the tick today is missing
     tickStudyToday();
     expect(calculateCurrentStreak(days())).toBe(3);
+  });
+
+  it('does not create a local progress summary (that would hide the server learned_days); the streak unions both', async () => {
+    vi.setSystemTime(new Date(2026, 10, 24, 8, 0));
+    tickStudyToday();
+    expect(localStorage.getItem('progressSummary')).toBeNull();
+    // server days from the cached summary + today's tick
+    localStorage.setItem('progressSummary', JSON.stringify({ learned_days: ['2026-11-23', '2026-11-22'], learned_count: 1 }));
+    const { getProgressSummary } = await import('@/lib/progress/progressSummary');
+    const s = await getProgressSummary('k');
+    expect(s?.learned_days).toEqual(['2026-11-22', '2026-11-23', '2026-11-24']);
+    expect(calculateCurrentStreak(s!.learned_days)).toBe(3);
   });
 
   it('the usage tracker no longer writes UTC day keys', () => {
