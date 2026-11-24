@@ -18,6 +18,7 @@ import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleJson, buildSampleXlsx, BUILTIN_CATEGORY_NAMES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
+import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
   BUILTIN_GROUPS,
@@ -87,6 +88,8 @@ const VocabularySetsScreen: React.FC = () => {
   const [renameValue, setRenameValue] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [manageId, setManageId] = useState<string | null>(null);
   const canImport = useProFeature('importSets');
 
   const setCounts = (id: string) => {
@@ -187,6 +190,20 @@ const VocabularySetsScreen: React.FC = () => {
             {selectionNote}
           </p>
         )}
+      </div>
+
+      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }} data-testid="manual-set-card">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="text-base font-semibold">Create your own set</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
+              Free: type words one by one. Have a long list? Import a file below (Pro).
+            </p>
+          </div>
+          <Button type="button" className="min-h-11 w-full sm:w-auto" data-testid="new-set-button" onClick={() => setCreateOpen(true)}>
+            New set
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
@@ -327,6 +344,11 @@ const VocabularySetsScreen: React.FC = () => {
               )}
               {!set.builtin && (
                 <div className="mt-3 grid grid-cols-2 gap-2 sm:flex">
+                  {set.manual && (
+                    <Button type="button" variant="outline" className="min-h-11" onClick={() => setManageId(set.id)}>
+                      Add / edit words
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     variant="outline"
@@ -354,6 +376,18 @@ const VocabularySetsScreen: React.FC = () => {
           );
         })}
       </ul>
+
+      <CreateManualSetDialog
+        open={createOpen}
+        onClose={(createdId) => {
+          setCreateOpen(false);
+          if (createdId) {
+            toast.success('Set created and added to your selection.');
+            setManageId(createdId);
+          }
+        }}
+      />
+      <ManageManualSetDialog setId={manageId} onClose={() => setManageId(null)} onImportCta={() => { setManageId(null); if (canImport) inputRef.current?.click(); else openProUpgrade('importSets'); }} />
 
       <Dialog open={Boolean(renameTarget)} onOpenChange={(open) => !open && setRenameTarget(null)}>
         <DialogContent>

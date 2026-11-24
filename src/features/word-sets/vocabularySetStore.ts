@@ -1,5 +1,14 @@
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
+import {
+  MANUAL_DEFAULT_CATEGORY,
+  MANUAL_SET_MAX_WORDS,
+  manualKey,
+  validateManualSetName,
+  validateManualWord,
+  type ManualFieldErrors,
+  type ManualWordInput,
+} from './manualSet';
 import { LAST_TODAY_WORD_KEY } from '@/utils/lastWordStorage';
 import {
   DEFAULT_SET_ID,
@@ -531,6 +540,110 @@ export function importVocabularySet(
   writeSelection(selection);
   clearResumeCursor();
   return { ok: true, set: meta };
+}
+
+function flattenManual(sheets: SheetData): VocabularyWord[] {
+  return flattenSheets(sheets);
+}
+
+function sheetsFromWords(words: VocabularyWord[]): SheetData {
+  const out: SheetData = {};
+  for (const w of words) {
+    const cat = w.category || MANUAL_DEFAULT_CATEGORY;
+    (out[cat] ??= []).push({ ...w, category: cat });
+  }
+  return out;
+}
+
+export type ManualResult = { ok: true; set?: VocabularySetMeta } | { ok: false; errors: ManualFieldErrors };
+
+/** [FB-45] Create a hand-made set. The first word is required (an empty set cannot be learned or selected). */
+export function createManualSet(name: string, first: ManualWordInput): ManualResult {
+  const errors: ManualFieldErrors = {};
+  const nameError = validateManualSetName(name);
+  if (nameError) errors.form = nameError;
+  const checked = validateManualWord(first, []);
+  if (checked.ok === false) Object.assign(errors, checked.errors);
+  if (Object.keys(errors).length > 0 || checked.ok === false) return { ok: false, errors };
+  const result = importVocabularySet(name, sheetsFromWords([checked.word]));
+  if (result.ok === false) return { ok: false, errors: { form: result.error } };
+  const sets = readImportedMetas().map((set) => (set.id === result.set.id ? { ...set, manual: true } : set));
+  writeImportedMetas(sets);
+  return { ok: true, set: { ...result.set, manual: true } };
+}
+
+function persistManual(id: string, words: VocabularyWord[]): string | null {
+  const sheets = sheetsFromWords(words);
+  const dataError = writeJson(dataKey(id), sheets);
+  if (dataError) return dataError;
+  const sets = readImportedMetas().map((set) =>
+    set.id === id ? { ...set, wordCount: words.length, updatedAt: new Date().toISOString() } : set
+  );
+  return writeImportedMetas(sets);
+}
+
+function manualWords(id: string): VocabularyWord[] | null {
+  if (!readImportedMetas().some((set) => set.id === id)) return null;
+  return flattenManual(getSetSheets(id));
+}
+
+export function addManualWord(id: string, input: ManualWordInput): ManualResult {
+  const words = manualWords(id);
+  if (!words) return { ok: false, errors: { form: 'That word set is no longer on this device.' } };
+  if (words.length >= MANUAL_SET_MAX_WORDS) {
+    return { ok: false, errors: { form: `A set can hold up to ${MANUAL_SET_MAX_WORDS} words. Import a file (Pro) for bigger sets.` } };
+  }
+  const checked = validateManualWord(input, words);
+  if (!checked.ok) return checked;
+  const error = persistManual(id, [...words, checked.word]);
+  if (error) return { ok: false, errors: { form: error } };
+  return { ok: true };
+}
+
+/** Edit meaning / example / translation / category of an existing word (found by its key). */
+export function updateManualWord(id: string, key: string, input: ManualWordInput): ManualResult {
+  const words = manualWords(id);
+  if (!words) return { ok: false, errors: { form: 'That word set is no longer on this device.' } };
+  const index = words.findIndex((w) => manualKey(w.word, w.category) === key);
+  if (index < 0) return { ok: false, errors: { form: 'That word is no longer in this set.' } };
+  const checked = validateManualWord(input, words, key);
+  if (!checked.ok) return checked;
+  const next = [...words];
+  next[index] = checked.word;
+  const error = persistManual(id, next);
+  if (error) return { ok: false, errors: { form: error } };
+  const newKey = manualKey(checked.word.word, checked.word.category);
+  if (newKey !== key) dropWordProgress(id, words[index]);
+  return { ok: true };
+}
+
+function dropWordProgress(id: string, word: Pick<VocabularyWord, 'word' | 'category'>): void {
+  const progress = getSetProgress(id);
+  const key = wordKey(word.word, word.category);
+  const learned = { ...progress.learned };
+  const learning = { ...(progress.learning ?? {}) };
+  delete learned[key];
+  delete learning[key];
+  saveProgress(id, {
+    ...progress,
+    learned,
+    learning,
+    todayKeys: (progress.todayKeys ?? []).filter((k) => k !== key),
+  });
+}
+
+export function removeManualWord(id: string, key: string): ManualResult {
+  const words = manualWords(id);
+  if (!words) return { ok: false, errors: { form: 'That word set is no longer on this device.' } };
+  const target = words.find((w) => manualKey(w.word, w.category) === key);
+  if (!target) return { ok: false, errors: { form: 'That word is no longer in this set.' } };
+  if (words.length <= 1) {
+    return { ok: false, errors: { form: 'A set needs at least one word. Delete the set instead.' } };
+  }
+  const error = persistManual(id, words.filter((w) => w !== target));
+  if (error) return { ok: false, errors: { form: error } };
+  dropWordProgress(id, target);
+  return { ok: true };
 }
 
 export function renameVocabularySet(

@@ -4,6 +4,7 @@ import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import { invalidateVocabularyIndex } from '@/services/search/vocabularyIndex';
 import { setAllWordsOverride } from '@/utils/allWords';
 import { DEFAULT_SET_ID, DEFAULT_SET_NAME, type VocabularySetMeta } from './types';
+import type { ManualWordInput } from './manualSet';
 import { filterByBuiltinGroups, sumStats, tagWords } from './mixQueue';
 import {
   BUILTIN_GROUPS,
@@ -15,6 +16,11 @@ import {
   getSetProgress,
   getSetSheets,
   importVocabularySet,
+  createManualSet,
+  addManualWord,
+  updateManualWord,
+  removeManualWord,
+  type ManualResult,
   listVocabularySets,
   markSetWordLearned,
   markSetWordNew,
@@ -68,6 +74,11 @@ interface VocabularySetContextValue {
   setBuiltinAll: (on: boolean) => string | null;
   activate: (id: string) => string | null;
   importSet: (name: string, sheets: SheetData, fileName?: string) => string | null;
+  /** [FB-45] Free: hand-made sets. */
+  createManualSet: (name: string, first: ManualWordInput) => ManualResult;
+  addManualWord: (id: string, input: ManualWordInput) => ManualResult;
+  updateManualWord: (id: string, key: string, input: ManualWordInput) => ManualResult;
+  removeManualWord: (id: string, key: string) => ManualResult;
   rename: (id: string, name: string) => string | null;
   remove: (id: string) => string | null;
   markLearned: (word: VocabularyWord) => void;
@@ -212,6 +223,39 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     [refresh]
   );
 
+  const createManual = useCallback(
+    (name: string, first: ManualWordInput) => {
+      const r = createManualSet(name, first);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+  const addManual = useCallback(
+    (id: string, input: ManualWordInput) => {
+      const r = addManualWord(id, input);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+  const updateManual = useCallback(
+    (id: string, key: string, input: ManualWordInput) => {
+      const r = updateManualWord(id, key, input);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+  const removeManual = useCallback(
+    (id: string, key: string) => {
+      const r = removeManualWord(id, key);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+
   const rename = useCallback(
     (id: string, name: string) => {
       const result = renameVocabularySet(id, name);
@@ -271,6 +315,10 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       setBuiltinAll,
       activate,
       importSet,
+      createManualSet: createManual,
+      addManualWord: addManual,
+      updateManualWord: updateManual,
+      removeManualWord: removeManual,
       rename,
       remove,
       markLearned,
@@ -292,6 +340,10 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       setBuiltinAll,
       activate,
       importSet,
+      createManual,
+      addManual,
+      updateManual,
+      removeManual,
       rename,
       remove,
       markLearned,
@@ -332,6 +384,10 @@ export function useVocabularySets(): VocabularySetContextValue {
     setBuiltinAll: () => null,
     activate: () => null,
     importSet: () => 'Word sets are unavailable.',
+    createManualSet: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    addManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    updateManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    removeManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
     rename: () => 'Word sets are unavailable.',
     remove: () => 'Word sets are unavailable.',
     markLearned: () => undefined,

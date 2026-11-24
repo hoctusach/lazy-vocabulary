@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import type { ImportParseResult, ImportSource } from './types';
 
-const MAX_WORDS = 4000;
+export const MAX_WORDS = 4000;
 const MAX_TEXT_CHARS = 3_500_000;
 const MAX_ERRORS = 8;
 
@@ -13,7 +13,7 @@ const TRANSLATION_HEADERS = ['translation', 'translate'];
 const CATEGORY_HEADERS = ['category', 'sheet', 'topic', 'tag'];
 const COUNT_HEADERS = ['count', 'frequency'];
 
-const LIMITS = {
+export const LIMITS = {
   word: 100,
   meaning: 500,
   example: 1000,

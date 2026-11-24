@@ -13,6 +13,8 @@ export interface VocabularySetMeta {
   createdAt: string;
   updatedAt: string;
   fileName?: string;
+  /** Created by hand on this device (free), not imported from a file. */
+  manual?: boolean;
 }
 
 export interface LearnedWordEntry {
