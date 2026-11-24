@@ -73,7 +73,7 @@ test('TAB-07', 'Desktop layout has no tabs; resize across 768 keeps working', as
 const VI_INIT = "(() => { const L = ['vi-VN', 'vi']; Object.defineProperty(navigator, 'language', { get: () => L[0], configurable: true }); Object.defineProperty(navigator, 'languages', { get: () => L, configurable: true }); })();";
 const EN_INIT = "(() => { const L = ['en-US', 'en']; Object.defineProperty(navigator, 'language', { get: () => L[0], configurable: true }); Object.defineProperty(navigator, 'languages', { get: () => L, configurable: true }); })();";
 const cardText = (s) => s.page.evaluate(() => document.querySelector('main').innerText);
-test('LEARN-01', 'Card fields (vi-VN device so the translation line shows) [FB-14]', async ({ session }) => {
+test('LEARN-01', 'Card fields (vi-VN device shows the default translation) [FB-14][FB-42]', async ({ session }) => {
   const s = await session({ initScript: VI_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'vi-VN,vi;q=0.9' }); await boot(s);
   const c = await s.page.evaluate(() => { const m = document.querySelector('main'); return { pill: m.querySelector('h3')?.textContent, w: m.querySelector('h1')?.textContent, txt: m.innerText }; });
   eq(c.pill, 'Phrasal Verb'); eq(c.w, U.P[0].word);
@@ -280,11 +280,12 @@ test('VOICE-05', 'Speed applied to utterance and persisted', async ({ session })
   eq((await prefs(s)).speech_rate, 1.5);
 });
 
-test('LANG-01', 'en-US device hides the Vietnamese translation [FB-14]', async ({ session }) => {
+test('LANG-01', '[FB-42] en-US device: Translation field is shown, default Vietnamese is not (supersedes FB-14)', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'en-US,en;q=0.9' }); await boot(s);
   const t = await cardText(s);
   ok(t.includes('* ' + U.P[0].meaning), 'meaning missing');
-  ok(!t.includes(U.P[0].translation), 'translation should be hidden on en-US');
+  ok(!t.includes(U.P[0].translation), 'default Vietnamese translation should not show on en-US');
+  ok(/\* Add translation/.test(t), '[FB-42] translation field/placeholder must be present on en-US');
 });
 test('LANG-02', 'vi-VN device shows the Vietnamese translation', async ({ session }) => {
   const s = await session({ initScript: VI_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'vi-VN,vi;q=0.9' }); await boot(s);

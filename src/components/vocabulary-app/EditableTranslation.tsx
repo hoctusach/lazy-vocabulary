@@ -5,10 +5,13 @@ import { useProFeature } from '@/services/billing/proFeatures';
 import { openProUpgrade } from '@/services/billing/proUpgradeStore';
 import {
   TRANSLATION_OVERRIDE_EVENT,
+  MAX_TRANSLATION_CHARS,
   getTranslationOverride,
   setTranslationOverride,
   type WordIdentity,
 } from '@/lib/translations/translationOverrides';
+import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
+import { guessLang } from '@/lib/translations/textDirection';
 import { emitTranslationEdit, SAVED_CONFIRM_MS } from '@/lib/translations/translationEditSignal';
 
 interface Props extends WordIdentity {
@@ -16,6 +19,7 @@ interface Props extends WordIdentity {
   translation?: string;
   /** Show the Pro edit control. The search preview is read-only. */
   editable?: boolean;
+  /** UI language for labels; defaults to the device language. */
   isVi?: boolean;
   color?: string;
 }
@@ -24,7 +28,9 @@ interface Props extends WordIdentity {
  * The translation line of a word card. Pro users get an in-place editor (no popup, multi-line, line breaks kept);
  * the edit is saved as a per-user override. Free users see the text read-only plus a Pro lock on the edit control.
  */
-const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, translation, editable = true, isVi = false, color }) => {
+const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, translation, editable = true, isVi: isViProp, color }) => {
+  const deviceIsVi = useIsVietnameseDevice();
+  const isVi = isViProp ?? deviceIsVi;
   const canEdit = useProFeature('editTranslation');
   const identity = React.useMemo(() => ({ word, category, sourceId }), [word, category, sourceId]);
   const idKey = `${sourceId ?? ''}|${category ?? ''}|${word}`;
@@ -34,7 +40,11 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   const [draft, setDraft] = React.useState('');
   const pending = React.useRef<{ identity: WordIdentity; draft: string; base: string } | null>(null);
 
-  const effective = override ?? translation ?? '';
+  // [FB-42] The field is ALWAYS shown. Edited value wins (any language). Blank override: the default (Vietnamese)
+  // translation only on a Vietnamese device; otherwise blank, with a placeholder to tap and add one.
+  const defaultShown = deviceIsVi ? translation ?? '' : '';
+  const effective = override ?? defaultShown;
+  const textLang = override !== undefined ? guessLang(override) : defaultShown ? 'vi' : undefined;
 
   React.useEffect(() => {
     setOverride(getTranslationOverride(identity));
@@ -93,8 +103,6 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
     emitTranslationEdit('save');
   };
 
-  if (!editing && !effective && !(editable && canEdit)) return null;
-
   const textStyle: React.CSSProperties = { fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line', color };
 
   if (editing) {
@@ -105,6 +113,8 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
           className="w-full rounded-md border theme-border bg-transparent p-2 text-sm"
           style={{ whiteSpace: 'pre-wrap', color }}
           rows={4}
+          dir="auto"
+          maxLength={MAX_TRANSLATION_CHARS}
           value={draft}
           autoFocus
           aria-label={isVi ? 'Sửa bản dịch' : 'Edit translation'}
@@ -123,7 +133,9 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
 
   return (
     <div className="lv-translation flex items-start gap-1" style={textStyle}>
-      <em className="min-w-0 flex-1" data-testid="translation-text">* {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}</em>
+      <em className="min-w-0 flex-1" data-testid="translation-text" dir="auto" lang={textLang} data-empty={effective ? undefined : 'true'} style={effective ? undefined : { opacity: 0.6 }}>
+        * {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}
+      </em>
       {saved && (
         <span role="status" data-testid="translation-saved" className="shrink-0 self-center text-xs font-medium not-italic" style={{ color: 'var(--lv-accent)' }}>
           {isVi ? 'Đã lưu' : 'Saved'}

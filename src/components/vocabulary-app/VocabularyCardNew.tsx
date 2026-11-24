@@ -5,7 +5,6 @@ import { getCategoryLabel } from '@/utils/categoryLabels';
 import ThemeMascot from '@/components/ThemeMascot';
 import WordCountDisplay from './WordCountDisplay';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
-import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 import EditableTranslation from './EditableTranslation';
 
 interface VocabularyCardNewProps {
@@ -31,7 +30,6 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   sourceId,
   showWordCount = false
 }) => {
-  const showTranslation = useIsVietnameseDevice();
   const categoryLabel = getCategoryLabel(category);
 
   const currentWordObj = { word, meaning, example, translation, category };
@@ -106,9 +104,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
-          {showTranslation && (
-            <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} isVi />
-          )}
+          <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} />
         </div>
       </CardContent>
     </Card>

@@ -6,7 +6,6 @@ import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
-import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 import EditableTranslation from './EditableTranslation';
 
 interface VocabularyCardProps {
@@ -51,7 +50,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
   nextVoiceLabel,
   searchPreview = false
 }) => {
-  const showTranslation = useIsVietnameseDevice();
   // Store current word in localStorage to help track sync issues
   useEffect(() => {
     if (word) {
@@ -143,15 +141,13 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
           >
             <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
           </div>
-          {showTranslation && (
-            <EditableTranslation
-              word={word}
-              category={currentCategory}
-              translation={translation}
-              editable={false}
-              color="var(--lv-text-primary)"
-            />
-          )}
+          <EditableTranslation
+            word={word}
+            category={category}
+            translation={translation}
+            editable={false}
+            color="var(--lv-text-primary)"
+          />
         </div>
         {/* Control buttons wrapper - optimized spacing */}
         {!searchPreview && (

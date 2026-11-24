@@ -113,8 +113,21 @@ export function applyRemoteOverride(user: string, id: string, text: string | nul
   return ok;
 }
 
+/**
+ * Max length of one translation, in Unicode code points. MUST match the SQL check
+ * (`char_length(translation) <= 4000`, Postgres counts code points). [FB-43]
+ */
+export const MAX_TRANSLATION_CHARS = 4000;
+
+/**
+ * Only line endings and surrounding whitespace are touched. No NFC/NFD normalization and no character is
+ * stripped (Arabic/Hebrew marks, ZWJ in emoji, CJK, Thai, combining accents all survive). Over-long text is cut at
+ * a code point boundary, never in the middle of a surrogate pair.
+ */
 export function normalizeTranslationText(text: string): string {
-  return text.replace(/\r\n?/g, '\n').trim();
+  const t = text.replace(/\r\n?/g, '\n').trim();
+  const points = Array.from(t);
+  return points.length > MAX_TRANSLATION_CHARS ? points.slice(0, MAX_TRANSLATION_CHARS).join('') : t;
 }
 
 export function getTranslationOverride(w: WordIdentity, user = currentOverrideUser()): string | undefined {

@@ -461,7 +461,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           dailySelection={wordSets.hasBuiltin ? dailySelection : null}
           isLoadingSelection={wordSets.hasBuiltin && isDailySelectionLoading && playbackWords.length === 0}
           onMarkWordLearned={handleMarkWordLearned}
-          underPlayerContent={view !== 'progress' ? wordSummarySection : undefined}
+          underPlayerContent={wordSummarySection}
           additionalContent={
             view === 'all' ? (
               <div className="space-y-3 mt-3">
