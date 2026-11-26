@@ -44,23 +44,31 @@ export const XSS_PATTERNS = [
   /data:\s*[^;]+;base64,/gi
 ];
 
-// SQL injection patterns - kept conservative but more precise
+// SQL injection patterns. They only match the SHAPE of an attack (for example "DROP TABLE", "UPDATE t SET c ="),
+// never a lone English word such as "select", "update", "set" or "exec", because vocabulary meanings and
+// examples are ordinary sentences. (The app talks to the database with parameterized calls, so this is a
+// second line of defence, not the main one.)
+const IDENT = '[\\w."`\\[\\]]+';
 export const SQL_INJECTION_PATTERNS = [
-  // SQL keywords with clear attack patterns (case-insensitive, word boundaries)
-  /\b(SELECT\s+\*\s+FROM|INSERT\s+INTO|UPDATE\s+.*\s+SET|DELETE\s+FROM|DROP\s+TABLE|CREATE\s+TABLE|ALTER\s+TABLE|EXEC|UNION\s+SELECT)\b/gi,
+  // Statements with their usual structure
+  new RegExp(
+    `\\b(?:SELECT\\s+\\*\\s+FROM|INSERT\\s+INTO|UPDATE\\s+${IDENT}\\s+SET\\s+${IDENT}\\s*=|DELETE\\s+FROM|DROP\\s+(TABLE|DATABASE)|CREATE\\s+(TABLE|DATABASE)|ALTER\\s+TABLE|EXEC(UTE)?\\s*\\(|EXEC(UTE)?\\s+(sp|xp)_\\w+|UNION\\s+(ALL\\s+)?SELECT)`,
+    'gi'
+  ),
   // SQL comment indicators at start of injection attempts
   /^\s*(--|#|\/\*)/g,
   /;\s*(--|#|\/\*)/g,
   // Clear injection patterns
   /'\s*(OR|AND)\s+.*[=<>]/gi,
   /"\s*(OR|AND)\s+.*[=<>]/gi,
-  // Semicolon-based command separation with dangerous keywords
-  /;\s*(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)/gi,
+  // A second statement after a semicolon
+  new RegExp(
+    `;\\s*(SELECT\\s+.+\\s+FROM\\s|INSERT\\s+INTO|UPDATE\\s+${IDENT}\\s+SET\\s|DELETE\\s+FROM|DROP\\s+(TABLE|DATABASE)|CREATE\\s+(TABLE|DATABASE)|ALTER\\s+TABLE|EXEC(UTE)?\\s*\\()`,
+    'gi'
+  ),
   // Classic injection patterns
   /'\s*OR\s+'?1'?\s*='?1/gi,
-  /'\s*OR\s+'?true'?\s*--/gi,
-  // UNION injection attempts
-  /UNION\s+(ALL\s+)?SELECT/gi
+  /'\s*OR\s+'?true'?\s*--/gi
 ];
 
 // File upload validation constants

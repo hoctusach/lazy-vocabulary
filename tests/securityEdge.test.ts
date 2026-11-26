@@ -14,15 +14,33 @@ describe('ordinary text must survive (M2)', () => {
     expect(sanitizeInput(text)).toBe(text);
   });
 
-  // Known issue: the SQL pattern "UPDATE ... SET" also matches normal English sentences.
-  it.fails('keeps a sentence with "update" and "set"', () => {
-    const text = 'Update your profile and set a goal';
+  it.each([
+    'Update your profile and set a goal',
+    'the exec team',
+    'I like it; select the best one',
+    'Finish this; update it later; then delete the old file',
+    'He will execute the plan and drop the idea',
+    'to set up a table for dinner',
+    'create a table of contents; insert a page break',
+    'Select all that apply',
+  ])('keeps the ordinary sentence %j', (text) => {
     expect(sanitizeInput(text)).toBe(text);
   });
+});
 
-  // Known issue: the keyword EXEC is removed even when it is the English word "exec".
-  it.fails('keeps the word "exec"', () => {
-    expect(sanitizeInput('the exec team')).toBe('the exec team');
+describe('SQL attack shapes are still removed (M1)', () => {
+  it.each([
+    ['x; DROP TABLE users', 'x; users'],
+    ['SELECT * FROM users', 'users'],
+    ["a' OR '1'='1", "a'1"],
+    ['1 UNION SELECT password FROM users', '1 password FROM users'],
+    ['INSERT INTO t VALUES (1)', 't VALUES (1)'],
+    ["UPDATE users SET name = 'x'", "'x'"],
+    ['DELETE FROM users', 'users'],
+    ['EXEC xp_cmdshell', ''],
+    ['exec(\'x\')', "'x')"],
+  ])('%j', (input, expected) => {
+    expect(sanitizeInput(input).trim()).toBe(expected.trim());
   });
 });
 
