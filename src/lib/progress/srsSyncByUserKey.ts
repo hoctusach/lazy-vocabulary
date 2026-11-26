@@ -6,9 +6,11 @@ import type { LearnedWordUpsert } from '@/lib/db/learned';
 import type { LearnedWordRow } from './learnedWordStats';
 import { extractServerSummary, type ServerSummary } from './serverSummary';
 import { showCongratsEffect } from '@/lib/utils/congratsEffect';
+import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 
-// Hard-coded total number of vocabulary words used for progress calculations
-export const TOTAL_WORDS = 3261;
+// Total number of vocabulary words used for progress calculations. Counted from the bundled data
+// so it can not drift from the word list (it was a hard-coded 3261 while the file has more).
+export const TOTAL_WORDS = Object.values(DEFAULT_VOCABULARY_DATA).reduce((sum, words) => sum + words.length, 0);
 
 function lsGet(key: string) {
   try {
