@@ -17,6 +17,7 @@ param(
   [switch]$IncludeDestructive,  # cases that mark words learned or rename/delete sets
   [string]$ApkPath = '',
   [switch]$SkipInstall,   # app is already installed on the phone
+  [string]$Only = '',   # run only these case numbers, e.g. 16,18,21,26,29 (ignores -Tags)
   [string]$AppId = 'com.lazy.vocabulary'   # package to test, e.g. com.hoctusach.lazyvocabulary (Play build)
 )
 $ErrorActionPreference = 'Stop'
@@ -48,7 +49,7 @@ if (-not $SkipInstall) {
 $nick = if ($env:E2E_NICKNAME) { $env:E2E_NICKNAME } else { 'e2e_tester' }
 $pass = if ($env:E2E_PASSCODE) { $env:E2E_PASSCODE } else { '123456' }
 $flowRoot = '.maestro'
-if ($AppId -ne 'com.lazy.vocabulary') {
+if ($AppId -ne 'com.lazy.vocabulary' -or $Only) {
   # Run a temporary copy of the flows that targets the other package.
   $flowRoot = Join-Path $out 'flows-copy'
   if (Test-Path $flowRoot) { Remove-Item -Recurse -Force $flowRoot }
@@ -56,8 +57,14 @@ if ($AppId -ne 'com.lazy.vocabulary') {
   Get-ChildItem $flowRoot -Recurse -Filter *.yaml | ForEach-Object {
     (Get-Content $_.FullName -Raw).Replace('com.lazy.vocabulary', $AppId) | Set-Content $_.FullName -NoNewline
   }
+  if ($Only) {
+    $keep = $Only -split '[,\s]+' | Where-Object { $_ } | ForEach-Object { [int]$_ }
+    Get-ChildItem (Join-Path $flowRoot 'flows') -Filter *.yaml | Where-Object { $keep -notcontains [int]($_.Name.Substring(0, 2)) } | Remove-Item
+  }
 }
-$args = @('test', $flowRoot, '--include-tags', $Tags,
+$args = @('test', $flowRoot)
+if (-not $Only) { $args += @('--include-tags', $Tags) }
+$args += @(
   '-e', "NICKNAME=$nick", '-e', "PASSCODE=$pass",
   '--format', 'junit', '--output', (Join-Path $out 'report.xml'),
   '--debug-output', $out)
@@ -65,7 +72,7 @@ $exclude = @()
 if (-not $IncludePending) { $exclude += 'pending' }
 if (-not $IncludeFresh) { $exclude += 'fresh-install' }
 if (-not $IncludeDestructive) { $exclude += 'destructive' }
-if ($exclude.Count -gt 0) { $args += @('--exclude-tags', ($exclude -join ',')) }
+if ($exclude.Count -gt 0 -and -not $Only) { $args += @('--exclude-tags', ($exclude -join ',')) }
 maestro @args
 $code = $LASTEXITCODE
 if ($code -ne 0) {
