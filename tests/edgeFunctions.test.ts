@@ -121,12 +121,16 @@ describe('set_nickname_passcode (create profile)', () => {
     expect((await json(await handler(post({ nickname: 'New One', passcode: '123456' })))).body).toEqual({ user_unique_key: 'newone', nickname: 'New One' });
   });
 
-  // Known bug: the passcode is converted to a number, so passcodes that differ only by leading zeros collide.
-  it.fails('keeps passcodes with leading zeros different (A8)', async () => {
-    await handler(post({ nickname: 'mimiu', passcode: '0123' }));
-    await handler(post({ nickname: 'mimiu', passcode: '00123' }));
-    const sent = db.rpc.mock.calls.map((c) => (c[1] as { passcode: number }).passcode);
-    expect(new Set(sent).size).toBe(2);
+  it.each(['0123', '00123', '0000', '0123456789'])('refuses a new passcode that starts with 0: %s (A8)', async (passcode) => {
+    const res = await json(await handler(post({ nickname: 'mimiu', passcode })));
+    expect(res).toEqual({ status: 400, body: { error: 'Passcode cannot start with 0.', code: 'PASSCODE_LEADING_ZERO' } });
+    expect(db.rpc).not.toHaveBeenCalled();
+  });
+
+  it('a passcode with a 0 inside or at the end is fine', async () => {
+    for (const passcode of ['1023', '1230', '9000000000']) {
+      expect((await json(await handler(post({ nickname: 'mimiu', passcode })))).status).toBe(200);
+    }
   });
 
   it('derives the same key for a nickname with a zero-width character (A6)', async () => {
@@ -199,6 +203,12 @@ describe('nickname-passcode-exchange (sign in)', () => {
     db.nicknameRow = { user_unique_key: 'mimiu' };
     const res = await json(await handler(post({ nickname: 'mi\u200Bmiu', passcode: '999999' })));
     expect(res.body.code).toBe('INCORRECT_PASSCODE'); // found the real account, so only the passcode is wrong
+  });
+
+  it('an existing passcode written with leading zeros can still sign in (nothing is locked out)', async () => {
+    okVerify();
+    expect((await json(await handler(post({ nickname: 'mimiu', passcode: '0123' })))).status).toBe(200);
+    expect(db.rpc).toHaveBeenCalledWith('verify_nickname_passcode', { nickname: 'mimiu', passcode: 123 });
   });
 
   it('a failing profile update or session save is 500', async () => {

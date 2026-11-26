@@ -82,6 +82,12 @@ Deno.serve(async (req) => {
     return errorResponse('Passcode must be 4-10 digits.', 400);
   }
 
+  // The passcode is stored as a number, so "0123" and "00123" would be the same passcode.
+  // New profiles may not start with 0. Signing in with an existing passcode is not affected.
+  if (passcodeRaw.startsWith('0')) {
+    return errorResponse('Passcode cannot start with 0.', 400, 'PASSCODE_LEADING_ZERO');
+  }
+
   const passcodeNumeric = Number(passcodeRaw);
   if (!Number.isFinite(passcodeNumeric)) {
     return errorResponse('Passcode must be numeric.', 400);
