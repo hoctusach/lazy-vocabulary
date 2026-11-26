@@ -1,28 +1,42 @@
 # Known issues and proposed solutions
 
-Each issue below has a test marked `it.fails` in `tests/` (or a normal test that documents today's behaviour).
+Each issue below had a test marked `it.fails` in `tests/` (or a normal test that documented today's behaviour).
 `it.fails` passes while the bug exists and **starts failing when the bug is fixed**: then change `it.fails` to `it`.
+
+**Status:** fixed in PR "Fix known issues" (one commit per issue, in this order) except **#5** and **#7**, which were left out on purpose,
+and **#17**, found later. Fixed issues are marked ✅; the proposals below are kept for the record, with a note where the fix differs.
 
 Priority: **P1** security or wrong data for real users, **P2** wrong behaviour in some cases, **P3** polish / needs a decision.
 
-| # | Priority | Issue | Where it is tested |
-| ---: | :---: | --- | --- |
-| 1 | P1 | Streak and "learned today" are wrong in time zones east of UTC (Vietnam) | `streakTimezone.test.ts` |
-| 2 | P2 | Nickname that passes validation is changed or emptied by sanitizing | `nicknameRules.test.ts`, `AuthGate.test.tsx` |
-| 3 | P1 | Passcodes differing only by leading zeros are the same passcode | `edgeFunctions.test.ts` |
-| 4 | P1 | Look-alike nicknames with zero-width characters become separate accounts | `nicknameRules.test.ts`, `edgeFunctions.test.ts` |
-| 5 | P1 | No limit on wrong passcode attempts | not testable yet (needs the feature) |
-| 6 | P2 | `TOTAL_WORDS` (3261) differs from the data (3263) | `defaultDataIntegrity.test.ts` |
-| 7 | P2 | 193 repeated word + category pairs in the built-in data | `defaultDataIntegrity.test.ts` |
-| 8 | P2 | Import limits cut text that the built-in data already exceeds | `defaultDataIntegrity.test.ts`, `importEdge.test.ts` |
-| 9 | P3 | Dialog says "100 days", code uses 60 days | `srsScheduling.test.ts` |
-| 10 | P3 | Daily size always uses the maximum of the range | `srsScheduling.test.ts` |
-| 11 | P3 | `new` counter ignores learned words | `learnedWordStatsEdge.test.ts` |
-| 12 | P2 | Search drops non-Latin text; `limit = 0` returns one result | `searchEdge.test.ts` |
-| 13 | P3 | Learning time can add negative time; uses the UTC day | `storageHelpers.test.ts` |
-| 14 | P2 | Old SQL file in the repo does not match the live database | (SQL tests use the live definitions) |
-| 15 | P2 | Status of a word in the middle of its schedule is `new` | `srsScheduling.test.ts` |
-| 16 | P2 | SQL-pattern sanitizer damages normal English ("update ... set", "exec") | `securityEdge.test.ts` |
+| # | Priority | Status | Issue | Where it is tested |
+| ---: | :---: | :---: | --- | --- |
+| 1 | P1 | ✅ | Streak and "learned today" are wrong in time zones east of UTC (Vietnam) | `streakTimezone.test.ts` |
+| 2 | P2 | ✅ | Nickname that passes validation is changed or emptied by sanitizing | `nicknameRules.test.ts`, `AuthGate.test.tsx` |
+| 3 | P1 | ✅ | Passcodes differing only by leading zeros are the same passcode | `edgeFunctions.test.ts` |
+| 4 | P1 | ✅ | Look-alike nicknames with zero-width characters become separate accounts | `nicknameRules.test.ts`, `edgeFunctions.test.ts` |
+| 5 | P1 | open | No limit on wrong passcode attempts | not testable yet (needs the feature) |
+| 6 | P2 | ✅ | `TOTAL_WORDS` (3261) differs from the data (3263) | `defaultDataIntegrity.test.ts` |
+| 7 | P2 | open | 193 repeated word + category pairs in the built-in data | `defaultDataIntegrity.test.ts` |
+| 8 | P2 | ✅ | Import limits cut text that the built-in data already exceeds | `defaultDataIntegrity.test.ts`, `importEdge.test.ts` |
+| 9 | P3 | ✅ | Dialog says "100 days", code uses 60 days | `srsScheduling.test.ts` |
+| 10 | P3 | ✅ | Daily size always uses the maximum of the range | `srsScheduling.test.ts` |
+| 11 | P3 | ✅ | `new` counter ignores learned words | `learnedWordStatsEdge.test.ts` |
+| 12 | P2 | ✅ | Search drops non-Latin text; `limit = 0` returns one result | `searchEdge.test.ts` |
+| 13 | P3 | ✅ | Learning time can add negative time; uses the UTC day | `storageHelpers.test.ts` |
+| 14 | P2 | ✅ | Old SQL file in the repo does not match the live database | (SQL tests use the live definitions) |
+| 15 | P2 | ✅ | Status of a word in the middle of its schedule is `new` | `srsScheduling.test.ts` |
+| 16 | P2 | ✅ | SQL-pattern sanitizer damages normal English ("update ... set", "exec") | `securityEdge.test.ts` |
+| 17 | P3 | open | Stored `null` in preferences replaces the default, so `is_muted` / `is_playing` can come back as `null` | `storageHelpers.test.ts` (`it.fails`) |
+
+How each fix was done where it differs from the proposal:
+- **#1** also covers `quizService`, `useDailyReminder`, `learningTimeService`, the daily usage tracker (which sends the learned day to the server) and the learning-time route. If the server writes learned days itself (for example in `mark_word_learned_by_key`), check it uses the user's local date too.
+- **#3** new passcodes may not start with 0 (client and `set_nickname_passcode`); signing in is not affected, so no existing user is locked out. Storing the passcode as text or hashed is still the better long-term fix.
+- **#4** also unified the three client copies of the canonical function (`core/nickname.ts`, `lib/auth/passcodeAuth.ts`, `lib/nickname.ts`). The database function `canon()` should drop invisible characters too (see the TODO in `2026-11-live-auth-functions-snapshot.sql`).
+- **#9** the dialog no longer states a number of days (the server decides the schedule).
+- **#10** only the unused `min` was removed; the sizes (25 / 50 / 100) are unchanged. Choosing the product number (for example 20 a day) is still a decision.
+- **#11** is a judgement call: "new" now means never seen (same as "remaining" and the server summary). Revert that commit if "new" was meant to include learned words.
+- **#15** `LearningProgress.status` is not read anywhere else in the app, so only the value changed.
+- **#16** patterns were tightened, not removed.
 
 ---
 
