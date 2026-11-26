@@ -3,13 +3,15 @@
  Usage (PowerShell, from the repo root):
    .\.maestro\scripts\run-e2e.ps1 -Tags smoke
    .\.maestro\scripts\run-e2e.ps1 -Tags regression -SkipBuild
+   .\.maestro\scripts\run-e2e.ps1 -Tags smoke -SkipBuild -ApkPath C:\path\to\lazy-vocabulary-debug.apk   # no Android SDK needed
    .\.maestro\scripts\run-e2e.ps1 -Tags smoke -IncludePending   # after background playback is merged
  Env: E2E_NICKNAME / E2E_PASSCODE (default: e2e_tester / 123456)
 #>
 param(
   [string]$Tags = 'smoke',
   [switch]$SkipBuild,
-  [switch]$IncludePending
+  [switch]$IncludePending,
+  [string]$ApkPath = ''
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
@@ -30,7 +32,7 @@ if (-not $SkipBuild) {
   .\gradlew.bat assembleDebug
   Pop-Location
 }
-$apk = Join-Path $root 'android\app\build\outputs\apk\debug\app-debug.apk'
+$apk = if ($ApkPath) { $ApkPath } else { Join-Path $root 'android\app\build\outputs\apk\debug\app-debug.apk' }
 if (-not (Test-Path $apk)) { throw "APK not found: $apk (run without -SkipBuild)" }
 adb install -r $apk
 & (Join-Path $PSScriptRoot 'push-fixtures.ps1')
