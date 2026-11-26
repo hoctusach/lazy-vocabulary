@@ -213,7 +213,8 @@ export function computeLearnedWordStats(
   const summary: DerivedProgressSummary = {
     learned: learnedCount,
     learning: learningCount,
-    new: Math.max(totalWords - learningCount, 0),
+    // Never seen yet: same meaning as `remaining` (and as the server summary, which uses remaining for new).
+    new: remainingCount,
     due: dueRows.length,
     remaining: remainingCount,
     total: learnedCount + learningCount + remainingCount,
