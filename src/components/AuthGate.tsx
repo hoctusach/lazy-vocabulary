@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { getNicknameLocal, validateDisplayName, NICKNAME_LS_KEY } from '../lib/nickname';
+import {
+  BLOCKED_NICKNAME_CHARS_HELP,
+  getNicknameLocal,
+  validateDisplayName,
+  NICKNAME_LS_KEY,
+} from '../lib/nickname';
 import { sanitizeNickname } from '@/services/nicknameService';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { saveSession, type Session as EdgeSession } from '@/lib/customAuth';
@@ -355,7 +360,7 @@ export default function AuthGate() {
     }
   };
 
-  const BLOCKED_CHARS_HELP = "< > \" ' ` $ \\ { } | ;";
+  const BLOCKED_CHARS_HELP = BLOCKED_NICKNAME_CHARS_HELP;
   const isCreateMode = s.mode === 'create';
   const buttonLabel = s.pending
     ? isCreateMode

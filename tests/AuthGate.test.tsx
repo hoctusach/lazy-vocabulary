@@ -164,11 +164,11 @@ describe('sign in (A9, A10, A11, A16, A17)', () => {
     await act(async () => finish({ session_token: 't' }));
   });
 
-  it('removes ( ) [ ] from the nickname before sending it (A3: this is what the server receives)', async () => {
-    h.exchange.mockRejectedValue(err('x', 'INCORRECT_PASSCODE'));
-    type('Mi (mi)', '123456');
+  it.each(['Mi (mi)', '(((', 'a[b]'])('rejects %j instead of changing it silently (A3)', async (nick) => {
+    type(nick, '123456');
     await submit();
-    expect(h.exchange).toHaveBeenCalledWith('Mi mi', '123456');
+    expect(await screen.findByText('Nickname contains blocked characters.')).toBeTruthy();
+    expect(h.exchange).not.toHaveBeenCalled();
   });
 });
 
