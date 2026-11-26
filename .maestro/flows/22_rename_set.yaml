@@ -1,6 +1,6 @@
 appId: com.lazy.vocabulary
 name: '#22 Rename set validates the name'
-tags: [regression]
+tags: [regression, destructive]
 ---
 - runFlow: ../common/fresh_start.yaml
 - runFlow:

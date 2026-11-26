@@ -13,6 +13,8 @@ param(
   [string]$Tags = 'smoke',
   [switch]$SkipBuild,
   [switch]$IncludePending,
+  [switch]$IncludeFresh,        # cases that need a clean install / new account
+  [switch]$IncludeDestructive,  # cases that mark words learned or rename/delete sets
   [string]$ApkPath = '',
   [switch]$SkipInstall,   # app is already installed on the phone
   [string]$AppId = 'com.lazy.vocabulary'   # package to test, e.g. com.hoctusach.lazyvocabulary (Play build)
@@ -59,7 +61,11 @@ $args = @('test', $flowRoot, '--include-tags', $Tags,
   '-e', "NICKNAME=$nick", '-e', "PASSCODE=$pass",
   '--format', 'junit', '--output', (Join-Path $out 'report.xml'),
   '--debug-output', $out)
-if (-not $IncludePending) { $args += @('--exclude-tags', 'pending') }
+$exclude = @()
+if (-not $IncludePending) { $exclude += 'pending' }
+if (-not $IncludeFresh) { $exclude += 'fresh-install' }
+if (-not $IncludeDestructive) { $exclude += 'destructive' }
+if ($exclude.Count -gt 0) { $args += @('--exclude-tags', ($exclude -join ',')) }
 maestro @args
 $code = $LASTEXITCODE
 if ($code -ne 0) {

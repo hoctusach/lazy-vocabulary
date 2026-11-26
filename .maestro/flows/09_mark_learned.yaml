@@ -1,6 +1,6 @@
 appId: com.lazy.vocabulary
 name: '#9 Mark as Learned confirms and removes the word'
-tags: [smoke]
+tags: [smoke, destructive]
 ---
 - runFlow: ../common/fresh_start.yaml
 - tapOn: 'Pause'

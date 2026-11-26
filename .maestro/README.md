@@ -1,7 +1,12 @@
 # Android end-to-end tests (Maestro)
 
 33 flows, one per test case. The case number is in each flow's `name` (`#9 ...`).
-Tags: `smoke` (run every release), `regression`, `pending` (needs the background-playback branch merged first: cases 30-33).
+Tags: `smoke` (run every release), `regression`, and three that are **skipped by default**:
+- `pending`: needs the background-playback branch merged first (cases 30-33). Add `-IncludePending`.
+- `fresh-install`: needs a clean install and new account (case 3). It clears the app data, which logs you out and deletes imported sets on the phone. Add `-IncludeFresh` only on a test phone.
+- `destructive`: marks words as learned or renames/deletes sets in the account on the phone (cases 9, 22, 23, 24). Add `-IncludeDestructive` only on a test account or phone.
+
+The flows assume the app is **already installed and logged in** on the phone. The login steps only run if the login screen appears (for example on a new device). Each flow starts the app cold, turns sound on and presses Play if needed. Import cases (18-21, 27) add sets named `e2e-valid` and similar; delete them by hand when you are done.
 
 ## One-time setup on Windows
 1. Install JDK 17+ and Node 20+. Install Android Studio (or just platform-tools) so `adb` works.

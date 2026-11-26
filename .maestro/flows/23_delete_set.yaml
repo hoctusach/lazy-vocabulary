@@ -1,6 +1,6 @@
 appId: com.lazy.vocabulary
 name: '#23 Delete set returns to Default'
-tags: [regression]
+tags: [regression, destructive]
 ---
 - runFlow: ../common/fresh_start.yaml
 - runFlow:

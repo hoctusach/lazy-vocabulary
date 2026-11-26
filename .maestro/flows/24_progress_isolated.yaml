@@ -1,6 +1,6 @@
 appId: com.lazy.vocabulary
 name: '#24 Progress is separate per set'
-tags: [regression]
+tags: [regression, destructive]
 ---
 - runFlow: ../common/fresh_start.yaml
 - runFlow:

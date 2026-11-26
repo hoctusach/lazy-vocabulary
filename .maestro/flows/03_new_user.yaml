@@ -1,6 +1,6 @@
 appId: com.lazy.vocabulary
-name: '#3 New user can create a profile and enter the app'
-tags: [smoke]
+name: '#3 New user can create a profile and enter the app (clean install only)'
+tags: [fresh-install]
 ---
 - launchApp:
     clearState: true

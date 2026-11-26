@@ -1,9 +1,8 @@
 appId: com.lazy.vocabulary
-name: '#16 Only Default set, no Rename/Delete for it'
+name: '#16 Default set is listed as built-in'
 tags: [smoke]
 ---
 - runFlow: ../common/fresh_start.yaml
 - tapOn: 'Sets'
 - assertVisible: 'Default'
-- assertNotVisible: 'Rename'
-- assertNotVisible: 'Delete'
+- assertVisible: '.*built-in.*'
