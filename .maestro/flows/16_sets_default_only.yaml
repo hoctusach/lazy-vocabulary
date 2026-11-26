@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#16 Default set is listed as built-in'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Sets'
+- assertVisible: 'Default'
+- assertVisible: '.*built-in.*'

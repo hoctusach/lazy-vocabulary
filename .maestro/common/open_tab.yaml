@@ -1,0 +1,4 @@
+# Opens a bottom tab. Pass TAB = Learn | Progress | Sets | More
+appId: com.lazy.vocabulary
+---
+- tapOn: ${TAB}

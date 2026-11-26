@@ -1,0 +1,15 @@
+appId: com.lazy.vocabulary
+name: '#12 Words Today lists New / Due / Learned'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+# The list is open by default on newer builds; only open it if it is collapsed.
+- runFlow:
+    when:
+      notVisible: 'NEW TODAY.*'
+    commands:
+      - tapOn: 'Words Today|Word Summary'
+- assertVisible: 'NEW TODAY.*'
+- assertVisible: 'DUE TODAY.*'
+- assertVisible: 'LEARNED.*'

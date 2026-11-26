@@ -1,0 +1,9 @@
+appId: com.lazy.vocabulary
+name: '#7 Mute and Unmute switch state'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Mute'
+- assertVisible: 'Unmute'
+- tapOn: 'Unmute'
+- assertVisible: 'Mute'

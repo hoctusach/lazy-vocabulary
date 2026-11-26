@@ -1,0 +1,11 @@
+appId: com.lazy.vocabulary
+name: '#5 Next Word changes the word'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Pause'
+- copyTextFrom:
+    text: '\*.*'
+- tapOn: 'Next Word'
+- assertNotVisible:
+    text: ${maestro.copiedText}

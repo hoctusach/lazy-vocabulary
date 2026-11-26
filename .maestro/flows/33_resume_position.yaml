@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#33 Reopening resumes the word read in the background (pending merge)'
+tags: [regression, pending]
+---
+- runFlow: ../common/fresh_start.yaml
+- pressKey: Home
+- launchApp
+- assertVisible: 'Next Word'

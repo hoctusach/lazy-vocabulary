@@ -1,0 +1,10 @@
+appId: com.lazy.vocabulary
+name: '#28 Tab bar does not cover content on a small screen'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- scrollUntilVisible:
+    element: 'Words Today|Word Summary'
+- assertVisible: 'Progress'
+- takeScreenshot: small-screen-progress

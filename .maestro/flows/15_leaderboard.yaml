@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#15 Leaderboard shows (needs network)'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- scrollUntilVisible:
+    element: '.*[Ll]eaderboard.*'

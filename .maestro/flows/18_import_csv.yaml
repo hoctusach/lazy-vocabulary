@@ -1,0 +1,10 @@
+appId: com.lazy.vocabulary
+name: '#18 Import a valid CSV'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- assertVisible: 'Imported 3 words.*|.*is now the active set.*'

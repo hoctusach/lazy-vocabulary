@@ -1,0 +1,12 @@
+appId: com.lazy.vocabulary
+name: '#26 Relaunch restores set, word, mute and last-used voice'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Mute'
+- tapOn: 'Change Voice'
+- stopApp
+- launchApp
+- assertVisible: 'Unmute'
+- assertVisible: 'Next Word'
+- tapOn: 'Unmute'

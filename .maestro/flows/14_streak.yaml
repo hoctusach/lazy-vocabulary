@@ -1,0 +1,7 @@
+appId: com.lazy.vocabulary
+name: '#14 Streak panel is visible'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- assertVisible: '.*[Ss]treak.*'

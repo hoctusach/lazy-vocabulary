@@ -1,0 +1,17 @@
+# Starts the already-installed, already-logged-in app from a cold start.
+# Login only runs if the login screen shows up (for example on a new device).
+appId: com.lazy.vocabulary
+---
+- launchApp
+- runFlow: login.yaml
+# Normalise state the previous test may have left behind: sound on, playing.
+- runFlow:
+    when:
+      visible: 'Unmute'
+    commands:
+      - tapOn: 'Unmute'
+- runFlow:
+    when:
+      visible: 'Play'
+    commands:
+      - tapOn: 'Play'

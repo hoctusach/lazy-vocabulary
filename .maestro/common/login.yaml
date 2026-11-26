@@ -1,0 +1,21 @@
+# Signs in (or creates the profile) with NICKNAME / PASSCODE. Needs network (Supabase).
+appId: com.lazy.vocabulary
+---
+- runFlow:
+    when:
+      visible: "Access your vocabulary"
+    commands:
+      - tapOn: "e.g., Mi mi U"
+      - inputText: ${NICKNAME}
+      - tapOn: "Enter passcode"
+      - inputText: ${PASSCODE}
+      - hideKeyboard
+      - tapOn: "Sign in"
+- runFlow:
+    when:
+      visible: "Create your profile"
+    commands:
+      - tapOn: "Create profile"
+- extendedWaitUntil:
+    visible: "Learn"
+    timeout: 30000

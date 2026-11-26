@@ -1,0 +1,9 @@
+appId: com.lazy.vocabulary
+name: '#10 Quick Search finds a word'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Quick Search'
+- tapOn: 'Search word...'
+- inputText: 'risk'
+- assertVisible: 'risk'

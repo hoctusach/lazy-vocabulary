@@ -1,0 +1,18 @@
+appId: com.lazy.vocabulary
+name: '#29 First open of the day builds the daily word list (follows main)'
+tags: [smoke]
+---
+# Run scripts/new-day.ps1 first (emulator) so this counts as the first open of a new day.
+- launchApp:
+    clearState: false
+- runFlow: ../common/login.yaml
+- tapOn: 'Progress'
+# The list is open by default on newer builds; only open it if it is collapsed.
+- runFlow:
+    when:
+      notVisible: 'NEW TODAY.*'
+    commands:
+      - tapOn: 'Words Today|Word Summary'
+- assertVisible: 'NEW TODAY \(\d+\)'
+- assertVisible: 'DUE TODAY \(\d+\)'
+- takeScreenshot: daily-words

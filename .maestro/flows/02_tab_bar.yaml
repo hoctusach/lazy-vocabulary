@@ -1,0 +1,13 @@
+appId: com.lazy.vocabulary
+name: '#2 Bottom tabs open the right screens'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- assertVisible: 'Learning Progress'
+- tapOn: 'Sets'
+- assertVisible: 'Word sets'
+- tapOn: 'More'
+- assertVisible: 'More'
+- tapOn: 'Learn'
+- assertVisible: 'Next Word'

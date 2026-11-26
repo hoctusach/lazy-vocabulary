@@ -1,0 +1,15 @@
+appId: com.lazy.vocabulary
+name: '#9 Mark as Learned confirms and removes the word'
+tags: [smoke, destructive]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Pause'
+- copyTextFrom:
+    text: '\*.*'
+- tapOn: 'Mark as Learned'
+- assertVisible: 'Are you sure you want to mark.*'
+- tapOn:
+    text: 'Mark as Learned'
+    index: 1
+- assertNotVisible:
+    text: ${maestro.copiedText}

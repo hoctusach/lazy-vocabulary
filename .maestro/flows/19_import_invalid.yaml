@@ -1,0 +1,11 @@
+appId: com.lazy.vocabulary
+name: '#19 Invalid file shows an error and creates no set'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-invalid.csv
+- assertVisible: 'Missing required columns.*'
+- assertNotVisible: 'Rename'

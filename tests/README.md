@@ -19,3 +19,6 @@ Rewrite these against the current code when touching the area:
 - Today list: due reviews included in the daily list, light/medium/hard daily option, today list construction.
 - Data loader: next-allowed-time scheduling, loading all sheets.
 - UI flows: mark word as new / removes today word / sound on learned, quick search view, voice toggle in the container.
+
+## End-to-end (Android)
+See `.maestro/README.md` (Maestro flows, Windows instructions).

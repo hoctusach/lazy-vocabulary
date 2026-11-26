@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#17 CSV template opens the share sheet'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Sets'
+- tapOn: 'CSV template'
+- assertNotVisible: 'Sets'

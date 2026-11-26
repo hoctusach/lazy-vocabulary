@@ -1,0 +1,15 @@
+appId: com.lazy.vocabulary
+name: '#20 Import Excel and JSON'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.xlsx
+- assertVisible: '.*is now the active set.*'
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.json
+- assertVisible: '.*is now the active set.*'

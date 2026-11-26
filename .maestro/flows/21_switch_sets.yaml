@@ -1,0 +1,17 @@
+appId: com.lazy.vocabulary
+name: '#21 Switching sets changes the card'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- tapOn: 'Learn'
+- assertVisible: 'give up|break the ice|spare'
+- tapOn: 'Sets'
+- tapOn:
+    text: 'Use this set'
+    index: 0
+- tapOn: 'Learn'
+- assertNotVisible: 'give up|break the ice|spare'

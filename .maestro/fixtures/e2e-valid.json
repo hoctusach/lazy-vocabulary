@@ -1,0 +1,4 @@
+{ "name": "E2E json", "words": [
+  { "word": "alpha", "meaning": "first", "example": "Alpha is first.", "category": "topic vocab" },
+  { "word": "beta", "meaning": "second", "example": "Beta is second.", "category": "topic vocab" }
+] }

@@ -1,0 +1,9 @@
+appId: com.lazy.vocabulary
+name: '#30 Lock screen shows the word and keeps reading (pending merge)'
+tags: [smoke, pending]
+---
+# Maestro cannot read the lock screen. This flow starts playback and locks the device;
+# scripts/check-notification.ps1 then reads the notification text with dumpsys.
+- runFlow: ../common/fresh_start.yaml
+- assertVisible: 'Pause'
+- pressKey: Lock

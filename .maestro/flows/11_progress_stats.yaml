@@ -1,0 +1,7 @@
+appId: com.lazy.vocabulary
+name: '#11 Progress shows learned / learning / new / due numbers'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- assertVisible: 'Learning Progress'

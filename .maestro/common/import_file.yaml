@@ -1,0 +1,11 @@
+# Imports FILE (already pushed to Download by scripts/push-fixtures.ps1) from the Sets tab.
+appId: com.lazy.vocabulary
+---
+- tapOn: "Sets"
+- tapOn: "Choose file"
+- runFlow:
+    when:
+      visible: "Downloads"
+    commands:
+      - tapOn: "Downloads"
+- tapOn: ${FILE}
