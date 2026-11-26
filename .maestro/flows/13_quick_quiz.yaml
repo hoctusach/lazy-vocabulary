@@ -1,0 +1,15 @@
+appId: com.lazy.vocabulary
+name: '#13 Quick Quiz: 5 questions then a score'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- tapOn: 'Quiz me'
+- repeat:
+    times: 5
+    commands:
+      - tapOn:
+          point: '50%,55%'
+      - tapOn:
+          text: 'Next|See results'
+- assertVisible: '[0-5] / 5'

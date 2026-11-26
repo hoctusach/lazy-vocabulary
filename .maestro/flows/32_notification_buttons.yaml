@@ -1,0 +1,14 @@
+appId: com.lazy.vocabulary
+name: '#32 Notification Pause / Next / Stop work (pending merge)'
+tags: [regression, pending]
+---
+- runFlow: ../common/fresh_start.yaml
+- pressKey: Home
+- swipe:
+    start: '50%,0%'
+    end: '50%,60%'
+- assertVisible: 'Playing in the background|Paused'
+- tapOn: 'Pause'
+- assertVisible: 'Paused'
+- tapOn: 'Next'
+- tapOn: 'Stop'

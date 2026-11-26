@@ -1,0 +1,9 @@
+appId: com.lazy.vocabulary
+name: '#6 Pause and Play switch state'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Pause'
+- assertVisible: 'Play'
+- tapOn: 'Play'
+- assertVisible: 'Pause'

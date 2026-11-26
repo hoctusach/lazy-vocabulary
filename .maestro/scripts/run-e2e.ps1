@@ -1,0 +1,53 @@
+<#
+ Windows runner: build the APK, install it, push fixtures, run the Maestro flows, save a report.
+ Usage (PowerShell, from the repo root):
+   .\.maestro\scripts\run-e2e.ps1 -Tags smoke
+   .\.maestro\scripts\run-e2e.ps1 -Tags regression -SkipBuild
+   .\.maestro\scripts\run-e2e.ps1 -Tags smoke -IncludePending   # after background playback is merged
+ Env: E2E_NICKNAME / E2E_PASSCODE (default: e2e_tester / 123456)
+#>
+param(
+  [string]$Tags = 'smoke',
+  [switch]$SkipBuild,
+  [switch]$IncludePending
+)
+$ErrorActionPreference = 'Stop'
+$root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
+Set-Location $root
+$out = Join-Path $root 'e2e-results'
+New-Item -ItemType Directory -Force $out | Out-Null
+
+foreach ($tool in 'adb', 'maestro', 'node') {
+  if (-not (Get-Command $tool -ErrorAction SilentlyContinue)) { throw "$tool is not on PATH" }
+}
+$devices = (adb devices | Select-String -Pattern '\tdevice$')
+if (-not $devices) { throw 'No Android device. Plug in a phone with USB debugging or start an emulator, then check: adb devices' }
+
+if (-not $SkipBuild) {
+  if (-not (Test-Path node_modules)) { npm ci }
+  npm run build:mobile
+  Push-Location android
+  .\gradlew.bat assembleDebug
+  Pop-Location
+}
+$apk = Join-Path $root 'android\app\build\outputs\apk\debug\app-debug.apk'
+if (-not (Test-Path $apk)) { throw "APK not found: $apk (run without -SkipBuild)" }
+adb install -r $apk
+& (Join-Path $PSScriptRoot 'push-fixtures.ps1')
+
+$nick = if ($env:E2E_NICKNAME) { $env:E2E_NICKNAME } else { 'e2e_tester' }
+$pass = if ($env:E2E_PASSCODE) { $env:E2E_PASSCODE } else { '123456' }
+$args = @('test', '.maestro', '--include-tags', $Tags,
+  '-e', "NICKNAME=$nick", '-e', "PASSCODE=$pass",
+  '--format', 'junit', '--output', (Join-Path $out 'report.xml'),
+  '--debug-output', $out)
+if (-not $IncludePending) { $args += @('--exclude-tags', 'pending') }
+maestro @args
+$code = $LASTEXITCODE
+if ($code -ne 0) {
+  adb logcat -d -t 500 | Out-File (Join-Path $out 'logcat.txt') -Encoding utf8
+  Write-Host "FAILED. Report and logcat are in $out"
+} else {
+  Write-Host "PASSED. Report is in $out"
+}
+exit $code

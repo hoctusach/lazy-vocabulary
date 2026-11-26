@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#8 Change Voice is available and tappable'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- assertVisible: 'Change Voice'
+- tapOn: 'Change Voice'
+- assertVisible: 'Next Word'

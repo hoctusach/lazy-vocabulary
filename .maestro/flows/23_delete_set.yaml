@@ -1,0 +1,13 @@
+appId: com.lazy.vocabulary
+name: '#23 Delete set returns to Default'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- tapOn: 'Delete'
+- tapOn: 'Delete set'
+- assertVisible: 'Set deleted.|Default'
+- assertNotVisible: 'Rename'

@@ -1,0 +1,17 @@
+appId: com.lazy.vocabulary
+name: '#22 Rename set validates the name'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- tapOn: 'Rename'
+- tapOn: 'Set name'
+- eraseText: 80
+- tapOn: 'Save'
+- assertVisible: 'Enter a name for this set.'
+- inputText: 'My set'
+- tapOn: 'Save'
+- assertVisible: 'Set renamed.|My set'

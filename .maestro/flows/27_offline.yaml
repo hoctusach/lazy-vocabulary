@@ -1,0 +1,14 @@
+appId: com.lazy.vocabulary
+name: '#27 Imported set works offline'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- setAirplaneMode: enabled
+- stopApp
+- launchApp
+- assertVisible: 'give up|break the ice|spare'
+- setAirplaneMode: disabled

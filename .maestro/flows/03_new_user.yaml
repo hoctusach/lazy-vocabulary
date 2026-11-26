@@ -1,0 +1,10 @@
+appId: com.lazy.vocabulary
+name: '#3 New user can create a profile and enter the app'
+tags: [smoke]
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    text: 'Access your vocabulary|Create your profile'
+- runFlow: ../common/login.yaml
+- assertVisible: 'Next Word'

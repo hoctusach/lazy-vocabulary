@@ -1,0 +1,9 @@
+appId: com.lazy.vocabulary
+name: '#25 More: theme and reminders'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'More'
+- tapOn: 'Switch to dark mode|Switch to light mode'
+- assertVisible: 'Switch to light mode|Switch to dark mode'
+- assertVisible: 'Enable daily reminders|Daily reminders on'

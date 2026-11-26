@@ -1,0 +1,8 @@
+appId: com.lazy.vocabulary
+name: '#1 Cold start shows a word card'
+tags: [smoke, regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- assertVisible:
+    text: 'Next Word'
+- assertVisible: 'Learn'

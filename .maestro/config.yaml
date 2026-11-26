@@ -1,0 +1,3 @@
+# Maestro workspace. Run all non-pending flows:  maestro test . --exclude-tags=pending
+flows:
+  - "flows/*.yaml"

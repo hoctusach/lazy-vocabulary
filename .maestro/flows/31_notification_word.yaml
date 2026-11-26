@@ -1,0 +1,11 @@
+appId: com.lazy.vocabulary
+name: '#31 Notification shows the word and keeps reading (pending merge)'
+tags: [smoke, pending]
+---
+- runFlow: ../common/fresh_start.yaml
+- assertVisible: 'Pause'
+- pressKey: Home
+- swipe:
+    start: '50%,0%'
+    end: '50%,70%'
+- assertVisible: 'Playing in the background'

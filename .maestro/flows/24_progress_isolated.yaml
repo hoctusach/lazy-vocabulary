@@ -1,0 +1,20 @@
+appId: com.lazy.vocabulary
+name: '#24 Progress is separate per set'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- runFlow:
+    file: ../common/import_file.yaml
+    env:
+      FILE: e2e-valid.csv
+- tapOn: 'Learn'
+- tapOn: 'Mark as Learned'
+- tapOn:
+    text: 'Mark as Learned'
+    index: 1
+- tapOn: 'Sets'
+- tapOn:
+    text: 'Use this set'
+    index: 0
+- tapOn: 'Progress'
+- assertVisible: 'Learning Progress'

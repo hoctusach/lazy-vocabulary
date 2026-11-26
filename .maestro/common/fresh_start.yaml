@@ -1,0 +1,6 @@
+# Clean install state, then log in.
+appId: com.lazy.vocabulary
+---
+- launchApp:
+    clearState: true
+- runFlow: login.yaml

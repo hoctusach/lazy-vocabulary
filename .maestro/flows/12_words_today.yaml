@@ -1,0 +1,10 @@
+appId: com.lazy.vocabulary
+name: '#12 Words Today lists New / Due / Learned'
+tags: [regression]
+---
+- runFlow: ../common/fresh_start.yaml
+- tapOn: 'Progress'
+- tapOn: 'Word Summary'
+- assertVisible: 'NEW TODAY.*'
+- assertVisible: 'DUE TODAY.*'
+- assertVisible: 'LEARNED.*'

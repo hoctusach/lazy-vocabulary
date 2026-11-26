@@ -1,0 +1,7 @@
+appId: com.lazy.vocabulary
+name: '#4 Card shows word, meaning and example'
+tags: [smoke]
+---
+- runFlow: ../common/fresh_start.yaml
+- assertVisible: '\*.*'
+- assertVisible: 'Mark as Learned'
