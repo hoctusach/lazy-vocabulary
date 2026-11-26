@@ -22,6 +22,12 @@ maestro test .maestro\flows\09_mark_learned.yaml -e NICKNAME=e2e_tester -e PASSC
 ```
 Results: `e2e-results\report.xml` (and `logcat.txt` on failure).
 
+## Self-healing run
+```powershell
+.\.maestro\scripts\e2e-heal.ps1 -Tags smoke -AppId com.hoctusach.lazyvocabulary
+```
+Runs the flows; for each failure Claude Code looks at the report, the screenshot and the live screen hierarchy, fixes the **flow** when the test is wrong (selector, wording, wait) and reruns, up to `-MaxRounds` (default 3). App bugs are written to `e2e-results\app-bugs.md`, not hidden by editing assertions. Review `git diff .maestro` afterwards.
+
 ## With Claude Code
 ```powershell
 claude "/e2e-android smoke"
