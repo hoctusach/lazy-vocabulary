@@ -35,6 +35,12 @@ describe('Mark as Learned dialog (G6)', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
+  it('does not promise a number of days (the review schedule is decided by the server)', () => {
+    setup();
+    expect(document.body.textContent).toMatch(/reappear later for review/);
+    expect(document.body.textContent).not.toMatch(/\d+\s*days/);
+  });
+
   it('Cancel calls onClose and never onConfirm', () => {
     const { onConfirm, onClose } = setup();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
