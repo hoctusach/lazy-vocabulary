@@ -1,0 +1,23 @@
+appId: com.lazy.vocabulary
+name: '#34 Login rejects a wrong passcode and accepts the right one (clean install only)'
+tags: [fresh-install]
+---
+# Needs the login screen, so it clears app data (logs the phone out). Needs network.
+# The test profile must already exist: sign in once with E2E_NICKNAME / E2E_PASSCODE first.
+- launchApp:
+    clearState: true
+- tapOn: 'e.g., Mi mi U'
+- inputText: ${NICKNAME}
+- tapOn: 'Enter passcode'
+- inputText: '000000'
+- hideKeyboard
+- tapOn: 'Sign in'
+- assertVisible: 'Incorrect passcode.*'
+- assertNotVisible: 'Next Word'
+- tapOn: 'Enter passcode'
+- inputText: ${PASSCODE}
+- hideKeyboard
+- tapOn: 'Sign in'
+- extendedWaitUntil:
+    visible: 'Learn'
+    timeout: 30000
