@@ -66,3 +66,11 @@ describe('sanitizeNickname and validateDisplayName use the same rule (A3)', () =
     }
   });
 });
+
+describe('one canonical function everywhere (A5, A6)', () => {
+  it('the helper used for the user key ignores invisible characters too', async () => {
+    const { canonNickname } = await import('@/core/nickname');
+    expect(canonNickname('Mi​ mi U')).toBe('mimiu');
+    expect(canonNickname('MIMIU')).toBe(toCanonical('mi mi u'));
+  });
+});
