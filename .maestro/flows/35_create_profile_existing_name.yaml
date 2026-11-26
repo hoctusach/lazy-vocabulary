@@ -1,0 +1,24 @@
+appId: com.lazy.vocabulary
+name: '#35 Creating a profile with an existing nickname is refused (clean install only)'
+tags: [fresh-install]
+---
+# SECURITY CHECK. Clears app data. Use ONLY a dedicated test nickname for E2E_NICKNAME:
+# if the server bug is not fixed, this flow takes over that account's passcode.
+- launchApp:
+    clearState: true
+- evalScript: ${output.newName = 'e2e' + Date.now()}
+- tapOn: 'e.g., Mi mi U'
+- inputText: ${output.newName}
+- tapOn: 'Enter passcode'
+- inputText: '000000'
+- hideKeyboard
+- tapOn: 'Sign in'
+- assertVisible: 'Create your profile'
+# Switch the name to one that already exists and try to create it with a different passcode.
+- tapOn: ${output.newName}
+- eraseText: 60
+- inputText: ${NICKNAME}
+- hideKeyboard
+- tapOn: 'Create profile'
+- assertVisible: 'That nickname is already taken.*'
+- assertNotVisible: 'Next Word'

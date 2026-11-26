@@ -1,6 +1,6 @@
 # Android end-to-end tests (Maestro)
 
-34 flows, one per test case. The case number is in each flow's `name` (`#9 ...`).
+35 flows, one per test case. The case number is in each flow's `name` (`#9 ...`).
 Tags: `smoke` (run every release), `regression`, and three that are **skipped by default**:
 - `pending`: needs the background-playback branch merged first (cases 30-33). Add `-IncludePending`.
 - `fresh-install`: needs a clean install and new account (case 3). It clears the app data, which logs you out and deletes imported sets on the phone. Add `-IncludeFresh` only on a test phone.
@@ -44,5 +44,5 @@ The second form is non-interactive and is what a bot can call; it exits non-zero
 - Flows match visible text and `aria-label`s (`Next Word`, `Mark as Learned`, `Quick Search`...). If a label changes in the app, update the flow.
 - These flows were written from the source code and have not been run on a device yet. Expect to adjust a few selectors on the first run.
 
-## Login (case 34, clean install only)
-Case 34 checks that a wrong passcode is rejected. It clears app data, so run it only on a test phone: `-Tags fresh-install -IncludeFresh`. The server-side check is also covered by `tests/nicknameAuthSql.test.ts`. Run `supabase/sql/2026-11-fix-verify-nickname-passcode.sql` in Supabase first, otherwise a wrong passcode is accepted.
+## Login (cases 34 and 35, clean install only)
+Case 34: a wrong passcode is rejected. Case 35: creating a profile with an existing nickname and a different passcode is refused. Both clear app data, so run them only on a test phone: `-Tags fresh-install -IncludeFresh`, and use a **dedicated test nickname** for `E2E_NICKNAME` (case 35 would take over that account while the server bug is open). The server side is covered by `tests/nicknameAuthSql.test.ts`. Run `supabase/sql/2026-11-fix-upsert-or-verify-profile.sql` in Supabase first.
