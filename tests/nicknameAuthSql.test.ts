@@ -9,26 +9,17 @@ import { readFileSync } from 'node:fs';
 import { PGlite } from '@electric-sql/pglite';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-const PRODUCTION = `
+const SNAPSHOT = readFileSync('supabase/sql/2026-11-live-auth-functions-snapshot.sql', 'utf8');
+
+// canon() is live in Supabase but its definition is not in the repo yet; this is the rule it implements.
+const CANON = `
 create function public.canon(s text) returns text language sql immutable as $$
   select lower(regexp_replace(coalesce(s, ''), '\\s+', '', 'g'));
 $$;
+`;
 
-create function public.verify_nickname_passcode(nickname text, passcode bigint)
-returns table(user_unique_key text) language sql security definer
-set search_path to 'public', 'pg_temp' as $$
-  select n.user_unique_key
-  from public.nicknames n
-  where canon(n.name) = canon(verify_nickname_passcode.nickname)
-    and n.passcode::text = verify_nickname_passcode.passcode::text
-  limit 1;
-$$;
-
-create function public.set_nickname_passcode(nickname text, passcode bigint)
-returns void language sql security definer set search_path to 'public', 'pg_temp' as $$
-  update public.nicknames set passcode = passcode
-  where user_unique_key = lower(replace(nickname,' ',''));
-$$;
+const PRODUCTION = `${CANON}
+${SNAPSHOT}
 
 -- The original (vulnerable) version.
 create function public.upsert_or_verify_profile(p_user_unique_key text, p_nickname text, p_passcode bigint, p_timezone text default null)
