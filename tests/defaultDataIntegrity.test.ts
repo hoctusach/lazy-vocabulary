@@ -42,9 +42,8 @@ describe('built-in vocabulary', () => {
     expect([...seen.entries()].filter(([, n]) => n > 1)).toEqual([]);
   });
 
-  // Known issue: the importer cuts fields at 100 / 500 / 1000 / 500 characters, but the built-in data is longer.
-  it.fails('fits the import limits, so exporting and re-importing the set loses nothing (L5)', () => {
-    const limits = { word: 100, meaning: 500, example: 1000, translation: 500 } as const;
+  it('fits the import limits, so exporting and re-importing the set loses nothing (L5)', () => {
+    const limits = { word: 200, meaning: 1000, example: 1500, translation: 500 } as const;
     const tooLong = all.filter((w) => (Object.keys(limits) as (keyof typeof limits)[]).some((k) => (w[k] ?? '').length > limits[k]));
     expect(tooLong).toEqual([]);
   });

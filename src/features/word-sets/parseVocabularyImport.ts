@@ -13,10 +13,12 @@ const TRANSLATION_HEADERS = ['translation', 'translate'];
 const CATEGORY_HEADERS = ['category', 'sheet', 'topic', 'tag'];
 const COUNT_HEADERS = ['count', 'frequency'];
 
+// Large enough for the built-in vocabulary (longest: word 176, meaning 933, example 1257, translation 432),
+// so exporting the Default set and importing it again loses nothing.
 const LIMITS = {
-  word: 100,
-  meaning: 500,
-  example: 1000,
+  word: 200,
+  meaning: 1000,
+  example: 1500,
   translation: 500,
   category: 40,
 };
@@ -38,7 +40,12 @@ function normalizeHeader(value: string): string {
   return value.replace(/^\uFEFF/, '').trim().toLowerCase();
 }
 
-function cleanText(value: unknown, max: number): string {
+/** Counts fields that were longer than their limit and had to be shortened. */
+interface CutCounter {
+  count: number;
+}
+
+function cleanText(value: unknown, max: number, cuts?: CutCounter): string {
   if (value == null) return '';
   let text = '';
   for (const char of String(value)) {
@@ -47,7 +54,11 @@ function cleanText(value: unknown, max: number): string {
     text += char;
   }
   text = text.trim();
-  return text.length > max ? text.slice(0, max) : text;
+  // Count characters, not UTF-16 units, so an emoji is never cut in half.
+  const characters = Array.from(text);
+  if (characters.length <= max) return text;
+  if (cuts) cuts.count += 1;
+  return characters.slice(0, max).join('');
 }
 
 function findHeader(headers: string[], aliases: string[]): string | null {
@@ -142,13 +153,14 @@ function rowsToSheets(
 
   const sheets: SheetData = {};
   const seen = new Set<string>();
+  const cuts: CutCounter = { count: 0 };
   let hidden = 0;
   let valid = 0;
 
   rows.forEach((row, index) => {
     const rowNumber = index + 2;
-    const word = cleanText(cell(row, map.word), LIMITS.word);
-    const meaning = cleanText(cell(row, map.meaning), LIMITS.meaning);
+    const word = cleanText(cell(row, map.word), LIMITS.word, cuts);
+    const meaning = cleanText(cell(row, map.meaning), LIMITS.meaning, cuts);
     if (!word && !meaning) return;
     if (!word || !meaning) {
       if (errors.length < MAX_ERRORS) {
@@ -158,10 +170,10 @@ function rowsToSheets(
       }
       return;
     }
-    const example = cleanText(cell(row, map.example), LIMITS.example);
-    const translation = cleanText(cell(row, map.translation), LIMITS.translation);
+    const example = cleanText(cell(row, map.example), LIMITS.example, cuts);
+    const translation = cleanText(cell(row, map.translation), LIMITS.translation, cuts);
     const category =
-      cleanText(cell(row, map.category), LIMITS.category) || fallbackCategory || 'imported';
+      cleanText(cell(row, map.category), LIMITS.category, cuts) || fallbackCategory || 'imported';
     const countRaw = cell(row, map.count);
     const countNumber = typeof countRaw === 'number' ? countRaw : Number.parseInt(String(countRaw ?? ''), 10);
     const count = Number.isFinite(countNumber) && countNumber > 0 ? Math.min(countNumber, 1_000_000) : 0;
@@ -185,6 +197,13 @@ function rowsToSheets(
     else list.push(entry);
     valid += 1;
   });
+
+  if (cuts.count > 0) {
+    warnings.push(
+      `${cuts.count} text field${cuts.count === 1 ? ' was' : 's were'} longer than the limit and ${cuts.count === 1 ? 'was' : 'were'} shortened ` +
+        `(word ${LIMITS.word}, meaning ${LIMITS.meaning}, example ${LIMITS.example}, translation ${LIMITS.translation}, category ${LIMITS.category} characters).`
+    );
+  }
 
   if (valid === 0) {
     if (errors.length === 0) {

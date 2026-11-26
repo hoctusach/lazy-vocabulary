@@ -25,10 +25,30 @@ describe('size limits (E6)', () => {
 });
 
 describe('field cleaning (E7, E8, E13)', () => {
-  it('cuts fields at the limits', () => {
-    const result = csv(`word,meaning,example,translation,category\n${'w'.repeat(150)},${'m'.repeat(600)},${'e'.repeat(1200)},${'t'.repeat(600)},${'c'.repeat(60)}`);
+  it('cuts fields at the limits and says so', () => {
+    const result = csv(`word,meaning,example,translation,category\n${'w'.repeat(250)},${'m'.repeat(1100)},${'e'.repeat(1600)},${'t'.repeat(600)},${'c'.repeat(60)}`);
     const row = rowsOf(result)[0];
-    expect([row.word.length, row.meaning.length, row.example.length, row.translation?.length, row.category?.length]).toEqual([100, 500, 1000, 500, 40]);
+    expect([row.word.length, row.meaning.length, row.example.length, row.translation?.length, row.category?.length]).toEqual([200, 1000, 1500, 500, 40]);
+    expect(result.ok && result.warnings.join(' ')).toMatch(/5 text fields were longer than the limit and were shortened/);
+  });
+
+  it('does not warn when nothing was cut', () => {
+    const result = csv('word,meaning\na,x');
+    expect(result.ok && result.warnings).toEqual([]);
+  });
+
+  it('accepts the longest fields of the built-in vocabulary (word 176, meaning 933, example 1257) unchanged', () => {
+    const result = csv(`word,meaning,example\n${'w'.repeat(176)},${'m'.repeat(933)},${'e'.repeat(1257)}`);
+    const row = rowsOf(result)[0];
+    expect([row.word.length, row.meaning.length, row.example.length]).toEqual([176, 933, 1257]);
+    expect(result.ok && result.warnings).toEqual([]);
+  });
+
+  it('never cuts an emoji in half', () => {
+    const result = csv(`word,meaning\n${'😀'.repeat(250)},x`);
+    const word = rowsOf(result)[0].word;
+    expect(Array.from(word)).toHaveLength(200);
+    expect(word).toBe('😀'.repeat(200));
   });
 
   it('removes control characters and keeps emoji, CJK, Thai and Arabic text', () => {
