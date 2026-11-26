@@ -322,7 +322,8 @@ function toLearningProgress(word: TodayWord, timezone: string | null): LearningP
   const learnedAt = srs?.learned_at ?? null;
   const nextReviewIso = srs?.next_review_at ?? null;
   const nextReviewDate = nextReviewIso ? toDateKey(new Date(nextReviewIso), timezone) : '';
-  const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs));
+  // A word that has been reviewed at least once is in its schedule ("not_due" / "due"), not "new".
+  const status = determineStatus(reviewCount, nextReviewIso ?? '', isLearnedState(srs) || reviewCount > 0);
 
   return {
     word: word.word,

@@ -92,11 +92,26 @@ describe('status and queue after a review (C3)', () => {
     expect(progress.reviewCount).toBe(1);
   });
 
-  // Known issue: toLearningProgress treats only words with in_review_queue=false (or 11+ reviews) as "learned",
-  // so a word in the middle of its schedule is reported as status "new" instead of "not_due".
-  it.fails('a word in the middle of its schedule is "not_due", not "new"', async () => {
-    const { progress } = await review(0);
-    expect(progress.status).toBe('not_due');
+  it('a word in the middle of its schedule is "not_due", not "new"', async () => {
+    for (const stored of [0, 1, 4, 9]) {
+      const { progress } = await review(stored);
+      expect(progress.status).toBe('not_due');
+    }
+  });
+
+  it('after the 11th review the status is "learned"', async () => {
+    const { progress } = await review(10);
+    expect(progress.status).toBe('learned');
+  });
+
+  it('a word never reviewed stays "new"', async () => {
+    const { selection } = await markWordReviewed(
+      'user',
+      'a::idioms',
+      'light',
+      state([word('a::idioms'), word('b::idioms')])
+    );
+    expect(selection.newWords.map((w) => w.status)).toEqual(['new']);
   });
 
   it('the 11th review marks the word learned and removes it from the queue', async () => {
