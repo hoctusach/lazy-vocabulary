@@ -54,7 +54,8 @@ describe('computeLearnedWordStats', () => {
 
     expect(summary.learning).toBe(3);
     expect(summary.due).toBe(2);
-    expect(summary.new).toBe(7);
+    // 10 words, 1 learned and 3 learning: 6 were never seen ("new" now means the same as "remaining").
+    expect(summary.new).toBe(6);
     expect(summary.remaining).toBe(6);
   });
 
