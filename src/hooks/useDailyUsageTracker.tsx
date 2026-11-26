@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { ensureLearnedDay, setLearningTimeForDay } from '@/lib/progress/progressSummary';
 import { trackSessionEnd, trackSessionStart } from '@/services/analyticsService';
+import { getLocalDateISO } from '@/utils/date';
 
+/** The learner's local calendar day (also sent to the server as a learned day). */
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateISO();
 }
 
 function getLocalMs(key: string): number {

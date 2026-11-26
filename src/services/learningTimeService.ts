@@ -1,9 +1,12 @@
+import { getLocalDateISO } from '@/utils/date';
+
 export interface LearningTimeRecord {
   [date: string]: number; // milliseconds
 }
 
+/** The learner's local calendar day. */
 function formatDate(date: Date): string {
-  return date.toISOString().split('T')[0];
+  return getLocalDateISO(date);
 }
 
 function getStorageKey(learnerId: string) {
@@ -38,7 +41,8 @@ function startSession(learnerId: string) {
 function stopSession(learnerId: string): number {
   const start = sessionStarts[learnerId];
   if (start == null) return 0;
-  const duration = Date.now() - start;
+  // A device clock moved backwards during the session must not subtract time.
+  const duration = Math.max(0, Date.now() - start);
   sessionStarts[learnerId] = null;
 
   const record = loadRecord(learnerId);

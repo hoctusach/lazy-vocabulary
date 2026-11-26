@@ -4,6 +4,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { useDailyUsageTracker } from '../src/hooks/useDailyUsageTracker';
+import { getLocalDateISO } from '../src/utils/date';
 
 const advanceSession = async (ms: number) => {
   vi.advanceTimersByTime(ms);
@@ -29,13 +30,13 @@ describe('useDailyUsageTracker', () => {
       window.dispatchEvent(new Event('beforeunload'));
     });
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getLocalDateISO();
     const key = `dailyTime_${today}`;
     expect(parseInt(localStorage.getItem(key) || '0', 10)).toBe(16 * 60 * 1000);
   });
 
   it('accumulates time across sessions', async () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getLocalDateISO();
     const key = `dailyTime_${today}`;
 
     renderHook(() => useDailyUsageTracker());
