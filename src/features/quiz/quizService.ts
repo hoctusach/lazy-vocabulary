@@ -1,7 +1,9 @@
+import { getLocalDateISO } from '@/utils/date';
+
 const QUIZ_DONE_KEY = 'lazyVoca.quiz.lastCompletedDay';
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateISO();
 }
 
 export function hasCompletedQuizToday(): boolean {

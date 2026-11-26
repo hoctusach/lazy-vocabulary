@@ -4,6 +4,7 @@ import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { getProgressSummary } from '@/lib/progress/progressSummary';
 import { calculateCurrentStreak, hasLearnedToday } from '@/lib/progress/streak';
 import { pickReminderMessage } from '@/lib/reminders/messages';
+import { getLocalDateISO } from '@/utils/date';
 
 const REMINDER_STATE_KEY = 'lazyVoca.reminder.state';
 const INITIAL_CHECK_DELAY_MS = 4000;
@@ -19,7 +20,7 @@ type ReminderState = {
 };
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateISO();
 }
 
 function readState(): ReminderState {

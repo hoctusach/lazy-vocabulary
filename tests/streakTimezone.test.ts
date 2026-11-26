@@ -1,8 +1,7 @@
 /**
  * @vitest-environment node
  * Streak and "learned today" around the user's local midnight (D6, D7).
- * `it.fails` marks a known bug: the test passes while the bug exists and starts failing when it is fixed
- * (then change `it.fails` to `it`).
+ * The streak uses the learner's local calendar day, also in time zones east of UTC (Vietnam).
  */
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { calculateCurrentStreak, getRecentDays, hasLearnedToday } from '@/lib/progress/streak';
@@ -44,19 +43,19 @@ describe('time zones west of UTC (works)', () => {
   });
 });
 
-describe('time zones east of UTC, e.g. Vietnam (known bug)', () => {
+describe('time zones east of UTC, e.g. Vietnam', () => {
   // 10:00 on 26 Nov in Ho Chi Minh City. The user learned today, so the learned day is 2026-11-26.
-  it.fails('hasLearnedToday is true when the learned day is the local date', () => {
+  it('hasLearnedToday is true when the learned day is the local date', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     expect(hasLearnedToday(['2026-11-26'])).toBe(true);
   });
 
-  it.fails('the streak counts today', () => {
+  it('the streak counts today', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     expect(calculateCurrentStreak(['2026-11-26', '2026-11-25'])).toBe(2);
   });
 
-  it.fails('the last day of the recent-days strip is the local date and marked as today', () => {
+  it('the last day of the recent-days strip is the local date and marked as today', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     const days = getRecentDays([], 7);
     expect(days[6]).toMatchObject({ date: '2026-11-26', isToday: true });
@@ -76,5 +75,20 @@ describe('recent days strip', () => {
   it('crosses a leap day', () => {
     at('UTC', '2028-03-02T12:00:00Z');
     expect(getRecentDays([], 4).map((d) => d.date)).toEqual(['2028-02-28', '2028-02-29', '2028-03-01', '2028-03-02']);
+  });
+});
+
+describe('other zones and daylight saving', () => {
+  it('Auckland (UTC+13) and Honolulu (UTC-10) use their local day', () => {
+    at('Pacific/Auckland', '2026-12-31T12:00:00Z'); // 1 Jan 01:00 in Auckland
+    expect(hasLearnedToday(['2027-01-01'])).toBe(true);
+    at('Pacific/Honolulu', '2027-01-01T05:00:00Z'); // 31 Dec 19:00 in Honolulu
+    expect(hasLearnedToday(['2026-12-31'])).toBe(true);
+  });
+
+  it('counts across a daylight saving change without skipping or repeating a day', () => {
+    at('America/New_York', '2026-11-02T15:00:00Z'); // DST ended on 1 Nov 2026
+    expect(calculateCurrentStreak(['2026-11-02', '2026-11-01', '2026-10-31', '2026-10-30'])).toBe(4);
+    expect(getRecentDays([], 4).map((d) => d.date)).toEqual(['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']);
   });
 });
