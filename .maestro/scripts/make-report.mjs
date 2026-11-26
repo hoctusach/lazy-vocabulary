@@ -43,7 +43,15 @@ if (junitPath && existsSync(junitPath)) {
     const failed = /<failure|<error/.test(body) || /ERROR|FAIL/i.test(status);
     const skipped = /<skipped/.test(body) || /SKIPPED/i.test(status);
     c.result = skipped ? 'SKIPPED' : failed ? 'FAIL' : 'PASS';
-    c.note = failed ? (/<(?:failure|error)[^>]*message="([^"]*)"/.exec(body)?.[1] ?? '').slice(0, 160) : '';
+    if (failed) {
+      // Maestro puts the reason either in a message attribute or as the element text.
+      const attr = /<(?:failure|error)\b[^>]*\bmessage="([^"]*)"/.exec(body)?.[1];
+      const text = /<(?:failure|error)\b[^>]*>([\s\S]*?)<\/(?:failure|error)>/.exec(body)?.[1];
+      const raw = (attr || text || '').replace(/<!\[CDATA\[|\]\]>/g, '');
+      c.note = raw
+        .replace(/&quot;/g, "'").replace(/&apos;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+        .replace(/\s+/g, ' ').replace(/\|/g, '/').trim().slice(0, 200);
+    }
   }
 }
 
