@@ -5,6 +5,6 @@ tags: [regression]
 - runFlow: ../common/fresh_start.yaml
 - tapOn: 'Progress'
 - scrollUntilVisible:
-    element: 'Word Summary'
+    element: 'Words Today|Word Summary'
 - assertVisible: 'Progress'
 - takeScreenshot: small-screen-progress

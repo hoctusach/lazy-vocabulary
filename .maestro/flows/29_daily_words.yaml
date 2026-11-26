@@ -7,7 +7,12 @@ tags: [smoke]
     clearState: false
 - runFlow: ../common/login.yaml
 - tapOn: 'Progress'
-- tapOn: 'Word Summary'
+# The list is open by default on newer builds; only open it if it is collapsed.
+- runFlow:
+    when:
+      notVisible: 'NEW TODAY.*'
+    commands:
+      - tapOn: 'Words Today|Word Summary'
 - assertVisible: 'NEW TODAY \(\d+\)'
 - assertVisible: 'DUE TODAY \(\d+\)'
 - takeScreenshot: daily-words
