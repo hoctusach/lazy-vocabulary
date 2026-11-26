@@ -5,6 +5,7 @@
    .\.maestro\scripts\run-e2e.ps1 -Tags regression -SkipBuild
    .\.maestro\scripts\run-e2e.ps1 -Tags smoke -SkipBuild -ApkPath C:\path\to\lazy-vocabulary-debug.apk   # no Android SDK needed
    .\.maestro\scripts\run-e2e.ps1 -Tags smoke -SkipBuild -SkipInstall   # APK already installed on the phone
+   .\.maestro\scripts\run-e2e.ps1 -Tags smoke -SkipBuild -SkipInstall -AppId com.hoctusach.lazyvocabulary   # test the Play build
    .\.maestro\scripts\run-e2e.ps1 -Tags smoke -IncludePending   # after background playback is merged
  Env: E2E_NICKNAME / E2E_PASSCODE (default: e2e_tester / 123456)
 #>
@@ -13,7 +14,8 @@ param(
   [switch]$SkipBuild,
   [switch]$IncludePending,
   [string]$ApkPath = '',
-  [switch]$SkipInstall   # app is already installed on the phone
+  [switch]$SkipInstall,   # app is already installed on the phone
+  [string]$AppId = 'com.lazy.vocabulary'   # package to test, e.g. com.hoctusach.lazyvocabulary (Play build)
 )
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
@@ -43,7 +45,17 @@ if (-not $SkipInstall) {
 
 $nick = if ($env:E2E_NICKNAME) { $env:E2E_NICKNAME } else { 'e2e_tester' }
 $pass = if ($env:E2E_PASSCODE) { $env:E2E_PASSCODE } else { '123456' }
-$args = @('test', '.maestro', '--include-tags', $Tags,
+$flowRoot = '.maestro'
+if ($AppId -ne 'com.lazy.vocabulary') {
+  # Run a temporary copy of the flows that targets the other package.
+  $flowRoot = Join-Path $out 'flows-copy'
+  if (Test-Path $flowRoot) { Remove-Item -Recurse -Force $flowRoot }
+  Copy-Item -Recurse '.maestro' $flowRoot
+  Get-ChildItem $flowRoot -Recurse -Filter *.yaml | ForEach-Object {
+    (Get-Content $_.FullName -Raw).Replace('com.lazy.vocabulary', $AppId) | Set-Content $_.FullName -NoNewline
+  }
+}
+$args = @('test', $flowRoot, '--include-tags', $Tags,
   '-e', "NICKNAME=$nick", '-e', "PASSCODE=$pass",
   '--format', 'junit', '--output', (Join-Path $out 'report.xml'),
   '--debug-output', $out)
