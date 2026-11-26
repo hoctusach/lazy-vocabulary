@@ -50,4 +50,8 @@ if ($code -ne 0) {
 } else {
   Write-Host "PASSED. Report is in $out"
 }
+$stamp = Get-Date -Format 'yyyy-MM-dd'
+$commit = (git rev-parse --short HEAD)
+$dev = (adb shell getprop ro.product.model).Trim() + ', Android ' + (adb shell getprop ro.build.version.release).Trim()
+node .maestro/scripts/make-report.mjs --out "reports/e2e-android-$stamp.md" --junit (Join-Path $out 'report.xml') --device $dev --commit $commit
 exit $code
