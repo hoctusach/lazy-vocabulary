@@ -65,10 +65,12 @@ type SelectionNormalizationMeta = {
   timezone: string | null;
 };
 
-const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
-  light: { min: 15, max: 25 },
-  moderate: { min: 30, max: 50 },
-  intense: { min: 50, max: 100 },
+// Number of words requested per day for each intensity. (This used to be a { min, max } range
+// where only max was ever read.)
+const DAILY_COUNT_BY_SEVERITY: Record<SeverityLevel, number> = {
+  light: 25,
+  moderate: 50,
+  intense: 100,
 };
 
 const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
@@ -255,8 +257,7 @@ function deriveWordFromId(wordId: string): string {
 }
 
 function getDailyCount(severity: SeverityLevel): number {
-  const config = DEFAULT_SEVERITY_CONFIG[severity] ?? DEFAULT_SEVERITY_CONFIG.light;
-  return config.max;
+  return DAILY_COUNT_BY_SEVERITY[severity] ?? DAILY_COUNT_BY_SEVERITY.light;
 }
 
 function buildSrsFromSelection(selectionRow: DailySelectionRow | null | undefined): TodayWordSrs | undefined {

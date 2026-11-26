@@ -171,7 +171,7 @@ describe('markWordReviewed bookkeeping (C17, C25)', () => {
 });
 
 describe('daily size by intensity (C8)', () => {
-  it('uses the maximum of each range (the minimum of the range is never used)', () => {
+  it('asks for 25, 50 and 100 words a day', () => {
     expect(getCountForSeverity('light')).toBe(25);
     expect(getCountForSeverity('moderate')).toBe(50);
     expect(getCountForSeverity('intense')).toBe(100);
