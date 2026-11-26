@@ -30,10 +30,14 @@ describe('canonical form (A5, A6)', () => {
     expect(toCanonical('mimiu')).not.toBe(toCanonical('mimiu2'));
   });
 
-  // Known bug: zero-width characters are not removed, so a look-alike name becomes a different account.
-  it.fails('treats zero-width characters like nothing', () => {
-    expect(toCanonical('mi​miu')).toBe('mimiu');
-    expect(toCanonical('mimiu﻿')).toBe('mimiu');
+  it('treats zero-width and other invisible format characters like nothing (A6)', () => {
+    expect(toCanonical('mi\u200Bmiu')).toBe('mimiu');
+    expect(toCanonical('mimiu\uFEFF')).toBe('mimiu');
+    expect(toCanonical('mi\u2060mi\u200Cu')).toBe('mimiu');
+  });
+
+  it('keeps emoji and other letters (only invisible format characters are dropped)', () => {
+    expect(toCanonical('😀 Nguyễn')).toBe('😀nguyễn');
   });
 });
 

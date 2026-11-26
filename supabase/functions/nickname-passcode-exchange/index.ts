@@ -33,8 +33,9 @@ function getUserKey(data: unknown): string | null {
   return typeof k === "string" && k ? k : null;
 }
 
+// Spaces and invisible format characters (zero-width space, BOM...) must not make a look-alike account.
 const canon = (s: string) =>
-  s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
+  s.normalize("NFKC").toLowerCase().replace(/[\s\p{Cf}]+/gu, "");
 
 function isValidTimezone(timezone: string): boolean {
   try {

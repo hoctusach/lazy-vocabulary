@@ -129,9 +129,8 @@ describe('set_nickname_passcode (create profile)', () => {
     expect(new Set(sent).size).toBe(2);
   });
 
-  // Known bug: zero-width characters are not removed from the derived key.
-  it.fails('derives the same key for a nickname with a zero-width character (A6)', async () => {
-    await handler(post({ nickname: 'mi​miu', passcode: '123456' }));
+  it('derives the same key for a nickname with a zero-width character (A6)', async () => {
+    await handler(post({ nickname: 'mi\u200Bmiu', passcode: '123456' }));
     expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ user_unique_key: 'mimiu' }));
   });
 });
@@ -193,6 +192,13 @@ describe('nickname-passcode-exchange (sign in)', () => {
     const a = (await json(await handler(post({ nickname: 'mimiu', passcode: '123456' })))).body.session_token;
     const b = (await json(await handler(post({ nickname: 'mimiu', passcode: '123456' })))).body.session_token;
     expect(a).not.toBe(b);
+  });
+
+  it('looks up the same account for a nickname with a zero-width character (A6)', async () => {
+    db.rpc.mockResolvedValue({ data: [], error: null });
+    db.nicknameRow = { user_unique_key: 'mimiu' };
+    const res = await json(await handler(post({ nickname: 'mi\u200Bmiu', passcode: '999999' })));
+    expect(res.body.code).toBe('INCORRECT_PASSCODE'); // found the real account, so only the passcode is wrong
   });
 
   it('a failing profile update or session save is 500', async () => {

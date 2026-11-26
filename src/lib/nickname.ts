@@ -4,8 +4,9 @@ export function getNicknameLocal(): string | null {
   try { return localStorage.getItem(NICKNAME_LS_KEY); } catch { return null; }
 }
 
+/** Same rule as the Edge Functions: spaces and invisible format characters (zero-width space, BOM...) are ignored. */
 export function toCanonical(s: string): string {
-  return s.normalize('NFKC').toLowerCase().replace(/\s+/g, '');
+  return s.normalize('NFKC').toLowerCase().replace(/[\s\p{Cf}]+/gu, '');
 }
 
 /** Characters that are never allowed in a nickname. Validation rejects them (the name is never silently changed). */

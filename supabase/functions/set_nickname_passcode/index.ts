@@ -20,7 +20,8 @@ function canonNickname(input: string): string {
   return input
     .normalize('NFKC')
     .toLowerCase()
-    .replace(/\s+/g, '');
+    // Spaces and invisible format characters (zero-width space, BOM...) must not make a look-alike account.
+    .replace(/[\s\p{Cf}]+/gu, '');
 }
 
 function isValidTimezone(timezone: string): boolean {
