@@ -7,7 +7,7 @@ const read = (p: string) => readFileSync(resolve(process.cwd(), p), 'utf8');
 
 describe('[FB-06] Free/Pro split: friends leaderboard stays free, Pro is discoverable', () => {
   it('the Pro feature list is exactly no ads, set import, unlimited quiz, all themes, Michael voice, translation editing [FB-33]', () => {
-    expect([...PRO_FEATURES].sort()).toEqual(['allThemes', 'editTranslation', 'importSets', 'maleVoice', 'noAds', 'unlimitedQuiz']);
+    expect([...PRO_FEATURES].sort()).toEqual(['allThemes', 'editTranslation', 'importSets', 'maleVoice', 'noAds', 'unlimitedQuiz', 'unlimitedScans']);
   });
   it('friends / leaderboard code never consults Pro gating', () => {
     for (const f of ['src/components/vocabulary-app/LeaderboardPanel.tsx', 'src/lib/progress/friends.ts']) {

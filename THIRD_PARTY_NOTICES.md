@@ -57,3 +57,12 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+## Scan text (FB-66)
+
+| Component | License | URL |
+| --- | --- | --- |
+| Google ML Kit Text Recognition and Translation (on device) | ML Kit terms of service | https://developers.google.com/ml-kit |
+| @capacitor-mlkit/text-recognition, @capacitor-mlkit/translation (Capawesome) | Apache-2.0 | https://github.com/capawesome-team/capacitor-mlkit |
+| @capacitor/camera | MIT | https://github.com/ionic-team/capacitor-plugins |
+| Free Dictionary API (English meaning provider, no key) | see https://dictionaryapi.dev | https://dictionaryapi.dev |

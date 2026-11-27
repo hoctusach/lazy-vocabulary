@@ -45,3 +45,9 @@
 
 # sherpa-onnx (Kokoro on-device TTS): the JNI layer reflects on Kotlin fields/classes
 -keep class com.k2fsa.sherpa.onnx.** { *; }
+
+# [FB-66] ML Kit script packs other than Latin are excluded from the build (see app/build.gradle); the plugin only touches them when asked
+-dontwarn com.google.mlkit.vision.text.chinese.**
+-dontwarn com.google.mlkit.vision.text.devanagari.**
+-dontwarn com.google.mlkit.vision.text.japanese.**
+-dontwarn com.google.mlkit.vision.text.korean.**

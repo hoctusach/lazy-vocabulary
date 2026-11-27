@@ -17,6 +17,7 @@ const BENEFITS: Record<ProFeature, string> = {
   allThemes: 'All 5 themes',
   maleVoice: 'Natural male voice (Michael)',
   editTranslation: 'Edit translations on your word cards',
+  unlimitedScans: 'Unlimited “Scan text”',
 };
 
 const LEAD: Partial<Record<ProFeature, string>> = {
@@ -26,6 +27,7 @@ const LEAD: Partial<Record<ProFeature, string>> = {
   maleVoice: 'The natural male voice is part of Pro.',
   editTranslation: 'Editing translations on word cards is part of Pro.',
   noAds: 'Pro removes all ads.',
+  unlimitedScans: 'You have used today’s free scans. Unlock unlimited “Scan text” with Pro.',
 };
 
 const DEFAULT_LEAD = 'One-time purchase. Learning, listening, built-in sets and the friends leaderboard stay free.';
