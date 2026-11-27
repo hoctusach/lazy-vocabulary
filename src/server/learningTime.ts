@@ -1,4 +1,5 @@
 import { lovableCors } from './corsMiddleware';
+import { getLocalDateISO } from '@/utils/date';
 
 interface LearningTimeRecord {
   [date: string]: number;
@@ -72,7 +73,7 @@ export default async function handler(req: Req, res: Res) {
         res.end('Invalid payload');
         return;
       }
-      const day = (date as string) || new Date().toISOString().split('T')[0];
+      const day = (date as string) || getLocalDateISO();
       const record = loadRecord(learnerId);
       record[day] = (record[day] || 0) + duration;
       saveRecord(learnerId, record);

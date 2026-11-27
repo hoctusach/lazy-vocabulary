@@ -87,7 +87,13 @@ describe('set_nickname_passcode (create profile)', () => {
 
   it('derives the user key from the nickname (A5)', async () => {
     await handler(post({ nickname: '  Mi  mi U ', passcode: '123456' }));
-    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ user_unique_key: 'mimiu', nickname: 'Mi  mi U', passcode: 123456 }));
+    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ p_user_unique_key: 'mimiu', p_nickname: 'Mi  mi U', p_passcode: '123456' }));
+  });
+
+  it('calls the database function with exactly the argument names of its SQL signature', async () => {
+    await handler(post({ nickname: 'mimiu', passcode: '123456' }));
+    const args = db.rpc.mock.calls[0][1] as Record<string, unknown>;
+    expect(Object.keys(args).sort()).toEqual(['p_nickname', 'p_passcode', 'p_timezone', 'p_user_unique_key']);
   });
 
   it('checks the timezone (A20)', async () => {
@@ -121,18 +127,27 @@ describe('set_nickname_passcode (create profile)', () => {
     expect((await json(await handler(post({ nickname: 'New One', passcode: '123456' })))).body).toEqual({ user_unique_key: 'newone', nickname: 'New One' });
   });
 
-  // Known bug: the passcode is converted to a number, so passcodes that differ only by leading zeros collide.
-  it.fails('keeps passcodes with leading zeros different (A8)', async () => {
+  it.each(['0123', '00123', '0000', '0123456789', '123456'])('sends the passcode as typed, as text: %s (A8)', async (passcode) => {
+    const res = await json(await handler(post({ nickname: 'mimiu', passcode })));
+    expect(res.status).toBe(200);
+    expect(db.rpc).toHaveBeenLastCalledWith('upsert_or_verify_profile', expect.objectContaining({ p_passcode: passcode }));
+  });
+
+  it('a numeric passcode from an old client is turned into text', async () => {
+    await handler(post({ nickname: 'mimiu', passcode: 123456 }));
+    expect(db.rpc).toHaveBeenLastCalledWith('upsert_or_verify_profile', expect.objectContaining({ p_passcode: '123456' }));
+  });
+
+  it('"0123" and "00123" reach the database as different passcodes', async () => {
     await handler(post({ nickname: 'mimiu', passcode: '0123' }));
     await handler(post({ nickname: 'mimiu', passcode: '00123' }));
-    const sent = db.rpc.mock.calls.map((c) => (c[1] as { passcode: number }).passcode);
+    const sent = db.rpc.mock.calls.map((c) => (c[1] as { p_passcode: string }).p_passcode);
     expect(new Set(sent).size).toBe(2);
   });
 
-  // Known bug: zero-width characters are not removed from the derived key.
-  it.fails('derives the same key for a nickname with a zero-width character (A6)', async () => {
-    await handler(post({ nickname: 'mi​miu', passcode: '123456' }));
-    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ user_unique_key: 'mimiu' }));
+  it('derives the same key for a nickname with a zero-width character (A6)', async () => {
+    await handler(post({ nickname: 'mi\u200Bmiu', passcode: '123456' }));
+    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ p_user_unique_key: 'mimiu' }));
   });
 });
 
@@ -193,6 +208,27 @@ describe('nickname-passcode-exchange (sign in)', () => {
     const a = (await json(await handler(post({ nickname: 'mimiu', passcode: '123456' })))).body.session_token;
     const b = (await json(await handler(post({ nickname: 'mimiu', passcode: '123456' })))).body.session_token;
     expect(a).not.toBe(b);
+  });
+
+  it('calls the profile function with exactly the argument names of its SQL signature', async () => {
+    okVerify();
+    await handler(post({ nickname: 'mimiu', passcode: '123456' }));
+    const call = db.rpc.mock.calls.find((c) => c[0] === 'upsert_or_verify_profile')!;
+    expect(Object.keys(call[1] as Record<string, unknown>).sort()).toEqual(['p_nickname', 'p_passcode', 'p_timezone', 'p_user_unique_key']);
+  });
+
+  it('looks up the same account for a nickname with a zero-width character (A6)', async () => {
+    db.rpc.mockResolvedValue({ data: [], error: null });
+    db.nicknameRow = { user_unique_key: 'mimiu' };
+    const res = await json(await handler(post({ nickname: 'mi\u200Bmiu', passcode: '999999' })));
+    expect(res.body.code).toBe('INCORRECT_PASSCODE'); // found the real account, so only the passcode is wrong
+  });
+
+  it('signs in with the passcode as typed, leading zeros kept', async () => {
+    okVerify();
+    expect((await json(await handler(post({ nickname: 'mimiu', passcode: '0123' })))).status).toBe(200);
+    expect(db.rpc).toHaveBeenCalledWith('verify_nickname_passcode', { nickname: 'mimiu', passcode: '0123' });
+    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ p_passcode: '0123' }));
   });
 
   it('a failing profile update or session save is 500', async () => {

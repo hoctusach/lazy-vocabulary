@@ -33,8 +33,9 @@ function getUserKey(data: unknown): string | null {
   return typeof k === "string" && k ? k : null;
 }
 
+// Spaces and invisible format characters (zero-width space, BOM...) must not make a look-alike account.
 const canon = (s: string) =>
-  s.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
+  s.normalize("NFKC").toLowerCase().replace(/[\s\p{Cf}]+/gu, "");
 
 function isValidTimezone(timezone: string): boolean {
   try {
@@ -72,9 +73,8 @@ Deno.serve(async (req) => {
   if (!nickname) return errorResponse("Nickname is required", 400);
   if (!/^\d{4,10}$/.test(passRaw))
     return errorResponse("Passcode must be 4-10 digits", 400);
-  const passcode = Number(passRaw);
-  if (!Number.isFinite(passcode))
-    return errorResponse("Passcode must be numeric", 400);
+  // The passcode is used as text, exactly as typed (leading zeros are kept).
+  const passcode = passRaw;
 
   const timezoneRaw =
     typeof body?.timezone === "string" ? body.timezone.trim() : "";

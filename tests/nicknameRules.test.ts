@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toCanonical, validateDisplayName } from '@/lib/nickname';
+import { BLOCKED_NICKNAME_CHARS_HELP, toCanonical, validateDisplayName } from '@/lib/nickname';
 import { sanitizeNickname } from '@/services/nicknameService';
 
 describe('nickname validation (A1, A2, A4)', () => {
@@ -11,7 +11,7 @@ describe('nickname validation (A1, A2, A4)', () => {
     expect(validateDisplayName('a'.repeat(41))).toBe('Nickname must be at most 40 characters.');
   });
 
-  it.each(['a<b', 'a>b', 'a"b', "a'b", 'a`b', 'a$b', 'a\\b', 'a{b', 'a}b', 'a|b', 'a;b', 'ab\u0000c', 'ab\nc'])(
+  it.each(['a<b', 'a>b', 'a"b', "a'b", 'a`b', 'a$b', 'a\\b', 'a{b', 'a}b', 'a|b', 'a;b', 'a(b', 'a)b', 'a[b', 'a]b', '(((', 'ab\u0000c', 'ab\nc'])(
     'blocks %j',
     (name) => expect(validateDisplayName(name)).toBe('Nickname contains blocked characters.')
   );
@@ -30,24 +30,47 @@ describe('canonical form (A5, A6)', () => {
     expect(toCanonical('mimiu')).not.toBe(toCanonical('mimiu2'));
   });
 
-  // Known bug: zero-width characters are not removed, so a look-alike name becomes a different account.
-  it.fails('treats zero-width characters like nothing', () => {
-    expect(toCanonical('mi​miu')).toBe('mimiu');
-    expect(toCanonical('mimiu﻿')).toBe('mimiu');
+  it('treats zero-width and other invisible format characters like nothing (A6)', () => {
+    expect(toCanonical('mi\u200Bmiu')).toBe('mimiu');
+    expect(toCanonical('mimiu\uFEFF')).toBe('mimiu');
+    expect(toCanonical('mi\u2060mi\u200Cu')).toBe('mimiu');
+  });
+
+  it('keeps emoji and other letters (only invisible format characters are dropped)', () => {
+    expect(toCanonical('😀 Nguyễn')).toBe('😀nguyễn');
   });
 });
 
-describe('sanitizeNickname vs validateDisplayName (A3)', () => {
-  it('removes the characters it blocks and trims', () => {
+describe('sanitizeNickname and validateDisplayName use the same rule (A3)', () => {
+  it('a name that passes validation is not changed by sanitizing', () => {
+    for (const name of ['Mi mi U', 'Nguyễn Văn A', '你好吗', 'user_01', 'a-b-c', '😀😀😀']) {
+      expect(validateDisplayName(name)).toBeNull();
+      expect(sanitizeNickname(name)).toBe(name);
+    }
+  });
+
+  it('a name that would have been changed silently is now rejected', () => {
+    for (const name of ['(((', '[[[', 'a(b)', 'Mi (mi)']) {
+      expect(validateDisplayName(name)).toBe('Nickname contains blocked characters.');
+    }
+  });
+
+  it('sanitizing still removes blocked characters and trims, as a safety net', () => {
     expect(sanitizeNickname('  Mi (mi) ')).toBe('Mi mi');
     expect(sanitizeNickname('a[b]c')).toBe('abc');
   });
 
-  // Known bug: validation accepts these names but sanitizing turns them into something too short or empty.
-  it.fails('a name that passes validation is still valid after sanitizing', () => {
-    for (const name of ['(((', '[[[', 'a(b)']) {
-      expect(validateDisplayName(name)).toBeNull();
-      expect(validateDisplayName(sanitizeNickname(name))).toBeNull();
+  it('the help text lists every blocked character', () => {
+    for (const ch of ['<', '>', '"', "'", '`', '$', '(', ')', '[', ']', '{', '}', '|', ';', '\\']) {
+      expect(BLOCKED_NICKNAME_CHARS_HELP).toContain(ch);
     }
+  });
+});
+
+describe('one canonical function everywhere (A5, A6)', () => {
+  it('the helper used for the user key ignores invisible characters too', async () => {
+    const { canonNickname } = await import('@/core/nickname');
+    expect(canonNickname('Mi​ mi U')).toBe('mimiu');
+    expect(canonNickname('MIMIU')).toBe(toCanonical('mi mi u'));
   });
 });

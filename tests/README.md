@@ -27,4 +27,4 @@ Rewrite these against the current code when touching the area:
 - UI flows: mark word as new / removes today word / sound on learned, quick search view, voice toggle in the container.
 
 ## Known bugs are tests too
-17 tests are written with `it.fails`. They describe the correct behaviour of a known bug: they pass while the bug exists and fail once it is fixed (then change `it.fails` to `it`). The list with proposed fixes is in `tests/KNOWN-ISSUES.md`.
+A test written with `it.fails` describes the correct behaviour of a known bug: it passes while the bug exists and fails once the bug is fixed (then change `it.fails` to `it`). Two are left: repeated words in the built-in data (#7) and `null` preferences (#17). The list with fixes and status is in `tests/KNOWN-ISSUES.md`.

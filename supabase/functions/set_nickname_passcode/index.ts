@@ -20,7 +20,8 @@ function canonNickname(input: string): string {
   return input
     .normalize('NFKC')
     .toLowerCase()
-    .replace(/\s+/g, '');
+    // Spaces and invisible format characters (zero-width space, BOM...) must not make a look-alike account.
+    .replace(/[\s\p{Cf}]+/gu, '');
 }
 
 function isValidTimezone(timezone: string): boolean {
@@ -81,11 +82,6 @@ Deno.serve(async (req) => {
     return errorResponse('Passcode must be 4-10 digits.', 400);
   }
 
-  const passcodeNumeric = Number(passcodeRaw);
-  if (!Number.isFinite(passcodeNumeric)) {
-    return errorResponse('Passcode must be numeric.', 400);
-  }
-
   const timezoneRaw =
     typeof payload.timezone === 'string' ? payload.timezone.trim() : '';
   if (timezoneRaw && !isValidTimezone(timezoneRaw)) {
@@ -110,9 +106,11 @@ Deno.serve(async (req) => {
   });
 
   const { data, error } = await adminClient.rpc('upsert_or_verify_profile', {
-    user_unique_key: userKey,
-    nickname,
-    passcode: passcodeNumeric,
+    // Argument names must match the SQL function: upsert_or_verify_profile(p_user_unique_key, p_nickname, p_passcode, p_timezone).
+    p_user_unique_key: userKey,
+    p_nickname: nickname,
+    // Sent and stored as text, exactly as typed (leading zeros are kept).
+    p_passcode: passcodeRaw,
     // Forward the validated timezone so the database can persist it with the nickname.
     p_timezone: timezone,
   });

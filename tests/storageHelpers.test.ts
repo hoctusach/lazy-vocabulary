@@ -117,7 +117,7 @@ describe('learning time (K5)', () => {
     expect(learningTimeService.getTotalHours('b')).toBe(0);
   });
 
-  it('a session over midnight is booked on the day it ends (UTC)', async () => {
+  it('a session over midnight is booked on the day it ends (local day)', async () => {
     const { learningTimeService } = await import('@/services/learningTimeService');
     vi.setSystemTime(new Date('2026-03-10T23:50:00Z'));
     learningTimeService.startSession('u');
@@ -126,12 +126,27 @@ describe('learning time (K5)', () => {
     expect(JSON.parse(localStorage.getItem('learningTime_u')!)).toEqual({ '2026-03-11': 20 * 60_000 });
   });
 
-  // Known bug: if the device clock is moved back during a session, a negative time is added.
-  it.fails('never adds negative time when the clock goes backwards', async () => {
+  it('never adds negative time when the clock goes backwards', async () => {
     const { learningTimeService } = await import('@/services/learningTimeService');
     learningTimeService.startSession('u');
     vi.setSystemTime(new Date('2026-03-10T09:00:00Z'));
     expect(learningTimeService.stopSession('u')).toBeGreaterThanOrEqual(0);
+  });
+
+  it('books the time on the local day in Vietnam (UTC+7), not the UTC day', async () => {
+    const original = process.env.TZ;
+    process.env.TZ = 'Asia/Ho_Chi_Minh';
+    try {
+      const { learningTimeService } = await import('@/services/learningTimeService');
+      vi.setSystemTime(new Date('2026-03-10T17:10:00Z')); // 00:10 on the 11th in Vietnam
+      learningTimeService.startSession('u');
+      vi.advanceTimersByTime(5 * 60_000);
+      learningTimeService.stopSession('u');
+      expect(Object.keys(JSON.parse(localStorage.getItem('learningTime_u')!))).toEqual(['2026-03-11']);
+    } finally {
+      if (original === undefined) delete process.env.TZ;
+      else process.env.TZ = original;
+    }
   });
 
   it('ignores corrupt stored data', async () => {

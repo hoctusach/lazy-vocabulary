@@ -1,3 +1,5 @@
+import { canonNickname } from '@/core/nickname';
+
 const PASSCODE_ACCOUNTS_KEY = 'lazyVoca.passcodeAccounts';
 
 export type PasscodeAuthErrorCode =
@@ -43,13 +45,6 @@ function writeStore(store: PasscodeStore) {
   } catch {
     throw new PasscodeAuthError('Failed to persist passcode locally.', 'STORAGE_UNAVAILABLE');
   }
-}
-
-function canonNickname(value: string) {
-  return value
-    .normalize('NFKC')
-    .toLowerCase()
-    .replace(/\s+/g, '');
 }
 
 export async function signInWithPasscode(

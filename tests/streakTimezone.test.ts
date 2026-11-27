@@ -77,3 +77,18 @@ describe('recent days strip', () => {
     expect(getRecentDays([], 4).map((d) => d.date)).toEqual(['2028-02-28', '2028-02-29', '2028-03-01', '2028-03-02']);
   });
 });
+
+describe('other zones and daylight saving', () => {
+  it('Auckland (UTC+13) and Honolulu (UTC-10) use their local day', () => {
+    at('Pacific/Auckland', '2026-12-31T12:00:00Z'); // 1 Jan 01:00 in Auckland
+    expect(hasLearnedToday(['2027-01-01'])).toBe(true);
+    at('Pacific/Honolulu', '2027-01-01T05:00:00Z'); // 31 Dec 19:00 in Honolulu
+    expect(hasLearnedToday(['2026-12-31'])).toBe(true);
+  });
+
+  it('counts across a daylight saving change without skipping or repeating a day', () => {
+    at('America/New_York', '2026-11-02T15:00:00Z'); // DST ended on 1 Nov 2026
+    expect(calculateCurrentStreak(['2026-11-02', '2026-11-01', '2026-10-31', '2026-10-30'])).toBe(4);
+    expect(getRecentDays([], 4).map((d) => d.date)).toEqual(['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']);
+  });
+});

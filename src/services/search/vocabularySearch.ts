@@ -27,6 +27,7 @@ interface ScoredWord {
 }
 
 export const searchVocabulary = (query: string, limit = 20): VocabularyWord[] => {
+  if (limit <= 0) return [];
   const normalized = normalizeQuery(query).toLowerCase();
   if (!normalized) return [];
 

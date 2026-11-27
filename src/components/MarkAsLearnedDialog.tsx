@@ -1,4 +1,5 @@
 import React from 'react';
+import { MASTER_INTERVAL_DAYS } from '@/lib/progress/reviewSchedule';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,7 +33,7 @@ export const MarkAsLearnedDialog: React.FC<MarkAsLearnedDialogProps> = ({
             Are you sure you want to mark "{word}" as learned?
             <br /><br />
             This word will be hidden from your daily practice and will automatically
-            reappear after 100 days for review.
+            reappear after {MASTER_INTERVAL_DAYS} days for review.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

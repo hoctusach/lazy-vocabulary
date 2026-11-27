@@ -87,21 +87,33 @@ describe('limit (H7)', () => {
     expect(result).toContain('apple');
   });
 
-  // Known bug: with limit 0 the exact match is still pushed into the empty list.
-  it.fails('limit 0 returns nothing', () => {
+  it('limit 0 or less returns nothing', () => {
     expect(names('apple', 0)).toEqual([]);
+    expect(names('apple', -3)).toEqual([]);
   });
 });
 
 describe('non-Latin words (H5, H6)', () => {
-  // Known limitation: the query is reduced to Latin letters, so non-Latin words can never be found.
-  it.fails('finds a CJK word', () => {
-    use(w('你好'), w('hello'));
-    expect(names('你好')).toContain('你好');
+  it.each([
+    ['你好', '你好'],
+    ['สวัสดี', 'สวัสดี'],
+    ['مرحبا', 'مرحبا'],
+    ['привет', 'привет'],
+    ['안녕하세요', '안녕하세요'],
+  ])('finds the %s word in its own script', (word, query) => {
+    use(w(word), w('hello'));
+    expect(names(query)).toContain(word);
   });
 
-  it('Vietnamese words are matched without accents (so đường and duong are the same key)', () => {
-    use(w('đường'), w('con đường'));
-    expect(names('duong').length).toBeGreaterThan(0);
+  it('a query of symbols only still returns nothing', () => {
+    use(w('你好'));
+    expect(names('？！…')).toEqual([]);
+  });
+
+  it('Vietnamese words are matched with or without accents (đ is mapped to d)', () => {
+    use(w('đường'), w('con đường'), w('duong'));
+    expect(names('duong')).toEqual(expect.arrayContaining(['đường', 'duong']));
+    expect(names('đường')).toEqual(expect.arrayContaining(['đường', 'duong']));
+    expect(names('ĐƯỜNG')).toContain('đường');
   });
 });

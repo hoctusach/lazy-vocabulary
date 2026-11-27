@@ -19,6 +19,7 @@ import {
   type TodaySelectionState,
 } from '@/services/learningProgressService';
 import type { TodayWord } from '@/types/vocabulary';
+import { MASTER_INTERVAL_DAYS, REVIEW_INTERVALS_DAYS } from '@/lib/progress/reviewSchedule';
 
 const NOW = new Date('2026-03-10T10:00:00.000Z');
 
@@ -76,6 +77,11 @@ describe('review schedule (C1, C2)', () => {
     expect(payload.next_review_at).toBe(isoDay(days));
   });
 
+  it('the schedule constants match what the tests below expect', () => {
+    expect(REVIEW_INTERVALS_DAYS).toEqual([1, 2, 3, 5, 7, 10, 14, 21, 28, 35]);
+    expect(MASTER_INTERVAL_DAYS).toBe(60);
+  });
+
   it('from the 11th review on, the interval is the 60-day master interval', async () => {
     for (const stored of [10, 11, 25]) {
       const { payload } = await review(stored);
@@ -92,11 +98,26 @@ describe('status and queue after a review (C3)', () => {
     expect(progress.reviewCount).toBe(1);
   });
 
-  // Known issue: toLearningProgress treats only words with in_review_queue=false (or 11+ reviews) as "learned",
-  // so a word in the middle of its schedule is reported as status "new" instead of "not_due".
-  it.fails('a word in the middle of its schedule is "not_due", not "new"', async () => {
-    const { progress } = await review(0);
-    expect(progress.status).toBe('not_due');
+  it('a word in the middle of its schedule is "not_due", not "new"', async () => {
+    for (const stored of [0, 1, 4, 9]) {
+      const { progress } = await review(stored);
+      expect(progress.status).toBe('not_due');
+    }
+  });
+
+  it('after the 11th review the status is "learned"', async () => {
+    const { progress } = await review(10);
+    expect(progress.status).toBe('learned');
+  });
+
+  it('a word never reviewed stays "new"', async () => {
+    const { selection } = await markWordReviewed(
+      'user',
+      'a::idioms',
+      'light',
+      state([word('a::idioms'), word('b::idioms')])
+    );
+    expect(selection.newWords.map((w) => w.status)).toEqual(['new']);
   });
 
   it('the 11th review marks the word learned and removes it from the queue', async () => {

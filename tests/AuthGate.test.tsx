@@ -126,6 +126,13 @@ describe('sign in (A9, A10, A11, A16, A17)', () => {
     expect(codeInput().value).toBe('123456');
   });
 
+  it('a passcode that starts with 0 is sent as typed when signing in', async () => {
+    h.exchange.mockResolvedValue({ session_token: 't', nickname: 'Old' });
+    type('oldtimer', '012345');
+    await submit();
+    await waitFor(() => expect(h.exchange).toHaveBeenCalledWith('oldtimer', '012345'));
+  });
+
   it('the right passcode saves the session and the passcode', async () => {
     const session = { session_token: 't', nickname: 'Mi mi U', user_unique_key: 'mimiu' };
     h.exchange.mockResolvedValue(session);
@@ -175,11 +182,11 @@ describe('sign in (A9, A10, A11, A16, A17)', () => {
     await act(async () => finish({ session_token: 't' }));
   });
 
-  it('removes ( ) [ ] from the nickname before sending it (A3: this is what the server receives)', async () => {
-    h.exchange.mockRejectedValue(err('x', 'INCORRECT_PASSCODE'));
-    type('Mi (mi)', '123456');
+  it.each(['Mi (mi)', '(((', 'a[b]'])('rejects %j instead of changing it silently (A3)', async (nick) => {
+    type(nick, '123456');
     await submit();
-    expect(h.exchange).toHaveBeenCalledWith('Mi mi', '123456');
+    expect(await screen.findByText('Nickname contains blocked characters.')).toBeTruthy();
+    expect(h.exchange).not.toHaveBeenCalled();
   });
 });
 
@@ -209,6 +216,16 @@ describe('create profile (A12, A13)', () => {
     expect(await screen.findByText('That nickname is already taken. Try another.')).toBeTruthy();
     expect(h.exchange).not.toHaveBeenCalled();
     expect(h.saveSession).not.toHaveBeenCalled();
+  });
+
+  it.each(['0123', '000000'])('accepts a new passcode that starts with 0 and sends it as typed: %s', async (code) => {
+    h.create.mockResolvedValue({ nickname: 'Newbie' });
+    h.exchange.mockResolvedValue({ session_token: 't', nickname: 'Newbie' });
+    type('Newbie', code);
+    await submit('Create profile');
+    await waitFor(() => expect(h.create).toHaveBeenCalledWith('Newbie', code));
+    expect(h.exchange).toHaveBeenCalledWith('Newbie', code);
+    expect(h.storePasscode).toHaveBeenCalledWith(code);
   });
 
   it('can go back to sign in', async () => {
