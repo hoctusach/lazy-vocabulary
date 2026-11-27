@@ -134,7 +134,7 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   return (
     <div className="lv-translation flex items-start gap-1" style={textStyle}>
       <em className="min-w-0 flex-1" data-testid="translation-text" dir="auto" lang={textLang} data-empty={effective ? undefined : 'true'} style={effective ? undefined : { opacity: 0.6 }}>
-        * {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}
+        {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}
       </em>
       {saved && (
         <span role="status" data-testid="translation-saved" className="shrink-0 self-center text-xs font-medium not-italic" style={{ color: 'var(--lv-accent)' }}>

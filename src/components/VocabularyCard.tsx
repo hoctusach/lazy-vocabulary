@@ -102,7 +102,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="italic"
             style={{ color: 'var(--lv-meaning)', fontSize: '1.25rem', textAlign: 'left', whiteSpace: 'pre-line' }}
           >
-            <span style={{ color: 'var(--lv-meaning)', fontStyle: 'italic' }}>* </span>
             {meaning}
           </div>
 
@@ -110,7 +109,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="italic"
             style={{ color: 'var(--lv-example)', fontSize: '1rem', textAlign: 'left', whiteSpace: 'pre-line' }}
           >
-            <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
 

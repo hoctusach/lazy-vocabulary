@@ -127,7 +127,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               color: 'var(--lv-meaning)',
             }}
           >
-            <span className="italic" style={{ color: 'var(--lv-meaning)' }}>*</span> {meaning}
+            {meaning}
           </div>
           {/* Example */}
           <div
@@ -139,7 +139,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               color: 'var(--lv-example)',
             }}
           >
-            <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
+            {example}
           </div>
           <EditableTranslation
             word={word}

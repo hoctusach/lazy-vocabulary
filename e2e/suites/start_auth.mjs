@@ -27,7 +27,7 @@ test('START-02', 'Cold start signed-in: no AuthGate, card shows word/meaning/exa
   await U.boot(s);
   const b = await body(s);
   ok(!b.includes('Access your vocabulary'), 'gate shown');
-  ok(b.includes('* ' + U.P[0].meaning) && b.includes('* ' + U.P[0].example), 'meaning/example');
+  ok(b.includes('' + U.P[0].meaning) && b.includes('' + U.P[0].example), 'meaning/example');
   ok(!b.includes('Tap anywhere to start listening'), 'chip should be hidden');
   ok(s.fake.count('generate_daily_selection_v2') >= 1, 'daily selection RPC');
 });

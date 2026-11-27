@@ -85,7 +85,6 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
               whiteSpace: 'pre-line'
             }}
           >
-            <span style={{ color: 'var(--lv-meaning)', fontStyle: 'italic' }}>* </span>
             {meaning}
           </div>
 
@@ -101,7 +100,6 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
               whiteSpace: 'pre-line'
             }}
           >
-            <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
           <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} />
