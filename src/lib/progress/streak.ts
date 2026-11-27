@@ -1,7 +1,14 @@
-function todayKey(date = new Date()): string {
-  const cursor = new Date(date);
-  cursor.setHours(0, 0, 0, 0);
-  return cursor.toISOString().slice(0, 10);
+/** Local calendar date as YYYY-MM-DD (not UTC, which is off by a day east of Greenwich). */
+export function localKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/** Today's local calendar date (YYYY-MM-DD). Use this, never toISOString(), for learned_days. [FB-40] */
+export function todayKey(date = new Date()): string {
+  return localKey(date);
 }
 
 export function calculateCurrentStreak(days: string[]): number {
@@ -13,7 +20,7 @@ export function calculateCurrentStreak(days: string[]): number {
 
   let streak = 0;
   while (streak < 366) {
-    const key = cursor.toISOString().slice(0, 10);
+    const key = localKey(cursor);
     if (!learnedDays.has(key)) break;
     streak += 1;
     cursor.setDate(cursor.getDate() - 1);
@@ -42,7 +49,7 @@ export function getRecentDays(days: string[], count = 7): RecentDay[] {
   cursor.setDate(cursor.getDate() - (count - 1));
 
   for (let i = 0; i < count; i += 1) {
-    const key = cursor.toISOString().slice(0, 10);
+    const key = localKey(cursor);
     result.push({ date: key, learned: learnedDays.has(key), isToday: key === today });
     cursor.setDate(cursor.getDate() + 1);
   }

@@ -1,0 +1,135 @@
+name: Android release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: 'Android versionCode (integer, must increase for every Play upload)'
+        required: true
+        type: string
+      version_name:
+        description: 'Android versionName (e.g. 1.0.0)'
+        required: true
+        type: string
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Tag builds: v1.2.3 -> versionName 1.2.3, versionCode = run number (override by using workflow_dispatch).
+      VERSION_CODE: ${{ inputs.version_code || github.run_number }}
+      VERSION_NAME: ${{ inputs.version_name || github.ref_name }}
+      VITE_ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || vars.ADMOB_APP_ID }}
+      VITE_ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID || vars.ADMOB_BANNER_ID }}
+      ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || vars.ADMOB_APP_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check signing secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          missing=""
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error title=Missing signing secrets::Add these repository secrets (Settings > Secrets and variables > Actions):$missing. See ANDROID.md."
+            exit 1
+          fi
+
+      - name: Normalize version
+        run: |
+          name="${VERSION_NAME#v}"
+          if ! echo "$VERSION_CODE" | grep -Eq '^[0-9]+$'; then
+            echo "::error::version_code must be an integer, got '$VERSION_CODE'"; exit 1
+          fi
+          if [ -z "$name" ]; then echo "::error::version_name is empty"; exit 1; fi
+          echo "VERSION_NAME=$name" >> "$GITHUB_ENV"
+          echo "Building versionName=$name versionCode=$VERSION_CODE"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Guard - AdMob IDs must not be Google test IDs
+        env:
+          VITE_ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || vars.ADMOB_APP_ID }}
+          VITE_ADMOB_BANNER_ID: ${{ secrets.ADMOB_BANNER_ID || vars.ADMOB_BANNER_ID }}
+        run: |
+          if [ -z "$VITE_ADMOB_APP_ID" ] || [ -z "$VITE_ADMOB_BANNER_ID" ] || echo "$VITE_ADMOB_APP_ID$VITE_ADMOB_BANNER_ID" | grep -q 3940256099942544; then
+            echo "::error::Release build blocked: set ADMOB_APP_ID and ADMOB_BANNER_ID (repo secrets or variables) to your real AdMob IDs (see ANDROID.md)."
+            exit 1
+          fi
+
+      - name: Build web app
+        run: npm run build
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Restore keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > android/release.keystore
+          {
+            echo "storeFile=release.keystore"
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+          } > android/keystore.properties
+
+      - name: Build AAB and APK
+        working-directory: android
+        run: ./gradlew bundleRelease assembleRelease -PversionCode="$VERSION_CODE" -PversionName="$VERSION_NAME" --no-daemon
+
+      - name: Remove signing material
+        if: always()
+        run: rm -f android/release.keystore android/keystore.properties
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lazy-vocabulary-${{ env.VERSION_NAME }}-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lazy-vocabulary-${{ env.VERSION_NAME }}-apk
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lazy-vocabulary-${{ env.VERSION_NAME }}-mapping
+          path: android/app/build/outputs/mapping/release/mapping.txt
+          if-no-files-found: warn

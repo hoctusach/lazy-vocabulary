@@ -14,12 +14,12 @@ vi.mock('@/utils/lastWordStorage', () => ({
   getTodayLastWord: vi.fn(() => null)
 }));
 
-describe('useVocabularyDataLoader voice persistence', () => {
+describe('[FB-61] useVocabularyDataLoader never writes the saved voice', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('does not persist empty voice selections', async () => {
+  it('[FB-61] neither empty nor fallback voice selections overwrite the saved voice', async () => {
     const setFavoriteVoiceMock = setFavoriteVoice as unknown as vi.Mock;
 
     const setWordList = vi.fn();
@@ -47,8 +47,7 @@ describe('useVocabularyDataLoader voice persistence', () => {
 
     rerender({ voice: 'Voice Prime' });
 
-    await waitFor(() => {
-      expect(setFavoriteVoiceMock).toHaveBeenCalledWith('Voice Prime');
-    });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(setFavoriteVoiceMock).not.toHaveBeenCalled(); // a selection (e.g. a fallback) is not an explicit choice
   });
 });

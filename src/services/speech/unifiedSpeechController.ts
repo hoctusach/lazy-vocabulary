@@ -2,6 +2,11 @@
 import { VocabularyWord } from '@/types/vocabulary';
 import { realSpeechService } from './realSpeechService';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
+import { estimateReadingTimeMs } from './readingTime';
+import { markStudiedToday } from '@/lib/reminders/studySignal';
+
+/** Shortest time a card stays up before auto-advance, even if speech ends or fails at once. */
+export const MIN_WORD_DWELL_MS = 1500;
 
 const DEBUG_SPEECH = (window as any).DEBUG_SPEECH;
 
@@ -17,6 +22,8 @@ class UnifiedSpeechController {
   private isSpeaking = false;
   private playbackEpoch = 0;
   private timers: Set<number> = new Set();
+  /** Resolver for a silent (no speech engine) card that is waiting out its reading time. */
+  private silentResolve: ((v: boolean) => void) | null = null;
 
   getMuted(): boolean {
     return this.isMutedState;
@@ -72,8 +79,16 @@ class UnifiedSpeechController {
     }
     this.playbackEpoch++;
     this.clearAllTimers();
+    this.settleSilentWait();
     this.queue = [];
     this.isSpeaking = false;
+  }
+
+  /** Drops a pending reading-time wait (its timer is cleared separately) so awaiting callers are released. */
+  private settleSilentWait(): void {
+    const resolve = this.silentResolve;
+    this.silentResolve = null;
+    resolve?.(false);
   }
 
   async speak(
@@ -105,7 +120,25 @@ class UnifiedSpeechController {
     const text = parts.join('. ');
     const synthesis = window.speechSynthesis;
     if (!synthesis || typeof synthesis.speak !== 'function') {
-      resolve(false);
+      // No speech engine on this device: show the card for a reading time, then
+      // advance as if the speech had finished, so auto-advance does not stall.
+      this.isSpeaking = true;
+      this.silentResolve = resolve;
+      const id = window.setTimeout(() => {
+        this.unregisterTimer(id);
+        this.silentResolve = null;
+        if (!this.canAdvance(epoch)) {
+          resolve(false);
+          return;
+        }
+        this.isSpeaking = false;
+        if (this.wordCompleteCallback) {
+          this.wordCompleteCallback();
+        }
+        resolve(true);
+        this.processQueue();
+      }, estimateReadingTimeMs(text));
+      this.registerTimer(id);
       return;
     }
     if (synthesis.speaking || synthesis.pending) {
@@ -127,6 +160,7 @@ class UnifiedSpeechController {
     }
 
     this.isSpeaking = true;
+    const startedAt = Date.now();
 
     realSpeechService.speak(text, {
       voiceName,
@@ -134,17 +168,13 @@ class UnifiedSpeechController {
       epoch,
       onStart: () => {
         if (!this.canAdvance(epoch)) return;
+        if (!this.isMutedState) markStudiedToday('play');
         if (DEBUG_SPEECH) console.log('Word speech started:', word.word, 'epoch', epoch);
       },
       onEnd: () => {
         if (!this.canAdvance(epoch)) return;
         if (DEBUG_SPEECH) console.log('Word speech completed:', word.word, 'epoch', epoch);
-        this.isSpeaking = false;
-        if (this.wordCompleteCallback) {
-          this.wordCompleteCallback();
-        }
-        resolve(true);
-        this.processQueue();
+        this.finishWithMinDwell(epoch, startedAt, true, resolve);
       },
       onError: (error) => {
         if (!this.canAdvance(epoch)) return;
@@ -154,17 +184,50 @@ class UnifiedSpeechController {
           resolve(false);
           return;
         }
-        this.isSpeaking = false;
-        if (this.wordCompleteCallback) {
-          this.wordCompleteCallback();
-        }
-        resolve(false);
-        this.processQueue();
+        this.finishWithMinDwell(epoch, startedAt, false, resolve);
       }
+    }).catch((error) => {
+      // A throwing engine must not leave the controller stuck in "speaking".
+      console.warn('[speech] speak failed', error);
+      if (!this.canAdvance(epoch)) return;
+      this.isSpeaking = false;
+      resolve(false);
+      this.processQueue();
     });
   }
 
+  /**
+   * Completes a word, but never sooner than MIN_WORD_DWELL_MS after it started.
+   * An engine that fails instantly (e.g. the native shim with no plugin) would
+   * otherwise advance through the whole deck in a microtask loop and freeze the page.
+   */
+  private finishWithMinDwell(epoch: number, startedAt: number, ok: boolean, resolve: (v: boolean) => void): void {
+    const complete = () => {
+      if (!this.canAdvance(epoch)) {
+        resolve(false);
+        return;
+      }
+      this.isSpeaking = false;
+      this.wordCompleteCallback?.();
+      resolve(ok);
+      this.processQueue();
+    };
+    const wait = MIN_WORD_DWELL_MS - (Date.now() - startedAt);
+    if (wait <= 0) {
+      complete();
+      return;
+    }
+    // isSpeaking stays true during the wait so nothing else starts speaking.
+    const id = window.setTimeout(() => {
+      this.unregisterTimer(id);
+      complete();
+    }, wait);
+    this.registerTimer(id);
+  }
+
   stop(): void {
+    this.clearAllTimers();
+    this.settleSilentWait();
     realSpeechService.stop();
     this.isSpeaking = false;
     this.queue = [];

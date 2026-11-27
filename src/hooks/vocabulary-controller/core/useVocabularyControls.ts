@@ -3,8 +3,11 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { vocabularyService } from '@/services/vocabularyService';
 import { SpeechState } from '@/services/speech/core/SpeechState';
 import { unifiedSpeechController } from '@/services/speech/unifiedSpeechController';
+import { stopSpeechForUserIntent } from '@/services/speech/stopSpeechForUserIntent';
 import { toast } from 'sonner';
 import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { nextAllowedVoice } from '@/services/speech/voiceAccess';
+import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 
 export const useVocabularyControls = (
   isPaused: boolean,
@@ -27,17 +30,17 @@ export const useVocabularyControls = (
     const newMutedState = !isMuted;
     console.log(`[VOCABULARY-CONTROLS] Toggle mute: ${isMuted} -> ${newMutedState}`);
     setIsMuted(newMutedState);
-    if (newMutedState) unifiedSpeechController.stop();
+    if (newMutedState) stopSpeechForUserIntent('user-mute');
   }, [isMuted, setIsMuted]);
 
   const toggleVoice = useCallback(() => {
     if (allVoices.length < 2) return;
-    const currentIndex = allVoices.findIndex(v => v.name === selectedVoiceName);
-    const nextIndex = (currentIndex + 1) % allVoices.length;
-    const nextVoice = allVoices[nextIndex];
+    const nextVoice = nextAllowedVoice(allVoices, selectedVoiceName);
+    if (!nextVoice) return;
+    markVoiceExplicit();
     setSelectedVoiceName(nextVoice.name);
     setFavoriteVoice(nextVoice.name);
-    unifiedSpeechController.stop();
+    stopSpeechForUserIntent('user-voice-change');
     toast.success(`Voice changed to ${nextVoice.name} (${nextVoice.lang})`);
   }, [allVoices, selectedVoiceName, setSelectedVoiceName]);
 

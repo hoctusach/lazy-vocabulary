@@ -11,6 +11,8 @@ import { findVoice } from '@/hooks/vocabulary-playback/speech-playback/findVoice
 import { getSupabaseClient } from '@/lib/supabaseClient';
 import { cleanSpeechText } from '@/utils/speech';
 import { trackUiInteraction, trackWordSearch } from '@/services/analyticsService';
+import { searchVocabulary } from '@/services/search/vocabularySearch';
+import { localWordToResult, mergeSearchResults } from '@/services/search/mergeSearchResults';
 
 interface WordSearchModalProps {
   isOpen: boolean;
@@ -37,6 +39,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   const [results, setResults] = useState<VocabularySearchResult[]>([]);
   const [selectedWord, setSelectedWord] = useState<VocabularySearchResult | null>(null);
   const [noResults, setNoResults] = useState(false);
+  const [serverUnavailable, setServerUnavailable] = useState(false);
   const previewVoice: VoiceSelection = {
     label: 'US',
     region: 'US',
@@ -51,6 +54,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setSelectedWord(null);
       setResults([]);
       setNoResults(false);
+      setServerUnavailable(false);
       setLoading(false);
       trackUiInteraction('search_modal_viewed', {
         context: { has_initial_query: Boolean(initialQuery) },
@@ -120,6 +124,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setSelectedWord(null);
       setLoading(false);
       setNoResults(false);
+      setServerUnavailable(false);
       return;
     }
 
@@ -131,6 +136,34 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       setResults([]);
       setSelectedWord(null);
       setNoResults(false);
+      setServerUnavailable(false);
+      // The active word set (built-in or imported) is searchable on the device itself.
+      let localResults: ReturnType<typeof localWordToResult>[] = [];
+      try {
+        localResults = searchVocabulary(trimmed).map(localWordToResult);
+      } catch (localError) {
+        console.warn('Local vocabulary search failed', localError);
+      }
+      const showLocalOnly = (source: string) => {
+        setServerUnavailable(true);
+        if (localResults.length > 0) {
+          setResults(localResults);
+          setNoResults(false);
+        } else {
+          setResults([]);
+          setSelectedWord(null);
+          setNoResults(true);
+        }
+        trackWordSearch({
+          query: trimmed,
+          resultCount: localResults.length,
+          source,
+          durationMs:
+            startedAt != null && typeof performance !== 'undefined'
+              ? Math.round(performance.now() - startedAt)
+              : null,
+        });
+      };
       try {
         const supabase = getSupabaseClient();
         const { data, error } = await supabase.rpc('search_vocabulary', {
@@ -141,20 +174,11 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
 
         if (error) {
           console.error('Failed to fetch vocabulary search results', error);
-          setNoResults(true);
-          trackWordSearch({
-            query: trimmed,
-            resultCount: 0,
-            source: 'modal_error',
-            durationMs:
-              startedAt != null && typeof performance !== 'undefined'
-                ? Math.round(performance.now() - startedAt)
-                : null,
-          });
+          showLocalOnly('modal_error');
           return;
         }
 
-        const nextResults = Array.isArray(data) ? data : [];
+        const nextResults = mergeSearchResults(localResults, Array.isArray(data) ? data : []);
         if (nextResults.length === 0) {
           setNoResults(true);
           trackWordSearch({
@@ -183,18 +207,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
       } catch (err) {
         if (!isCancelled) {
           console.error('Failed to fetch vocabulary search results', err);
-          setResults([]);
-          setSelectedWord(null);
-          setNoResults(true);
-          trackWordSearch({
-            query: trimmed,
-            resultCount: 0,
-            source: 'modal_exception',
-            durationMs:
-              startedAt != null && typeof performance !== 'undefined'
-                ? Math.round(performance.now() - startedAt)
-                : null,
-          });
+          showLocalOnly('modal_exception');
         }
       } finally {
         if (!isCancelled) {
@@ -280,6 +293,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
     setResults([]);
     setSelectedWord(null);
     setNoResults(false);
+    setServerUnavailable(false);
     setLoading(false);
     onClose();
   };
@@ -295,7 +309,7 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent
-        className="sm:max-w-md max-h-[90vh] top-[5%] sm:top-[10%] md:top-1/2 translate-y-0 md:translate-y-[-50%]"
+        className="sm:max-w-md"
       >
         <DialogHeader>
           <DialogTitle>Quick Search</DialogTitle>
@@ -325,6 +339,11 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
                 <Loader className="h-4 w-4 animate-spin" />
               </div>
             )}
+            {!loading && results.length === 0 && !debouncedQuery.trim() && (
+              <p className="p-3 text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+                Type a word to look it up.
+              </p>
+            )}
             {results.map((item) => {
               const isSelected = selectedWord?.word_id === item.word_id;
               return (
@@ -350,6 +369,13 @@ const WordSearchModal: React.FC<WordSearchModalProps> = ({ isOpen, onClose, init
               );
             })}
           </ScrollArea>
+
+          {serverUnavailable && !loading && (
+            <p role="status" className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
+              Couldn&apos;t reach the online dictionary, so this only searched the word set on this device.
+              Check your connection to search everything.
+            </p>
+          )}
 
           {noResults && debouncedQuery.trim() && !loading && (
             <div>

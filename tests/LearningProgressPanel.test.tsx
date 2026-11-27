@@ -1,13 +1,23 @@
 /**
  * @vitest-environment jsdom
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, it, expect } from 'vitest';
+import { afterEach, describe, it, expect } from 'vitest';
 import { LearningProgressPanel } from '@/components/LearningProgressPanel';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 describe('LearningProgressPanel', () => {
+  afterEach(cleanup);
+  it('[FB-39] is expanded by default', () => {
+    render(
+      <TooltipProvider>
+        <LearningProgressPanel progressStats={{ total: 10, learning: 5, new: 3, due: 2, learned: 4 }} learnerId="t" progressError={null} />
+      </TooltipProvider>
+    );
+    expect(screen.getByText('Due Review')).toBeTruthy();
+  });
+
   it('renders learned stat', () => {
     const progressStats = { total: 10, learning: 5, new: 3, due: 2, learned: 4 };
 
@@ -21,8 +31,7 @@ describe('LearningProgressPanel', () => {
       </TooltipProvider>
     );
 
-    const triggers = screen.getAllByRole('button', { name: 'Learning Progress' });
-    fireEvent.click(triggers[0]);
+    // [FB-39] open by default: no click needed
     const learnedLabel = screen.getByText('Learned');
     expect(learnedLabel.previousElementSibling?.textContent).toBe('4');
   });
@@ -41,9 +50,6 @@ describe('LearningProgressPanel', () => {
       </TooltipProvider>
     );
 
-    const triggers = screen.getAllByRole('button', { name: 'Learning Progress' });
-    await user.click(triggers[0]);
-    await user.click(triggers[1]);
     const dueTrigger = (await screen.findAllByRole('button', { name: /due review count/i }))[0];
     await user.click(dueTrigger);
 
@@ -63,9 +69,6 @@ describe('LearningProgressPanel', () => {
         />
       </TooltipProvider>
     );
-
-    const triggers = screen.getAllByRole('button', { name: 'Learning Progress' });
-    await userEvent.click(triggers[triggers.length - 1]);
 
     const notice = await screen.findByText(/Progress data unavailable\. Please check with your administrator\./i);
     expect(notice).toBeTruthy();

@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { ensureUserKey } from "@/lib/progress/srsSyncByUserKey";
 import { getProgressSummary } from "@/lib/progress/progressSummary";
+import { STUDY_TICK_EVENT } from "@/lib/progress/studyTick";
 import { calculateCurrentStreak, getRecentDays } from "@/lib/progress/streak";
 
 interface StreakPanelProps {
@@ -19,6 +20,13 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
   const [streakDays, setStreakDays] = useState(0);
   const [recentDays, setRecentDays] = useState<ReturnType<typeof getRecentDays>>([]);
   const [isLoading, setIsLoading] = useState(true);
+  // [FB-40] Re-read when studying starts today (no reload needed).
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const onTick = () => setTick((n) => n + 1);
+    window.addEventListener(STUDY_TICK_EVENT, onTick);
+    return () => window.removeEventListener(STUDY_TICK_EVENT, onTick);
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,7 +52,7 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
     return () => {
       isMounted = false;
     };
-  }, [refreshKey]);
+  }, [refreshKey, tick]);
 
   if (!isLoading && streakDays === 0 && recentDays.every((day) => !day.learned)) {
     // Nothing learned yet — avoid showing an empty "0-day streak" before the first session.
@@ -54,20 +62,17 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
   return (
     <Card
       className={cn(
-        "mt-3 w-full border-2 theme-card-surface theme-border",
+        "lv-section mt-3 w-full",
         className,
       )}
     >
-      <CardContent className="flex items-center justify-between gap-3 p-3">
+      <CardContent className="flex items-center justify-between gap-3 p-3 pl-5">
         <div className="flex items-center gap-2.5">
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-            style={{ background: "var(--lv-accent-soft)", color: "var(--lv-accent)" }}
-          >
+          <span className="lv-section-icon">
             <Flame className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <div className="text-sm font-semibold" style={{ color: "var(--lv-heading)" }}>
+            <div className="lv-section-title">
               {isLoading ? "…" : `${streakDays}-day streak`}
             </div>
             <div className="text-xs theme-muted-text">

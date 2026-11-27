@@ -1,0 +1,273 @@
+import { getKokoro, getKokoroState, isKokoroSupported, refreshKokoroStatus, subscribeKokoro } from './kokoro/kokoroTts';
+import { freeKokoroVoice, isProVoice } from './voiceAccess';
+import { hasFeature } from '@/services/billing/proFeatures';
+import { KOKORO_VOICES, getKokoroVoiceByName, mapRateToKokoroSpeed } from './kokoro/kokoroVoices';
+import { estimateReadingTimeMs } from './readingTime';
+import { buildSpeakOptions, loadNativeTts, pickVoiceIndex, shouldUseNativeTts, type NativeVoice } from './nativeTts';
+
+/**
+ * Provides `window.speechSynthesis` / `SpeechSynthesisUtterance` backed by the
+ * native TTS plugin, so the existing speech pipeline (which speaks through the
+ * Web Speech API) works unchanged in the Capacitor app. Installed only when
+ * running natively or when Web Speech is absent; plain browsers keep the real API.
+ */
+
+class ShimVoice {
+  default: boolean;
+  constructor(
+    public voiceURI: string,
+    public name: string,
+    public lang: string,
+    public localService: boolean,
+    isDefault: boolean,
+    public index: number,
+  ) {
+    this.default = isDefault;
+  }
+}
+
+class ShimUtterance extends EventTarget {
+  text: string;
+  lang = '';
+  voice: ShimVoice | null = null;
+  rate = 1;
+  pitch = 1;
+  volume = 1;
+  onstart: ((e: Event) => void) | null = null;
+  onend: ((e: Event) => void) | null = null;
+  onerror: ((e: Event) => void) | null = null;
+  onpause: ((e: Event) => void) | null = null;
+  onresume: ((e: Event) => void) | null = null;
+  onboundary: ((e: Event) => void) | null = null;
+  onmark: ((e: Event) => void) | null = null;
+  constructor(text = '') {
+    super();
+    this.text = String(text);
+  }
+  emit(type: string, extra: Record<string, unknown> = {}) {
+    const e = new Event(type);
+    Object.assign(e, { utterance: this, charIndex: 0, elapsedTime: 0, name: '' }, extra);
+    const handler = (this as unknown as Record<string, unknown>)['on' + type];
+    if (typeof handler === 'function') {
+      try { (handler as (e: Event) => void).call(this, e); } catch (err) { console.warn('[nativeTts] handler', err); }
+    }
+    this.dispatchEvent(e);
+  }
+}
+
+export const FAILED_SPEAK_DELAY_MS = 300;
+
+class ShimSynth extends EventTarget {
+  speaking = false;
+  pending = false;
+  paused = false;
+  onvoiceschanged: ((e: Event) => void) | null = null;
+  private voices: ShimVoice[] = [];
+  private systemVoices: ShimVoice[] = [];
+  private kokoroListed = false;
+  private kokoroUsed = false;
+  private raw: NativeVoice[] = [];
+  private queue: ShimUtterance[] = [];
+  private current: ShimUtterance | null = null;
+  private token = 0;
+  private loading = false;
+  private silentTimer: ReturnType<typeof setTimeout> | null = null;
+  private silentRelease: (() => void) | null = null;
+
+  constructor() {
+    super();
+    void this.loadVoices(6);
+    if (isKokoroSupported()) {
+      subscribeKokoro(() => {
+        if (getKokoroState().downloaded !== this.kokoroListed) this.rebuildVoices();
+      });
+      void refreshKokoroStatus();
+    }
+  }
+
+  /** Kokoro voices first (only when downloaded; Heart is the default), then the device's system voices. */
+  private rebuildVoices(): void {
+    const withKokoro = isKokoroSupported() && getKokoroState().downloaded;
+    this.kokoroListed = withKokoro;
+    const extra = withKokoro
+      ? KOKORO_VOICES.map((v, i) => new ShimVoice(`kokoro:${v.id}`, v.name, 'en-US', true, false, -1 - i))
+      : [];
+    // system voices keep their native index (used to select them when speaking), whatever their list position
+    this.voices = [...extra, ...this.systemVoices];
+    this.fireVoicesChanged();
+  }
+
+  private async loadVoices(retries: number): Promise<void> {
+    if (this.loading) return;
+    this.loading = true;
+    try {
+      const h = await loadNativeTts();
+      const res = h ? await h.tts.getSupportedVoices() : null;
+      const list = (res?.voices ?? []) as NativeVoice[];
+      if (list.length) {
+        this.raw = list;
+        this.systemVoices = list.map((v, i) => new ShimVoice(v.voiceURI || v.name, v.name, v.lang, v.localService, v.default, i));
+        this.rebuildVoices();
+      } else if (retries > 0) {
+        setTimeout(() => { this.loading = false; void this.loadVoices(retries - 1); }, 1000);
+        return;
+      }
+    } catch {
+      /* no native voices available */
+    }
+    this.loading = false;
+  }
+
+  private fireVoicesChanged() {
+    const e = new Event('voiceschanged');
+    if (typeof this.onvoiceschanged === 'function') this.onvoiceschanged(e);
+    this.dispatchEvent(e);
+  }
+
+  getVoices(): SpeechSynthesisVoice[] {
+    return this.voices as unknown as SpeechSynthesisVoice[];
+  }
+
+  speak(u: SpeechSynthesisUtterance): void {
+    this.queue.push(u as unknown as ShimUtterance);
+    this.pending = true;
+    if (!this.current && !this.paused) void this.next();
+  }
+
+  private async next(): Promise<void> {
+    const u = this.queue.shift();
+    this.pending = this.queue.length > 0;
+    if (!u) return;
+    this.current = u;
+    this.speaking = true;
+    const my = ++this.token;
+    u.emit('start');
+    // FB-30: the Kokoro plugin (and some Android engines) ignore `volume`, so a muted utterance (volume 0) must never
+    // reach an engine. Keep the reading time silently so auto-advance continues, then end as usual.
+    if (u.volume === 0) {
+      await this.silentWait(estimateReadingTimeMs(u.text));
+      if (my !== this.token) return;
+      this.current = null;
+      this.speaking = false;
+      u.emit('end');
+      if (!this.paused) void this.next();
+      return;
+    }
+    let errorType: string | null = null;
+    try {
+      let kv = getKokoroVoiceByName(u.voice?.name);
+      // Never speak a Pro voice for a free user (stale selection, saved favorite): Heart if ready, else the system voice.
+      if (kv && isProVoice(kv) && !hasFeature('maleVoice')) kv = getKokoroState().downloaded ? freeKokoroVoice() : undefined;
+      let spoken = false;
+      if (kv) {
+        this.kokoroUsed = true;
+        try {
+          const k = getKokoro();
+          if (!k) throw new Error('kokoro-missing');
+          if (my !== this.token) return;
+          await k.plugin.speak({ text: u.text, voice: kv.id, speed: mapRateToKokoroSpeed(u.rate, kv) });
+          spoken = true;
+        } catch (err) {
+          console.warn('[nativeTts] Kokoro failed, using the system voice', (err as { code?: string })?.code || (err as Error)?.message);
+          if ((err as { code?: string })?.code === 'NOT_DOWNLOADED') void refreshKokoroStatus();
+          if (my !== this.token) return; // cancelled meanwhile
+        }
+      } else if (this.kokoroUsed) {
+        this.kokoroUsed = false;
+        try { void getKokoro()?.plugin.release().catch(() => {}); } catch { /* ignore */ }
+      }
+      if (!spoken) {
+        const h = await loadNativeTts();
+        if (!h) throw new Error('not-supported');
+        if (my !== this.token) return; // cancelled/muted while the plugin loaded: never start late audio
+        const voiceIdx = kv ? pickVoiceIndex(this.raw, 'en-US') : pickVoiceIndex(this.raw, u.lang, u.voice?.name);
+        await h.tts.speak(buildSpeakOptions(u, kv ? voiceIdx : u.voice ? u.voice.index : voiceIdx));
+      }
+    } catch (err) {
+      errorType = String((err as Error)?.message) === 'not-supported' ? 'synthesis-unavailable' : 'synthesis-failed';
+    }
+    // A failing engine rejects within microtasks. Settle on a real timer so a caller that
+    // re-speaks from onerror cannot starve the event loop (page freeze, REG-02/EDGE-10).
+    if (errorType) await new Promise((r) => setTimeout(r, FAILED_SPEAK_DELAY_MS));
+    // cancel()/pause() already settled state and events for a superseded utterance
+    if (my !== this.token) return;
+    this.current = null;
+    this.speaking = false;
+    if (errorType) u.emit('error', { error: errorType });
+    else u.emit('end');
+    if (!this.paused) void this.next();
+  }
+
+  private silentWait(ms: number): Promise<void> {
+    return new Promise((resolve) => {
+      const done = () => {
+        if (this.silentTimer) clearTimeout(this.silentTimer);
+        this.silentTimer = null;
+        this.silentRelease = null;
+        resolve();
+      };
+      this.silentRelease = done;
+      this.silentTimer = setTimeout(done, ms);
+    });
+  }
+
+  cancel(): void {
+    const had = this.current;
+    this.queue = [];
+    this.pending = false;
+    this.paused = false;
+    this.token++;
+    this.current = null;
+    this.speaking = false;
+    this.silentRelease?.();
+    void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
+    this.stopKokoro();
+    // Browsers fire the cancel error asynchronously; doing it synchronously let
+    // onerror -> speak -> cancel recurse without yielding.
+    if (had) setTimeout(() => had.emit('error', { error: 'canceled' }), 0);
+  }
+
+  private stopKokoro(): void {
+    if (!this.kokoroUsed) return;
+    try { void getKokoro()?.plugin.stop().catch(() => {}); } catch { /* ignore */ }
+  }
+
+  pause(): void {
+    // Native engine can't pause mid-utterance: stop, and replay the utterance on resume.
+    if (!this.current || this.paused) return;
+    this.paused = true;
+    const u = this.current;
+    this.queue.unshift(u);
+    this.token++;
+    this.current = null;
+    this.speaking = false;
+    this.silentRelease?.();
+    void loadNativeTts().then((h) => h?.tts.stop()).catch(() => {});
+    this.stopKokoro();
+    u.emit('pause');
+  }
+
+  resume(): void {
+    if (!this.paused) return;
+    this.paused = false;
+    const u = this.queue[0];
+    u?.emit('resume');
+    void this.next();
+  }
+}
+
+export function installNativeSpeechShim(): boolean {
+  if (typeof window === 'undefined') return false;
+  const present = typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance === 'function';
+  if (!shouldUseNativeTts(present)) return false;
+  try {
+    const synth = new ShimSynth();
+    Object.defineProperty(window, 'speechSynthesis', { value: synth, configurable: true, writable: true });
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: ShimUtterance, configurable: true, writable: true });
+    Object.defineProperty(window, 'SpeechSynthesisVoice', { value: ShimVoice, configurable: true, writable: true });
+    return true;
+  } catch (err) {
+    console.warn('[nativeTts] shim install failed', err);
+    return false;
+  }
+}

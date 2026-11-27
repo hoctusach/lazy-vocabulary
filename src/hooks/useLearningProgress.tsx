@@ -7,6 +7,7 @@ import {
   markWordAsNew as markWordAsNewService,
   getModeForSeverity,
   getCountForSeverity,
+  appendTodayWords,
   type TodaySelectionState,
   type TodaySelectionWithStats,
 } from '@/services/learningProgressService';
@@ -20,6 +21,8 @@ import {
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
+import { planBuiltinSelection } from '@/features/word-sets/mixQueue';
+import { BUILTIN_GROUPS } from '@/features/word-sets/vocabularySetStore';
 import { buildTodaysWords } from '@/utils/todayWords';
 import {
   identifyUser,
@@ -30,6 +33,9 @@ import {
 } from '@/services/analyticsService';
 import { getNicknameLocal } from '@/lib/nickname';
 import { formatDateKey } from '@/utils/dateKey';
+import { isInActiveSet, pickTopUp, toTodaySummary } from '@/services/dailyTopUp';
+import { topUpNeeded } from '@/lib/progress/dailyTarget';
+import { localKey } from '@/lib/progress/streak';
 import {
   DAILY_SELECTION_KEY,
   LAST_SELECTION_DATE_KEY,
@@ -58,15 +64,32 @@ function toStats(summary: DerivedProgressSummary | null): typeof DEFAULT_STATS {
   };
 }
 
-export const useLearningProgress = () => {
+export interface UseLearningProgressOptions {
+  /**
+   * Built-in groups the learner is mixing (multi-set selection). Omitted = all six, i.e. the
+   * original behaviour. One group -> p_category = that group. 2-5 groups -> RPC with NULL and the
+   * rows are filtered client-side. None -> the RPC is never called.
+   */
+  builtinGroups?: readonly string[];
+}
+
+export const useLearningProgress = (options: UseLearningProgressOptions = {}) => {
+  const groupsKey = (options.builtinGroups ?? BUILTIN_GROUPS).join('|');
+  const plan = useMemo(
+    () => planBuiltinSelection(groupsKey ? groupsKey.split('|') : []),
+    [groupsKey]
+  );
+  const category = plan.category;
+  const filterGroups = plan.filterGroups;
+  const filterKey = filterGroups ? filterGroups.join('|') : '';
   const [userKey, setUserKey] = useState<string | null>(null);
   const [severity, setSeverity] = useState<SeverityLevel>('light');
-  const [category] = useState<string | null>(null);
   const [dailySelection, setDailySelection] = useState<DailySelection | null>(null);
   const [todayWords, setTodayWords] = useState<TodayWord[]>([]);
   const [progressStats, setProgressStats] = useState(DEFAULT_STATS);
   const learnedCountRef = useRef<number | null>(null);
   const [learnedWords, setLearnedWords] = useState<LearnedWordSummary[]>([]);
+  const [learnedTodayWords, setLearnedTodayWords] = useState<LearnedWordSummary[]>([]);
   const [newTodayLearnedWords, setNewTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [dueTodayLearnedWords, setDueTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
@@ -161,6 +184,7 @@ export const useLearningProgress = () => {
         setDailySelection(null);
         setTodayWords([]);
         setLearnedWords([]);
+        setLearnedTodayWords([]);
         setNewTodayLearnedWords([]);
         setDueTodayLearnedWords([]);
         setProgressStats(applyLearnedOverride(null));
@@ -175,6 +199,7 @@ export const useLearningProgress = () => {
       setDailySelection(null);
       setTodayWords([]);
       setLearnedWords([]);
+        setLearnedTodayWords([]);
       setNewTodayLearnedWords([]);
       setDueTodayLearnedWords([]);
       setProgressStats(applyLearnedOverride(null));
@@ -220,6 +245,15 @@ export const useLearningProgress = () => {
     let isActive = true;
 
     const initForUser = async () => {
+      if (!plan.call) {
+        // No built-in group selected: never touch the daily-selection RPC.
+        learnedCountRef.current = null;
+        setDailySelection(null);
+        setTodayWords([]);
+        setProgressError(null);
+        setIsDailySelectionLoading(false);
+        return;
+      }
       setIsDailySelectionLoading(true);
       try {
         await bootstrapLearnedFromServerByKey();
@@ -242,7 +276,9 @@ export const useLearningProgress = () => {
         const count = getCountForSeverity(preferredSeverity);
 
         try {
-          const result = await getOrCreateTodayWords(userKey, mode, count, category ?? null);
+          const result = filterGroups
+            ? await getOrCreateTodayWords(userKey, mode, count, category ?? null, filterGroups)
+            : await getOrCreateTodayWords(userKey, mode, count, category ?? null);
           if (!isActive) return;
           setDailySelection(result.selection);
           setTodayWords(result.words);
@@ -255,6 +291,7 @@ export const useLearningProgress = () => {
           learnedCountRef.current =
             result.summary?.source === 'server' ? null : result.learnedWords.length;
           setLearnedWords(result.learnedWords);
+          setLearnedTodayWords(result.learnedTodayWords);
           setNewTodayLearnedWords(result.newTodayWords);
           setDueTodayLearnedWords(result.dueTodayWords);
           setProgressStats(applyLearnedOverride(result.summary ?? null));
@@ -266,6 +303,7 @@ export const useLearningProgress = () => {
           setTodayWords([]);
           learnedCountRef.current = null;
           setLearnedWords([]);
+        setLearnedTodayWords([]);
           setNewTodayLearnedWords([]);
           setDueTodayLearnedWords([]);
           setProgressStats(applyLearnedOverride(null));
@@ -277,6 +315,7 @@ export const useLearningProgress = () => {
         setTodayWords([]);
         learnedCountRef.current = null;
         setLearnedWords([]);
+        setLearnedTodayWords([]);
         setNewTodayLearnedWords([]);
         setDueTodayLearnedWords([]);
         setProgressStats(applyLearnedOverride(null));
@@ -292,11 +331,11 @@ export const useLearningProgress = () => {
     return () => {
       isActive = false;
     };
-  }, [applyLearnedOverride, category, emitDailySelectionEvent, userKey]);
+  }, [applyLearnedOverride, category, emitDailySelectionEvent, filterKey, plan.call, userKey]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {
-      if (!userKey) return;
+      if (!userKey || !plan.call) return;
       try {
         const mode = getModeForSeverity(level);
         const count = getCountForSeverity(level);
@@ -306,6 +345,7 @@ export const useLearningProgress = () => {
           mode,
           count,
           category: category ?? null,
+          filterGroups,
         });
         setSeverity(level);
         setDailySelection(result.selection);
@@ -320,6 +360,7 @@ export const useLearningProgress = () => {
         learnedCountRef.current =
           result.summary?.source === 'server' ? null : result.learnedWords.length;
         setLearnedWords(result.learnedWords);
+        setLearnedTodayWords(result.learnedTodayWords);
         setNewTodayLearnedWords(result.newTodayWords);
         setDueTodayLearnedWords(result.dueTodayWords);
         setProgressStats(applyLearnedOverride(result.summary ?? null));
@@ -330,11 +371,11 @@ export const useLearningProgress = () => {
         setIsDailySelectionLoading(false);
       }
     },
-    [applyLearnedOverride, category, emitDailySelectionEvent, userKey]
+    [applyLearnedOverride, category, emitDailySelectionEvent, filterGroups, plan.call, userKey]
   );
 
   const regenerateToday = useCallback(async () => {
-    if (!userKey) return;
+    if (!userKey || !plan.call) return;
     const mode = getModeForSeverity(severity);
     const count = getCountForSeverity(severity);
     try {
@@ -344,6 +385,7 @@ export const useLearningProgress = () => {
         mode,
         count,
         category: category ?? null,
+        filterGroups,
       });
       setDailySelection(result.selection);
       setTodayWords(result.words);
@@ -356,6 +398,7 @@ export const useLearningProgress = () => {
       learnedCountRef.current =
         result.summary?.source === 'server' ? null : result.learnedWords.length;
       setLearnedWords(result.learnedWords);
+      setLearnedTodayWords(result.learnedTodayWords);
       setNewTodayLearnedWords(result.newTodayWords);
       setDueTodayLearnedWords(result.dueTodayWords);
       setProgressStats(applyLearnedOverride(result.summary ?? null));
@@ -365,7 +408,7 @@ export const useLearningProgress = () => {
     } finally {
       setIsDailySelectionLoading(false);
     }
-  }, [applyLearnedOverride, category, emitDailySelectionEvent, severity, userKey]);
+  }, [applyLearnedOverride, category, emitDailySelectionEvent, filterGroups, plan.call, severity, userKey]);
 
   const markWordAsPlayed = useCallback((word: string) => {
     const nowIso = new Date().toISOString();
@@ -442,8 +485,6 @@ export const useLearningProgress = () => {
       if (!currentState) return;
       try {
         const result = await markWordReviewed(userKey, target.word_id, severity, currentState);
-        setDailySelection(result.selection);
-        setTodayWords(result.words);
         trackWordLearned(userKey, {
           wordId: target.word_id,
           category: target.category,
@@ -460,20 +501,52 @@ export const useLearningProgress = () => {
           }
           setLearnedWords(result.learnedWords);
         }
-        if (result.newTodayWords) {
-          setNewTodayLearnedWords(result.newTodayWords);
-        }
-        if (result.dueTodayWords) {
-          setDueTodayLearnedWords(result.dueTodayWords);
-        }
         if (result.summary) {
           setProgressStats(applyLearnedOverride(result.summary));
         }
+
+        // [FB-51] The word leaves NEW/DUE and joins LEARNED-today (it still counts toward today's 20).
+        const same = (entry: { word: string }) => entry.word === target.word;
+        const nowIso = new Date().toISOString();
+        const nextLearnedToday = [
+          { word: target.word, category: target.category, learnedDate: nowIso },
+          ...learnedTodayWords.filter((entry) => !same(entry)),
+        ];
+        let nextNew = newTodayLearnedWords.filter((entry) => !same(entry));
+        let nextDue = dueTodayLearnedWords.filter((entry) => !same(entry));
+        let nextState = { ...currentState, words: result.words, selection: result.selection };
+
+        // ...and if today is now short (active + learned today < 20), top up on the device: Due first, then New.
+        const need = topUpNeeded(result.words.length, nextLearnedToday.length);
+        if (need > 0) {
+          const picked = pickTopUp({
+            need,
+            excludeWords: [
+              ...result.words.map((word) => word.word),
+              ...nextLearnedToday.map((entry) => entry.word),
+              ...learnedWords.map((entry) => entry.word),
+              ...(result.learnedWords ?? []).map((entry) => entry.word),
+            ],
+            groups: filterGroups ?? (category ? [category] : null),
+            seed: `${userKey}|${localKey(new Date())}`,
+          });
+          const extras = [...picked.due, ...picked.fresh];
+          if (extras.length > 0) {
+            nextState = appendTodayWords(nextState, extras, severity);
+            nextDue = [...nextDue, ...picked.due.map((word) => toTodaySummary(word, true))];
+            nextNew = [...nextNew, ...picked.fresh.map((word) => toTodaySummary(word, false))];
+          }
+        }
+        setDailySelection(nextState.selection);
+        setTodayWords(nextState.words);
+        setLearnedTodayWords(nextLearnedToday);
+        setNewTodayLearnedWords(nextNew);
+        setDueTodayLearnedWords(nextDue);
       } catch (error) {
         console.warn('[useLearningProgress] Failed to mark word learned', error);
       }
     },
-    [applyLearnedOverride, buildCurrentTodayState, severity, todayWords, userKey]
+    [applyLearnedOverride, buildCurrentTodayState, category, dueTodayLearnedWords, filterGroups, learnedTodayWords, learnedWords, newTodayLearnedWords, severity, todayWords, userKey]
   );
 
   const markWordAsNew = useCallback(
@@ -488,8 +561,9 @@ export const useLearningProgress = () => {
         setProgressError(null);
         learnedCountRef.current = result.summary.source === 'server' ? null : result.learnedWords.length;
         setLearnedWords(result.learnedWords);
-        setNewTodayLearnedWords(result.newTodayWords);
-        setDueTodayLearnedWords(result.dueTodayWords);
+        setLearnedTodayWords(result.learnedTodayWords);
+        setNewTodayLearnedWords(result.newTodayWords.filter(isInActiveSet));
+        setDueTodayLearnedWords(result.dueTodayWords.filter(isInActiveSet));
         setProgressStats(applyLearnedOverride(result.summary));
         const [idWord, idCategory] = wordId.split('::');
         const safeWord = (idWord ?? wordId).trim();
@@ -547,6 +621,7 @@ export const useLearningProgress = () => {
     regenerateToday,
     markWordAsPlayed,
     learnedWords,
+    learnedTodayWords,
     newTodayLearnedWords,
     dueTodayLearnedWords,
     markWordLearned,

@@ -19,9 +19,9 @@ const VoiceDebugPanel: React.FC = () => {
 
   useEffect(() => {
     loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
+    if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = loadVoices;
     return () => {
-      window.speechSynthesis.onvoiceschanged = null;
+      if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = null;
     };
   }, []);
 

@@ -1,4 +1,5 @@
 import { formatDateKey, toDateKeyFromISOString } from '@/utils/dateKey';
+import { localKey } from '@/lib/progress/streak';
 
 type Nullable<T> = T | null | undefined;
 
@@ -70,6 +71,25 @@ function matchesToday(value: Nullable<string>, today: Date, timezone: string | n
   const dateKey = toDateKeyFromISOString(iso, timezone);
   if (!dateKey) return false;
   return dateKey === formatDateKey(today, timezone);
+}
+
+/** Local calendar day (device) of a timestamp or a date-only string; null when unparseable. */
+export function localDayOf(value: Nullable<string>): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed; // server `date` column: already a calendar day
+  const parsed = Date.parse(trimmed);
+  return Number.isNaN(parsed) ? null : localKey(new Date(parsed));
+}
+
+/**
+ * [FB-51] True only for a word marked learned on `today` (local date). Prior-day learned rows (the RPC returns up to
+ * 100 historical ones) never qualify. A row without any usable date is NOT treated as today.
+ */
+export function isLearnedOnDay(row: LearnedWordRow, today: string): boolean {
+  if ((row?.srs_state ?? '').toLowerCase() !== 'learned') return false;
+  const day = localDayOf(row.mark_learned_at) ?? localDayOf(row.last_review_at);
+  return day === today;
 }
 
 function isDue(row: LearnedWordRow, now: Date): boolean {
@@ -165,6 +185,8 @@ export function computeLearnedWordStats(
   learnedWords: LearnedWordSummary[];
   newTodayWords: TodayLearnedWordSummary[];
   dueTodayWords: TodayLearnedWordSummary[];
+  /** [FB-51] Only words marked learned today (local date); `learnedWords` stays the all-time list. */
+  learnedTodayWords: LearnedWordSummary[];
   summary: DerivedProgressSummary;
 } {
   const now = options.now ?? new Date();
@@ -206,6 +228,12 @@ export function computeLearnedWordStats(
     .map(toLearnedSummary)
     .filter((value): value is LearnedWordSummary => value !== null);
 
+  const todayLocal = localKey(now);
+  const learnedTodayWords = learnedRows
+    .filter((row) => isLearnedOnDay(row, todayLocal))
+    .map(toLearnedSummary)
+    .filter((value): value is LearnedWordSummary => value !== null);
+
   const learnedCount = learnedRows.length;
   const learningCount = learningRows.length;
   const remainingCount = Math.max(totalWords - learnedCount - learningCount, 0);
@@ -213,12 +241,12 @@ export function computeLearnedWordStats(
   const summary: DerivedProgressSummary = {
     learned: learnedCount,
     learning: learningCount,
-    new: Math.max(totalWords - learningCount, 0),
+    new: remainingCount,
     due: dueRows.length,
     remaining: remainingCount,
     total: learnedCount + learningCount + remainingCount,
     source: 'client',
   };
 
-  return { learnedWords, newTodayWords, dueTodayWords, summary };
+  return { learnedWords, newTodayWords, dueTodayWords, learnedTodayWords, summary };
 }

@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Pause, Play, RefreshCw, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
+import EditableTranslation from '@/components/vocabulary-app/EditableTranslation';
 
 interface VocabularyCardProps {
   word: string;
@@ -87,11 +88,11 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
                 {mainWord}
               </h2>
               {wordType && (
-                <p className="text-sm text-purple-700 font-medium -mt-1">{wordType} {phoneticPart}</p>
+                <p className="text-sm text-[var(--lv-text-secondary)] font-medium -mt-1">{wordType} {phoneticPart}</p>
               )}
             </div>
             {isPaused && (
-              <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-medium">
+              <span className="text-xs bg-[var(--lv-accent-soft)] text-[var(--lv-example)] px-2 py-1 rounded-full font-medium">
                 Paused
               </span>
             )}
@@ -101,7 +102,6 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="italic"
             style={{ color: 'var(--lv-meaning)', fontSize: '1.25rem', textAlign: 'left', whiteSpace: 'pre-line' }}
           >
-            <span style={{ color: 'var(--lv-meaning)', fontStyle: 'italic' }}>* </span>
             {meaning}
           </div>
 
@@ -109,15 +109,10 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
             className="italic"
             style={{ color: 'var(--lv-example)', fontSize: '1rem', textAlign: 'left', whiteSpace: 'pre-line' }}
           >
-            <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
 
-          {translation && (
-            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
-              <em>* {translation}</em>
-            </div>
-          )}
+          <EditableTranslation word={word} category={category} translation={translation} editable={false} />
           
         </div>
       </CardContent>

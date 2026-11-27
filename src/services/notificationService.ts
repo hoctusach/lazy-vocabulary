@@ -117,7 +117,7 @@ class NotificationService {
       return;
     }
     
-    if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
       this.swRegistration.showNotification(options.title, {
         body: options.body,
         icon: '/favicon.ico',

@@ -63,20 +63,24 @@ const NotificationManager: React.FC<{ className?: string }> = ({ className }) =>
     }
   };
 
+  const label = enabled ? 'Reminders: on' : 'Reminders: off';
+
   return (
     <button
       type="button"
       onClick={handleClick}
-      className={`w-11 h-11 rounded-full border theme-border bg-[var(--lv-card-bg)] shadow-md flex items-center justify-center transition-transform duration-300 hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${className ?? ''}`}
+      data-testid="web-reminders-toggle"
+      className={`inline-flex min-h-11 max-w-full items-center gap-2 rounded-full border theme-border bg-[var(--lv-card-bg)] px-3 text-sm font-medium text-[var(--lv-text-primary)] shadow-sm transition-colors hover:bg-[var(--lv-card-highlight)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--lv-accent)] ${className ?? ''}`}
       title={enabled ? 'Daily reminders on' : 'Enable daily reminders'}
-      aria-label={enabled ? 'Daily reminders on' : 'Enable daily reminders'}
+      aria-label={enabled ? 'Reminders: on. Daily reminders on' : 'Reminders: off. Enable daily reminders'}
       aria-pressed={enabled}
     >
       {enabled ? (
-        <Bell className="h-5 w-5" style={{ color: 'var(--lv-accent)' }} />
+        <Bell className="h-5 w-5 shrink-0" aria-hidden="true" style={{ color: 'var(--lv-accent)' }} />
       ) : (
-        <BellOff className="h-5 w-5" style={{ color: 'var(--lv-text-secondary)' }} />
+        <BellOff className="h-5 w-5 shrink-0" aria-hidden="true" style={{ color: 'var(--lv-text-secondary)' }} />
       )}
+      <span className="truncate">{label}</span>
     </button>
   );
 };

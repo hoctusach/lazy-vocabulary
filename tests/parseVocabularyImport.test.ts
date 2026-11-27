@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
 import { parseVocabularyImport } from '@/features/word-sets/parseVocabularyImport';
-import { buildSampleCsv, buildSampleJson, buildSampleXlsx } from '@/features/word-sets/sampleTemplate';
+import { buildSampleCsv, buildSampleXlsx, SAMPLE_TEMPLATE_ROWS } from '@/features/word-sets/sampleTemplate';
 
 describe('parseVocabularyImport', () => {
   it('parses a CSV with the required columns and keeps the category', () => {
@@ -130,12 +130,12 @@ describe('parseVocabularyImport', () => {
     expect(result.errors[0]).toMatch(/word/i);
   });
 
-  it('round-trips the downloadable CSV, JSON, and Excel templates', () => {
+  it('round-trips the downloadable CSV and Excel templates (JSON is no longer offered but a supplied JSON file still parses)', () => {
     const csv = parseVocabularyImport({ fileName: 'vocabulary-set-template.csv', text: buildSampleCsv() });
     expect(csv.ok).toBe(true);
     if (csv.ok) expect(csv.wordCount).toBe(3);
 
-    const json = parseVocabularyImport({ fileName: 'vocabulary-set-template.json', text: buildSampleJson() });
+    const json = parseVocabularyImport({ fileName: 'vocabulary-set-template.json', text: JSON.stringify({ name: 'Sample set', words: SAMPLE_TEMPLATE_ROWS }) });
     expect(json.ok).toBe(true);
     if (json.ok) expect(json.sheets['phrasal verbs'][0].word).toBe('give up');
 

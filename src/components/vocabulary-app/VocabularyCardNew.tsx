@@ -2,8 +2,11 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getCategoryLabel } from '@/utils/categoryLabels';
+import ThemeMascot from '@/components/ThemeMascot';
 import WordCountDisplay from './WordCountDisplay';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
+import EditableTranslation from './EditableTranslation';
+import AdminWordEditor from '@/features/admin/AdminWordEditor';
 
 interface VocabularyCardNewProps {
   word: string;
@@ -13,6 +16,7 @@ interface VocabularyCardNewProps {
   backgroundColor: string;
   isSpeaking: boolean;
   category: string;
+  sourceId?: string;
   showWordCount?: boolean;
 }
 
@@ -24,6 +28,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   backgroundColor,
   isSpeaking,
   category,
+  sourceId,
   showWordCount = false
 }) => {
   const categoryLabel = getCategoryLabel(category);
@@ -34,17 +39,18 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
   return (
     <Card
       className={cn(
-        "w-full max-w-2xl mx-auto transition-all duration-500 ease-in-out border-2 theme-card-surface",
+        "lv-word-card w-full max-w-2xl mx-auto transition-all duration-500 ease-in-out border-2 theme-card-surface",
         isSpeaking && "ring-2 ring-[var(--lv-accent)]/50"
       )}
       style={{ background: backgroundColor }}
     >
       <CardContent className="p-4 sm:p-5">
+        <ThemeMascot className="lv-card-mascot" />
         <div className="space-y-2">
           {/* Category and Word Count */}
           <div className="flex items-center justify-between">
             <h3
-              className="text-sm font-medium px-3 py-1 rounded-full theme-card-highlight theme-muted-text border theme-border"
+              className="lv-category text-sm font-medium px-3 py-1 rounded-full theme-card-highlight theme-muted-text border theme-border"
             >
               {categoryLabel}
             </h3>
@@ -57,18 +63,19 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
           {/* Word */}
           <div className="text-left">
             <h1
-              className="font-bold"
+              className="lv-word-title font-bold"
               style={{ color: 'var(--lv-word-title)', fontSize: 'clamp(1.5rem, 5vw, 2rem)', textAlign: 'left', lineHeight: 1.25 }}
             >
               {main}
               {annotations.map((t, i) => (
-                <span key={i} className="ml-1 text-xs theme-muted-text">{t}</span>
+                <span key={i} className="lv-ipa ml-1 text-xs theme-muted-text">{t}</span>
               ))}
             </h1>
           </div>
 
           {/* Meaning - transparent background, left-aligned, smaller font */}
           <div
+            className="lv-meaning"
             style={{
               color: 'var(--lv-meaning)',
               fontSize: '1rem',
@@ -79,12 +86,12 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
               whiteSpace: 'pre-line'
             }}
           >
-            <span style={{ color: 'var(--lv-meaning)', fontStyle: 'italic' }}>* </span>
             {meaning}
           </div>
 
           {/* Example - transparent background, left-aligned, smaller font */}
           <div
+            className="lv-example"
             style={{
               color: 'var(--lv-example)',
               fontSize: '0.9rem',
@@ -94,14 +101,10 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
               whiteSpace: 'pre-line'
             }}
           >
-            <span style={{ color: 'var(--lv-example)', fontStyle: 'italic' }}>* </span>
             {example}
           </div>
-          {translation && (
-            <div style={{ fontStyle: 'italic', fontSize: '0.9em', textAlign: 'left', whiteSpace: 'pre-line' }}>
-              <em>* {translation}</em>
-            </div>
-          )}
+          <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} />
+          {(!sourceId || sourceId === 'default') && <AdminWordEditor word={word} meaning={meaning} example={example} translation={translation} category={category} />}
         </div>
       </CardContent>
     </Card>

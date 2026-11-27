@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 y
 node_modules
+capacitor-www
 # dist
 dist-ssr
 *.local
@@ -25,3 +26,5 @@ android/local.properties
 *.njsproj
 *.sln
 *.sw?
+e2e/fixtures/*
+!e2e/fixtures/generate.mjs
