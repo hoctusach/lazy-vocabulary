@@ -26,11 +26,54 @@ afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 const mount = () => render(<VocabularySetProvider><VocabularySetsScreen /></VocabularySetProvider>);
 const type = async (label: string, text: string) => { await userEvent.type(screen.getByLabelText(label), text); };
 
+describe('[FB-57] category is one of the six built-in names', () => {
+  const SIX = ['topic vocab', 'phrasal verbs', 'idioms', 'grammar', 'phrases, collocations', 'word formation'];
+  it('the list is exactly the six C1/C2 groups and matches BUILTIN_GROUPS', async () => {
+    const { MANUAL_CATEGORIES } = await import('@/features/word-sets/manualSet');
+    const { BUILTIN_GROUPS } = await import('@/features/word-sets/vocabularySetStore');
+    expect([...MANUAL_CATEGORIES]).toEqual(SIX);
+    expect([...BUILTIN_GROUPS]).toEqual(SIX);
+  });
+  it('accepts each of the six (case-insensitive input becomes the canonical string) and rejects anything else', () => {
+    for (const c of SIX) expect(validateManualWord({ word: 'w', meaning: 'm', category: c }, [])).toMatchObject({ ok: true, word: { category: c } });
+    expect(validateManualWord({ word: 'w', meaning: 'm', category: ' IDIOMS ' }, [])).toMatchObject({ ok: true, word: { category: 'idioms' } });
+    for (const bad of ['my words', 'greetings', 'phrases', 'collocations']) {
+      expect(validateManualWord({ word: 'w', meaning: 'm', category: bad }, [])).toMatchObject({ ok: false, errors: { category: expect.any(String) } });
+    }
+  });
+  it('the Create dialog and the add/edit form use a <select> of exactly those six, preselecting topic vocab', async () => {
+    mount();
+    await userEvent.click(screen.getByTestId('new-set-button'));
+    const sel = screen.getByTestId('manual-category') as HTMLSelectElement;
+    expect(sel.tagName).toBe('SELECT');
+    expect([...sel.options].map((o) => o.value)).toEqual(SIX);
+    expect(sel.value).toBe('topic vocab');
+    expect(document.querySelector('input#manual-category')).toBeNull(); // no free-text category
+    await type('Set name', 'Cats');
+    await type('Word', 'tabby');
+    await type('Meaning', 'a cat');
+    await userEvent.selectOptions(sel, 'idioms');
+    await userEvent.click(screen.getByTestId('create-set-submit'));
+    const id = listVocabularySets().find((s) => s.name === 'Cats')!.id;
+    expect(flattenSheets(getSetSheets(id))[0]).toMatchObject({ word: 'tabby', category: 'idioms' });
+    // add one by one: the select is there too; edit an existing word and change its category
+    const dlg = await screen.findByTestId('manage-set-dialog');
+    const add = within(dlg).getByTestId('manual-category') as HTMLSelectElement;
+    expect([...add.options].map((o) => o.value)).toEqual(SIX);
+    await userEvent.click(within(dlg).getByLabelText('Edit tabby'));
+    const edit = within(dlg).getByTestId('manual-category') as HTMLSelectElement;
+    expect(edit.value).toBe('idioms');
+    await userEvent.selectOptions(edit, 'grammar');
+    await userEvent.click(within(dlg).getByTestId('manual-word-submit'));
+    expect(flattenSheets(getSetSheets(id))[0]).toMatchObject({ word: 'tabby', category: 'grammar' });
+  });
+});
+
 describe('[FB-45] validation (pure)', () => {
-  it('requires word and meaning, trims everything, defaults the category', () => {
+  it('requires word and meaning, trims everything, defaults the category to topic vocab', () => {
     const r = validateManualWord({ word: '  hello  ', meaning: ' xin chào ', example: '  hi ', translation: ' t ' }, []);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.word).toMatchObject({ word: 'hello', meaning: 'xin chào', example: 'hi', translation: 't', category: 'my words' });
+    if (r.ok) expect(r.word).toMatchObject({ word: 'hello', meaning: 'xin chào', example: 'hi', translation: 't', category: 'topic vocab' });
     expect(validateManualWord({ word: '   ', meaning: 'x' }, [])).toMatchObject({ ok: false, errors: { word: expect.any(String) } });
     expect(validateManualWord({ word: 'a', meaning: '  ' }, [])).toMatchObject({ ok: false, errors: { meaning: expect.any(String) } });
   });
@@ -38,16 +81,17 @@ describe('[FB-45] validation (pure)', () => {
     expect(validateManualWord({ word: '!!!', meaning: 'x' }, [])).toMatchObject({ ok: false, errors: { word: expect.stringMatching(/letter or number/) } });
     expect(validateManualWord({ word: 'a', meaning: '???' }, [])).toMatchObject({ ok: false, errors: { meaning: expect.any(String) } });
     expect(validateManualWord({ word: 'a', meaning: 'b', category: '---' }, [])).toMatchObject({ ok: false, errors: { category: expect.any(String) } });
+    expect(validateManualWord({ word: 'a', meaning: 'b', category: 'my words' }, [])).toMatchObject({ ok: false, errors: { category: expect.any(String) } });
     expect(validateManualWord({ word: 'a'.repeat(101), meaning: 'b' }, [])).toMatchObject({ ok: false, errors: { word: expect.stringMatching(/100/) } });
     expect(validateManualWord({ word: 'a', meaning: 'b'.repeat(501) }, [])).toMatchObject({ ok: false, errors: { meaning: expect.stringMatching(/500/) } });
-    expect(validateManualWord({ word: 'a', meaning: 'b', category: 'c'.repeat(41) }, [])).toMatchObject({ ok: false, errors: { category: expect.stringMatching(/40/) } });
+    expect(validateManualWord({ word: 'a', meaning: 'b', category: 'c'.repeat(41) }, [])).toMatchObject({ ok: false, errors: { category: expect.any(String) } });
     expect(validateManualWord({ word: 'a', meaning: 'b', translation: 't'.repeat(501) }, [])).toMatchObject({ ok: false, errors: { translation: expect.any(String) } });
     expect(validateManualWord({ word: 'a', meaning: 'b', example: 'e'.repeat(1001) }, [])).toMatchObject({ ok: false, errors: { example: expect.any(String) } });
   });
   it('rejects a duplicate word+category (case-insensitive) but allows the same word in another category', () => {
-    const existing = [{ word: 'Hello', category: 'my words' }];
+    const existing = [{ word: 'Hello', category: 'topic vocab' }];
     expect(validateManualWord({ word: ' hello ', meaning: 'x' }, existing)).toMatchObject({ ok: false, errors: { word: expect.stringMatching(/already/) } });
-    expect(validateManualWord({ word: 'hello', meaning: 'x', category: 'greetings' }, existing).ok).toBe(true);
+    expect(validateManualWord({ word: 'hello', meaning: 'x', category: 'idioms' }, existing).ok).toBe(true);
   });
 });
 
@@ -65,10 +109,10 @@ describe('[FB-45] store: create / add / edit / remove, persisted', () => {
     expect(addManualWord(id, { word: 'beta', meaning: 'second', translation: 'thứ hai' }).ok).toBe(true);
     expect(addManualWord(id, { word: 'ALPHA', meaning: 'dup' })).toMatchObject({ ok: false });
     expect(listVocabularySets().find((s) => s.id === id)?.wordCount).toBe(2);
-    expect(updateManualWord(id, manualKey('beta', 'my words'), { word: 'beta', meaning: 'second!!', translation: '' }).ok).toBe(true);
+    expect(updateManualWord(id, manualKey('beta', 'topic vocab'), { word: 'beta', meaning: 'second!!', translation: '' }).ok).toBe(true);
     expect(flattenSheets(getSetSheets(id)).find((w) => w.word === 'beta')?.meaning).toBe('second!!');
-    expect(removeManualWord(id, manualKey('beta', 'my words')).ok).toBe(true);
-    expect(removeManualWord(id, manualKey('alpha', 'my words'))).toMatchObject({ ok: false, errors: { form: expect.stringMatching(/at least one word/) } });
+    expect(removeManualWord(id, manualKey('beta', 'topic vocab')).ok).toBe(true);
+    expect(removeManualWord(id, manualKey('alpha', 'topic vocab'))).toMatchObject({ ok: false, errors: { form: expect.stringMatching(/at least one word/) } });
     // survives a "reload": read straight from storage
     expect(flattenSheets(getSetSheets(id)).map((w) => w.word)).toEqual(['alpha']);
   });

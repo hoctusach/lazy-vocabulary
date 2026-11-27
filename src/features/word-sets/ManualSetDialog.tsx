@@ -6,7 +6,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useVocabularySets } from './VocabularySetContext';
 import { getSetSheets, flattenSheets } from './vocabularySetStore';
 import {
+  MANUAL_CATEGORIES,
   MANUAL_DEFAULT_CATEGORY,
+  canonicalManualCategory,
   MANUAL_LIMITS,
   MANUAL_SET_MAX_WORDS,
   manualKey,
@@ -14,7 +16,7 @@ import {
   type ManualWordInput,
 } from './manualSet';
 
-const EMPTY: Required<ManualWordInput> = { word: '', meaning: '', category: '', translation: '', example: '' };
+const EMPTY: Required<ManualWordInput> = { word: '', meaning: '', category: MANUAL_DEFAULT_CATEGORY, translation: '', example: '' };
 
 const FieldError: React.FC<{ id: string; message?: string }> = ({ id, message }) =>
   message ? (
@@ -82,7 +84,24 @@ export const ManualWordForm: React.FC<{
         <Field name="word" label="Word" value={value.word} error={errors.word} required max={MANUAL_LIMITS.word} onChange={set('word')} />
       )}
       <Field name="meaning" label="Meaning" value={value.meaning} error={errors.meaning} required max={MANUAL_LIMITS.meaning} multiline onChange={set('meaning')} />
-      <Field name="category" label="Category" value={value.category} error={errors.category} max={MANUAL_LIMITS.category} placeholder={MANUAL_DEFAULT_CATEGORY} onChange={set('category')} />
+      <div>
+        <label htmlFor="manual-category" className="text-sm font-medium">Category</label>
+        <select
+          id="manual-category"
+          aria-label="Category"
+          data-testid="manual-category"
+          value={canonicalManualCategory(value.category) ?? MANUAL_DEFAULT_CATEGORY}
+          aria-invalid={errors.category ? true : undefined}
+          aria-describedby={errors.category ? 'manual-category-error' : undefined}
+          className="mt-1 min-h-11 w-full rounded-md border bg-transparent px-2 text-base"
+          onChange={(e) => set('category')(e.target.value)}
+        >
+          {MANUAL_CATEGORIES.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+        <FieldError id="manual-category-error" message={errors.category} />
+      </div>
       <Field name="translation" label="Translation (optional)" value={value.translation} error={errors.translation} max={MANUAL_LIMITS.translation} multiline onChange={set('translation')} />
       <Field name="example" label="Example (optional)" value={value.example} error={errors.example} max={MANUAL_LIMITS.example} multiline onChange={set('example')} />
     </div>
@@ -148,7 +167,7 @@ export const ManageManualSetDialog: React.FC<{ setId: string | null; onClose: ()
     setEditing(manualKey(w.word, w.category));
     setErrors({});
     setJustAdded(null);
-    setWord({ word: w.word, meaning: w.meaning, category: w.category ?? '', translation: w.translation ?? '', example: w.example });
+    setWord({ word: w.word, meaning: w.meaning, category: canonicalManualCategory(w.category) ?? MANUAL_DEFAULT_CATEGORY, translation: w.translation ?? '', example: w.example });
   };
   const remove = (w: (typeof words)[number]) => {
     if (!setId) return;

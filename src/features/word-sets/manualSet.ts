@@ -3,7 +3,22 @@ import { LIMITS } from './parseVocabularyImport';
 
 /** [FB-45] Free users can build a set by hand. File import stays Pro. */
 export const MANUAL_SET_MAX_WORDS = 500;
-export const MANUAL_DEFAULT_CATEGORY = 'my words';
+/** [FB-57] Category is one of the six built-in groups (exact strings), never free text. Same list as BUILTIN_GROUPS. */
+export const MANUAL_CATEGORIES: readonly string[] = [
+  'topic vocab',
+  'phrasal verbs',
+  'idioms',
+  'grammar',
+  'phrases, collocations',
+  'word formation',
+];
+export const MANUAL_DEFAULT_CATEGORY = 'topic vocab';
+
+/** The canonical category for a typed/stored value (trim + case-insensitive), or null when it is not one of the six. */
+export function canonicalManualCategory(value: string | undefined | null): string | null {
+  const t = (value ?? '').trim().toLowerCase();
+  return MANUAL_CATEGORIES.find((c) => c === t) ?? null;
+}
 export const MANUAL_LIMITS = LIMITS; // same per-field limits as file import
 
 export type ManualWordInput = {
@@ -29,7 +44,7 @@ export function manualKey(word: string, category?: string): string {
 }
 
 /**
- * Validates one hand-typed word. All fields are trimmed; word + meaning required; category defaults to "my words";
+ * Validates one hand-typed word. All fields are trimmed; word + meaning required; category must be one of the six built-in groups (empty = "topic vocab");
  * junk (no letter or digit) rejected; limits match the importer; duplicates (word + category) rejected.
  * `editing` is the key of the word being edited so it does not collide with itself.
  */
@@ -41,7 +56,8 @@ export function validateManualWord(
   const errors: ManualFieldErrors = {};
   const word = trimField(input.word);
   const meaning = trimField(input.meaning);
-  const category = trimField(input.category) || MANUAL_DEFAULT_CATEGORY;
+  const rawCategory = trimField(input.category);
+  const category = rawCategory ? (canonicalManualCategory(rawCategory) ?? rawCategory) : MANUAL_DEFAULT_CATEGORY;
   const translation = trimField(input.translation);
   const example = trimField(input.example);
 
@@ -53,8 +69,7 @@ export function validateManualWord(
   else if (!hasLetterOrDigit(meaning)) errors.meaning = 'The meaning needs at least one letter or number.';
   else if (Array.from(meaning).length > LIMITS.meaning) errors.meaning = `Meaning can be at most ${LIMITS.meaning} characters.`;
 
-  if (!hasLetterOrDigit(category)) errors.category = 'Category needs at least one letter or number.';
-  else if (Array.from(category).length > LIMITS.category) errors.category = `Category can be at most ${LIMITS.category} characters.`;
+  if (!MANUAL_CATEGORIES.includes(category)) errors.category = 'Pick a category from the list.';
 
   if (Array.from(translation).length > LIMITS.translation) errors.translation = `Translation can be at most ${LIMITS.translation} characters.`;
   if (Array.from(example).length > LIMITS.example) errors.example = `Example can be at most ${LIMITS.example} characters.`;
