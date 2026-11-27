@@ -25,7 +25,7 @@ export const SAMPLE_TEMPLATE_ROWS = [
   },
 ];
 
-/** Built-in group names, exact strings (same as the Word Set groups). [FB-44] */
+/** Built-in group names, exact strings (same as the C1, C2 groups). [FB-44] */
 export const BUILTIN_CATEGORY_NAMES = [
   'topic vocab',
   'phrasal verbs',
@@ -38,14 +38,16 @@ export const BUILTIN_CATEGORY_NAMES = [
 /** Sheet names the Excel importer ignores (documentation only). */
 export const HELP_SHEET_NAMES = ['readme', '_help'];
 
-/** Plain-language notes shown next to the template buttons and embedded in the JSON/XLSX templates. */
+/** Short help lines shown on the Library screen (one per line) and in the Excel example file. [FB-44][FB-60] */
 export const CATEGORY_HELP_LINES: string[] = [
-  'Required columns/fields: word, meaning. Optional: example, translation, category.',
-  `category: the built-in group names are exactly: ${BUILTIN_CATEGORY_NAMES.map((n) => `"${n}"`).join(', ')}.`,
-  'Any other category text is also accepted: it becomes its own group inside your imported set, so a tool that needs a custom group is not stuck.',
-  'A blank category falls back to "imported". In an Excel file without a category column, the sheet name is the category.',
-  'Keep text as plain UTF-8 (any language). CSV has no comments, so this note lives here and in the JSON/Excel templates.',
+  'Required columns: word, meaning',
+  'Optional: example, translation, category',
+  'Categories: topic vocab, phrasal verbs, idioms, grammar, phrases, collocations, word formation',
+  'Other category names make their own group. Blank means imported.',
 ];
+
+/** Extra note that only makes sense inside the Excel file. */
+const XLSX_EXTRA_NOTES: string[] = ['No category column? The sheet name is used as the category.'];
 
 const FIELDS = ['word', 'meaning', 'example', 'translation', 'category'] as const;
 
@@ -73,13 +75,8 @@ export function buildSampleXlsx(): ArrayBuffer {
   const book = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(book, sheet, 'words');
   // Help sheet: skipped by the importer (see HELP_SHEET_NAMES).
-  const help = XLSX.utils.aoa_to_sheet([['Notes'], ...CATEGORY_HELP_LINES.map((line) => [line])]);
+  const help = XLSX.utils.aoa_to_sheet([['Notes'], ...[...CATEGORY_HELP_LINES, ...XLSX_EXTRA_NOTES].map((line) => [line])]);
   XLSX.utils.book_append_sheet(book, help, 'README');
   const output = XLSX.write(book, { bookType: 'xlsx', type: 'array' }) as ArrayBuffer;
   return output;
-}
-
-export function buildSampleJson(): string {
-  // JSON has no comments: `_help` is a documentation-only field the importer ignores.
-  return `${JSON.stringify({ name: 'Sample set', _help: CATEGORY_HELP_LINES, words: SAMPLE_TEMPLATE_ROWS }, null, 2)}\n`;
 }

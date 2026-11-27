@@ -16,7 +16,7 @@ import { useProFeature } from '@/services/billing/proFeatures';
 import { openProUpgrade } from '@/services/billing/proUpgradeStore';
 import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
-import { buildSampleCsv, buildSampleJson, buildSampleXlsx, BUILTIN_CATEGORY_NAMES } from './sampleTemplate';
+import { buildSampleCsv, buildSampleXlsx, CATEGORY_HELP_LINES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
 import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
@@ -31,7 +31,7 @@ import {
   getSetSheets,
 } from './vocabularySetStore';
 
-const ACCEPT = '.csv,.xlsx,.xls,.json,text/csv,application/json,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+const ACCEPT = '.csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
 /** Native checkbox with a real tri-state (indeterminate) for the "select all built-in" parent. */
 const Checkbox: React.FC<{
@@ -146,9 +146,6 @@ const VocabularySetsScreen: React.FC = () => {
   const downloadCsv = async () => {
     await saveTextFile('vocabulary-set-template.csv', buildSampleCsv(), 'text/csv');
   };
-  const downloadJson = async () => {
-    await saveTextFile('vocabulary-set-template.json', buildSampleJson(), 'application/json');
-  };
   const downloadXlsx = async () => {
     const bytes = buildSampleXlsx();
     await saveBlob(
@@ -161,7 +158,7 @@ const VocabularySetsScreen: React.FC = () => {
     <section className="space-y-4" data-screen="word-sets">
       <div>
         <h2 className="text-xl font-semibold" style={{ color: 'var(--lv-heading)' }}>
-          Word sets
+          Library
         </h2>
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
           Tick what you want to learn. Learn only plays ticked sets.{' '}
@@ -211,7 +208,7 @@ const VocabularySetsScreen: React.FC = () => {
           <div>
             <h3 className="text-base font-semibold">Import a set</h3>
             <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
-              CSV, Excel or JSON with word and meaning columns.
+              Add many words at once from a CSV or Excel file.
             </p>
           </div>
           <Button
@@ -237,22 +234,19 @@ const VocabularySetsScreen: React.FC = () => {
             }}
           />
         </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-1">
-          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadCsv()}>
-            CSV template
+        <div className="mt-3 grid grid-cols-2 gap-2" data-testid="example-files-row">
+          <Button type="button" variant="outline" className="min-h-11" onClick={() => void downloadCsv()}>
+            Download CSV
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadXlsx()}>
-            Excel template
-          </Button>
-          <Button type="button" variant="ghost" size="sm" className="min-h-9 px-2 text-xs underline" onClick={() => void downloadJson()}>
-            JSON template
+          <Button type="button" variant="outline" className="min-h-11" onClick={() => void downloadXlsx()}>
+            Download Excel
           </Button>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground" data-testid="template-category-help">
-          Columns: word, meaning (required); example, translation, category (optional). Built-in category names:{' '}
-          {BUILTIN_CATEGORY_NAMES.map((n) => `"${n}"`).join(', ')}. Any other category text is allowed and becomes its own group
-          (blank = "imported"). The JSON and Excel templates include these notes.
-        </p>
+        <ul className="mt-3 space-y-0.5 text-xs text-muted-foreground" data-testid="template-category-help">
+          {CATEGORY_HELP_LINES.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
         {errors.length > 0 && (
           <div
             role="alert"

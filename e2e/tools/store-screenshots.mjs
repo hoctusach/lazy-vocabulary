@@ -67,7 +67,7 @@ const setsStorage = {
   [`lv.vocabularySets.progress.${IMPORT_ID}`]: JSON.stringify({ learned: {}, learning: {} }),
   'lazyVoca.selectedSources.v1': JSON.stringify(['default:topic vocab', 'default:phrasal verbs', 'default:idioms', IMPORT_ID]),
 };
-await shot('05-sets.png', { theme: 'ocean', tab: 'Sets', extraStorage: setsStorage, after: async (p) => {
+await shot('05-sets.png', { theme: 'ocean', tab: 'Library', extraStorage: setsStorage, after: async (p) => {
   await p.evaluate(() => {
     // Hide transient toasts and the (tall) import card so the checklist + summary fit in one frame.
     document.querySelectorAll('[data-sonner-toaster], [data-sonner-toast], ol[role="region"]').forEach((n) => { n.style.display = 'none'; });

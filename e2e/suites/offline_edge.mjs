@@ -28,7 +28,7 @@ test('OFFLINE-03', 'Local features work with the network down', async ({ session
   await importFile(s, 'setB.csv'); await waitText(s, 'Imported 6 words into “setB”.');
   await U.cardBtn(s, 'setA', 'Rename'); await s.page.focus('input[aria-label="Set name"]'); await s.page.$eval('input[aria-label="Set name"]', (e) => e.select()); await s.page.keyboard.type('Offline A'); await click(s, { text: 'Save' }); await waitText(s, 'Set renamed.'); await sleep(600);
   await U.useOnly(s, 'Offline A');
-  await click(s, { text: 'CSV template' }); await s.page.waitForFunction(() => window.__downloads.length === 1, { timeout: 4000 });
+  await click(s, { text: 'Download CSV' }); await s.page.waitForFunction(() => window.__downloads.length === 1, { timeout: 4000 });
   await U.cardBtn(s, 'setB', 'Delete'); await click(s, { text: 'Delete set' }); await waitText(s, 'Set deleted.');
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await click(s, { text: 'Quiz me' }); await waitText(s, 'Question 1 of 5'); await click(s, { text: 'Close' });
   await tab(s, 'Learn'); await sleep(600);
@@ -86,7 +86,7 @@ test('REG-03', 'Signed-out Learn shows real words, never "No words in ..." ', as
 
 // ---------- EDGE ----------
 test('EDGE-01', 'Very long (100 char, no spaces) word does not overflow Learn / Progress / Sets', async ({ session }) => {
-  const s = await session({}); await boot(s); await importFile(s, 'long_word.csv'); await waitText(s, 'was added to your selection'); await noHScroll(s, 'Sets');
+  const s = await session({}); await boot(s); await importFile(s, 'long_word.csv'); await waitText(s, 'was added to your selection'); await noHScroll(s, 'Library');
   await tab(s, 'Learn');
   for (let i = 0; i < 4; i++) { if (/^x{50}/.test((await word(s)) || '')) break; await sleep(500); await ctl(s, 'Next Word'); }
   ok(/^x{50}/.test((await word(s)) || ''), 'long word not shown'); await sleep(400); await noHScroll(s, 'Learn');
@@ -102,7 +102,7 @@ test('EDGE-02', 'Very long meaning/example: Learn, Quiz, Detail do not overflow'
 });
 test('EDGE-03', 'Long set name: header subtitle and Sets card do not overflow', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'Word_Set_Sixty_characters_long_name_for_the_header_overflow_test_x.csv'); await waitText(s, 'was added to your selection');
-  await noHScroll(s, 'Sets'); await tab(s, 'Learn'); await noHScroll(s, 'Learn header'); await tab(s, 'More'); await noHScroll(s, 'More');
+  await noHScroll(s, 'Library'); await tab(s, 'Learn'); await noHScroll(s, 'Learn header'); await tab(s, 'More'); await noHScroll(s, 'More');
 });
 test('EDGE-04', 'Unicode / Vietnamese / emoji words import and display intact', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'unicode.csv'); await waitText(s, 'Imported 4 words into “unicode”.'); await U.useOnly(s, 'unicode');
@@ -112,8 +112,8 @@ test('EDGE-04', 'Unicode / Vietnamese / emoji words import and display intact', 
 });
 test('EDGE-05', 'Rapid tab tapping 20x', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await s.page.evaluate(async () => { const names = ['Progress', 'Sets', 'More', 'Learn']; for (let i = 0; i < 20; i++) { [...document.querySelectorAll('nav[aria-label=Primary] button')].find((b) => b.textContent.trim() === names[i % 4]).click(); await new Promise((r) => setTimeout(r, 15)); } });
-  await sleep(800); await tab(s, 'Sets'); await waitText(s, 'Word sets');
+  await s.page.evaluate(async () => { const names = ['Progress', 'Library', 'More', 'Learn']; for (let i = 0; i < 20; i++) { [...document.querySelectorAll('nav[aria-label=Primary] button')].find((b) => b.textContent.trim() === names[i % 4]).click(); await new Promise((r) => setTimeout(r, 15)); } });
+  await sleep(800); await tab(s, 'Library'); await waitText(s, 'Create your own set');
 });
 test('EDGE-06', 'Rapid control taps 30x: state consistent, no overlapping utterances', async ({ session }) => {
   const s = await session({}); await boot(s);

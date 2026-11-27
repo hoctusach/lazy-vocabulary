@@ -57,15 +57,15 @@ test('E2E-SWEEP-01', 'Click every visible control on each tab and in each dialog
   const go = (name) => async () => { await dismiss(s); if (s.page.url().includes('/vocabulary/')) await s.page.goBack(); await tab(s, name); await sleep(150); };
   all.learn = await sweep(s, 'Learn', async () => { await go('Learn')(); await sleep(300); });
   all.progress = await sweep(s, 'Progress', go('Progress'));
-  all.sets = await sweep(s, 'Sets', async () => { await go('Sets')(); if (!(await U.setNames(s)).includes('setA')) { await importFile(s, 'setA.csv'); await sleep(300); } }, { skip: (it) => /^(Delete)$/.test(it.name) });
+  all.sets = await sweep(s, 'Library', async () => { await go('Library')(); if (!(await U.setNames(s)).includes('setA')) { await importFile(s, 'setA.csv'); await sleep(300); } }, { skip: (it) => /^(Delete)$/.test(it.name) });
   all.more = await sweep(s, 'More', go('More'));
   // dialogs: open each and click every control in it
   const openers = [
     ['Learned dialog', 'Learn', () => U.click(s, { label: 'Mark as Learned' })],
     ['Search', 'Learn', () => U.click(s, { label: 'Quick Search' })],
     ['Quiz', 'Progress', () => U.click(s, { text: 'Quiz me' })],
-    ['Rename', 'Sets', () => U.cardBtn(s, 'setA', 'Rename')],
-    ['Delete', 'Sets', async () => { if (!(await U.setNames(s)).includes('setA')) await importFile(s, 'setA.csv'); await U.cardBtn(s, 'setA', 'Delete'); }],
+    ['Rename', 'Library', () => U.cardBtn(s, 'setA', 'Rename')],
+    ['Delete', 'Library', async () => { if (!(await U.setNames(s)).includes('setA')) await importFile(s, 'setA.csv'); await U.cardBtn(s, 'setA', 'Delete'); }],
   ];
   for (const [name, tabName, open] of openers) {
     const prep = async () => { await dismiss(s); await tab(s, tabName); await sleep(200); await open(); await sleep(300); };

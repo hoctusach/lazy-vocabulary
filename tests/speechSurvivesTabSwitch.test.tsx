@@ -67,7 +67,7 @@ describe('[FB-01] tab switching never stops speech', () => {
   it('keeps the Learn player mounted and calls no stop/cancel through every tab round trip', () => {
     render(<Index />);
     expect(mounts.mount).toBe(1);
-    for (const t of ['Progress', 'Sets', 'More', 'Learn', 'Sets', 'Learn', 'Progress', 'More', 'Progress', 'Learn']) {
+    for (const t of ['Progress', 'Library', 'More', 'Learn', 'Library', 'Learn', 'Progress', 'More', 'Progress', 'Learn']) {
       act(() => go(t));
       expect(stops.controllerStop).not.toHaveBeenCalled();
       expect(stops.cancel).not.toHaveBeenCalled();

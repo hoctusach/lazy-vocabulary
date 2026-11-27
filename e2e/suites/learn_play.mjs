@@ -9,7 +9,7 @@ const W = POOL_ORDER;
 test('TAB-01', 'Four tabs present, >=44px, Learn current', async ({ session }) => {
   const s = await session({}); await boot(s);
   const r = await s.page.evaluate(() => [...document.querySelectorAll('nav[aria-label=Primary] button')].map((b) => ({ t: b.textContent.trim(), h: b.getBoundingClientRect().height, cur: b.getAttribute('aria-current') })));
-  eq(r.map((x) => x.t), ['Learn', 'Progress', 'Sets', 'More']);
+  eq(r.map((x) => x.t), ['Learn', 'Progress', 'Library', 'More']);
   ok(r.every((x) => x.h >= 44), 'tab heights ' + JSON.stringify(r));
   eq(r.find((x) => x.t === 'Learn').cur, 'page');
 });
@@ -21,8 +21,8 @@ test('TAB-02', 'Learn -> Progress shows progress panels and hides card/controls'
   ok(await s.page.evaluate(() => { const h = document.querySelector('[data-testid="learn-host"]'); return !!h && h.hidden && h.getBoundingClientRect().height === 0; }), 'learn card still visible');
 });
 test('TAB-03', 'Sets tab content', async ({ session }) => {
-  const s = await session({}); await boot(s); await tab(s, 'Sets');
-  await waitText(s, 'Word sets'); await waitText(s, 'Import a set'); await waitText(s, 'Word Set: C1, C2');
+  const s = await session({}); await boot(s); await tab(s, 'Library');
+  await waitText(s, 'Create your own set'); await waitText(s, 'Import a set'); await waitText(s, 'Word Set: C1, C2');
 });
 test('TAB-04', 'More tab content', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'More');
@@ -41,7 +41,7 @@ test('TAB-06', 'Auto-play keeps speaking across tab switches (no cancel, keeps a
   const cur = () => s.page.evaluate(() => !!window.__speech.current);
   const before = await speechInfo(s);
   ok(await cur(), 'should be speaking before switching');
-  for (const t of ['Progress', 'Sets', 'More', 'Learn', 'Progress', 'Learn', 'More', 'Sets', 'Progress', 'Learn']) {
+  for (const t of ['Progress', 'Library', 'More', 'Learn', 'Progress', 'Learn', 'More', 'Library', 'Progress', 'Learn']) {
     await tab(s, t); await sleep(120);
     const i = await speechInfo(s);
     eq(i.cancels, before.cancels, `speech cancelled when switching to ${t}`);
@@ -149,7 +149,7 @@ test('LEARN-07', 'Mark learned in imported set is local only and updates stats',
   const prog = JSON.parse(await s.ls('lv.vocabularySets.progress.' + id));
   ok(Object.keys(prog.learned || {}).some((k) => k.toLowerCase().includes(w.toLowerCase())), 'learned map: ' + JSON.stringify(prog).slice(0, 300));
   eq(s.fake.count('mark_word_learned_by_key'), 0, 'server call for imported set');
-  await tab(s, 'Sets'); await waitText(s, '1 learned on this device');
+  await tab(s, 'Library'); await waitText(s, '1 learned on this device');
 });
 skip('LEARN-09', 'Mark-as-New unreachable', 'product gap');
 test('LEARN-10', 'Due review word shows under DUE TODAY and in the Due tile', async ({ session }) => {

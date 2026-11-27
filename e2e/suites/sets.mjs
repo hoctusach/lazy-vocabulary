@@ -4,7 +4,7 @@ import { sleep } from '../lib/harness.mjs';
 import fs from 'node:fs'; import os from 'node:os'; import path from 'node:path';
 const { selectAll, ok, eq, waitText, click, body, boot, tab, importFile, setNames, metaSets, cardBtn, cardHas, cardText, waitAlert, alertText, fx, word, waitWord, ctl } = U;
 
-const start = async (s) => { await boot(s); await tab(s, 'Sets'); await waitText(s, 'Word sets'); };
+const start = async (s) => { await boot(s); await tab(s, 'Library'); await waitText(s, 'Create your own set'); };
 const importOk = async (s, f, n) => { await importFile(s, f); await waitText(s, 'was added to your selection'); if (n) await waitText(s, `Imported ${n} words into`); };
 const noSets = async (s) => eq((await metaSets(s)).length, 0, 'a set was created');
 const dataOf = async (s, i = 0) => { const m = await metaSets(s); return Object.values(JSON.parse(await s.ls('lv.vocabularySets.data.' + m[i].id))).flat(); };
@@ -42,12 +42,14 @@ test('SET-05', 'Import XLSX; multi-sheet workbook gives one category per sheet',
   const arr = await dataOf(s, 1);
   eq([...new Set(arr.map((w) => w.category))].sort(), ['Alpha', 'Beta']);
 });
-test('SET-06', 'Template downloads (CSV/Excel/JSON) have the right names and re-import', async ({ session }) => {
+test('SET-06', 'Example file downloads (Download CSV / Download Excel, in one row, no JSON/Template) have the right names and re-import [FB-60]', async ({ session }) => {
   const s = await session({ initScript: U.DOWNLOAD_HOOK }); await start(s);
-  for (const [btn, name] of [['CSV template', 'vocabulary-set-template.csv'], ['Excel template', 'vocabulary-set-template.xlsx'], ['JSON template', 'vocabulary-set-template.json']]) {
+  for (const [btn, name] of [['Download CSV', 'vocabulary-set-template.csv'], ['Download Excel', 'vocabulary-set-template.xlsx']]) {
     await click(s, { text: btn });
     await s.page.waitForFunction((n) => window.__downloads.some((d) => d.name === n), { timeout: 5000 }, name);
   }
+  const row = await s.page.evaluate(() => { const r = document.querySelector('[data-testid="example-files-row"]'); const b = [...r.querySelectorAll('button')]; const t = b.map((x) => x.getBoundingClientRect().top); return { n: b.length, sameRow: Math.abs(t[0] - t[1]) < 4, txt: document.body.innerText }; });
+  eq(row.n, 2); ok(row.sameRow, '[FB-60] CSV and Excel buttons share one row'); ok(!/JSON|Template/.test(row.txt.split('Import a set')[1]?.split('Selected')[0] ?? ''), '[FB-60] no JSON / Template wording in the import card');
   const dl = await s.page.evaluate(() => window.__downloads);
   const csv = Buffer.from(dl.find((d) => d.name.endsWith('.csv')).bytes).toString('utf8').trim().split('\n');
   eq(csv.length, 4, 'header + 3 rows'); ok(/word/.test(csv[0]) && /meaning/.test(csv[0]));
@@ -61,7 +63,7 @@ test('SET-06', 'Template downloads (CSV/Excel/JSON) have the right names and re-
 test('SET-08', 'Unsupported file types are rejected with a message', async ({ session }) => {
   const s = await session({}); await start(s);
   for (const f of ['notes.txt', 'pic.png', 'noext']) {
-    await U.pickFile(s, fx(f)); await waitAlert(s, /Unsupported file type\. Import a \.csv, \.xlsx, \.xls, or \.json file\./); 
+    await U.pickFile(s, fx(f)); await waitAlert(s, /Unsupported file type\. Import a \.csv, \.xlsx or \.xls file\./); 
   }
   await noSets(s);
 });
@@ -129,7 +131,7 @@ test('SET-19', 'Per-set progress isolation', async ({ session }) => {
   await U.useOnly(s, 'setA'); await tab(s, 'Learn');
   await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
-  await tab(s, 'Sets'); await waitText(s, '1 learned on this device');
+  await tab(s, 'Library'); await waitText(s, '1 learned on this device');
   ok((await cardText(s, 'setA')).includes('1 learned'), await cardText(s, 'setA'));
   ok((await cardText(s, 'setB')).includes('0 learned'), await cardText(s, 'setB'));
   ok(!(await cardText(s, 'Word Set: C1, C2')).includes('learned on this device'));
@@ -146,7 +148,7 @@ test('SET-20', 'Rename succeeds, updates card/header, persists', async ({ sessio
   await click(s, { text: 'Save' }); await waitText(s, 'Set renamed.');
   eq(await setNames(s), ['Word Set: C1, C2', 'My words']);
   ok((await s.page.evaluate(() => document.querySelector('header')?.innerText || '')).includes('My words'), 'header');
-  await s.reload(); await tab(s, 'Sets'); await waitText(s, 'My words');
+  await s.reload(); await tab(s, 'Library'); await waitText(s, 'My words');
 });
 test('SET-21', 'Rename validation: blank error, 60 cap, emoji + Vietnamese accepted', async ({ session }) => {
   const s = await session({}); await start(s);
@@ -200,7 +202,7 @@ test('SET-27', 'Selection persists across a reload and is mixed with imported se
   const s = await session({}); await start(s);
   await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection');
   await U.mix(s, ['idioms', 'grammar'], ['setA']);
-  await s.reload(); await tab(s, 'Sets'); await waitText(s, 'Word sets');
+  await s.reload(); await tab(s, 'Library'); await waitText(s, 'Create your own set');
   const id = (await metaSets(s))[0].id;
   eq(JSON.parse(await s.ls('lazyVoca.selectedSources.v1')), ['default:idioms', 'default:grammar', id]);
   eq(await U.boxChecked(s, 'Include setA'), true); eq(await U.boxChecked(s, 'Include grammar'), true); eq(await U.boxChecked(s, 'Include topic vocab'), false);
@@ -253,7 +255,7 @@ test('SET-MIX-03', 'Deleting a selected imported set keeps the rest of the selec
   const metas = await metaSets(s); const idB = metas.find((m) => m.name === 'setB').id;
   await cardBtn(s, 'setA', 'Delete'); await click(s, { text: 'Delete set' }); await waitText(s, 'Set deleted.');
   eq(JSON.parse(await s.ls('lazyVoca.selectedSources.v1')), ['default:idioms', idB]);
-  await s.reload(); await tab(s, 'Sets'); await waitText(s, 'Word sets');
+  await s.reload(); await tab(s, 'Library'); await waitText(s, 'Create your own set');
   eq(await U.boxChecked(s, 'Include setB'), true); eq(await U.boxChecked(s, 'Include idioms'), true);
   ok(/Selected: 2 sets/.test(await body(s)), 'summary after delete');
   await tab(s, 'Learn'); await sleep(1200);

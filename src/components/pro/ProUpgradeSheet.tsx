@@ -13,7 +13,7 @@ type Load = 'loading' | 'ready' | 'unavailable';
 
 const BENEFITS: Record<ProFeature, { en: string; vi: string }> = {
   noAds: { en: 'No ads', vi: 'Không quảng cáo' },
-  importSets: { en: 'Import your own word sets (CSV, Excel, JSON)', vi: 'Nhập bộ từ riêng (CSV, Excel, JSON)' },
+  importSets: { en: 'Import your own word sets (CSV, Excel)', vi: 'Nhập bộ từ riêng (CSV, Excel, JSON)' },
   unlimitedQuiz: { en: 'Unlimited “Quiz me”', vi: '“Quiz me” không giới hạn' },
   allThemes: { en: 'All 5 themes', vi: 'Cả 5 giao diện' },
   maleVoice: { en: 'Natural male voice (Michael)', vi: 'Giọng nam tự nhiên (Michael)' },

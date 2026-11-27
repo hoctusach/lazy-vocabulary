@@ -80,7 +80,7 @@ THEMES.forEach(([name, label], i) => {
       for (const k of ['text/surface', 'text/bg', 'heading/surface', 'onAccent/accent']) ok(c[k] >= 4.5, `${k} contrast ${c[k]?.toFixed?.(2)} (${name}${dark ? '-dark' : ''})`);
       ok(c.vars.every((x) => x), 'css vars defined ' + c.vars);
       global.__themeVars = global.__themeVars || {}; global.__themeVars[name + (dark ? '-dark' : '')] = c.vars.join('|');
-      for (const t of ['Learn', 'Progress', 'Sets', 'More']) {
+      for (const t of ['Learn', 'Progress', 'Library', 'More']) {
         await tab(s, t); await sleep(700);
         await s.page.screenshot({ path: path.join(SHOTS, `${name}-${dark ? 'dark' : 'light'}-${t.toLowerCase()}.png`) });
         const bad = await invisibleText(s); ok(bad.length === 0, `invisible text on ${t}: ${bad}`);
@@ -175,7 +175,7 @@ test('ACCT-02', 'Sign out keeps sets, theme and preferences; sign-in again resto
   ok(await s.ls('lv.vocabularySets.v1'), 'sets kept'); eq(await s.ls('user-theme'), 'pixel'); ok(await s.ls('lv_preferences'), 'prefs kept');
   await s.page.type('input[placeholder="e.g., Mi mi U"]', 'e2e'); await s.page.type('input[type=password]', '1234'); await click(s, { text: 'Sign in' });
   await s.page.waitForFunction(() => localStorage.getItem('lazyVoca.nickname') === 'e2e', { timeout: 8000 }); await sleep(1800);
-  await tab(s, 'Sets'); await waitText(s, 'setA');
+  await tab(s, 'Library'); await waitText(s, 'setA');
 });
 test('ACCT-03', 'After sign-out + reload the gate shows and no stale session remains', async ({ session }) => {
   const s = await session({}); await boot(s); await signOut(s); await waitText(s, 'Access your vocabulary');
@@ -200,7 +200,7 @@ test('PERSIST-03', 'Imported-set progress persists', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   for (let i = 0; i < 2; i++) { await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 }); await sleep(500);
     await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await U.waitGone(s, 'Are you sure'); await sleep(800); }
-  await s.reload(); await tab(s, 'Sets'); await waitText(s, '2 learned on this device');
+  await s.reload(); await tab(s, 'Library'); await waitText(s, '2 learned on this device');
 });
 test('PERSIST-04', 'Built-in progress after reload comes back from the server + cache', async ({ session }) => {
   const s = await session({}); await boot(s);

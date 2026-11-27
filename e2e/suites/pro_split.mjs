@@ -75,10 +75,10 @@ test('PRO-05', 'Pro: Quiz me is unlimited [FB-06]', async ({ session }) => {
 
 test('PRO-06', 'Free: import is locked (badge → sheet); sets imported earlier stay listed and usable [FB-06]', async ({ session }) => {
   // import while Pro, then lose Pro (refund) and reload
-  const s = await session({}); await boot(s); await tab(s, 'Sets'); await U.waitText(s, 'Word sets');
+  const s = await session({}); await boot(s); await tab(s, 'Library'); await U.waitText(s, 'Create your own set');
   await importFile(s, 'vocab.csv'); await waitText(s, 'Imported 10 words into “vocab”.');
   await s.page.evaluate(() => localStorage.removeItem('lazyVoca.pro.v1'));
-  await s.reload(); await sleep(1000); await tab(s, 'Sets'); await waitText(s, 'Word sets');
+  await s.reload(); await sleep(1000); await tab(s, 'Library'); await waitText(s, 'Create your own set');
   eq(await setNames(s), ['Word Set: C1, C2', 'vocab']);
   const info = await s.page.evaluate(() => { const b = [...document.querySelectorAll('button')].find((x) => /Choose file/.test(x.innerText)); return { locked: b.dataset.locked, badge: !!b.querySelector('[aria-label="Pro feature"]'), h: b.getBoundingClientRect().height }; });
   eq(info.locked, 'true'); ok(info.badge, 'badge'); ok(info.h >= 44, 'tap target');
@@ -89,7 +89,7 @@ test('PRO-06', 'Free: import is locked (badge → sheet); sets imported earlier 
   // existing set: selectable, learnable, deletable
   await U.useOnly(s, 'vocab'); await tab(s, 'Learn');
   await s.page.waitForFunction(() => /^vocab\d+$/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
-  await tab(s, 'Sets');
+  await tab(s, 'Library');
   ok(await U.cardHas(s, 'vocab', 'Delete'), 'delete stays available');
 });
 

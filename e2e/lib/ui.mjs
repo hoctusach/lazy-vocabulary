@@ -69,7 +69,7 @@ export const cardWord = (s) => s.page.evaluate(() => {
 
 /** Import a fixture on the Sets tab. Returns after the UI settled. */
 export async function importFile(s, fixture) {
-  await tab(s, 'Sets');
+  await tab(s, 'Library');
   const input = await s.page.$('input[type=file][aria-label="Import vocabulary file"]');
   ok(input, 'file input not found');
   await input.uploadFile(fx(fixture));
@@ -140,14 +140,14 @@ export const boxState = async (s, label) => (await boxHandle(s, label)).evaluate
 const GROUPS = ['topic vocab', 'phrasal verbs', 'idioms', 'grammar', 'phrases, collocations', 'word formation'];
 /** Untick every built-in group (needs at least one imported set selected). Leaves you on the Sets tab. */
 export async function builtinOff(s) {
-  await tab(s, 'Sets');
+  await tab(s, 'Library');
   let st = await boxState(s, BUILTIN_PARENT);
   if (st.indeterminate) { await setBox(s, BUILTIN_PARENT, true); st = await boxState(s, BUILTIN_PARENT); }
   if (st.checked) await setBox(s, BUILTIN_PARENT, false);
 }
 /** Select exactly one source: an imported set by name, or null for the whole built-in set. */
 export async function useOnly(s, name) {
-  await tab(s, 'Sets');
+  await tab(s, 'Library');
   const labels = await s.page.evaluate(() => [...document.querySelectorAll('input[type=checkbox]')].map((i) => i.getAttribute('aria-label')));
   const imported = labels.filter((l) => l && l.startsWith('Include ') && !GROUPS.includes(l.slice(8)));
   if (name) {
@@ -161,7 +161,7 @@ export async function useOnly(s, name) {
 }
 /** Select exactly the given built-in groups plus the given imported sets. */
 export async function mix(s, groups, sets = []) {
-  await tab(s, 'Sets');
+  await tab(s, 'Library');
   const labels = await s.page.evaluate(() => [...document.querySelectorAll('input[type=checkbox]')].map((i) => i.getAttribute('aria-label')));
   const imported = labels.filter((l) => l && l.startsWith('Include ') && !GROUPS.includes(l.slice(8)));
   for (const g of GROUPS) if (groups.includes(g)) await setBox(s, `Include ${g}`, true);

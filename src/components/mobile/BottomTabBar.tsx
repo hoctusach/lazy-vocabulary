@@ -7,7 +7,7 @@ export type AppTab = 'learn' | 'progress' | 'sets' | 'more';
 const TABS: Array<{ id: AppTab; label: string; icon: React.ReactNode }> = [
   { id: 'learn', label: 'Learn', icon: <BookOpen className="h-5 w-5" /> },
   { id: 'progress', label: 'Progress', icon: <TrendingUp className="h-5 w-5" /> },
-  { id: 'sets', label: 'Sets', icon: <Library className="h-5 w-5" /> },
+  { id: 'sets', label: 'Library', icon: <Library className="h-5 w-5" /> },
   { id: 'more', label: 'More', icon: <MoreHorizontal className="h-5 w-5" /> },
 ];
 

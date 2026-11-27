@@ -449,7 +449,7 @@ export function parseVocabularyImport(source: ImportSource): ImportParseResult {
   if (!['csv', 'xlsx', 'xls', 'json'].includes(extension)) {
     return {
       ok: false,
-      errors: ['Unsupported file type. Import a .csv, .xlsx, .xls, or .json file.'],
+      errors: ['Unsupported file type. Import a .csv, .xlsx or .xls file.'],
     };
   }
 
