@@ -19,6 +19,7 @@ import {
   type TodaySelectionState,
 } from '@/services/learningProgressService';
 import type { TodayWord } from '@/types/vocabulary';
+import { MASTER_INTERVAL_DAYS, REVIEW_INTERVALS_DAYS } from '@/lib/progress/reviewSchedule';
 
 const NOW = new Date('2026-03-10T10:00:00.000Z');
 
@@ -74,6 +75,11 @@ describe('review schedule (C1, C2)', () => {
     const { payload } = await review(stored);
     expect(payload.review_count).toBe(stored + 1);
     expect(payload.next_review_at).toBe(isoDay(days));
+  });
+
+  it('the schedule constants match what the tests below expect', () => {
+    expect(REVIEW_INTERVALS_DAYS).toEqual([1, 2, 3, 5, 7, 10, 14, 21, 28, 35]);
+    expect(MASTER_INTERVAL_DAYS).toBe(60);
   });
 
   it('from the 11th review on, the interval is the 60-day master interval', async () => {

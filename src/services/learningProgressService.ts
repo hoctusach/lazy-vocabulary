@@ -21,6 +21,7 @@ import {
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
 import { extractServerSummary } from '@/lib/progress/serverSummary';
+import { MASTER_INTERVAL_DAYS, REVIEW_INTERVALS_DAYS } from '@/lib/progress/reviewSchedule';
 
 export type GenerateParams = {
   userKey: string;
@@ -73,8 +74,6 @@ const DAILY_COUNT_BY_SEVERITY: Record<SeverityLevel, number> = {
   intense: 100,
 };
 
-const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
-const MASTER_INTERVAL_DAYS = 60;
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 

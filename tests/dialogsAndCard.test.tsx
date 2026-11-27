@@ -8,6 +8,7 @@ import { MarkAsLearnedDialog } from '@/components/MarkAsLearnedDialog';
 import { MarkAsNewDialog } from '@/components/MarkAsNewDialog';
 import VocabularyCardNew from '@/components/vocabulary-app/VocabularyCardNew';
 import { getCategoryLabel } from '@/utils/categoryLabels';
+import { MASTER_INTERVAL_DAYS } from '@/lib/progress/reviewSchedule';
 
 afterEach(() => cleanup());
 
@@ -35,10 +36,10 @@ describe('Mark as Learned dialog (G6)', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
-  it('does not promise a number of days (the review schedule is decided by the server)', () => {
+  it('says the word comes back after 60 days, taken from the same constant as the schedule', () => {
     setup();
-    expect(document.body.textContent).toMatch(/reappear later for review/);
-    expect(document.body.textContent).not.toMatch(/\d+\s*days/);
+    expect(document.body.textContent).toMatch(/reappear after 60 days for review/);
+    expect(MASTER_INTERVAL_DAYS).toBe(60);
   });
 
   it('Cancel calls onClose and never onConfirm', () => {
