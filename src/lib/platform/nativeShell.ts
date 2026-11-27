@@ -27,9 +27,12 @@ export async function initNativeShell(): Promise<void> {
 
   try {
     const { StatusBar, Style } = await import('@capacitor/status-bar');
-    await StatusBar.setOverlaysWebView({ overlay: true });
+    const android = Capacitor.getPlatform() === 'android';
+    if (android) await StatusBar.setOverlaysWebView({ overlay: true });
     await StatusBar.setStyle({ style: Style.Light });
-    await StatusBar.setBackgroundColor({ color: '#1e40af' });
+    // [FB-68] overlay + background colour are Android-only APIs (they reject on iOS, where the WebView already
+    // extends under the status bar and CSS safe-area insets handle the notch/Dynamic Island).
+    if (android) await StatusBar.setBackgroundColor({ color: '#1e40af' });
   } catch (error) {
     console.warn('[native] status bar', error);
   }

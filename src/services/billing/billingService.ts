@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { isNativeIOS, nativePlatform } from '@/lib/platform/platformKind';
 import { clearProEntitlement, isProActive, setProEntitlement } from './entitlement';
 
 export const PRO_PRODUCT_ID = 'pro_unlock';
@@ -19,18 +19,19 @@ type Plugin = typeof import('@capgo/native-purchases');
 let pluginPromise: Promise<Plugin> | null = null;
 const loadPlugin = () => (pluginPromise ??= import('@capgo/native-purchases'));
 
+/** Google Play Billing (Android) or StoreKit 2 (iOS), both through @capgo/native-purchases. Web/PWA: no billing. */
 export function isBillingSupported(): boolean {
-  try {
-    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
-  } catch {
-    return false;
-  }
+  return nativePlatform() !== null;
 }
+
+const storeName = (): string => (isNativeIOS() ? 'the App Store' : 'Google Play');
 
 interface OwnedTx {
   productIdentifier?: string;
   purchaseState?: string;
   isAcknowledged?: boolean;
+  /** iOS (StoreKit 2): set when Apple refunded / revoked the purchase. */
+  revocationDate?: string | null;
   purchaseToken?: string;
   transactionId?: string;
   orderId?: string;
@@ -40,11 +41,17 @@ const tokenOf = (t: OwnedTx) => t.purchaseToken ?? t.transactionId;
 
 /** Grants/acknowledges from a list of owned purchases. Returns true if Pro owned. */
 async function applyOwned(purchases: OwnedTx[], api: Plugin['NativePurchases']): Promise<boolean> {
-  const pro = purchases.find((p) => p.productIdentifier === PRO_PRODUCT_ID && p.purchaseState === '1');
+  // Android reports purchaseState '1' = purchased. iOS (StoreKit 2 currentEntitlements) has no purchaseState: an
+  // entitlement that is listed and not revoked is owned.
+  const pro = purchases.find(
+    (p) =>
+      p.productIdentifier === PRO_PRODUCT_ID &&
+      (isNativeIOS() ? !p.revocationDate : p.purchaseState === '1'),
+  );
   if (!pro) return false;
   setProEntitlement({ productId: PRO_PRODUCT_ID, purchaseToken: tokenOf(pro), orderId: pro.orderId });
   const token = tokenOf(pro);
-  if (pro.isAcknowledged === false && token) {
+  if (!isNativeIOS() && pro.isAcknowledged === false && token) {
     try {
       await api.acknowledgePurchase({ purchaseToken: token });
     } catch (e) {
@@ -94,7 +101,7 @@ export async function initBilling(): Promise<void> {
 
 let cachedProduct: ProProduct | null = null;
 
-/** Play product details, or null when billing/product is unavailable (never throws, never hangs). */
+/** Store (Play / App Store) product details, or null when billing/product is unavailable (never throws, never hangs). */
 export function getProProduct(): Promise<ProProduct | null> {
   return withTimeout(loadProProduct(), PRODUCT_TIMEOUT_MS, null);
 }
@@ -150,7 +157,7 @@ async function doPurchase(): Promise<PurchaseResult> {
       return { status: 'error', message: 'Purchase could not be completed.' };
     }
     setProEntitlement({ productId: PRO_PRODUCT_ID, purchaseToken: tokenOf(tx), orderId: tx.orderId });
-    if (tx.isAcknowledged === false && tokenOf(tx)) {
+    if (!isNativeIOS() && tx.isAcknowledged === false && tokenOf(tx)) {
       try {
         await NativePurchases.acknowledgePurchase({ purchaseToken: tokenOf(tx)! });
       } catch (e) {
@@ -179,7 +186,7 @@ export function restorePro(): Promise<PurchaseResult> {
   if (restoreInFlight) return restoreInFlight;
   restoreInFlight = withTimeout<PurchaseResult>(doRestore(), RESTORE_TIMEOUT_MS, {
     status: 'error',
-    message: 'Could not reach Google Play. Please try again.',
+    message: `Could not reach ${storeName()}. Please try again.`,
   }).finally(() => {
     restoreInFlight = null;
   });
@@ -196,7 +203,7 @@ async function doRestore(): Promise<PurchaseResult> {
     }
     const owned = await queryOwned(NativePurchases, PURCHASE_TYPE);
     if (await applyOwned(owned, NativePurchases)) return { status: 'purchased' };
-    return { status: 'error', message: 'No previous purchase found for this Google account.' };
+    return { status: 'error', message: isNativeIOS() ? 'No previous purchase found for this Apple ID.' : 'No previous purchase found for this Google account.' };
   } catch (e) {
     return { status: 'error', message: (e as Error)?.message || 'Could not restore purchase. Please try again.' };
   }

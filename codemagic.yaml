@@ -1,0 +1,85 @@
+# Codemagic CI for Lazy Vocabulary iOS (no Mac needed). See IOS_PLAN.md for the exact one-time setup.
+# NO secrets in this file: certificates/profiles/API keys live in Codemagic (Teams > Personal account >
+# Integrations / Code signing identities) and are only referenced here by NAME.
+workflows:
+  ios-simulator:
+    name: iOS simulator build (unsigned)
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    environment:
+      node: 22
+      xcode: latest
+    triggering:
+      events: [pull_request]
+      branch_patterns:
+        - pattern: 'feat/ios'
+          include: true
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web bundle (capacitor-www, never docs/)
+        script: npx vite build --outDir capacitor-www --emptyOutDir --base ./
+      - name: Capacitor sync (existing ios/ project)
+        script: npx cap sync ios
+      - name: Unsigned simulator build
+        script: |
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
+    artifacts:
+      - build/ios/Build/Products/Debug-iphonesimulator/App.app
+
+  ios-testflight:
+    name: iOS App Store / TestFlight (signed, manual)
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    environment:
+      node: 22
+      xcode: latest
+      # Signing: Codemagic automatic code signing with the App Store Connect API key integration.
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.hoctusach.lazyvocabulary
+      groups:
+        # Create this group in Codemagic UI. Variables (never commit values):
+        #   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY (production web config)
+        #   VITE_ADMOB_IOS_APP_ID, VITE_ADMOB_IOS_BANNER_ID (REAL AdMob iOS ids; test ids are the default)
+        - lazyvocab_ios
+      vars:
+        XCODE_PROJECT: ios/App/App.xcodeproj
+        XCODE_SCHEME: App
+        BUNDLE_ID: com.hoctusach.lazyvocabulary
+    integrations:
+      app_store_connect: codemagic_asc_key   # name of the App Store Connect API key you add in Codemagic
+    scripts:
+      - name: Install dependencies
+        script: npm ci
+      - name: Build web bundle (capacitor-www, never docs/)
+        script: npx vite build --outDir capacitor-www --emptyOutDir --base ./
+      - name: Capacitor sync
+        script: npx cap sync ios
+      - name: Put the real AdMob iOS app id into Info.plist (only if provided)
+        script: |
+          if [ -n "$VITE_ADMOB_IOS_APP_ID" ]; then
+            /usr/libexec/PlistBuddy -c "Set :GADApplicationIdentifier $VITE_ADMOB_IOS_APP_ID" ios/App/App/Info.plist
+          else
+            echo "WARNING: VITE_ADMOB_IOS_APP_ID not set, building with Google TEST AdMob ids"
+          fi
+      - name: Apply signing
+        script: xcode-project use-profiles
+      - name: Build number from App Store Connect
+        script: |
+          LATEST=$(app-store-connect get-latest-app-store-build-number "$BUNDLE_ID" 2>/dev/null || echo 0)
+          agvtool new-version -all $((LATEST + 1))
+        working_directory: ios/App
+      - name: Archive + export IPA
+        script: |
+          xcode-project build-ipa --project "$XCODE_PROJECT" --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false   # submit for review manually in App Store Connect

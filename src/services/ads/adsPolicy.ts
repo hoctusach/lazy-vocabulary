@@ -22,9 +22,14 @@ export interface PlatformInfo {
   platform: string;
 }
 
-/** Ads exist only in the native Android app. Web/PWA/iOS are strict no-ops. */
+/** Ads exist only in the native apps (Android + iOS). Web/PWA is a strict no-op. */
 export function isAdsSupported(info: PlatformInfo): boolean {
-  return info.isNative === true && info.platform === 'android';
+  return info.isNative === true && (info.platform === 'android' || info.platform === 'ios');
+}
+
+/** iOS must show the App Tracking Transparency prompt before the first ad request. */
+export function needsTrackingPrompt(info: PlatformInfo): boolean {
+  return info.isNative === true && info.platform === 'ios';
 }
 
 export function isGoogleTestId(id: string | null | undefined): boolean {

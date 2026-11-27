@@ -1,5 +1,5 @@
 /**
- * Android-only AdMob banner controller. This module is ONLY ever loaded through a
+ * Native (Android + iOS) AdMob banner controller. This module is ONLY ever loaded through a
  * dynamic import from `useBannerAds` after `isAdsSupported()` is true, so the
  * admob plugin never runs (or is eagerly loaded) on web/PWA.
  *
@@ -17,7 +17,9 @@ import {
   type AdmobConsentInfo,
 } from '@capacitor-community/admob';
 import { adsAllowed, onAdsAllowedChange } from '@/hooks/useAdsVisibility';
-import { ADS_CONFIG } from '@/config/ads';
+import { adsConfigFor } from '@/config/ads';
+import { nativePlatform } from '@/lib/platform/platformKind';
+import { ensureTrackingAuthorization } from './tracking';
 import {
   DEFAULT_AD_SLOT_PX,
   canProceedWithAds,
@@ -122,6 +124,8 @@ async function ensureReady(): Promise<boolean> {
           info = await AdMob.showConsentForm();
         }
         if (!canProceedWithAds(info)) return false;
+        // iOS: App Tracking Transparency prompt before the first ad request (no-op elsewhere).
+        await ensureTrackingAuthorization(AdMob, nativePlatform());
         await AdMob.initialize();
         attachListeners();
         ready = true;
@@ -159,14 +163,15 @@ async function apply(): Promise<void> {
     if (!bannerShown) {
       if (attempts >= MAX_SHOW_ATTEMPTS) return;
       attempts += 1;
+      const cfg = adsConfigFor(nativePlatform());
       await AdMob.showBanner({
-        adId: ADS_CONFIG.bannerId,
+        adId: cfg.bannerId,
         adSize: BannerAdSize.ADAPTIVE_BANNER,
         position: BannerAdPosition.BOTTOM_CENTER,
         // margin (dp) = distance from the screen bottom to the TOP of the tab bar (floating bars + safe area
         // included), and above the SRS line if that would otherwise be covered. See computeBannerMarginDp.
         margin: measureBannerMarginDp(),
-        isTesting: isGoogleTestId(ADS_CONFIG.bannerId),
+        isTesting: isGoogleTestId(cfg.bannerId),
       });
       bannerShown = true;
       bannerHidden = false;
