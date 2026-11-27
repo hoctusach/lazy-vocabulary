@@ -48,7 +48,7 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
 
   const handleNextWord = () => {
     if (!currentWord) {
-      toast.info('No words available in this category. Try switching categories or regenerate today\'s list.');
+      toast.info('There are no words in this category.');
       return;
     }
     onNextWord();

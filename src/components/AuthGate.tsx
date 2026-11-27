@@ -225,7 +225,7 @@ export default function AuthGate() {
             });
           } catch (error) {
             console.error('AuthGate:prepareTodaySelection', error);
-            toast.error("Failed to prepare today's words. Please refresh if they don't load.");
+            toast.error("Could not load today's words. Please refresh the page.");
             throw error;
           }
         })();

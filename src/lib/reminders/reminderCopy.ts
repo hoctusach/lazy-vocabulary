@@ -1,4 +1,5 @@
-export type ReminderLang = 'en' | 'vi';
+/** [FB-58] The app speaks English only for now. */
+export type ReminderLang = 'en';
 
 const EN = [
   '2 minutes of words? Your sloth is waiting 🦥',
@@ -7,17 +8,11 @@ const EN = [
   'Your words miss you. Come say hi 👋',
 ];
 
-const VI = [
-  'Học 2 phút từ vựng nhé? Bé lười đang đợi 🦥',
-  'Vài từ thôi, thong thả nha. Bé lười giữ chỗ cho bạn rồi 🦥',
-  'Nghỉ chút rồi học vài từ nhé? 2 phút là đủ 🌿',
-  'Từ vựng nhớ bạn đó, ghé chút nha 👋',
-];
-
 export const REMINDER_TITLE = 'Lazy Vocabulary';
 
 export function reminderLines(lang: ReminderLang): string[] {
-  return lang === 'vi' ? VI : EN;
+  void lang;
+  return EN;
 }
 
 /** Deterministic rotation so re-planning doesn't reshuffle already-scheduled text. */

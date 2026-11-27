@@ -162,7 +162,7 @@ const VocabularySetsScreen: React.FC = () => {
   return (
     <section className="space-y-4" data-screen="word-sets">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--lv-heading)' }}>
+        <h2 className="lv-page-title">
           Library
         </h2>
         <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
@@ -199,10 +199,10 @@ const VocabularySetsScreen: React.FC = () => {
         )}
       </div>
 
-      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }} data-testid="manual-set-card">
+      <div className="lv-section p-4 pl-5" data-testid="manual-set-card">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-semibold">Create your own set</h3>
+            <h3 className="lv-section-title">Create your own set</h3>
             <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
               Free: type words one by one. Have a long list? Import a file below (Pro).
             </p>
@@ -213,10 +213,10 @@ const VocabularySetsScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
+      <div className="lv-section p-4 pl-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-semibold">Import a set</h3>
+            <h3 className="lv-section-title">Import a set</h3>
             <p className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
               Add many words at once from a CSV or Excel file.
             </p>
@@ -290,7 +290,7 @@ const VocabularySetsScreen: React.FC = () => {
           return (
             <li
               key={set.id}
-              className="rounded-2xl border p-4 theme-card-surface"
+              className="lv-section p-4 pl-5"
               style={{
                 borderColor: selected ? 'var(--lv-accent)' : 'var(--lv-border-color)',
                 boxShadow: selected ? '0 0 0 1px var(--lv-accent)' : undefined,
@@ -309,7 +309,7 @@ const VocabularySetsScreen: React.FC = () => {
                 )}
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="truncate text-lg font-semibold">{set.name}</h3>
+                    <h3 className="lv-section-title truncate">{set.name}</h3>
                     {selected && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-[var(--lv-accent-soft)] px-2 py-1 text-xs font-medium">
                         <Check className="h-3.5 w-3.5" />

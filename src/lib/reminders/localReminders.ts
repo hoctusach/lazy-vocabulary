@@ -2,7 +2,6 @@ import { Capacitor } from '@capacitor/core';
 import { planReminders } from './reminderPlanner';
 import { loadSettings, saveSettings, type ReminderSettings } from './reminderSettings';
 import { hasStudiedToday } from './studySignal';
-import { isVietnameseDevice } from '@/utils/deviceLanguage';
 import type { ReminderLang } from './reminderCopy';
 
 /** The slice of @capacitor/local-notifications we use (also what tests/e2e mock). */
@@ -52,7 +51,7 @@ export function getReminderPlugin(): Promise<ReminderPlugin | null> {
 }
 
 export function currentLang(): ReminderLang {
-  return isVietnameseDevice() ? 'vi' : 'en';
+  return 'en';
 }
 
 export type PermissionResult = 'granted' | 'denied';

@@ -24,8 +24,8 @@ const AdminImportedSets: React.FC = () => {
     if (error) toast.error(error); else toast.success('Set added to your Library.');
   };
   return (
-    <div className="rounded-2xl border p-4 theme-card-surface" data-testid="admin-sets-card">
-      <h3 className="text-base font-semibold">All users' sets (admin)</h3>
+    <div className="lv-section p-4 pl-5" data-testid="admin-sets-card">
+      <h3 className="lv-section-title">All users' sets (admin)</h3>
       {!sets || sets.length === 0 ? (
         <p className="mt-1 text-sm">No sets found.</p>
       ) : (

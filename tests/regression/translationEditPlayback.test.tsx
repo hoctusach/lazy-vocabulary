@@ -59,7 +59,7 @@ describe('[FB-33] translation edit pauses the Learn player, then Saved -> next w
 
     fireEvent.change(screen.getByTestId('translation-editor'), { target: { value: 'từ bỏ' } });
     fireEvent.click(screen.getByTestId('translation-save'));
-    expect(screen.getByTestId('translation-saved').textContent).toBe('Đã lưu');
+    expect(screen.getByTestId('translation-saved').textContent).toBe('Saved');
     expect(screen.getByTestId('translation-text').textContent).toContain('từ bỏ');
     expect(log.nexts).toBe(0); // confirmation first
     await flush(1500);
@@ -75,7 +75,7 @@ describe('[FB-33] translation edit pauses the Learn player, then Saved -> next w
     const log = await mountPlayer();
     fireEvent.click(screen.getByTestId('translation-edit'));
     expect(screen.getByTestId('state').textContent).toBe('paused');
-    fireEvent.click(screen.getByText('Hủy'));
+    fireEvent.click(screen.getByText('Cancel'));
     await flush(3000);
     expect(screen.getByTestId('state').textContent).toBe('playing');
     expect(log.nexts).toBe(0);

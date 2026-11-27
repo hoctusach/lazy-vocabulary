@@ -27,10 +27,10 @@ test('PRO-01', 'Free: other themes are locked; tapping opens the sheet with "Pro
   ok(await noBuy(s), 'Buy button must not exist without billing');
   const t = await sheetText(s);
   ok(/No ads/.test(t) && /Import your own word sets/.test(t) && /Unlimited/.test(t) && /All 5 themes/.test(t) && /male voice/.test(t), 'benefits: ' + t);
-  ok(/Restore purchase/.test(t), 'restore stays');
+  ok(/Restore purchases/.test(t) && /already bought Pro/.test(t), 'restore stays, with its help line [FB-58]');
   eq(await s.page.evaluate(() => document.querySelector('[data-feature=allThemes]').dataset.highlight), 'true');
   eq((await theme(s)).cls, 'theme-sloth', 'theme must not change');
-  await sleep(800); await click(s, { text: 'Restore purchase' });
+  await sleep(800); await click(s, { text: 'Restore purchases' });
   await waitSheet(s, /not available|No previous purchase/i);
   await closeSheet(s);
 });

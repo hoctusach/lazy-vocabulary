@@ -25,7 +25,7 @@ export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   useEffect(() => {
     const supported = !!window.speechSynthesis;
     if (!supported) {
-      console.warn("Your browser doesn't support speech synthesis.");
+      console.warn("Speech is not supported in this browser..");
       return;
     }
 

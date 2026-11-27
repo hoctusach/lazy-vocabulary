@@ -28,14 +28,14 @@ const MorePanel: React.FC = () => {
   return (
     <section className="space-y-4" data-screen="more">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--lv-heading)' }}>
+        <h2 className="lv-page-title">
           More
         </h2>
       </div>
 
       {isProEnabled() && <ProCard />}
 
-      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
+      <div className="lv-section p-4 pl-5">
         {/* Account & privacy group: Delete account / privacy links (feat/play-store-ads-release) slot in below the greeting. */}
         <UserGreeting />
         <div className="mt-3 flex flex-wrap items-center gap-2">

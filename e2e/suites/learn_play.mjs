@@ -293,8 +293,7 @@ test('LANG-02', 'vi-VN device shows the Vietnamese translation', async ({ sessio
 });
 
 // ---------- SRS principle line [FB-34] ----------
-const LINE_EN = 'Review right before you forget \u2014 remember it for good';
-const LINE_VI = 'Nghe l\u1ea1i \u0111\u00fang l\u00fac s\u1eafp qu\u00ean \u2014 nh\u1edb l\u00e2u h\u01a1n';
+const LINE_EN = 'Listen again just before you forget \u2014 it sticks longer';
 const lineText = (s) => s.page.evaluate(() => document.querySelector('[data-testid="srs-principle"]')?.innerText?.trim() ?? null);
 const oldTip = (s) => s.page.evaluate(() => !!document.querySelector('[data-testid="srs-tip"]'));
 test('SRS-01', 'Always-visible SRS principle line, English copy (en-US) [FB-34]', async ({ session }) => {
@@ -305,10 +304,10 @@ test('SRS-01', 'Always-visible SRS principle line, English copy (en-US) [FB-34]'
   const t = await s.page.evaluate(() => document.body.innerText);
   ok(!/Never forget|months|20 words/.test(t), 'no unverifiable numeric claims: ' + t);
 });
-test('SRS-02', 'Principle line uses Vietnamese copy on a vi-VN device [FB-34]', async ({ session }) => {
+test('SRS-02', 'Principle line is English on a vi-VN device too (no Vietnamese UI) [FB-34][FB-58]', async ({ session }) => {
   const s = await session({ initScript: VI_INIT }); await s.page.setExtraHTTPHeaders({ 'Accept-Language': 'vi-VN,vi;q=0.9' }); await boot(s);
-  await waitText(s, LINE_VI);
-  eq(await lineText(s), LINE_VI);
+  await waitText(s, LINE_EN);
+  eq(await lineText(s), LINE_EN);
 });
 test('SRS-03', 'Line sits above the tab bar without overlapping; tap opens the explanation [FB-34]', async ({ session }) => {
   const s = await session({ initScript: EN_INIT }); await boot(s);

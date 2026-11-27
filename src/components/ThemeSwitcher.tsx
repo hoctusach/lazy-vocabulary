@@ -5,26 +5,23 @@ import { FREE_THEME, type ThemeName } from "@/lib/themeManager";
 import { useProFeature } from "@/services/billing/proFeatures";
 import { openProUpgrade } from "@/services/billing/proUpgradeStore";
 import ProBadge from "@/components/pro/ProBadge";
-import { useIsVietnameseDevice } from "@/utils/deviceLanguage";
 
 type ThemeOption = {
   name: ThemeName;
   label: string;
-  en: string;
-  vi: string;
+  description: string;
 };
 
 export const themeOptions: ThemeOption[] = [
-  { name: "notes", label: "Margin Notes", en: "Lined paper, highlighter", vi: "Giấy kẻ ngang, bút dạ" },
-  { name: "sloth", label: "Cozy Sloth", en: "Warm, soft, rounded", vi: "Ấm áp, mềm mại, bo tròn" },
-  { name: "blocks", label: "Bold Blocks", en: "Thick lines, flat colour", vi: "Nét đậm, màu phẳng" },
-  { name: "pixel", label: "Pixel Quest", en: "Retro game, XP & combos", vi: "Game cổ điển, XP & combo" },
-  { name: "riso", label: "Riso Zine", en: "Two-ink print, grain", vi: "In riso hai màu, hạt nhám" }
+  { name: "notes", label: "Margin Notes", description: "Lined paper, highlighter" },
+  { name: "sloth", label: "Cozy Sloth", description: "Warm, soft, rounded" },
+  { name: "blocks", label: "Bold Blocks", description: "Thick lines, flat colour" },
+  { name: "pixel", label: "Pixel Quest", description: "Retro game, XP & combos" },
+  { name: "riso", label: "Riso Zine", description: "Two-ink print, grain" }
 ];
 
 const ThemeSwitcher: React.FC = () => {
   const { theme, setTheme, toggleDark, isDark } = useTheme();
-  const isVi = useIsVietnameseDevice();
   const allThemes = useProFeature("allThemes");
 
   const buttons = useMemo(
@@ -52,7 +49,7 @@ const ThemeSwitcher: React.FC = () => {
             </span>
             <span className="min-w-0 flex-1">
               <span className="lv-theme-name block text-sm font-bold leading-tight">{option.label}</span>
-              <span className="theme-muted-text block text-xs leading-snug">{isVi ? option.vi : option.en}</span>
+              <span className="theme-muted-text block text-xs leading-snug">{option.description}</span>
             </span>
             <span className="lv-theme-check shrink-0 text-xs font-bold" aria-hidden="true">
               {isActive ? "✓" : ""}
@@ -61,15 +58,13 @@ const ThemeSwitcher: React.FC = () => {
           </button>
         );
       }),
-    [theme, setTheme, isVi, allThemes]
+    [theme, setTheme, allThemes]
   );
 
   return (
     <div className="theme-switcher w-full space-y-3 text-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide theme-muted-text">
-        {isVi ? "Giao diện" : "Appearance"}
-      </p>
-      <div className="grid grid-cols-1 gap-2" role="group" aria-label={isVi ? "Chọn giao diện" : "Choose a theme"}>
+      <h3 className="lv-section-title">Appearance</h3>
+      <div className="grid grid-cols-1 gap-2" role="group" aria-label="Choose a theme">
         {buttons}
       </div>
       <button
@@ -81,7 +76,7 @@ const ThemeSwitcher: React.FC = () => {
         aria-pressed={isDark}
       >
         {isDark ? <Moon className="h-4 w-4" aria-hidden="true" /> : <Sun className="h-4 w-4" aria-hidden="true" />}
-        <span>{isDark ? (isVi ? "Chế độ tối" : "Dark mode") : isVi ? "Chế độ sáng" : "Light mode"}</span>
+        <span>{isDark ? "Dark mode" : "Light mode"}</span>
       </button>
     </div>
   );

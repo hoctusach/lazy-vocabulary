@@ -6,10 +6,9 @@ import { cleanup, render, screen, fireEvent } from '@testing-library/react';
 const vi_ = vi.hoisted(() => ({ isVi: false }));
 vi.mock('@/utils/deviceLanguage', () => ({ useIsVietnameseDevice: () => vi_.isVi, isVietnameseDevice: () => vi_.isVi }));
 
-const EN = 'Review right before you forget — remember it for good';
-const VI = 'Nghe lại đúng lúc sắp quên — nhớ lâu hơn';
+const EN = 'Listen again just before you forget — it sticks longer';
 
-describe('[FB-34] always-visible SRS principle line', () => {
+describe('[FB-34][FB-58] always-visible SRS principle line (English only)', () => {
   beforeEach(() => { localStorage.clear(); });
   afterEach(cleanup);
   const mount = async (fixed = true) => {
@@ -23,9 +22,13 @@ describe('[FB-34] always-visible SRS principle line', () => {
     expect(el.textContent).toBe(EN);
     expect(el.textContent).not.toMatch(/\d|never forget|month/i);
   });
-  it('shows the Vietnamese line', async () => {
+  it('[FB-58] a Vietnamese device sees the same English line and no Vietnamese anywhere in it', async () => {
     vi_.isVi = true; await mount();
-    expect(screen.getByTestId('srs-principle').textContent).toBe(VI);
+    const t = screen.getByTestId('srs-principle').textContent!;
+    expect(t).toBe(EN);
+    expect(t).not.toMatch(/[ạảãàáâấầẩẫậăắằẳẵặẹẻẽèéêếềểễệỉĩịọỏõòóôốồổỗộơớờởỡợụủũùúưứừửữựỳỷỹỵđ]/i);
+    fireEvent.click(screen.getByTestId('srs-principle'));
+    expect(document.querySelector('[role="dialog"]')!.textContent).not.toMatch(/[ạảãàáâấầẩẫậăắằẳẵặẹẻẽèéêếềểễệỉĩịọỏõòóôốồổỗộơớờởỡợụủũùúưứừửữựỳỷỹỵđ]/i);
   });
   it('is always visible: no dismiss button, no collapse, no "Why?" and nothing stored', async () => {
     vi_.isVi = false; await mount();
@@ -41,16 +44,12 @@ describe('[FB-34] always-visible SRS principle line', () => {
     expect(app).not.toMatch(/SrsTipCard|srs-tip/);
     expect(app).toContain('SrsPrincipleLine');
   });
-  it('tap opens a brief explanation with the real review intervals (EN and VI)', async () => {
+  it('tap opens a brief explanation with the real review intervals', async () => {
     vi_.isVi = false; await mount();
     expect(screen.queryByTestId('srs-principle-dialog')).toBeNull();
     fireEvent.click(screen.getByTestId('srs-principle'));
     expect(screen.getByTestId('srs-principle-dialog')).toBeTruthy();
     expect(screen.getByTestId('srs-principle-intervals').textContent).toBe('Next reviews for a word: after 1, 2, 3, 5, 7, 10, 14, 21, 28, 35 days, then every 60 days.');
-    cleanup();
-    vi_.isVi = true; await mount();
-    fireEvent.click(screen.getByTestId('srs-principle'));
-    expect(screen.getByTestId('srs-principle-intervals').textContent).toContain('sau 1, 2, 3, 5, 7');
   });
   it('is themed: only CSS variables (all 5 themes) and the shared themed popup', async () => {
     vi_.isVi = false; await mount();

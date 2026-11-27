@@ -55,7 +55,7 @@ export const useCorePlayback = (onUserInteraction?: () => void) => {
   const checkSpeechSupport = (): boolean => {
     if (!window.speechSynthesis) {
       console.error("Speech synthesis not supported in this browser");
-      toast.error("Speech synthesis isn't supported in your browser");
+      toast.error("Speech is not supported in this browser.");
       return false;
     }
     return true;

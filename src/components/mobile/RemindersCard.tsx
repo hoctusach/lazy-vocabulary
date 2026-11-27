@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 import { MAX_SLOTS, isValidTime, loadSettings, saveSettings, type ReminderSettings } from '@/lib/reminders/reminderSettings';
 import { getReminderPlugin, replanNow, setRemindersEnabled } from '@/lib/reminders/localReminders';
 
 /** More-tab: study reminders toggle + up to 3 time slots. Hidden where there is no plugin (web). */
 const RemindersCard: React.FC = () => {
-  const isVi = useIsVietnameseDevice();
   const [available, setAvailable] = useState(false);
   const [settings, setSettings] = useState<ReminderSettings>(() => loadSettings());
   const [denied, setDenied] = useState(false);
@@ -44,14 +42,12 @@ const RemindersCard: React.FC = () => {
     if (on && res === 'denied') setDenied(true);
   };
 
-  const t = isVi
-    ? { title: 'Nhắc học', toggle: 'Nhắc học', hint: 'Tối đa 3 lần mỗi ngày, chỉ khi bạn chưa học hôm nay.', denied: 'Chưa có quyền thông báo. Hãy bật trong Cài đặt hệ thống để nhận nhắc học.', slot: 'Lần nhắc', time: 'Giờ nhắc' }
-    : { title: 'Study reminders', toggle: 'Study reminders', hint: 'Up to 3 a day, only if you haven’t studied yet today.', denied: 'Notifications are off for this app. Allow them in system settings to get reminders.', slot: 'Reminder', time: 'Reminder time' };
+  const t = { title: 'Study reminders', toggle: 'Study reminders', hint: 'Up to 3 a day, only if you haven’t studied yet today.', denied: 'Notifications are off for this app. Allow them in system settings to get reminders.', slot: 'Reminder', time: 'Reminder time' };
 
   return (
-    <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }} data-testid="reminders-card">
+    <div className="lv-section p-4 pl-5" data-testid="reminders-card">
       <label className="flex min-h-11 items-center justify-between gap-3">
-        <span className="text-base font-semibold" style={{ color: 'var(--lv-heading)' }}>{t.toggle}</span>
+        <span className="lv-section-title">{t.toggle}</span>
         <input
           type="checkbox"
           role="switch"

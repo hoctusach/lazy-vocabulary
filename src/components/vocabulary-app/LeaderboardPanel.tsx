@@ -377,11 +377,11 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
     <Collapsible open={isOpen} onOpenChange={setUserOpen} asChild>
       <Card
         className={cn(
-          "mt-3 w-full border-2 theme-card-surface theme-border",
+          "lv-section mt-3 w-full",
           className,
         )}
       >
-        <CardContent className="p-3">
+        <CardContent className="p-3 pl-5">
           <CollapsibleTrigger asChild>
             {showAddCta ? (
               <button
@@ -408,14 +408,11 @@ const LeaderboardPanel: React.FC<LeaderboardPanelProps> = ({
                 aria-label={`${isOpen ? "Collapse" : "Expand"} leaderboard`}
               >
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--lv-accent)]/10 text-[var(--lv-accent)]">
+                  <span className="lv-section-icon">
                     <Users className="h-4 w-4" aria-hidden="true" />
                   </span>
                   <span className="min-w-0">
-                    <span
-                      className="block text-sm font-semibold"
-                      style={{ color: "var(--lv-heading)" }}
-                    >
+                    <span className="lv-section-title block">
                       Leaderboard
                     </span>
                     <span className="block text-xs theme-muted-text">

@@ -4,28 +4,29 @@
  * of repeating the same line all day.
  */
 
-const START_TIER = [
-  "10 phút thôi, vô đi! Liếc một cái rồi ra cũng được 😌",
-  "Từ vựng đang nằm chờ bạn kìa 👀",
-  "Ghé một chút thôi, không cần cày cả buổi đâu.",
-  "Học 3 lần 1 ngày là đẹp rồi, khỏi cần nhiều 🌱",
-  "Mở app lên xíu cho từ vựng đỡ buồn 🥲",
+// [FB-58] English only, short and simple.
+export const START_TIER = [
+  "Got 10 minutes? Your words are waiting 😌",
+  "Your words are waiting for you 👀",
+  "Just a quick visit. No need to study for long.",
+  "Three short sessions a day is plenty 🌱",
+  "Open the app and say hi to your words 🙂",
 ];
 
-const BUILDING_TIER = [
-  "Sắp rồi đó! Đừng để đứt streak giữa chừng 🔥",
-  "Gần lên trình rồi, cố thêm chút nữa!",
-  "Bữa nay chưa ghé qua đó nha 👋",
-  "Não đang đói từ vựng, cho ăn tí đi!",
-  "Còn xíu nữa là qua ngày mới rồi, tranh thủ học đi!",
+export const BUILDING_TIER = [
+  "Almost there! Keep your streak going 🔥",
+  "You are close to the next level. A little more!",
+  "You have not studied yet today 👋",
+  "Your brain wants some words. Feed it!",
+  "The day is almost over. Study a few words now!",
 ];
 
-const STRONG_TIER = [
-  "Sắp xịn rồi đó, đừng dừng lại chứ! 💪",
-  "Cỡ này mà bỏ streak thì phí lắm nha!",
-  "Sắp lên advanced rồi, cố lên!",
-  "Bạn đang trên đà thành cao thủ từ vựng rồi đó 😎",
-  "Chuỗi ngày học của bạn đang đẹp lắm, đừng làm gãy!",
+export const STRONG_TIER = [
+  "You are doing great. Keep going! 💪",
+  "Your streak is too good to lose!",
+  "You are nearly at the advanced level. Keep going!",
+  "You are on your way to being a word master 😎",
+  "Your study streak looks great. Do not break it!",
 ];
 
 function pickRandom(pool: string[]): string {

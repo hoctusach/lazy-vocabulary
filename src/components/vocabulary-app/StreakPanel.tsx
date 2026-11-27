@@ -62,20 +62,17 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
   return (
     <Card
       className={cn(
-        "mt-3 w-full border-2 theme-card-surface theme-border",
+        "lv-section mt-3 w-full",
         className,
       )}
     >
-      <CardContent className="flex items-center justify-between gap-3 p-3">
+      <CardContent className="flex items-center justify-between gap-3 p-3 pl-5">
         <div className="flex items-center gap-2.5">
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-            style={{ background: "var(--lv-accent-soft)", color: "var(--lv-accent)" }}
-          >
+          <span className="lv-section-icon">
             <Flame className="h-4 w-4" aria-hidden="true" />
           </span>
           <div>
-            <div className="text-sm font-semibold" style={{ color: "var(--lv-heading)" }}>
+            <div className="lv-section-title">
               {isLoading ? "…" : `${streakDays}-day streak`}
             </div>
             <div className="text-xs theme-muted-text">

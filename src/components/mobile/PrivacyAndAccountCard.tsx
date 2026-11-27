@@ -35,11 +35,10 @@ const PrivacyAndAccountCard: React.FC = () => {
 
   return (
     <div
-      className="rounded-2xl border p-4 text-sm theme-card-surface"
-      style={{ borderColor: 'var(--lv-border-color)' }}
+      className="lv-section p-4 pl-5 text-sm"
       data-section="privacy-account"
     >
-      <h3 className="mb-2 font-semibold" style={{ color: 'var(--lv-heading)' }}>
+      <h3 className="lv-section-title mb-2">
         Privacy &amp; account
       </h3>
       <ul className="space-y-2">

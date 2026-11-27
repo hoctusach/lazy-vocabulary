@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { ChevronDown, Info } from 'lucide-react';
+import { BarChart3, ChevronDown, Info } from 'lucide-react';
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -34,96 +33,80 @@ export const LearningProgressPanel: React.FC<LearningProgressPanelProps> = ({
     }
   }, [progressError]);
 
+  const tile = (tone: string, value: number, label: string, extra?: React.ReactNode) => (
+    <div className="lv-tile" data-tone={tone}>
+      <div className="flex items-center justify-center gap-1">
+        <div className="lv-tile-num">{value}</div>
+        {extra}
+      </div>
+      <div className="lv-tile-label">{label}</div>
+    </div>
+  );
+
   return (
     <TooltipProvider delayDuration={0}>
       {progressError && (
-        <div className="rounded-md border border-yellow-500 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-200">
+        <div className="mb-2 rounded-md border p-3 text-sm" style={{ borderColor: 'var(--lv-warning)', color: 'var(--lv-text-primary)' }}>
           {progressError}
         </div>
       )}
-      <Collapsible open={open} onOpenChange={setOpen} className="w-full">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <CollapsibleTrigger className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold">Learning Progress</h3>
-              <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} />
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent className="space-y-3 pt-1">
+      <Collapsible open={open} onOpenChange={setOpen} className="lv-section mt-3 w-full" data-testid="learning-progress-section">
+        <CollapsibleTrigger className="lv-section-head" data-state={open ? 'open' : 'closed'}>
+          <span className="lv-section-icon"><BarChart3 className="h-4 w-4" aria-hidden="true" /></span>
+          <h3 className="lv-section-title flex-1">Learning Progress</h3>
+          <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', open && 'rotate-180')} aria-hidden="true" />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="lv-section-body space-y-4">
             {!progressError && (
               <>
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: 'var(--lv-text-secondary)' }}>
-                      {progressStats.learned}
-                    </div>
-                    <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                      Learned
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <div className="text-2xl font-bold text-[var(--lv-error)]">{progressStats.due}</div>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label="How does due review count work?"
-                            className="h-10 w-10 text-[var(--lv-helper-text)] hover:text-[var(--lv-text-primary)]"
-                          >
-                            <Info className="h-4 w-4" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="max-w-xs text-left">
-                          <div className="space-y-1">
-                            <p className="font-bold">How does due review count work?</p>
-                            <p>It goes with the Spaced Repetition Principle.</p>
-                            <p>
-                              Each correct review pushes the next one farther out: 2 → 3 → 5 → 7 → 10 → 14 → 21 → 28 → 35 days. After that, mastered items return every 60 days.
-                            </p>
-                            <p>
-                              Tip: Open the app DAILY and clear “Due Reviews” to keep routine and memories strong.
-                            </p>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                      Due Review
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-[var(--lv-success)]">{progressStats.learning}</div>
-                    <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                      Learning
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-[var(--lv-warning)]">{progressStats.new}</div>
-                    <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                      New
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-[var(--lv-accent)]">{progressStats.total}</div>
-                    <div className="text-sm" style={{ color: 'var(--lv-helper-text)' }}>
-                      Total
-                    </div>
-                  </div>
+                <div className="lv-tiles">
+                  {tile('muted', progressStats.learned, 'Learned')}
+                  {tile(
+                    'due',
+                    progressStats.due,
+                    'Due Review',
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="How does due review count work?"
+                          className="h-9 w-9 text-[var(--lv-helper-text)] hover:text-[var(--lv-text-primary)]"
+                        >
+                          <Info className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-xs text-left">
+                        <div className="space-y-1">
+                          <p className="font-bold">How does due review count work?</p>
+                          <p>A word comes back when its review is due.</p>
+                          <p>
+                            Each correct review pushes the next one farther out: 2 → 3 → 5 → 7 → 10 → 14 → 21 → 28 → 35 days. After that, words you know come back every 60 days.
+                          </p>
+                          <p>Tip: open the app every day and clear your due reviews.</p>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  {tile('success', progressStats.learning, 'Learning')}
+                  {tile('warning', progressStats.new, 'New')}
+                  {tile('accent', progressStats.total, 'Total')}
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm font-medium">
                     <span>Learning Progress</span>
                     <span>{Math.round(learnedPercentage)}%</span>
                   </div>
-                  <Progress value={learnedPercentage} className="h-2" />
+                  <div className="lv-meter" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(learnedPercentage)} aria-label="Learning Progress">
+                    <span style={{ width: `${learnedPercentage}%` }} />
+                  </div>
                 </div>
               </>
             )}
-          </CollapsibleContent>
-        </div>
+          </div>
+        </CollapsibleContent>
       </Collapsible>
     </TooltipProvider>
   );

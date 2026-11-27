@@ -44,7 +44,7 @@ export const useVoiceManagement = () => {
         const hasUKVoice = availableVoices.some(v => v.lang?.toLowerCase().startsWith('en-gb'));
 
         if (!hasUSVoice || !hasUKVoice) {
-          toast.warning('Some English voices may not be available. Speech quality might be affected.');
+          toast.warning('Some English voices are not available on this device.');
         }
       }
     };

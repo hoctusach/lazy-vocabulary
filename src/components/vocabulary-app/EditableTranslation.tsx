@@ -10,7 +10,6 @@ import {
   setTranslationOverride,
   type WordIdentity,
 } from '@/lib/translations/translationOverrides';
-import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
 import { useShouldShowDefaultVi } from '@/lib/translations/showDefaultVi';
 import { guessLang } from '@/lib/translations/textDirection';
 import { emitTranslationEdit, SAVED_CONFIRM_MS } from '@/lib/translations/translationEditSignal';
@@ -20,8 +19,6 @@ interface Props extends WordIdentity {
   translation?: string;
   /** Show the Pro edit control. The search preview is read-only. */
   editable?: boolean;
-  /** UI language for labels; defaults to the device language. */
-  isVi?: boolean;
   color?: string;
 }
 
@@ -29,9 +26,7 @@ interface Props extends WordIdentity {
  * The translation line of a word card. Pro users get an in-place editor (no popup, multi-line, line breaks kept);
  * the edit is saved as a per-user override. Free users see the text read-only plus a Pro lock on the edit control.
  */
-const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, translation, editable = true, isVi: isViProp, color }) => {
-  const deviceIsVi = useIsVietnameseDevice();
-  const isVi = isViProp ?? deviceIsVi;
+const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, translation, editable = true, color }) => {
   const showDefaultVi = useShouldShowDefaultVi();
   const canEdit = useProFeature('editTranslation');
   const identity = React.useMemo(() => ({ word, category, sourceId }), [word, category, sourceId]);
@@ -120,14 +115,14 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
           maxLength={MAX_TRANSLATION_CHARS}
           value={draft}
           autoFocus
-          aria-label={isVi ? 'Sửa bản dịch' : 'Edit translation'}
+          aria-label="Edit translation"
           onChange={(e) => onChange(e.target.value)}
         />
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={save} data-testid="translation-save">{isVi ? 'Lưu' : 'Save'}</Button>
-          <Button size="sm" variant="outline" onClick={cancel}>{isVi ? 'Hủy' : 'Cancel'}</Button>
+          <Button size="sm" onClick={save} data-testid="translation-save">Save</Button>
+          <Button size="sm" variant="outline" onClick={cancel}>Cancel</Button>
           {override !== undefined && (
-            <Button size="sm" variant="ghost" onClick={reset}>{isVi ? 'Dùng bản gốc' : 'Use original'}</Button>
+            <Button size="sm" variant="ghost" onClick={reset}>Use original</Button>
           )}
         </div>
       </div>
@@ -137,15 +132,15 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   return (
     <div className="lv-translation flex items-start gap-1" style={textStyle}>
       <em className="min-w-0 flex-1" data-testid="translation-text" dir="auto" lang={textLang} data-empty={effective ? undefined : 'true'} style={effective ? undefined : { opacity: 0.6 }}>
-        {effective || (isVi ? 'Thêm bản dịch' : 'Add translation')}
+        {effective || 'Add translation'}
       </em>
       {saved && (
         <span role="status" data-testid="translation-saved" className="shrink-0 self-center text-xs font-medium not-italic" style={{ color: 'var(--lv-accent)' }}>
-          {isVi ? 'Đã lưu' : 'Saved'}
+          Saved
         </span>
       )}
       {editable && (canEdit ? (
-        <button type="button" className="shrink-0 p-1 opacity-70 hover:opacity-100" aria-label={isVi ? 'Sửa bản dịch' : 'Edit translation'} data-testid="translation-edit" onClick={start}>
+        <button type="button" className="shrink-0 p-1 opacity-70 hover:opacity-100" aria-label="Edit translation" data-testid="translation-edit" onClick={start}>
           <Pencil size={14} aria-hidden="true" />
         </button>
       ) : (

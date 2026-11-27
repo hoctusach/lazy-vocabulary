@@ -71,7 +71,7 @@ export const usePlaybackExecution = (
       
       // Ensure speech synthesis is available
       if (!checkSpeechSupport()) {
-        toast.error("Your browser doesn't support speech synthesis");
+        toast.error("Speech is not supported in this browser.");
         scheduleAutoAdvance(3000);
         setPlayInProgress(false);
         return;

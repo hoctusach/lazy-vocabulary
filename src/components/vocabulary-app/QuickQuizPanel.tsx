@@ -97,17 +97,14 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
 
   return (
     <>
-      <Card className={cn("mt-3 w-full border-2 theme-card-surface theme-border", className)}>
-        <CardContent className="flex items-center justify-between gap-3 p-3">
+      <Card className={cn("lv-section mt-3 w-full", className)}>
+        <CardContent className="flex items-center justify-between gap-3 p-3 pl-5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-              style={{ background: "var(--lv-accent-soft)", color: "var(--lv-accent)" }}
-            >
+            <span className="lv-section-icon">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: "var(--lv-heading)" }}>
+              <div className="lv-section-title">
                 {wordOfTheDay ? `Word of the day: ${wordOfTheDay.word}` : "60-second quiz"}
               </div>
               <div className="text-xs theme-muted-text truncate">

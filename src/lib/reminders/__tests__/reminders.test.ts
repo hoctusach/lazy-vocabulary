@@ -61,11 +61,10 @@ describe('planReminders', () => {
   it('ids derive from date + slot', () => {
     expect(reminderId(new Date(2026, 10, 21), 2)).toBe(2611212);
   });
-  it('copy follows the language and rotates', () => {
+  it('[FB-58] copy is English only and rotates', () => {
     const en = planReminders(on(), at(6), false, 'en');
-    const vi = planReminders(on(), at(6), false, 'vi');
     expect(en[0].body).toBe(reminderLines('en')[0]);
-    expect(vi[0].body).toContain('Bé lười');
+    expect(reminderLines('en').join(' ')).not.toMatch(/[ạảãàáâấầẩẫậăắằẳẵặẹẻẽèéêếềểễệỉĩịọỏõòóôốồổỗộơớờởỡợụủũùúưứừửữựỳỷỹỵđ]/i);
     expect(new Set(en.map((r) => r.body)).size).toBeGreaterThan(1);
   });
 });
