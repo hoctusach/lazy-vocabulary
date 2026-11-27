@@ -126,7 +126,7 @@ describe('sign in (A9, A10, A11, A16, A17)', () => {
     expect(codeInput().value).toBe('123456');
   });
 
-  it('an existing passcode that starts with 0 can still sign in', async () => {
+  it('a passcode that starts with 0 is sent as typed when signing in', async () => {
     h.exchange.mockResolvedValue({ session_token: 't', nickname: 'Old' });
     type('oldtimer', '012345');
     await submit();
@@ -207,11 +207,14 @@ describe('create profile (A12, A13)', () => {
     expect(h.saveSession).not.toHaveBeenCalled();
   });
 
-  it.each(['0123', '000000'])('refuses a new passcode that starts with 0: %s', async (code) => {
+  it.each(['0123', '000000'])('accepts a new passcode that starts with 0 and sends it as typed: %s', async (code) => {
+    h.create.mockResolvedValue({ nickname: 'Newbie' });
+    h.exchange.mockResolvedValue({ session_token: 't', nickname: 'Newbie' });
     type('Newbie', code);
     await submit('Create profile');
-    expect(await screen.findByText('Passcode cannot start with 0.')).toBeTruthy();
-    expect(h.create).not.toHaveBeenCalled();
+    await waitFor(() => expect(h.create).toHaveBeenCalledWith('Newbie', code));
+    expect(h.exchange).toHaveBeenCalledWith('Newbie', code);
+    expect(h.storePasscode).toHaveBeenCalledWith(code);
   });
 
   it('can go back to sign in', async () => {

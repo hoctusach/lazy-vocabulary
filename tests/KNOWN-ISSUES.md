@@ -30,7 +30,7 @@ Priority: **P1** security or wrong data for real users, **P2** wrong behaviour i
 
 How each fix was done where it differs from the proposal:
 - **#1** also covers `quizService`, `useDailyReminder`, `learningTimeService`, the daily usage tracker (which sends the learned day to the server) and the learning-time route. If the server writes learned days itself (for example in `mark_word_learned_by_key`), check it uses the user's local date too.
-- **#3** new passcodes may not start with 0 (client and `set_nickname_passcode`); signing in is not affected, so no existing user is locked out. Storing the passcode as text or hashed is still the better long-term fix.
+- **#3** the passcode is stored **as typed** (text), leading zeros kept: `supabase/sql/2026-11-passcode-as-text.sql` changes the column and the three login functions, and both Edge Functions and `lib/auth` send the text. Users who set a passcode before this change (zero already lost, typed `012345`, saved `12345`) keep working and are upgraded to the typed form at their next sign-in. The migration stops by itself if another database function or view still uses `passcode`. Hashing the passcode is still the better long-term fix.
 - **#4** also unified the three client copies of the canonical function (`core/nickname.ts`, `lib/auth/passcodeAuth.ts`, `lib/nickname.ts`). The database function `canon()` should drop invisible characters too (see the TODO in `2026-11-live-auth-functions-snapshot.sql`).
 - **#9** the dialog no longer states a number of days (the server decides the schedule).
 - **#10** only the unused `min` was removed; the sizes (25 / 50 / 100) are unchanged. Choosing the product number (for example 20 a day) is still a decision.

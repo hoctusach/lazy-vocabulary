@@ -87,7 +87,7 @@ describe('set_nickname_passcode (create profile)', () => {
 
   it('derives the user key from the nickname (A5)', async () => {
     await handler(post({ nickname: '  Mi  mi U ', passcode: '123456' }));
-    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ user_unique_key: 'mimiu', nickname: 'Mi  mi U', passcode: 123456 }));
+    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ user_unique_key: 'mimiu', nickname: 'Mi  mi U', passcode: '123456' }));
   });
 
   it('checks the timezone (A20)', async () => {
@@ -121,16 +121,22 @@ describe('set_nickname_passcode (create profile)', () => {
     expect((await json(await handler(post({ nickname: 'New One', passcode: '123456' })))).body).toEqual({ user_unique_key: 'newone', nickname: 'New One' });
   });
 
-  it.each(['0123', '00123', '0000', '0123456789'])('refuses a new passcode that starts with 0: %s (A8)', async (passcode) => {
+  it.each(['0123', '00123', '0000', '0123456789', '123456'])('sends the passcode as typed, as text: %s (A8)', async (passcode) => {
     const res = await json(await handler(post({ nickname: 'mimiu', passcode })));
-    expect(res).toEqual({ status: 400, body: { error: 'Passcode cannot start with 0.', code: 'PASSCODE_LEADING_ZERO' } });
-    expect(db.rpc).not.toHaveBeenCalled();
+    expect(res.status).toBe(200);
+    expect(db.rpc).toHaveBeenLastCalledWith('upsert_or_verify_profile', expect.objectContaining({ passcode }));
   });
 
-  it('a passcode with a 0 inside or at the end is fine', async () => {
-    for (const passcode of ['1023', '1230', '9000000000']) {
-      expect((await json(await handler(post({ nickname: 'mimiu', passcode })))).status).toBe(200);
-    }
+  it('a numeric passcode from an old client is turned into text', async () => {
+    await handler(post({ nickname: 'mimiu', passcode: 123456 }));
+    expect(db.rpc).toHaveBeenLastCalledWith('upsert_or_verify_profile', expect.objectContaining({ passcode: '123456' }));
+  });
+
+  it('"0123" and "00123" reach the database as different passcodes', async () => {
+    await handler(post({ nickname: 'mimiu', passcode: '0123' }));
+    await handler(post({ nickname: 'mimiu', passcode: '00123' }));
+    const sent = db.rpc.mock.calls.map((c) => (c[1] as { passcode: string }).passcode);
+    expect(new Set(sent).size).toBe(2);
   });
 
   it('derives the same key for a nickname with a zero-width character (A6)', async () => {
@@ -205,10 +211,11 @@ describe('nickname-passcode-exchange (sign in)', () => {
     expect(res.body.code).toBe('INCORRECT_PASSCODE'); // found the real account, so only the passcode is wrong
   });
 
-  it('an existing passcode written with leading zeros can still sign in (nothing is locked out)', async () => {
+  it('signs in with the passcode as typed, leading zeros kept', async () => {
     okVerify();
     expect((await json(await handler(post({ nickname: 'mimiu', passcode: '0123' })))).status).toBe(200);
-    expect(db.rpc).toHaveBeenCalledWith('verify_nickname_passcode', { nickname: 'mimiu', passcode: 123 });
+    expect(db.rpc).toHaveBeenCalledWith('verify_nickname_passcode', { nickname: 'mimiu', passcode: '0123' });
+    expect(db.rpc).toHaveBeenCalledWith('upsert_or_verify_profile', expect.objectContaining({ passcode: '0123' }));
   });
 
   it('a failing profile update or session save is 500', async () => {

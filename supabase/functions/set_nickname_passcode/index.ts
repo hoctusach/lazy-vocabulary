@@ -82,17 +82,6 @@ Deno.serve(async (req) => {
     return errorResponse('Passcode must be 4-10 digits.', 400);
   }
 
-  // The passcode is stored as a number, so "0123" and "00123" would be the same passcode.
-  // New profiles may not start with 0. Signing in with an existing passcode is not affected.
-  if (passcodeRaw.startsWith('0')) {
-    return errorResponse('Passcode cannot start with 0.', 400, 'PASSCODE_LEADING_ZERO');
-  }
-
-  const passcodeNumeric = Number(passcodeRaw);
-  if (!Number.isFinite(passcodeNumeric)) {
-    return errorResponse('Passcode must be numeric.', 400);
-  }
-
   const timezoneRaw =
     typeof payload.timezone === 'string' ? payload.timezone.trim() : '';
   if (timezoneRaw && !isValidTimezone(timezoneRaw)) {
@@ -119,7 +108,8 @@ Deno.serve(async (req) => {
   const { data, error } = await adminClient.rpc('upsert_or_verify_profile', {
     user_unique_key: userKey,
     nickname,
-    passcode: passcodeNumeric,
+    // Sent and stored as text, exactly as typed (leading zeros are kept).
+    passcode: passcodeRaw,
     // Forward the validated timezone so the database can persist it with the nickname.
     p_timezone: timezone,
   });

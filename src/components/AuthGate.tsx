@@ -43,13 +43,11 @@ type UIState = {
   info?: string;
 };
 
-function validatePasscode(passcode: string, creating = false): string | null {
+function validatePasscode(passcode: string): string | null {
   const trimmed = passcode.trim();
   if (trimmed.length < 4) return 'Passcode must be at least 4 digits.';
   if (trimmed.length > 10) return 'Passcode must be at most 10 digits.';
   if (!/^\d+$/.test(trimmed)) return 'Passcode can only contain numbers.';
-  // Passcodes are stored as numbers, so a leading 0 would be lost. Existing passcodes can still sign in.
-  if (creating && trimmed.startsWith('0')) return 'Passcode cannot start with 0.';
   return null;
 }
 
@@ -127,7 +125,7 @@ export default function AuthGate() {
       return;
     }
 
-    const passcodeError = validatePasscode(passcodeInput, s.mode === 'create');
+    const passcodeError = validatePasscode(passcodeInput);
     if (passcodeError) {
       setS((p) => ({ ...p, error: passcodeError, info: undefined }));
       return;
@@ -375,7 +373,7 @@ export default function AuthGate() {
     ? 'Pick a nickname and numeric passcode to create your profile. We will sign you in after saving it.'
     : 'Enter your nickname and passcode to sync progress across devices.';
   const passcodeHelpText = isCreateMode
-    ? 'Choose a 4-10 digit passcode. Numbers only, not starting with 0.'
+    ? 'Choose a 4-10 digit passcode. Numbers only.'
     : PASSCODE_HELP;
 
   return (

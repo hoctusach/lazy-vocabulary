@@ -157,13 +157,13 @@ function nicknameMatchesSession(nickname: string, session: Session | null): bool
   return canonNickname(session.nickname) === canonNickname(nickname);
 }
 
-function normalizePasscode(passcode: string): { trimmed: string; numeric: number } {
+/** The passcode as typed (text, leading zeros kept); digits only. */
+function normalizePasscode(passcode: string): { trimmed: string } {
   const trimmed = passcode.trim();
-  const numeric = Number(trimmed);
-  if (!trimmed || !Number.isFinite(numeric)) {
+  if (!/^\d+$/.test(trimmed)) {
     throw new Error('Passcode must be numeric.');
   }
-  return { trimmed, numeric };
+  return { trimmed };
 }
 
 function isEdgeSessionExpired(session: EdgeSession | null, skewSec = 30): boolean {
@@ -339,8 +339,8 @@ export async function registerNicknameWithPasscode(
   passcode: string,
   options: { rememberPasscode?: boolean } = {},
 ): Promise<RegisterNicknameResponse> {
-  const { trimmed, numeric } = normalizePasscode(passcode);
-  const response = await setNicknamePasscode(nickname, numeric);
+  const { trimmed } = normalizePasscode(passcode);
+  const response = await setNicknamePasscode(nickname, trimmed);
 
   if (options.rememberPasscode) {
     rememberPasscode(trimmed);

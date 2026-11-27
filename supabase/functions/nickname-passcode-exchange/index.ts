@@ -73,9 +73,8 @@ Deno.serve(async (req) => {
   if (!nickname) return errorResponse("Nickname is required", 400);
   if (!/^\d{4,10}$/.test(passRaw))
     return errorResponse("Passcode must be 4-10 digits", 400);
-  const passcode = Number(passRaw);
-  if (!Number.isFinite(passcode))
-    return errorResponse("Passcode must be numeric", 400);
+  // The passcode is used as text, exactly as typed (leading zeros are kept).
+  const passcode = passRaw;
 
   const timezoneRaw =
     typeof body?.timezone === "string" ? body.timezone.trim() : "";
