@@ -3,6 +3,16 @@
 Each issue below has a test marked `it.fails` in `tests/` (or a normal test that documents today's behaviour).
 `it.fails` passes while the bug exists and **starts failing when the bug is fixed**: then change `it.fails` to `it`.
 
+## Update after PR #693 (Grok Bot, merged into main)
+These were found on the old main and are **already fixed in main** by PR #693; their `it.fails` tests became normal tests:
+- **#1** streak and "learned today" use the local day (FB-40).
+- **#6** the total comes from the data: `getDefaultVocabularyTotal()` counts distinct words, the same rows the server counts.
+- **#10** replaced by one daily rule: 20 words in total, due first, then new (FB-35 / FB-51, `lib/progress/dailyTarget.ts`).
+- **#11** "new" means never seen (`new: remainingCount`).
+
+Still open on main: #2, #3, #4, #5, #7, #8, #9, #12, #13, #14, #15, #16, #17. The fixes for most of them are in the next PR (stacked on this one).
+Also seen while updating: three words in the built-in data have a trailing space (`'meet up '`, `'fall through '`, `'take up something '`...), so they count as separate keys from the same words without it.
+
 Priority: **P1** security or wrong data for real users, **P2** wrong behaviour in some cases, **P3** polish / needs a decision.
 
 | # | Priority | Issue | Where it is tested |

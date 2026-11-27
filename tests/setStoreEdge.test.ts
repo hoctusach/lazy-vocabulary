@@ -129,30 +129,41 @@ describe('today queue (E21)', () => {
     return progress;
   };
 
-  // Daily size of a custom set on main: at most 8 new words, at most 16 words in total.
-  it('takes at most 8 new words', () => {
-    expect(buildTodayQueue(words(50), emptyProgress(), '2026-03-10')).toHaveLength(8);
+  // Daily size of a custom set (FB-35 / FB-51): 20 words in total, due first, then new ones.
+  it('takes 20 words from a long list of new words', () => {
+    expect(buildTodayQueue(words(50), emptyProgress(), '2026-03-10')).toHaveLength(20);
   });
 
-  it('puts due words first, then up to 8 new ones', () => {
+  it('a short list gives all its words', () => {
+    expect(buildTodayQueue(words(7), emptyProgress(), '2026-03-10')).toHaveLength(7);
+  });
+
+  it('puts due words first, then fills with new ones up to 20', () => {
     const due = words(5, 'due');
     const queue = buildTodayQueue([...words(30), ...due], learnedDue(due), '2026-03-10');
-    expect(queue).toHaveLength(13);
+    expect(queue).toHaveLength(20);
     expect(queue.slice(0, 5).map((w) => w.word)).toEqual(due.map((w) => w.word));
   });
 
-  it('caps the list at 16 words in total', () => {
+  it('shows only due words when there are 25 of them (20 in total)', () => {
     const due = words(25, 'due');
     const queue = buildTodayQueue([...words(10), ...due], learnedDue(due), '2026-03-10');
-    expect(queue).toHaveLength(16);
+    expect(queue).toHaveLength(20);
     expect(queue.every((w) => w.word.startsWith('due'))).toBe(true);
   });
 
-  it('keeps the list of the day once it was built', () => {
+  it('keeps the list of the day first, in the same order, and never repeats a word', () => {
     const list = words(5);
     const progress = { ...emptyProgress(), todayDate: '2026-03-10', todayKeys: [wordKey('w2', 'imported'), wordKey('w0', 'imported')] };
-    expect(buildTodayQueue(list, progress, '2026-03-10').map((w) => w.word)).toEqual(['w2', 'w0']);
-    expect(buildTodayQueue(list, progress, '2026-03-11').length).toBeGreaterThan(0); // next day: rebuilt
+    const queue = buildTodayQueue(list, progress, '2026-03-10').map((w) => w.word);
+    expect(queue.slice(0, 2)).toEqual(['w2', 'w0']);
+    expect(new Set(queue).size).toBe(queue.length);
+  });
+
+  it('a new day builds a fresh list', () => {
+    const list = words(5);
+    const progress = { ...emptyProgress(), todayDate: '2026-03-10', todayKeys: [wordKey('w2', 'imported')] };
+    expect(buildTodayQueue(list, progress, '2026-03-11')).toHaveLength(5);
   });
 
   it('is empty-safe', () => {

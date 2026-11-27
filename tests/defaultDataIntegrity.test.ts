@@ -26,10 +26,11 @@ describe('built-in vocabulary', () => {
     expect(all.filter((w) => w.category && w.category !== w.sheet)).toEqual([]);
   });
 
-  // Known issue: the file has 3263 words but the app uses TOTAL_WORDS = 3261 for "remaining" and percentages.
-  it.fails('the word total equals TOTAL_WORDS (L2)', async () => {
-    const { TOTAL_WORDS } = await import('@/lib/progress/srsSyncByUserKey');
-    expect(all.length).toBe(TOTAL_WORDS);
+  it('the app total is the number of distinct words, which is what the server counts (L2)', async () => {
+    const { getDefaultVocabularyTotal } = await import('@/data/defaultVocabulary');
+    const distinct = new Set(all.map((w) => w.word)).size; // same key the app uses: the word text as written
+    expect(getDefaultVocabularyTotal()).toBe(distinct);
+    expect(distinct).toBeLessThan(all.length); // some words appear in more than one category
   });
 
   // Known issue: 193 pairs of word + category are repeated, so they share one progress id (`word::category`).

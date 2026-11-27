@@ -8,7 +8,7 @@ Run everything: `npm test` (Vitest). All suites should pass; a failure means a r
 | Input safety | `validation`, `sanitization`, `contentFilters`, `securityEdge` |
 | Login | `AuthGate` (screen), `edgeFunctions` (Supabase Edge Functions), `nicknameRules` |
 | Spaced repetition and stats | `srsScheduling`, `learnedWordStatsEdge`, `streakTimezone` |
-| Storage helpers | `storageHelpers` (last word, word counts, learning time, preferences, quiz, friend link) |
+| Storage helpers | `storageHelpers` (last word, word counts, learning time, preferences) |
 | Reminders | `dailyReminder` |
 | Built-in data | `defaultDataIntegrity` |
 | UI pieces | `dialogsAndCard` |

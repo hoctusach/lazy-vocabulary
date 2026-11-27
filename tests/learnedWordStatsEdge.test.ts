@@ -72,11 +72,11 @@ describe('counters (D3)', () => {
     expect(summary.total).toBe(3); // total follows the rows, not the configured total, when they exceed it
   });
 
-  it('documents how "new" is counted: total minus learning words (learned words are not subtracted)', () => {
+  it('"new" means never seen: the total minus learned and learning words, the same as "remaining"', () => {
     const rows = [row({ srs_state: 'learned', word_id: 'a::x' }), row({ srs_state: 'learning', word_id: 'b::x' })];
     const { summary } = stats(rows, 10);
-    expect(summary.new).toBe(9);
-    expect(summary.remaining).toBe(8);
+    expect(summary.new).toBe(8);
+    expect(summary.new).toBe(summary.remaining);
   });
 });
 

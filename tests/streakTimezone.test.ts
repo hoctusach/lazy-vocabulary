@@ -1,8 +1,7 @@
 /**
  * @vitest-environment node
  * Streak and "learned today" around the user's local midnight (D6, D7).
- * `it.fails` marks a known bug: the test passes while the bug exists and starts failing when it is fixed
- * (then change `it.fails` to `it`).
+ * The streak uses the learner's local calendar day, also in time zones east of UTC (Vietnam).
  */
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { calculateCurrentStreak, getRecentDays, hasLearnedToday } from '@/lib/progress/streak';
@@ -44,19 +43,19 @@ describe('time zones west of UTC (works)', () => {
   });
 });
 
-describe('time zones east of UTC, e.g. Vietnam (known bug)', () => {
+describe('time zones east of UTC, e.g. Vietnam', () => {
   // 10:00 on 26 Nov in Ho Chi Minh City. The user learned today, so the learned day is 2026-11-26.
-  it.fails('hasLearnedToday is true when the learned day is the local date', () => {
+  it('hasLearnedToday is true when the learned day is the local date', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     expect(hasLearnedToday(['2026-11-26'])).toBe(true);
   });
 
-  it.fails('the streak counts today', () => {
+  it('the streak counts today', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     expect(calculateCurrentStreak(['2026-11-26', '2026-11-25'])).toBe(2);
   });
 
-  it.fails('the last day of the recent-days strip is the local date and marked as today', () => {
+  it('the last day of the recent-days strip is the local date and marked as today', () => {
     at('Asia/Ho_Chi_Minh', '2026-11-26T03:00:00Z');
     const days = getRecentDays([], 7);
     expect(days[6]).toMatchObject({ date: '2026-11-26', isToday: true });
