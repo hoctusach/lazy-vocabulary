@@ -43,6 +43,7 @@ jobs:
       - name: Build unsigned simulator app (universal iPhone + iPad)
         run: |
           set -o pipefail
+          mkdir -p build
           xcodebuild \
             -project ios/App/App.xcodeproj \
             -scheme App \
