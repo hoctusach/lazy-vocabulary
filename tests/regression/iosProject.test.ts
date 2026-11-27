@@ -110,6 +110,9 @@ describe('[FB-67] CI + plan for the no-Mac build path', () => {
     expect(y).toContain('macos-');
     expect(y).toContain('-sdk iphonesimulator');
     expect(y).toContain('CODE_SIGNING_ALLOWED=NO');
+    // build/ must exist before tee writes the log, else pipefail fails a green build
+    expect(y.indexOf('mkdir -p build\n')).toBeGreaterThan(-1);
+    expect(y.indexOf('mkdir -p build\n')).toBeLessThan(y.indexOf('tee build/xcodebuild.log'));
     expect(y).toContain('--outDir capacitor-www');
     expect(y).toContain('npx cap sync ios');
     expect(y).not.toContain('cap add ios');
