@@ -2,41 +2,46 @@
  * @vitest-environment jsdom
  */
 import React from 'react';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { cleanup, render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
+import * as ent from '@/services/billing/entitlement';
 import { applyTheme, getActiveTheme, initTheme, normalizeTheme, THEME_IDS, DEFAULT_THEME } from '@/lib/themeManager';
 
 const bodyThemes = () => [...document.body.classList].filter((c) => c.startsWith('theme-'));
 
+// Product config: Pro split on, so the default (and the only free theme) is Cozy Sloth. Theme tests run as a Pro user so every theme can be applied.
 beforeEach(() => {
+  vi.stubEnv('VITE_ENABLE_PRO', 'true');
+  ent.__resetEntitlementForTests();
+  ent.setProEntitlement();
   localStorage.clear();
   document.body.className = '';
   document.documentElement.className = '';
   if (!window.matchMedia) window.matchMedia = (() => ({ matches: false, addEventListener() {}, removeEventListener() {} })) as never;
 });
-afterEach(() => cleanup());
+afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 
 describe('themeManager', () => {
-  it('has the 5 real themes and defaults to notes', () => {
+  it('has the 5 real themes and defaults to sloth (Cozy Sloth)', () => {
     expect([...THEME_IDS]).toEqual(['notes', 'sloth', 'blocks', 'pixel', 'riso']);
-    expect(DEFAULT_THEME).toBe('notes');
-    expect(getActiveTheme()).toBe('notes');
+    expect(DEFAULT_THEME).toBe('notes'); // flag-off default; the Pro split's default is the free theme
+    expect(getActiveTheme()).toBe('sloth');
   });
 
-  it('new user: initTheme applies theme-notes', () => {
+  it('new user: initTheme applies theme-sloth', () => {
     initTheme();
-    expect(bodyThemes()).toEqual(['theme-notes']);
+    expect(bodyThemes()).toEqual(['theme-sloth']);
   });
 
   for (const legacy of ['mint', 'morning', 'ocean', 'sakura', 'cyber', 'default', 'dark', 'light', 'nonsense', '']) {
-    it(`migrates legacy/unknown stored value "${legacy}" to notes`, () => {
+    it(`migrates legacy/unknown stored value "${legacy}" to sloth`, () => {
       localStorage.setItem('user-theme', legacy);
-      expect(getActiveTheme()).toBe('notes');
+      expect(getActiveTheme()).toBe('sloth');
       initTheme();
-      expect(bodyThemes()).toEqual(['theme-notes']);
-      expect(localStorage.getItem('user-theme')).toBe('notes');
+      expect(bodyThemes()).toEqual(['theme-sloth']);
+      expect(localStorage.getItem('user-theme')).toBe('sloth');
     });
   }
 
@@ -55,8 +60,8 @@ describe('themeManager', () => {
     applyTheme('pixel');
     applyTheme('riso');
     expect(bodyThemes()).toEqual(['theme-riso']);
-    expect(normalizeTheme(undefined)).toBe('notes');
-    expect(normalizeTheme('mint')).toBe('notes');
+    expect(normalizeTheme(undefined)).toBe('sloth');
+    expect(normalizeTheme('mint')).toBe('sloth');
   });
 });
 
@@ -66,18 +71,18 @@ describe('ThemeProvider + ThemeSwitcher', () => {
     return <span data-testid="probe">{theme}|{String(isDark)}</span>;
   };
 
-  it('defaults to notes light and applies the body class', () => {
+  it('defaults to sloth light and applies the body class', () => {
     render(<ThemeProvider><Probe /></ThemeProvider>);
-    expect(screen.getByTestId('probe').textContent).toBe('notes|false');
-    expect(bodyThemes()).toEqual(['theme-notes']);
+    expect(screen.getByTestId('probe').textContent).toBe('sloth|false');
+    expect(bodyThemes()).toEqual(['theme-sloth']);
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 
-  it('keeps the stored dark preference and a legacy theme value becomes notes', () => {
+  it('keeps the stored dark preference and a legacy theme value becomes sloth', () => {
     localStorage.setItem('lv-dark', 'true');
     localStorage.setItem('user-theme', 'cyber');
     render(<ThemeProvider><Probe /></ThemeProvider>);
-    expect(screen.getByTestId('probe').textContent).toBe('notes|true');
+    expect(screen.getByTestId('probe').textContent).toBe('sloth|true');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
     expect(localStorage.getItem('lv-dark')).toBe('true');
   });
@@ -89,14 +94,14 @@ describe('ThemeProvider + ThemeSwitcher', () => {
     }
     expect(document.querySelectorAll('[data-theme-option]').length).toBe(5);
     expect(document.querySelectorAll('.lv-swatch').length).toBe(5);
-    expect(screen.getByRole('button', { name: 'Margin Notes' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Cozy Sloth' }).getAttribute('aria-pressed')).toBe('true');
 
     fireEvent.click(screen.getByRole('button', { name: 'Pixel Quest' }));
     expect(screen.getByTestId('probe').textContent).toBe('pixel|false');
     expect(bodyThemes()).toEqual(['theme-pixel']);
     expect(localStorage.getItem('user-theme')).toBe('pixel');
     expect(screen.getByRole('button', { name: 'Pixel Quest' }).getAttribute('aria-pressed')).toBe('true');
-    expect(screen.getByRole('button', { name: 'Margin Notes' }).getAttribute('aria-pressed')).toBe('false');
+    expect(screen.getByRole('button', { name: 'Cozy Sloth' }).getAttribute('aria-pressed')).toBe('false');
   });
 
   it('dark toggle flips html.dark and persists, keeping the theme', () => {

@@ -7,7 +7,8 @@ const kSpeak = vi.fn();
 const kStop = vi.fn(async () => {});
 const kRelease = vi.fn(async () => {});
 const kStatus = { downloaded: true, downloading: false };
-const env = { native: true, android: true };
+const env = { native: true, android: true, pro: false };
+vi.mock('@/services/billing/proFeatures', () => ({ hasFeature: () => env.pro }));
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: { isNativePlatform: () => env.native, getPlatform: () => (env.android ? 'android' : 'ios') },
@@ -36,7 +37,7 @@ describe('shim + Kokoro', () => {
     ttsSpeak.mockResolvedValue(undefined);
     kSpeak.mockResolvedValue({ interrupted: false });
     kStatus.downloaded = true;
-    env.native = true; env.android = true;
+    env.native = true; env.android = true; env.pro = false;
     vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
   afterEach(() => { env.native = false; vi.restoreAllMocks(); });
@@ -73,11 +74,21 @@ describe('shim + Kokoro', () => {
     expect(synth.getVoices().map((v) => v.name)).toEqual(['US Voice']);
   });
 
-  it('speaks a Kokoro voice via the plugin with mapped speed', async () => {
+  it('a Pro user speaking Kokoro Michael goes through the plugin with mapped speed', async () => {
+    env.pro = true;
     const synth = await install();
     const events = speakText(synth, 1);
     await wait();
     expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'am_michael', speed: expect.closeTo(1.0) });
+    expect(ttsSpeak).not.toHaveBeenCalled();
+    expect(events).toEqual(['end']);
+  });
+
+  it('a free user asking for Michael speaks Heart (Pro voice gating), never the system voice', async () => {
+    const synth = await install();
+    const events = speakText(synth, 1);
+    await wait();
+    expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'af_heart', speed: expect.closeTo(1.0) });
     expect(ttsSpeak).not.toHaveBeenCalled();
     expect(events).toEqual(['end']);
   });
