@@ -267,9 +267,11 @@ describe('[FB-51] Word Summary: Today numerator and LEARNED section', () => {
     const { TooltipProvider } = await import('@/components/ui/tooltip');
     render(<TooltipProvider><App /></TooltipProvider>);
     fireEvent.click(await screen.findByRole('button', { name: /Word Summary/i }));
-    const label = await screen.findByTestId('today-total');
-    expect(label.textContent).toMatch(/Today:\s*20\/20/);
-    expect(label.textContent).toMatch(/8 new \+ 11 due \+ 1 learned today/);
+    await screen.findByText(/NEW TODAY \(8\)/);
+    expect(screen.getByText(/DUE TODAY \(11\)/)).toBeTruthy();
+    // [FB-56] the "Today: n/20 (...)" line is gone
+    expect(screen.queryByTestId('today-total')).toBeNull();
+    expect(document.body.textContent).not.toMatch(/Today:\s*\d+\/\d+/);
     expect(screen.getByText(/LEARNED \(1\)/)).toBeTruthy();
     expect(screen.getByText('doneToday')).toBeTruthy();
     expect(screen.queryByText('old0')).toBeNull();
