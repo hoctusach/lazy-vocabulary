@@ -211,14 +211,18 @@ test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only f
   await importFile(s, 'setA.csv'); await waitText(s, 'Imported 6 words into “setA”.');
   await U.mix(s, ['idioms'], ['setA']);
   const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/defaultVocabulary.json'), 'utf8'));
-  const idioms = new Set(data.idioms.map((w) => w.word.trim()));
-  const others = new Set(Object.entries(data).filter(([k]) => k !== 'idioms').flatMap(([, v]) => v.map((w) => w.word.trim())));
+  // The card text has no spaces before annotations ("Make ends meet(idiom, verb)"): compare without whitespace.
+  const nz = (w) => String(w).replace(/\s+/g, '');
+  const idioms = new Set(data.idioms.map((w) => nz(w.word)));
+  const others = new Set(Object.entries(data).filter(([k]) => k !== 'idioms').flatMap(([, v]) => v.map((w) => nz(w.word))));
   const setA = new Set(['aaa1', 'aaa2', 'aaa3', 'aaa4', 'aaa5', 'aaa6']);
   await tab(s, 'Learn'); await sleep(1200);
   const seen = [];
-  for (let i = 0; i < 14; i++) { seen.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); }
-  for (const w of seen) ok(w && (setA.has(w) || idioms.has(w) || /kick yourself/.test(w)), `"${w}" is not from idioms or setA: ${seen}`);
-  for (const w of seen) ok(setA.has(w) || !others.has(w) || idioms.has(w), `"${w}" is a word from another built-in group`);
+  // [FB-51] the card keeps its position in the new 26-word mixed list (20 built-in + 6 setA), so look at a full lap
+  for (let i = 0; i < 30; i++) { seen.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); }
+  // [FB-51] the idioms part of the day is topped up to 20 from the bundle, so any bundle idiom may appear
+  for (const w of seen) ok(w && (setA.has(w) || idioms.has(nz(w)) || /kick yourself/.test(w)), `"${w}" is not from idioms or setA: ${seen}`);
+  for (const w of seen) ok(setA.has(w) || !others.has(nz(w)) || idioms.has(nz(w)), `"${w}" is a word from another built-in group`);
   ok(seen.some((w) => setA.has(w)) && seen.some((w) => !setA.has(w)), 'queue is not mixed: ' + seen);
   const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
   ok(calls.length >= 2 && calls.at(-1).body.p_category === 'idioms', 'last p_category must be idioms: ' + JSON.stringify(calls.map((c) => c.body)));
@@ -227,12 +231,16 @@ test('SET-MIX-02', 'Two built-in groups: every card over ~10 Next presses belong
   const s = await session({}); await start(s);
   await U.mix(s, ['phrasal verbs', 'idioms']);
   const pool = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'e2e/lib/pool.json'), 'utf8'));
-  const allowed = new Set(pool.filter((w) => ['phrasal verbs', 'idioms'].includes(w.category)).map((w) => w.word.trim()));
-  const outside = new Set(pool.filter((w) => !['phrasal verbs', 'idioms'].includes(w.category)).map((w) => w.word.trim()));
+  // [FB-51] the day is topped up to 20 from the bundle: any bundle word of the two groups is allowed; nothing from the other groups.
+  const nz = (w) => String(w).replace(/\s+/g, '');
+  const data = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'src/data/defaultVocabulary.json'), 'utf8'));
+  const inGroups = new Set(['phrasal verbs', 'idioms'].flatMap((g) => data[g].map((w) => nz(w.word))));
+  const allowed = new Set([...pool.filter((w) => ['phrasal verbs', 'idioms'].includes(w.category)).map((w) => nz(w.word)), ...inGroups]);
+  const outside = new Set(pool.filter((w) => !['phrasal verbs', 'idioms'].includes(w.category)).map((w) => nz(w.word)).filter((w) => !inGroups.has(w)));
   await tab(s, 'Learn'); await sleep(1200);
   const seen = [];
   for (let i = 0; i < 10; i++) { seen.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); }
-  for (const w of seen) ok(w && allowed.has(w) && !outside.has(w), `"${w}" is outside phrasal verbs + idioms: ${seen}`);
+  for (const w of seen) ok(w && allowed.has(nz(w)) && !outside.has(nz(w)), `"${w}" is outside phrasal verbs + idioms: ${seen}`);
   ok(new Set(seen).size >= 2, 'expected more than one distinct card: ' + seen);
   const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
   ok(calls.length >= 1 && calls.at(-1).body.p_category == null, 'two groups -> p_category NULL: ' + JSON.stringify(calls.map((c) => c.body)));

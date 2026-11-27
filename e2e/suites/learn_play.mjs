@@ -204,7 +204,7 @@ test('PLAY-05', 'Next: cancel, next word spoken, wraps after last', async ({ ses
   const c0 = (await speechInfo(s)).cancels;
   await ctl(s, 'Next Word'); await waitWord(s, W[1]); await waitSpeech(s, U.re1);
   ok((await speechInfo(s)).cancels > c0, 'cancel');
-  for (let i = 2; i <= 8; i++) { await sleep(450); await ctl(s, 'Next Word'); await waitWord(s, W[i % 8]); }
+  for (let i = 2; i <= W.length; i++) { await sleep(450); await ctl(s, 'Next Word'); await waitWord(s, W[i % W.length]); } // [FB-51] the day is 20 words, not 8
 });
 test('PLAY-06', 'Next while paused shows next word but does not speak it', async ({ session }) => {
   const s = await session({}); await boot(s);

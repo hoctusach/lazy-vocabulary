@@ -49,6 +49,8 @@ export function createFake(opts = {}) {
     review_count: 0, srs_state: null, ...extra,
   });
 
+  // [FB-51] the real server returns `mark_learned_at` (a date) for learned words; LEARNED lists only today's.
+  const localDay = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const canon = (x) => String(x || '').toLowerCase().replace(/\s+/g, '');
   let tokenSeq = 0;
   const pgErr = (code, message) => json(400, { code, message, details: null, hint: null });
@@ -90,7 +92,7 @@ export function createFake(opts = {}) {
       switch (name) {
         case 'generate_daily_selection_v2':
           return json(200, f.pool.filter((w) => !body.p_category || w.category === body.p_category).slice(0, body.p_count || 8).map((w) =>
-            row(w, f.learned.has(w.word) ? { srs_state: 'learned', is_today_selection: false } : {})));
+            row(w, f.learned.has(w.word) ? { srs_state: 'learned', is_today_selection: false, mark_learned_at: localDay(), last_review_at: new Date().toISOString() } : {})));
         case 'fetch_vocabulary_by_ids':
           return json(200, f.pool.filter((w) => (body.p_ids || []).includes(w.word)).map((w) => row(w)));
         case 'search_vocabulary': {
