@@ -1,7 +1,20 @@
 import type { VocabularyWord } from '@/types/vocabulary';
 import { getKokoroVoiceByName, mapRateToKokoroSpeed } from '@/services/speech/kokoro/kokoroVoices';
 import { sanitizeVoiceName } from '@/services/speech/voiceAccess';
+import { getCategoryLabel } from '@/utils/categoryLabels';
+import { getTranslationOverride } from '@/lib/translations/translationOverrides';
+import { shouldShowDefaultVi } from '@/lib/translations/showDefaultVi';
 import type { PlaybackQueue } from './playbackService';
+
+/**
+ * [FB-65] The translation the in-app card shows (FB-42/FB-64): the user's override always, else the default only when
+ * `shouldShowDefaultVi()`. Same rule as EditableTranslation, so the notification never leaks a hidden translation.
+ */
+export function effectiveTranslation(w: Pick<VocabularyWord, 'word' | 'category' | 'translation' | 'sourceId'>, showDefault = shouldShowDefaultVi()): string {
+  const override = getTranslationOverride({ word: w.word, category: w.category, sourceId: w.sourceId });
+  if (override !== undefined) return override;
+  return showDefault ? w.translation ?? '' : '';
+}
 
 /** Pause between words handed to the native service (matches the in-app post-speech pause floor, FB-52). */
 export const NATIVE_PAUSE_MS = 1500;
@@ -39,13 +52,15 @@ export function buildNativeQueue(
   const chosen = sanitizeVoiceName(opts.voiceName ?? null);
   const kokoro = getKokoroVoiceByName(chosen);
   const systemVoiceName = kokoro ? undefined : (opts.voiceUri ?? lookupVoiceUri(chosen)) || undefined;
+  const showDefault = shouldShowDefaultVi();
   return {
     items: rotated.map((w) => ({
       word: w.word,
       meaning: w.meaning ?? '',
       example: w.example ?? '',
-      translation: w.translation ?? '',
+      translation: effectiveTranslation(w, showDefault),
       category: w.category ?? '',
+      categoryLabel: w.category ? getCategoryLabel(w.category) : '',
       pauseMs: NATIVE_PAUSE_MS,
     })),
     index: 0,

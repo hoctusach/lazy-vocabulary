@@ -110,6 +110,7 @@ public class PlaybackServicePlugin extends Plugin {
                     it.example = o.optString("example", "");
                     it.translation = o.optString("translation", "");
                     it.category = o.optString("category", "");
+                    it.categoryLabel = o.optString("categoryLabel", "");
                     it.pauseMs = o.optLong("pauseMs", 1500);
                     if (!it.word.isEmpty()) q.items.add(it);
                 } catch (org.json.JSONException ignored) { }

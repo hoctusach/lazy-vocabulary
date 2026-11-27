@@ -12,6 +12,8 @@ import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPla
 import { usePlaybackService } from '@/hooks/usePlaybackService';
 import { vocabularyService } from '@/services/vocabularyService';
 import { getFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { useShouldShowDefaultVi } from '@/lib/translations/showDefaultVi';
+import { TRANSLATION_OVERRIDE_EVENT } from '@/lib/translations/translationOverrides';
 import { buildNativeQueue, findQueueIndex } from '@/services/background/buildNativeQueue';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
@@ -78,6 +80,13 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
 
   // [FB-52] The native service owns the upcoming queue. Built once per list/voice/mute change (current word read from a
   // ref); the index of the card inside it travels with every word update, so no re-push per word.
+  const showDefaultVi = useShouldShowDefaultVi();
+  const [overrideTick, setOverrideTick] = React.useState(0);
+  React.useEffect(() => {
+    const bump = () => setOverrideTick((n) => n + 1);
+    window.addEventListener(TRANSLATION_OVERRIDE_EVENT, bump);
+    return () => window.removeEventListener(TRANSLATION_OVERRIDE_EVENT, bump);
+  }, []);
   const currentWordRef = React.useRef(currentWord);
   currentWordRef.current = currentWord;
   const nativeQueue = useMemo(
@@ -89,7 +98,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             muted: isMuted,
           })
         : null,
-    [hasData, selectedVoiceName, isMuted, initialWords, dailySelection]
+    // [FB-65] A visibility toggle / translation edit rebuilds the queue so a running notification refreshes.
+    [hasData, selectedVoiceName, isMuted, initialWords, dailySelection, showDefaultVi, overrideTick]
   );
   const nativeIndex = nativeQueue && currentWord ? findQueueIndex(nativeQueue.items, currentWord) : undefined;
 
