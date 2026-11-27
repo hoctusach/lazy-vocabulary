@@ -146,7 +146,7 @@ export const CreateManualSetDialog: React.FC<{ open: boolean; onClose: (createdI
 };
 
 /** Add words one by one, and edit / remove existing words of a hand-made set. */
-export const ManageManualSetDialog: React.FC<{ setId: string | null; onClose: () => void; onImportCta?: () => void }> = ({ setId, onClose, onImportCta }) => {
+export const ManageManualSetDialog: React.FC<{ setId: string | null; onClose: () => void; onImportCta?: () => void; onScanText?: (setId: string) => void }> = ({ setId, onClose, onImportCta, onScanText }) => {
   const { sets, addManualWord, updateManualWord, removeManualWord } = useVocabularySets();
   const [word, setWord] = useState({ ...EMPTY });
   const [errors, setErrors] = useState<ManualFieldErrors>({});
@@ -198,6 +198,9 @@ export const ManageManualSetDialog: React.FC<{ setId: string | null; onClose: ()
             <Button type="button" className="min-h-11" onClick={submit} data-testid="manual-word-submit">{editing ? 'Save changes' : 'Add word'}</Button>
           )}
           {editing && <Button type="button" variant="outline" className="min-h-11" onClick={reset}>Cancel edit</Button>}
+          {!editing && onScanText && setId && !atCap && (
+            <Button type="button" variant="outline" className="min-h-11" data-testid="manage-scan-text" onClick={() => onScanText(setId)}>Scan text</Button>
+          )}
         </div>
         {words.length > 0 && (
           <ul className="max-h-48 space-y-1 overflow-y-auto border-t pt-2" data-testid="manual-word-list">

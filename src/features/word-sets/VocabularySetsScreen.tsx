@@ -22,6 +22,7 @@ import { PLAN_NOTICE } from './todayPlan';
 import AdminImportedSets from '@/features/admin/AdminImportedSets';
 import ShowViToggle from './ShowViToggle';
 import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
+import { ScanTextDialog } from '@/features/scan-text';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
   BUILTIN_GROUPS,
@@ -95,6 +96,8 @@ const VocabularySetsScreen: React.FC = () => {
   const [busy, setBusy] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
   const [manageId, setManageId] = useState<string | null>(null);
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanTarget, setScanTarget] = useState<string | null>(null);
   const canImport = useProFeature('importSets');
 
   const setCounts = (id: string) => {
@@ -207,9 +210,14 @@ const VocabularySetsScreen: React.FC = () => {
               Free: type words one by one. Have a long list? Import a file below (Pro).
             </p>
           </div>
-          <Button type="button" className="min-h-11 w-full sm:w-auto" data-testid="new-set-button" onClick={() => setCreateOpen(true)}>
-            New set
-          </Button>
+          <div className="flex w-full gap-2 sm:w-auto">
+            <Button type="button" className="min-h-11 flex-1 sm:flex-none" data-testid="new-set-button" onClick={() => setCreateOpen(true)}>
+              New set
+            </Button>
+            <Button type="button" variant="outline" className="min-h-11 flex-1 sm:flex-none" data-testid="scan-text-button" onClick={() => { setScanTarget(null); setScanOpen(true); }}>
+              Scan text
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -394,7 +402,8 @@ const VocabularySetsScreen: React.FC = () => {
           }
         }}
       />
-      <ManageManualSetDialog setId={manageId} onClose={() => setManageId(null)} onImportCta={() => { setManageId(null); if (canImport) inputRef.current?.click(); else openProUpgrade('importSets'); }} />
+      <ScanTextDialog open={scanOpen} targetSetId={scanTarget} onClose={() => setScanOpen(false)} />
+      <ManageManualSetDialog setId={manageId} onClose={() => setManageId(null)} onScanText={(id) => { setManageId(null); setScanTarget(id); setScanOpen(true); }} onImportCta={() => { setManageId(null); if (canImport) inputRef.current?.click(); else openProUpgrade('importSets'); }} />
 
       <Dialog open={Boolean(renameTarget)} onOpenChange={(open) => !open && setRenameTarget(null)}>
         <DialogContent>

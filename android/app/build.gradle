@@ -87,6 +87,16 @@ dependencies {
 
 apply from: 'capacitor.build.gradle'
 
+// [FB-66] Scan text ships the Latin ML Kit recognizer only. @capacitor-mlkit/text-recognition declares every script pack
+// (Chinese / Devanagari / Japanese / Korean, several MB each); they are excluded here to keep the APK small. To add a
+// script later: delete its line below and add its id to INSTALLED_SCRIPTS in src/features/scan-text/nativeScan.ts.
+configurations.configureEach {
+    exclude group: 'com.google.mlkit', module: 'text-recognition-chinese'
+    exclude group: 'com.google.mlkit', module: 'text-recognition-devanagari'
+    exclude group: 'com.google.mlkit', module: 'text-recognition-japanese'
+    exclude group: 'com.google.mlkit', module: 'text-recognition-korean'
+}
+
 // ---- AdMob: single source of truth is src/config/ads.ts --------------------------------------
 // App id precedence: env ADMOB_APP_ID / -PadmobAppId, then VITE_ADMOB_APP_ID= in root .env.production / .env, then Google's test id.
 def ADMOB_TEST_APP_ID = "ca-app-pub-3940256099942544~3347511713"

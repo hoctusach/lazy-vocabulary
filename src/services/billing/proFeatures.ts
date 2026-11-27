@@ -3,9 +3,9 @@ import { isProEnabled } from '@/config/features';
 import { isProActive, subscribeProEntitlement } from './entitlement';
 
 /** Everything the one-time Pro unlock gates. */
-export type ProFeature = 'noAds' | 'importSets' | 'unlimitedQuiz' | 'allThemes' | 'maleVoice' | 'editTranslation';
+export type ProFeature = 'noAds' | 'importSets' | 'unlimitedQuiz' | 'allThemes' | 'maleVoice' | 'editTranslation' | 'unlimitedScans';
 
-export const PRO_FEATURES: readonly ProFeature[] = ['noAds', 'importSets', 'unlimitedQuiz', 'allThemes', 'maleVoice', 'editTranslation'];
+export const PRO_FEATURES: readonly ProFeature[] = ['noAds', 'importSets', 'unlimitedQuiz', 'allThemes', 'maleVoice', 'editTranslation', 'unlimitedScans'];
 
 /**
  * Single source of truth for gating. With VITE_ENABLE_PRO off nothing is gated (today's behaviour);
