@@ -210,7 +210,8 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   return (
     <DebugInfoContext.Provider value={debugInfo}>
       <VocabularyLayout showWordCard={true} hasData={hasData} onToggleView={() => {}}>
-        <div className="space-y-3">
+        {/* [FB-69] `lv-learn-stack` = two columns on large tablets/desktop (card left, panels right); see styles/tablet.css. */}
+        <div className={variant === 'full' ? 'space-y-3 lv-learn-stack' : 'space-y-3'}>
           <UserInteractionManager
             currentWord={currentWord}
             playCurrentWord={playCurrentWord}

@@ -1,6 +1,7 @@
 import { KOKORO_VOICES, isKokoroVoiceName } from './kokoro/kokoroVoices';
 import { isKokoroSupported } from './kokoro/kokoroTts';
-import { loadNativeTts, isNativePlatform, type NativeVoice } from './nativeTts';
+import { nativePlatform } from '@/lib/platform/platformKind';
+import { loadNativeTts, isNativePlatform, filterIosVoices, type NativeVoice } from './nativeTts';
 
 /**
  * [FB-41] The list of voices the user can pick from = web speechSynthesis voices (incl. the shim's) MERGED with the
@@ -14,7 +15,8 @@ export async function loadNativeSystemVoices(): Promise<NativeVoice[]> {
   try {
     const h = await loadNativeTts();
     const res = h ? await h.tts.getSupportedVoices() : null;
-    return (res?.voices ?? []) as NativeVoice[];
+    const list = (res?.voices ?? []) as NativeVoice[];
+    return nativePlatform() === 'ios' ? filterIosVoices(list) : list;
   } catch {
     return [];
   }

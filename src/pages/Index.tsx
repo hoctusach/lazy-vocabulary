@@ -89,9 +89,9 @@ const DesktopHome: React.FC = () => {
   return (
     <div className="min-h-screen transition-colors duration-300" data-layout="desktop">
       <AppHeader />
-      <main className="container mx-auto px-4">
+      <main className="lv-tablet-main mx-auto w-full max-w-6xl px-4">
         <VocabularyAppWithLearning />
-        <div className="mx-auto mt-6 max-w-6xl px-4">
+        <div className="lv-library-wrap mx-auto mt-6 max-w-6xl px-4">
           <VocabularySetsScreen />
         </div>
       </main>
