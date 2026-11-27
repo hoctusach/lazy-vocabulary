@@ -117,7 +117,7 @@ describe('[FB-06] Quiz me: 1 per local day for free', () => {
   }));
   const quizMe = () => {
     fireEvent.click(screen.getByRole('button', { name: 'Quiz me' }));
-    const close = screen.queryByRole('button', { name: /close/i });
+    const close = screen.queryAllByRole('button', { name: /close/i })[0]; // (more than one can be mounted for a frame under load)
     if (close) fireEvent.click(close); // modal quiz dialog would hide the button from the next click
   };
   const panel = () => render(<QuickQuizPanel targetWords={words as never} />);
@@ -127,7 +127,7 @@ describe('[FB-06] Quiz me: 1 per local day for free', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Quiz me' }));
     expect(screen.getByText(/Question 1 of/)).toBeTruthy();
     expect(quizSessionsToday()).toBe(1);
-    fireEvent.click(screen.getByRole('button', { name: /close/i }));
+    fireEvent.click(screen.getAllByRole('button', { name: /close/i })[0]);
     fireEvent.click(screen.getByRole('button', { name: 'Quiz me' }));
     expect(getProUpgradeState()).toMatchObject({ open: true, feature: 'unlimitedQuiz' });
     expect(quizSessionsToday()).toBe(1);
