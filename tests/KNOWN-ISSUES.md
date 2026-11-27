@@ -3,24 +3,29 @@
 Each issue below had a test marked `it.fails` in `tests/` (or a normal test that documented today's behaviour).
 `it.fails` passes while the bug exists and **starts failing when the bug is fixed**: then change `it.fails` to `it`.
 
-**Status:** fixed in PR "Fix known issues" (one commit per issue, in this order) except **#5** and **#7**, which were left out on purpose,
-and **#17**, found later. Fixed issues are marked ✅; the proposals below are kept for the record, with a note where the fix differs.
+**Status** (after PR #693 and this PR):
+- **Fixed in main by PR #693 (Grok Bot):** #1 (local day, FB-40), #6 (total counted from the data: `getDefaultVocabularyTotal()`), #10 (one daily rule, 20 words in total: FB-35 / FB-51, `lib/progress/dailyTarget.ts`), #11 (`new: remainingCount`). Their `it.fails` tests became normal tests.
+- **Fixed in this PR** (one commit per issue): #2, #3, #4, #9, #12, #13, #14, #15, #16. Marked ✅ below. **#8 partly**: import now warns how many fields were shortened and never cuts an emoji in half, but the shared limits stay 100 / 500 / 1000 characters (the manual add-word form uses the same limits and its tests expect them), so long built-in entries are still shortened on re-import. Raising them is a product decision.
+- **Also fixed here:** `set_nickname_passcode` called the database function with argument names that do not exist in its SQL signature (`user_unique_key`, `nickname`, `passcode` instead of `p_user_unique_key`, `p_nickname`, `p_passcode`); the sign-in function was already corrected by Grok Bot, a test now checks both.
+- **Left out on purpose:** #5, #7. **Found later:** #17.
+
+Also seen: three words in the built-in data have a trailing space (`'meet up '`, `'fall through '`, `'take up something '`), so they count as separate keys from the same words without it.
 
 Priority: **P1** security or wrong data for real users, **P2** wrong behaviour in some cases, **P3** polish / needs a decision.
 
 | # | Priority | Status | Issue | Where it is tested |
 | ---: | :---: | :---: | --- | --- |
-| 1 | P1 | ✅ | Streak and "learned today" are wrong in time zones east of UTC (Vietnam) | `streakTimezone.test.ts` |
+| 1 | P1 | ✅ main | Streak and "learned today" are wrong in time zones east of UTC (Vietnam) | `streakTimezone.test.ts` |
 | 2 | P2 | ✅ | Nickname that passes validation is changed or emptied by sanitizing | `nicknameRules.test.ts`, `AuthGate.test.tsx` |
 | 3 | P1 | ✅ | Passcodes differing only by leading zeros are the same passcode | `edgeFunctions.test.ts` |
 | 4 | P1 | ✅ | Look-alike nicknames with zero-width characters become separate accounts | `nicknameRules.test.ts`, `edgeFunctions.test.ts` |
 | 5 | P1 | open | No limit on wrong passcode attempts | not testable yet (needs the feature) |
-| 6 | P2 | ✅ | `TOTAL_WORDS` (3261) differs from the data (3263) | `defaultDataIntegrity.test.ts` |
+| 6 | P2 | ✅ main | `TOTAL_WORDS` (3261) differs from the data (3263) | `defaultDataIntegrity.test.ts` |
 | 7 | P2 | open | 193 repeated word + category pairs in the built-in data | `defaultDataIntegrity.test.ts` |
-| 8 | P2 | ✅ | Import limits cut text that the built-in data already exceeds | `defaultDataIntegrity.test.ts`, `importEdge.test.ts` |
+| 8 | P2 | partly | Import limits cut text that the built-in data already exceeds | `defaultDataIntegrity.test.ts`, `importEdge.test.ts` |
 | 9 | P3 | ✅ | Dialog says "100 days", code uses 60 days | `srsScheduling.test.ts` |
-| 10 | P3 | ✅ | Daily size always uses the maximum of the range | `srsScheduling.test.ts` |
-| 11 | P3 | ✅ | `new` counter ignores learned words | `learnedWordStatsEdge.test.ts` |
+| 10 | P3 | ✅ main | Daily size always uses the maximum of the range | `srsScheduling.test.ts` |
+| 11 | P3 | ✅ main | `new` counter ignores learned words | `learnedWordStatsEdge.test.ts` |
 | 12 | P2 | ✅ | Search drops non-Latin text; `limit = 0` returns one result | `searchEdge.test.ts` |
 | 13 | P3 | ✅ | Learning time can add negative time; uses the UTC day | `storageHelpers.test.ts` |
 | 14 | P2 | ✅ | Old SQL file in the repo does not match the live database | (SQL tests use the live definitions) |
@@ -29,12 +34,10 @@ Priority: **P1** security or wrong data for real users, **P2** wrong behaviour i
 | 17 | P3 | open | Stored `null` in preferences replaces the default, so `is_muted` / `is_playing` can come back as `null` | `storageHelpers.test.ts` (`it.fails`) |
 
 How each fix was done where it differs from the proposal:
-- **#1** also covers `quizService`, `useDailyReminder`, `learningTimeService`, the daily usage tracker (which sends the learned day to the server) and the learning-time route. If the server writes learned days itself (for example in `mark_word_learned_by_key`), check it uses the user's local date too.
+- **#1, #6, #10, #11** were fixed in main by PR #693 (their own implementation); the commits of this PR for them were dropped when merging.
 - **#3** the passcode is stored **as typed** (text), leading zeros kept: `supabase/sql/2026-11-passcode-as-text.sql` changes the column and the three login functions, and both Edge Functions and `lib/auth` send the text. Users who set a passcode before this change (zero already lost, typed `012345`, saved `12345`) keep working and are upgraded to the typed form at their next sign-in. The migration stops by itself if another database function or view still uses `passcode`. Hashing the passcode is still the better long-term fix.
 - **#4** also unified the three client copies of the canonical function (`core/nickname.ts`, `lib/auth/passcodeAuth.ts`, `lib/nickname.ts`). The database function `canon()` should drop invisible characters too (see the TODO in `2026-11-live-auth-functions-snapshot.sql`).
 - **#9** the dialog no longer states a number of days (the server decides the schedule).
-- **#10** only the unused `min` was removed; the sizes (25 / 50 / 100) are unchanged. Choosing the product number (for example 20 a day) is still a decision.
-- **#11** is a judgement call: "new" now means never seen (same as "remaining" and the server summary). Revert that commit if "new" was meant to include learned words.
 - **#15** `LearningProgress.status` is not read anywhere else in the app, so only the value changed.
 - **#16** patterns were tightened, not removed.
 

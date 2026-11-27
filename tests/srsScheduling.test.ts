@@ -192,10 +192,10 @@ describe('markWordReviewed bookkeeping (C17, C25)', () => {
 });
 
 describe('daily size by intensity (C8)', () => {
-  it('asks for 25, 50 and 100 words a day', () => {
-    expect(getCountForSeverity('light')).toBe(25);
-    expect(getCountForSeverity('moderate')).toBe(50);
-    expect(getCountForSeverity('intense')).toBe(100);
+  it('asks for the same daily total (20) for every intensity', () => {
+    expect(getCountForSeverity('light')).toBe(20);
+    expect(getCountForSeverity('moderate')).toBe(20);
+    expect(getCountForSeverity('intense')).toBe(20);
   });
 
   it('maps severity to mode', () => {

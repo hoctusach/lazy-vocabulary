@@ -145,12 +145,23 @@ describe('sign in (A9, A10, A11, A16, A17)', () => {
     expect(h.toastSuccess).toHaveBeenCalled();
   });
 
-  it('a network error shows a message and lets the learner try again', async () => {
+  it('a network error shows a friendly message (never "Failed to fetch") and lets the learner try again', async () => {
     h.exchange.mockRejectedValue(new Error('Failed to fetch'));
     type('mimiu', '123456');
     await submit();
-    expect(await screen.findByText('Failed to fetch')).toBeTruthy();
+    expect(await screen.findByText("Can't reach the server. Check your internet connection and try again.")).toBeTruthy();
+    expect(screen.queryByText('Failed to fetch')).toBeNull();
     expect((screen.getByRole('button', { name: 'Sign in' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
+  it.each([
+    [err('boom', undefined, 500)],
+    [err('HTTP 502')],
+  ])('a server problem (%o) shows "The server is having trouble"', async (failure) => {
+    h.exchange.mockRejectedValue(failure);
+    type('mimiu', '123456');
+    await submit();
+    expect(await screen.findByText('The server is having trouble right now. Please try again in a moment.')).toBeTruthy();
   });
 
   it('an error without a message falls back to "Sign-in failed"', async () => {

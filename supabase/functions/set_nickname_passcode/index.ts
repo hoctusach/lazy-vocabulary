@@ -106,10 +106,11 @@ Deno.serve(async (req) => {
   });
 
   const { data, error } = await adminClient.rpc('upsert_or_verify_profile', {
-    user_unique_key: userKey,
-    nickname,
+    // Argument names must match the SQL function: upsert_or_verify_profile(p_user_unique_key, p_nickname, p_passcode, p_timezone).
+    p_user_unique_key: userKey,
+    p_nickname: nickname,
     // Sent and stored as text, exactly as typed (leading zeros are kept).
-    passcode: passcodeRaw,
+    p_passcode: passcodeRaw,
     // Forward the validated timezone so the database can persist it with the nickname.
     p_timezone: timezone,
   });

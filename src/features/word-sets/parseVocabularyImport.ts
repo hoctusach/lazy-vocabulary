@@ -2,7 +2,7 @@ import * as XLSX from 'xlsx';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import type { ImportParseResult, ImportSource } from './types';
 
-const MAX_WORDS = 4000;
+export const MAX_WORDS = 4000;
 const MAX_TEXT_CHARS = 3_500_000;
 const MAX_ERRORS = 8;
 
@@ -13,12 +13,12 @@ const TRANSLATION_HEADERS = ['translation', 'translate'];
 const CATEGORY_HEADERS = ['category', 'sheet', 'topic', 'tag'];
 const COUNT_HEADERS = ['count', 'frequency'];
 
-// Large enough for the built-in vocabulary (longest: word 176, meaning 933, example 1257, translation 432),
-// so exporting the Default set and importing it again loses nothing.
-const LIMITS = {
-  word: 200,
-  meaning: 1000,
-  example: 1500,
+// Shared with the manual add-word form. Note: a few built-in entries are longer (word 176, meaning 933,
+// example 1257), so exporting the Default set and importing it again shortens them (and says so in a warning).
+export const LIMITS = {
+  word: 100,
+  meaning: 500,
+  example: 1000,
   translation: 500,
   category: 40,
 };
@@ -164,7 +164,10 @@ function rowsToSheets(
     if (!word && !meaning) return;
     if (!word || !meaning) {
       if (errors.length < MAX_ERRORS) {
-        pushError(errors, `Row ${rowNumber} needs both a word and a meaning.`);
+        const detail = word
+          ? `"${word.slice(0, 40)}" is missing its meaning`
+          : `has a meaning ("${meaning.slice(0, 40)}") but no word`;
+        pushError(errors, `Row ${rowNumber} ${detail}. Each row needs both a word and a meaning.`);
       } else {
         hidden += 1;
       }
@@ -193,9 +196,13 @@ function rowsToSheets(
     if (!sheets[category]) sheets[category] = [];
     const list = sheets[category];
     const existing = list.findIndex((item) => item.word.toLowerCase() === word.toLowerCase());
-    if (existing >= 0) list[existing] = entry;
-    else list.push(entry);
-    valid += 1;
+    if (existing >= 0) {
+      list[existing] = entry;
+    } else {
+      list.push(entry);
+      // Only unique words count toward the cap, so a file full of repeats is not rejected.
+      valid += 1;
+    }
   });
 
   if (cuts.count > 0) {
@@ -404,6 +411,7 @@ function parseWorkbook(data: ArrayBuffer | Uint8Array, warnings: string[]): { sh
   const sheets: SheetData = {};
   const errors: string[] = [];
   for (const sheetName of workbook.SheetNames) {
+    if (['readme', '_help'].includes(sheetName.trim().toLowerCase())) continue; // [FB-44] template notes sheet
     const worksheet = workbook.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { defval: '' });
     if (rows.length === 0) continue;
@@ -460,7 +468,7 @@ export function parseVocabularyImport(source: ImportSource): ImportParseResult {
   if (!['csv', 'xlsx', 'xls', 'json'].includes(extension)) {
     return {
       ok: false,
-      errors: ['Unsupported file type. Import a .csv, .xlsx, .xls, or .json file.'],
+      errors: ['Unsupported file type. Import a .csv, .xlsx or .xls file.'],
     };
   }
 

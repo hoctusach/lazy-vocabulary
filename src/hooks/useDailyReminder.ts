@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
 import { ensureUserKey } from '@/lib/progress/srsSyncByUserKey';
 import { getProgressSummary } from '@/lib/progress/progressSummary';
 import { calculateCurrentStreak, hasLearnedToday } from '@/lib/progress/streak';
 import { pickReminderMessage } from '@/lib/reminders/messages';
-import { getLocalDateISO } from '@/utils/date';
 
 const REMINDER_STATE_KEY = 'lazyVoca.reminder.state';
 const INITIAL_CHECK_DELAY_MS = 4000;
@@ -19,8 +19,10 @@ type ReminderState = {
   lastShownAt: number;
 };
 
+import { todayKey as localTodayKey } from '@/lib/progress/streak';
+
 function todayKey(): string {
-  return getLocalDateISO();
+  return localTodayKey(); // local calendar day [FB-40]
 }
 
 function readState(): ReminderState {
@@ -54,9 +56,12 @@ function writeState(state: ReminderState): void {
  * plain browser Notification while it's hidden (only if permission was
  * already granted — see NotificationManager). There is no server push here,
  * so this only reaches an already-open tab; it can't wake a closed one.
+ * Web only: the native app uses useStudyReminders.
  */
 export function useDailyReminder(): void {
   useEffect(() => {
+    // On the Android app, scheduled local notifications (useStudyReminders) replace this.
+    if (Capacitor.isNativePlatform()) return;
     let cancelled = false;
 
     const maybeRemind = async () => {

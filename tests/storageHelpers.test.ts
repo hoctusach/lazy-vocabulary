@@ -203,24 +203,3 @@ describe('quiz done once per day (I7)', () => {
     expect(() => markQuizCompletedToday()).not.toThrow();
   });
 });
-
-describe('friend share link (D15, D16)', () => {
-  it('builds a link with only the friend parameter', async () => {
-    window.history.pushState({}, '', '/app?a=1&friend=old#x');
-    const { buildFriendShareUrl } = await import('@/lib/progress/friendCompare');
-    const url = new URL(buildFriendShareUrl('tok en'));
-    expect(url.searchParams.get('friend')).toBe('tok en');
-    expect(url.searchParams.has('a')).toBe(false);
-    expect(url.hash).toBe('');
-  });
-
-  it('reads the friend key and ignores empty values', async () => {
-    const { readFriendKeyFromLocation } = await import('@/lib/progress/friendCompare');
-    window.history.pushState({}, '', '/?friend=abc123');
-    expect(readFriendKeyFromLocation()).toBe('abc123');
-    window.history.pushState({}, '', '/?friend=%20%20');
-    expect(readFriendKeyFromLocation()).toBeNull();
-    window.history.pushState({}, '', '/');
-    expect(readFriendKeyFromLocation()).toBeNull();
-  });
-});

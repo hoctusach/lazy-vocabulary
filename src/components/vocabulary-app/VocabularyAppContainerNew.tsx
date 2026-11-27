@@ -9,15 +9,20 @@ import UserInteractionManager from "./UserInteractionManager";
 import AudioStatusIndicator from "./AudioStatusIndicator";
 import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabularyState";
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
+import { usePlaybackService } from '@/hooks/usePlaybackService';
 import { vocabularyService } from '@/services/vocabularyService';
+import { getFavoriteVoice } from '@/lib/preferences/localPreferences';
+import { buildNativeQueue, findQueueIndex } from '@/services/background/buildNativeQueue';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
 
 interface VocabularyAppContainerNewProps {
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   initialWords?: VocabularyWord[];
   additionalContent?: React.ReactNode;
+  underPlayerContent?: React.ReactNode;
   onOpenSearch: (word?: string) => void;
   dailySelection?: DailySelection | null;
   isLoadingSelection?: boolean;
@@ -31,6 +36,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   onMarkWordLearned,
   initialWords,
   additionalContent,
+  underPlayerContent,
   onOpenSearch,
   dailySelection,
   isLoadingSelection = false,
@@ -68,6 +74,44 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     isSpeaking,
     isAudioUnlocked: userInteractionState.isAudioUnlocked,
     playCurrentWord
+  });
+
+  // [FB-52] The native service owns the upcoming queue. Built once per list/voice/mute change (current word read from a
+  // ref); the index of the card inside it travels with every word update, so no re-push per word.
+  const currentWordRef = React.useRef(currentWord);
+  currentWordRef.current = currentWord;
+  const nativeQueue = useMemo(
+    () =>
+      hasData
+        ? buildNativeQueue(vocabularyService.getWordList(), currentWordRef.current, {
+            voiceName: selectedVoiceName || getFavoriteVoice(), // [FB-61] never an empty voice before the list loads
+            rate: getSpeechRate(),
+            muted: isMuted,
+          })
+        : null,
+    [hasData, selectedVoiceName, isMuted, initialWords, dailySelection]
+  );
+  const nativeIndex = nativeQueue && currentWord ? findQueueIndex(nativeQueue.items, currentWord) : undefined;
+
+  // Android: keep playing (and show a notification) while the app is backgrounded.
+  usePlaybackService({
+    isPlaying: hasData && !isPaused && !!currentWord,
+    active: hasData && !!currentWord,
+    word: currentWord?.word,
+    detail: currentWord?.meaning || currentWord?.category || currentCategory,
+    // Explicit directions: a stale notification tap must never flip the wrong way.
+    onPause: () => { if (!isPaused) togglePause(); },
+    onPlay: () => { if (isPaused) togglePause(); },
+    onNext: goToNextAndSpeak,
+    queue: nativeQueue,
+    index: nativeIndex,
+    // Native advanced while the WebView was frozen: catch up (bounded) so the card matches what was last heard.
+    onNativeSync: (target: number) => {
+      if (nativeIndex === undefined || !nativeQueue) return;
+      const n = nativeQueue.items.length;
+      const steps = (((target - nativeIndex) % n) + n) % n;
+      for (let i = 0; i < Math.min(steps, 8); i += 1) setTimeout(goToNextAndSpeak, 350 * (i + 1));
+    },
   });
 
   // Memoize debug data
@@ -181,6 +225,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
             playCurrentWord={playCurrentWord}
             onMarkWordLearned={onMarkWordLearned}
             additionalContent={additionalContent}
+            underPlayerContent={underPlayerContent}
             onOpenSearch={onOpenSearch}
             currentUserLearnedCount={currentUserLearnedCount}
             currentUserLearningCount={currentUserLearningCount}

@@ -10,9 +10,9 @@ export const normalizeQuery = (input: string): string => {
   return main
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    // d with stroke has no decomposition, so map it by hand (đường -> duong).
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
+    // Vietnamese d with stroke (U+0111 / U+0110) has no decomposition, so map it by hand (duong with a stroke -> duong).
+    .replace(/\u0111/g, 'd')
+    .replace(/\u0110/g, 'D')
     .replace(/[^\p{L}\p{M}\p{N}\s'-]/gu, '')
     .replace(/\s+/g, ' ')
     .trim();

@@ -1,0 +1,153 @@
+/*
+ * [FB-58] One section system for every tab (Learn, Progress, Library, More).
+ * Shared title typography + a crafted surface, built only from theme tokens, so all 5 themes (light + dark) follow.
+ *   .lv-page-title    the screen title (Library, More)
+ *   .lv-section       a section surface (Word Summary, Learning Progress, Streak, Leaderboard, Quiz, Library/More cards)
+ *   .lv-section-head  header row with icon chip + .lv-section-title
+ *   .lv-section-title the ONE section title style: same font, size, weight, letter-spacing and colour everywhere
+ *   .lv-tile          a count tile (big number + small label)
+ *   .lv-lane/.lv-row  Word Summary lanes (NEW / DUE / LEARNED today) and their word rows
+ */
+body[class*="theme-"] .lv-page-title,
+body[class*="theme-"] .lv-section-title {
+  font-family: var(--lv-font-display);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--lv-heading);
+  margin: 0;
+}
+body[class*="theme-"] .lv-page-title { font-size: 1.375rem; line-height: 1.2; }
+body[class*="theme-"] .lv-section-title { font-size: 1.0625rem; line-height: 1.25; }
+
+body[class*="theme-"] .lv-section {
+  position: relative;
+  background: var(--lv-card-bg);
+  border: var(--lv-border-w) solid var(--lv-border-color);
+  border-radius: var(--lv-radius);
+  box-shadow: var(--lv-shadow-sm);
+  overflow: hidden;
+}
+/* a slim accent rail on the leading edge gives every section the same signature */
+body[class*="theme-"] .lv-section::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  background: var(--lv-accent);
+  opacity: .9;
+}
+body[class*="theme-"] .lv-section-head {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  width: 100%;
+  padding: .75rem .9rem .75rem 1.1rem;
+  text-align: left;
+  background: color-mix(in srgb, var(--lv-accent) 9%, var(--lv-card-bg));
+}
+body[class*="theme-"] .lv-section-head[data-state="open"] { border-bottom: var(--lv-border-w) solid var(--lv-border-color); }
+body[class*="theme-"] .lv-section-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--lv-radius-sm);
+  background: var(--lv-accent-soft);
+  color: var(--lv-accent);
+}
+body[class*="theme-"] .lv-section-body { padding: .85rem .9rem .95rem 1.1rem; }
+body[class*="theme-"] .lv-section-hint { font-size: .8125rem; color: var(--lv-text-secondary); }
+
+/* count tiles (Learning Progress) */
+body[class*="theme-"] .lv-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+@media (min-width: 768px) { body[class*="theme-"] .lv-tiles { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+body[class*="theme-"] .lv-tile {
+  --tile: var(--lv-accent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .1rem;
+  padding: .85rem .5rem .7rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--tile) 11%, var(--lv-card-bg));
+  border: var(--lv-border-w) solid color-mix(in srgb, var(--tile) 40%, var(--lv-border-color));
+  border-radius: var(--lv-radius-sm);
+}
+body[class*="theme-"] .lv-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: var(--tile);
+  border-radius: var(--lv-radius-sm) var(--lv-radius-sm) 0 0;
+}
+body[class*="theme-"] .lv-tile-num {
+  font-family: var(--lv-font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--tile);
+  font-variant-numeric: tabular-nums;
+}
+body[class*="theme-"] .lv-tile-label { font-size: .8125rem; font-weight: 600; color: var(--lv-text-secondary); }
+body[class*="theme-"] .lv-tile[data-tone="success"] { --tile: var(--lv-success); }
+body[class*="theme-"] .lv-tile[data-tone="due"] { --tile: var(--lv-error); }
+body[class*="theme-"] .lv-tile[data-tone="warning"] { --tile: var(--lv-warning); }
+body[class*="theme-"] .lv-tile[data-tone="muted"] { --tile: var(--lv-text-secondary); }
+
+/* progress meter */
+body[class*="theme-"] .lv-meter {
+  height: .75rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--lv-text-secondary) 18%, var(--lv-card-bg));
+  border: 1px solid var(--lv-border-color);
+}
+body[class*="theme-"] .lv-meter > span { display: block; height: 100%; background: var(--lv-accent); transition: width .4s ease; }
+
+/* Word Summary: the day at a glance + three lanes */
+body[class*="theme-"] .lv-day-meter { display: flex; height: .6rem; border-radius: 999px; overflow: hidden; background: color-mix(in srgb, var(--lv-text-secondary) 16%, var(--lv-card-bg)); border: 1px solid var(--lv-border-color); }
+body[class*="theme-"] .lv-day-meter > span { display: block; height: 100%; }
+body[class*="theme-"] .lv-lane { --lane: var(--lv-accent); display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+body[class*="theme-"] .lv-lane[data-lane="new"] { --lane: var(--lv-success); }
+body[class*="theme-"] .lv-lane[data-lane="due"] { --lane: var(--lv-error); }
+body[class*="theme-"] .lv-lane[data-lane="learned"] { --lane: var(--lv-accent); }
+body[class*="theme-"] .lv-lane-title {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: .4rem;
+  margin: 0;
+  padding: .2rem .65rem;
+  font-family: var(--lv-font-ui);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  color: var(--lane);
+  background: color-mix(in srgb, var(--lane) 14%, var(--lv-card-bg));
+  border: var(--lv-border-w) solid color-mix(in srgb, var(--lane) 45%, var(--lv-border-color));
+  border-radius: 999px;
+}
+body[class*="theme-"] .lv-lane-title::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--lane); }
+body[class*="theme-"] .lv-lane-list { display: flex; flex-direction: column; gap: .4rem; max-height: 15rem; overflow-y: auto; }
+body[class*="theme-"] .lv-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .45rem .6rem;
+  font-size: .875rem;
+  color: var(--lv-text-primary);
+  background: color-mix(in srgb, var(--lane) 9%, var(--lv-card-bg));
+  border: 1px solid color-mix(in srgb, var(--lane) 30%, var(--lv-border-color));
+  border-left: 4px solid var(--lane);
+  border-radius: var(--lv-radius-sm);
+}
+body[class*="theme-"] .lv-row-word { font-weight: 700; overflow-wrap: anywhere; }
+body[class*="theme-"] .lv-row-meta { font-size: .75rem; color: var(--lv-text-secondary); }
+body[class*="theme-"] .lv-row button { flex: none; padding: .35rem; border-radius: var(--lv-radius-sm); color: var(--lane); min-width: 2rem; min-height: 2rem; display: inline-flex; align-items: center; justify-content: center; }
+body[class*="theme-"] .lv-row-empty { padding: .5rem .6rem; font-size: .8125rem; font-style: italic; color: var(--lv-text-secondary); border: 1px dashed color-mix(in srgb, var(--lane) 45%, var(--lv-border-color)); border-radius: var(--lv-radius-sm); }

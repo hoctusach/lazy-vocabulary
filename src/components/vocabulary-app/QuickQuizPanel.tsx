@@ -14,7 +14,10 @@ import { cn } from "@/lib/utils";
 import type { VocabularyWord } from "@/types/vocabulary";
 import { buildQuiz, pickWordOfTheDay } from "@/features/quiz/quizEngine";
 import type { QuizQuestion } from "@/features/quiz/types";
-import { markQuizCompletedToday } from "@/features/quiz/quizService";
+import { markStudiedToday } from "@/lib/reminders/studySignal";
+import { canStartQuiz, markQuizCompletedToday, recordQuizStart } from "@/features/quiz/quizService";
+import { hasFeature } from "@/services/billing/proFeatures";
+import { openProUpgrade } from "@/services/billing/proUpgradeStore";
 import { getVocabularySourceRevision, loadAllWords, subscribeVocabularySource } from "@/utils/allWords";
 
 interface QuickQuizPanelProps {
@@ -45,10 +48,15 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
   const wordOfTheDay = useMemo(() => pickWordOfTheDay(pool), [pool]);
 
   const startQuiz = (seedWord?: VocabularyWord) => {
+    if (!canStartQuiz(hasFeature("unlimitedQuiz"))) {
+      openProUpgrade("unlimitedQuiz");
+      return;
+    }
     const targets = targetWords && targetWords.length > 0 ? targetWords : pool;
     const seeded = seedWord ? [seedWord, ...targets.filter((w) => w.word !== seedWord.word)] : targets;
     const built = buildQuiz(seeded, pool, QUESTION_COUNT);
 
+    if (built.length > 0) recordQuizStart();
     setQuestions(built);
     setQuestionIndex(0);
     setSelected(null);
@@ -62,6 +70,7 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
   const handleSelect = (option: string) => {
     if (selected) return;
     setSelected(option);
+    markStudiedToday('quiz');
     if (option === currentQuestion.correctMeaning) {
       setCorrectCount((count) => count + 1);
     }
@@ -88,17 +97,14 @@ const QuickQuizPanel: React.FC<QuickQuizPanelProps> = ({ targetWords, className 
 
   return (
     <>
-      <Card className={cn("mt-3 w-full border-2 theme-card-surface theme-border", className)}>
-        <CardContent className="flex items-center justify-between gap-3 p-3">
+      <Card className={cn("lv-section mt-3 w-full", className)}>
+        <CardContent className="flex items-center justify-between gap-3 p-3 pl-5">
           <div className="flex items-center gap-2.5 min-w-0">
-            <span
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-              style={{ background: "var(--lv-accent-soft)", color: "var(--lv-accent)" }}
-            >
+            <span className="lv-section-icon">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
             </span>
             <div className="min-w-0">
-              <div className="text-sm font-semibold" style={{ color: "var(--lv-heading)" }}>
+              <div className="lv-section-title">
                 {wordOfTheDay ? `Word of the day: ${wordOfTheDay.word}` : "60-second quiz"}
               </div>
               <div className="text-xs theme-muted-text truncate">

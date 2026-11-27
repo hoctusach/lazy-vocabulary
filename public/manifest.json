@@ -1,12 +1,12 @@
 {
   "name": "Lazy Vocabulary",
   "short_name": "LazyVoca",
-  "description": "Master English vocabulary with passive listening, spaced repetition, and quick daily practice.",
+  "description": "Just 15 minutes a day with spaced repetition to master English vocabulary.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#ffffff",
+  "background_color": "#1a5488",
   "theme_color": "#2563eb",
   "icons": [
     {

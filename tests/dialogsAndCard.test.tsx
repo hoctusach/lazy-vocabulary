@@ -102,12 +102,20 @@ describe('word card (G1, G2, G5)', () => {
     expect(screen.getByText('(phr v)')).toBeTruthy();
   });
 
-  it('shows the translation only when there is one', () => {
-    const { unmount } = card({ translation: 'bỏ cuộc' });
-    expect(screen.getByText(/bỏ cuộc/)).toBeTruthy();
-    unmount();
+  it('always shows a translation line: the user\'s text, or "Add translation" when there is nothing to show', () => {
     card();
-    expect(screen.queryByText(/\* bỏ cuộc/)).toBeNull();
+    expect(screen.getByText('Add translation')).toBeTruthy();
+  });
+
+  it('hides the built-in Vietnamese translation on an English device until it is switched on, shows it on a Vietnamese device', () => {
+    const { unmount } = card({ translation: 'bỏ cuộc' });
+    expect(screen.queryByText('bỏ cuộc')).toBeNull();
+    expect(screen.getByText('Add translation')).toBeTruthy();
+    unmount();
+    localStorage.setItem('lv_show_vi_translation', '1');
+    card({ translation: 'bỏ cuộc' });
+    expect(screen.getByText('bỏ cuộc')).toBeTruthy();
+    localStorage.removeItem('lv_show_vi_translation');
   });
 
   it('keeps line breaks in the meaning and handles very long text without crashing', () => {
@@ -118,6 +126,7 @@ describe('word card (G1, G2, G5)', () => {
 
   it('does not render HTML from the word data', () => {
     card({ meaning: '<img src=x onerror=alert(1)>' });
-    expect(document.querySelector('img')).toBeNull();
+    expect(document.querySelector('img[src="x"]')).toBeNull();
+    expect(document.body.textContent).toContain('<img src=x onerror=alert(1)>');
   });
 });

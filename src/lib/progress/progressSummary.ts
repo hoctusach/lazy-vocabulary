@@ -1,5 +1,6 @@
 import { getSupabaseClient } from '@/lib/supabaseClient';
-import { TOTAL_WORDS } from './srsSyncByUserKey';
+import { getDefaultVocabularyTotal } from '@/data/defaultVocabulary';
+import { readStudyDays } from '@/lib/progress/studyDays';
 
 export type ProgressSummaryFields = {
   learning_count: number;
@@ -115,7 +116,7 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
       learning_due_count: local.learning_due_count ?? 0,
       remaining_count:
         local.remaining_count ??
-        Math.max(TOTAL_WORDS - (local.learned_count ?? 0), 0),
+        Math.max(getDefaultVocabularyTotal() - (local.learned_count ?? 0), 0),
       learning_time: local.learning_time ?? 0,
       learned_days: local.learned_days ?? null,
       updated_at: local.updated_at ?? null,
@@ -130,7 +131,7 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
       learning_due_count: remote.learning_due_count ?? 0,
       remaining_count:
         remote.remaining_count ??
-        Math.max(TOTAL_WORDS - (remote.learned_count ?? 0), 0),
+        Math.max(getDefaultVocabularyTotal() - (remote.learned_count ?? 0), 0),
       learning_time: remote.learning_time ?? 0,
       learned_days: remote.learned_days ?? null,
       updated_at: remote.updated_at ?? null,
@@ -142,7 +143,7 @@ async function fetchExistingSummary(userKey: string): Promise<SummaryRow | null>
     learning_count: 0,
     learned_count: 0,
     learning_due_count: 0,
-    remaining_count: Math.max(TOTAL_WORDS, 0),
+    remaining_count: Math.max(getDefaultVocabularyTotal(), 0),
     learning_time: 0,
     learned_days: [],
     updated_at: null,
@@ -156,6 +157,7 @@ export async function refreshProgressSummary(
   const remote = await fetchSummaryFromServer(userKey);
   const summary = toProgressSummary(remote) ?? toProgressSummary(await fetchExistingSummary(userKey));
   if (!summary) return null;
+  summary.learned_days = normaliseDays([...summary.learned_days, ...readStudyDays()]); // [FB-40]
 
   persistProgressSummaryLocal(summary);
   return summary;
@@ -165,7 +167,9 @@ export async function getProgressSummary(
   userKey: string
 ): Promise<ProgressSummaryFields | null> {
   if (!userKey) return null;
-  return toProgressSummary(await fetchExistingSummary(userKey));
+  const summary = toProgressSummary(await fetchExistingSummary(userKey));
+  if (summary) summary.learned_days = normaliseDays([...summary.learned_days, ...readStudyDays()]); // [FB-40]
+  return summary;
 }
 
 function normaliseDays(days: string[] | null | undefined): string[] {
@@ -187,7 +191,7 @@ function toProgressSummary(source: SummaryRow | null): ProgressSummaryFields | n
     learned_count: learnedCount,
     learning_due_count: source.learning_due_count ?? 0,
     remaining_count:
-      source.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
+      source.remaining_count ?? Math.max(getDefaultVocabularyTotal() - learnedCount, 0),
     learning_time: source.learning_time ?? 0,
     learned_days: normaliseDays(source.learned_days),
     updated_at: source.updated_at ?? null,
@@ -211,7 +215,7 @@ export async function mergeProgressSummary(
     remaining_count:
       updates.remaining_count ??
       existing?.remaining_count ??
-      Math.max(TOTAL_WORDS - nextLearnedCount, 0),
+      Math.max(getDefaultVocabularyTotal() - nextLearnedCount, 0),
     learning_time: updates.learning_time ?? existing?.learning_time ?? 0,
     learned_days: updates.learned_days
       ? normaliseDays(updates.learned_days)
@@ -235,7 +239,7 @@ export async function recalcProgressSummary(userKey: string): Promise<void> {
     learned_count: learnedCount,
     learning_due_count: remote.learning_due_count ?? 0,
     remaining_count:
-      remote.remaining_count ?? Math.max(TOTAL_WORDS - learnedCount, 0),
+      remote.remaining_count ?? Math.max(getDefaultVocabularyTotal() - learnedCount, 0),
     learning_time: remote.learning_time ?? undefined,
     learned_days: remote.learned_days ?? undefined,
     updated_at: remote.updated_at ?? undefined,

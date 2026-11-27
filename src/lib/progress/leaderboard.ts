@@ -1,10 +1,6 @@
-import { getActiveSession } from '@/lib/auth';
-import { getNicknameLocal } from '@/lib/nickname';
-import { getSupabaseClient } from '@/lib/supabaseClient';
-import { getProgressSummary } from './progressSummary';
-import { calculateCurrentStreak } from './streak';
+import { callFriendsRpc, FriendsError, friendsErrorMessage, type LeaderboardPeriod } from './friends';
 
-export type LeaderboardTimeframe = 'today' | 'week' | 'allTime';
+export type LeaderboardTimeframe = LeaderboardPeriod;
 
 export type LeaderboardEntry = {
   userKey: string;
@@ -13,8 +9,6 @@ export type LeaderboardEntry = {
   learnedWords: number;
   learningWords: number;
   dueWords: number;
-  streakDays?: number;
-  learningMinutes?: number;
   isCurrentUser?: boolean;
 };
 
@@ -23,298 +17,65 @@ export type LeaderboardState = {
   entries: LeaderboardEntry[];
   currentUserEntry?: LeaderboardEntry;
   isLoading: boolean;
+  /** True when there is no live session; no board is shown. */
+  signedOut?: boolean;
+  /** True when this device is signed in but the server session could not be renewed. */
+  sessionExpired?: boolean;
   error?: string;
 };
 
-type LearnedWordsLeaderboardRow = {
-  user_unique_key?: unknown;
-  srs_state?: unknown;
-  in_review_queue?: unknown;
-  next_review_at?: unknown;
-};
+type LeaderboardRpcRow = Record<string, unknown>;
 
-type LeaderboardRow = {
-  user_unique_key?: unknown;
-  nickname?: unknown;
-  name?: unknown;
-  learned_count?: unknown;
-  learning_count?: unknown;
-  learning_due_count?: unknown;
-  learning_time?: unknown;
-  learned_days?: unknown;
-  updated_at?: unknown;
-};
-
-type LeaderboardOptions = {
-  limit?: number;
-  currentUserLearnedCount?: number;
-  currentUserLearningCount?: number;
-  currentUserDueCount?: number;
-};
-
-const DEFAULT_LIMIT = 5;
-const USER_KEY_STORAGE_KEY = 'lazyVoca.userKey';
-
-function readLocalStorage(key: string): string | null {
-  if (typeof localStorage === 'undefined') return null;
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
+function toCount(value: unknown): number {
+  const n = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : NaN;
+  return Number.isFinite(n) ? Math.max(0, Math.trunc(n)) : 0;
 }
 
-function toFiniteNumber(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-  if (typeof value === 'bigint') {
-    return Number(value);
-  }
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (!trimmed) return null;
-    const parsed = Number(trimmed);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
-function toPositiveInteger(value: unknown, fallback = 0): number {
-  const parsed = toFiniteNumber(value);
-  if (parsed === null) return fallback;
-  return Math.max(0, Math.trunc(parsed));
-}
-
-function toStringArray(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set<string>();
-  value.forEach((entry) => {
-    if (typeof entry !== 'string') return;
-    const trimmed = entry.trim();
-    if (trimmed.length === 10) {
-      seen.add(trimmed);
-    }
-  });
-  return Array.from(seen).sort();
-}
-
-function displayNameFromRow(row: LeaderboardRow, userKey: string): string {
-  const candidates = [row.name, row.nickname, userKey];
-  for (const candidate of candidates) {
-    if (typeof candidate !== 'string') continue;
-    const trimmed = candidate.trim();
-    if (trimmed) return trimmed;
-  }
-  return 'Learner';
-}
-
-function learningMinutesFromHours(value: unknown): number | undefined {
-  const hours = toFiniteNumber(value);
-  if (hours === null) return undefined;
-  return Math.max(0, Math.round(hours * 60));
-}
-
-function sortLeaderboardEntries(entries: LeaderboardEntry[]): LeaderboardEntry[] {
-  return [...entries].sort((a, b) => {
-    if (b.learnedWords !== a.learnedWords) return b.learnedWords - a.learnedWords;
-    if (b.learningWords !== a.learningWords) return b.learningWords - a.learningWords;
-    return a.nickname.localeCompare(b.nickname, undefined, { sensitivity: 'base' });
-  });
-}
-
-async function resolveCurrentIdentity(): Promise<{ userKey: string | null; nickname: string | null }> {
-  let session: Awaited<ReturnType<typeof getActiveSession>> = null;
-  try {
-    session = await getActiveSession();
-  } catch (error) {
-    console.warn('leaderboard:resolveIdentity', error);
-  }
-  const sessionUserKey = session?.user_unique_key?.trim() || session?.user?.id?.trim() || '';
-  const localUserKey = readLocalStorage(USER_KEY_STORAGE_KEY)?.trim() || '';
-  const userKey = sessionUserKey || localUserKey || null;
-
-  const sessionNickname =
-    session?.user?.name?.trim() ||
-    session?.name?.trim() ||
-    session?.user?.nickname?.trim() ||
-    session?.nickname?.trim() ||
-    '';
-  const nickname = sessionNickname || getNicknameLocal()?.trim() || userKey;
-
-  return { userKey, nickname: nickname || null };
-}
-
-function isDueFromTimestamp(value: unknown, now = Date.now()): boolean {
-  if (typeof value !== 'string') return false;
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) return false;
-  return parsed <= now;
-}
-
-function resolveLearningState(row: LearnedWordsLeaderboardRow): 'learned' | 'learning' | null {
-  const state = typeof row.srs_state === 'string' ? row.srs_state.trim().toLowerCase() : '';
-  if (state === 'learned' || state === 'learning') return state;
-  if (typeof row.in_review_queue === 'boolean') return row.in_review_queue ? 'learning' : 'learned';
-  return null;
-}
-
-function aggregateLearnedWordRows(rows: LearnedWordsLeaderboardRow[]): LeaderboardRow[] {
-  const byUser = new Map<string, { learned: number; learning: number; due: number }>();
-
-  rows.forEach((row) => {
-    const userKey = typeof row.user_unique_key === 'string' ? row.user_unique_key.trim() : '';
-    if (!userKey) return;
-
-    const state = resolveLearningState(row);
-    if (!state) return;
-
-    const counts = byUser.get(userKey) ?? { learned: 0, learning: 0, due: 0 };
-    if (state === 'learned') {
-      counts.learned += 1;
-    } else {
-      counts.learning += 1;
-      if (isDueFromTimestamp(row.next_review_at)) {
-        counts.due += 1;
-      }
-    }
-    byUser.set(userKey, counts);
-  });
-
-  return Array.from(byUser.entries()).map(([userKey, counts]) => ({
-    user_unique_key: userKey,
-    learned_count: counts.learned,
-    learning_count: counts.learning,
-    learning_due_count: counts.due,
-  }));
-}
-
-async function fetchLeaderboardRows(limit: number): Promise<LeaderboardRow[]> {
-  try {
-    const client = getSupabaseClient();
-    const { data, error } = await client
-      .from('learned_words')
-      .select('user_unique_key, srs_state, in_review_queue, next_review_at');
-
-    if (error) {
-      console.warn('leaderboard:fetchTop', error.message);
-      return [];
-    }
-
-    const learnedWordRows = Array.isArray(data) ? (data as LearnedWordsLeaderboardRow[]) : [];
-    return sortLeaderboardEntries(rowsToEntries(aggregateLearnedWordRows(learnedWordRows), null))
-      .slice(0, limit)
-      .map((entry) => ({
-        user_unique_key: entry.userKey,
-        learned_count: entry.learnedWords,
-        learning_count: entry.learningWords,
-        learning_due_count: entry.dueWords,
-      }));
-  } catch (error) {
-    console.warn('leaderboard:fetchTop', error);
-    return [];
-  }
-}
-
-function rowsToEntries(rows: LeaderboardRow[], currentUserKey: string | null): LeaderboardEntry[] {
-  return rows
-    .map((row) => {
-      const userKey = typeof row.user_unique_key === 'string' ? row.user_unique_key.trim() : '';
-      if (!userKey) return null;
-      const learnedDays = toStringArray(row.learned_days);
-
-      return {
-        userKey,
-        nickname: displayNameFromRow(row, userKey),
-        rank: 0,
-        learnedWords: toPositiveInteger(row.learned_count),
-        learningWords: toPositiveInteger(row.learning_count),
-        dueWords: toPositiveInteger(row.learning_due_count),
-        streakDays: calculateCurrentStreak(learnedDays),
-        learningMinutes: learningMinutesFromHours(row.learning_time),
-        isCurrentUser: currentUserKey ? userKey === currentUserKey : false,
-      } satisfies LeaderboardEntry;
-    })
-    .filter((entry): entry is LeaderboardEntry => entry !== null);
-}
-
-function applyRanks(entries: LeaderboardEntry[]): LeaderboardEntry[] {
-  return sortLeaderboardEntries(entries).map((entry, index) => ({
-    ...entry,
-    rank: index + 1,
-  }));
-}
-
-async function buildCurrentUserEntry(
-  userKey: string,
-  nickname: string | null,
-  rank: number,
-  learnedOverride?: number,
-  learningOverride?: number,
-  dueOverride?: number
-): Promise<LeaderboardEntry> {
-  let summary: Awaited<ReturnType<typeof getProgressSummary>> = null;
-  try {
-    summary = await getProgressSummary(userKey);
-  } catch (error) {
-    console.warn('leaderboard:currentUserSummary', error);
-  }
-  const learnedDays = summary?.learned_days ?? [];
+function rowToEntry(row: LeaderboardRpcRow, index: number): LeaderboardEntry | null {
+  const userKey = typeof row.user_key === 'string' ? row.user_key.trim() : '';
+  if (!userKey) return null;
+  const nickname = typeof row.nickname === 'string' && row.nickname.trim() ? row.nickname.trim() : userKey;
+  const rank = toCount(row.rank);
   return {
     userKey,
-    nickname: nickname || userKey,
-    rank,
-    learnedWords: toPositiveInteger(learnedOverride ?? summary?.learned_count),
-    learningWords: toPositiveInteger(learningOverride ?? summary?.learning_count),
-    dueWords: toPositiveInteger(dueOverride ?? summary?.learning_due_count),
-    streakDays: calculateCurrentStreak(learnedDays),
-    learningMinutes: learningMinutesFromHours(summary?.learning_time),
-    isCurrentUser: true,
+    nickname,
+    rank: rank > 0 ? rank : index + 1,
+    learnedWords: toCount(row.learned_words),
+    learningWords: toCount(row.learning_words),
+    dueWords: toCount(row.due_words),
+    isCurrentUser: row.is_current_user === true,
   };
 }
 
+/**
+ * Friends-only board: the signed-in user plus the people they added, ranked
+ * by the server. Never lists anyone else.
+ */
 export async function getLeaderboardState(
-  options: LeaderboardOptions = {}
+  options: { period?: LeaderboardTimeframe } = {}
 ): Promise<LeaderboardState> {
-  const limit = Math.max(1, Math.trunc(options.limit ?? DEFAULT_LIMIT));
-  const { userKey, nickname } = await resolveCurrentIdentity();
-  const rows = await fetchLeaderboardRows(limit);
-  let rankedEntries = applyRanks(rowsToEntries(rows, userKey));
-
-  let currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser);
-
-  if (userKey && !currentUserEntry) {
-    const optimisticRank = rankedEntries.length + 1;
-    currentUserEntry = await buildCurrentUserEntry(
-      userKey,
-      nickname,
-      optimisticRank,
-      options.currentUserLearnedCount,
-      options.currentUserLearningCount,
-      options.currentUserDueCount
-    );
-    rankedEntries = applyRanks([...rankedEntries, currentUserEntry]);
-    currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
-  } else if (currentUserEntry && typeof options.currentUserLearnedCount === 'number') {
-    rankedEntries = applyRanks(
-      rankedEntries.map((entry) =>
-        entry.isCurrentUser
-          ? {
-              ...entry,
-              learnedWords: toPositiveInteger(options.currentUserLearnedCount),
-              learningWords: toPositiveInteger(options.currentUserLearningCount, entry.learningWords),
-              dueWords: toPositiveInteger(options.currentUserDueCount, entry.dueWords),
-            }
-          : entry
-      )
-    );
-    currentUserEntry = rankedEntries.find((entry) => entry.isCurrentUser) ?? currentUserEntry;
+  const timeframe = options.period ?? 'allTime';
+  try {
+    const data = await callFriendsRpc('get_friends_leaderboard', { p_period: timeframe });
+    const rows = Array.isArray(data) ? (data as LeaderboardRpcRow[]) : [];
+    const entries = rows
+      .map((row, index) => (row && typeof row === 'object' ? rowToEntry(row, index) : null))
+      .filter((entry): entry is LeaderboardEntry => entry !== null)
+      .sort((a, b) => a.rank - b.rank);
+    return {
+      timeframe,
+      entries,
+      currentUserEntry: entries.find((entry) => entry.isCurrentUser),
+      isLoading: false,
+    };
+  } catch (error) {
+    if (error instanceof FriendsError && error.kind === 'signed_out') {
+      return { timeframe, entries: [], isLoading: false, signedOut: true };
+    }
+    if (error instanceof FriendsError && error.kind === 'session_expired') {
+      return { timeframe, entries: [], isLoading: false, sessionExpired: true };
+    }
+    const message = error instanceof FriendsError ? error.message : friendsErrorMessage('unavailable');
+    return { timeframe, entries: [], isLoading: false, error: message };
   }
-
-  return {
-    timeframe: 'allTime',
-    entries: rankedEntries.slice(0, limit),
-    currentUserEntry,
-    isLoading: false,
-  };
 }

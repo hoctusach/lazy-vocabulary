@@ -2,33 +2,54 @@ import React from 'react';
 import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
-import FriendCompareCard from '@/components/vocabulary-app/FriendCompareCard';
-import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
+import NaturalVoiceRow from '@/components/mobile/NaturalVoiceRow';
+import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
+import { isNativePlatform } from '@/services/speech/nativeTts';
+import { isProEnabled } from '@/config/features';
+import ProCard from '@/components/mobile/ProCard';
+import RemindersCard from '@/components/mobile/RemindersCard';
+
+declare const __APP_VERSION__: string;
+const APP_VERSION = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : '';
+
+const OPEN_SOURCE_LICENSES = [
+  { name: 'Kokoro-82M by hexgrad', url: 'https://huggingface.co/hexgrad/Kokoro-82M', license: 'Apache-2.0' },
+  { name: 'sherpa-onnx by k2-fsa (Next-gen Kaldi)', url: 'https://github.com/k2-fsa/sherpa-onnx', license: 'Apache-2.0', note: 'includes OpenFst, kaldi-native-fbank (Apache-2.0) and nlohmann/json (MIT)' },
+  { name: 'ONNX Runtime by Microsoft', url: 'https://github.com/microsoft/onnxruntime', license: 'MIT', note: 'statically linked in sherpa-onnx' },
+  { name: 'Kokoro model files and English lexicon (k2-fsa model package, fp32)', url: 'https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0', license: 'Apache-2.0' },
+  { name: 'Kokoro model files (k2-fsa model package, int8, for low-memory devices)', url: 'https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0', license: 'Apache-2.0' },
+  { name: 'CMU Pronouncing Dictionary', url: 'https://github.com/cmusphinx/cmudict', license: 'BSD-2-Clause', note: 'Copyright (C) 1993-2015 Carnegie Mellon University' },
+  { name: 'Kotlin standard library', url: 'https://github.com/JetBrains/kotlin', license: 'Apache-2.0' },
+];
 
 const MorePanel: React.FC = () => {
-  const { activeSet } = useVocabularySets();
+  const native = isNativePlatform();
 
   return (
     <section className="space-y-4" data-screen="more">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--lv-heading)' }}>
+        <h2 className="lv-page-title">
           More
         </h2>
-        <p className="mt-1 text-sm leading-relaxed" style={{ color: 'var(--lv-text-secondary)' }}>
-          Learning <span className="font-medium">{activeSet.name}</span>. Audio settings stay on this device.
-          Speech uses the voices installed on your phone or browser.
-        </p>
       </div>
 
-      <FriendCompareCard />
+      {isProEnabled() && <ProCard />}
 
-      <div className="rounded-2xl border p-4 theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
+      <div className="lv-section p-4 pl-5">
+        {/* Account & privacy group: Delete account / privacy links (feat/play-store-ads-release) slot in below the greeting. */}
         <UserGreeting />
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <ThemeSwitcher />
-          <NotificationManager />
+          {/* Web Notification API is unavailable in the Android WebView; native uses RemindersCard below. */}
+          {!native && <NotificationManager />}
         </div>
       </div>
+
+      <RemindersCard />
+
+      <NaturalVoiceRow />
+
+      <PrivacyAndAccountCard />
 
       <div className="rounded-2xl border p-4 text-sm leading-relaxed theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }}>
         <p className="slogan-note !text-left">
@@ -38,13 +59,21 @@ const MorePanel: React.FC = () => {
             How to do it?
           </a>
         </p>
-        <p className="mt-3" style={{ color: 'var(--lv-text-secondary)' }}>
-          Tap anywhere once if speech does not start. Phones block audio until you interact with the app.
-        </p>
         <p className="mt-4 text-xs" style={{ color: 'var(--lv-helper-text)' }}>
-          © 2025 Lazy Vocabulary - hoctusach@gmail.com
+          Lazy Vocabulary{APP_VERSION ? ` v${APP_VERSION}` : ''} · © 2025 Lazy Vocabulary - hoctusach@gmail.com
         </p>
       </div>
+      <details className="rounded-2xl border p-4 text-sm theme-card-surface" style={{ borderColor: 'var(--lv-border-color)' }} data-section="licenses">
+        <summary className="cursor-pointer font-semibold" style={{ color: 'var(--lv-heading)' }}>Open-source licenses</summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5" style={{ color: 'var(--lv-text-secondary)' }}>
+          {OPEN_SOURCE_LICENSES.map((l) => (
+            <li key={l.name}>
+              <a href={l.url} target="_blank" rel="noopener noreferrer" className="font-medium text-blue-600 hover:underline">{l.name}</a>{' '}
+              - {l.license}{l.note ? ` (${l.note})` : ''}
+            </li>
+          ))}
+        </ul>
+      </details>
     </section>
   );
 };

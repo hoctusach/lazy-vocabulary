@@ -105,7 +105,7 @@ export const useAutoPlay = (
       } else {
         console.log('[AUTO-PLAY] Conditions changed, skipping execution');
       }
-    }, delayMs); // Delay to prevent race conditions and allow composition guards
+    }, typeof document !== 'undefined' && document.hidden ? Math.min(delayMs, 100) : delayMs); // Delay to prevent race conditions and allow composition guards
     unifiedSpeechController.registerTimer(autoPlayTimeoutRef.current);
 
     return () => {

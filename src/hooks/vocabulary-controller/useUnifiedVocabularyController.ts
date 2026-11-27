@@ -14,6 +14,7 @@ import { VocabularyWord } from '@/types/vocabulary';
 import { resolvePlaybackPreferences } from '@/lib/preferences/playbackPreferences';
 import { setSpeechRate } from '@/utils/speech/core/speechSettings';
 import { recordDisplayedWord } from '@/features/word-sets/vocabularySetStore';
+import { DEFAULT_SET_ID } from '@/features/word-sets/types';
 
 /**
  * Unified Vocabulary Controller - Single source of truth for vocabulary state
@@ -237,14 +238,15 @@ export const useUnifiedVocabularyController = (
     if (!currentWord?.word) return;
     saveLastWord(vocabularyService.getCurrentSheetName(), currentWord.word);
     saveTodayLastWord(currentIndex, currentWord.word, currentWord.category);
-    recordDisplayedWord(currentWord.word, currentWord.category);
+    if (currentWord.sourceId !== DEFAULT_SET_ID) {
+      recordDisplayedWord(currentWord.word, currentWord.category, currentWord.sourceId);
+    }
   }, [currentWord?.word, currentWord?.category, currentIndex]);
 
-  // Cleanup on unmount
+  // Cleanup on unmount: timers only. Never stop speech here (see stopSpeechForUserIntent).
   useEffect(() => {
     return () => {
       clearAutoAdvanceTimer();
-      unifiedSpeechController.stop();
     };
   }, [clearAutoAdvanceTimer]);
 

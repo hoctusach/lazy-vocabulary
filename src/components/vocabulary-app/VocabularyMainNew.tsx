@@ -1,3 +1,4 @@
+import { stopSpeechForUserIntent } from '@/services/speech/stopSpeechForUserIntent';
 import React from "react";
 import { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyCardNew from "./VocabularyCardNew";
@@ -5,6 +6,7 @@ import { useBackgroundColor } from "./useBackgroundColor";
 import VocabularyControlsColumn from "./VocabularyControlsColumn";
 import PracticeDialog from "@/components/practice/PracticeDialog";
 import { unifiedSpeechController } from "@/services/speech/unifiedSpeechController";
+import { onTranslationEdit, SAVED_CONFIRM_MS } from "@/lib/translations/translationEditSignal";
 
 interface VocabularyMainNewProps {
   currentWord: ReadonlyWord | null;
@@ -19,7 +21,7 @@ interface VocabularyMainNewProps {
   selectedVoiceName: string;
   showWordCount?: boolean;
   playCurrentWord: () => void;
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   onOpenSearch: (word?: string) => void;
   emptyState?: {
     word: string;
@@ -65,7 +67,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
     if (!isPaused) {
       handleTogglePause();
     }
-    unifiedSpeechController.stop();
+    stopSpeechForUserIntent('practice');
     setIsPracticeOpen(true);
   }, [isPaused, handleTogglePause]);
 
@@ -76,6 +78,47 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
     }
     wasPlayingBeforePracticeRef.current = false;
   }, [isPaused, handleTogglePause]);
+
+  // Translation edit (FB-33): pause while editing; cancel restores the previous state on the same word;
+  // save -> "Saved" confirmation, then next word and resume auto-play.
+  const pausedRef = React.useRef(isPaused);
+  pausedRef.current = isPaused;
+  const toggleRef = React.useRef(handleTogglePause);
+  toggleRef.current = handleTogglePause;
+  const nextRef = React.useRef(handleManualNext);
+  nextRef.current = handleManualNext;
+  const pausedByEditRef = React.useRef(false);
+  const advanceTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  React.useEffect(() => {
+    const clearTimer = () => { if (advanceTimerRef.current) { clearTimeout(advanceTimerRef.current); advanceTimerRef.current = null; } };
+    const off = onTranslationEdit((e) => {
+      if (e === 'start') {
+        clearTimer();
+        if (!pausedRef.current) {
+          pausedByEditRef.current = true;
+          toggleRef.current();
+        }
+        stopSpeechForUserIntent('translation-edit');
+      } else if (e === 'cancel') {
+        clearTimer();
+        if (pausedByEditRef.current) {
+          pausedByEditRef.current = false;
+          if (pausedRef.current) toggleRef.current();
+        }
+      } else if (e === 'save') {
+        clearTimer();
+        const resume = pausedByEditRef.current;
+        pausedByEditRef.current = false;
+        advanceTimerRef.current = setTimeout(() => {
+          advanceTimerRef.current = null;
+          // Un-pause first only if the edit paused it, then advance (goToNextAndSpeak speaks when not paused).
+          if (resume && pausedRef.current) toggleRef.current();
+          setTimeout(() => nextRef.current(), 0);
+        }, SAVED_CONFIRM_MS);
+      }
+    });
+    return () => { off(); clearTimer(); };
+  }, []);
 
   return (
     <div className="flex w-full max-w-5xl flex-col gap-3 md:flex-row md:items-start md:gap-4 mx-auto">
@@ -89,6 +132,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           backgroundColor={backgroundColor}
           isSpeaking={isSoundPlaying && Boolean(currentWord)}
           category={categoryToDisplay}
+          sourceId={currentWord?.sourceId}
           showWordCount={shouldShowWordCount}
         />
       </div>
@@ -106,7 +150,6 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
           playCurrentWord={playCurrentWord}
           onMarkWordLearned={onMarkWordLearned}
           onOpenSearch={onOpenSearch}
-          onOpenPractice={handleOpenPractice}
         />
       </div>
       <PracticeDialog

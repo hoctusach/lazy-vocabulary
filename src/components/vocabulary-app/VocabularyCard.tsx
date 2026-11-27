@@ -2,10 +2,11 @@ import React, { useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Volume2, VolumeX, Pause, Play, SkipForward, Speaker } from 'lucide-react';
+import { Volume2, VolumeX, Pause, Play, SkipForward } from 'lucide-react';
 import { VoiceSelection } from '@/hooks/vocabulary-playback/useVoiceSelection';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import { trackUiInteraction } from '@/services/analyticsService';
+import EditableTranslation from './EditableTranslation';
 
 interface VocabularyCardProps {
   word: string;
@@ -126,7 +127,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               color: 'var(--lv-meaning)',
             }}
           >
-            <span className="italic" style={{ color: 'var(--lv-meaning)' }}>*</span> {meaning}
+            {meaning}
           </div>
           {/* Example */}
           <div
@@ -138,36 +139,15 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               color: 'var(--lv-example)',
             }}
           >
-            <span className="italic" style={{ color: 'var(--lv-example)' }}>*</span> {example}
+            {example}
           </div>
-          {translation && (
-            <div
-              style={{
-                fontStyle: 'italic',
-                fontSize: '0.9em',
-                textAlign: 'left',
-                whiteSpace: 'pre-line',
-                color: 'var(--lv-text-primary)',
-              }}
-            >
-              <em>* {translation}</em>
-            </div>
-          )}
-          {/* Mobile note below example */}
-          {!searchPreview && (
-            <div
-              className="mobile-note text-left italic mt-2"
-              style={{ color: 'var(--lv-helper-text)', fontSize: '0.8rem' }}
-            >
-              <p>⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or any button (e.g. Next) to enable it.</p>
-              <p className="flex items-start gap-2 mt-1">
-                <Speaker size={16} aria-hidden="true" className="shrink-0 text-yellow-500" />
-                <span className="leading-snug">
-                  As this is free app, there are some free voices by device and browser — please pick your preferred one!
-                </span>
-              </p>
-            </div>
-          )}
+          <EditableTranslation
+            word={word}
+            category={category}
+            translation={translation}
+            editable={false}
+            color="var(--lv-text-primary)"
+          />
         </div>
         {/* Control buttons wrapper - optimized spacing */}
         {!searchPreview && (
@@ -178,7 +158,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={handleMuteClick}
               className={cn(
                 "h-6 text-xs px-1.5",
-                isMuted ? "text-purple-700 border-purple-300 bg-purple-50" : "text-gray-700"
+                isMuted ? "text-[var(--lv-accent)] border-[var(--lv-accent)] bg-[var(--lv-accent-soft)]" : "text-[var(--lv-text-primary)]"
               )}
             >
               {isMuted ? <VolumeX size={12} className="mr-1" /> : <Volume2 size={12} className="mr-1" />}
@@ -191,7 +171,7 @@ const VocabularyCard: React.FC<VocabularyCardProps> = ({
               onClick={handlePauseClick}
               className={cn(
                 "h-6 text-xs px-1.5",
-                isPaused ? "text-orange-500 border-orange-300 bg-orange-50" : "text-gray-700"
+                isPaused ? "text-[var(--lv-example)] border-[var(--lv-example)] bg-[var(--lv-card-highlight)]" : "text-[var(--lv-text-primary)]"
               )}
             >
               {isPaused ? <Play size={12} className="mr-1" /> : <Pause size={12} className="mr-1" />}

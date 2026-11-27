@@ -7,7 +7,7 @@ export type AppTab = 'learn' | 'progress' | 'sets' | 'more';
 const TABS: Array<{ id: AppTab; label: string; icon: React.ReactNode }> = [
   { id: 'learn', label: 'Learn', icon: <BookOpen className="h-5 w-5" /> },
   { id: 'progress', label: 'Progress', icon: <TrendingUp className="h-5 w-5" /> },
-  { id: 'sets', label: 'Sets', icon: <Library className="h-5 w-5" /> },
+  { id: 'sets', label: 'Library', icon: <Library className="h-5 w-5" /> },
   { id: 'more', label: 'More', icon: <MoreHorizontal className="h-5 w-5" /> },
 ];
 
@@ -21,7 +21,7 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({ tab, onChange, className })
   return (
     <nav
       className={cn(
-        'fixed inset-x-0 bottom-0 z-40 border-t bg-[var(--lv-card-bg)]/95 backdrop-blur',
+        'lv-tabbar fixed inset-x-0 bottom-0 z-40 border-t bg-[var(--lv-card-bg)]',
         className
       )}
       style={{
@@ -29,6 +29,7 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({ tab, onChange, className })
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
       aria-label="Primary"
+      data-bottom-tab-bar
     >
       <ul className="mx-auto grid max-w-lg grid-cols-4">
         {TABS.map((item) => {
@@ -38,14 +39,15 @@ const BottomTabBar: React.FC<BottomTabBarProps> = ({ tab, onChange, className })
               <button
                 type="button"
                 className={cn(
-                  'flex min-h-11 w-full flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium',
+                  'lv-tab flex min-h-11 w-full flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] font-medium',
                   selected ? 'text-[var(--lv-accent)]' : 'text-[var(--lv-text-secondary)]'
                 )}
                 aria-current={selected ? 'page' : undefined}
+                data-tab={item.id}
                 onClick={() => onChange(item.id)}
               >
                 {item.icon}
-                {item.label}
+                <span className="lv-tab-label">{item.label}</span>
               </button>
             </li>
           );

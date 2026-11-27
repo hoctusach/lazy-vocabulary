@@ -1,58 +1,141 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import { invalidateVocabularyIndex } from '@/services/search/vocabularyIndex';
 import { setAllWordsOverride } from '@/utils/allWords';
+import { deleteImportedSetRemote, syncImportedSets } from '@/features/admin/adminApi';
+import { DEFAULT_SET_ID, DEFAULT_SET_NAME, type VocabularySetMeta } from './types';
+import type { ManualWordInput } from './manualSet';
+import { filterByBuiltinGroups, sumStats, tagWords } from './mixQueue';
+import { NEW_DAY_EVENT, addToPlan, clearTodayPlan, getPlanSources } from './todayPlan';
 import {
-  DEFAULT_SET_ID,
-  type SetProgressState,
-  type VocabularySetMeta,
-} from './types';
-import {
+  BUILTIN_GROUPS,
+  allBuiltinSourceIds,
+  builtinGroupOf,
+  setHasWords,
+  localDateKey,
   deleteVocabularySet,
   ensureTodayQueue,
   flattenSheets,
-  getActiveSetId,
+  getSelectedSources,
   getSetProgress,
   getSetSheets,
   importVocabularySet,
+  createManualSet,
+  addManualWord,
+  updateManualWord,
+  removeManualWord,
+  type ManualResult,
   listVocabularySets,
   markSetWordLearned,
   markSetWordNew,
   progressStatsFor,
   renameVocabularySet,
+  selectedBuiltinGroups,
+  selectedImportedIds,
   setActiveSet,
+  setBuiltinGroupsSelected,
   subscribeDisplayedWords,
+  toggleSource,
 } from './vocabularySetStore';
+
+export interface ImportedQueue {
+  sourceId: string;
+  name: string;
+  words: VocabularyWord[];
+}
+
+export interface ImportedProgressEntry {
+  sourceId: string;
+  word: string;
+  category: string;
+  reviewCount: number;
+  learnedAt: string;
+  lastReviewAt?: string;
+  nextReviewAt: string;
+}
 
 interface VocabularySetContextValue {
   sets: VocabularySetMeta[];
+  /** Back-compat label: the single selected set, or a synthetic "Mixed" entry. */
   activeSet: VocabularySetMeta;
+  /** Selected source ids: 'default:<group>' and imported set ids. Never empty. */
+  selectedSources: string[];
+  selectedBuiltinGroups: string[];
+  selectedImportedSets: VocabularySetMeta[];
+  /** True when at least one built-in group is part of the mix. */
+  hasBuiltin: boolean;
+  /**
+   * [FB-63] What TODAY is built from: the sources frozen for this local day. Ticking sets in the Library only changes
+   * `selectedSources` (tomorrow's plan). `importedQueues`, `importedLearned/Due`, `stats` and `planBuiltinGroups` follow the plan.
+   */
+  planSources: string[];
+  planBuiltinGroups: string[];
+  planHasBuiltin: boolean;
+  /** True when the Library selection differs from today's plan ("Changes apply from tomorrow."). */
+  planDiffers: boolean;
+  /** True when no built-in group is selected (only imported sets). */
   isCustomSet: boolean;
-  sheets: SheetData;
+  /** Words of the selected imported sets (each tagged with `sourceId`). */
   words: VocabularyWord[];
-  progress: SetProgressState;
-  todayWords: VocabularyWord[];
+  /** Today's queue per selected imported set (local SRS), already tagged with `sourceId`. */
+  importedQueues: ImportedQueue[];
+  importedLearned: ImportedProgressEntry[];
+  importedDue: ImportedProgressEntry[];
+  /** Summed stats over the selected imported sets. */
   stats: ReturnType<typeof progressStatsFor>;
   refresh: () => void;
+  toggleSource: (id: string) => string | null;
+  setBuiltinAll: (on: boolean) => string | null;
   activate: (id: string) => string | null;
   importSet: (name: string, sheets: SheetData, fileName?: string) => string | null;
+  /** [FB-45] Free: hand-made sets. */
+  createManualSet: (name: string, first: ManualWordInput) => ManualResult;
+  addManualWord: (id: string, input: ManualWordInput) => ManualResult;
+  updateManualWord: (id: string, key: string, input: ManualWordInput) => ManualResult;
+  removeManualWord: (id: string, key: string) => ManualResult;
   rename: (id: string, name: string) => string | null;
   remove: (id: string) => string | null;
   markLearned: (word: VocabularyWord) => void;
-  markNew: (word: string, category?: string) => void;
+  markNew: (word: string, category?: string, sourceId?: string) => void;
 }
 
 const VocabularySetContext = createContext<VocabularySetContextValue | null>(null);
 
-function applySearchSource(activeId: string, words: VocabularyWord[]) {
-  if (activeId === DEFAULT_SET_ID) setAllWordsOverride(null);
-  else setAllWordsOverride(words);
+/** Search and quiz draw from the union of the selected sources. */
+function applySearchSource(selection: string[], importedWords: VocabularyWord[]) {
+  const groups = selectedBuiltinGroups(selection);
+  if (groups.length === BUILTIN_GROUPS.length && importedWords.length === 0) {
+    setAllWordsOverride(null);
+  } else {
+    const builtin = groups.length
+      ? filterByBuiltinGroups(flattenSheets(DEFAULT_VOCABULARY_DATA), groups).map((word) => ({
+          ...word,
+          sourceId: DEFAULT_SET_ID,
+        }))
+      : [];
+    setAllWordsOverride([...builtin, ...importedWords]);
+  }
   invalidateVocabularyIndex();
+}
+
+function describeSelection(sets: VocabularySetMeta[], selection: string[]): VocabularySetMeta {
+  const groups = selectedBuiltinGroups(selection);
+  const importedIds = selectedImportedIds(selection);
+  const builtin = sets.find((set) => set.id === DEFAULT_SET_ID) ?? sets[0];
+  if (importedIds.length === 0 && groups.length === BUILTIN_GROUPS.length) return builtin;
+  if (importedIds.length === 1 && groups.length === 0) {
+    return sets.find((set) => set.id === importedIds[0]) ?? builtin;
+  }
+  // A single built-in group has no better name than the collection; several sources read "Mixed: N sets".
+  const label = selection.length === 1 ? `${builtin.name} (${groups[0]})` : `Mixed: ${selection.length} sets`;
+  return { ...builtin, id: 'mix', name: label, builtin: false };
 }
 
 export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [version, setVersion] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
+  const [dayTick, setDayTick] = useState(0);
   const refresh = useCallback(() => setVersion((value) => value + 1), []);
 
   React.useEffect(() => subscribeDisplayedWords(() => setSeenTick((value) => value + 1)), []);
@@ -61,30 +144,132 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     void version;
     return listVocabularySets();
   }, [version]);
-  const activeId = useMemo(() => {
+  const selectedSources = useMemo(() => {
     void version;
-    return getActiveSetId();
+    return getSelectedSources();
   }, [version]);
-  const activeSet = sets.find((set) => set.id === activeId) ?? sets[0];
-  const sheets = useMemo(() => {
+  const selectedKey = selectedSources.join('|');
+  const selectedBuiltin = useMemo(() => selectedBuiltinGroups(selectedSources), [selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const selectedImported = useMemo(() => {
+    const ids = new Set(selectedImportedIds(selectedSources));
+    return sets.filter((set) => ids.has(set.id));
+  }, [sets, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const activeSet = useMemo(() => describeSelection(sets, selectedSources), [sets, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // [FB-63] Today's plan: frozen for the local day, re-snapshotted from the selection when a new day starts.
+  const planSources = useMemo(() => {
+    void dayTick;
+    return getPlanSources(
+      selectedSources,
+      (id) => builtinGroupOf(id) !== null || (sets.some((set) => set.id === id) && setHasWords(id)),
+      localDateKey()
+    );
+  }, [sets, selectedKey, dayTick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planKey = planSources.join('|');
+  const planBuiltin = useMemo(() => selectedBuiltinGroups(planSources), [planKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planImported = useMemo(() => {
+    const ids = new Set(selectedImportedIds(planSources));
+    return sets.filter((set) => ids.has(set.id));
+  }, [sets, planKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planDiffers = selectedKey !== planKey;
+
+  // New local day while the app stays open: re-read the plan (and so the selection) at the next midnight.
+  React.useEffect(() => {
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5).getTime();
+    const timer = setTimeout(() => { setDayTick((v) => v + 1); setVersion((v) => v + 1); }, Math.max(1000, next - now.getTime()));
+    return () => clearTimeout(timer);
+  }, [dayTick]);
+
+  const importedData = useMemo(() => {
     void version;
-    return getSetSheets(activeSet.id);
-  }, [activeSet.id, version]);
-  const words = useMemo(() => flattenSheets(sheets), [sheets]);
-  const progress = useMemo(() => {
+    return selectedImported.map((set) => ({
+      set,
+      words: tagWords(flattenSheets(getSetSheets(set.id)), set.id),
+    }));
+  }, [selectedImported, version]);
+  const words = useMemo(() => importedData.flatMap((entry) => entry.words), [importedData]);
+  // [FB-63] The learning side (queues, learned/due lists, stats) reads the PLAN, not the live selection.
+  const planData = useMemo(() => {
+    void version;
+    return planImported.map((set) => ({
+      set,
+      words: tagWords(flattenSheets(getSetSheets(set.id)), set.id),
+    }));
+  }, [planImported, version]);
+
+  const importedQueues = useMemo<ImportedQueue[]>(() => {
+    void version;
+    return planData.map(({ set, words: setWords }) => ({
+      sourceId: set.id,
+      name: set.name,
+      words: tagWords(ensureTodayQueue(set.id, setWords), set.id),
+    }));
+  }, [importedData, version]);
+
+  // [FB-55] Best-effort copy of this device's own imported/manual sets to the server (own rows; lets an admin browse them).
+  // Signed out or table missing = silently nothing. Debounced so a burst of edits is one upload.
+  const syncKey = useMemo(() => sets.filter((s) => !s.builtin).map((s) => `${s.id}:${s.updatedAt}:${s.wordCount}`).join('|'), [sets]);
+  React.useEffect(() => {
+    if (!syncKey) return;
+    const timer = setTimeout(() => {
+      void syncImportedSets(
+        sets.filter((s) => !s.builtin).map((s) => ({ id: s.id, name: s.name, sheets: getSetSheets(s.id) }))
+      );
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [syncKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { stats, importedLearned, importedDue } = useMemo(() => {
     void version;
     void seenTick;
-    return getSetProgress(activeSet.id);
-  }, [activeSet.id, version, seenTick]);
-  const todayWords = useMemo(() => {
-    void version;
-    return activeSet.id === DEFAULT_SET_ID ? [] : ensureTodayQueue(activeSet.id, words);
-  }, [activeSet.id, words, version]);
-  const stats = useMemo(() => progressStatsFor(words, progress), [words, progress]);
+    const deadline = new Date();
+    deadline.setHours(23, 59, 59, 999);
+    const parts: ReturnType<typeof progressStatsFor>[] = [];
+    const learned: ImportedProgressEntry[] = [];
+    const due: ImportedProgressEntry[] = [];
+    for (const { set, words: setWords } of planData) {
+      const progress = getSetProgress(set.id);
+      parts.push(progressStatsFor(setWords, progress));
+      for (const entry of Object.values(progress.learned)) {
+        const item = { ...entry, sourceId: set.id };
+        learned.push(item);
+        const next = Date.parse(entry.nextReviewAt);
+        if (!Number.isFinite(next) || next <= deadline.getTime()) due.push(item);
+      }
+    }
+    return { stats: sumStats(parts), importedLearned: learned, importedDue: due };
+  }, [planData, version, seenTick]);
 
   React.useEffect(() => {
-    applySearchSource(activeSet.id, words);
-  }, [activeSet.id, words]);
+    applySearchSource(selectedSources, words);
+  }, [selectedKey, words]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  React.useEffect(() => {
+    const onNewDay = () => { clearTodayPlan(); setDayTick((v) => v + 1); setVersion((v) => v + 1); };
+    window.addEventListener(NEW_DAY_EVENT, onNewDay);
+    return () => window.removeEventListener(NEW_DAY_EVENT, onNewDay);
+  }, []);
+
+  const toggle = useCallback(
+    (id: string) => {
+      const result = toggleSource(id);
+      if (!result.ok) return result.error;
+      refresh();
+      return null;
+    },
+    [refresh]
+  );
+
+  const setBuiltinAll = useCallback(
+    (on: boolean) => {
+      const result = setBuiltinGroupsSelected(on);
+      if (!result.ok) return result.error;
+      refresh();
+      return null;
+    },
+    [refresh]
+  );
 
   const activate = useCallback(
     (id: string) => {
@@ -100,8 +285,45 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     (name: string, nextSheets: SheetData, fileName?: string) => {
       const result = importVocabularySet(name, nextSheets, fileName);
       if (!result.ok) return result.error;
+      addToPlan(result.set.id, localDateKey()); // [FB-63] a brand-new set joins today right away
       refresh();
       return null;
+    },
+    [refresh]
+  );
+
+  const createManual = useCallback(
+    (name: string, first: ManualWordInput) => {
+      const r = createManualSet(name, first);
+      if (r.ok) {
+        if (r.set) addToPlan(r.set.id, localDateKey());
+        refresh();
+      }
+      return r;
+    },
+    [refresh]
+  );
+  const addManual = useCallback(
+    (id: string, input: ManualWordInput) => {
+      const r = addManualWord(id, input);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+  const updateManual = useCallback(
+    (id: string, key: string, input: ManualWordInput) => {
+      const r = updateManualWord(id, key, input);
+      if (r.ok) refresh();
+      return r;
+    },
+    [refresh]
+  );
+  const removeManual = useCallback(
+    (id: string, key: string) => {
+      const r = removeManualWord(id, key);
+      if (r.ok) refresh();
+      return r;
     },
     [refresh]
   );
@@ -120,6 +342,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     (id: string) => {
       const result = deleteVocabularySet(id);
       if (!result.ok) return result.error;
+      void deleteImportedSetRemote(id);
       refresh();
       return null;
     },
@@ -128,33 +351,51 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const markLearned = useCallback(
     (word: VocabularyWord) => {
-      markSetWordLearned(activeSet.id, word);
+      const sourceId = word.sourceId ?? selectedImportedIds()[0];
+      if (!sourceId) return;
+      markSetWordLearned(sourceId, word);
       refresh();
     },
-    [activeSet.id, refresh]
+    [refresh]
   );
 
   const markNew = useCallback(
-    (word: string, category?: string) => {
-      markSetWordNew(activeSet.id, word, category);
+    (word: string, category?: string, sourceId?: string) => {
+      const id = sourceId ?? selectedImportedIds()[0];
+      if (!id) return;
+      markSetWordNew(id, word, category);
       refresh();
     },
-    [activeSet.id, refresh]
+    [refresh]
   );
 
   const value = useMemo<VocabularySetContextValue>(
     () => ({
       sets,
       activeSet,
-      isCustomSet: activeSet.id !== DEFAULT_SET_ID,
-      sheets,
+      selectedSources,
+      selectedBuiltinGroups: selectedBuiltin,
+      selectedImportedSets: selectedImported,
+      hasBuiltin: selectedBuiltin.length > 0,
+      planSources,
+      planBuiltinGroups: planBuiltin,
+      planHasBuiltin: planBuiltin.length > 0,
+      planDiffers,
+      isCustomSet: selectedBuiltin.length === 0,
       words,
-      progress,
-      todayWords,
+      importedQueues,
+      importedLearned,
+      importedDue,
       stats,
       refresh,
+      toggleSource: toggle,
+      setBuiltinAll,
       activate,
       importSet,
+      createManualSet: createManual,
+      addManualWord: addManual,
+      updateManualWord: updateManual,
+      removeManualWord: removeManual,
       rename,
       remove,
       markLearned,
@@ -163,14 +404,26 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     [
       sets,
       activeSet,
-      sheets,
+      selectedSources,
+      selectedBuiltin,
+      selectedImported,
+      planSources,
+      planBuiltin,
+      planDiffers,
       words,
-      progress,
-      todayWords,
+      importedQueues,
+      importedLearned,
+      importedDue,
       stats,
       refresh,
+      toggle,
+      setBuiltinAll,
       activate,
       importSet,
+      createManual,
+      addManual,
+      updateManual,
+      removeManual,
       rename,
       remove,
       markLearned,
@@ -183,7 +436,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
 
 const FALLBACK_SET: VocabularySetMeta = {
   id: DEFAULT_SET_ID,
-  name: 'Default',
+  name: DEFAULT_SET_NAME,
   builtin: true,
   wordCount: 0,
   createdAt: '',
@@ -196,15 +449,29 @@ export function useVocabularySets(): VocabularySetContextValue {
   return {
     sets: [FALLBACK_SET],
     activeSet: FALLBACK_SET,
+    selectedSources: allBuiltinSourceIds(),
+    selectedBuiltinGroups: [...BUILTIN_GROUPS],
+    selectedImportedSets: [],
+    hasBuiltin: true,
+    planSources: allBuiltinSourceIds(),
+    planBuiltinGroups: [...BUILTIN_GROUPS],
+    planHasBuiltin: true,
+    planDiffers: false,
     isCustomSet: false,
-    sheets: {},
     words: [],
-    progress: { learned: {} },
-    todayWords: [],
+    importedQueues: [],
+    importedLearned: [],
+    importedDue: [],
     stats: { total: 0, learned: 0, learning: 0, new: 0, due: 0 },
     refresh: () => undefined,
+    toggleSource: () => null,
+    setBuiltinAll: () => null,
     activate: () => null,
     importSet: () => 'Word sets are unavailable.',
+    createManualSet: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    addManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    updateManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
+    removeManualWord: () => ({ ok: false, errors: { form: 'Word sets are unavailable.' } }),
     rename: () => 'Word sets are unavailable.',
     remove: () => 'Word sets are unavailable.',
     markLearned: () => undefined,

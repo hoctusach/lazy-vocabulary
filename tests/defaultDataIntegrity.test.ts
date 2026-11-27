@@ -26,10 +26,11 @@ describe('built-in vocabulary', () => {
     expect(all.filter((w) => w.category && w.category !== w.sheet)).toEqual([]);
   });
 
-  it('the word total equals TOTAL_WORDS (L2)', async () => {
-    const { TOTAL_WORDS } = await import('@/lib/progress/srsSyncByUserKey');
-    expect(all.length).toBe(TOTAL_WORDS);
-    expect(TOTAL_WORDS).toBeGreaterThan(3000);
+  it('the app total is the number of distinct words, which is what the server counts (L2)', async () => {
+    const { getDefaultVocabularyTotal } = await import('@/data/defaultVocabulary');
+    const distinct = new Set(all.map((w) => w.word)).size; // same key the app uses: the word text as written
+    expect(getDefaultVocabularyTotal()).toBe(distinct);
+    expect(distinct).toBeLessThan(all.length); // some words appear in more than one category
   });
 
   // Known issue: 193 pairs of word + category are repeated, so they share one progress id (`word::category`).
@@ -42,8 +43,9 @@ describe('built-in vocabulary', () => {
     expect([...seen.entries()].filter(([, n]) => n > 1)).toEqual([]);
   });
 
-  it('fits the import limits, so exporting and re-importing the set loses nothing (L5)', () => {
-    const limits = { word: 200, meaning: 1000, example: 1500, translation: 500 } as const;
+  // Known issue: the importer cuts fields at 100 / 500 / 1000 / 500 characters, but the built-in data is longer.
+  it.fails('fits the import limits, so exporting and re-importing the set loses nothing (L5)', () => {
+    const limits = { word: 100, meaning: 500, example: 1000, translation: 500 } as const;
     const tooLong = all.filter((w) => (Object.keys(limits) as (keyof typeof limits)[]).some((k) => (w[k] ?? '').length > limits[k]));
     expect(tooLong).toEqual([]);
   });

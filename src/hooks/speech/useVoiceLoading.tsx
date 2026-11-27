@@ -23,26 +23,26 @@ export const useVoiceLoading = (voiceRegion: 'US' | 'UK' | 'AU') => {
   }, []);
 
   useEffect(() => {
-    const supported = 'speechSynthesis' in window;
+    const supported = !!window.speechSynthesis;
     if (!supported) {
-      console.warn("Your browser doesn't support speech synthesis.");
+      console.warn("Speech is not supported in this browser..");
       return;
     }
 
     const voicesLoaded = loadVoices();
     
     if (!voicesLoaded) {
-      if ('onvoiceschanged' in window.speechSynthesis) {
+      if (window.speechSynthesis && 'onvoiceschanged' in window.speechSynthesis) {
         const voicesChangedHandler = () => {
           const success = loadVoices();
           if (success) {
-            window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+            window.speechSynthesis?.removeEventListener?.('voiceschanged', voicesChangedHandler);
           }
         };
         
-        window.speechSynthesis.addEventListener('voiceschanged', voicesChangedHandler);
+        window.speechSynthesis?.addEventListener?.('voiceschanged', voicesChangedHandler);
         return () => {
-          window.speechSynthesis.removeEventListener('voiceschanged', voicesChangedHandler);
+          window.speechSynthesis?.removeEventListener?.('voiceschanged', voicesChangedHandler);
         };
       } else {
         const retryTimes = [300, 600, 900, 1200];

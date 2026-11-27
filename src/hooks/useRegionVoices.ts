@@ -18,9 +18,9 @@ export const useRegionVoices = (region: 'US' | 'UK' | 'AU') => {
 
   useEffect(() => {
     loadVoices();
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
+    window.speechSynthesis?.addEventListener?.('voiceschanged', loadVoices);
     return () => {
-      window.speechSynthesis.removeEventListener('voiceschanged', loadVoices);
+      window.speechSynthesis?.removeEventListener?.('voiceschanged', loadVoices);
     };
   }, [loadVoices]);
 

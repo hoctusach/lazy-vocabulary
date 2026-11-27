@@ -28,7 +28,7 @@ const AudioStatusIndicator: React.FC<AudioStatusIndicatorProps> = ({ isAudioUnlo
       role="status"
     >
       <Volume2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-      <span>Tap anywhere to turn the audio on</span>
+      <span>Tap anywhere to start listening</span>
     </div>
   );
 };

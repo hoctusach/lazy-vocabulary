@@ -1,5 +1,4 @@
 import React from "react";
-import { Speaker } from "lucide-react";
 import type { ReadonlyWord } from "@/types/vocabulary";
 import VocabularyMainNew from "./VocabularyMainNew";
 import LeaderboardPanel from "./LeaderboardPanel";
@@ -17,12 +16,14 @@ interface ContentWithDataNewProps {
   displayTime: number;
   selectedVoiceName: string;
   playCurrentWord: () => void;
-  onMarkWordLearned?: (word: string, category?: string) => void;
+  onMarkWordLearned?: (word: string, category?: string, sourceId?: string) => void;
   onOpenSearch: (word?: string) => void;
   currentUserLearnedCount?: number;
   currentUserLearningCount?: number;
   currentUserDueCount?: number;
   additionalContent?: React.ReactNode;
+  /** Rendered directly under the card player in every variant (Word Summary, FB-50). */
+  underPlayerContent?: React.ReactNode;
   variant?: 'full' | 'card';
   emptyState?: {
     word: string;
@@ -51,6 +52,7 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
   currentUserLearningCount,
   currentUserDueCount,
   additionalContent,
+  underPlayerContent,
   variant = 'full',
   emptyState,
 }) => {
@@ -75,6 +77,8 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
         onOpenSearch={onOpenSearch}
       />
 
+      {underPlayerContent}
+
       {!cardOnly && <StreakPanel refreshKey={currentUserLearnedCount} />}
 
       {!cardOnly && (
@@ -86,25 +90,6 @@ const ContentWithDataNew: React.FC<ContentWithDataNewProps> = ({
       )}
 
       {!cardOnly && additionalContent}
-
-      {/* Mobile speech note statically above debug panel */}
-      <div className="mobile-note text-xs italic text-gray-500 text-left my-1">
-        <p>
-          ⭐ Speech won’t autoplay due to security. Sometimes, tap anywhere or
-          any button (e.g. Next) to enable it.
-        </p>
-        <p className="flex items-start gap-2 mt-1">
-          <Speaker
-            aria-hidden="true"
-            className="h-5 w-5 shrink-0 text-yellow-500"
-            strokeWidth={2.4}
-          />
-          <span className="leading-snug">
-            As this is free app, there are some free voices by device and
-            browser — please pick your preferred one!
-          </span>
-        </p>
-      </div>
     </>
   );
 };
