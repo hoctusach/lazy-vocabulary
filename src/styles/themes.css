@@ -120,22 +120,22 @@ body[class*="theme-"] .lv-theme-card {
   border-radius: var(--lv-radius-sm);
   box-shadow: var(--lv-shadow-sm);
 }
-/* "Mark as learned" is a quiet secondary action: outlined, normal weight. Pause is the only primary. */
+/* "Mark as Learned" invites a tap (FB-54): a soft accent-tinted surface, a bit bolder. Pause stays the only primary (solid fill, taller). */
 body[class*="theme-"] button.lv-ctl-mark {
-  background: transparent;
-  color: var(--lv-text-secondary);
-  border: var(--lv-border-w) solid var(--lv-border-color);
+  background: color-mix(in srgb, var(--lv-accent) 16%, var(--lv-card-bg));
+  color: var(--lv-text-primary);
+  border: var(--lv-border-w) solid color-mix(in srgb, var(--lv-accent) 45%, var(--lv-border-color));
   border-radius: var(--lv-radius-sm);
   box-shadow: none;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: none;
 }
 body[class*="theme-"] button.lv-ctl.lv-ctl-pause { background: var(--lv-button-primary-bg); color: var(--lv-button-primary-text); }
-body[class*="theme-"] button.lv-ctl-mark:hover:not(:disabled) { background: var(--lv-card-highlight); color: var(--lv-text-primary); }
+body[class*="theme-"] button.lv-ctl-mark:hover:not(:disabled) { background: color-mix(in srgb, var(--lv-accent) 26%, var(--lv-card-bg)); color: var(--lv-text-primary); }
 body[class*="theme-"] button.lv-ctl.lv-ctl-pause:hover { background: var(--lv-button-primary-bg); color: var(--lv-button-primary-text); }
 body[class*="theme-"] button:active:not(:disabled) { transform: translateY(1px) scale(.985); }
 
-/* Learn control dock (mobile): Audio | Pause (hero) | Next, then Search + a quiet "Mark as learned" */
+/* Learn control dock (mobile): Audio | Pause (hero) | Next, then Search + a quiet "Mark as Learned" */
 @media (max-width: 767px) {
   body[class*="theme-"] .lv-controls { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 14px; align-items: center; }
   body[class*="theme-"] .lv-ctl-audio { grid-column: span 2; order: 1; height: 56px; min-height: 56px; }

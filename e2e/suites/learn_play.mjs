@@ -79,9 +79,9 @@ test('LEARN-01', 'Card fields (vi-VN device shows the default translation) [FB-1
   eq(c.pill, 'Phrasal Verb'); eq(c.w, U.P[0].word);
   ok(c.txt.includes('* ' + U.P[0].meaning) && c.txt.includes('* ' + U.P[0].example) && c.txt.includes('* ' + U.P[0].translation));
 });
-test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as learned (no Mute/Voice/Rate), 4-col grid, no Previous [FB-10]', async ({ session }) => {
+test('LEARN-02', 'Dock shows Audio, Pause, Next, Search, Mark as Learned (no Mute/Voice/Rate), 4-col grid, no Previous [FB-10]', async ({ session }) => {
   const s = await session({}); await boot(s);
-  for (const l of ['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
+  for (const l of ['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as Learned']) ok(await U.findHandle(s, { label: l }).then((h) => !!h.asElement()), 'missing ' + l);
   for (const l of ['Mute', 'Unmute', 'Change Voice', 'Voice', 'Speech Rate', 'Mark as LEARNED']) ok(!(await U.label(s, l)), 'should not be on the dock: ' + l);
   ok(await s.page.evaluate(() => !!document.querySelector('main .grid-cols-4')), '4 col grid');
   ok(!(await U.label(s, 'Vocabulary Detail')) && !(await U.label(s, 'Practice')), 'Details/Practice buttons must be gone');
@@ -94,14 +94,14 @@ test('LEARN-12', 'Details and Practice buttons are absent from Learn', async ({ 
   ok(!all.some((l) => /vocabulary detail|^practice$|^details$/i.test(l)), 'found: ' + all);
   eq(await s.page.evaluate(() => [...document.querySelectorAll('main button, main a')].filter((b) => /^(Details|Practice)$/.test(b.textContent.trim())).length), 0);
 });
-test('LEARN-13', 'Mark as learned is present, sentence case, and not more prominent than Pause [FB-09]', async ({ session }) => {
+test('LEARN-13', 'Mark as Learned (capital L) is present, softly filled, and not more prominent than Pause [FB-09][FB-54]', async ({ session }) => {
   const s = await session({}); await boot(s);
-  const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as learned"]'); const p = document.querySelector('main button[aria-label="Pause"]'); if (!b || !p) return null;
+  const r = await s.page.evaluate(() => { const b = document.querySelector('main button[aria-label="Mark as Learned"]'); const p = document.querySelector('main button[aria-label="Pause"]'); if (!b || !p) return null;
     const bb = b.getBoundingClientRect(), pb = p.getBoundingClientRect(); const cs = getComputedStyle(b), ps = getComputedStyle(p);
     return { txt: b.textContent.trim(), title: b.title, h: Math.round(bb.height), ph: Math.round(pb.height), fw: +cs.fontWeight, tt: cs.textTransform, bg: cs.backgroundColor, pbg: ps.backgroundColor, fs: parseFloat(cs.fontSize), ps: parseFloat(ps.fontSize), after: getComputedStyle(b, '::after').content }; });
-  ok(r, 'button missing'); eq(r.txt, 'Mark as learned'); eq(r.title, 'Mark as learned'); eq(r.tt, 'none', 'no uppercase');
+  ok(r, 'button missing'); eq(r.txt, 'Mark as Learned'); eq(r.title, 'Mark as Learned'); eq(r.tt, 'none', 'no uppercase');
   ok(r.h < r.ph, 'height ' + r.h + ' vs Pause ' + r.ph); ok(r.fw < 700, 'weight ' + r.fw);
-  ok(r.bg !== r.pbg, 'mark must not share the Pause fill: ' + r.bg); ok(r.fs <= r.ps + 2, 'font ' + r.fs + ' vs Pause ' + r.ps);
+  ok(r.bg !== r.pbg, 'mark must not share the Pause fill: ' + r.bg); ok(r.bg !== 'rgba(0, 0, 0, 0)' && r.bg !== 'transparent', '[FB-54] mark has a soft filled background: ' + r.bg); ok(r.fs <= r.ps + 2, 'font ' + r.fs + ' vs Pause ' + r.ps);
   ok(!/XP/.test(r.after), 'no +1 XP badge: ' + r.after);
 });
 test('LEARN-14', 'Speech hint lines are absent on web and in the native app', async ({ session }) => {
@@ -122,7 +122,7 @@ test('LEARN-04', 'Audio chip until first tap, then speech starts', async ({ sess
 });
 test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as learned');
+  await ctl(s, 'Mark as Learned');
   await waitText(s, `Are you sure you want to mark "${U.P[0].word}" as learned?`);
   await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
@@ -133,7 +133,7 @@ test('LEARN-05', 'Mark learned (built-in): confirm, toast, one RPC', async ({ se
 });
 test('LEARN-06', 'Mark learned cancel: no RPC, no toast', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await ctl(s, 'Mark as learned'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
+  await ctl(s, 'Mark as Learned'); await waitText(s, 'Are you sure'); await click(s, { text: 'Cancel' });
   await U.waitGone(s, 'Are you sure'); await sleep(400);
   eq(s.fake.count('mark_word_learned_by_key'), 0); ok(!(await body(s)).includes('Word marked as learned.'));
   await waitWord(s, W[0]);
@@ -143,7 +143,7 @@ test('LEARN-07', 'Mark learned in imported set is local only and updates stats',
   await U.importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await tab(s, 'Learn'); await s.page.waitForFunction(() => /^aaa\d/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
   const w = await word(s);
-  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true });
+  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true });
   await waitText(s, 'Word marked as learned.');
   const id = (await U.metaSets(s))[0].id;
   const prog = JSON.parse(await s.ls('lv.vocabularySets.progress.' + id));

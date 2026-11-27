@@ -23,26 +23,27 @@ const renderControls = (props: Record<string, unknown> = {}) =>
   );
 
 describe('Learn controls', () => {
-  it('[FB-09] has no Details/Practice buttons and a quiet, sentence-case Mark as learned button', () => {
+  it('[FB-09][FB-54] has no Details/Practice buttons and a secondary, capital-L Mark as Learned button', () => {
     renderControls();
     expect(screen.queryByLabelText('Vocabulary Detail')).toBeNull();
     expect(screen.queryByLabelText('Practice')).toBeNull();
     expect(screen.queryByLabelText('Mark as LEARNED')).toBeNull();
-    expect(screen.queryByLabelText('Mark as Learned')).toBeNull();
-    const b = screen.getByLabelText('Mark as learned');
-    expect(b.textContent).toContain('Mark as learned');
-    expect(b.getAttribute('title')).toBe('Mark as learned');
+    expect(screen.queryByLabelText('Mark as learned')).toBeNull(); // [FB-54] capital L
+    const b = screen.getByLabelText('Mark as Learned');
+    expect(b.textContent).toContain('Mark as Learned');
+    expect(b.getAttribute('title')).toBe('Mark as Learned');
     // secondary: not a filled success hero, not bold, not a 2-column tile
     expect(b.className).not.toContain('col-span-2');
     expect(b.className).not.toContain('font-bold');
+    expect(b.className).not.toContain('bg-transparent'); // [FB-54] soft filled surface (themes.css), not an outline
     expect(b.className).not.toContain('bg-[var(--lv-success)]');
     expect(b.className).toContain('lv-ctl-mark');
   });
 
-  it('[FB-10] top level is Audio, Pause, Next, Search, Mark as learned; no Mute/Voice/Rate until Audio opens', async () => {
+  it('[FB-10] top level is Audio, Pause, Next, Search, Mark as Learned; no Mute/Voice/Rate until Audio opens', async () => {
     renderControls();
     const labels = screen.getAllByRole('button').map((b) => b.getAttribute('aria-label'));
-    expect(labels).toEqual(['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as learned']);
+    expect(labels).toEqual(['Audio', 'Pause', 'Next Word', 'Quick Search', 'Mark as Learned']);
     for (const l of ['Mute', 'Unmute', 'Change Voice', 'Speech Rate']) expect(screen.queryByLabelText(l)).toBeNull();
     expect(screen.getByLabelText('Pause').className).toContain('lv-ctl-pause');
 

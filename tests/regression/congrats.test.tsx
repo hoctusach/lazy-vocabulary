@@ -60,7 +60,7 @@ describe('[FB-47] popup + sound fire on the tap', () => {
     expect(document.querySelector('.lv-congrats')).toBeTruthy();
   });
 
-  it('confirming Mark as learned shows the popup immediately even if marking never resolves (slow sync)', async () => {
+  it('confirming Mark as Learned shows the popup immediately even if marking never resolves (slow sync)', async () => {
     const onMark = vi.fn(() => new Promise(() => {})); // never settles
     render(
       <MemoryRouter>
@@ -69,7 +69,7 @@ describe('[FB-47] popup + sound fire on the tap', () => {
           playCurrentWord={() => {}} onMarkWordLearned={onMark as never} onOpenSearch={() => {}} />
       </MemoryRouter>
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Mark as learned' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Mark as Learned' }));
     expect(document.querySelector('.lv-congrats')).toBeNull();
     await userEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Mark as Learned' }));
     expect(document.querySelector('.lv-congrats')).toBeTruthy();

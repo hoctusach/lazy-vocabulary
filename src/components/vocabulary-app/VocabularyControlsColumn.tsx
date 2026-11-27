@@ -149,13 +149,13 @@ const VocabularyControlsColumn: React.FC<VocabularyControlsColumnProps> = ({
           size="sm"
           onClick={handleMarkAsLearnedClick}
           variant="outline"
-          className="lv-ctl-mark col-span-4 h-11 min-h-11 w-full gap-1.5 border border-slate-200 bg-transparent px-2 text-xs font-medium text-[var(--lv-text-secondary)] hover:bg-[var(--lv-card-highlight)] hover:text-[var(--lv-text-primary)] disabled:opacity-60 dark:border-slate-700 md:w-auto md:min-w-11"
-          title="Mark as learned"
-          aria-label="Mark as learned"
+          className="lv-ctl-mark col-span-4 h-11 min-h-11 w-full gap-1.5 px-2 text-xs font-semibold text-[var(--lv-text-primary)] disabled:opacity-60 md:w-auto md:min-w-11"
+          title="Mark as Learned"
+          aria-label="Mark as Learned"
           disabled={!currentWord}
         >
           <CheckCircle size={16} aria-hidden="true" />
-          <span className="md:sr-only">Mark as learned</span>
+          <span className="md:sr-only">Mark as Learned</span>
         </Button>
       )}
 

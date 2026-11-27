@@ -54,7 +54,7 @@ describe('VocabularyControlsColumn mark as learned', () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(screen.getByRole('button', { name: 'Mark as learned' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Mark as Learned' }));
     expect(onMarkWordLearned).not.toHaveBeenCalled();
     const dialog = screen.getByRole('alertdialog');
     await userEvent.click(within(dialog).getByRole('button', { name: 'Mark as Learned' }));

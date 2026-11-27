@@ -128,7 +128,7 @@ test('SET-19', 'Per-set progress isolation', async ({ session }) => {
   await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await importFile(s, 'setB.csv'); await waitText(s, 'Imported 6 words into “setB”.');
   await U.useOnly(s, 'setA'); await tab(s, 'Learn');
   await s.page.waitForFunction(() => /^aaa/.test(document.querySelector('main h1')?.textContent || ''), { timeout: 8000 });
-  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
+  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.');
   await tab(s, 'Sets'); await waitText(s, '1 learned on this device');
   ok((await cardText(s, 'setA')).includes('1 learned'), await cardText(s, 'setA'));
   ok((await cardText(s, 'setB')).includes('0 learned'), await cardText(s, 'setB'));

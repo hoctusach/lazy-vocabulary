@@ -39,7 +39,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
   await ctl(s, 'Next Word'); await U.waitWord(s, U.POOL_ORDER[1]);
-  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me'); await sleep(800);
   await tab(s, 'Learn'); await ctl(s, 'Quick Search'); await s.page.click('input[placeholder="Search word..."]'); await s.page.keyboard.type('lever'); await sleep(1500);
   ok(/No results found|offline|couldn|leverage|unavailable/i.test(await body(s)));
@@ -48,7 +48,7 @@ test('OFFLINE-04', 'Going offline mid-session: learned/next/progress/search do n
 test('OFFLINE-05', 'Back online: reload converges with the server', async ({ session }) => {
   const s = await session({}); s.allow.push(NET); await boot(s);
   s.fake.mode = 'down';
-  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
+  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(1200);
   s.fake.mode = 'ok'; await s.reload(); await sleep(3500);
   await tab(s, 'Progress'); await waitText(s, 'Quiz me');
   ok((await body(s)).length > 200); // converged: app renders; learned sync call count recorded for the report
@@ -128,7 +128,7 @@ test('EDGE-07', 'localStorage full: no crash or blank screen', async ({ session 
   const s = await session({}); await boot(s); s.allow.push(/Quota|quota|setItem|storage/i);
   await s.page.evaluate(() => { let n = 1 << 20; const f = 'x'.repeat(n); let i = 0; try { while (true) { localStorage.setItem('zz_fill' + i++, f); } } catch (e) {} for (const size of [65536, 4096, 256, 16, 1]) { const c = 'y'.repeat(size); for (;;) { try { localStorage.setItem('zz_fill' + i++, c); } catch (e) { break; } } } });
   await ctl(s, 'Next Word'); await sleep(400);
-  await ctl(s, 'Mark as learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
+  await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await sleep(800);
   await sleep(2300); // the 2 s congrats popup covers the Speed button in the Cozy Sloth layout (new default theme)
   await U.openAudio(s); await ctl(s, 'Speech Rate'); await s.page.evaluate(() => [...document.querySelectorAll('button')].find((b) => /^1\.5\s*[×x]$/.test(b.textContent.trim())).click()); await sleep(500);
   await tab(s, 'More'); await click(s, { label: 'Pixel Quest' });
