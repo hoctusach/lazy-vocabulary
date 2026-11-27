@@ -21,11 +21,13 @@ describe('[FB-53] natural app notification', () => {
     expect(svc).toContain('.setSmallIcon(');
   });
 
-  it('title = word, text = meaning, expanded text = meaning + translation + example + category', () => {
+  it('[FB-53][FB-65] title = word, text = meaning, expanded = category, meaning, example, translation (card order)', () => {
     expect(svc).toContain('.setContentTitle(title)');
     expect(svc).toContain('.setContentText(text)');
-    const big = svc.slice(svc.indexOf('private String bigText()'), svc.indexOf('private Notification buildNotification()'));
-    for (const f of ['it.meaning', 'it.translation', 'it.example', 'it.category']) expect(big).toContain(f);
+    const big = svc.slice(svc.indexOf('private CharSequence bigText()'), svc.indexOf('private Notification buildNotification()'));
+    for (const f of ['it.categoryLabel', 'it.meaning', 'it.example', 'it.translation']) expect(big).toContain(f);
+    expect(big.indexOf('it.meaning')).toBeLessThan(big.indexOf('it.example'));
+    expect(big.indexOf('it.example')).toBeLessThan(big.indexOf('it.translation'));
   });
 
   it('Pause/Play, Next and Stop actions go to the service (foreground-service PendingIntent, works when locked)', () => {

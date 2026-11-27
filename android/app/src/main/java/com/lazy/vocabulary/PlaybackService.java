@@ -60,6 +60,8 @@ public class PlaybackService extends Service {
         String example = "";
         String translation = "";
         String category = "";
+        /** [FB-65] Display label (same as the in-app card pill); falls back to category when empty. */
+        String categoryLabel = "";
         long pauseMs = 1500;
     }
 
@@ -545,35 +547,37 @@ public class PlaybackService extends Service {
                 : PendingIntent.getService(this, req, i, flags);
     }
 
-    private String bigText() {
+    /** [FB-65] Expanded body: category, meaning, example, translation (the word is the title), with per-field spans. */
+    private CharSequence bigText() {
         Item it = currentItem();
-        StringBuilder sb = new StringBuilder();
-        if (it != null && it.word.equals(title)) {
-            append(sb, it.meaning);
-            append(sb, it.translation);
-            append(sb, it.example.isEmpty() ? "" : "“" + it.example + "”");
-            append(sb, it.category);
-        } else {
-            append(sb, text);
+        if (it == null || !it.word.equals(title)) return text == null ? "" : text;
+        String cat = it.categoryLabel.isEmpty() ? it.category : it.categoryLabel;
+        java.util.List<NotificationBody.Line> lines = NotificationBody.lines(cat, it.meaning, it.example, it.translation);
+        android.text.SpannableStringBuilder sb = new android.text.SpannableStringBuilder();
+        for (NotificationBody.Line l : lines) {
+            if (sb.length() > 0) sb.append('\n');
+            int start = sb.length();
+            sb.append(l.text);
+            int end = sb.length();
+            if (l.kind == NotificationBody.MEANING || l.kind == NotificationBody.TRANSLATION) {
+                sb.setSpan(new android.text.style.StyleSpan(android.graphics.Typeface.ITALIC), start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            } else if (l.kind == NotificationBody.CATEGORY) {
+                sb.setSpan(new android.text.style.RelativeSizeSpan(0.85f), start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                sb.setSpan(new android.text.style.ForegroundColorSpan(0xFF757575), start, end, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
         }
-        return sb.toString();
-    }
-
-    private static void append(StringBuilder sb, String s) {
-        if (s == null || s.trim().isEmpty()) return;
-        if (sb.length() > 0) sb.append('\n');
-        sb.append(s.trim());
+        return sb;
     }
 
     private Notification buildNotification() {
         Intent open = new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent contentPi = PendingIntent.getActivity(this, 0, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        String big = bigText();
+        CharSequence big = bigText();
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(getApplicationInfo().icon)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(big.isEmpty() ? text : big))
+                .setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(big.length() == 0 ? text : big))
                 .setContentIntent(contentPi)
                 // Swipe-away of a paused (dismissible) card stops the service cleanly.
                 .setDeleteIntent(servicePi(ACTION_STOP, 4))

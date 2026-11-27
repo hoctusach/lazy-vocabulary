@@ -17,6 +17,8 @@ export interface PlaybackQueueItem {
   example?: string;
   translation?: string;
   category?: string;
+  /** [FB-65] Card-style category label shown in the notification. */
+  categoryLabel?: string;
   /** Pause after the word before the next one starts. */
   pauseMs?: number;
 }
