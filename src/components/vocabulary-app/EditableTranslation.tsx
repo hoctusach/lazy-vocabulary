@@ -11,6 +11,7 @@ import {
   type WordIdentity,
 } from '@/lib/translations/translationOverrides';
 import { useIsVietnameseDevice } from '@/utils/deviceLanguage';
+import { useShouldShowDefaultVi } from '@/lib/translations/showDefaultVi';
 import { guessLang } from '@/lib/translations/textDirection';
 import { emitTranslationEdit, SAVED_CONFIRM_MS } from '@/lib/translations/translationEditSignal';
 
@@ -31,6 +32,7 @@ interface Props extends WordIdentity {
 const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, translation, editable = true, isVi: isViProp, color }) => {
   const deviceIsVi = useIsVietnameseDevice();
   const isVi = isViProp ?? deviceIsVi;
+  const showDefaultVi = useShouldShowDefaultVi();
   const canEdit = useProFeature('editTranslation');
   const identity = React.useMemo(() => ({ word, category, sourceId }), [word, category, sourceId]);
   const idKey = `${sourceId ?? ''}|${category ?? ''}|${word}`;
@@ -41,8 +43,9 @@ const EditableTranslation: React.FC<Props> = ({ word, category, sourceId, transl
   const pending = React.useRef<{ identity: WordIdentity; draft: string; base: string } | null>(null);
 
   // [FB-42] The field is ALWAYS shown. Edited value wins (any language). Blank override: the default (Vietnamese)
-  // translation only on a Vietnamese device; otherwise blank, with a placeholder to tap and add one.
-  const defaultShown = deviceIsVi ? translation ?? '' : '';
+  // translation on a Vietnamese device, or on an English device when "Show Vietnamese translation" is on [FB-64];
+  // otherwise blank, with a placeholder to tap and add one.
+  const defaultShown = showDefaultVi ? translation ?? '' : '';
   const effective = override ?? defaultShown;
   const textLang = override !== undefined ? guessLang(override) : defaultShown ? 'vi' : undefined;
 

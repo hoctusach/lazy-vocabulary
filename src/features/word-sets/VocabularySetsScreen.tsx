@@ -19,6 +19,7 @@ import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleXlsx, CATEGORY_HELP_LINES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
 import AdminImportedSets from '@/features/admin/AdminImportedSets';
+import ShowViToggle from './ShowViToggle';
 import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
@@ -317,6 +318,7 @@ const VocabularySetsScreen: React.FC = () => {
                   </p>
                 </div>
               </div>
+              {set.builtin && <ShowViToggle />}
               {set.builtin && (
                 <ul className="mt-3 space-y-1 border-t pt-3" style={{ borderColor: 'var(--lv-border-color)' }}>
                   {BUILTIN_GROUPS.map((group) => {
