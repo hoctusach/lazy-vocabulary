@@ -1,19 +1,26 @@
+import './silenceConsole'
+import '@/services/speech/installSpeechShim'
 
 import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
+import './styles/fonts.css'
+import './styles/theme-tokens.css'
+import './styles/themes.css'
+import './styles/sections.css'
 import { loadSessionOnBoot } from '@/lib/customAuth'
 import { ThemeProvider } from '@/contexts/ThemeContext'
 import { initTheme } from '@/lib/themeManager'
+import { AppErrorBoundary } from '@/components/AppErrorBoundary'
 
-// Disable console logs in production for better performance
-if (import.meta.env.PROD) {
-  console.log = () => {};
-  console.warn = () => {};
-  console.info = () => {};
-}
+// Production console silencing lives in ./silenceConsole (first import above).
 
-loadSessionOnBoot();
+try { loadSessionOnBoot(); } catch (e) { console.error('[boot] session', e); }
+
+// Cloud sync of per-user translation overrides (Pro). Lazy and failure-proof: never blocks first paint.
+void import('@/lib/translations/translationOverridesSync')
+  .then((m) => m.startTranslationOverridesSync())
+  .catch((e) => console.warn('[boot] translation sync', e));
 
 if (typeof document !== "undefined") {
   if (document.readyState === "loading") {
@@ -29,7 +36,9 @@ if (!rootElement) {
 }
 
 createRoot(rootElement).render(
-  <ThemeProvider>
-    <App />
-  </ThemeProvider>
+  <AppErrorBoundary>
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  </AppErrorBoundary>
 );

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
-import { setFavoriteVoice } from '@/lib/preferences/localPreferences';
 import { getTodayLastWord } from '@/utils/lastWordStorage';
 
 /**
@@ -39,14 +38,7 @@ export const useVocabularyDataLoader = (
     }
   };
 
-  // Persist selected voice whenever it changes
-  useEffect(() => {
-    if (!selectedVoiceName) {
-      return;
-    }
-
-    setFavoriteVoice(selectedVoiceName);
-  }, [selectedVoiceName]);
+  // [FB-61] The saved voice is written only by explicit choices; a fallback selection must never overwrite it.
 
   // Load initial data
   useEffect(() => {

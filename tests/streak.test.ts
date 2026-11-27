@@ -1,13 +1,14 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { calculateCurrentStreak, hasLearnedToday, getRecentDays } from '@/lib/progress/streak';
 
-function isoDaysAgo(daysAgo: number, from = new Date('2024-06-15T12:00:00Z')): string {
+function isoDaysAgo(daysAgo: number, from = new Date("2024-06-15T12:00:00")): string {
   const d = new Date(from);
-  d.setUTCDate(d.getUTCDate() - daysAgo);
-  return d.toISOString().slice(0, 10);
+  d.setDate(d.getDate() - daysAgo);
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  return `${d.getFullYear()}-${m}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-describe('calculateCurrentStreak', () => {
+describe('[FB-17] calculateCurrentStreak', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
@@ -17,7 +18,7 @@ describe('calculateCurrentStreak', () => {
   });
 
   it('counts consecutive days ending today', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
 
@@ -26,7 +27,7 @@ describe('calculateCurrentStreak', () => {
   });
 
   it('stops at the first gap', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
 
@@ -35,7 +36,7 @@ describe('calculateCurrentStreak', () => {
   });
 
   it('returns 0 when today has not been learned yet, even with a past run', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
 
@@ -44,33 +45,33 @@ describe('calculateCurrentStreak', () => {
   });
 });
 
-describe('hasLearnedToday', () => {
+describe('[FB-17] hasLearnedToday', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
 
   it('is true when today is in the list', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
     expect(hasLearnedToday([isoDaysAgo(0, now)])).toBe(true);
   });
 
   it('is false when today is missing', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
     expect(hasLearnedToday([isoDaysAgo(1, now)])).toBe(false);
   });
 });
 
-describe('getRecentDays', () => {
+describe('[FB-17] getRecentDays', () => {
   afterEach(() => {
     vi.useRealTimers();
   });
 
   it('returns the last N days oldest-first, marking learned + today', () => {
-    const now = new Date('2024-06-15T12:00:00Z');
+    const now = new Date("2024-06-15T12:00:00");
     vi.useFakeTimers();
     vi.setSystemTime(now);
 

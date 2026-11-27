@@ -1,5 +1,6 @@
 
 import { SheetData, VocabularyWord } from "@/types/vocabulary";
+import { normalizeCategory } from "@/data/defaultVocabulary";
 
 export class VocabularyDataProcessor {
   constructor() {}
@@ -7,11 +8,13 @@ export class VocabularyDataProcessor {
   processDataTypes(data: any): SheetData {
     const processedData: SheetData = {};
     
-    for (const sheetName in data) {
-      processedData[sheetName] = [];
+    for (const rawSheetName in data) {
+      // 'phrases, collocation' -> 'phrases, collocations' whatever the source
+      const sheetName = normalizeCategory(rawSheetName) as string;
+      processedData[sheetName] = processedData[sheetName] ?? [];
       
-      if (Array.isArray(data[sheetName])) {
-        for (const word of data[sheetName]) {
+      if (Array.isArray(data[rawSheetName])) {
+        for (const word of data[rawSheetName]) {
           // Ensure all fields are properly typed and add default category if missing
           processedData[sheetName].push({
             word: String(word.word || ""),
@@ -19,7 +22,7 @@ export class VocabularyDataProcessor {
             example: String(word.example || ""),
             translation: String(word.translation || ""),
             count: word.count !== undefined ? word.count : 0,
-            category: word.category || sheetName // Use sheet name as default category
+            category: normalizeCategory(word.category) || sheetName // Use sheet name as default category
           });
         }
       }

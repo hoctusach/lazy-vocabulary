@@ -8,6 +8,8 @@ export interface VocabularyWord {
   count: number | string; // This allows both number and string types
   category?: string; // Making category optional to support existing default vocabulary data
   nextAllowedTime?: string;
+  /** Set in the mixed learning queue: the word set it came from ('default' or an imported set id). */
+  sourceId?: string;
 }
 
 export type TodayWordSrs = {

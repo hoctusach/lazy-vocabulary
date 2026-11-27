@@ -11,7 +11,7 @@ interface SpeechRateControlProps {
   buttonClassName?: string;
 }
 
-const RATE_OPTIONS = [
+export const SPEECH_RATE_OPTIONS = [
   { value: 0.5, label: '0.5x' },
   { value: 0.75, label: '0.75x' },
   { value: 1, label: '1x' },
@@ -53,7 +53,7 @@ const SpeechRateControl: React.FC<SpeechRateControlProps> = ({ rate, onChange, b
       </PopoverTrigger>
       <PopoverContent className="w-64 p-3" side="top" align="center">
         <div className="grid grid-cols-4 gap-2">
-          {RATE_OPTIONS.map(({ value, label }) => {
+          {SPEECH_RATE_OPTIONS.map(({ value, label }) => {
             const isActive = Math.abs(rate - value) < 0.001;
             return (
               <PopoverClose asChild key={value}>

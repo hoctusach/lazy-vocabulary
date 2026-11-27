@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { cleanSpeechText, prepareTextForSpeech } from '../src/utils/speech/core/speechText';
 
+// Current intended behaviour: IPA, (pos) and [labels] are stripped, list numbers are
+// kept so they are read aloud, and a trailing full stop is added for a natural pause.
 const cases: Array<{ input: string; output: string }> = [
   {
     input: '/ˈækt/ (verb) [C] 1. to do something',

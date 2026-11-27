@@ -220,6 +220,19 @@ function getActiveEdgeSession(): EdgeSession | null {
   return session;
 }
 
+/**
+ * Only an explicit rejection from the server means the stored credentials are
+ * no longer good. A network failure or a 5xx must keep the user signed in,
+ * otherwise opening the app offline after the 1 hour edge session expired
+ * would sign the user out and wipe their caches.
+ */
+export function isCredentialRejection(err: unknown): boolean {
+  const e = err as { code?: unknown; status?: unknown } | null;
+  const code = typeof e?.code === 'string' ? e.code : '';
+  if (code === 'INCORRECT_PASSCODE' || code === 'NICKNAME_NOT_FOUND') return true;
+  return e?.status === 401 || e?.status === 403;
+}
+
 let ensuringSupabaseSession: Promise<Session | null> | null = null;
 
 async function ensureSupabaseAuthSessionInternal(): Promise<Session | null> {
@@ -244,6 +257,7 @@ async function ensureSupabaseAuthSessionInternal(): Promise<Session | null> {
     return refreshed ?? stored.session;
   } catch (err) {
     console.warn('auth:ensureSupabaseAuthSession', (err as Error).message);
+    if (!isCredentialRejection(err)) return stored.session;
     clearStoredAuth({ keepPasscode: true });
     return null;
   }
@@ -256,6 +270,40 @@ export async function ensureSupabaseAuthSession(): Promise<Session | null> {
     });
   }
   return ensuringSupabaseSession;
+}
+
+/** True when the device holds a stored sign-in (auth payload or nickname), regardless of server state. */
+export function hasStoredSignIn(): boolean {
+  return loadStoredAuthPayload() !== null || !!readFromStorage(NICKNAME_LS_KEY)?.trim();
+}
+
+/** The nickname this device is signed in as, if any. */
+export function getStoredSignInNickname(): string | null {
+  const nick = loadStoredAuthPayload()?.session.nickname?.trim() || readFromStorage(NICKNAME_LS_KEY)?.trim();
+  return nick || null;
+}
+
+let forcingRefresh: Promise<Session | null> | null = null;
+
+/**
+ * Re-runs the passcode exchange even when the local edge session looks valid
+ * (the server may not know the token, e.g. it predates user_sessions). Returns
+ * null when there is no stored sign-in or passcode to exchange. Throws the
+ * exchange error (network or credential rejection) so callers can tell them
+ * apart with isCredentialRejection. Never signs the user out.
+ */
+export function forceRefreshSession(): Promise<Session | null> {
+  if (!forcingRefresh) {
+    forcingRefresh = (async () => {
+      const nickname = getStoredSignInNickname();
+      const passcode = getStoredPasscode();
+      if (!nickname || !passcode) return null;
+      return signInWithPasscode(nickname, passcode, { rememberPasscode: false });
+    })().finally(() => {
+      forcingRefresh = null;
+    });
+  }
+  return forcingRefresh;
 }
 
 export async function getActiveSession(): Promise<Session | null> {
@@ -285,6 +333,7 @@ export async function refreshActiveSession(): Promise<Session | null> {
     return refreshed ?? stored.session;
   } catch (err) {
     console.warn('auth:refreshActiveSession', (err as Error).message);
+    if (!isCredentialRejection(err)) return stored.session;
     clearStoredAuth({ keepPasscode: true });
     return null;
   }

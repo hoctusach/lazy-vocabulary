@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import PracticeDialog from '@/components/practice/PracticeDialog';
 import PracticeHistory from '@/features/practice/components/PracticeHistory';
 import { searchVocabulary } from '@/services/search/vocabularySearch';
+import EditableTranslation from '@/components/vocabulary-app/EditableTranslation';
 import type { VocabularyWord } from '@/types/vocabulary';
 
 const findVocabularyWord = (slug?: string): VocabularyWord | null => {
@@ -64,12 +65,12 @@ const VocabularyDetailPage: React.FC = () => {
             <h2 className="font-semibold">Example</h2>
             <p className="mt-1 whitespace-pre-line italic text-slate-700 dark:text-slate-200">{word.example}</p>
           </section>
-          {word.translation && (
-            <section>
-              <h2 className="font-semibold">Translation</h2>
-              <p className="mt-1 whitespace-pre-line text-slate-700 dark:text-slate-200">{word.translation}</p>
-            </section>
-          )}
+          <section>
+            <h2 className="font-semibold">Translation</h2>
+            <div className="mt-1 text-slate-700 dark:text-slate-200">
+              <EditableTranslation word={word.word} category={word.category} translation={word.translation ?? undefined} editable={false} />
+            </div>
+          </section>
         </CardContent>
       </Card>
 

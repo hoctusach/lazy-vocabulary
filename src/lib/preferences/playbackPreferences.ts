@@ -1,5 +1,6 @@
 import type { UserPreferences } from '@/core/models';
 import { readPreferencesFromStorage } from './localPreferences';
+import { sanitizeVoiceName } from '@/services/speech/voiceAccess';
 
 type VoiceList = readonly SpeechSynthesisVoice[];
 
@@ -17,7 +18,7 @@ export interface ResolvedPlaybackPreferences {
 }
 
 const extractRequestedVoice = (prefs: UserPreferences): string | null => {
-  const rawVoice = typeof prefs.favorite_voice === 'string' ? prefs.favorite_voice.trim() : '';
+  const rawVoice = typeof prefs.favorite_voice === 'string' ? sanitizeVoiceName(prefs.favorite_voice.trim()) : '';
   return rawVoice.length > 0 ? rawVoice : null;
 };
 

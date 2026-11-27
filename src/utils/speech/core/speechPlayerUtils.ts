@@ -29,6 +29,7 @@ export function waitForVoices(): Promise<SpeechSynthesisVoice[]> {
       reject(new Error('Could not load voices'));
     }, 5000);
 
+    if (!window.speechSynthesis) { clearTimeout(timeout); reject(new Error('Speech synthesis unavailable')); return; }
     window.speechSynthesis.onvoiceschanged = () => {
       clearTimeout(timeout);
       const loaded = loadVoices();

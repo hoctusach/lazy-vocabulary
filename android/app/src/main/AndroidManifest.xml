@@ -9,6 +9,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <!-- AdMob App ID, generated from src/config/ads.ts into @string/admob_app_id (see app/build.gradle). -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
+
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation"
             android:name=".MainActivity"
@@ -32,6 +37,11 @@
 
         </activity>
 
+        <service
+            android:name=".PlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -46,6 +56,11 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.android.vending.BILLING" />
 </manifest>

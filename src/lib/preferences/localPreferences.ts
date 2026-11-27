@@ -12,8 +12,14 @@ const defaultPrefs: UserPreferences = {
   daily_option: null,
 };
 
-export const hasLocalStorage = (): boolean =>
-  typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+export const hasLocalStorage = (): boolean => {
+  try {
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
+  } catch {
+    // Blocked storage makes even reading window.localStorage throw a SecurityError.
+    return false;
+  }
+};
 
 const parseStoredPreferences = (): Partial<UserPreferences> => {
   if (!hasLocalStorage()) return {};

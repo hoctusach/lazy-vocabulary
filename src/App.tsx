@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, useLocation } from "react-router-dom";
 import AppRouter from "@/lib/platform/AppRouter";
 import { initNativeShell } from "@/lib/platform/nativeShell";
+import { initBilling } from "@/services/billing/billingService";
 import { Helmet } from "react-helmet";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -14,6 +15,9 @@ import { useSessionTracker } from "./hooks/useSessionTracker";
 import { useEffect } from "react";
 import AuthGate from "./components/AuthGate";
 import InstallPrompt from "./components/InstallPrompt";
+import KokoroAutoDownload from "./components/KokoroAutoDownload";
+import ProUpgradeSheet from "./components/pro/ProUpgradeSheet";
+import { isProEnabled } from "./config/features";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
 import { clearLegacyCustomWordKeys } from "./lib/cleanup/clearLegacyCustomWordKeys";
 import { clearLegacyStreakKeys } from "./lib/cleanup/clearLegacyStreakKeys";
@@ -25,15 +29,19 @@ const queryClient = new QueryClient();
 
 const App = () => {
   useEffect(() => {
-    void initNativeShell();
+    // Plugin failures must never block first paint.
+    try { void initNativeShell().catch(() => {}); } catch { /* ignore */ }
+    try { if (isProEnabled()) void initBilling().catch(() => {}); } catch { /* ignore */ }
   }, []);
   useEffect(() => {
-    clearLegacyCustomWordKeys();
-    clearLegacyStreakKeys();
-    void autoBackfillOnReload();
+    try {
+      clearLegacyCustomWordKeys();
+      clearLegacyStreakKeys();
+      void Promise.resolve(autoBackfillOnReload()).catch(() => {});
+    } catch { /* ignore */ }
   }, []);
   useEffect(() => {
-    void bootstrapLearnedFromServerByKey();
+    try { void Promise.resolve(bootstrapLearnedFromServerByKey()).catch(() => {}); } catch { /* ignore */ }
   }, []);
   useSessionTracker();
   useDailyUsageTracker();
@@ -42,11 +50,11 @@ const App = () => {
       <TooltipProvider>
         <Helmet>
           <title>
-            Lazy Vocabulary – Master English Vocabulary with Passive Learning
+            Lazy Vocabulary – Just 15 minutes a day with spaced repetition
           </title>
           <meta
             name="description"
-            content="Learn English vocabulary easily. Passive learning with audio, examples, and categorized words. Improve fluency by skimming and listening."
+            content="Just 15 minutes a day with spaced repetition to master English vocabulary."
           />
           <link rel="canonical" href="https://your-domain.com/" />
         </Helmet>
@@ -66,6 +74,8 @@ const App = () => {
         </AppRouter>
         <AuthGate />
         <InstallPrompt />
+        <KokoroAutoDownload />
+        {isProEnabled() && <ProUpgradeSheet />}
       </TooltipProvider>
     </QueryClientProvider>
   );

@@ -12,7 +12,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ jsonLoadError }) => {
   return (
     <Alert variant="destructive" className="mb-4">
       <AlertDescription>
-        Custom vocabulary file is corrupt; loaded default list instead.
+        Your word file could not be read, so the built-in words are shown.
       </AlertDescription>
     </Alert>
   );

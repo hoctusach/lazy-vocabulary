@@ -2,8 +2,10 @@ import type { DailyMode, DailySelection, LearningProgress, SeverityLevel } from 
 import type { TodayWord, TodayWordSrs } from '@/types/vocabulary';
 import { getDailySelectionV2, type DailySelectionV2Row } from '@/lib/db/supabase';
 import type { LearnedWordUpsert } from '@/lib/db/learned';
-import { ensureUserKey, markLearnedServerByKey, TOTAL_WORDS } from '@/lib/progress/srsSyncByUserKey';
+import { ensureUserKey, markLearnedServerByKey } from '@/lib/progress/srsSyncByUserKey';
+import { getDefaultVocabularyTotal, normalizeCategory } from '@/data/defaultVocabulary';
 import { getSupabaseClient } from '@/lib/supabaseClient';
+import { filterByBuiltinGroups } from '@/features/word-sets/mixQueue';
 import { buildTodaysWords } from '@/utils/todayWords';
 import {
   DAILY_SELECTION_KEY,
@@ -20,13 +22,23 @@ import {
   type LearnedWordSummary,
   type TodayLearnedWordSummary,
 } from '@/lib/progress/learnedWordStats';
+import { markStudiedToday } from '@/lib/reminders/studySignal';
 import { extractServerSummary } from '@/lib/progress/serverSummary';
+import { todayKey } from '@/lib/progress/streak';
+import { isInActiveSet, pickTopUp, rowWord, toTodaySummary } from '@/services/dailyTopUp';
+import { DAILY_TARGET, topUpNeeded } from '@/lib/progress/dailyTarget';
 
 export type GenerateParams = {
   userKey: string;
   mode: DailyMode;
   count: number;
   category?: string | null;
+  /**
+   * Multi-set mixing, 2-5 built-in groups: the RPC is called with `category` NULL and the rows are
+   * filtered to these groups client-side. The server quota is shared across all groups, so fewer
+   * built-in words than usual may arrive that day. Ignored when null/empty.
+   */
+  filterGroups?: string[] | null;
 };
 
 export type TodaySelectionState = {
@@ -42,6 +54,8 @@ export type TodaySelectionState = {
 export type TodaySelectionWithStats = TodaySelectionState & {
   summary: DerivedProgressSummary | null;
   learnedWords: LearnedWordSummary[];
+  /** [FB-51] Words marked learned today only (local date). */
+  learnedTodayWords: LearnedWordSummary[];
   newTodayWords: TodayLearnedWordSummary[];
   dueTodayWords: TodayLearnedWordSummary[];
 };
@@ -65,14 +79,15 @@ type SelectionNormalizationMeta = {
   timezone: string | null;
 };
 
-const DEFAULT_SEVERITY_CONFIG: Record<SeverityLevel, { min: number; max: number }> = {
-  light: { min: 15, max: 25 },
-  moderate: { min: 30, max: 50 },
-  intense: { min: 50, max: 100 },
-};
+/**
+ * FB-35 (Option A): one daily target, 20 words TOTAL (new + review). If few reviews are due the rest is filled
+ * with new words up to 20. The old Light/Medium/Hard sizes (25/50/100) contradicted that, so every severity now
+ * maps to the same total; the severity type stays only so stored preferences keep parsing.
+ */
+export const DAILY_TOTAL_WORDS = DAILY_TARGET;
 
-const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
-const MASTER_INTERVAL_DAYS = 60;
+export const REVIEW_INTERVALS_DAYS = [1, 2, 3, 5, 7, 10, 14, 21, 28, 35];
+export const MASTER_INTERVAL_DAYS = 60;
 const EXPOSURE_DELAYS_MINUTES = [0, 5, 7, 10, 15, 30, 60, 90, 120];
 const MASTER_EXPOSURE_DELAY_MINUTES = 180;
 
@@ -254,9 +269,8 @@ function deriveWordFromId(wordId: string): string {
   return candidate || wordId;
 }
 
-function getDailyCount(severity: SeverityLevel): number {
-  const config = DEFAULT_SEVERITY_CONFIG[severity] ?? DEFAULT_SEVERITY_CONFIG.light;
-  return config.max;
+function getDailyCount(_severity: SeverityLevel): number {
+  return DAILY_TOTAL_WORDS;
 }
 
 function buildSrsFromSelection(selectionRow: DailySelectionRow | null | undefined): TodayWordSrs | undefined {
@@ -543,7 +557,7 @@ export async function loadDailySelectionSummary(
   }
 
   const fallback = computeLearnedWordStats(rows as unknown as LearnedWordRow[], {
-    totalWords: TOTAL_WORDS,
+    totalWords: getDefaultVocabularyTotal(),
     timezone: opts?.timezone ?? null,
   });
 
@@ -585,44 +599,58 @@ async function fetchVocabularyByIds(wordIds: string[]): Promise<Record<string, V
   return map;
 }
 
-export async function fetchAndCommitTodaySelection(
-  params: GenerateParams
-): Promise<TodaySelectionWithStats> {
-  const { userKey, mode, count, category = null } = params;
-  const [selectionRows, timezone] = await Promise.all([
-    generateDailySelectionV2(userKey, mode, count, category),
-    resolveUserTimezone(userKey),
-  ]);
-  if (!Array.isArray(selectionRows) || selectionRows.length === 0) {
+const SERVER_MAX_PER_CALL = 25; // generate_daily_selection_v2 clamps p_count to 25
+
+type ServerPass = {
+  rawRows: DailySelectionRow[];
+  /** Rows the device can show (bundle words), limited to the selected groups. */
+  rows: DailySelectionRow[];
+  today: TodaySelectionState;
+  /** Active (not learned) today rows the server counted, including words this device cannot show. */
+  serverActive: number;
+};
+
+async function loadServerPass(
+  userKey: string,
+  mode: DailyMode,
+  count: number,
+  category: string | null,
+  filterGroups: string[] | null,
+  timezone: string | null
+): Promise<ServerPass> {
+  const rawRows = await generateDailySelectionV2(userKey, mode, count, category);
+  if (!Array.isArray(rawRows) || rawRows.length === 0) {
     throw new Error('No daily selection rows returned');
+  }
+  const serverActive = rawRows.filter(
+    (row) => row.is_today_selection !== false && (row.srs_state ?? '').toLowerCase() !== 'learned'
+  ).length;
+
+  // [FB-51] Words the shipped bundle lacks (server-only) are dropped here, then topped up from the bundle.
+  let rows = rawRows.filter((row) => isInActiveSet(row));
+  if (filterGroups && filterGroups.length > 0) {
+    rows = filterByBuiltinGroups(rows, filterGroups);
   }
 
   const selectionById = new Map(
-    selectionRows
+    rows
       .filter(
         (row) =>
-          typeof row?.word_id === 'string' &&
-          row.word_id.length > 0 &&
-          row.is_today_selection !== false
+          typeof row?.word_id === 'string' && row.word_id.length > 0 && row.is_today_selection !== false
       )
       .map((row) => [row.word_id, row])
   );
   const ids = Array.from(selectionById.keys());
 
-  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[LearningProgress] fetchAndCommitTodaySelection rpc result', {
-      generatedCount: selectionRows.length,
-    });
+  let vocabMap: Record<string, VocabularyRow> = {};
+  if (ids.length > 0) {
+    vocabMap = await fetchVocabularyByIds(ids);
   }
-
-  const vocabMap = await fetchVocabularyByIds(ids);
   const vocabRows = ids
     .map((id) => {
       const selection = selectionById.get(id);
       const vocab = vocabMap[id];
-
       if (!selection && !vocab) return null;
-
       const merged: VocabularyRow = {
         ...(vocab ?? {}),
         word_id: id,
@@ -630,49 +658,133 @@ export async function fetchAndCommitTodaySelection(
         meaning: selection?.meaning ?? vocab?.meaning ?? '',
         example: selection?.example ?? vocab?.example ?? '',
         translation: selection?.translation ?? vocab?.translation ?? null,
-        category: selection?.category ?? vocab?.category ?? null,
+        category: normalizeCategory(selection?.category ?? vocab?.category ?? null),
         count: vocab?.count ?? 0,
       };
-
       return merged;
     })
     .filter((row): row is VocabularyRow => Boolean(row));
 
-  if (vocabRows.length === 0) {
-    throw new Error('No vocabulary details available for selection');
-  }
-
-  const today = normalizeToDailySelection(vocabRows, selectionRows, {
+  const today = normalizeToDailySelection(vocabRows, rows, {
     mode,
     count,
     category: category ?? null,
     timezone: timezone ?? null,
   });
+  return { rawRows, rows, today, serverActive };
+}
 
-  if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[Normalized TodayWords]', today.words);
-    console.log('[LearningProgress] fetchAndCommitTodaySelection vocab details', {
-      words: today.words.map((word) => ({
-        word_id: word.word_id,
-        category: word.category,
-        word: word.word,
-      })),
-    });
+function readLocallyLearnedWords(userKey: string): string[] {
+  try {
+    if (typeof localStorage === 'undefined') return [];
+    const raw = localStorage.getItem('learningProgress');
+    const parsed = raw ? (JSON.parse(raw) as Record<string, unknown>) : null;
+    const mine = parsed && typeof parsed === 'object' ? (parsed[userKey] as Record<string, unknown> | undefined) : undefined;
+    return mine && typeof mine === 'object' ? Object.keys(mine).map((id) => id.split('::')[0] ?? id) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Add topped-up words to a day (same sort/selection rebuild as the server path). */
+export function appendTodayWords(state: TodaySelectionState, extra: TodayWord[], severity: SeverityLevel): TodaySelectionState {
+  if (extra.length === 0) return state;
+  const ordered = buildTodaysWords([...state.words, ...extra], 'ALL');
+  const selection = buildSelection(ordered, severity, {
+    mode: state.mode,
+    count: state.count,
+    category: state.category,
+    timezone: state.timezone,
+  });
+  selection.date = state.selection.date ?? state.date;
+  selection.timezone = state.selection.timezone ?? state.timezone ?? null;
+  return { ...state, words: ordered, selection };
+}
+
+export async function fetchAndCommitTodaySelection(
+  params: GenerateParams
+): Promise<TodaySelectionWithStats> {
+  const { userKey, mode, count, category = null, filterGroups = null } = params;
+  const timezone = await resolveUserTimezone(userKey);
+  const severity = MODE_TO_SEVERITY[mode] ?? 'light';
+  const localToday = todayKey();
+
+  let pass = await loadServerPass(userKey, mode, count, category, filterGroups, timezone);
+  const learnedTodayOf = (p: ServerPass) =>
+    computeLearnedWordStats(p.rows as unknown as LearnedWordRow[], { timezone }).learnedTodayWords;
+
+  // [FB-51] 1) Ask the server for more (it fills due first) while we are short after dropping server-only words.
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const need = topUpNeeded(pass.today.words.length, learnedTodayOf(pass).length);
+    const nextCount = Math.min(SERVER_MAX_PER_CALL, pass.serverActive + need);
+    if (need === 0 || nextCount <= pass.serverActive) break;
+    try {
+      const again = await loadServerPass(userKey, mode, nextCount, category, filterGroups, timezone);
+      if (again.today.words.length <= pass.today.words.length) break;
+      pass = again;
+    } catch {
+      break;
+    }
   }
 
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
-    console.log('[LearningProgress] fetchAndCommitTodaySelection final selection', {
-      selectionSize: today.words.length,
+    console.log('[LearningProgress] fetchAndCommitTodaySelection rpc result', {
+      generatedCount: pass.rawRows.length,
+      kept: pass.rows.length,
     });
   }
 
-  const derived = computeLearnedWordStats(selectionRows as unknown as LearnedWordRow[], {
-    totalWords: TOTAL_WORDS,
+  const derived = computeLearnedWordStats(pass.rows as unknown as LearnedWordRow[], {
+    totalWords: getDefaultVocabularyTotal(),
     timezone,
   });
+  let today = pass.today;
 
-  const serverSummary = extractServerSummary(selectionRows);
+  // [FB-51] 2) Device top-up: Due first (none known beyond the server's rows), then New from the bundle.
+  const learnedBefore = [
+    ...derived.learnedWords.map((entry) => entry.word),
+    ...readLocallyLearnedWords(userKey),
+  ];
+  const serverLearnedAll = pass.rawRows
+    .filter((row) => (row.srs_state ?? '').toLowerCase() === 'learned')
+    .map((row) => rowWord(row));
+  const planGroups = filterGroups && filterGroups.length > 0 ? filterGroups : category ? [category] : null;
+  const need = topUpNeeded(today.words.length, derived.learnedTodayWords.length);
+  const picked = pickTopUp({
+    need,
+    dueCandidates: pass.rawRows
+      .filter(
+        (row) =>
+          row.is_today_selection === false &&
+          (row.srs_state ?? '').toLowerCase() !== 'learned' &&
+          row.in_review_queue !== false &&
+          Boolean(row.next_review_at) &&
+          Date.parse(row.next_review_at as string) <= Date.now()
+      )
+      .map((row) => buildTodayWord(row, undefined))
+      .filter((word): word is TodayWord => Boolean(word)),
+    excludeWords: [
+      ...today.words.map((word) => word.word),
+      ...pass.rawRows.filter((row) => row.is_today_selection !== false).map((row) => rowWord(row)),
+      ...learnedBefore,
+      ...serverLearnedAll,
+    ],
+    groups: planGroups,
+    seed: `${userKey}|${localToday}`,
+  });
+  const extras = [...picked.due, ...picked.fresh];
+  today = appendTodayWords(today, extras, severity);
 
+  const newTodayWords = [
+    ...derived.newTodayWords,
+    ...picked.fresh.map((word) => toTodaySummary(word, false)),
+  ];
+  const dueTodayWords = [
+    ...derived.dueTodayWords,
+    ...picked.due.map((word) => toTodaySummary(word, true)),
+  ];
+
+  const serverSummary = extractServerSummary(pass.rawRows);
   const summary: DerivedProgressSummary = serverSummary
     ? {
         learned: serverSummary.learned,
@@ -690,12 +802,12 @@ export async function fetchAndCommitTodaySelection(
     ...today,
     summary,
     learnedWords: derived.learnedWords,
-    newTodayWords: derived.newTodayWords,
-    dueTodayWords: derived.dueTodayWords,
+    learnedTodayWords: derived.learnedTodayWords,
+    newTodayWords,
+    dueTodayWords,
   };
 
   persistTodaySelectionState(today);
-
   return result;
 }
 
@@ -703,7 +815,8 @@ export async function getOrCreateTodayWords(
   userKey: string,
   mode: DailyMode,
   count: number,
-  category?: string | null
+  category?: string | null,
+  filterGroups?: string[] | null
 ): Promise<TodaySelectionWithStats> {
   if (process.env.NEXT_PUBLIC_LAZYVOCA_DEBUG === '1') {
     console.log('[LearningProgress] getOrCreateTodayWords fetching selection', {
@@ -712,7 +825,13 @@ export async function getOrCreateTodayWords(
     });
   }
 
-  return fetchAndCommitTodaySelection({ userKey, mode, count, category: category ?? null });
+  return fetchAndCommitTodaySelection({
+    userKey,
+    mode,
+    count,
+    category: category ?? null,
+    filterGroups: filterGroups ?? null,
+  });
 }
 
 export async function prepareUserSession(): Promise<string | null> {
@@ -744,6 +863,7 @@ export async function markWordReviewed(
     throw new Error('Word not found in today cache');
   }
 
+  markStudiedToday('mark');
   const { payload, progress } = applyReviewToWord(currentState.words[index]);
   const words = [...currentState.words];
 
@@ -777,7 +897,7 @@ export async function markWordReviewed(
       dueTodayWords: derivedDueToday,
       summary: derivedSummary,
     } = computeLearnedWordStats(rows, {
-      totalWords: TOTAL_WORDS,
+      totalWords: getDefaultVocabularyTotal(),
       timezone: currentState.timezone,
     });
     summary = derivedSummary;
@@ -815,6 +935,7 @@ export async function markWordReviewed(
 
 export type MarkWordAsNewResult = {
   learnedWords: LearnedWordSummary[];
+  learnedTodayWords: LearnedWordSummary[];
   newTodayWords: TodayLearnedWordSummary[];
   dueTodayWords: TodayLearnedWordSummary[];
   summary: DerivedProgressSummary;
@@ -825,6 +946,7 @@ export async function markWordAsNew(
   wordId: string
 ): Promise<MarkWordAsNewResult | null> {
   if (!userKey || !wordId) return null;
+  markStudiedToday('mark');
 
   const client = getSupabaseClient();
   if (!client) return null;
@@ -848,13 +970,14 @@ export async function markWordAsNew(
           .filter((row): row is LearnedWordRow => row !== null)
       : [];
 
-    const { learnedWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
-      totalWords: TOTAL_WORDS,
+    const { learnedWords, learnedTodayWords, newTodayWords, dueTodayWords, summary } = computeLearnedWordStats(normalizedRows, {
+      totalWords: getDefaultVocabularyTotal(),
       timezone,
     });
 
     return {
       learnedWords,
+      learnedTodayWords,
       newTodayWords,
       dueTodayWords,
       summary,

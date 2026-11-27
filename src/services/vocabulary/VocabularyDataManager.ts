@@ -60,30 +60,15 @@ export class VocabularyDataManager {
   }
 
 async loadDefaultVocabulary() {
+  // Single source of truth: the copy bundled from src/data/defaultVocabulary.json.
   try {
     console.log("Loading default vocabulary data");
-    try {
-      const response = await fetch("/defaultVocabulary.json");
-      if (!response.ok) throw new Error(`Failed to fetch default vocabulary: ${response.status}`);
-      const fetchedData = await response.json();
-      this.data = this.dataProcessor.processDataTypes(fetchedData);
-      this.notifyVocabularyChange();
-    } catch (error) {
-      console.warn("Failed to load from JSON file, using embedded default data:", error);
-      this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-      this.notifyVocabularyChange();
-    }
+    this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
+    this.notifyVocabularyChange();
     return true;
   } catch (error) {
-    console.error("Failed to load default vocabulary:", error);
-    try {
-      this.data = this.dataProcessor.processDataTypes(DEFAULT_VOCABULARY_DATA);
-      this.notifyVocabularyChange();
-      return true;
-    } catch (fallbackError) {
-      console.error("Critical error: Failed to load any vocabulary data:", fallbackError);
-      return false;
-    }
+    console.error("Critical error: Failed to load default vocabulary:", error);
+    return false;
   }
 }
 

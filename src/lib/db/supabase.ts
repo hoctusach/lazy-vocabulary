@@ -109,6 +109,8 @@ export type DailySelectionV2Row = {
   in_review_queue?: boolean | null;
   review_count?: number | null;
   learned_at?: string | null;
+  /** [FB-56] The day the word was marked learned (kept so learned-today never falls back to last_review_at). */
+  mark_learned_at?: string | null;
   last_review_at?: string | null;
   next_review_at?: string | null;
   next_display_at?: string | null;
@@ -212,6 +214,7 @@ function normalizeDailySelectionRow(row: RawDailySelectionRow): DailySelectionV2
     in_review_queue: toOptionalBoolean(row.in_review_queue),
     review_count: toOptionalNumber(row.review_count),
     learned_at: toOptionalString(row.learned_at),
+    mark_learned_at: toOptionalString(row.mark_learned_at),
     last_review_at: toOptionalString(row.last_review_at),
     next_review_at: toOptionalString(row.next_review_at),
     next_display_at: toOptionalString(row.next_display_at),
