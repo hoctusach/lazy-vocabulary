@@ -6,14 +6,14 @@ const read = (f: string) => readFileSync(join(process.cwd(), f), 'utf8');
 const J = 'android/app/src/main/java/com/lazy/vocabulary/';
 
 // Real screen-off playback on a device is manual (proxy): these assert the wiring that makes it possible.
-describe('[FB-31] background / screen-off playback wiring', () => {
+describe('[FB-31][FB-52] background / screen-off playback wiring', () => {
   const svc = read(J + 'PlaybackService.java');
   const act = read(J + 'MainActivity.java');
 
   it('service is restartable (START_STICKY) and never returns START_NOT_STICKY for start/update', () => {
     expect(svc).toContain('START_STICKY');
     // the only NOT_STICKY returns are explicit stop/shutdown/orphan paths
-    const startPath = svc.slice(svc.indexOf('running = true;'), svc.indexOf('ensureMediaSession()', svc.indexOf('running = true;')));
+    const startPath = svc.slice(svc.indexOf('running = true;'), svc.indexOf('return START_STICKY', svc.indexOf('running = true;')) + 20);
     expect(startPath).toContain('return START_STICKY');
   });
 
@@ -22,12 +22,10 @@ describe('[FB-31] background / screen-off playback wiring', () => {
     expect(read(J + 'PlaybackServicePlugin.java')).toContain('static boolean isLoaded()');
   });
 
-  it('an active MediaSession in PLAYING state backs the foreground notification (MediaStyle)', () => {
-    expect(svc).toContain('new MediaSession(');
-    expect(svc).toContain('STATE_PLAYING');
-    expect(svc).toContain('setActive(true)');
-    expect(svc).toContain('Notification.MediaStyle');
-    expect(svc).toContain('setMediaSession(');
+  it('[FB-53] the notification is NOT a MediaStyle / MediaSession widget', () => {
+    expect(svc).not.toContain('MediaStyle');
+    expect(svc).not.toContain('MediaSession');
+    expect(svc).toContain('BigTextStyle');
   });
 
   it('manifest keeps the mediaPlayback foreground service and wake lock', () => {
@@ -36,12 +34,13 @@ describe('[FB-31] background / screen-off playback wiring', () => {
     expect(m).toContain('android.permission.WAKE_LOCK');
   });
 
-  it('MainActivity re-resumes the WebView after onPause/onStop and with a periodic heartbeat while backgrounded', () => {
-    expect(act).toMatch(/onPause\(\)[\s\S]*keepWebViewRunningIfPlaying\(\)[\s\S]*startHeartbeat\(\)/);
-    expect(act).toMatch(/onStop\(\)[\s\S]*keepWebViewRunningIfPlaying\(\)/);
-    expect(act).toContain('resumeTimers()');
-    expect(act).toContain('postDelayed');
-    expect(act).toMatch(/onResume\(\)[\s\S]*stopHeartbeat\(\)/);
+  it('[FB-52] MainActivity no longer fights Chromium with WebView timer hacks; it hands over to the native queue', () => {
+    expect(act).not.toContain('resumeTimers');
+    expect(act).not.toContain('keepWebViewRunningIfPlaying');
+    expect(act).not.toContain('heartbeat');
+    expect(act).toMatch(/onPause\(\)[\s\S]*PlaybackService\.takeOver\(\)/);
+    expect(act).toMatch(/onResume\(\)[\s\S]*PlaybackService\.handBack\(\)/);
+    expect(act).toContain('KokoroEngine.trim'); // unchanged
   });
 
   it('no JS page-hide / visibility handler stops speech or the playback service (FB-01/FB-31)', () => {

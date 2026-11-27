@@ -11,6 +11,8 @@ import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabu
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import { usePlaybackService } from '@/hooks/usePlaybackService';
 import { vocabularyService } from '@/services/vocabularyService';
+import { buildNativeQueue, findQueueIndex } from '@/services/background/buildNativeQueue';
+import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
 import type { DailySelection } from '@/types/learning';
 import { VocabularyWord } from '@/types/vocabulary';
@@ -73,6 +75,23 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     playCurrentWord
   });
 
+  // [FB-52] The native service owns the upcoming queue. Built once per list/voice/mute change (current word read from a
+  // ref); the index of the card inside it travels with every word update, so no re-push per word.
+  const currentWordRef = React.useRef(currentWord);
+  currentWordRef.current = currentWord;
+  const nativeQueue = useMemo(
+    () =>
+      hasData
+        ? buildNativeQueue(vocabularyService.getWordList(), currentWordRef.current, {
+            voiceName: selectedVoiceName,
+            rate: getSpeechRate(),
+            muted: isMuted,
+          })
+        : null,
+    [hasData, selectedVoiceName, isMuted, initialWords, dailySelection]
+  );
+  const nativeIndex = nativeQueue && currentWord ? findQueueIndex(nativeQueue.items, currentWord) : undefined;
+
   // Android: keep playing (and show a notification) while the app is backgrounded.
   usePlaybackService({
     isPlaying: hasData && !isPaused && !!currentWord,
@@ -83,6 +102,15 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     onPause: () => { if (!isPaused) togglePause(); },
     onPlay: () => { if (isPaused) togglePause(); },
     onNext: goToNextAndSpeak,
+    queue: nativeQueue,
+    index: nativeIndex,
+    // Native advanced while the WebView was frozen: catch up (bounded) so the card matches what was last heard.
+    onNativeSync: (target: number) => {
+      if (nativeIndex === undefined || !nativeQueue) return;
+      const n = nativeQueue.items.length;
+      const steps = (((target - nativeIndex) % n) + n) % n;
+      for (let i = 0; i < Math.min(steps, 8); i += 1) setTimeout(goToNextAndSpeak, 350 * (i + 1));
+    },
   });
 
   // Memoize debug data

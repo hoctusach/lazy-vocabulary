@@ -7,6 +7,7 @@ const svc = vi.hoisted(() => ({
   stopPlaybackService: vi.fn().mockResolvedValue(undefined),
   setPlaybackHandlers: vi.fn(),
   updatePlaybackService: vi.fn().mockResolvedValue(undefined),
+  setPlaybackQueue: vi.fn().mockResolvedValue(undefined),
   isPlaybackServiceRunning: vi.fn().mockReturnValue(true),
 }));
 vi.mock('@/services/background/playbackService', () => svc);
@@ -41,6 +42,28 @@ describe('[FB-16] usePlaybackService', () => {
     expect(onPlay).toHaveBeenCalled();
     rerender({ ...base, onPlay, isPlaying: true, active: true, word: 'a', detail: 'x' });
     expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'a', text: 'x', playing: true });
+  });
+
+  it('[FB-52] pushes the queue to the native service (once per queue change, index travels with the word)', () => {
+    const queue = { items: [{ word: 'a' }, { word: 'b' }], index: 0, engine: 'system' as const };
+    const { rerender } = renderHook((p) => usePlaybackService(p), {
+      initialProps: { ...base, isPlaying: true, word: 'a', detail: 'x', queue, index: 0 },
+    });
+    expect(svc.setPlaybackQueue).toHaveBeenCalledTimes(1);
+    expect(svc.setPlaybackQueue).toHaveBeenLastCalledWith({ ...queue, index: 0 });
+    rerender({ ...base, isPlaying: true, word: 'b', detail: 'y', queue, index: 1 });
+    expect(svc.setPlaybackQueue).toHaveBeenCalledTimes(1);
+    expect(svc.startPlaybackService).toHaveBeenLastCalledWith({ title: 'b', text: 'y', playing: true, index: 1 });
+  });
+
+  it('[FB-52] native hand-back sync reaches onNativeSync', () => {
+    const onNativeSync = vi.fn();
+    renderHook(() => usePlaybackService({ ...base, isPlaying: true, word: 'a', onNativeSync }));
+    const h = svc.setPlaybackHandlers.mock.calls[0][0];
+    h.onNativeState({ index: 3, playing: true, native: true, sync: false });
+    expect(onNativeSync).not.toHaveBeenCalled();
+    h.onNativeState({ index: 3, playing: true, native: false, sync: true });
+    expect(onNativeSync).toHaveBeenCalledWith(3);
   });
 
   it('stops on unmount and routes actions to latest handlers', () => {

@@ -9,6 +9,7 @@ const plugin = vi.hoisted(() => ({
 }));
 const platform = vi.hoisted(() => ({ native: true, name: 'android' }));
 let actionCb: ((e: { action: 'pause' | 'next' }) => void) | undefined;
+let stateCb: ((e: { index: number; playing: boolean; native: boolean; sync: boolean }) => void) | undefined;
 
 vi.mock('@capacitor/core', () => ({
   Capacitor: { isNativePlatform: () => platform.native, getPlatform: () => platform.name },
@@ -24,7 +25,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   __resetPlaybackServiceForTests();
   platform.native = true; platform.name = 'android';
-  plugin.addListener.mockImplementation(async (_e: string, cb: typeof actionCb) => { actionCb = cb; return { remove: vi.fn() }; });
+  plugin.addListener.mockImplementation(async (e: string, cb: never) => { if (e === 'state') stateCb = cb; else actionCb = cb; return { remove: vi.fn() }; });
 });
 
 describe('[FB-16] playbackService', () => {
@@ -53,6 +54,14 @@ describe('[FB-16] playbackService', () => {
     expect(plugin.update).not.toHaveBeenCalled();
     await stopPlaybackService();
     expect(plugin.stop).toHaveBeenCalledTimes(1);
+  });
+
+  it('[FB-52] forwards native state events (hand-back sync) to the handlers', async () => {
+    const onNativeState = vi.fn();
+    setPlaybackHandlers({ onPause: vi.fn(), onNext: vi.fn(), onNativeState });
+    await startPlaybackService({ title: 'a', text: '' });
+    stateCb!({ index: 4, playing: true, native: false, sync: true });
+    expect(onNativeState).toHaveBeenCalledWith({ index: 4, playing: true, native: false, sync: true });
   });
 
   it('maps notification actions to handlers', async () => {

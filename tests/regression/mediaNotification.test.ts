@@ -6,17 +6,18 @@ import { join } from 'node:path';
 const read = (f: string) => readFileSync(join(process.cwd(), f), 'utf8');
 const J = 'android/app/src/main/java/com/lazy/vocabulary/';
 
-// [FB-49] Lock screen + notification shade media card. Real device behavior is proxy/manual (see catalog);
-// these assert the wiring that produces it.
-describe('[FB-49] native media notification + session', () => {
+// [FB-49] lock-screen card, superseded by [FB-53]: a natural app notification (BigTextStyle), not a media widget.
+// Real lock-screen look is proxy/manual (see catalog); these assert the wiring that produces it.
+describe('[FB-49][FB-53] native notification', () => {
   const svc = read(J + 'PlaybackService.java');
   const plugin = read(J + 'PlaybackServicePlugin.java');
 
-  it('MediaStyle notification bound to an active MediaSession, public on the lock screen', () => {
-    expect(svc).toContain('Notification.MediaStyle');
-    expect(svc).toContain('setMediaSession(');
-    expect(svc).toContain('new MediaSession(');
+  it('[FB-53] BigTextStyle, public on the lock screen, no MediaStyle / MediaSession', () => {
+    expect(svc).toContain('NotificationCompat.BigTextStyle');
     expect(svc).toContain('VISIBILITY_PUBLIC');
+    expect(svc).not.toContain('MediaStyle');
+    expect(svc).not.toContain('MediaSession');
+    expect(svc).not.toContain('setMediaSession');
     expect(svc).toContain('FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK');
   });
 
@@ -27,41 +28,27 @@ describe('[FB-49] native media notification + session', () => {
     expect(svc).toContain('static final String ACTION_PLAY');
   });
 
-  it('now-playing metadata: title = word, artist/subtitle = meaning, app name as album', () => {
-    expect(svc).toContain('new MediaMetadata.Builder()');
-    expect(svc).toContain('METADATA_KEY_TITLE, title');
-    expect(svc).toContain('METADATA_KEY_ARTIST, text');
-    expect(svc).toContain('METADATA_KEY_ALBUM, "Lazy Vocabulary"');
+  it('pause / play / next / stop intents are handled natively and forwarded to JS', () => {
+    expect(svc).toMatch(/ACTION_PAUSE\.equals\(action\)[\s\S]*emitAction\("pause"\)/);
+    expect(svc).toMatch(/ACTION_PLAY\.equals\(action\)[\s\S]*emitAction\("play"\)/);
+    expect(svc).toMatch(/ACTION_NEXT\.equals\(action\)[\s\S]*emitAction\("next"\)/);
+    expect(svc).toMatch(/ACTION_STOP\.equals\(action\)[\s\S]*shutdown\(\)/);
   });
 
-  it('playback state flips PLAYING <-> PAUSED and the session accepts play/pause/next', () => {
-    expect(svc).toMatch(/playing \? PlaybackState\.STATE_PLAYING : PlaybackState\.STATE_PAUSED/);
-    expect(svc).toContain('ACTION_PLAY | PlaybackState.ACTION_PAUSE');
-    expect(svc).toMatch(/onPlay\(\)[^}]*emitAction\("play"\)/);
-    expect(svc).toMatch(/onPause\(\)[^}]*emitAction\("pause"\)/);
-    expect(svc).toMatch(/onSkipToNext\(\)[^}]*emitAction\("next"\)/);
-  });
-
-  it('pause / play / next notification intents are handled and forwarded to JS', () => {
-    expect(svc).toMatch(/ACTION_PAUSE\.equals\(action\) \|\| ACTION_PLAY\.equals\(action\) \|\| ACTION_NEXT\.equals\(action\)/);
-    expect(svc).toMatch(/ACTION_PAUSE\.equals\(action\) \? "pause" : ACTION_PLAY\.equals\(action\) \? "play" : "next"/);
-  });
-
-  it('JS -> service: word, meaning and playing flag reach the service (start + direct update)', () => {
+  it('JS -> service: word, meaning, playing flag and index reach the service', () => {
     expect(plugin).toContain('call.getString("title")');
     expect(plugin).toContain('call.getBoolean("playing", true)');
     expect(plugin).toContain('PlaybackService.applyState(');
     expect(svc).toContain('static void applyState(');
   });
 
-  it('a paused player keeps the foreground card (wake lock released) and the service survives the screen turning off', () => {
-    expect(svc).toMatch(/if \(playing\) acquireWakeLock\(\); else releaseWakeLock\(\)/);
+  it('a paused player keeps the card (wake lock released) and the service stays restartable', () => {
+    expect(svc).toMatch(/if \(playing && running\) acquireWakeLock\(\); else releaseWakeLock\(\)/);
     expect(svc).toContain('START_STICKY');
-    expect(read(J + 'MainActivity.java')).toContain('keepWebViewRunningIfPlaying');
   });
 });
 
-describe('[FB-49] JS side', () => {
+describe('[FB-49][FB-53] JS side', () => {
   beforeEach(() => vi.resetModules());
 
   it('hook and bridge are never driven by visibility/pagehide, and pause keeps the card', () => {
@@ -71,7 +58,7 @@ describe('[FB-49] JS side', () => {
     expect(read('src/services/background/playbackService.ts')).toMatch(/action === 'play'\) handlers\?\.onPlay/);
   });
 
-  it('web Media Session API mirrors metadata and handlers in addition to the native session', async () => {
+  it('web Media Session API (browser only) mirrors metadata and handlers in addition to the native session', async () => {
     const handlers: Record<string, () => void> = {};
     const ms = { metadata: null as unknown, playbackState: 'none', setActionHandler: (a: string, f: () => void) => { handlers[a] = f; } };
     Object.defineProperty(navigator, 'mediaSession', { value: ms, configurable: true });
