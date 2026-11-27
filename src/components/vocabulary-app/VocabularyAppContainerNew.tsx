@@ -83,7 +83,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     () =>
       hasData
         ? buildNativeQueue(vocabularyService.getWordList(), currentWordRef.current, {
-            voiceName: selectedVoiceName,
+            voiceName: selectedVoiceName || getFavoriteVoice(), // [FB-61] never an empty voice before the list loads
             rate: getSpeechRate(),
             muted: isMuted,
           })

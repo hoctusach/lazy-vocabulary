@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { logAvailableVoices } from '@/utils/speech/debug/logVoices';
 import { nextAllowedVoice, sanitizeVoiceName } from '@/services/speech/voiceAccess';
 import { markVoiceExplicit } from '@/services/speech/kokoro/kokoroPrefs';
 import { isKokoroVoiceName } from '@/services/speech/kokoro/kokoroVoices';
+import { isKokoroSupported } from '@/services/speech/kokoro/kokoroTts';
+import { bestFallbackVoice } from '@/services/speech/voiceFallback';
 import { loadNativeSystemVoices, mergeSystemVoices } from '@/services/speech/voiceCatalog';
 import { VOICE_SELECTED_EVENT } from '@/services/speech/voiceSelection';
 import { getFavoriteVoice, setFavoriteVoice } from '@/lib/preferences/localPreferences';
@@ -17,9 +19,9 @@ export interface VoiceContext {
 export const useVoiceContext = (): VoiceContext => {
   const [allVoices, setAllVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoiceName, setSelectedVoiceName] = useState('');
-  // Kokoro voices appear asynchronously (after the model status loads): while one is the saved favorite but not
-  // listed yet we show the first system voice without overwriting the saved choice.
-  const skipPersist = useRef(false);
+  // [FB-61] The saved favorite is written ONLY by an explicit choice (selectVoiceByName, cycleVoice, the natural-voice
+  // default, model removal). A list that arrives late (Kokoro after the model status, native voices after the plugin
+  // loads) must never rewrite it, so there is no "persist whatever is selected" effect here (nor in the data loader).
 
   useEffect(() => {
     let alive = true;
@@ -46,9 +48,12 @@ export const useVoiceContext = (): VoiceContext => {
         : undefined;
       if (preferred) {
         setSelectedVoiceName(preferred.name);
+      } else if (favorite && isKokoroVoiceName(favorite) && isKokoroSupported()) {
+        // Natural voice saved but not listed yet (model still loading/downloading): keep it selected. Speech waits for it
+        // instead of falling to a system voice, and nothing is written.
+        setSelectedVoiceName(favorite);
       } else if (voices.length > 0) {
-        skipPersist.current = isKokoroVoiceName(favorite);
-        setSelectedVoiceName(voices[0].name);
+        setSelectedVoiceName(bestFallbackVoice(voices).name);
       }
     };
     const reload = () => void loadVoices();
@@ -71,16 +76,6 @@ export const useVoiceContext = (): VoiceContext => {
       document.removeEventListener('visibilitychange', onVisible);
     };
   }, []);
-
-  useEffect(() => {
-    if (skipPersist.current) {
-      skipPersist.current = false;
-      return;
-    }
-    if (selectedVoiceName) {
-      setFavoriteVoice(selectedVoiceName);
-    }
-  }, [selectedVoiceName]);
 
   const cycleVoice = () => {
     if (allVoices.length < 2) return;

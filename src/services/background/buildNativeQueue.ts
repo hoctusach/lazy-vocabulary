@@ -1,5 +1,6 @@
 import type { VocabularyWord } from '@/types/vocabulary';
 import { getKokoroVoiceByName, mapRateToKokoroSpeed } from '@/services/speech/kokoro/kokoroVoices';
+import { sanitizeVoiceName } from '@/services/speech/voiceAccess';
 import type { PlaybackQueue } from './playbackService';
 
 /** Pause between words handed to the native service (matches the in-app post-speech pause floor, FB-52). */
@@ -21,13 +22,23 @@ export function findQueueIndex(list: readonly Pick<VocabularyWord, 'word' | 'cat
 export function buildNativeQueue(
   list: readonly VocabularyWord[],
   current: Pick<VocabularyWord, 'word' | 'category'> | null | undefined,
-  opts: { voiceName?: string | null; rate: number; muted: boolean; lang?: string },
+  opts: {
+    voiceName?: string | null;
+    /** [FB-61] Native voice name for a system voice (looked up from the voice list when omitted). */
+    voiceUri?: string | null;
+    rate: number;
+    muted: boolean;
+    lang?: string;
+  },
 ): PlaybackQueue | null {
   if (list.length === 0) return null;
   // Window of NATIVE_QUEUE_MAX words that starts at the current one (the controller wraps around the list).
   const start = findQueueIndex(list, current);
   const rotated = [...list.slice(start), ...list.slice(0, start)].slice(0, NATIVE_QUEUE_MAX);
-  const kokoro = getKokoroVoiceByName(opts.voiceName);
+  // [FB-61] Same voice rule as the foreground: a free user's locked Michael is Heart; a system voice keeps its own name.
+  const chosen = sanitizeVoiceName(opts.voiceName ?? null);
+  const kokoro = getKokoroVoiceByName(chosen);
+  const systemVoiceName = kokoro ? undefined : (opts.voiceUri ?? lookupVoiceUri(chosen)) || undefined;
   return {
     items: rotated.map((w) => ({
       word: w.word,
@@ -40,9 +51,21 @@ export function buildNativeQueue(
     index: 0,
     engine: kokoro ? 'kokoro' : 'system',
     voice: kokoro?.id,
+    voiceName: systemVoiceName,
     speed: kokoro ? mapRateToKokoroSpeed(opts.rate, kokoro) : undefined,
     rate: opts.rate,
     lang: opts.lang ?? 'en-US',
     muted: opts.muted,
   };
+}
+
+/** The native name (voiceURI) of a listed system voice, for the service's TextToSpeech.setVoice. */
+function lookupVoiceUri(name: string | null | undefined): string | undefined {
+  if (!name) return undefined;
+  try {
+    const v = window.speechSynthesis?.getVoices?.().find((x) => x.name === name);
+    return v?.voiceURI || undefined;
+  } catch {
+    return undefined;
+  }
 }

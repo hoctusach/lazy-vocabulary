@@ -26,6 +26,8 @@ export interface PlaybackQueue {
   index: number;
   engine: 'kokoro' | 'system';
   voice?: string;
+  /** [FB-61] The saved SYSTEM voice (native voice name / voiceURI) so the service speaks with it, not the engine default. */
+  voiceName?: string;
   speed?: number;
   rate?: number;
   lang?: string;

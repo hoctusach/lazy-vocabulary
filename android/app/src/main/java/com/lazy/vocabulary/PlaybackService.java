@@ -68,6 +68,8 @@ public class PlaybackService extends Service {
         final List<Item> items = new ArrayList<>();
         String engine = "system"; // "kokoro" | "system"
         String voice = "af_heart";
+        /** [FB-61] System voice name (android.speech.tts.Voice#getName) the user picked; empty = pick by language only. */
+        String voiceName = "";
         float speed = 1.0f;
         float rate = 1.0f;
         String lang = "en-US";
@@ -372,7 +374,13 @@ public class PlaybackService extends Service {
         }
         String speech = speechText(it);
         if (speech.isEmpty()) { main.post(done); return; }
-        if ("kokoro".equals(queue.engine) && speakKokoro(speech, myToken, done)) return;
+        if ("kokoro".equals(queue.engine)) {
+            if (speakKokoro(speech, myToken, done)) return;
+            // [FB-61] Kokoro was chosen but is not ready: never swap in the engine's default voice (that is how the
+            // lock screen jumped to an Australian voice). Keep the timing silently; the saved voice is untouched.
+            main.postDelayed(done, estimateMs(it, false));
+            return;
+        }
         speakSystem(speech, myToken, done);
     }
 
@@ -402,6 +410,7 @@ public class PlaybackService extends Service {
             @Override public void run() {
                 if (myToken != token || systemTts == null) return;
                 try {
+                    applySystemVoice();
                     systemTts.setSpeechRate(Math.max(0.5f, Math.min(2.0f, queue.rate)));
                     systemTts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override public void onStart(String utteranceId) { }
@@ -433,7 +442,7 @@ public class PlaybackService extends Service {
                                 return;
                             }
                             systemTtsReady = true;
-                            try { systemTts.setLanguage(Locale.forLanguageTag(queue.lang)); } catch (RuntimeException ignored) { }
+                            applySystemVoice();
                             if (r != null) r.run();
                         }
                     });
@@ -443,6 +452,23 @@ public class PlaybackService extends Service {
         }
         if (!systemTtsReady) { main.postDelayed(done, estimateMsForFallback(speech)); return; }
         speakNow.run();
+    }
+
+    /** [FB-61] Speak with the SAME system voice the user picked in the app, not the engine default. */
+    private void applySystemVoice() {
+        if (systemTts == null) return;
+        try {
+            String want = queue.voiceName;
+            if (want != null && !want.isEmpty()) {
+                java.util.Set<android.speech.tts.Voice> all = systemTts.getVoices();
+                if (all != null) {
+                    for (android.speech.tts.Voice v : all) {
+                        if (want.equals(v.getName())) { systemTts.setVoice(v); return; }
+                    }
+                }
+            }
+            systemTts.setLanguage(Locale.forLanguageTag(queue.lang));
+        } catch (RuntimeException ignored) { }
     }
 
     private long estimateMsForFallback(String speech) {

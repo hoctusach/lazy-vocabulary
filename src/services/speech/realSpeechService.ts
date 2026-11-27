@@ -9,6 +9,9 @@ import { logAvailableVoices } from "@/utils/speech/debug/logVoices";
 import { hasUserInteracted, resetUserInteraction } from "@/utils/userInteraction";
 import { unifiedSpeechController } from "./unifiedSpeechController";
 import { canUseSpeechSynthesis, getSpeechSynthesis } from "@/lib/platform/speechSynthesis";
+import { isKokoroVoiceName } from "./kokoro/kokoroVoices";
+import { isKokoroSupported } from "./kokoro/kokoroTts";
+import { bestFallbackVoice, waitForVoiceByName } from "./voiceFallback";
 
 const DEBUG_SPEECH = (window as any).DEBUG_SPEECH;
 
@@ -91,6 +94,19 @@ class RealSpeechService {
     // Wait for voices to be loaded
     await this.ensureVoicesLoaded();
 
+    // [FB-61] A saved natural (Kokoro) voice that is not listed yet (model status still loading) is waited for: the
+    // first English system voice (often Australian) must not speak instead. If it never shows up this utterance uses
+    // the best system voice; the saved preference is not touched.
+    if (
+      options.voiceName &&
+      isKokoroVoiceName(options.voiceName) &&
+      isKokoroSupported() &&
+      !speechSynthesis.getVoices().some((v) => v.name === options.voiceName)
+    ) {
+      await waitForVoiceByName(options.voiceName);
+      if (!unifiedSpeechController.canAdvance(epoch)) return false;
+    }
+
     return new Promise((resolve) => {
       if (!unifiedSpeechController.canAdvance(epoch)) {
         resolve(false);
@@ -122,7 +138,7 @@ class RealSpeechService {
         const allVoices = speechSynthesis.getVoices();
         logAvailableVoices(allVoices);
         const fallback =
-          allVoices.find(v => v.lang.startsWith('en')) || allVoices[0] || null;
+          (allVoices.length ? bestFallbackVoice(allVoices) : null);
         if (fallback) {
           utterance.voice = fallback;
           utterance.lang = fallback.lang;

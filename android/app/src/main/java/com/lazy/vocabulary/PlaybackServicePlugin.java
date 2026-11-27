@@ -118,6 +118,8 @@ public class PlaybackServicePlugin extends Plugin {
         String engine = call.getString("engine", "system");
         q.engine = "kokoro".equals(engine) ? "kokoro" : "system";
         q.voice = call.getString("voice", "af_heart");
+        String voiceName = call.getString("voiceName", "");
+        q.voiceName = voiceName == null ? "" : voiceName;
         Double speed = call.getDouble("speed", 1.0);
         q.speed = (float) Math.max(0.5, Math.min(2.0, speed == null ? 1.0 : speed));
         Double rate = call.getDouble("rate", 1.0);
