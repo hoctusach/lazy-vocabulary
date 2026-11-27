@@ -16,10 +16,10 @@ const { rpc, rows } = vi.hoisted(() => {
     new_selected_today: true,
   });
   const rows = [
-    mkRow('i1', 'idioms'),
-    mkRow('g1', 'grammar'),
-    mkRow('p1', 'phrasal verbs'),
-    mkRow('c1', 'phrases, collocation'),
+    mkRow('keep a straight face', 'idioms'),
+    mkRow('The passive', 'grammar'),
+    mkRow('Knuckle down', 'phrasal verbs'),
+    mkRow('pay /peɪ/', 'phrases, collocation'),
   ];
   const rpc = vi.fn((name: string) => {
     if (name === 'generate_daily_selection_v2') {
@@ -55,6 +55,9 @@ vi.mock('@/services/analyticsService', () => ({
 }));
 
 const dailyCalls = () => rpc.mock.calls.filter(([name]) => name === 'generate_daily_selection_v2');
+// [FB-51] A 4-row day is topped up on the device to 20 (and the server may be asked once more), so assert the
+// server rows are kept rather than the exact total.
+const mine = ['keep a straight face', 'The passive', 'Knuckle down', 'pay /peɪ/'];
 const ALL = ['topic vocab', 'phrasal verbs', 'idioms', 'grammar', 'phrases, collocations', 'word formation'];
 
 describe('built-in daily selection with a group mix (client-side only)', () => {
@@ -65,29 +68,33 @@ describe('built-in daily selection with a group mix (client-side only)', () => {
 
   it('all six groups: p_category NULL, every row kept', async () => {
     const { result } = renderHook(() => useLearningProgress({ builtinGroups: ALL }));
-    await waitFor(() => expect(result.current.todayWords).toHaveLength(rows.length));
-    expect(dailyCalls()).toHaveLength(1);
+    await waitFor(() => expect(result.current.todayWords).toHaveLength(20));
+    expect(dailyCalls().length).toBeGreaterThanOrEqual(1);
+    expect(result.current.todayWords.map((word) => word.word)).toEqual(expect.arrayContaining(mine));
     expect(dailyCalls()[0][1]).toMatchObject({ p_user_key: 'user-key', p_category: null });
   });
 
   it('no options behaves like all six', async () => {
     const { result } = renderHook(() => useLearningProgress());
-    await waitFor(() => expect(result.current.todayWords).toHaveLength(rows.length));
+    await waitFor(() => expect(result.current.todayWords).toHaveLength(20));
     expect(dailyCalls()[0][1]).toMatchObject({ p_category: null });
   });
 
   it('exactly one group: that group is passed as p_category', async () => {
     renderHook(() => useLearningProgress({ builtinGroups: ['idioms'] }));
-    await waitFor(() => expect(dailyCalls()).toHaveLength(1));
+    await waitFor(() => expect(dailyCalls().length).toBeGreaterThanOrEqual(1));
     expect(dailyCalls()[0][1]).toMatchObject({ p_category: 'idioms' });
   });
 
   it('2-5 groups: p_category NULL and rows filtered client-side', async () => {
     const { result } = renderHook(() => useLearningProgress({ builtinGroups: ['idioms', 'phrases, collocations'] }));
     await waitFor(() => expect(result.current.todayWords.length).toBeGreaterThan(0));
-    expect(dailyCalls()).toHaveLength(1);
     expect(dailyCalls()[0][1]).toMatchObject({ p_category: null });
-    expect(result.current.todayWords.map((word) => word.word).sort()).toEqual(['c1', 'i1']);
+    const words = result.current.todayWords.map((word) => word.word);
+    expect(words).toEqual(expect.arrayContaining(['keep a straight face', 'pay /peɪ/']));
+    // grammar / phrasal rows are filtered out client-side; only the two selected groups remain (topped up to 20)
+    expect(words).not.toContain('The passive');
+    expect(words).not.toContain('Knuckle down');
   });
 
   it('no built-in group: the RPC is never called', async () => {

@@ -1,3 +1,4 @@
+import { DAILY_TARGET, activeTarget } from '@/lib/progress/dailyTarget';
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import {
@@ -27,7 +28,7 @@ const PROGRESS_PREFIX = 'lv.vocabularySets.progress.';
 const DISPLAYED_WORD_EVENT = 'lv:vocabulary-set-displayed';
 
 /** FB-35 (Option A): 20 words per day TOTAL for imported sets too: due/reviews first, fill with new words. */
-export const DAILY_TOTAL = 20;
+export const DAILY_TOTAL = DAILY_TARGET;
 
 interface MetaFile {
   sets: VocabularySetMeta[];
@@ -441,18 +442,29 @@ export function buildTodayQueue(
   today = localDateKey()
 ): VocabularyWord[] {
   const byKey = new Map(words.map((word) => [wordKey(word.word, word.category), word]));
+  // [FB-51] Words marked learned today leave the queue but still count toward today's 20.
+  const learnedToday = Object.values(progress.learned).filter((entry) => {
+    const stamp = Date.parse(entry.lastReviewAt || entry.learnedAt);
+    return Number.isFinite(stamp) && localDateKey(new Date(stamp)) === today;
+  }).length;
+  const wanted = activeTarget(learnedToday);
+
+  let restored: VocabularyWord[] = [];
   if (progress.todayDate === today && progress.todayKeys && progress.todayKeys.length > 0) {
-    const restored = progress.todayKeys
+    restored = progress.todayKeys
       .map((key) => byKey.get(key))
       .filter((word): word is VocabularyWord => Boolean(word));
-    if (restored.length > 0) return restored;
+    if (restored.length >= wanted && restored.length > 0) return restored;
   }
+  const have = new Set(restored.map((word) => wordKey(word.word, word.category)));
 
   const due: VocabularyWord[] = [];
   const fresh: VocabularyWord[] = [];
   const deadline = endOfLocalDay(today);
   for (const word of words) {
-    const learned = progress.learned[wordKey(word.word, word.category)];
+    const key = wordKey(word.word, word.category);
+    if (have.has(key)) continue;
+    const learned = progress.learned[key];
     if (!learned) {
       fresh.push(word);
       continue;
@@ -460,7 +472,7 @@ export function buildTodayQueue(
     const next = Date.parse(learned.nextReviewAt);
     if (!Number.isFinite(next) || next <= deadline) due.push(word);
   }
-  const chosen = [...due, ...fresh].slice(0, DAILY_TOTAL);
+  const chosen = [...restored, ...due, ...fresh].slice(0, Math.max(wanted, restored.length));
   if (chosen.length === 0 && words.length > 0) return words.slice(0, DAILY_TOTAL);
   return chosen;
 }

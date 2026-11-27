@@ -40,6 +40,10 @@ vi.mock('@/hooks/useLearningProgress', () => ({
         learnedDate: '2024-01-01'
       }
     ],
+    // [FB-51] the Word Summary LEARNED section lists only words marked learned today
+    learnedTodayWords: [{ word: 'end up /ˈend ʌp/ [intransitive]', category: 'phrases', learnedDate: new Date().toISOString() }],
+    newTodayLearnedWords: [],
+    dueTodayLearnedWords: [],
     markWordLearned: vi.fn(),
     markWordAsNew: vi.fn(),
     todayWords: [] as VocabularyWord[]
@@ -101,7 +105,7 @@ beforeEach(async () => {
 });
 
 describe('quick search view', () => {
-  it('normalizes query and shows exact match first', async () => {
+  it('[FB-51] normalizes query and shows exact match first', async () => {
     render(
       <TooltipProvider>
         <VocabularyAppWithLearning />

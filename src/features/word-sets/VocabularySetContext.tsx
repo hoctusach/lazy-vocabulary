@@ -46,6 +46,7 @@ export interface ImportedProgressEntry {
   category: string;
   reviewCount: number;
   learnedAt: string;
+  lastReviewAt?: string;
   nextReviewAt: string;
 }
 

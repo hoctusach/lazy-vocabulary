@@ -17,6 +17,8 @@ import { BUILTIN_GROUPS, builtinSelectedWordCount } from '@/features/word-sets/v
 import { DEFAULT_SET_ID } from '@/features/word-sets/types';
 import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import { useLearningProgress } from '@/hooks/useLearningProgress';
+import { todayKey } from '@/lib/progress/streak';
+import { localDayOf } from '@/lib/progress/learnedWordStats';
 import { DAILY_TOTAL_WORDS, hasCachedTodaySelection } from '@/services/learningProgressService';
 import { vocabularyService } from '@/services/vocabularyService';
 import ToastProvider from './vocabulary-app/ToastProvider';
@@ -57,7 +59,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     markWordLearned: markCurrentWordLearned,
     markWordAsNew,
     todayWords,
-    learnedWords,
+    learnedTodayWords,
     newTodayLearnedWords,
     dueTodayLearnedWords,
     isDailySelectionLoading,
@@ -113,7 +115,11 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
   const scopeBuiltin = <T extends { category?: string | null }>(list: T[]): T[] =>
     !wordSets.hasBuiltin ? [] : partialBuiltin ? filterByBuiltinGroups(list, groups) : list;
 
-  const importedLearnedDisplay = wordSets.importedLearned.map((entry) => ({
+  // [FB-51] LEARNED lists only words marked learned TODAY (device-local date). All-time counts live in Learning Progress.
+  const todayLocal = todayKey();
+  const importedLearnedDisplay = wordSets.importedLearned
+    .filter((entry) => localDayOf(entry.lastReviewAt ?? entry.learnedAt) === todayLocal)
+    .map((entry) => ({
     word: entry.word,
     category: entry.category,
     reviewCount: entry.reviewCount,
@@ -147,7 +153,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
       }));
   });
 
-  const builtinLearnedList = scopeBuiltin(Array.isArray(learnedWords) ? learnedWords : []);
+  const builtinLearnedList = scopeBuiltin(Array.isArray(learnedTodayWords) ? learnedTodayWords : []);
   const builtinNewList = scopeBuiltin(Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : []);
   const builtinDueList = scopeBuiltin(Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : []);
   const learnedWordsList = [...builtinLearnedList, ...importedLearnedDisplay];
@@ -322,9 +328,9 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
                 <div className="text-sm text-[var(--lv-text-secondary)] italic">No daily selection available yet.</div>
               )}
               <p className="text-sm font-medium" data-testid="today-total">
-                Today: {newTodayList.length + dueTodayList.length}/{DAILY_TOTAL_WORDS}
+                Today: {newTodayList.length + dueTodayList.length + learnedWordsList.length}/{DAILY_TOTAL_WORDS}
                 <span className="font-normal text-[var(--lv-text-secondary)]">
-                  {' '}({newTodayList.length} new + {dueTodayList.length} due; words you mark learned leave the list)
+                  {' '}({newTodayList.length} new + {dueTodayList.length} due + {learnedWordsList.length} learned today)
                 </span>
               </p>
               <div className="grid gap-3 md:grid-cols-3">
@@ -403,7 +409,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
                 </div>
 
                 <div className="space-y-1.5">
-                  <h4 className="font-medium text-[var(--lv-text-secondary)]">LEARNED ({learnedWordsList.length})</h4>
+                  <h4 className="font-medium text-[var(--lv-text-secondary)]">LEARNED ({learnedWordsList.length}) <span className="text-xs font-normal">today</span></h4>
                   <div className="space-y-1 max-h-60 overflow-y-auto">
                     {learnedWordsList.length > 0 ? (
                       learnedWordsList.map((word, index) => (
@@ -432,7 +438,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
                       ))
                     ) : (
                       <div className="text-sm p-2 rounded border border-slate-200 bg-slate-100 text-slate-800 italic dark:border-slate-700 dark:bg-slate-900/40 dark:text-slate-100">
-                        No learned words
+                        No learned words today
                       </div>
                     )}
                   </div>
