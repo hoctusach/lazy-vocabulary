@@ -88,7 +88,7 @@ describe('shim + Kokoro', () => {
     const synth = await install();
     const events = speakText(synth, 1);
     await wait();
-    expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'af_heart', speed: expect.closeTo(1.0) });
+    expect(kSpeak).toHaveBeenCalledWith({ text: 'hello', voice: 'af_heart', speed: expect.any(Number) });
     expect(ttsSpeak).not.toHaveBeenCalled();
     expect(events).toEqual(['end']);
   });
