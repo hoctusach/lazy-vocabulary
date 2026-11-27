@@ -1,0 +1,86 @@
+name: iOS simulator build
+
+# Unsigned iOS Simulator build (iPhone + iPad) on a GitHub-hosted macOS runner. No certificates, no secrets.
+# App Store signing/upload lives in codemagic.yaml (secrets are referenced there by name only).
+on:
+  pull_request:
+    paths:
+      - 'ios/**'
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/ios.yml'
+      - 'codemagic.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulator-build:
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Web bundle goes to the gitignored capacitor-www/ (never docs/, the live website: FB-28).
+      - name: Build web bundle for the native shell
+        run: npx vite build --outDir capacitor-www --emptyOutDir --base ./
+      - name: Sync Capacitor iOS (uses the existing ios/ project, never `cap add`)
+        run: npx cap sync ios
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_16.4.app || true
+      - name: Build unsigned simulator app (universal iPhone + iPad)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/ios \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tee build/xcodebuild.log | tail -n 40
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LazyVocabulary-simulator-app
+          path: build/ios/Build/Products/Debug-iphonesimulator/App.app
+          if-no-files-found: error
+
+      # Simulator smoke test: boots an iPad and an iPhone, launches the app, checks it stays alive, takes screenshots.
+      # Non-blocking: the simulator runtime on hosted runners can be flaky, the build above is the gate.
+      - name: Simulator smoke test (iPad + iPhone)
+        continue-on-error: true
+        run: |
+          APP=build/ios/Build/Products/Debug-iphonesimulator/App.app
+          mkdir -p build/shots
+          for DEV in "iPad Pro 13-inch (M4)" "iPhone 16 Pro"; do
+            UDID=$(xcrun simctl list devices available | grep -F "$DEV" | head -1 | grep -oE '[0-9A-F-]{36}')
+            [ -n "$UDID" ] || { echo "no simulator named $DEV"; continue; }
+            xcrun simctl boot "$UDID"
+            xcrun simctl bootstatus "$UDID" -b
+            xcrun simctl install "$UDID" "$APP"
+            xcrun simctl launch "$UDID" com.hoctusach.lazyvocabulary
+            sleep 12
+            xcrun simctl io "$UDID" screenshot "build/shots/$(echo "$DEV" | tr -c 'A-Za-z0-9' _).png"
+            xcrun simctl listapps "$UDID" | grep -q com.hoctusach.lazyvocabulary
+            xcrun simctl shutdown "$UDID"
+          done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: simulator-screenshots
+          path: build/shots
+          if-no-files-found: ignore

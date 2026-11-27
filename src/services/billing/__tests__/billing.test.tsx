@@ -170,8 +170,9 @@ describe('restorePro', () => {
   });
 });
 
-describe('web / ios no-op', () => {
-  it.each([[false, 'web'], [true, 'ios']])('native=%s platform=%s', async (native, name) => {
+// [FB-68] iOS is no longer a no-op: it uses StoreKit 2 through the same plugin (covered in tests/regression/iosServices.test.tsx).
+describe('web / non-native no-op [FB-68]', () => {
+  it.each([[false, 'web'], [false, 'ios'], [true, 'web']])('native=%s platform=%s', async (native, name) => {
     platform.native = native; platform.name = name;
     expect(billing.isBillingSupported()).toBe(false);
     await billing.initBilling();

@@ -121,7 +121,7 @@ const VocabularyMainNew: React.FC<VocabularyMainNewProps> = ({
   }, []);
 
   return (
-    <div className="flex w-full max-w-5xl flex-col gap-3 md:flex-row md:items-start md:gap-4 mx-auto">
+    <div data-lv-main-card className="flex w-full max-w-5xl flex-col gap-3 md:flex-row md:items-start md:gap-4 mx-auto">
       {/* Main card - takes most of the space. Controls sit under it on phones. */}
       <div className="min-w-0 flex-1">
         <VocabularyCardNew

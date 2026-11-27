@@ -1,4 +1,6 @@
-import { Capacitor, registerPlugin } from '@capacitor/core';
+import { registerPlugin } from '@capacitor/core';
+import { isNativeAndroid, isNativeIOS } from '@/lib/platform/platformKind';
+import { pauseIosNowPlaying, startIosNowPlaying, stopIosNowPlaying } from './iosNowPlaying';
 
 export interface PlaybackInfo {
   title: string;
@@ -55,13 +57,14 @@ interface PlaybackServicePlugin {
 
 const Native = registerPlugin<PlaybackServicePlugin>('PlaybackService');
 
-/** Only native Android has the foreground service; everything else is a no-op. */
+/** Native Android has the foreground service (+ native queue); web is a no-op. iOS uses the Now Playing fallback. */
 export function isBackgroundPlaybackSupported(): boolean {
-  try {
-    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
-  } catch {
-    return false;
-  }
+  return isNativeAndroid();
+}
+
+/** [FB-68] iOS: UIBackgroundModes=audio + silent loop + Media Session (see iosNowPlaying.ts). */
+export function isIosNowPlayingSupported(): boolean {
+  return isNativeIOS();
 }
 
 export interface PlaybackHandlers {
@@ -102,6 +105,13 @@ async function ensureListener(): Promise<void> {
 
 /** Start (or refresh) the foreground service. Asks for notification permission once; denial is fine. */
 export async function startPlaybackService(info: PlaybackInfo): Promise<void> {
+  if (isIosNowPlayingSupported()) {
+    running = true;
+    syncWebMediaSession({ ...info, playing: info.playing !== false });
+    if (info.playing !== false) await startIosNowPlaying();
+    else pauseIosNowPlaying();
+    return;
+  }
   if (!isBackgroundPlaybackSupported()) return;
   syncWebMediaSession({ ...info, playing: info.playing !== false });
   try {
@@ -161,6 +171,12 @@ export async function setPlaybackQueue(queue: PlaybackQueue): Promise<void> {
 }
 
 export async function updatePlaybackService(info: PlaybackInfo): Promise<void> {
+  if (isIosNowPlayingSupported() && running) {
+    syncWebMediaSession(info);
+    if (info.playing === false) pauseIosNowPlaying();
+    else await startIosNowPlaying();
+    return;
+  }
   if (!isBackgroundPlaybackSupported() || !running) return;
   syncWebMediaSession(info);
   try {
@@ -171,6 +187,12 @@ export async function updatePlaybackService(info: PlaybackInfo): Promise<void> {
 }
 
 export async function stopPlaybackService(): Promise<void> {
+  if (isIosNowPlayingSupported() && running) {
+    running = false;
+    syncWebMediaSession(null);
+    stopIosNowPlaying();
+    return;
+  }
   if (!isBackgroundPlaybackSupported() || !running) return;
   running = false;
   syncWebMediaSession(null);

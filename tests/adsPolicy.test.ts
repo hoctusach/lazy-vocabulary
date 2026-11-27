@@ -22,9 +22,9 @@ describe('shouldShowBannerForTab', () => {
 });
 
 describe('isAdsSupported', () => {
-  it('is true only for native android', () => {
+  it('is true only for native android and iOS [FB-68]', () => {
     expect(isAdsSupported({ isNative: true, platform: 'android' })).toBe(true);
-    expect(isAdsSupported({ isNative: true, platform: 'ios' })).toBe(false);
+    expect(isAdsSupported({ isNative: true, platform: 'ios' })).toBe(true);
     expect(isAdsSupported({ isNative: false, platform: 'web' })).toBe(false);
     expect(isAdsSupported({ isNative: false, platform: 'android' })).toBe(false);
   });
