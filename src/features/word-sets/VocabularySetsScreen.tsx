@@ -18,6 +18,7 @@ import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleXlsx, CATEGORY_HELP_LINES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
+import AdminImportedSets from '@/features/admin/AdminImportedSets';
 import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
 import { saveBlob, saveTextFile } from '@/lib/platform/saveFile';
 import {
@@ -270,6 +271,8 @@ const VocabularySetsScreen: React.FC = () => {
           </p>
         )}
       </div>
+
+      <AdminImportedSets />
 
       <ul className="space-y-3">
         {sets.map((set) => {

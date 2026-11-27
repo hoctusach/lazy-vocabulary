@@ -6,6 +6,7 @@ import ThemeMascot from '@/components/ThemeMascot';
 import WordCountDisplay from './WordCountDisplay';
 import parseWordAnnotations from '@/utils/text/parseWordAnnotations';
 import EditableTranslation from './EditableTranslation';
+import AdminWordEditor from '@/features/admin/AdminWordEditor';
 
 interface VocabularyCardNewProps {
   word: string;
@@ -103,6 +104,7 @@ const VocabularyCardNew: React.FC<VocabularyCardNewProps> = ({
             {example}
           </div>
           <EditableTranslation word={word} category={category} sourceId={sourceId} translation={translation} />
+          {(!sourceId || sourceId === 'default') && <AdminWordEditor word={word} meaning={meaning} example={example} translation={translation} category={category} />}
         </div>
       </CardContent>
     </Card>

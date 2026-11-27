@@ -3,6 +3,7 @@ import { DEFAULT_VOCABULARY_DATA } from '@/data/defaultVocabulary';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import { invalidateVocabularyIndex } from '@/services/search/vocabularyIndex';
 import { setAllWordsOverride } from '@/utils/allWords';
+import { deleteImportedSetRemote, syncImportedSets } from '@/features/admin/adminApi';
 import { DEFAULT_SET_ID, DEFAULT_SET_NAME, type VocabularySetMeta } from './types';
 import type { ManualWordInput } from './manualSet';
 import { filterByBuiltinGroups, sumStats, tagWords } from './mixQueue';
@@ -159,6 +160,19 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   }, [importedData, version]);
 
+  // [FB-55] Best-effort copy of this device's own imported/manual sets to the server (own rows; lets an admin browse them).
+  // Signed out or table missing = silently nothing. Debounced so a burst of edits is one upload.
+  const syncKey = useMemo(() => sets.filter((s) => !s.builtin).map((s) => `${s.id}:${s.updatedAt}:${s.wordCount}`).join('|'), [sets]);
+  React.useEffect(() => {
+    if (!syncKey) return;
+    const timer = setTimeout(() => {
+      void syncImportedSets(
+        sets.filter((s) => !s.builtin).map((s) => ({ id: s.id, name: s.name, sheets: getSetSheets(s.id) }))
+      );
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [syncKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { stats, importedLearned, importedDue } = useMemo(() => {
     void version;
     void seenTick;
@@ -271,6 +285,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     (id: string) => {
       const result = deleteVocabularySet(id);
       if (!result.ok) return result.error;
+      void deleteImportedSetRemote(id);
       refresh();
       return null;
     },
