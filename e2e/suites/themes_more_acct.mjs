@@ -11,7 +11,7 @@ const SHOT_VP = { width: 390, height: 844, deviceScaleFactor: 1, isMobile: true,
 
 // ---- in-page colour helpers (injected per call) ----
 const PAGE_FNS = `
-  window.__rgb = (css) => { const e = document.createElement('i'); e.style.color = css; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); const m = c.match(/[\\d.]+/g).map(Number); return { r: m[0], g: m[1], b: m[2], a: m[3] === undefined ? 1 : m[3] }; };
+  window.__rgb = (css) => { const e = document.createElement('i'); e.style.color = css; document.body.appendChild(e); const c = getComputedStyle(e).color; e.remove(); const m = c.match(/[\\d.]+/g).map(Number); const k = /^color\\(/.test(c) ? 255 : 1; /* modern colour syntax (color-mix results) comes back as color(srgb 0..1) */ return { r: m[0] * k, g: m[1] * k, b: m[2] * k, a: m[3] === undefined ? 1 : m[3] }; };
   window.__lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
   window.__cr = (a, b) => { const x = window.__lum(a), y = window.__lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
   window.__over = (f, b) => ({ r: f.r * f.a + b.r * (1 - f.a), g: f.g * f.a + b.g * (1 - f.a), b: f.b * f.a + b.b * (1 - f.a), a: 1 });

@@ -269,7 +269,7 @@ export function builtinSelectedWordCount(groups: readonly string[]): number {
   return sum;
 }
 
-function setHasWords(id: string): boolean {
+export function setHasWords(id: string): boolean {
   const data = readJson<SheetData>(dataKey(id));
   return !!data && typeof data === 'object' && Object.values(data).some((rows) => Array.isArray(rows) && rows.length > 0);
 }

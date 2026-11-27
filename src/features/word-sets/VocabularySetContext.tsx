@@ -7,11 +7,12 @@ import { deleteImportedSetRemote, syncImportedSets } from '@/features/admin/admi
 import { DEFAULT_SET_ID, DEFAULT_SET_NAME, type VocabularySetMeta } from './types';
 import type { ManualWordInput } from './manualSet';
 import { filterByBuiltinGroups, sumStats, tagWords } from './mixQueue';
-import { addToPlan, getPlanSources } from './todayPlan';
+import { NEW_DAY_EVENT, addToPlan, clearTodayPlan, getPlanSources } from './todayPlan';
 import {
   BUILTIN_GROUPS,
   allBuiltinSourceIds,
   builtinGroupOf,
+  setHasWords,
   localDateKey,
   deleteVocabularySet,
   ensureTodayQueue,
@@ -160,7 +161,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     void dayTick;
     return getPlanSources(
       selectedSources,
-      (id) => builtinGroupOf(id) !== null || sets.some((set) => set.id === id),
+      (id) => builtinGroupOf(id) !== null || (sets.some((set) => set.id === id) && setHasWords(id)),
       localDateKey()
     );
   }, [sets, selectedKey, dayTick]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -243,6 +244,12 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
   React.useEffect(() => {
     applySearchSource(selectedSources, words);
   }, [selectedKey, words]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  React.useEffect(() => {
+    const onNewDay = () => { clearTodayPlan(); setDayTick((v) => v + 1); setVersion((v) => v + 1); };
+    window.addEventListener(NEW_DAY_EVENT, onNewDay);
+    return () => window.removeEventListener(NEW_DAY_EVENT, onNewDay);
+  }, []);
 
   const toggle = useCallback(
     (id: string) => {

@@ -58,7 +58,7 @@ test('SET-06', 'Example file downloads (Download CSV / Download Excel, in one ro
     const p = path.join(dir, d.name); fs.writeFileSync(p, Buffer.from(d.bytes));
     await U.pickFile(s, p); await waitText(s, 'Imported 3 words into'); await sleep(250);
   }
-  eq((await metaSets(s)).length, 3);
+  eq((await metaSets(s)).length, 2);
 });
 test('SET-08', 'Unsupported file types are rejected with a message', async ({ session }) => {
   const s = await session({}); await start(s);
@@ -208,7 +208,7 @@ test('SET-27', 'Selection persists across a reload and is mixed with imported se
   eq(await U.boxChecked(s, 'Include setA'), true); eq(await U.boxChecked(s, 'Include grammar'), true); eq(await U.boxChecked(s, 'Include topic vocab'), false);
   const st = await U.boxState(s, 'Select all groups of Word Set: C1, C2'); eq(st.indeterminate, true);
 });
-test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only from those sources [FB-18]', async ({ session }) => {
+test('SET-MIX-01', 'Built-in "idioms" + an imported set: from the next day Learn words come only from those sources [FB-18][FB-63]', async ({ session }) => {
   const s = await session({}); await start(s);
   await importFile(s, 'setA.csv'); await waitText(s, 'Imported 6 words into “setA”.');
   await U.mix(s, ['idioms'], ['setA']);
@@ -229,7 +229,7 @@ test('SET-MIX-01', 'Built-in "idioms" + an imported set: Learn words come only f
   const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
   ok(calls.length >= 2 && calls.at(-1).body.p_category === 'idioms', 'last p_category must be idioms: ' + JSON.stringify(calls.map((c) => c.body)));
 });
-test('SET-MIX-02', 'Two built-in groups: every card over ~10 Next presses belongs to them [FB-18]', async ({ session }) => {
+test('SET-MIX-02', 'Two built-in groups: from the next day every card over ~10 Next presses belongs to them [FB-18][FB-63]', async ({ session }) => {
   const s = await session({}); await start(s);
   await U.mix(s, ['phrasal verbs', 'idioms']);
   const pool = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'e2e/lib/pool.json'), 'utf8'));
@@ -263,4 +263,26 @@ test('SET-MIX-03', 'Deleting a selected imported set keeps the rest of the selec
   for (let i = 0; i < 10; i++) { seen.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); }
   for (const w of seen) ok(w && !/^aaa/.test(w), `deleted set's word shown: ${seen}`);
   ok(seen.some((w) => /^bbb/.test(w)), 'setB words missing: ' + seen);
+});
+test('SET-MIX-04', 'Ticking / unticking groups keeps today\'s words and shows "Changes apply from tomorrow."; the next day uses the new selection [FB-63]', async ({ session }) => {
+  const s = await session({}); await start(s);
+  await tab(s, 'Learn'); await sleep(1200);
+  const before = [];
+  for (let i = 0; i < 22; i++) { before.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); } // one full lap of today's list
+  await tab(s, 'Library');
+  for (const g of ['topic vocab', 'phrasal verbs', 'grammar', 'phrases, collocations', 'word formation']) await U.setBox(s, `Include ${g}`, false);
+  await waitText(s, 'Changes apply from tomorrow.');
+  ok(/Selected: 1 set/.test(await body(s)), 'the Library shows the new selection');
+  eq(JSON.parse(await s.ls('lazyVoca.selectedSources.v1')), ['default:idioms']);
+  // today is unchanged: still the same first-lap words, the day plan still has all six groups
+  eq(JSON.parse(await s.ls('lazyVoca.todayPlan.v1')).sources.length, 6);
+  await tab(s, 'Learn'); await sleep(1000);
+  const after = [];
+  for (let i = 0; i < 6; i++) { after.push(await word(s)); await ctl(s, 'Next Word'); await sleep(450); }
+  ok(new Set(before).size >= 15 && after.every((w) => before.includes(w)), `today's list changed after ticking: before=${before} after=${after}`);
+  // a new day: built from the current selection (idioms only)
+  await U.nextDay(s); await sleep(1500);
+  const calls = s.fake.calls.filter((c) => c.name === 'generate_daily_selection_v2');
+  ok(calls.at(-1).body.p_category === 'idioms', 'new day asks for idioms only: ' + JSON.stringify(calls.map((c) => c.body)));
+  eq(JSON.parse(await s.ls('lazyVoca.todayPlan.v1')).sources, ['default:idioms']);
 });

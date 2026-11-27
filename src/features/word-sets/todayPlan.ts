@@ -57,6 +57,10 @@ export function addToPlan(id: string, today: string): void {
   if (!plan.sources.includes(id)) write({ date: today, sources: [...plan.sources, id] });
 }
 
-export function __clearPlanForTests(): void {
+/** Forget today's plan so the next read snapshots the live selection (a new day). */
+export function clearTodayPlan(): void {
   try { window.localStorage.removeItem(TODAY_PLAN_KEY); } catch { /* ignore */ }
 }
+
+/** `window.dispatchEvent(new Event(NEW_DAY_EVENT))` starts "a new day" right now (used by tests/e2e to apply a selection). */
+export const NEW_DAY_EVENT = 'lv:new-day';

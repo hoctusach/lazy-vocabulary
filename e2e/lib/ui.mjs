@@ -144,8 +144,11 @@ export async function builtinOff(s) {
   let st = await boxState(s, BUILTIN_PARENT);
   if (st.indeterminate) { await setBox(s, BUILTIN_PARENT, true); st = await boxState(s, BUILTIN_PARENT); }
   if (st.checked) await setBox(s, BUILTIN_PARENT, false);
+  await nextDay(s); // [FB-63] apply the selection as "the next day"
 }
-/** Select exactly one source: an imported set by name, or null for the whole built-in set. */
+/** [FB-63] Ticking sets only changes TOMORROW's list. Tests that need the new selection in Learn now start a new day. */
+export async function nextDay(s) { await s.page.evaluate(() => window.dispatchEvent(new Event('lv:new-day'))); await sleep(400); }
+/** Select exactly one source: an imported set by name, or null for the whole built-in set (then a new day starts, FB-63). */
 export async function useOnly(s, name) {
   await tab(s, 'Library');
   const labels = await s.page.evaluate(() => [...document.querySelectorAll('input[type=checkbox]')].map((i) => i.getAttribute('aria-label')));
@@ -158,6 +161,7 @@ export async function useOnly(s, name) {
     await setBox(s, BUILTIN_PARENT, true);
     for (const l of imported) await setBox(s, l, false);
   }
+  await nextDay(s);
 }
 /** Select exactly the given built-in groups plus the given imported sets. */
 export async function mix(s, groups, sets = []) {
@@ -168,6 +172,7 @@ export async function mix(s, groups, sets = []) {
   for (const n of sets) await setBox(s, `Include ${n}`, true);
   for (const g of GROUPS) if (!groups.includes(g)) await setBox(s, `Include ${g}`, false);
   for (const l of imported) if (!sets.includes(l.slice(8))) await setBox(s, l, false);
+  await nextDay(s);
 }
 export const alertText = (s) => s.page.evaluate(() => document.querySelector('[role=alert]')?.innerText || '');
 export async function waitAlert(s, re, timeout = 8000) {

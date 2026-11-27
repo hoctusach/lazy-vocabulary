@@ -14,7 +14,8 @@ export interface MixSource {
 
 /**
  * Slots per source, summing to `total` (or less when the sources hold fewer words). Largest-remainder rounding on the
- * size share; a non-empty source with Due words gets at least one slot; no source gets more than it holds.
+ * size share; every non-empty source gets at least one slot (when there are enough slots), so a tiny set never starves;
+ * no source gets more than it holds.
  * One source gets everything (up to `total`).
  */
 export function allocateQuotas(sources: readonly MixSource[], total: number = DAILY_TARGET): Record<string, number> {
@@ -30,9 +31,12 @@ export function allocateQuotas(sources: readonly MixSource[], total: number = DA
   const sum = live.reduce((acc, s) => acc + s.size, 0);
   const shares = live.map((s) => ({ s, exact: (cap * s.size) / sum }));
   shares.forEach(({ s, exact }) => { out[s.id] = Math.min(Math.floor(exact), s.size); });
-  // a tiny set with Due words still contributes
-  for (const { s } of shares) {
-    if (out[s.id] === 0 && (s.due ?? 0) > 0) out[s.id] = 1;
+  // Every non-empty source gets at least one slot (a tiny set with Due words must not wait, and a tiny NEW set must not
+  // starve forever behind a big one), as long as there are enough slots for all of them.
+  if (cap >= live.length) {
+    for (const { s } of shares) if (out[s.id] === 0) out[s.id] = 1;
+  } else {
+    for (const { s } of shares) if (out[s.id] === 0 && (s.due ?? 0) > 0) out[s.id] = 1;
   }
   let used = live.reduce((acc, s) => acc + out[s.id], 0);
   // hand out the rest by largest remainder, then by size, respecting each source's capacity
