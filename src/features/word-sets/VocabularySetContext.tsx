@@ -7,9 +7,12 @@ import { deleteImportedSetRemote, syncImportedSets } from '@/features/admin/admi
 import { DEFAULT_SET_ID, DEFAULT_SET_NAME, type VocabularySetMeta } from './types';
 import type { ManualWordInput } from './manualSet';
 import { filterByBuiltinGroups, sumStats, tagWords } from './mixQueue';
+import { addToPlan, getPlanSources } from './todayPlan';
 import {
   BUILTIN_GROUPS,
   allBuiltinSourceIds,
+  builtinGroupOf,
+  localDateKey,
   deleteVocabularySet,
   ensureTodayQueue,
   flattenSheets,
@@ -61,6 +64,15 @@ interface VocabularySetContextValue {
   selectedImportedSets: VocabularySetMeta[];
   /** True when at least one built-in group is part of the mix. */
   hasBuiltin: boolean;
+  /**
+   * [FB-63] What TODAY is built from: the sources frozen for this local day. Ticking sets in the Library only changes
+   * `selectedSources` (tomorrow's plan). `importedQueues`, `importedLearned/Due`, `stats` and `planBuiltinGroups` follow the plan.
+   */
+  planSources: string[];
+  planBuiltinGroups: string[];
+  planHasBuiltin: boolean;
+  /** True when the Library selection differs from today's plan ("Changes apply from tomorrow."). */
+  planDiffers: boolean;
   /** True when no built-in group is selected (only imported sets). */
   isCustomSet: boolean;
   /** Words of the selected imported sets (each tagged with `sourceId`). */
@@ -122,6 +134,7 @@ function describeSelection(sets: VocabularySetMeta[], selection: string[]): Voca
 export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [version, setVersion] = useState(0);
   const [seenTick, setSeenTick] = useState(0);
+  const [dayTick, setDayTick] = useState(0);
   const refresh = useCallback(() => setVersion((value) => value + 1), []);
 
   React.useEffect(() => subscribeDisplayedWords(() => setSeenTick((value) => value + 1)), []);
@@ -142,6 +155,31 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [sets, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
   const activeSet = useMemo(() => describeSelection(sets, selectedSources), [sets, selectedKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // [FB-63] Today's plan: frozen for the local day, re-snapshotted from the selection when a new day starts.
+  const planSources = useMemo(() => {
+    void dayTick;
+    return getPlanSources(
+      selectedSources,
+      (id) => builtinGroupOf(id) !== null || sets.some((set) => set.id === id),
+      localDateKey()
+    );
+  }, [sets, selectedKey, dayTick]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planKey = planSources.join('|');
+  const planBuiltin = useMemo(() => selectedBuiltinGroups(planSources), [planKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planImported = useMemo(() => {
+    const ids = new Set(selectedImportedIds(planSources));
+    return sets.filter((set) => ids.has(set.id));
+  }, [sets, planKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const planDiffers = selectedKey !== planKey;
+
+  // New local day while the app stays open: re-read the plan (and so the selection) at the next midnight.
+  React.useEffect(() => {
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5).getTime();
+    const timer = setTimeout(() => { setDayTick((v) => v + 1); setVersion((v) => v + 1); }, Math.max(1000, next - now.getTime()));
+    return () => clearTimeout(timer);
+  }, [dayTick]);
+
   const importedData = useMemo(() => {
     void version;
     return selectedImported.map((set) => ({
@@ -150,10 +188,18 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     }));
   }, [selectedImported, version]);
   const words = useMemo(() => importedData.flatMap((entry) => entry.words), [importedData]);
+  // [FB-63] The learning side (queues, learned/due lists, stats) reads the PLAN, not the live selection.
+  const planData = useMemo(() => {
+    void version;
+    return planImported.map((set) => ({
+      set,
+      words: tagWords(flattenSheets(getSetSheets(set.id)), set.id),
+    }));
+  }, [planImported, version]);
 
   const importedQueues = useMemo<ImportedQueue[]>(() => {
     void version;
-    return importedData.map(({ set, words: setWords }) => ({
+    return planData.map(({ set, words: setWords }) => ({
       sourceId: set.id,
       name: set.name,
       words: tagWords(ensureTodayQueue(set.id, setWords), set.id),
@@ -181,7 +227,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     const parts: ReturnType<typeof progressStatsFor>[] = [];
     const learned: ImportedProgressEntry[] = [];
     const due: ImportedProgressEntry[] = [];
-    for (const { set, words: setWords } of importedData) {
+    for (const { set, words: setWords } of planData) {
       const progress = getSetProgress(set.id);
       parts.push(progressStatsFor(setWords, progress));
       for (const entry of Object.values(progress.learned)) {
@@ -192,7 +238,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     return { stats: sumStats(parts), importedLearned: learned, importedDue: due };
-  }, [importedData, version, seenTick]);
+  }, [planData, version, seenTick]);
 
   React.useEffect(() => {
     applySearchSource(selectedSources, words);
@@ -232,6 +278,7 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
     (name: string, nextSheets: SheetData, fileName?: string) => {
       const result = importVocabularySet(name, nextSheets, fileName);
       if (!result.ok) return result.error;
+      addToPlan(result.set.id, localDateKey()); // [FB-63] a brand-new set joins today right away
       refresh();
       return null;
     },
@@ -241,7 +288,10 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
   const createManual = useCallback(
     (name: string, first: ManualWordInput) => {
       const r = createManualSet(name, first);
-      if (r.ok) refresh();
+      if (r.ok) {
+        if (r.set) addToPlan(r.set.id, localDateKey());
+        refresh();
+      }
       return r;
     },
     [refresh]
@@ -320,6 +370,10 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       selectedBuiltinGroups: selectedBuiltin,
       selectedImportedSets: selectedImported,
       hasBuiltin: selectedBuiltin.length > 0,
+      planSources,
+      planBuiltinGroups: planBuiltin,
+      planHasBuiltin: planBuiltin.length > 0,
+      planDiffers,
       isCustomSet: selectedBuiltin.length === 0,
       words,
       importedQueues,
@@ -346,6 +400,9 @@ export const VocabularySetProvider: React.FC<{ children: React.ReactNode }> = ({
       selectedSources,
       selectedBuiltin,
       selectedImported,
+      planSources,
+      planBuiltin,
+      planDiffers,
       words,
       importedQueues,
       importedLearned,
@@ -389,6 +446,10 @@ export function useVocabularySets(): VocabularySetContextValue {
     selectedBuiltinGroups: [...BUILTIN_GROUPS],
     selectedImportedSets: [],
     hasBuiltin: true,
+    planSources: allBuiltinSourceIds(),
+    planBuiltinGroups: [...BUILTIN_GROUPS],
+    planHasBuiltin: true,
+    planDiffers: false,
     isCustomSet: false,
     words: [],
     importedQueues: [],

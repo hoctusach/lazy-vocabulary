@@ -18,6 +18,7 @@ import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleXlsx, CATEGORY_HELP_LINES } from './sampleTemplate';
 import { DEFAULT_SET_ID } from './types';
+import { PLAN_NOTICE } from './todayPlan';
 import AdminImportedSets from '@/features/admin/AdminImportedSets';
 import ShowViToggle from './ShowViToggle';
 import { CreateManualSetDialog, ManageManualSetDialog } from './ManualSetDialog';
@@ -60,7 +61,7 @@ const Checkbox: React.FC<{
 };
 
 const VocabularySetsScreen: React.FC = () => {
-  const { sets, selectedSources, selectedBuiltinGroups, toggleSource, setBuiltinAll, importSet, rename, remove } =
+  const { sets, selectedSources, selectedBuiltinGroups, planDiffers, toggleSource, setBuiltinAll, importSet, rename, remove } =
     useVocabularySets();
   const [selectionNote, setSelectionNote] = useState<string | null>(null);
   const groupCounts = builtinGroupCounts();
@@ -76,11 +77,13 @@ const VocabularySetsScreen: React.FC = () => {
     const error = toggleSource(id);
     setSelectionNote(error);
     if (error) toast.error(error);
+    else toast.info(PLAN_NOTICE); // [FB-63] today's words stay as they are
   };
   const onToggleBuiltinAll = () => {
     const error = setBuiltinAll(builtinSelectedCount < BUILTIN_GROUPS.length);
     setSelectionNote(error);
     if (error) toast.error(error);
+    else toast.info(PLAN_NOTICE);
   };
   const inputRef = useRef<HTMLInputElement>(null);
   const [errors, setErrors] = useState<string[]>([]);
@@ -184,6 +187,11 @@ const VocabularySetsScreen: React.FC = () => {
           Selected: {selectedSources.length} {selectedSources.length === 1 ? 'set' : 'sets'} ·{' '}
           {selectedWordCount.toLocaleString()} {selectedWordCount === 1 ? 'word' : 'words'}
         </p>
+        {planDiffers && !selectionNote && (
+          <p role="status" data-testid="plan-note" className="mt-1 text-sm" style={{ color: 'var(--lv-text-secondary)' }}>
+            {PLAN_NOTICE}
+          </p>
+        )}
         {selectionNote && (
           <p role="status" data-testid="selection-note" className="mt-1 text-sm text-amber-800 dark:text-amber-200">
             {selectionNote}

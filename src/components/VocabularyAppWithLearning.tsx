@@ -6,6 +6,8 @@ import StreakPanel from './vocabulary-app/StreakPanel';
 import LeaderboardPanel from './vocabulary-app/LeaderboardPanel';
 import { useVocabularySets } from '@/features/word-sets/VocabularySetContext';
 import { findSetWord } from '@/features/word-sets/vocabularySetStore';
+import { allocateQuotas, takeByQuota } from '@/features/word-sets/dailyMix';
+import { DAILY_TARGET, MAX_TOTAL } from '@/lib/progress/dailyTarget';
 import {
   buildMixedQueue,
   filterByBuiltinGroups,
@@ -64,7 +66,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     dueTodayLearnedWords,
     isDailySelectionLoading,
     progressError,
-  } = useLearningProgress({ builtinGroups: wordSets.selectedBuiltinGroups });
+  } = useLearningProgress({ builtinGroups: wordSets.planBuiltinGroups });
   const [didTriggerFirstTimeLoad, setDidTriggerFirstTimeLoad] = useState(false);
 
   useEffect(() => {
@@ -110,11 +112,79 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
 
   // Built-in part of the mix. With only some groups selected the server lists still cover the whole
   // built-in set, so they are narrowed to the selected groups here.
-  const groups = wordSets.selectedBuiltinGroups;
+  const groups = wordSets.planBuiltinGroups; // [FB-63] today's plan, not the live Library selection
   const partialBuiltin = groups.length > 0 && groups.length < BUILTIN_GROUPS.length;
   const scopeBuiltin = <T extends { category?: string | null }>(list: T[]): T[] =>
-    !wordSets.hasBuiltin ? [] : partialBuiltin ? filterByBuiltinGroups(list, groups) : list;
+    !wordSets.planHasBuiltin ? [] : partialBuiltin ? filterByBuiltinGroups(list, groups) : list;
 
+  // The built-in daily list is account-backed. With no user key (fresh install, signed out) or a
+  // failed fetch it stays empty, so fall back to the local built-in groups instead of an empty card.
+  const builtinToday = useMemo(
+    () => (wordSets.planHasBuiltin ? scopeBuiltin(todayWords) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todayWords, wordSets.planHasBuiltin, groups.join('|')]
+  );
+  const needsLocalFallback =
+    wordSets.planHasBuiltin && builtinToday.length === 0 && !isDailySelectionLoading;
+  const localFallbackWords = useMemo(
+    () => (needsLocalFallback ? interleaveBuiltinGroups(DEFAULT_VOCABULARY_DATA, groups) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [needsLocalFallback, groups.join('|')]
+  );
+  const builtinPlayback: VocabularyWord[] = builtinToday.length > 0 ? builtinToday : localFallbackWords;
+
+  // [FB-63] With a built-in part AND imported sets (or several imported sets) a day is ~20 words split in proportion to
+  // the sources' sizes (Due first, then New inside each source). A single source keeps all of the day.
+  const dueByImported = (sourceId: string) => wordSets.importedDue.filter((entry) => entry.sourceId === sourceId).length;
+  const mixSlices = useMemo(() => {
+    const importedCount = wordSets.importedQueues.length;
+    const families = (builtinPlayback.length > 0 && wordSets.planHasBuiltin ? 1 : 0) + importedCount;
+    if (importedCount === 0 || families < 2 || needsLocalFallback) return null;
+    const sources = [
+      ...(wordSets.planHasBuiltin
+        ? [{ id: DEFAULT_SET_ID, size: builtinSelectedWordCount(groups), due: dueTodayLearnedWords.length }]
+        : []),
+      ...wordSets.importedQueues.map((q) => ({
+        id: q.sourceId,
+        size: wordSets.sets.find((set) => set.id === q.sourceId)?.wordCount ?? q.words.length,
+        due: dueByImported(q.sourceId),
+      })),
+    ];
+    const quotas = allocateQuotas(sources, DAILY_TARGET + learnedTodayWords.length > MAX_TOTAL ? MAX_TOTAL : DAILY_TARGET);
+    return takeByQuota(
+      [
+        ...(wordSets.planHasBuiltin ? [{ id: DEFAULT_SET_ID, words: builtinPlayback as readonly VocabularyWord[] }] : []),
+        ...wordSets.importedQueues.map((q) => ({ id: q.sourceId, words: q.words as readonly VocabularyWord[] })),
+      ],
+      quotas,
+      DAILY_TARGET
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [builtinPlayback, wordSets.importedQueues, wordSets.importedDue, wordSets.planHasBuiltin, needsLocalFallback, groups.join('|')]);
+  const sliceOf = (sourceId: string, words: VocabularyWord[]): VocabularyWord[] => mixSlices?.[sourceId] ?? words;
+  const builtinMix = sliceOf(DEFAULT_SET_ID, builtinPlayback);
+  const builtinQuizMix = sliceOf(DEFAULT_SET_ID, builtinToday);
+  const importedMix = wordSets.importedQueues.map((queue) => ({ sourceId: queue.sourceId, words: sliceOf(queue.sourceId, queue.words) }));
+
+  // Union of today's sources: the built-in part plus each imported set, round-robin.
+  const playbackWords = useMemo<SourcedWord[]>(
+    () =>
+      buildMixedQueue<VocabularyWord>([
+        { sourceId: DEFAULT_SET_ID, words: builtinMix },
+        ...importedMix,
+      ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mixSlices, builtinPlayback, wordSets.importedQueues]
+  );
+  const quizWords = useMemo(
+    () =>
+      buildMixedQueue<VocabularyWord>([
+        { sourceId: DEFAULT_SET_ID, words: builtinQuizMix },
+        ...importedMix,
+      ]),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [mixSlices, builtinToday, wordSets.importedQueues]
+  );
   // [FB-51] LEARNED lists only words marked learned TODAY (device-local date). All-time counts live in Learning Progress.
   const todayLocal = todayKey();
   const importedLearnedDisplay = wordSets.importedLearned
@@ -127,7 +197,9 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     learnedDate: entry.learnedAt as string | undefined,
     sourceId: entry.sourceId,
   }));
-  const importedDueDisplay = wordSets.importedDue.map((entry) => ({
+  const inSlice = (sourceId: string, word: string) =>
+    !mixSlices || (mixSlices[sourceId] ?? []).some((w) => w.word === word);
+  const importedDueDisplay = wordSets.importedDue.filter((entry) => inSlice(entry.sourceId, entry.word)).map((entry) => ({
     word: entry.word,
     category: entry.category,
     reviewCount: entry.reviewCount,
@@ -141,7 +213,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
         .filter((entry) => entry.sourceId === queue.sourceId)
         .map((entry) => `${entry.category}::${entry.word}`)
     );
-    return queue.words
+    return sliceOf(queue.sourceId, queue.words)
       .filter((word) => !learnedKeys.has(`${word.category ?? ''}::${word.word}`))
       .map((word) => ({
         word: word.word,
@@ -154,8 +226,9 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
   });
 
   const builtinLearnedList = scopeBuiltin(Array.isArray(learnedTodayWords) ? learnedTodayWords : []);
-  const builtinNewList = scopeBuiltin(Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : []);
-  const builtinDueList = scopeBuiltin(Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : []);
+  const inBuiltinMix = (word: string) => !mixSlices || builtinMix.some((w) => w.word === word);
+  const builtinNewList = scopeBuiltin(Array.isArray(newTodayLearnedWords) ? newTodayLearnedWords : []).filter((w) => inBuiltinMix(w.word));
+  const builtinDueList = scopeBuiltin(Array.isArray(dueTodayLearnedWords) ? dueTodayLearnedWords : []).filter((w) => inBuiltinMix(w.word));
   const learnedWordsList = [...builtinLearnedList, ...importedLearnedDisplay];
   const newTodayList = [...builtinNewList, ...importedNewDisplay];
   const dueTodayList = [...builtinDueList, ...importedDueDisplay];
@@ -226,45 +299,11 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     setWordToReset(null);
   };
 
-  // The built-in daily list is account-backed. With no user key (fresh install, signed out) or a
-  // failed fetch it stays empty, so fall back to the local built-in groups instead of an empty card.
-  const builtinToday = useMemo(
-    () => (wordSets.hasBuiltin ? scopeBuiltin(todayWords) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [todayWords, wordSets.hasBuiltin, groups.join('|')]
-  );
-  const needsLocalFallback =
-    wordSets.hasBuiltin && builtinToday.length === 0 && !isDailySelectionLoading;
-  const localFallbackWords = useMemo(
-    () => (needsLocalFallback ? interleaveBuiltinGroups(DEFAULT_VOCABULARY_DATA, groups) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [needsLocalFallback, groups.join('|')]
-  );
-  const builtinPlayback: VocabularyWord[] = builtinToday.length > 0 ? builtinToday : localFallbackWords;
-
-  // Union of the selected sources: the built-in part plus each imported set, round-robin.
-  const playbackWords = useMemo<SourcedWord[]>(
-    () =>
-      buildMixedQueue<VocabularyWord>([
-        { sourceId: DEFAULT_SET_ID, words: builtinPlayback },
-        ...wordSets.importedQueues.map((queue) => ({ sourceId: queue.sourceId, words: queue.words })),
-      ]),
-    [builtinPlayback, wordSets.importedQueues]
-  );
-  const quizWords = useMemo(
-    () =>
-      buildMixedQueue<VocabularyWord>([
-        { sourceId: DEFAULT_SET_ID, words: builtinToday },
-        ...wordSets.importedQueues.map((queue) => ({ sourceId: queue.sourceId, words: queue.words })),
-      ]),
-    [builtinToday, wordSets.importedQueues]
-  );
-
   // [FB-38] Total/New come from the active selection (same count as the Word Set card), never from
   // the server's 4000-row table or remaining_count.
   const playbackStats = activeProgressStats(
-    wordSets.hasBuiltin ? builtinSelectedWordCount(groups) : 0,
-    wordSets.hasBuiltin ? progressStats : null,
+    wordSets.planHasBuiltin ? builtinSelectedWordCount(groups) : 0,
+    wordSets.planHasBuiltin ? progressStats : null,
     wordSets.importedQueues.length > 0 ? wordSets.stats : null
   );
 
@@ -295,7 +334,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     <LearningProgressPanel
       progressStats={playbackStats}
       learnerId={wordSets.activeSet.id}
-      progressError={wordSets.hasBuiltin ? progressError : null}
+      progressError={wordSets.planHasBuiltin ? progressError : null}
     />
   );
   // [FB-50] Word Summary lives on the Learn tab, directly under the card player.
@@ -318,7 +357,7 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
           <TooltipContent side="top">Click to expand or collapse the word summary.</TooltipContent>
         </Tooltip>
         <CollapsibleContent className="space-y-3">
-          {wordSets.hasBuiltin && progressError && wordSets.importedQueues.length === 0 ? (
+          {wordSets.planHasBuiltin && progressError && wordSets.importedQueues.length === 0 ? (
             <div className="rounded-md border border-yellow-500 bg-yellow-50 p-3 text-sm text-yellow-800 dark:border-yellow-700 dark:bg-yellow-950/60 dark:text-yellow-200">
               {progressError}
             </div>
@@ -458,8 +497,8 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
       <div className={view === 'all' ? 'w-full max-w-6xl mx-auto p-4' : 'w-full'}>
         <VocabularyAppContainerNew
           initialWords={playbackWords}
-          dailySelection={wordSets.hasBuiltin ? dailySelection : null}
-          isLoadingSelection={wordSets.hasBuiltin && isDailySelectionLoading && playbackWords.length === 0}
+          dailySelection={wordSets.planHasBuiltin ? dailySelection : null}
+          isLoadingSelection={wordSets.planHasBuiltin && isDailySelectionLoading && playbackWords.length === 0}
           onMarkWordLearned={handleMarkWordLearned}
           underPlayerContent={wordSummarySection}
           additionalContent={

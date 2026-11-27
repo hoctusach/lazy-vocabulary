@@ -342,7 +342,7 @@ export function setSelectedSources(ids: readonly string[]): { ok: true } | { ok:
   if (!writeSelection(next)) {
     return { ok: false, error: 'Could not save your selection because storage is not available on this device.' };
   }
-  clearResumeCursor();
+  // [FB-63] No resume-cursor reset: today's words (and your place in them) stay as they are until tomorrow.
   return { ok: true };
 }
 

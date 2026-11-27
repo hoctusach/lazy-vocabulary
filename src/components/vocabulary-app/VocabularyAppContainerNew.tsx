@@ -11,6 +11,7 @@ import { useStableVocabularyState } from "@/hooks/vocabulary-app/useStableVocabu
 import { useOptimizedAutoPlay } from "@/hooks/vocabulary-app/useOptimizedAutoPlay";
 import { usePlaybackService } from '@/hooks/usePlaybackService';
 import { vocabularyService } from '@/services/vocabularyService';
+import { getFavoriteVoice } from '@/lib/preferences/localPreferences';
 import { buildNativeQueue, findQueueIndex } from '@/services/background/buildNativeQueue';
 import { getSpeechRate } from '@/utils/speech/core/speechSettings';
 import { DebugInfoContext } from '@/contexts/DebugInfoContext';
