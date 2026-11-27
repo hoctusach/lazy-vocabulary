@@ -71,6 +71,6 @@ describe('[FB-37] app version in the footer comes from package.json', () => {
     const cfg = read('vite.config.ts');
     expect(cfg).toContain('package.json');
     expect(cfg).toContain('readAppVersion()');
-    expect(pkg.version).toBe('1.0.5');
+    expect(pkg.version).toBe('1.0.6');
   });
 });
