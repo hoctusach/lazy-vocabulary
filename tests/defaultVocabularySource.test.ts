@@ -55,7 +55,8 @@ describe('default vocabulary single source', () => {
   });
 
   it('is free of "sth" -> "something" corruption', () => {
-    const text = JSON.stringify(DEFAULT_VOCABULARY_DATA);
+    // [FB-72] "AsomethingMA" is the live server PK of "asthma" (kept verbatim so dedup/sync still match; PKs are not renamed).
+    const text = JSON.stringify(DEFAULT_VOCABULARY_DATA).replace('"AsomethingMA"', '"ASTHMA-PK"');
     expect(text).not.toMatch(/[a-z]something|something[a-z]/i);
   });
 
