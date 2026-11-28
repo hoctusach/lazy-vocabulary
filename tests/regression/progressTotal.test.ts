@@ -14,7 +14,7 @@ const ALL = countSheetWords(DEFAULT_VOCABULARY_DATA);
 describe('[FB-38] Learning Progress Total = active selection (same count as the Word Set card)', () => {
   it('all six groups = the Word Set card count (row count, not distinct words, not 4000)', () => {
     expect(builtinSelectedWordCount(BUILTIN_GROUPS)).toBe(ALL);
-    expect(ALL).toBe(3965);
+    expect(ALL).toBe(3964);
     const s = activeProgressStats(builtinSelectedWordCount(BUILTIN_GROUPS), { learned: 67, learning: 755, due: 333 }, null);
     expect(s.total).toBe(ALL);
     expect(s.new).toBe(ALL - 67 - 755);

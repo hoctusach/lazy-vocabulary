@@ -80,12 +80,16 @@ function assertLayout(m, size) {
 }
 
 for (const size of SIZES) {
-  test(`E2E-${size.id}`, `[FB-69] ${size.label}: no overflow, constrained cards, ${size.cols === 2 ? 'two-column Learn' : 'single readable column'}`, async ({ session }) => {
+  test(`E2E-${size.id}`, `[FB-69][FB-85] ${size.label}: no overflow, constrained cards, ${size.cols === 2 ? 'two-column Learn' : 'single readable column'}`, async ({ session }) => {
     const s = await openIpad(session, size);
     assertLayout(await s.page.evaluate(MEASURE), size);
     // Main controls are real touch targets (>= 40px) and inside the viewport.
     const controls = await s.page.evaluate(() => ['Pause', 'Next Word', 'Quick Search'].map((l) => { const b = [...document.querySelectorAll('button')].find((x) => x.getAttribute('aria-label') === l && x.offsetParent); const r = b?.getBoundingClientRect(); return { l, w: r?.width ?? 0, h: r?.height ?? 0, inView: !!r && r.right <= window.innerWidth && r.left >= 0 }; }));
     for (const c of controls) ok(c.w >= 40 && c.h >= 40 && c.inView, `${size.label}: control ${JSON.stringify(c)}`);
+    // [FB-85] the summary card is titled TODAY on iPad (iOS UA), never "Word Summary"
+    const heads = await s.page.evaluate(() => [...document.querySelectorAll('[data-testid="word-summary-section"] h3')].map((h) => h.textContent.trim()));
+    eq(heads, ['TODAY']);
+    ok(!(await U.body(s)).includes('Word Summary'), `${size.label}: [FB-85] old title still visible`);
   });
 }
 
