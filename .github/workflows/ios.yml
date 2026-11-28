@@ -26,9 +26,6 @@ concurrency:
   group: ios-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
-
 jobs:
   swift-tests:
     name: Swift unit tests (simulator)
@@ -36,6 +33,8 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 26 (Capacitor 8 binaries need Swift 6.2)
+        run: scripts/ios/select-xcode.sh
       - name: Fetch + verify sherpa-onnx (pinned url + sha256, same as Package.swift)
         run: scripts/ios/fetch-sherpa-onnx.sh
       - name: Run KokoroTtsKit tests on the iOS Simulator
@@ -46,7 +45,7 @@ jobs:
           xcodebuild -list || true
           xcodebuild test \
             -scheme KokoroTtsKit-Package \
-            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -destination "platform=iOS Simulator,id=$("$GITHUB_WORKSPACE/scripts/ios/pick-sim.sh" iPhone)" \
             -resultBundlePath "$GITHUB_WORKSPACE/build/swift-tests.xcresult" \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$GITHUB_WORKSPACE/build/swift-tests.log" | tail -n 80
       - uses: actions/upload-artifact@v4
@@ -64,6 +63,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 26 (Capacitor 8 binaries need Swift 6.2)
+        run: scripts/ios/select-xcode.sh
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -119,6 +120,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+      - name: Select Xcode 26 (Capacitor 8 binaries need Swift 6.2)
+        run: scripts/ios/select-xcode.sh
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -153,10 +156,11 @@ jobs:
           APP=build/ios/Build/Products/Debug-iphonesimulator/App.app
           mkdir -p build/shots
           FAIL=0
-          for DEV in "iPhone 16 Pro" "iPad Pro 13-inch (M4)"; do
-            UDID=$(xcrun simctl list devices available | grep -F "$DEV" | head -1 | grep -oE '[0-9A-F-]{36}' || true)
-            [ -n "$UDID" ] || { echo "no simulator named $DEV"; FAIL=1; continue; }
-            SHOT="build/shots/$(echo "$DEV" | tr -c 'A-Za-z0-9' _).png"
+          for DEV in iPhone iPad; do
+            UDID=$(scripts/ios/pick-sim.sh "$DEV" || true)
+            [ -n "$UDID" ] || { echo "no $DEV simulator"; FAIL=1; continue; }
+            echo "== $DEV $UDID"
+            SHOT="build/shots/$DEV.png"
             xcrun simctl boot "$UDID"
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" "$APP"

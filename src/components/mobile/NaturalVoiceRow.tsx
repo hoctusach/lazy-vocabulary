@@ -12,7 +12,7 @@ import { KOKORO_DOWNLOAD_BYTES } from '@/services/speech/kokoro/kokoroVoices';
 
 const mb = (bytes: number) => Math.round(bytes / 1_000_000);
 
-/** One compact line in More: "Natural voice: Ready · 333 MB — Delete / Re-download". Android only. */
+/** One compact line in More: "Natural voice: Ready · 333 MB — Delete / Re-download". Android + iOS (native Kokoro plugin). */
 const NaturalVoiceRow: React.FC = () => {
   if (!isKokoroSupported()) return null;
   return <NaturalVoiceRowInner />;

@@ -16,6 +16,7 @@ import { useEffect } from "react";
 import AuthGate from "./components/AuthGate";
 import InstallPrompt from "./components/InstallPrompt";
 import KokoroAutoDownload from "./components/KokoroAutoDownload";
+import AppleVoiceHint from "./components/AppleVoiceHint";
 import ProUpgradeSheet from "./components/pro/ProUpgradeSheet";
 import { isProEnabled } from "./config/features";
 import { useDailyUsageTracker } from "./hooks/useDailyUsageTracker";
@@ -75,6 +76,7 @@ const App = () => {
         <AuthGate />
         <InstallPrompt />
         <KokoroAutoDownload />
+        <AppleVoiceHint />
         {isProEnabled() && <ProUpgradeSheet />}
       </TooltipProvider>
     </QueryClientProvider>

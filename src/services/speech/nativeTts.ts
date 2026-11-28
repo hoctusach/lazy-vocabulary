@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { nativePlatform } from '@/lib/platform/platformKind';
+import { findPreferredAppleVoiceIndex } from './appleVoices';
 import type { TextToSpeechPlugin, TTSOptions } from '@capacitor-community/text-to-speech';
 
 export interface NativeVoice {
@@ -74,6 +75,11 @@ export function pickVoiceIndex(voices: NativeVoice[], lang: string | undefined, 
   const l = lang.toLowerCase().replace('_', '-');
   const primary = l.split('-')[0];
   const norm = (v: NativeVoice) => v.lang.toLowerCase().replace('_', '-');
+  // [FB-74] iOS, US/generic English: Ava (Premium), then Evan / Nathan (Enhanced) win over the generic quality ranking
+  if (platform === 'ios' && (l === 'en-us' || l === 'en')) {
+    const preferred = findPreferredAppleVoiceIndex(voices);
+    if (preferred !== undefined) return preferred;
+  }
   const best = (match: (v: NativeVoice) => boolean): number | undefined => {
     let at = -1;
     voices.forEach((v, i) => {

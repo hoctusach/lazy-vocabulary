@@ -32,6 +32,7 @@ let package = Package(
             dependencies: [
                 "KokoroCore",
                 .product(name: "Capacitor", package: "capacitor-swift-pm", condition: .when(platforms: [.iOS])),
+                .product(name: "Cordova", package: "capacitor-swift-pm", condition: .when(platforms: [.iOS])),
                 .target(name: "SherpaOnnxC", condition: .when(platforms: [.iOS])),
             ]
         ),
@@ -41,6 +42,7 @@ let package = Package(
             dependencies: [
                 "KokoroTtsNative", "KokoroCore",
                 .product(name: "Capacitor", package: "capacitor-swift-pm", condition: .when(platforms: [.iOS])),
+                .product(name: "Cordova", package: "capacitor-swift-pm", condition: .when(platforms: [.iOS])),
             ]
         ),
     ]
