@@ -152,6 +152,8 @@ export function syncWebMediaSession(info: PlaybackInfo | null): void {
     ms.setActionHandler('play', () => handlers?.onPlay?.());
     ms.setActionHandler('pause', () => handlers?.onPause());
     ms.setActionHandler('nexttrack', () => handlers?.onNext());
+    // [FB-73] No Stop: pause keeps the session so it can be resumed (also iOS lock screen / Control Center / AirPods).
+    try { ms.setActionHandler('stop', null); } catch { /* not supported */ }
   } catch {
     /* unsupported handler/action: the native session still works */
   }

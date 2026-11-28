@@ -6,6 +6,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import { useDailyReminder } from '@/hooks/useDailyReminder';
 import { useStudyReminders } from '@/hooks/useStudyReminders';
+import { useNewDayWatcher } from '@/hooks/useNewDayWatcher';
 import { OPEN_LEARN_EVENT } from '@/lib/reminders/localReminders';
 import { VocabularySetProvider, useVocabularySets } from '@/features/word-sets/VocabularySetContext';
 import VocabularySetsScreen from '@/features/word-sets/VocabularySetsScreen';
@@ -110,6 +111,7 @@ const DesktopHome: React.FC = () => {
 const IndexBody: React.FC = () => {
   useDailyReminder();
   useStudyReminders();
+  useNewDayWatcher();
   const desktop = useIsDesktop();
   return desktop ? <DesktopHome /> : <MobileHome />;
 };

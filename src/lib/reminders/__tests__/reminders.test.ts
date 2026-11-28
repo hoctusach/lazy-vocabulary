@@ -26,16 +26,16 @@ function mockPlugin(display = 'granted', pending: { id: number; extra?: unknown 
 beforeEach(() => { localStorage.clear(); delete window.__LV_LOCAL_NOTIFICATIONS__; });
 
 describe('planReminders', () => {
-  it('[FB-07] plans 3 slots a day for 7 days at the default times', () => {
+  it('[FB-07] plans 3 slots a day for 14 days at the default times', () => {
     const plan = planReminders(on(), at(6), false, 'en');
-    expect(plan).toHaveLength(21);
+    expect(plan).toHaveLength(42);
     expect(plan.slice(0, 3).map((r) => `${r.at.getHours()}:${r.at.getMinutes()}`)).toEqual(['8:0', '12:30', '20:30']);
-    expect(new Set(plan.map((r) => r.id)).size).toBe(21);
+    expect(new Set(plan.map((r) => r.id)).size).toBe(42);
   });
   it('drops times already past today', () => {
     const plan = planReminders(on(), at(13), false, 'en');
     expect(plan.filter((r) => r.at.getDate() === 21)).toHaveLength(1);
-    expect(plan).toHaveLength(19);
+    expect(plan).toHaveLength(40);
   });
   it('[FB-07] never exceeds 3 per day even if settings carry more slots', () => {
     const s = on();
@@ -46,7 +46,7 @@ describe('planReminders', () => {
   it('[FB-07] skips only today once studied; tomorrow onward stays', () => {
     const plan = planReminders(on(), at(6), true, 'en');
     expect(plan.some((r) => r.at.getDate() === 21)).toBe(false);
-    expect(plan).toHaveLength(18);
+    expect(plan).toHaveLength(39);
     expect(plan[0].at.getDate()).toBe(22);
   });
   it('respects per-slot off and edited time', () => {
@@ -73,7 +73,7 @@ describe('replanReminders', () => {
   it('cancels our old reminders (not others) and schedules inexact+idle with icon', async () => {
     const { p, state } = mockPlugin('granted', [{ id: 1, extra: { lvReminder: true } }, { id: 2, extra: { other: true } }]);
     const n = await replanReminders(p, on(), at(6), false, 'en');
-    expect(n).toBe(21);
+    expect(n).toBe(42);
     expect(p.cancel).toHaveBeenCalledWith({ notifications: [{ id: 1 }] });
     expect(state.pending.some((x) => x.id === 2)).toBe(true);
     const first = (p.schedule.mock.calls[0][0].notifications[0]) as any;
@@ -86,9 +86,9 @@ describe('replanReminders', () => {
     const { p } = mockPlugin();
     await replanReminders(p, on(), at(6), false, 'en');
     const n = await replanReminders(p, on(), at(9), true, 'en');
-    expect(n).toBe(18);
-    const days = p.schedule.mock.calls[1][0].notifications.map((x: any) => x.schedule.at.getDate());
-    expect(Math.min(...days)).toBe(22);
+    expect(n).toBe(39);
+    const times = p.schedule.mock.calls[1][0].notifications.map((x: any) => x.schedule.at.getTime());
+    expect(new Date(Math.min(...times)).getDate()).toBe(22);
   });
   it('toggle off cancels everything and schedules nothing', async () => {
     const { p, state } = mockPlugin();

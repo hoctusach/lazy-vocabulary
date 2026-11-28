@@ -1,7 +1,8 @@
 import { MAX_SLOTS, isValidTime, type ReminderSettings } from './reminderSettings';
 import { REMINDER_TITLE, reminderBody, type ReminderLang } from './reminderCopy';
 
-export const PLAN_DAYS = 7;
+/** 14 days x 3 slots = 42 < iOS's 64 pending-notification cap; covers a fortnight without opening the app (FB-74). */
+export const PLAN_DAYS = 14;
 
 export type PlannedReminder = {
   id: number;
