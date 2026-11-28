@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronDown, Eye, ListChecks } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { firstReviewDateKey } from '@/lib/progress/reviewSchedule';
 
 /** [FB-58] Word Summary: same data as before (NEW TODAY / DUE TODAY / LEARNED today), a new section look. */
 export interface SummaryWord {
@@ -31,6 +32,9 @@ const formatDate = (value?: string) => {
   const parsed = Date.parse(trimmed);
   return Number.isNaN(parsed) ? trimmed : new Date(parsed).toISOString().slice(0, 10);
 };
+
+/** [FB-70] A NEW TODAY word is being learned today, so its Next is the first SRS interval from today (display only, no schedule row is created). */
+const newWordNext = (value?: string) => (value ? formatDate(value) : firstReviewDateKey());
 
 const Lane: React.FC<{
   lane: 'new' | 'due' | 'learned';
@@ -98,7 +102,7 @@ const WordSummaryPanel: React.FC<Props> = ({ open, onOpenChange, error, newList,
                     title={`NEW TODAY (${newList.length})`}
                     empty="No new words assigned today"
                     items={newList}
-                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${formatDate(w.nextReviewAt)}`}
+                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${newWordNext(w.nextReviewAt)}`}
                     viewLabel={(w) => `View ${w.word}`}
                     onView={onView}
                   />
