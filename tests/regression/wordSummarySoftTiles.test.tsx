@@ -5,6 +5,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import WordSummaryPanel from '@/components/WordSummaryPanel';
+import { firstReviewDateKey } from '@/lib/progress/reviewSchedule';
 
 afterEach(cleanup);
 
@@ -60,7 +61,7 @@ describe('Word Summary soft-tile rows [FB-71]', () => {
 
   it('[FB-71] the FB-70 subtitle is kept', () => {
     mount();
-    expect(screen.getByText('Review #0 · Next: after you learn it')).toBeTruthy();
+    expect(screen.getByText(`Review #0 · Next: ${firstReviewDateKey()}`)).toBeTruthy();
     expect(screen.getByText('Review #2 · Next: 2026-12-01')).toBeTruthy();
   });
 
