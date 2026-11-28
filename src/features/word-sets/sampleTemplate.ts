@@ -1,5 +1,5 @@
 import JSON2CSVParser from '@json2csv-parser';
-import * as XLSX from 'xlsx';
+import { loadXlsx } from '@/lib/xlsxLoader';
 
 export const SAMPLE_TEMPLATE_ROWS = [
   {
@@ -62,7 +62,8 @@ export function buildSampleCsv(): string {
 }
 
 /** Excel template produced with the xlsx package. One sheet named "words". */
-export function buildSampleXlsx(): ArrayBuffer {
+export async function buildSampleXlsx(): Promise<ArrayBuffer> {
+  const XLSX = await loadXlsx();
   const sheet = XLSX.utils.json_to_sheet(
     SAMPLE_TEMPLATE_ROWS.map((row) => ({
       word: row.word,

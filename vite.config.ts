@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -51,9 +52,12 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
       sourcemap: false,
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom'],
-            ui: ['@radix-ui/react-dialog', '@radix-ui/react-toast'],
+          manualChunks(id: string) {
+            // [FB-84] The 1.3 MB built-in vocabulary JSON gets its own chunk (cached separately, not in the entry chunk).
+            if (id.includes('/src/data/defaultVocabulary.json')) return 'vocab-data';
+            if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'vendor';
+            if (/node_modules\/@radix-ui\/react-(dialog|toast)\//.test(id)) return 'ui';
+            return undefined;
           }
         }
       }
@@ -63,6 +67,7 @@ export default defineConfig(async ({ mode }): Promise<UserConfig> => {
     esbuild: mode === 'production'
       ? { pure: ['console.log', 'console.info', 'console.debug', 'console.warn', 'console.group', 'console.groupCollapsed', 'console.groupEnd'] }
       : undefined,
+    test: { setupFiles: [path.resolve(__dirname, "tests/setup/xlsx.ts")] },
     define: {
       'process.env.NODE_ENV': JSON.stringify(mode),
       __APP_VERSION__: JSON.stringify(readAppVersion())

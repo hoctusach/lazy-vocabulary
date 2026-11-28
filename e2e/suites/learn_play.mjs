@@ -16,7 +16,7 @@ test('TAB-01', 'Four tabs present, >=44px, Learn current', async ({ session }) =
 test('TAB-02', 'Learn -> Progress shows progress panels and hides card/controls', async ({ session }) => {
   const s = await session({}); await boot(s); await tab(s, 'Progress');
   for (const t of ['Add a friend', 'Quiz me', 'Learning Progress']) await waitText(s, t);
-  ok(!(await body(s)).includes('Word Summary'), '[FB-50] Word Summary must not be on Progress');
+  ok(!(await s.page.evaluate(() => { const e = document.querySelector('[data-testid="word-summary-section"]'); return !!e && e.offsetParent !== null; })), '[FB-50] TODAY card must not be on Progress');
   // The Learn player stays mounted (so speech continues) but is hidden off-tab.
   ok(await s.page.evaluate(() => { const h = document.querySelector('[data-testid="learn-host"]'); return !!h && h.hidden && h.getBoundingClientRect().height === 0; }), 'learn card still visible');
 });
@@ -167,9 +167,9 @@ test('LEARN-10', 'Due review word shows under DUE TODAY and in the Due tile', as
     return r;
   };
   await s.goto('/'); await waitWord(s, U.P[0].word, 12000);
-  await click(s, { textHas: 'Word Summary' }); await sleep(400);
+  await click(s, { text: 'TODAY' }); await sleep(400);
   const t = await body(s);
-  ok(/DUE TODAY\s*\(?1\)?/i.test(t.replace(/\n/g, ' ')), 'DUE TODAY (1) heading missing: ' + t.slice(t.indexOf('Word Summary'), t.indexOf('Word Summary') + 400).replace(/\n/g, ' / '));
+  ok(/DUE TODAY\s*\(?1\)?/i.test(t.replace(/\n/g, ' ')), 'DUE TODAY (1) heading missing: ' + t.slice(t.indexOf('TODAY'), t.indexOf('TODAY') + 400).replace(/\n/g, ' / '));
 });
 test('LEARN-11', 'Resume position after reload', async ({ session }) => {
   const s = await session({}); await boot(s);

@@ -266,7 +266,7 @@ describe('[FB-51] Word Summary: Today numerator and LEARNED section', () => {
     const { default: App } = await import('@/components/VocabularyAppWithLearning');
     const { TooltipProvider } = await import('@/components/ui/tooltip');
     render(<TooltipProvider><App /></TooltipProvider>);
-    fireEvent.click(await screen.findByRole('button', { name: /Word Summary/i }));
+    fireEvent.click(await screen.findByRole('button', { name: 'TODAY' }));
     await screen.findByText(/NEW TODAY \(8\)/);
     expect(screen.getByText(/DUE TODAY \(11\)/)).toBeTruthy();
     // [FB-56] the "Today: n/20 (...)" line is gone
