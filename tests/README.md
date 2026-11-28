@@ -19,6 +19,8 @@ Run everything: `npm test` (Vitest). All suites should pass; a failure means a r
 | Data loading | `useVocabularyDataLoaderInitialWordsIndex`, `useVocabularyDataLoaderVoicePersistence` |
 | Quiz, practice, reminders | `quizEngine`, `practiceRuleEngine`, `reminderMessages`, `fetchLatestMessage`, `parseWordAnnotations` |
 
+Non-functional tests (performance budgets, device matrix, reliability) are separate and not part of `npm test`: `npm run test:nfr`, see `tests/regression/NFR_CATALOG.md`.
+
 ## Known gaps (suites removed because they tested APIs that no longer exist)
 Rewrite these against the current code when touching the area:
 - Server daily selection (`fetchAndCommitTodaySelection`, `generate_daily_selection_v2`): selection, new-words-by-category. The review schedule itself is covered by `srsScheduling`.

@@ -14,7 +14,11 @@
     "test": "vitest run",
     "lint": "eslint --ext .ts,.tsx src",
     "test:e2e": "node e2e/run.mjs",
-    "test:regression": "vitest run -t FB- && node e2e/run.mjs --grep FB-"
+    "test:regression": "vitest run -t FB- && node e2e/run.mjs --grep FB-",
+    "test:nfr": "npm run test:nfr:perf && npm run test:nfr:devices && npm run test:nfr:reliability",
+    "test:nfr:perf": "vitest run -c vitest.nfr.config.ts && node e2e/nfr/run.mjs --grep NFR-PERF",
+    "test:nfr:devices": "node e2e/nfr/run.mjs --grep NFR-DEV",
+    "test:nfr:reliability": "node e2e/nfr/run.mjs --grep NFR-REL"
   },
   "dependencies": {
     "@capacitor-community/admob": "^8.3.0",
@@ -106,6 +110,7 @@
     "@typescript-eslint/parser": "^8.35.0",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.21",
+    "axe-core": "^4.14.1",
     "dotenv": "^17.2.2",
     "eslint": "^9.29.0",
     "eslint-plugin-react-hooks": "^5.2.0",
