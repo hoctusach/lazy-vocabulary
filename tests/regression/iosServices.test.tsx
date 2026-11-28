@@ -160,7 +160,7 @@ describe('[FB-68] iOS TTS voice selection (AVSpeechSynthesizer)', () => {
     v('Bells', 'en-US', 'com.apple.speech.synthesis.voice.Bells'),
     v('Samantha', 'en-US', 'com.apple.voice.compact.en-US.Samantha'),
     v('Zoe (Premium)', 'en-US', 'com.apple.voice.premium.en-US.Zoe'),
-    v('Evan (Enhanced)', 'en-US', 'com.apple.voice.enhanced.en-US.Evan'),
+    v('Tom (Enhanced)', 'en-US', 'com.apple.voice.enhanced.en-US.Tom'),
     v('Daniel', 'en-GB', 'com.apple.voice.compact.en-GB.Daniel'),
     v('Linh', 'vi-VN', 'com.apple.voice.compact.vi-VN.Linh'),
   ];
@@ -193,10 +193,12 @@ describe('[FB-68] iOS TTS voice selection (AVSpeechSynthesizer)', () => {
     expect(buildSpeakOptions({ text: 'run' }, undefined, null).category).toBeUndefined();
   });
 
-  it('[FB-68] Kokoro (Android ONNX plugin) is not offered on iOS; system voices are used instead', () => {
-    expect(isKokoroSupported()).toBe(false);
+  it('[FB-68][FB-75] Kokoro is offered on iOS (Swift plugin) and Android, never on web', () => {
+    expect(isKokoroSupported()).toBe(true);
     platform.name = 'android';
     expect(isKokoroSupported()).toBe(true);
+    platform.native = false; platform.name = 'web';
+    expect(isKokoroSupported()).toBe(false);
   });
 });
 

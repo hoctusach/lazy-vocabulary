@@ -7,11 +7,11 @@ const kSpeak = vi.fn();
 const kStop = vi.fn(async () => {});
 const kRelease = vi.fn(async () => {});
 const kStatus = { downloaded: true, downloading: false };
-const env = { native: true, android: true, pro: false };
+const env = { native: true, android: true, pro: false, platformName: null as string | null };
 vi.mock('@/services/billing/proFeatures', () => ({ hasFeature: () => env.pro }));
 
 vi.mock('@capacitor/core', () => ({
-  Capacitor: { isNativePlatform: () => env.native, getPlatform: () => (env.android ? 'android' : 'ios') },
+  Capacitor: { isNativePlatform: () => env.native, getPlatform: () => env.platformName ?? (env.android ? 'android' : 'ios') },
   registerPlugin: () => ({
     getStatus: async () => ({ supported: true, ...kStatus, bytesOnDisk: 0, downloadSize: 1, version: 'v' }),
     speak: (o: unknown) => kSpeak(o),
@@ -37,7 +37,7 @@ describe('shim + Kokoro', () => {
     ttsSpeak.mockResolvedValue(undefined);
     kSpeak.mockResolvedValue({ interrupted: false });
     kStatus.downloaded = true;
-    env.native = true; env.android = true; env.pro = false;
+    env.native = true; env.android = true; env.pro = false; env.platformName = null;
     vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
   afterEach(() => { env.native = false; vi.restoreAllMocks(); });
@@ -68,8 +68,8 @@ describe('shim + Kokoro', () => {
     expect(synth.getVoices().map((v) => v.name)).toEqual(['US Voice']);
   });
 
-  it('shows no Kokoro voices when unsupported', async () => {
-    env.android = false;
+  it('shows no Kokoro voices when unsupported (neither android nor ios)', async () => {
+    env.platformName = 'web';
     const synth = await install();
     expect(synth.getVoices().map((v) => v.name)).toEqual(['US Voice']);
   });

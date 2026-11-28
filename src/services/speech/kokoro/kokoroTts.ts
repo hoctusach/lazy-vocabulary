@@ -36,9 +36,12 @@ export interface KokoroHandle { plugin: KokoroTtsPlugin }
 
 let handle: KokoroHandle | null = null;
 
+/** [FB-75] Kokoro runs natively on Android (Kotlin plugin) and iOS (Swift plugin, sherpa-onnx); never on web. */
 export function isKokoroSupported(): boolean {
   try {
-    return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+    if (!Capacitor.isNativePlatform()) return false;
+    const p = Capacitor.getPlatform();
+    return p === 'android' || p === 'ios';
   } catch {
     return false;
   }

@@ -28,3 +28,8 @@ android/local.properties
 *.sw?
 e2e/fixtures/*
 !e2e/fixtures/generate.mjs
+
+# iOS CI/build outputs
+/build/
+ios/App/KokoroTtsKit/.build/
+ios/App/KokoroTtsKit/.swiftpm/
