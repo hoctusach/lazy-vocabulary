@@ -51,15 +51,15 @@ beforeEach(() => {
 });
 afterEach(() => { vi.restoreAllMocks(); });
 
-describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
-  it('[FB-73] isKokoroSupported is true on native iOS and Android, false on web/PWA', async () => {
+describe('[FB-75] iOS Kokoro (native Swift plugin) on the JS side', () => {
+  it('[FB-75] isKokoroSupported is true on native iOS and Android, false on web/PWA', async () => {
     const { isKokoroSupported } = await import('@/services/speech/kokoro/kokoroTts');
     expect(isKokoroSupported()).toBe(true);
     env.platform = 'android'; expect(isKokoroSupported()).toBe(true);
     env.native = false; env.platform = 'web'; expect(isKokoroSupported()).toBe(false);
   });
 
-  it('[FB-73] the app shows the Natural voice row / download flow on iOS (status -> download -> ready)', async () => {
+  it('[FB-75] the app shows the Natural voice row / download flow on iOS (status -> download -> ready)', async () => {
     const k = await import('@/services/speech/kokoro/kokoroTts');
     let s = await k.refreshKokoroStatus();
     expect(s.downloaded).toBe(false);
@@ -72,7 +72,7 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
     expect((await k.getKokoroNetwork()).metered).toBe(false);
   });
 
-  it('[FB-73] the iOS auto-download check starts a download on Wi-Fi and prompts on mobile data', async () => {
+  it('[FB-75] the iOS auto-download check starts a download on Wi-Fi and prompts on mobile data', async () => {
     const auto = await import('@/services/speech/kokoro/kokoroAutoDownload');
     expect(await auto.runAutoDownloadCheck()).toBe('started');
     await wait();
@@ -103,7 +103,7 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
     return events;
   };
 
-  it('[FB-73] with the model downloaded, Heart speaks through the Kokoro plugin (not AVSpeech)', async () => {
+  it('[FB-75] with the model downloaded, Heart speaks through the Kokoro plugin (not AVSpeech)', async () => {
     env.downloaded = true;
     const synth = await installShim();
     expect(synth.getVoices().map((v) => v.name).slice(0, 2)).toEqual(['Kokoro Heart (US female)', 'Kokoro Michael (US male)']);
@@ -114,7 +114,7 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
     expect(events).toEqual(['end']);
   });
 
-  it('[FB-73] model not downloaded: Kokoro voices are not listed and AVSpeech speaks', async () => {
+  it('[FB-75] model not downloaded: Kokoro voices are not listed and AVSpeech speaks', async () => {
     env.downloaded = false;
     const synth = await installShim();
     expect(synth.getVoices().some((v) => v.name.startsWith('Kokoro'))).toBe(false);
@@ -126,7 +126,7 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
     expect(events).toEqual(['end']);
   });
 
-  it('[FB-73] Kokoro error (OOV / NOT_DOWNLOADED / engine error) falls back to AVSpeech for that utterance', async () => {
+  it('[FB-75] Kokoro error (OOV / NOT_DOWNLOADED / engine error) falls back to AVSpeech for that utterance', async () => {
     env.downloaded = true;
     plugin.speak.mockRejectedValueOnce(Object.assign(new Error('Unknown words'), { code: 'OOV' }));
     const synth = await installShim();
@@ -137,7 +137,7 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
     expect(events).toEqual(['end']);
   });
 
-  it('[FB-73] cancel stops the Kokoro plugin (interrupt) and AVSpeech', async () => {
+  it('[FB-75] cancel stops the Kokoro plugin (interrupt) and AVSpeech', async () => {
     env.downloaded = true;
     plugin.speak.mockImplementation(() => new Promise(() => {}));
     const synth = await installShim();
@@ -150,8 +150,8 @@ describe('[FB-73] iOS Kokoro (native Swift plugin) on the JS side', () => {
   });
 });
 
-describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
-  it('[FB-74] order: Ava (Premium) > Evan (Enhanced) > Nathan (Enhanced), by voiceURI', async () => {
+describe('[FB-76] Apple premium voice preference (iOS AVSpeech)', () => {
+  it('[FB-76] order: Ava (Premium) > Evan (Enhanced) > Nathan (Enhanced), by voiceURI', async () => {
     const { findPreferredAppleVoiceIndex } = await import('@/services/speech/appleVoices');
     expect(findPreferredAppleVoiceIndex([SAMANTHA, NATHAN, EVAN, AVA])).toBe(3);
     expect(findPreferredAppleVoiceIndex([SAMANTHA, NATHAN, EVAN])).toBe(2);
@@ -160,14 +160,14 @@ describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
     expect(findPreferredAppleVoiceIndex([AVA, EVAN, NATHAN], 'male')).toBe(1);
   });
 
-  it('[FB-74] matches by name + quality when the identifier is not the standard one', async () => {
+  it('[FB-76] matches by name + quality when the identifier is not the standard one', async () => {
     const { findPreferredAppleVoiceIndex } = await import('@/services/speech/appleVoices');
     expect(findPreferredAppleVoiceIndex([SAMANTHA, V('x', 'Ava (Premium)')])).toBe(1);
     expect(findPreferredAppleVoiceIndex([V('x', 'Ava')])).toBeUndefined(); // compact Ava is not the premium one
     expect(findPreferredAppleVoiceIndex([V('x', 'Evan (Enhanced)', 'en-GB')])).toBeUndefined();
   });
 
-  it('[FB-74] default pick on iOS: preferred voice beats the generic quality ranking; Android/web are unchanged', async () => {
+  it('[FB-76] default pick on iOS: preferred voice beats the generic quality ranking; Android/web are unchanged', async () => {
     const { pickVoiceIndex } = await import('@/services/speech/nativeTts');
     const list = [SAMANTHA, V('com.apple.voice.enhanced.en-US.Zoe', 'Zoe (Enhanced)'), AVA];
     expect(pickVoiceIndex(list, 'en-US', undefined, 'ios')).toBe(2);
@@ -177,14 +177,14 @@ describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
     expect(pickVoiceIndex(list, 'en-US', 'Samantha', 'ios')).toBe(0); // an explicit user choice wins
   });
 
-  it('[FB-74] default voice (nothing saved) on iOS is Ava (Premium) when installed', async () => {
+  it('[FB-76] default voice (nothing saved) on iOS is Ava (Premium) when installed', async () => {
     const { bestFallbackVoice } = await import('@/services/speech/voiceFallback');
     expect(bestFallbackVoice([SAMANTHA, EVAN, AVA], 'ios').name).toBe('Ava (Premium)');
     expect(bestFallbackVoice([SAMANTHA, NATHAN], 'ios').name).toBe('Nathan (Enhanced)');
     expect(bestFallbackVoice([SAMANTHA, EVAN, AVA], 'android').name).toBe('Samantha');
   });
 
-  it('[FB-74] hint logic: only on iOS, only when none of the three is installed, only once (persisted)', async () => {
+  it('[FB-76] hint logic: only on iOS, only when none of the three is installed, only once (persisted)', async () => {
     const h = await import('@/services/speech/appleVoiceHint');
     expect(h.shouldShowAppleVoiceHint([SAMANTHA], 'ios')).toBe(true);
     expect(h.shouldShowAppleVoiceHint([SAMANTHA, EVAN], 'ios')).toBe(false);
@@ -196,16 +196,13 @@ describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
     expect(h.shouldShowAppleVoiceHint([SAMANTHA], 'ios')).toBe(false);
   });
 
-  it('[FB-74] hint copy names the Settings path and the voices, EN + VI', async () => {
+  it('[FB-76] hint copy names the Settings path and the voices, English only', async () => {
     const { appleVoiceHintCopy } = await import('@/services/speech/appleVoiceHint');
-    const en = appleVoiceHintCopy(false);
+    const en = appleVoiceHintCopy();
     expect(en.body).toContain('Settings › Accessibility › Spoken Content (iOS 26: Read & Speak) › Voices › English');
     expect(en.body).toContain('Ava (Premium)');
     expect(en.body).toContain('Evan (Enhanced)');
-    const vi_ = appleVoiceHintCopy(true);
-    expect(vi_.body).toContain('Ava (Premium)');
-    expect(vi_.body).toContain('Cài đặt');
-    expect(vi_.action).not.toBe(en.action);
+    expect(JSON.stringify(en)).not.toMatch(/[À-ỹ]/);
   });
 
   async function mountHint() {
@@ -223,7 +220,7 @@ describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
     return toast;
   }
 
-  it('[FB-74] iOS without the preferred voices: the hint toast shows once and is persisted', async () => {
+  it('[FB-76] iOS without the preferred voices: the hint toast shows once and is persisted', async () => {
     env.voices = [SAMANTHA];
     const toast = await mountHint();
     expect(toast).toHaveBeenCalledTimes(1);
@@ -233,7 +230,7 @@ describe('[FB-74] Apple premium voice preference (iOS AVSpeech)', () => {
     expect(again).not.toHaveBeenCalled();
   });
 
-  it('[FB-74] no hint on iOS when Ava / Evan is installed, and none on Android or web', async () => {
+  it('[FB-76] no hint on iOS when Ava / Evan is installed, and none on Android or web', async () => {
     env.voices = [SAMANTHA, EVAN];
     expect(await mountHint()).not.toHaveBeenCalled();
     vi.resetModules(); localStorage.clear();

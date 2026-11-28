@@ -63,7 +63,7 @@ public class PlaybackServicePlugin extends Plugin {
             i.putExtra(PlaybackService.EXTRA_PLAYING, playing == null || playing);
         }
         try {
-            if (PlaybackService.ACTION_STOP.equals(action)) {
+            if (PlaybackService.ACTION_DISMISS.equals(action)) {
                 if (PlaybackService.running) ctx.startService(i);
             } else if (Build.VERSION.SDK_INT >= 26) {
                 ctx.startForegroundService(i);
@@ -134,7 +134,7 @@ public class PlaybackServicePlugin extends Plugin {
     }
 
     @PluginMethod
-    public void stop(PluginCall call) { send(PlaybackService.ACTION_STOP, call); }
+    public void stop(PluginCall call) { send(PlaybackService.ACTION_DISMISS, call); }
 
     @PluginMethod
     public void requestNotificationPermission(PluginCall call) {

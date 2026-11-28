@@ -11,7 +11,7 @@ type V = { lang?: string; name: string; voiceURI?: string };
 const norm = (lang: string | undefined) => (lang ?? '').toLowerCase().replace('_', '-');
 
 export function bestFallbackVoice<T extends V>(voices: readonly T[], platform: string | null = nativePlatform()): T {
-  // [FB-74] iOS: Ava (Premium) > Evan (Enhanced) > Nathan (Enhanced) when installed
+  // [FB-76] iOS: Ava (Premium) > Evan (Enhanced) > Nathan (Enhanced) when installed
   if (platform === 'ios') {
     const i = findPreferredAppleVoiceIndex(voices);
     if (i !== undefined) return voices[i];

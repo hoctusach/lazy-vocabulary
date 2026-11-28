@@ -75,7 +75,7 @@ export function pickVoiceIndex(voices: NativeVoice[], lang: string | undefined, 
   const l = lang.toLowerCase().replace('_', '-');
   const primary = l.split('-')[0];
   const norm = (v: NativeVoice) => v.lang.toLowerCase().replace('_', '-');
-  // [FB-74] iOS, US/generic English: Ava (Premium), then Evan / Nathan (Enhanced) win over the generic quality ranking
+  // [FB-76] iOS, US/generic English: Ava (Premium), then Evan / Nathan (Enhanced) win over the generic quality ranking
   if (platform === 'ios' && (l === 'en-us' || l === 'en')) {
     const preferred = findPreferredAppleVoiceIndex(voices);
     if (preferred !== undefined) return preferred;

@@ -1,7 +1,8 @@
 import React from 'react';
-import { ChevronDown, Eye, ListChecks } from 'lucide-react';
+import { ChevronDown, ChevronRight, ListChecks } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { firstReviewDateKey } from '@/lib/progress/reviewSchedule';
 
 /** [FB-58] Word Summary: same data as before (NEW TODAY / DUE TODAY / LEARNED today), a new section look. */
 export interface SummaryWord {
@@ -32,6 +33,9 @@ const formatDate = (value?: string) => {
   return Number.isNaN(parsed) ? trimmed : new Date(parsed).toISOString().slice(0, 10);
 };
 
+/** [FB-70] A NEW TODAY word is being learned today, so its Next is the first SRS interval from today (display only, no schedule row is created). */
+const newWordNext = (value?: string) => (value ? formatDate(value) : firstReviewDateKey());
+
 const Lane: React.FC<{
   lane: 'new' | 'due' | 'learned';
   title: string;
@@ -46,15 +50,13 @@ const Lane: React.FC<{
     <div className="lv-lane-list">
       {items.length > 0 ? (
         items.map((w, i) => (
-          <div key={`${w.word}-${i}`} className="lv-row">
-            <div className="min-w-0">
-              <div className="lv-row-word">{w.word}</div>
-              <div className="lv-row-meta">{meta(w)}</div>
-            </div>
-            <button type="button" aria-label={viewLabel(w)} onClick={() => onView(w.word)}>
-              <Eye className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
+          <button key={`${w.word}-${i}`} type="button" className="lv-row" aria-label={viewLabel(w)} onClick={() => onView(w.word)}>
+            <span className="lv-row-text">
+              <span className="lv-row-word">{w.word}</span>
+              <span className="lv-row-meta">{meta(w)}</span>
+            </span>
+            <ChevronRight className="lv-row-chev h-5 w-5" aria-hidden="true" />
+          </button>
         ))
       ) : (
         <div className="lv-row-empty">{empty}</div>
@@ -98,7 +100,7 @@ const WordSummaryPanel: React.FC<Props> = ({ open, onOpenChange, error, newList,
                     title={`NEW TODAY (${newList.length})`}
                     empty="No new words assigned today"
                     items={newList}
-                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${formatDate(w.nextReviewAt)}`}
+                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${newWordNext(w.nextReviewAt)}`}
                     viewLabel={(w) => `View ${w.word}`}
                     onView={onView}
                   />

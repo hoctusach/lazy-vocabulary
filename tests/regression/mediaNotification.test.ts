@@ -32,7 +32,7 @@ describe('[FB-49][FB-53] native notification', () => {
     expect(svc).toMatch(/ACTION_PAUSE\.equals\(action\)[\s\S]*emitAction\("pause"\)/);
     expect(svc).toMatch(/ACTION_PLAY\.equals\(action\)[\s\S]*emitAction\("play"\)/);
     expect(svc).toMatch(/ACTION_NEXT\.equals\(action\)[\s\S]*emitAction\("next"\)/);
-    expect(svc).toMatch(/ACTION_STOP\.equals\(action\)[\s\S]*shutdown\(\)/);
+    expect(svc).toMatch(/ACTION_DISMISS\.equals\(action\)[\s\S]*shutdown\(\)/);
   });
 
   it('JS -> service: word, meaning, playing flag and index reach the service', () => {

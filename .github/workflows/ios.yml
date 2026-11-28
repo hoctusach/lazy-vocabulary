@@ -172,6 +172,31 @@ jobs:
             xcrun simctl shutdown "$UDID"
           done
           exit $FAIL
+      # [FB-74] Reminder "Play" action smoke (non-blocking). simctl cannot tap a notification action button, so this only
+      # proves: the build launches, a push carrying the reminder category (`lv-reminder`) is accepted without crashing the
+      # app, and the app is still running afterwards. The real Play tap (opens the app, starts today's playback) is a
+      # manual TestFlight/real-device check, see tests/regression/USER_FEEDBACK.md (FB-74).
+      - name: Reminder Play action smoke (iPhone simulator)
+        continue-on-error: true
+        run: |
+          APP=build/ios/Build/Products/Debug-iphonesimulator/App.app
+          mkdir -p build/shots
+          UDID=$(xcrun simctl list devices available | grep -F "iPhone 16 Pro" | head -1 | grep -oE '[0-9A-F-]{36}')
+          [ -n "$UDID" ] || { echo "no iPhone simulator"; exit 0; }
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+          xcrun simctl install "$UDID" "$APP"
+          xcrun simctl privacy "$UDID" grant notifications com.hoctusach.lazyvocabulary || true
+          xcrun simctl launch "$UDID" com.hoctusach.lazyvocabulary
+          sleep 8
+          cat > build/reminder.apns <<'JSON'
+          {"Simulator Target Bundle":"com.hoctusach.lazyvocabulary","aps":{"alert":{"title":"Lazy Vocabulary","body":"2 minutes of words?"},"category":"lv-reminder"},"lvReminder":true}
+          JSON
+          xcrun simctl push "$UDID" com.hoctusach.lazyvocabulary build/reminder.apns || true
+          sleep 4
+          xcrun simctl io "$UDID" screenshot build/shots/reminder_play_smoke.png
+          xcrun simctl spawn "$UDID" launchctl list | grep -q com.hoctusach.lazyvocabulary
+          xcrun simctl shutdown "$UDID" || true
       - uses: actions/upload-artifact@v4
         if: always()
         with:

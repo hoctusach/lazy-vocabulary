@@ -147,13 +147,13 @@ describe('[FB-67] CI + plan for the no-Mac build path', () => {
   });
 });
 
-describe('[FB-73] iOS Kokoro native plugin wiring (static)', () => {
+describe('[FB-75] iOS Kokoro native plugin wiring (static)', () => {
   const pkg = read('ios/App/KokoroTtsKit/Package.swift');
   const script = read('scripts/ios/fetch-sherpa-onnx.sh');
   const wf = read('.github/workflows/ios.yml');
   const tf = read('.github/workflows/ios-testflight.yml');
 
-  it('[FB-73] sherpa-onnx is a remote SPM binaryTarget with a checksum and the fetch script pins the same url + sha256', () => {
+  it('[FB-75] sherpa-onnx is a remote SPM binaryTarget with a checksum and the fetch script pins the same url + sha256', () => {
     const url = pkg.match(/url: "([^"]+\.xcframework\.zip)"/)?.[1];
     const sum = pkg.match(/checksum: "([0-9a-f]{64})"/)?.[1];
     expect(url).toBeTruthy();
@@ -163,7 +163,7 @@ describe('[FB-73] iOS Kokoro native plugin wiring (static)', () => {
     expect(url).toContain('k2-fsa/sherpa-onnx');
   });
 
-  it('[FB-73] the app target links the local package (Xcode embeds the dynamic SherpaOnnxC.framework from the binary target), and SceneDelegate registers the plugin', () => {
+  it('[FB-75] the app target links the local package (Xcode embeds the dynamic SherpaOnnxC.framework from the binary target), and SceneDelegate registers the plugin', () => {
     const pbx = read(PBX);
     expect(pbx).toContain('relativePath = KokoroTtsKit;');
     expect(pbx).toMatch(/productName = KokoroTtsKit;/);
@@ -172,7 +172,7 @@ describe('[FB-73] iOS Kokoro native plugin wiring (static)', () => {
     expect(scene).toContain('LazyBridgeViewController()');
   });
 
-  it('[FB-73] Swift sources exist (G2P / PostFx / plugin / tests) and no large binary is committed', () => {
+  it('[FB-75] Swift sources exist (G2P / PostFx / plugin / tests) and no large binary is committed', () => {
     for (const f of [
       'KokoroCore/KokoroG2P.swift', 'KokoroCore/KokoroPostFx.swift', 'KokoroCore/Resources/cmudict-extra-us.txt',
       'KokoroTtsNative/KokoroTtsPlugin.swift', 'KokoroTtsNative/KokoroEngine.swift', 'KokoroTtsNative/KokoroModelStore.swift',
@@ -181,7 +181,7 @@ describe('[FB-73] iOS Kokoro native plugin wiring (static)', () => {
     expect(read("ios/App/KokoroTtsKit/Sources/KokoroCore/KokoroG2P.swift")).not.toMatch(/import\s+espeak/i);
   });
 
-  it('[FB-73] CI builds an unsigned IPA, runs the Swift tests + a blank-screen smoke test; TestFlight is guarded by secrets', () => {
+  it('[FB-75] CI builds an unsigned IPA, runs the Swift tests + a blank-screen smoke test; TestFlight is guarded by secrets', () => {
     expect(wf).toContain('workflow_dispatch');
     expect(wf).toContain('CODE_SIGNING_ALLOWED=NO');
     expect(wf).toContain('LazyVocabulary-unsigned.ipa');

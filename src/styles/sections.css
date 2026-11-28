@@ -134,20 +134,29 @@ body[class*="theme-"] .lv-lane-title {
 }
 body[class*="theme-"] .lv-lane-title::before { content: ""; width: .5rem; height: .5rem; border-radius: 50%; background: var(--lane); }
 body[class*="theme-"] .lv-lane-list { display: flex; flex-direction: column; gap: .4rem; max-height: 15rem; overflow-y: auto; }
+/* [FB-71] Soft tile: borderless, ~6% lane tint, lane chevron, whole row is one button (no eye, no inset accent line). */
 body[class*="theme-"] .lv-row {
   display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: .5rem;
-  padding: .45rem .6rem;
+  padding: .55rem .6rem .55rem .75rem;
+  min-height: 2.75rem;
   font-size: .875rem;
+  text-align: left;
   color: var(--lv-text-primary);
-  background: color-mix(in srgb, var(--lane) 9%, var(--lv-card-bg));
-  border: 1px solid color-mix(in srgb, var(--lane) 30%, var(--lv-border-color));
-  border-left: 4px solid var(--lane);
+  background: color-mix(in srgb, var(--lane) 6%, var(--lv-card-bg));
+  border: 0;
   border-radius: var(--lv-radius-sm);
+  cursor: pointer;
+  transition: background-color .12s ease, transform .12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
-body[class*="theme-"] .lv-row-word { font-weight: 700; overflow-wrap: anywhere; }
-body[class*="theme-"] .lv-row-meta { font-size: .75rem; color: var(--lv-text-secondary); }
-body[class*="theme-"] .lv-row button { flex: none; padding: .35rem; border-radius: var(--lv-radius-sm); color: var(--lane); min-width: 2rem; min-height: 2rem; display: inline-flex; align-items: center; justify-content: center; }
+body[class*="theme-"] .lv-row:active { background: color-mix(in srgb, var(--lane) 16%, var(--lv-card-bg)); transform: scale(.985); }
+body[class*="theme-"] .lv-row:focus-visible { outline: 2px solid var(--lane); outline-offset: 2px; }
+body[class*="theme-"] .lv-row-text { display: block; min-width: 0; }
+body[class*="theme-"] .lv-row-word { display: block; font-weight: 700; overflow-wrap: anywhere; }
+body[class*="theme-"] .lv-row-meta { display: block; font-size: .75rem; color: var(--lv-text-secondary); }
+body[class*="theme-"] .lv-row-chev { flex: none; color: var(--lane); }
 body[class*="theme-"] .lv-row-empty { padding: .5rem .6rem; font-size: .8125rem; font-style: italic; color: var(--lv-text-secondary); border: 1px dashed color-mix(in srgb, var(--lane) 45%, var(--lv-border-color)); border-radius: var(--lv-radius-sm); }

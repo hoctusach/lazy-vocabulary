@@ -11,6 +11,7 @@ import {
   type TodaySelectionState,
   type TodaySelectionWithStats,
 } from '@/services/learningProgressService';
+import { NEW_DAY_EVENT } from '@/features/word-sets/todayPlan';
 import type { DailySelection, SeverityLevel } from '@/types/learning';
 import type { TodayWord } from '@/types/vocabulary';
 import { getLocalPreferences, saveLocalPreferences } from '@/lib/preferences/localPreferences';
@@ -93,6 +94,13 @@ export const useLearningProgress = (options: UseLearningProgressOptions = {}) =>
   const [newTodayLearnedWords, setNewTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [dueTodayLearnedWords, setDueTodayLearnedWords] = useState<TodayLearnedWordSummary[]>([]);
   const [isDailySelectionLoading, setIsDailySelectionLoading] = useState(true);
+  // [FB-74] bumped at a local-day rollover while the app stayed alive: reload today's selection.
+  const [dayTick, setDayTick] = useState(0);
+  useEffect(() => {
+    const onNewDay = () => setDayTick((v) => v + 1);
+    window.addEventListener(NEW_DAY_EVENT, onNewDay);
+    return () => window.removeEventListener(NEW_DAY_EVENT, onNewDay);
+  }, []);
   const [progressError, setProgressError] = useState<string | null>(null);
   const dueEventTrackerRef = useRef<Set<string>>(new Set());
   const identifiedKeyRef = useRef<string | null>(null);
@@ -331,7 +339,7 @@ export const useLearningProgress = (options: UseLearningProgressOptions = {}) =>
     return () => {
       isActive = false;
     };
-  }, [applyLearnedOverride, category, emitDailySelectionEvent, filterKey, plan.call, userKey]);
+  }, [applyLearnedOverride, category, dayTick, emitDailySelectionEvent, filterKey, plan.call, userKey]);
 
   const generateDailyWords = useCallback(
     async (level: SeverityLevel = 'light') => {

@@ -3,6 +3,7 @@ import { planReminders } from './reminderPlanner';
 import { loadSettings, saveSettings, type ReminderSettings } from './reminderSettings';
 import { hasStudiedToday } from './studySignal';
 import type { ReminderLang } from './reminderCopy';
+import { requestPlayToday } from './playIntent';
 
 /** The slice of @capacitor/local-notifications we use (also what tests/e2e mock). */
 export interface ReminderPlugin {
@@ -11,7 +12,26 @@ export interface ReminderPlugin {
   getPending(): Promise<{ notifications: { id: number; extra?: unknown }[] }>;
   cancel(opts: { notifications: { id: number }[] }): Promise<void>;
   schedule(opts: { notifications: Record<string, unknown>[] }): Promise<unknown>;
-  addListener?(event: string, cb: (e: { notification?: { extra?: { lvReminder?: boolean } } }) => void): Promise<unknown> | unknown;
+  addListener?(event: string, cb: (e: { actionId?: string; notification?: { extra?: { lvReminder?: boolean } } }) => void): Promise<unknown> | unknown;
+  registerActionTypes?(opts: { types: ReminderActionType[] }): Promise<void>;
+}
+
+export interface ReminderActionType {
+  id: string;
+  actions: { id: string; title: string; foreground?: boolean }[];
+}
+
+/** [FB-74] Notification category carrying the Play button. */
+export const REMINDER_ACTION_TYPE = 'lv-reminder';
+export const PLAY_ACTION_ID = 'play';
+
+/**
+ * Android: the plugin's action buttons always launch MainActivity (cold start capable; the action is retained until JS
+ * listens). iOS: UNNotificationAction needs `foreground: true` so Play opens the app instead of running in the background.
+ */
+export function reminderActionTypes(platform: 'android' | 'ios' | string = Capacitor.getPlatform()): ReminderActionType[] {
+  const play = { id: PLAY_ACTION_ID, title: 'Play', ...(platform === 'ios' ? { foreground: true } : {}) };
+  return [{ id: REMINDER_ACTION_TYPE, actions: [play] }];
 }
 
 export const SMALL_ICON = 'ic_stat_notify';
@@ -44,6 +64,7 @@ export function getReminderPlugin(): Promise<ReminderPlugin | null> {
         cancel: (o) => ln.cancel(o),
         schedule: (o) => ln.schedule(o as never),
         addListener: (e, cb) => ln.addListener(e as 'localNotificationActionPerformed', cb as never),
+        registerActionTypes: (o) => ln.registerActionTypes(o as never),
       };
     })
     .catch(() => null);
@@ -92,12 +113,22 @@ export async function replanReminders(
 
     const plan = planReminders(settings, now, studiedToday, lang);
     if (plan.length === 0) return 0;
+    let actionTypeId: string | undefined;
+    try {
+      if (plugin.registerActionTypes) {
+        await plugin.registerActionTypes({ types: reminderActionTypes() });
+        actionTypeId = REMINDER_ACTION_TYPE;
+      }
+    } catch {
+      actionTypeId = undefined; // reminders still work, just without the Play button
+    }
     await plugin.schedule({
       notifications: plan.map((p) => ({
         id: p.id,
         title: p.title,
         body: p.body,
         smallIcon: SMALL_ICON,
+        ...(actionTypeId ? { actionTypeId } : {}),
         schedule: { at: p.at, allowWhileIdle: true },
         extra: { lvReminder: true, route: 'learn' },
       })),
@@ -161,7 +192,9 @@ export async function listenForTaps(): Promise<void> {
   listening = true;
   try {
     await plugin.addListener('localNotificationActionPerformed', (e) => {
-      if (e?.notification?.extra?.lvReminder) window.dispatchEvent(new Event(OPEN_LEARN_EVENT));
+      if (!e?.notification?.extra?.lvReminder) return;
+      window.dispatchEvent(new Event(OPEN_LEARN_EVENT));
+      if (e.actionId === PLAY_ACTION_ID) requestPlayToday(); // explicit Play button; a plain tap only opens the app
     });
   } catch {
     listening = false;

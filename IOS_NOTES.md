@@ -66,7 +66,7 @@ Tokenizing and sentence splitting use `Intl.Segmenter` with the profile's langua
 3. Run on a device: camera, gallery pick, OCR of a printed paragraph, translation pack download on a Vietnamese-language device.
 4. App Store Connect: privacy labels and policy text (section 5), review notes mentioning the on-demand language packs.
 
-# iOS notes: Kokoro natural voices (FB-73) and Apple voices (FB-74)
+# iOS notes: Kokoro natural voices (FB-75) and Apple voices (FB-76)
 
 * Code: `ios/App/KokoroTtsKit` (local SwiftPM package, not managed by `cap sync`). `KokoroCore` = pure Foundation (G2P, PostFx, variants, bundled
   `cmudict-extra-us.txt`), `KokoroTtsNative` = iOS plugin (download, engine, Capacitor plugin). Keep it behaviour-identical to `android/.../kokoro/*`;
@@ -76,5 +76,5 @@ Tokenizing and sentence splitting use `Intl.Segmenter` with the profile's langua
   `ios-static` because it needs no separate onnxruntime xcframework and no link-order flags). Bump url + checksum in `Package.swift` and
   `scripts/ios/fetch-sherpa-onnx.sh` together (a test checks they match). The app target embeds it (Embed Frameworks phase in `App.xcodeproj`).
 * The plugin is not an npm plugin: `SceneDelegate.swift` uses `LazyBridgeViewController` to `registerPluginInstance(KokoroTtsPlugin())`.
-* Apple voices (FB-74): `src/services/speech/appleVoices.ts` (order Ava premium > Evan > Nathan enhanced), hint in `AppleVoiceHint.tsx` (`lv_apple_voice_hint_seen`).
+* Apple voices (FB-76): `src/services/speech/appleVoices.ts` (order Ava premium > Evan > Nathan enhanced), hint in `AppleVoiceHint.tsx` (`lv_apple_voice_hint_seen`).
 * CI: `.github/workflows/ios.yml` (Xcode 26 via `scripts/ios/select-xcode.sh`), `ios-testflight.yml` (disabled by secrets guard), `codemagic.yaml`.

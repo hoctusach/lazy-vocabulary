@@ -193,7 +193,7 @@ describe('[FB-68] iOS TTS voice selection (AVSpeechSynthesizer)', () => {
     expect(buildSpeakOptions({ text: 'run' }, undefined, null).category).toBeUndefined();
   });
 
-  it('[FB-68][FB-73] Kokoro is offered on iOS (Swift plugin) and Android, never on web', () => {
+  it('[FB-68][FB-75] Kokoro is offered on iOS (Swift plugin) and Android, never on web', () => {
     expect(isKokoroSupported()).toBe(true);
     platform.name = 'android';
     expect(isKokoroSupported()).toBe(true);

@@ -47,7 +47,7 @@ public class MainActivity extends BridgeActivity {
     public void onDestroy() {
         if (isFinishing() && PlaybackService.running) {
             // The WebView (and so the playback) dies with the activity: do not leave an orphan notification.
-            try { startService(new Intent(this, PlaybackService.class).setAction(PlaybackService.ACTION_STOP)); }
+            try { startService(new Intent(this, PlaybackService.class).setAction(PlaybackService.ACTION_DISMISS)); }
             catch (RuntimeException ignored) { }
         }
         super.onDestroy();

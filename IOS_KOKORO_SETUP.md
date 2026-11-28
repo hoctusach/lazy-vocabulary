@@ -1,6 +1,6 @@
 # iOS Kokoro voices: build, install and test (no Mac needed)
 
-Target: **iPhone 13**, free Apple ID, Windows or Mac PC. The app (with the native Kokoro plugin, FB-73) is built by GitHub Actions on a
+Target: **iPhone 13**, free Apple ID, Windows or Mac PC. The app (with the native Kokoro plugin, FB-75) is built by GitHub Actions on a
 macOS runner. You download an **unsigned `.ipa`** and sign + install it with **Sideloadly**. The TestFlight route (needs the paid
 Apple Developer Program) and a Mac/Xcode route are described afterwards. Nothing here needs secrets for the first route.
 
@@ -62,7 +62,7 @@ it gets the **fp32** model, about 310 MB; devices with less than 3 GB get int8, 
 | 9 | **Call / Siri / alarm interruption** | The word ends, playback continues afterwards. |
 | 10 | **Delete + re-download** (More > Natural voice > Delete / Re-download) | Voice list drops to system voices; re-download works (resumes if you cancel and restart). |
 | 11 | **Cancel mid-download, kill the app, reopen** | Download resumes where it stopped, no corrupted voice (sha256 is verified). |
-| 12 | **Apple voice hint** (FB-74): uninstall nothing; if Ava/Evan/Nathan are NOT installed, a one-time toast appears (EN, or VI on a Vietnamese phone) | Explains Settings > Accessibility > Spoken Content (iOS 26: Read & Speak) > Voices > English > "Ava (Premium)" / "Evan (Enhanced)". It never appears again after it was shown. |
+| 12 | **Apple voice hint** (FB-76): uninstall nothing; if Ava/Evan/Nathan are NOT installed, a one-time toast appears (English only) | Explains Settings > Accessibility > Spoken Content (iOS 26: Read & Speak) > Voices > English > "Ava (Premium)" / "Evan (Enhanced)". It never appears again after it was shown. |
 | 13 | **Apple premium preference**: download "Ava (Premium)" in Settings, reopen the app, delete the Natural voice (so the system voice is used) | The default system voice is Ava (Premium); with no Ava, Evan then Nathan (Enhanced). A voice you pick yourself always wins. |
 | 14 | **Memory**: play 10 minutes with Heart | No crash. (iOS can kill the app under memory pressure; the model is released after 10 idle minutes and on a memory warning.) |
 

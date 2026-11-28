@@ -30,16 +30,16 @@ describe('[FB-53] natural app notification', () => {
     expect(big.indexOf('it.example')).toBeLessThan(big.indexOf('it.translation'));
   });
 
-  it('Pause/Play, Next and Stop actions go to the service (foreground-service PendingIntent, works when locked)', () => {
+  it('[FB-73] Pause/Play toggle and Next actions go to the service (foreground-service PendingIntent, works when locked)', () => {
     expect(svc).toMatch(/addAction\([^)]*"Pause", servicePi\(ACTION_PAUSE/);
     expect(svc).toMatch(/addAction\([^)]*"Play", servicePi\(ACTION_PLAY/);
     expect(svc).toMatch(/addAction\([^)]*"Next", servicePi\(ACTION_NEXT/);
-    expect(svc).toMatch(/addAction\([^)]*"Stop", servicePi\(ACTION_STOP/);
+    expect(svc).not.toMatch(/"Stop"/);
     expect(svc).toContain('PendingIntent.getForegroundService');
   });
 
   it('swipe-away (delete intent / task removed) stops the service cleanly', () => {
-    expect(svc).toContain('.setDeleteIntent(servicePi(ACTION_STOP');
+    expect(svc).toContain('.setDeleteIntent(servicePi(ACTION_DISMISS');
     expect(svc).toMatch(/onTaskRemoved[\s\S]*shutdown\(\)/);
   });
 });
