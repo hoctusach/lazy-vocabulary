@@ -3,6 +3,7 @@ import UserGreeting from '@/components/UserGreeting';
 import ThemeSwitcher from '@/components/ThemeSwitcher';
 import NotificationManager from '@/components/NotificationManager';
 import NaturalVoiceRow from '@/components/mobile/NaturalVoiceRow';
+import PasscodeHintCard from '@/components/mobile/PasscodeHintCard';
 import PrivacyAndAccountCard from '@/components/mobile/PrivacyAndAccountCard';
 import { isNativePlatform } from '@/services/speech/nativeTts';
 import { isProEnabled } from '@/config/features';
@@ -49,6 +50,8 @@ const MorePanel: React.FC = () => {
       <RemindersCard />
 
       <NaturalVoiceRow />
+
+      <PasscodeHintCard />
 
       <PrivacyAndAccountCard />
 

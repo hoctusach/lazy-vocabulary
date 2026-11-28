@@ -25,6 +25,8 @@ import type { NicknameEventDetail } from '@/lib/nicknameEvents';
 import { initializeSpeechSystem } from '@/utils/speech';
 import { friendlyAuthMessage, validatePasscode } from '@/lib/auth/authMessages';
 import { markUserInteraction } from '@/utils/userInteraction';
+import ForgotPasscode from '@/components/ForgotPasscode';
+import { HINT_WARNING, PASSCODE_HINT_MAX, validatePasscodeHint } from '@/lib/auth/passcodeHint';
 
 function isSeverityLevel(value: unknown): value is SeverityLevel {
   return value === 'light' || value === 'moderate' || value === 'intense';
@@ -32,13 +34,14 @@ function isSeverityLevel(value: unknown): value is SeverityLevel {
 
 const PASSCODE_HELP = '4-10 digits; numbers only.';
 
-type Mode = 'signin' | 'create';
+type Mode = 'signin' | 'create' | 'forgot';
 
 type UIState = {
   ready: boolean;
   show: boolean;
   nickname: string;
   passcode: string;
+  hint?: string;
   pending: boolean;
   mode: Mode;
   error?: string;
@@ -124,6 +127,16 @@ export default function AuthGate() {
     if (passcodeError) {
       setS((p) => ({ ...p, error: passcodeError, info: undefined }));
       return;
+    }
+
+    let hintToSave: string | null = null;
+    if (s.mode === 'create') {
+      const hintCheck = validatePasscodeHint(s.hint, passcodeInput);
+      if (!hintCheck.ok) {
+        setS((p) => ({ ...p, error: hintCheck.error, info: undefined }));
+        return;
+      }
+      hintToSave = hintCheck.hint;
     }
 
     setS((p) => ({ ...p, pending: true, error: undefined, info: undefined }));
@@ -285,7 +298,10 @@ export default function AuthGate() {
     if (isCreateMode) {
       let nicknameHint: string | undefined;
       try {
-        const result = (await setNicknamePasscode(sanitizedName, trimmedPasscode)) as {
+        const created = hintToSave
+          ? setNicknamePasscode(sanitizedName, trimmedPasscode, hintToSave)
+          : setNicknamePasscode(sanitizedName, trimmedPasscode);
+        const result = (await created) as {
           nickname?: string;
           name?: string;
         };
@@ -345,6 +361,29 @@ export default function AuthGate() {
       }));
     }
   };
+
+  if (s.mode === 'forgot') {
+    return (
+      <div
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'var(--lv-overlay)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+        }}
+      >
+        <ForgotPasscode
+          initialNickname={s.nickname}
+          onBack={(nickname) =>
+            setS((p) => ({ ...p, mode: 'signin', nickname: nickname || p.nickname, passcode: '', error: undefined, info: undefined }))
+          }
+        />
+      </div>
+    );
+  }
 
   const BLOCKED_CHARS_HELP = BLOCKED_NICKNAME_CHARS_HELP;
   const isCreateMode = s.mode === 'create';
@@ -451,6 +490,40 @@ export default function AuthGate() {
           }}
         />
         <div style={{ marginTop: 4, fontSize: 12, color: 'var(--lv-helper-text)' }}>{passcodeHelpText}</div>
+        {isCreateMode && (
+          <>
+            <label htmlFor="signup-hint" style={{ display: 'block', marginTop: 12, fontSize: 13, fontWeight: 600 }}>
+              Passcode hint (optional)
+            </label>
+            <input
+              id="signup-hint"
+              data-testid="signup-hint-input"
+              value={s.hint ?? ''}
+              onChange={(e) => setS((p) => ({ ...p, hint: e.target.value, error: undefined }))}
+              maxLength={PASSCODE_HINT_MAX}
+              disabled={s.pending}
+              autoComplete="off"
+              aria-describedby="signup-hint-warning"
+              style={{
+                width: '100%',
+                minHeight: 44,
+                padding: '10px 12px',
+                fontSize: 16,
+                borderRadius: 8,
+                border: '1px solid var(--lv-field-border)',
+                background: 'var(--lv-field-bg)',
+                color: 'var(--lv-field-text)',
+              }}
+            />
+            <div
+              id="signup-hint-warning"
+              data-testid="signup-hint-warning"
+              style={{ marginTop: 4, fontSize: 12, color: 'var(--lv-helper-text)' }}
+            >
+              {HINT_WARNING}
+            </div>
+          </>
+        )}
         {s.info && (
           <div
             style={{
@@ -485,6 +558,28 @@ export default function AuthGate() {
         >
           {buttonLabel}
         </button>
+        {!isCreateMode && (
+          <button
+            type="button"
+            data-testid="forgot-passcode-link"
+            onClick={() => setS((p) => ({ ...p, mode: 'forgot', error: undefined, info: undefined }))}
+            disabled={s.pending}
+            style={{
+              marginTop: 10,
+              width: '100%',
+              minHeight: 44,
+              padding: '8px 12px',
+              border: 'none',
+              background: 'transparent',
+              color: 'var(--lv-button-secondary-text)',
+              fontSize: 13,
+              textDecoration: 'underline',
+              cursor: s.pending ? 'default' : 'pointer',
+            }}
+          >
+            Forgot passcode?
+          </button>
+        )}
         {!isCreateMode && (
           <button
             type="button"
