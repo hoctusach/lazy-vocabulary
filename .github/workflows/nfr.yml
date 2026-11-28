@@ -1,0 +1,52 @@
+name: NFR (non-functional tests)
+
+# Non-blocking: performance budgets, device matrix, reliability. See tests/regression/NFR_CATALOG.md.
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'e2e/**'
+      - 'tests/nfr/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - 'vitest.nfr.config.ts'
+      - '.github/workflows/nfr.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nfr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nfr:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      NFR_DIST: /tmp/lv-nfr-dist
+      NFR_RESULTS: ${{ github.workspace }}/nfr-out/nfr-results.json
+      NFR_VITEST_RESULTS: ${{ github.workspace }}/nfr-out/nfr-vitest-results.json
+      CHROME_PATH: /usr/bin/google-chrome
+      # Budgets are calibrated on a quiet dev box; shared runners are slower and noisier.
+      NFR_BUDGET_SCALE: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: mkdir -p nfr-out
+      # Builds into /tmp (fake backend config), never docs/.
+      - name: NFR suite
+        run: npm run test:nfr
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nfr-results
+          path: nfr-out/

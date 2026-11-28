@@ -6,6 +6,8 @@ Every user-reported bug or piece of feedback gets an `FB-xx` entry here and a re
 Run the suite: `npm run test:regression` (= `vitest run -t FB-` then `node e2e/run.mjs --grep FB-`).
 For a release run the e2e half against a fresh bundle: `npm run test:e2e -- --build --grep FB-`.
 
+Non-functional budgets (performance, device matrix, reliability) are catalogued separately in [`NFR_CATALOG.md`](NFR_CATALOG.md) (`npm run test:nfr`).
+
 Coverage: `existing` = test already existed and was only tagged · `new` = test added with this catalog · `proxy/manual` = cannot be fully automated.
 Paths: `tests/…` and `src/…` are vitest; `e2e:ID` is `e2e/suites/*.mjs` (puppeteer, `node e2e/run.mjs`). New tests live in `tests/regression/`.
 

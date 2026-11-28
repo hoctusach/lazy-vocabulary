@@ -1,0 +1,130 @@
+{
+ "NFR-PERF-01.fcp_ms": {
+  "baseline": 216,
+  "budget": 280
+ },
+ "NFR-PERF-01.root_mounted_ms": {
+  "baseline": 194,
+  "budget": 250
+ },
+ "NFR-PERF-01.dom_content_loaded_ms": {
+  "baseline": 161,
+  "budget": 210
+ },
+ "NFR-PERF-02.first_word_ms": {
+  "baseline": 231,
+  "budget": 300
+ },
+ "NFR-PERF-02.pause_tap_ms": {
+  "baseline": 29,
+  "budget": 60
+ },
+ "NFR-PERF-03.first_word_ms_4x": {
+  "baseline": 800,
+  "budget": 1050
+ },
+ "NFR-PERF-04.js_total_gz_kb": {
+  "baseline": 765.7,
+  "budget": 920
+ },
+ "NFR-PERF-04.css_total_gz_kb": {
+  "baseline": 25.3,
+  "budget": 31
+ },
+ "NFR-PERF-04.largest_js_chunk_gz_kb": {
+  "baseline": 685.5,
+  "budget": 825
+ },
+ "NFR-PERF-04.initial_js_gz_kb": {
+  "baseline": 745.5,
+  "budget": 895
+ },
+ "NFR-PERF-04.index_html_kb": {
+  "baseline": 6.6,
+  "budget": 8
+ },
+ "NFR-PERF-05.aab_mb": {
+  "baseline": 75.7,
+  "budget": 95
+ },
+ "NFR-PERF-06.json_mb": {
+  "baseline": 1.18,
+  "budget": 1.5
+ },
+ "NFR-PERF-06.parse_ms": {
+  "baseline": 2.3,
+  "budget": 10
+ },
+ "NFR-PERF-06.normalize_ms": {
+  "baseline": 0.07,
+  "budget": 5
+ },
+ "NFR-PERF-06.retained_heap_mb": {
+  "baseline": 3.1,
+  "budget": 4
+ },
+ "NFR-PERF-07.render_20x3_ms": {
+  "baseline": 22,
+  "budget": 80
+ },
+ "NFR-PERF-07.render_500x3_ms": {
+  "baseline": 180,
+  "budget": 350
+ },
+ "NFR-PERF-07.dom_nodes_1500_rows": {
+  "baseline": 9033,
+  "budget": 11500
+ },
+ "NFR-PERF-07.heap_1500_rows_mb": {
+  "baseline": 56.8,
+  "budget": 75
+ },
+ "NFR-PERF-08.build_today_queue_ms": {
+  "baseline": 3.6,
+  "budget": 12
+ },
+ "NFR-PERF-08.filter_groups_ms": {
+  "baseline": 1.4,
+  "budget": 6
+ },
+ "NFR-PERF-09.heap_growth_mb": {
+  "baseline": 0.27,
+  "budget": 2
+ },
+ "NFR-PERF-09.dom_node_growth": {
+  "baseline": 17,
+  "budget": 100
+ },
+ "NFR-PERF-09.listener_growth": {
+  "baseline": 1,
+  "budget": 10
+ },
+ "NFR-PERF-10.build_queue_200_ms": {
+  "baseline": 0.25,
+  "budget": 5
+ },
+ "NFR-PERF-10.update_total_ms_2000": {
+  "baseline": 2,
+  "budget": 50
+ },
+ "NFR-PERF-10.set_queue_x50_ms": {
+  "baseline": 6,
+  "budget": 30
+ },
+ "NFR-REL-02.offline_first_word_ms": {
+  "baseline": 245,
+  "budget": 340
+ },
+ "NFR-REL-03.slow3g_first_word_ms": {
+  "baseline": 13470,
+  "budget": 17500
+ },
+ "NFR-REL-04-abort.first_word_ms": {
+  "baseline": 255,
+  "budget": 340
+ },
+ "NFR-REL-04-503.first_word_ms": {
+  "baseline": 247,
+  "budget": 340
+ }
+}
