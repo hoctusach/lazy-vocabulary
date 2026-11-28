@@ -43,11 +43,12 @@ test('PROG-05', 'Word Summary lists for an imported set', async ({ session }) =>
   const items = await s.page.evaluate(() => document.querySelectorAll('button[aria-label^="View"]').length);
   ok(items >= n, `eye buttons ${items} vs new ${n}`);
 });
-test('PROG-05b', '[FB-70] NEW TODAY rows say when Next is not scheduled yet, never a bare dash', async ({ session }) => {
+test('PROG-05b', '[FB-70] NEW TODAY rows show Next = tomorrow (first SRS interval), never a bare dash', async ({ session }) => {
   const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
   await openSummary(s);
   const t = await flat(s);
-  ok(/Review #0 · Next: after you learn it/.test(t), 'new label: ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
+  const d = new Date(); d.setDate(d.getDate() + 1); const tomorrow = d.toISOString().slice(0, 10);
+  ok(t.includes(`Review #0 · Next: ${tomorrow}`), 'new next date ' + tomorrow + ': ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
   ok(!/Review #0 · Next: —/.test(t), 'no bare dash');
 });
 test('PROG-06', 'Empty summaries', async ({ session }) => {
