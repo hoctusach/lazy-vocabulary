@@ -32,6 +32,9 @@ const formatDate = (value?: string) => {
   return Number.isNaN(parsed) ? trimmed : new Date(parsed).toISOString().slice(0, 10);
 };
 
+/** [FB-70] A new word has no SRS schedule until it is marked learned, so show a label instead of a dash. */
+export const NEXT_NOT_SCHEDULED = 'after you learn it';
+
 const Lane: React.FC<{
   lane: 'new' | 'due' | 'learned';
   title: string;
@@ -98,7 +101,7 @@ const WordSummaryPanel: React.FC<Props> = ({ open, onOpenChange, error, newList,
                     title={`NEW TODAY (${newList.length})`}
                     empty="No new words assigned today"
                     items={newList}
-                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${formatDate(w.nextReviewAt)}`}
+                    meta={(w) => `Review #${formatCount(w.reviewCount)} · Next: ${w.nextReviewAt ? formatDate(w.nextReviewAt) : NEXT_NOT_SCHEDULED}`}
                     viewLabel={(w) => `View ${w.word}`}
                     onView={onView}
                   />
