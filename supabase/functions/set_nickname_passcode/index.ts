@@ -9,6 +9,7 @@ type Payload = {
   nickname?: unknown;
   passcode?: unknown;
   timezone?: unknown;
+  hint?: unknown;
 };
 
 type RpcResponse = {
@@ -33,6 +34,21 @@ function isValidTimezone(timezone: string): boolean {
     return false;
   }
 }
+
+// ---- same rules as src/lib/auth/passcodeHint.ts -------------------------------------------------
+const HINT_MAX = 60;
+function normalizeHint(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  // eslint-disable-next-line no-control-regex
+  const cleaned = raw.replace(/[\u0000-\u001F\u007F-\u009F\u2028\u2029]/g, ' ').replace(/\s+/g, ' ').trim();
+  return cleaned.length ? cleaned : null;
+}
+const squash = (s: string) => s.normalize('NFKC').toLowerCase().replace(/[\s\-_.\u2010-\u2015]+/g, '');
+function hintContainsPasscode(hint: string, passcode: string): boolean {
+  const p = squash(passcode);
+  return p.length > 0 && squash(hint).includes(p);
+}
+// -------------------------------------------------------------------------------------------------
 
 function errorResponse(message: string, status = 400, code?: string) {
   const body = code ? { error: message, code } : { error: message };
@@ -90,6 +106,16 @@ Deno.serve(async (req) => {
 
   const timezone = timezoneRaw || null;
 
+  const hint = normalizeHint(payload.hint);
+  if (hint !== null) {
+    if ([...hint].length > HINT_MAX) {
+      return errorResponse(`Hint must be at most ${HINT_MAX} characters.`, 400, 'HINT_TOO_LONG');
+    }
+    if (hintContainsPasscode(hint, passcodeRaw)) {
+      return errorResponse("Your hint can't contain your passcode.", 400, 'HINT_CONTAINS_PASSCODE');
+    }
+  }
+
   const userKey = canonNickname(nickname);
   if (!userKey) {
     return errorResponse('Failed to derive user key', 400);
@@ -104,6 +130,22 @@ Deno.serve(async (req) => {
   const adminClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+
+  // A hint is only stored when this call CREATES the profile (an existing account's hint is changed
+  // from Settings, by a signed-in user, via update-passcode-hint).
+  let isNewProfile = false;
+  if (hint !== null) {
+    try {
+      const { data: existing } = await adminClient
+        .from('nicknames')
+        .select('user_unique_key')
+        .eq('user_unique_key', userKey)
+        .maybeSingle();
+      isNewProfile = !existing;
+    } catch {
+      isNewProfile = false;
+    }
+  }
 
   const { data, error } = await adminClient.rpc('upsert_or_verify_profile', {
     // Argument names must match the SQL function: upsert_or_verify_profile(p_user_unique_key, p_nickname, p_passcode, p_timezone).
@@ -123,10 +165,25 @@ Deno.serve(async (req) => {
     return errorResponse('Failed to save profile', 500);
   }
 
-  const responsePayload = {
+  const responsePayload: Record<string, unknown> = {
     user_unique_key: extractKey((data as RpcResponse | null) ?? {}, userKey),
     nickname: extractNickname((data as RpcResponse | null) ?? {}, nickname),
   };
+
+  if (hint !== null && isNewProfile) {
+    // Best effort: sign-up must never fail because the hint SQL is not applied yet.
+    try {
+      const { error: hintError } = await adminClient.rpc('set_passcode_hint', {
+        p_user_unique_key: responsePayload.user_unique_key,
+        p_hint: hint,
+      });
+      if (hintError) console.error('set_passcode_hint', hintError.message);
+      responsePayload.hint_saved = !hintError;
+    } catch (e) {
+      console.error('set_passcode_hint', e instanceof Error ? e.message : 'failed');
+      responsePayload.hint_saved = false;
+    }
+  }
 
   return new Response(JSON.stringify(responsePayload), {
     status: 200,

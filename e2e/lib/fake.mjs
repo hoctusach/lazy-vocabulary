@@ -21,6 +21,7 @@ export function createFake(opts = {}) {
     mode: 'ok',                 // 'ok' | 'down' (abort every supabase request)
     exchange: 'ok',             // ok | INCORRECT_PASSCODE | NICKNAME_NOT_FOUND | 500 | hang
     create: 'ok',               // ok | taken
+    hint: null,                 // passcode-hint answer: null (no hint / unknown nickname) or a string
     pool: opts.pool || POOL,
     searchRows: null,           // override rows for search_vocabulary
     // Friends backend. users: canonical key -> { nick, today, week, all, learning, due }.
@@ -81,6 +82,8 @@ export function createFake(opts = {}) {
         if (f.create === 'taken') return json(409, { error: 'taken', code: 'NICKNAME_TAKEN' });
         return json(200, { ok: true });
       }
+      if (name === 'passcode-hint') return json(200, { hint: f.hint ?? null });
+      if (name === 'update-passcode-hint') { f.hint = body.hint ?? null; return json(200, { ok: true, hint: f.hint }); }
       return json(404, { error: 'unknown edge function ' + name });
     }
 

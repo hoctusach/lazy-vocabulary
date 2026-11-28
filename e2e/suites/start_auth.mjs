@@ -112,3 +112,70 @@ test('AUTH-12', 'Expired session with stored passcode: no gate, app still shows 
   ok(!(await body(s)).includes('Access your vocabulary'), 'gate shown for expired session');
   await s.page.waitForFunction(() => (document.querySelector('main h1')?.textContent || '').trim().length > 0, { timeout: 10000 });
 });
+
+const HINT = '[data-testid="signup-hint-input"]';
+const tid = (id) => `[data-testid="${id}"]`;
+const openForgot = async (s, nick) => {
+  await gate(s);
+  await s.page.click(NICK, { clickCount: 3 }); await s.page.type(NICK, nick);
+  await s.page.click(tid('forgot-passcode-link'));
+  await s.page.waitForSelector(tid('forgot-screen'));
+};
+
+test('AUTH-13', 'Sign-up with a hint sends it to set_nickname_passcode; warning visible [FB-77]', async ({ session }) => {
+  const s = await session({ signedIn: false });
+  await gate(s); await click(s, { text: 'Create a new profile' });
+  await waitText(s, "Anyone with your nickname can see this hint. Don't write the passcode itself.");
+  await waitText(s, 'Passcode hint (optional)');
+  await fill(s, 'Hinted User', '2468'); await s.page.type(HINT, '  my first pet ');
+  await submit(s, 'Create profile');
+  await s.page.waitForFunction(() => localStorage.getItem('lazyVoca.nickname') === 'Hinted User', { timeout: 8000 });
+  const call = s.fake.calls.find((c) => c.name === 'set_nickname_passcode');
+  eq(call.body.hint, 'my first pet');
+  await sleep(1500); await U.waitWord(s, U.POOL_ORDER[0], 12000);
+});
+test('AUTH-14', 'Sign-up hint containing the passcode is rejected before any network call [FB-77]', async ({ session }) => {
+  const s = await session({ signedIn: false });
+  await gate(s); await click(s, { text: 'Create a new profile' });
+  await fill(s, 'Hinted User', '2468'); await s.page.type(HINT, 'it is 24-68');
+  await submit(s, 'Create profile');
+  await waitText(s, "Your hint can't contain your passcode");
+  eq(s.fake.count('set_nickname_passcode'), 0, 'no create call');
+});
+test('AUTH-15', 'Forgot passcode with a hint: hint shown, three options, support mailto [FB-78]', async ({ session }) => {
+  const s = await session({ signedIn: false, fake: { hint: 'my first pet' } });
+  await openForgot(s, 'Tester One');
+  await s.page.click(tid('forgot-submit'));
+  await waitText(s, 'Your hint: my first pet');
+  ok(await s.page.$(tid('forgot-try-again')), 'try again');
+  const href = await s.page.$eval(tid('forgot-contact-support'), (a) => a.getAttribute('href'));
+  ok(href.startsWith('mailto:hoctusach@gmail.com'), 'support link ' + href);
+  await waitText(s, "can't be recovered automatically yet");
+  eq(s.fake.calls.filter((c) => c.name === 'passcode-hint').length, 1);
+});
+test('AUTH-16', 'Forgot passcode without a hint; Try logging in again prefilled [FB-78]', async ({ session }) => {
+  const s = await session({ signedIn: false });
+  await openForgot(s, 'Ghost Name');
+  await s.page.click(tid('forgot-submit'));
+  await waitText(s, 'No hint was set for this nickname.');
+  ok(await s.page.$(tid('forgot-contact-support')), 'support');
+  await s.page.click(tid('forgot-try-again'));
+  await waitText(s, 'Access your vocabulary');
+  eq(await s.page.$eval(NICK, (e) => e.value), 'Ghost Name');
+});
+test('AUTH-17', 'Forgot screen fits a 360px phone without horizontal overflow [FB-78]', async ({ session }) => {
+  const s = await session({ signedIn: false, fake: { hint: 'a hint that is quite long to check wrapping behaviour on a small phone screen' }, viewport: { width: 360, height: 640, deviceScaleFactor: 2, isMobile: true, hasTouch: true } });
+  await openForgot(s, 'Small Phone');
+  await s.page.click(tid('forgot-submit'));
+  await waitText(s, 'Your hint:');
+  const w = await s.page.evaluate(() => ({ sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
+  ok(w.sw <= w.cw, 'overflow ' + JSON.stringify(w));
+});
+test('AUTH-18', 'Normal sign-in unaffected by the hint feature (no hint calls) [FB-77]', async ({ session }) => {
+  const s = await session({ signedIn: false });
+  await gate(s); await fill(s, 'Tester One', '1234'); await submit(s);
+  await s.page.waitForFunction(() => localStorage.getItem('lazyVoca.nickname') === 'Tester One', { timeout: 8000 });
+  await sleep(1500); await U.waitWord(s, U.POOL_ORDER[0], 12000);
+  eq(s.fake.calls.filter((c) => c.name === 'passcode-hint').length, 0);
+  eq(s.fake.count('nickname-passcode-exchange') >= 1, true);
+});
