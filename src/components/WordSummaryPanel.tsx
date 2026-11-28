@@ -73,7 +73,7 @@ const WordSummaryPanel: React.FC<Props> = ({ open, onOpenChange, error, newList,
       <Collapsible open={open} onOpenChange={onOpenChange} className="lv-section">
         <CollapsibleTrigger className="lv-section-head" data-state={open ? 'open' : 'closed'}>
           <span className="lv-section-icon"><ListChecks className="h-4 w-4" aria-hidden="true" /></span>
-          <h3 className="lv-section-title flex-1">Word Summary</h3>
+          <h3 className="lv-section-title flex-1">TODAY</h3>
           <ChevronDown className={cn('h-4 w-4 shrink-0 transition-transform', open && 'rotate-180')} aria-hidden="true" />
         </CollapsibleTrigger>
         <CollapsibleContent>

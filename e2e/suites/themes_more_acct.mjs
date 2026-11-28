@@ -206,7 +206,7 @@ test('PERSIST-04', 'Built-in progress after reload comes back from the server + 
   const s = await session({}); await boot(s);
   await ctl(s, 'Mark as Learned'); await click(s, { text: 'Mark as Learned', inDialog: true }); await waitText(s, 'Word marked as learned.'); await sleep(800);
   await s.reload(); await sleep(2000); await tab(s, 'Learn');
-  await click(s, { textHas: 'Word Summary' }); await sleep(400);
+  await click(s, { text: 'TODAY' }); await sleep(400);
   ok(/LEARNED\s*\(1\)/i.test((await body(s)).replace(/\n/g, ' ')), 'LEARNED (1) lost after reload');
 });
 test('PERSIST-05', 'Muted, paused, 1.5x and GB voice persist', async ({ session }) => {

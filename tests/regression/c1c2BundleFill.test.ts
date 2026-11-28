@@ -14,13 +14,13 @@ const all = Object.entries(DEFAULT_VOCABULARY_DATA).flatMap(([g, rows]) =>
 const ids = new Set(keys.map((k) => `${k.category}|${k.word}`));
 const added = all.filter((r) => ids.has(`${r.group}|${r.word}`));
 
-describe('[FB-72] C1/C2 bundle gains the 704 server-only words', () => {
-  it('has 704 distinct keys (447 collocations + 257 topic vocab) and all are in the bundle', () => {
-    expect(keys).toHaveLength(704);
-    expect(ids.size).toBe(704);
+describe('[FB-72] C1/C2 bundle gains the server-only words (704 minus AsomethingMA, merged into asthma by FB-86)', () => {
+  it('has 704 distinct keys (447 collocations + 256 topic vocab) and all are in the bundle', () => {
+    expect(keys).toHaveLength(703);
+    expect(ids.size).toBe(703);
     expect(keys.filter((k) => k.category === 'phrases, collocations')).toHaveLength(447);
-    expect(keys.filter((k) => k.category === 'topic vocab')).toHaveLength(257);
-    expect(added).toHaveLength(704);
+    expect(keys.filter((k) => k.category === 'topic vocab')).toHaveLength(256);
+    expect(added).toHaveLength(703);
   });
 
   it('each added row has meaning, example, translation and count 0', () => {
@@ -36,7 +36,7 @@ describe('[FB-72] C1/C2 bundle gains the 704 server-only words', () => {
     expect(all).toHaveLength(3261 + keys.length);
     const n = (g: string) => DEFAULT_VOCABULARY_DATA[g].length;
     expect(n('phrases, collocations')).toBe(221 + 447);
-    expect(n('topic vocab')).toBe(1874 + 257);
+    expect(n('topic vocab')).toBe(1874 + 256);
     expect(n('phrasal verbs')).toBe(536);
     expect(n('idioms')).toBe(283);
     expect(n('grammar')).toBe(92);

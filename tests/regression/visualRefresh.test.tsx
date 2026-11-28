@@ -56,9 +56,9 @@ describe('[FB-58] Word Summary keeps its content with a new section look', () =>
     expect(screen.getByText('No learned words today')).toBeTruthy();
     expect(screen.getByText('No daily selection available yet.')).toBeTruthy();
   });
-  it('title is "Word Summary" and uses the shared section title class', () => {
+  it('title is "TODAY" [FB-85] and uses the shared section title class', () => {
     mount();
-    expect(screen.getByRole('heading', { name: 'Word Summary' }).className).toContain('lv-section-title');
+    expect(screen.getByRole('heading', { name: 'TODAY' }).className).toContain('lv-section-title');
   });
 });
 

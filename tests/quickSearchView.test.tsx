@@ -111,7 +111,7 @@ describe('quick search view', () => {
         <VocabularyAppWithLearning />
       </TooltipProvider>
     );
-    const summaryButton = await screen.findByRole('button', { name: /Word Summary/i });
+    const summaryButton = await screen.findByRole('button', { name: 'TODAY' });
     fireEvent.click(summaryButton);
     const viewButton = await screen.findByRole('button', { name: 'View Word' });
     fireEvent.click(viewButton);
