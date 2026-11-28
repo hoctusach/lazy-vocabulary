@@ -40,10 +40,10 @@ export const DEVICES = [
   { key: 'android-small', label: 'Small Android 360x640', w: 360, h: 640, dsf: 3, mobile: true, ua: 'android' },
   { key: 'pixel7', label: 'Pixel 7 412x915', w: 412, h: 915, dsf: 2.625, mobile: true, ua: 'android' },
   { key: 'android-large', label: 'Large Android phone 480x1040', w: 480, h: 1040, dsf: 3, mobile: true, ua: 'android' },
-  { key: 'android-tablet', label: 'Android tablet 800x1280', w: 800, h: 1280, dsf: 2, mobile: true, ua: 'android', known: 'FINDING-1: 768-815px wide tablets: Learn stack is wider than the viewport, action buttons are cut off at the right edge' },
+  { key: 'android-tablet', label: 'Android tablet 800x1280', w: 800, h: 1280, dsf: 2, mobile: true, ua: 'android' },
   { key: 'iphone-se', label: 'iPhone SE 375x667', w: 375, h: 667, dsf: 2, mobile: true, ua: 'iphone' },
   { key: 'iphone-13', label: 'iPhone 13 390x844', w: 390, h: 844, dsf: 3, mobile: true, ua: 'iphone' },
-  { key: 'ipad-9in', label: 'iPad 9.7in portrait 768x1024', w: 768, h: 1024, dsf: 2, mobile: false, ua: 'ipad', known: 'FINDING-1: 768-815px wide tablets: Learn stack is wider than the viewport, action buttons are cut off at the right edge' },
+  { key: 'ipad-9in', label: 'iPad 9.7in portrait 768x1024', w: 768, h: 1024, dsf: 2, mobile: false, ua: 'ipad' },
   { key: 'ipad-portrait', label: 'iPad portrait 820x1180', w: 820, h: 1180, dsf: 2, mobile: false, ua: 'ipad' },
   { key: 'ipad-landscape', label: 'iPad landscape 1180x820', w: 1180, h: 820, dsf: 2, mobile: false, ua: 'ipad' },
 ];

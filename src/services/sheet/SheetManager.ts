@@ -1,6 +1,5 @@
 
 import { SheetData } from "@/types/vocabulary";
-import * as XLSX from 'xlsx';
 import { SheetProcessor } from "./SheetProcessor";
 import { SheetNormalizer } from "./SheetNormalizer";
 
@@ -25,6 +24,7 @@ export class SheetManager {
     try {
       console.log("Starting Excel file processing");
       const data = await file.arrayBuffer();
+      const XLSX = await import('xlsx');
       const workbook = XLSX.read(data);
       const newData: SheetData = {};
       

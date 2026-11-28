@@ -24,8 +24,8 @@ describe('[FB-44][FB-60] import template documents valid category values', () =>
     expect(all).not.toMatch(/json|template/i);
   });
 
-  it('XLSX template has a README sheet with the same notes', () => {
-    const wb = XLSX.read(buildSampleXlsx(), { type: 'array' });
+  it('XLSX template has a README sheet with the same notes', async () => {
+    const wb = XLSX.read(await buildSampleXlsx(), { type: 'array' });
     expect(wb.SheetNames).toContain('README');
     const text = XLSX.utils.sheet_to_csv(wb.Sheets.README);
     for (const n of SIX) expect(text).toContain(n);
@@ -38,14 +38,14 @@ describe('[FB-44][FB-60] import template documents valid category values', () =>
   });
 
 
-  it('the documented sample still imports (help-only field/sheet ignored); a custom category stays its own group', () => {
+  it('the documented sample still imports (help-only field/sheet ignored); a custom category stays its own group', async () => {
     const j = parseVocabularyImport({ fileName: 'sample.json', text: JSON.stringify({ name: 'Sample set', words: SAMPLE_TEMPLATE_ROWS }) });
     expect(j.ok).toBe(true);
     if (!j.ok) return;
     expect(j.wordCount).toBe(3);
     expect(Object.keys(j.sheets).sort()).toEqual(['idioms', 'phrasal verbs', 'topic vocab']);
 
-    const x = parseVocabularyImport({ fileName: 'sample.xlsx', data: buildSampleXlsx() } as never);
+    const x = parseVocabularyImport({ fileName: 'sample.xlsx', data: await buildSampleXlsx() } as never);
     expect(x.ok).toBe(true);
     if (x.ok) { expect(x.wordCount).toBe(3); expect(Object.keys(x.sheets)).not.toContain('README'); }
 

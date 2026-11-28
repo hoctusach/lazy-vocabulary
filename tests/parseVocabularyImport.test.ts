@@ -130,7 +130,7 @@ describe('parseVocabularyImport', () => {
     expect(result.errors[0]).toMatch(/word/i);
   });
 
-  it('round-trips the downloadable CSV and Excel templates (JSON is no longer offered but a supplied JSON file still parses)', () => {
+  it('round-trips the downloadable CSV and Excel templates (JSON is no longer offered but a supplied JSON file still parses)', async () => {
     const csv = parseVocabularyImport({ fileName: 'vocabulary-set-template.csv', text: buildSampleCsv() });
     expect(csv.ok).toBe(true);
     if (csv.ok) expect(csv.wordCount).toBe(3);
@@ -141,7 +141,7 @@ describe('parseVocabularyImport', () => {
 
     const xlsx = parseVocabularyImport({
       fileName: 'vocabulary-set-template.xlsx',
-      data: buildSampleXlsx(),
+      data: await buildSampleXlsx(),
     });
     expect(xlsx.ok).toBe(true);
     if (xlsx.ok) {

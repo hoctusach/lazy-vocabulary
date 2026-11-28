@@ -66,7 +66,7 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
         className,
       )}
     >
-      <CardContent className="flex items-center justify-between gap-3 p-3 pl-5">
+      <CardContent className="flex flex-wrap items-center justify-between gap-3 p-3 pl-5">
         <div className="flex items-center gap-2.5">
           <span className="lv-section-icon">
             <Flame className="h-4 w-4" aria-hidden="true" />
@@ -81,7 +81,7 @@ const StreakPanel: React.FC<StreakPanelProps> = ({ className, refreshKey }) => {
           </div>
         </div>
 
-        <div className="flex items-end gap-1.5" aria-hidden={isLoading}>
+        <div className="flex max-w-full items-end gap-1.5" aria-hidden={isLoading}>
           {recentDays.map((day) => (
             <div key={day.date} className="flex flex-col items-center gap-1">
               <span

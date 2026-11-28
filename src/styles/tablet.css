@@ -7,7 +7,7 @@
 .lv-tablet-main { overflow-x: clip; }
 
 @media (min-width: 768px) {
-  .lv-learn-stack { max-width: 48rem; margin-inline: auto; }
+  .lv-learn-stack { width: 100%; min-width: 0; box-sizing: border-box; max-width: 48rem; margin-inline: auto; }
   .lv-learn-stack > * { min-width: 0; }
   .lv-tablet-main .lv-library-wrap { max-width: 48rem; }
   .lv-tablet-main [data-srs-principle-line] { max-width: 48rem; margin-inline: auto; }

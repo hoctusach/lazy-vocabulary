@@ -33,6 +33,7 @@ import { useDailyUsageTracker } from '@/hooks/useDailyUsageTracker';
 import type { VocabularyWord } from '@/types/vocabulary';
 import type { LearnedWordSummary } from '@/lib/progress/learnedWordStats';
 import SrsPrincipleLine from '@/features/srs-principle/SrsPrincipleLine';
+import { useLoadingTimeout } from '@/hooks/useLoadingTimeout';
 import { tickStudyToday } from '@/lib/progress/studyTick';
 import { trackUiInteraction } from '@/services/analyticsService';
 
@@ -40,6 +41,8 @@ interface VocabularyAppWithLearningProps {
   /** `all` keeps the original stacked page. Mobile tabs pass `learn` or `progress`. */
   view?: 'all' | 'learn' | 'progress';
 }
+
+const DAILY_SELECTION_TIMEOUT_MS = 8000;
 
 const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ view = 'all' }) => {
   useDailyUsageTracker();
@@ -61,9 +64,13 @@ const VocabularyAppWithLearning: React.FC<VocabularyAppWithLearningProps> = ({ v
     learnedTodayWords,
     newTodayLearnedWords,
     dueTodayLearnedWords,
-    isDailySelectionLoading,
+    isDailySelectionLoading: dailySelectionPending,
     progressError,
   } = useLearningProgress({ builtinGroups: wordSets.planBuiltinGroups });
+  // [FB-83] A backend that never answers must not keep Learn on the loading card: after the timeout the
+  // bundled vocabulary takes over (the late response, if any, still replaces it).
+  const selectionTimedOut = useLoadingTimeout(dailySelectionPending, DAILY_SELECTION_TIMEOUT_MS);
+  const isDailySelectionLoading = dailySelectionPending && !selectionTimedOut;
   const [didTriggerFirstTimeLoad, setDidTriggerFirstTimeLoad] = useState(false);
 
   useEffect(() => {

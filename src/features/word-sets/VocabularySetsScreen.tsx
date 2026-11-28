@@ -14,6 +14,7 @@ import {
 import { useVocabularySets } from './VocabularySetContext';
 import { useProFeature } from '@/services/billing/proFeatures';
 import { openProUpgrade } from '@/services/billing/proUpgradeStore';
+import { loadXlsx } from '@/lib/xlsxLoader';
 import ProBadge from '@/components/pro/ProBadge';
 import { parseVocabularyImport } from './parseVocabularyImport';
 import { buildSampleCsv, buildSampleXlsx, CATEGORY_HELP_LINES } from './sampleTemplate';
@@ -118,6 +119,7 @@ const VocabularySetsScreen: React.FC = () => {
     try {
       const buffer = await file.arrayBuffer();
       const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+      if (extension === 'xlsx' || extension === 'xls') await loadXlsx();
       const parsed =
         extension === 'xlsx' || extension === 'xls'
           ? parseVocabularyImport({ fileName: file.name, data: buffer })
@@ -155,7 +157,7 @@ const VocabularySetsScreen: React.FC = () => {
     await saveTextFile('vocabulary-set-template.csv', buildSampleCsv(), 'text/csv');
   };
   const downloadXlsx = async () => {
-    const bytes = buildSampleXlsx();
+    const bytes = await buildSampleXlsx();
     await saveBlob(
       'vocabulary-set-template.xlsx',
       new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
@@ -211,10 +213,10 @@ const VocabularySetsScreen: React.FC = () => {
             </p>
           </div>
           <div className="flex w-full gap-2 sm:w-auto">
-            <Button type="button" className="min-h-11 flex-1 sm:flex-none" data-testid="new-set-button" onClick={() => setCreateOpen(true)}>
+            <Button type="button" className="h-auto min-h-11 min-w-0 whitespace-normal flex-1 sm:flex-none" data-testid="new-set-button" onClick={() => setCreateOpen(true)}>
               New set
             </Button>
-            <Button type="button" variant="outline" className="min-h-11 flex-1 sm:flex-none" data-testid="scan-text-button" onClick={() => { setScanTarget(null); setScanOpen(true); }}>
+            <Button type="button" variant="outline" className="h-auto min-h-11 min-w-0 whitespace-normal flex-1 sm:flex-none" data-testid="scan-text-button" onClick={() => { setScanTarget(null); setScanOpen(true); }}>
               Scan text
             </Button>
           </div>
@@ -231,7 +233,7 @@ const VocabularySetsScreen: React.FC = () => {
           </div>
           <Button
             type="button"
-            className="min-h-11 w-full sm:w-auto"
+            className="h-auto min-h-11 w-full min-w-0 whitespace-normal sm:w-auto"
             disabled={busy}
             data-locked={canImport ? 'false' : 'true'}
             aria-label={canImport ? undefined : 'Choose file (Pro feature)'}
@@ -252,11 +254,11 @@ const VocabularySetsScreen: React.FC = () => {
             }}
           />
         </div>
-        <div className="mt-3 grid grid-cols-2 gap-2" data-testid="example-files-row">
-          <Button type="button" variant="outline" className="min-h-11" onClick={() => void downloadCsv()}>
+        <div className="mt-3 grid grid-cols-2 gap-2 [&>*]:min-w-0" data-testid="example-files-row">
+          <Button type="button" variant="outline" className="h-auto min-h-11 min-w-0 whitespace-normal" onClick={() => void downloadCsv()}>
             Download CSV
           </Button>
-          <Button type="button" variant="outline" className="min-h-11" onClick={() => void downloadXlsx()}>
+          <Button type="button" variant="outline" className="h-auto min-h-11 min-w-0 whitespace-normal" onClick={() => void downloadXlsx()}>
             Download Excel
           </Button>
         </div>
@@ -347,8 +349,8 @@ const VocabularySetsScreen: React.FC = () => {
                             label={`Include ${group}`}
                             onChange={() => onToggle(id)}
                           />
-                          <span className="flex-1 capitalize">{group}</span>
-                          <span style={{ color: 'var(--lv-text-secondary)' }}>
+                          <span className="min-w-0 flex-1 break-words capitalize">{group}</span>
+                          <span className="min-w-0 shrink break-words text-right" style={{ color: 'var(--lv-text-secondary)' }}>
                             {(groupCounts[group] ?? 0).toLocaleString()} words
                           </span>
                         </label>

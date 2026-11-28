@@ -1,4 +1,5 @@
-import * as XLSX from 'xlsx';
+import type * as XLSXTypes from 'xlsx';
+import { getLoadedXlsx } from '@/lib/xlsxLoader';
 import type { SheetData, VocabularyWord } from '@/types/vocabulary';
 import type { ImportParseResult, ImportSource } from './types';
 
@@ -398,8 +399,10 @@ function recordsFromUnknownList(
 }
 
 function parseWorkbook(data: ArrayBuffer | Uint8Array, warnings: string[]): { sheets: SheetData } | ImportParseResult {
-  let workbook: XLSX.WorkBook;
+  let XLSX: typeof XLSXTypes;
+  let workbook: XLSXTypes.WorkBook;
   try {
+    XLSX = getLoadedXlsx();
     workbook = XLSX.read(data, { type: 'array' });
   } catch {
     return { ok: false, errors: ['This Excel file could not be read. Export it again as .xlsx and try once more.'] };
