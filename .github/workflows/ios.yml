@@ -1,13 +1,17 @@
-name: iOS simulator build
+name: iOS build, tests and unsigned IPA
 
-# Unsigned iOS Simulator build (iPhone + iPad) on a GitHub-hosted macOS runner. No certificates, no secrets.
-# App Store signing/upload lives in codemagic.yaml (secrets are referenced there by name only).
+# macOS runner, manual (workflow_dispatch) + PRs touching iOS-relevant paths. NO certificates, NO secrets.
+#  1. Swift unit tests (G2P parity, post-FX, model status) on the iOS Simulator
+#  2. Release archive of the app WITH the Kokoro plugin -> unsigned LazyVocabulary-unsigned.ipa (sideload with Sideloadly)
+#  3. Debug simulator build + smoke test (boots iPhone, launches the app, screenshot must not be blank)
+# Signed TestFlight uploads live in ios-testflight.yml (disabled until secrets exist) and codemagic.yaml.
 on:
   pull_request:
     paths:
       - 'ios/**'
       - 'src/**'
       - 'public/**'
+      - 'scripts/ios/**'
       - 'package.json'
       - 'package-lock.json'
       - 'capacitor.config.ts'
@@ -22,10 +26,42 @@ concurrency:
   group: ios-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+
 jobs:
-  simulator-build:
+  swift-tests:
+    name: Swift unit tests (simulator)
     runs-on: macos-15
-    timeout-minutes: 45
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch + verify sherpa-onnx (pinned url + sha256, same as Package.swift)
+        run: scripts/ios/fetch-sherpa-onnx.sh
+      - name: Run KokoroTtsKit tests on the iOS Simulator
+        run: |
+          set -o pipefail
+          mkdir -p "$GITHUB_WORKSPACE/build"
+          cd ios/App/KokoroTtsKit
+          xcodebuild -list || true
+          xcodebuild test \
+            -scheme KokoroTtsKit-Package \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -resultBundlePath "$GITHUB_WORKSPACE/build/swift-tests.xcresult" \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$GITHUB_WORKSPACE/build/swift-tests.log" | tail -n 80
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swift-test-results
+          path: |
+            build/swift-tests.xcresult
+            build/swift-tests.log
+          if-no-files-found: ignore
+
+  build-ipa:
+    name: Unsigned IPA (Release, device)
+    runs-on: macos-15
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -33,14 +69,66 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # Web bundle goes to the gitignored capacitor-www/ (never docs/, the live website: FB-28).
-      - name: Build web bundle for the native shell
-        run: npx vite build --outDir capacitor-www --emptyOutDir --base ./
-      - name: Sync Capacitor iOS (uses the existing ios/ project, never `cap add`)
+      - name: Fetch + verify sherpa-onnx
+        run: scripts/ios/fetch-sherpa-onnx.sh
+      # Web bundle goes to the gitignored capacitor-www/ (never docs/, the live website: FB-28). build:mobile also runs `cap sync`.
+      - name: Build web bundle for the native shell (Pro enabled)
+        run: VITE_ENABLE_PRO=true npm run build:mobile
+      - name: Sync Capacitor iOS (existing ios/ project, never `cap add`)
         run: npx cap sync ios
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app || true
-      - name: Build unsigned simulator app (universal iPhone + iPad)
+      - name: Archive (unsigned) with the Kokoro plugin
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            2>&1 | tee build/archive.log | tail -n 60
+      - name: Package Payload/App.app into LazyVocabulary-unsigned.ipa
+        run: |
+          APP=build/App.xcarchive/Products/Applications/App.app
+          test -d "$APP"
+          echo "--- frameworks inside the app:"; ls "$APP/Frameworks" || true
+          test -d "$APP/Frameworks/SherpaOnnxC.framework" || { echo "SherpaOnnxC.framework is not embedded"; exit 1; }
+          ls "$APP/public" | head -5
+          /usr/libexec/PlistBuddy -c 'Print :MinimumOSVersion' "$APP/Info.plist"
+          rm -rf build/ipa && mkdir -p build/ipa/Payload
+          cp -R "$APP" build/ipa/Payload/App.app
+          (cd build/ipa && zip -qry ../LazyVocabulary-unsigned.ipa Payload)
+          ls -lh build/LazyVocabulary-unsigned.ipa
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LazyVocabulary-unsigned-ipa
+          path: build/LazyVocabulary-unsigned.ipa
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: archive-log
+          path: build/archive.log
+          if-no-files-found: ignore
+
+  simulator-smoke:
+    name: Simulator build + smoke test
+    runs-on: macos-15
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: scripts/ios/fetch-sherpa-onnx.sh
+      - name: Build web bundle for the native shell (Pro enabled)
+        run: VITE_ENABLE_PRO=true npm run build:mobile
+      - run: npx cap sync ios
+      - name: Build simulator app (iPhone + iPad, unsigned)
         run: |
           set -o pipefail
           mkdir -p build
@@ -52,32 +140,34 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build/ios \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            build | tee build/xcodebuild.log | tail -n 40
+            build 2>&1 | tee build/xcodebuild.log | tail -n 40
       - uses: actions/upload-artifact@v4
         with:
           name: LazyVocabulary-simulator-app
           path: build/ios/Build/Products/Debug-iphonesimulator/App.app
           if-no-files-found: error
-
-      # Simulator smoke test: boots an iPad and an iPhone, launches the app, checks it stays alive, takes screenshots.
-      # Non-blocking: the simulator runtime on hosted runners can be flaky, the build above is the gate.
-      - name: Simulator smoke test (iPad + iPhone)
-        continue-on-error: true
+      # Boots an iPhone and an iPad, launches the app, and fails when the WebView stays blank (white/solid splash screen).
+      - name: Simulator smoke test (WebView boots, no blank screen)
         run: |
+          set -u
           APP=build/ios/Build/Products/Debug-iphonesimulator/App.app
           mkdir -p build/shots
-          for DEV in "iPad Pro 13-inch (M4)" "iPhone 16 Pro"; do
-            UDID=$(xcrun simctl list devices available | grep -F "$DEV" | head -1 | grep -oE '[0-9A-F-]{36}')
-            [ -n "$UDID" ] || { echo "no simulator named $DEV"; continue; }
+          FAIL=0
+          for DEV in "iPhone 16 Pro" "iPad Pro 13-inch (M4)"; do
+            UDID=$(xcrun simctl list devices available | grep -F "$DEV" | head -1 | grep -oE '[0-9A-F-]{36}' || true)
+            [ -n "$UDID" ] || { echo "no simulator named $DEV"; FAIL=1; continue; }
+            SHOT="build/shots/$(echo "$DEV" | tr -c 'A-Za-z0-9' _).png"
             xcrun simctl boot "$UDID"
             xcrun simctl bootstatus "$UDID" -b
             xcrun simctl install "$UDID" "$APP"
             xcrun simctl launch "$UDID" com.hoctusach.lazyvocabulary
-            sleep 12
-            xcrun simctl io "$UDID" screenshot "build/shots/$(echo "$DEV" | tr -c 'A-Za-z0-9' _).png"
-            xcrun simctl listapps "$UDID" | grep -q com.hoctusach.lazyvocabulary
+            sleep 25
+            xcrun simctl io "$UDID" screenshot "$SHOT"
+            xcrun simctl spawn "$UDID" launchctl list | grep -q UIKitApplication:com.hoctusach.lazyvocabulary || { echo "$DEV: app is not running (crashed?)"; FAIL=1; }
+            if swift scripts/ios/png-stats.swift "$SHOT"; then echo "$DEV: UI rendered"; else echo "$DEV: BLANK SCREEN"; FAIL=1; fi
             xcrun simctl shutdown "$UDID"
           done
+          exit $FAIL
       - uses: actions/upload-artifact@v4
         if: always()
         with:
