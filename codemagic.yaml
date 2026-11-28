@@ -26,7 +26,7 @@ workflows:
       - name: Swift unit tests (G2P parity, post-FX, model status)
         script: |
           cd ios/App/KokoroTtsKit
-          xcodebuild test -scheme KokoroTtsKit-Package -destination 'platform=iOS Simulator,id=$(scripts/ios/pick-sim.sh iPhone)' CODE_SIGNING_ALLOWED=NO
+          xcodebuild test -scheme KokoroTtsKit -destination 'platform=iOS Simulator,id=$(scripts/ios/pick-sim.sh iPhone)' CODE_SIGNING_ALLOWED=NO
       - name: Unsigned simulator build
         script: |
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug \

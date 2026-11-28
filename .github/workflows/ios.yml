@@ -44,7 +44,7 @@ jobs:
           cd ios/App/KokoroTtsKit
           xcodebuild -list || true
           xcodebuild test \
-            -scheme KokoroTtsKit-Package \
+            -scheme KokoroTtsKit \
             -destination "platform=iOS Simulator,id=$("$GITHUB_WORKSPACE/scripts/ios/pick-sim.sh" iPhone)" \
             -resultBundlePath "$GITHUB_WORKSPACE/build/swift-tests.xcresult" \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$GITHUB_WORKSPACE/build/swift-tests.log" | tail -n 80

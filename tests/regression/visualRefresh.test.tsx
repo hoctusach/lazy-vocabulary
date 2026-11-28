@@ -111,7 +111,9 @@ describe('[FB-58] English only, simple UI', () => {
     expect(document.body.textContent).not.toMatch(VI_CHARS);
   });
   it('no source file ships Vietnamese UI text or a VI string table (data files and sample data excepted)', () => {
-    const allowed = new Set(['src/utils/translate.ts', 'src/utils/text/contentFilters.ts', 'src/features/word-sets/sampleTemplate.ts']);
+    const allowed = new Set(['src/utils/translate.ts', 'src/utils/text/contentFilters.ts', 'src/features/word-sets/sampleTemplate.ts',
+      // [FB-74] explicit request: the one-time Apple voice hint ships EN + VI copy (the only VI UI string table)
+      'src/services/speech/appleVoiceHint.ts']);
     const hits: string[] = [];
     const walk = (dir: string) => {
       for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

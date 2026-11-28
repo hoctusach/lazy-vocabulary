@@ -132,6 +132,6 @@ It does nothing unless **all** secrets exist **and** you type `yes` in the run f
 4. Optional: `scripts/ios/fetch-sherpa-onnx.sh` (verifies the pin; Xcode itself downloads the xcframework through Swift Package Manager).
 5. Open `ios/App/App.xcodeproj` (SPM, no CocoaPods, no `.xcworkspace`). Target **App** > Signing & Capabilities > your Personal Team; change the
    bundle id suffix if Xcode says it is taken. Run on the iPhone (Developer Mode + Trust as in 1.3).
-6. Tests: open `ios/App/KokoroTtsKit/Package.swift` in Xcode and run the `KokoroTtsKit-Package` scheme tests, or
-   `cd ios/App/KokoroTtsKit && xcodebuild test -scheme KokoroTtsKit-Package -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`.
+6. Tests: open `ios/App/KokoroTtsKit/Package.swift` in Xcode and run the `KokoroTtsKit` scheme tests, or
+   `cd ios/App/KokoroTtsKit && xcodebuild test -scheme KokoroTtsKit -destination 'platform=iOS Simulator,name=iPhone 17 Pro'`.
 7. Logs: Xcode console filter `kokoro`; Console.app; Safari Web Inspector for the WebView.
