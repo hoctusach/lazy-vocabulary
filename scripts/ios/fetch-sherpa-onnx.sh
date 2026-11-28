@@ -9,9 +9,8 @@
 # Usage: scripts/ios/fetch-sherpa-onnx.sh [--extract]
 set -euo pipefail
 
-VERSION="v2.0.2"
-NAME="sherpa-onnx-${VERSION}-ios-shared-onnxruntime-static.xcframework.zip"
-URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/xcframework/${NAME}"
+URL="https://github.com/k2-fsa/sherpa-onnx/releases/download/xcframework/sherpa-onnx-v2.0.2-ios-shared-onnxruntime-static.xcframework.zip"
+NAME="$(basename "$URL")"
 SHA256="9518838219e55716bb565df278b3f32093bb1948cc8a508f7b67989350bf9b25"
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"

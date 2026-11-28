@@ -11,8 +11,6 @@ let package = Package(
     platforms: [.iOS(.v15), .macOS(.v12)],
     products: [
         .library(name: "KokoroTtsKit", targets: ["KokoroCore", "KokoroTtsNative"]),
-        // Exposed on its own so the app target can "Embed & Sign" the dynamic framework (see App.xcodeproj Embed Frameworks phase).
-        .library(name: "SherpaOnnxC", targets: ["SherpaOnnxC"]),
     ],
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.6.0"),

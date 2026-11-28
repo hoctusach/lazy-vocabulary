@@ -1,6 +1,6 @@
 # Third-party notices
 
-## Kokoro on-device voices (Android app)
+## Kokoro on-device voices (Android and iOS apps)
 
 | Component | License | URL |
 | --- | --- | --- |
@@ -9,7 +9,8 @@
 | ONNX Runtime by Microsoft (statically linked in sherpa-onnx) | MIT | https://github.com/microsoft/onnxruntime |
 | Kokoro English lexicon (misaki-style, from the k2-fsa model package) | Apache-2.0 | https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0 |
 | CMU Pronouncing Dictionary | BSD-2-Clause | https://github.com/cmusphinx/cmudict |
-| Kotlin standard library | Apache-2.0 | https://github.com/JetBrains/kotlin |
+| Kotlin standard library (Android only) | Apache-2.0 | https://github.com/JetBrains/kotlin |
+| sherpa-onnx iOS xcframework `sherpa-onnx-v2.0.2-ios-shared-onnxruntime-static` (iOS only; ONNX Runtime statically linked) | Apache-2.0 (ONNX Runtime: MIT) | https://github.com/k2-fsa/sherpa-onnx/releases/tag/v2.0.2 |
 
 The model files (int8 Kokoro-82M v1.0 as packaged by k2-fsa) are downloaded on demand from Hugging Face, pinned to revision
 `57adb37fc0e8d4bd430cfc1b8f8c2294945b9af2` of `csukuangfj/kokoro-int8-multi-lang-v1_0`. espeak-ng (GPL) is not used or included.
@@ -21,6 +22,13 @@ sherpa-onnx no longer links espeak-ng; the binary contains no espeak symbols (ch
 
 The bundled `android/app/src/main/assets/kokoro/cmudict-extra-us.txt` is derived from the CMU Pronouncing Dictionary
 (cmusphinx/cmudict@74790861f652b15e4ac49015a90074ad62a27690).
+
+**iOS.** The iOS app uses the same pinned model files (downloaded on demand, stored in Application Support and excluded from
+iCloud backup), the same lexicon-based G2P (ported to Swift in `ios/App/KokoroTtsKit/Sources/KokoroCore`, no espeak-ng) and the
+sherpa-onnx v2.0.2 iOS xcframework (`SherpaOnnxC`, sha256 `9518838219e55716bb565df278b3f32093bb1948cc8a508f7b67989350bf9b25`),
+which is not committed: Swift Package Manager downloads it from the k2-fsa release (pinned checksum in
+`ios/App/KokoroTtsKit/Package.swift`; `scripts/ios/fetch-sherpa-onnx.sh` verifies the same pin). The bundled
+`ios/App/KokoroTtsKit/Sources/KokoroCore/Resources/cmudict-extra-us.txt` is a copy of the Android asset (same CMU derivation).
 
 ## CMU Pronouncing Dictionary license
 

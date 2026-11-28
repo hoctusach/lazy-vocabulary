@@ -89,7 +89,8 @@ Use TestFlight on Finley's iPhone/iPad after the `ios-testflight` build. Everyth
 | 4. CI | `.github/workflows/ios.yml` (simulator build + smoke), `codemagic.yaml` (simulator + TestFlight) | Done, first run still to be observed |
 | 5. First TestFlight build | Run Codemagic, fix compile errors that only a macOS build reveals, on-device pass (audio, IAP sandbox, ATT, ads) | Finley + next Claude Code session |
 | 6. Store submission | Metadata, screenshots (iPhone 6.9"/6.5" + iPad 13"), privacy labels, IAP attached, review notes | Finley |
-| 7. Post-launch | Native iOS queue (see stubs), Kokoro on iOS, scan-to-import on iOS (camera) | Later |
+| 7. Kokoro on iOS + CI IPA | Swift KokoroTts plugin, Apple premium voice preference + hint (FB-74), unsigned IPA artifact for Sideloadly, simulator tests, disabled TestFlight workflow | Done in code, CI-built, device test pending (FB-73/FB-74) |
+| 8. Post-launch | Native iOS queue (see stubs), scan-to-import on iOS (camera) | Later |
 
 ## 5. Android-only native pieces: audit and iOS status
 
@@ -99,10 +100,10 @@ Use TestFlight on Finley's iPhone/iPad after the `ios-testflight` build. Everyth
 | Google Play Billing `pro_unlock` | **Implemented**: same `@capgo/native-purchases` JS path; iOS reads StoreKit 2 entitlements (`getPurchases` = `Transaction.currentEntitlements`), `restorePurchases()` = `AppStore.sync()`, no acknowledge step, revoked purchases are not owned. Create the same product id `pro_unlock` in App Store Connect. Needs sandbox test on a device. |
 | AdMob + UMP | **Implemented**: iOS ids (Google TEST ids by default), UMP then **ATT prompt before `AdMob.initialize()`**, banner on Progress/Library tabs, no ads for Pro. Replace the test ids before release (see checklist #11). |
 | TTS / voices | **Implemented** with `@capacitor-community/text-to-speech` (AVSpeechSynthesizer): voice list from the device, language match prefers Premium > Enhanced > Compact, novelty voices (Bells, Zarvox, ...) hidden. |
-| Kokoro natural voices (ONNX in Kotlin) | **Stub.** `isKokoroSupported()` stays Android-only, so on iOS the "Natural voice" row and download are hidden and the system voices are used. A port needs ONNX Runtime for iOS + a Swift plugin, which needs a Mac. |
+| Kokoro natural voices (ONNX in Kotlin) | **Implemented (FB-73), untested on device.** Swift plugin `KokoroTts` in the local SPM package `ios/App/KokoroTtsKit` (G2P/PostFx ported, sherpa-onnx v2.0.2 xcframework as remote binaryTarget, AVAudioEngine playback). `isKokoroSupported()` is true on iOS + Android; AVSpeech stays the fallback. Built + unit-tested on CI (`ios.yml`), installed with an unsigned IPA through Sideloadly: see `IOS_KOKORO_SETUP.md`. |
 | File import (CSV/Excel) | Works through the WKWebView document picker (`accept` already lists extensions + MIME types). Export uses `Filesystem` + `Share` (iOS share sheet). Verify on device. |
 | Reminders (`@capacitor/local-notifications`) | Same plugin on iOS; permission prompt via the plugin. Verify on device (the `smallIcon` option is ignored on iOS). |
-| Custom Capacitor plugins (`PlaybackService`, `KokoroTts`) | Only registered on Android. On iOS `registerPlugin` is never called for them (every call is behind a platform guard). |
+| Custom Capacitor plugins (`PlaybackService`, `KokoroTts`) | `PlaybackService` is Android only (guarded). `KokoroTts` exists on iOS (Swift, registered in `SceneDelegate.swift` through `LazyBridgeViewController`). |
 | Hardware back button | Android only (`useAndroidBackButton`), nothing needed on iOS. |
 | Status bar overlay / background colour | Android-only APIs; guarded so they are not called on iOS. |
 | Scan-to-import (camera) | Built on another branch (`feat/fb66-scan-text`). Info.plist already has `NSCameraUsageDescription` and `NSPhotoLibraryUsageDescription` so the iOS build can use it. |
@@ -115,4 +116,5 @@ Use TestFlight on Finley's iPhone/iPad after the `ios-testflight` build. Everyth
   an offline-capable learning tool with native audio, notifications, IAP, so it should pass; mention native features in review notes.
 - Guideline 5.1.1(v): account deletion exists in-app (More > Privacy & account).
 - Replace Google TEST AdMob ids before submission; ATT text is already present.
-- Later: language-neutral content model ("any language"), Vietnamese App Store localisation, native iOS queue plugin, Kokoro on iOS.
+- Later: language-neutral content model ("any language"), Vietnamese App Store localisation, native iOS queue plugin.
+- Kokoro on iOS: Xcode 26 is required on CI (Capacitor 8 binaries are built with Swift 6.2). The Natural voice model is ~310 MB (fp32) on 4 GB iPhones; watch memory on device. No background URLSession and no native queue yet (WebView suspension while locked can stall long pauses).

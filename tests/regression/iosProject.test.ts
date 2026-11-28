@@ -113,7 +113,7 @@ describe('[FB-67] CI + plan for the no-Mac build path', () => {
     // build/ must exist before tee writes the log, else pipefail fails a green build
     expect(y.indexOf('mkdir -p build\n')).toBeGreaterThan(-1);
     expect(y.indexOf('mkdir -p build\n')).toBeLessThan(y.indexOf('tee build/xcodebuild.log'));
-    expect(y).toContain('--outDir capacitor-www');
+    expect(y.includes('--outDir capacitor-www') || (y.includes('npm run build:mobile') && read('package.json').includes('--outDir capacitor-www'))).toBe(true);
     expect(y).toContain('npx cap sync ios');
     expect(y).not.toContain('cap add ios');
     expect(y).not.toMatch(/\$\{\{\s*secrets\./);
@@ -125,7 +125,7 @@ describe('[FB-67] CI + plan for the no-Mac build path', () => {
     expect(y).toContain('ios-simulator:');
     expect(y).toContain('ios-testflight:');
     expect(y).toContain('bundle_identifier: com.hoctusach.lazyvocabulary');
-    expect(y).toContain('--outDir capacitor-www');
+    expect(y.includes('--outDir capacitor-www') || (y.includes('npm run build:mobile') && read('package.json').includes('--outDir capacitor-www'))).toBe(true);
     expect(y).not.toContain('cap add ios');
     expect(y).not.toMatch(/BEGIN (RSA |EC )?PRIVATE KEY|\.p8|\.p12|-----BEGIN/);
     expect(y).not.toMatch(/ca-app-pub-(?!3940256099942544)\d{16}/); // no real AdMob id committed
@@ -144,5 +144,52 @@ describe('[FB-67] CI + plan for the no-Mac build path', () => {
     // "Learn words in any language" must fit Apple's 30-character subtitle limit
     expect('Learn words in any language'.length).toBeLessThanOrEqual(30);
     expect(existsSync(resolve(process.cwd(), 'ios/App/App.xcodeproj/project.pbxproj'))).toBe(true);
+  });
+});
+
+describe('[FB-73] iOS Kokoro native plugin wiring (static)', () => {
+  const pkg = read('ios/App/KokoroTtsKit/Package.swift');
+  const script = read('scripts/ios/fetch-sherpa-onnx.sh');
+  const wf = read('.github/workflows/ios.yml');
+  const tf = read('.github/workflows/ios-testflight.yml');
+
+  it('[FB-73] sherpa-onnx is a remote SPM binaryTarget with a checksum and the fetch script pins the same url + sha256', () => {
+    const url = pkg.match(/url: "([^"]+\.xcframework\.zip)"/)?.[1];
+    const sum = pkg.match(/checksum: "([0-9a-f]{64})"/)?.[1];
+    expect(url).toBeTruthy();
+    expect(sum).toBeTruthy();
+    expect(script).toContain(url as string);
+    expect(script).toContain(sum as string);
+    expect(url).toContain('k2-fsa/sherpa-onnx');
+  });
+
+  it('[FB-73] the app target links the local package (Xcode embeds the dynamic SherpaOnnxC.framework from the binary target), and SceneDelegate registers the plugin', () => {
+    const pbx = read(PBX);
+    expect(pbx).toContain('relativePath = KokoroTtsKit;');
+    expect(pbx).toMatch(/productName = KokoroTtsKit;/);
+    const scene = read('ios/App/App/SceneDelegate.swift');
+    expect(scene).toContain('registerPluginInstance(KokoroTtsPlugin())');
+    expect(scene).toContain('LazyBridgeViewController()');
+  });
+
+  it('[FB-73] Swift sources exist (G2P / PostFx / plugin / tests) and no large binary is committed', () => {
+    for (const f of [
+      'KokoroCore/KokoroG2P.swift', 'KokoroCore/KokoroPostFx.swift', 'KokoroCore/Resources/cmudict-extra-us.txt',
+      'KokoroTtsNative/KokoroTtsPlugin.swift', 'KokoroTtsNative/KokoroEngine.swift', 'KokoroTtsNative/KokoroModelStore.swift',
+    ]) expect(existsSync(resolve(process.cwd(), 'ios/App/KokoroTtsKit/Sources', f)), f).toBe(true);
+    expect(existsSync(resolve(process.cwd(), 'ios/App/KokoroTtsKit/Tests/KokoroCoreTests/KokoroG2PTests.swift'))).toBe(true);
+    expect(read("ios/App/KokoroTtsKit/Sources/KokoroCore/KokoroG2P.swift")).not.toMatch(/import\s+espeak/i);
+  });
+
+  it('[FB-73] CI builds an unsigned IPA, runs the Swift tests + a blank-screen smoke test; TestFlight is guarded by secrets', () => {
+    expect(wf).toContain('workflow_dispatch');
+    expect(wf).toContain('CODE_SIGNING_ALLOWED=NO');
+    expect(wf).toContain('LazyVocabulary-unsigned.ipa');
+    expect(wf).toContain('xcodebuild test');
+    expect(wf).toContain('png-stats.swift');
+    expect(wf).toContain('VITE_ENABLE_PRO=true npm run build:mobile');
+    expect(tf).toContain("needs.check.outputs.enabled == 'true'");
+    expect(tf).toContain('secrets.APP_STORE_CONNECT_KEY_ID');
+    expect(tf).not.toMatch(/BEGIN PRIVATE KEY/);
   });
 });

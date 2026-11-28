@@ -19,7 +19,8 @@ const OPEN_SOURCE_LICENSES = [
   { name: 'Kokoro model files and English lexicon (k2-fsa model package, fp32)', url: 'https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0', license: 'Apache-2.0' },
   { name: 'Kokoro model files (k2-fsa model package, int8, for low-memory devices)', url: 'https://huggingface.co/csukuangfj/kokoro-int8-multi-lang-v1_0', license: 'Apache-2.0' },
   { name: 'CMU Pronouncing Dictionary', url: 'https://github.com/cmusphinx/cmudict', license: 'BSD-2-Clause', note: 'Copyright (C) 1993-2015 Carnegie Mellon University' },
-  { name: 'Kotlin standard library', url: 'https://github.com/JetBrains/kotlin', license: 'Apache-2.0' },
+  { name: 'Kotlin standard library (Android)', url: 'https://github.com/JetBrains/kotlin', license: 'Apache-2.0' },
+  { name: 'sherpa-onnx iOS xcframework v2.0.2 (iOS; ONNX Runtime statically linked)', url: 'https://github.com/k2-fsa/sherpa-onnx/releases/tag/v2.0.2', license: 'Apache-2.0', note: 'iOS also uses the CMU Pronouncing Dictionary-derived lexicon above; no espeak-ng' },
 ];
 
 const MorePanel: React.FC = () => {
