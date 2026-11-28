@@ -70,7 +70,7 @@ function assertProbe(d, m, issues, { scaled = false } = {}) {
 }
 
 for (const d of DEVICES) {
-  test(`NFR-DEV-01-${d.key}`, `${d.label}: no horizontal overflow, bottom nav + key buttons visible and >= ${MIN_TARGET}px, no clipped text (all tabs)`, async ({ session }) => {
+  test(`NFR-DEV-01-${d.key}`, `${d.w >= 768 && d.w < 816 ? '[FB-80] ' : ''}${d.label}: no horizontal overflow, bottom nav + key buttons visible and >= ${MIN_TARGET}px, no clipped text (all tabs)`, async ({ session }) => {
     const s = await openDevice(session, d);
     const issues = [];
     let m = await s.page.evaluate(PROBE);
@@ -110,7 +110,7 @@ for (const d of DEVICES.filter((x) => ['android-small', 'pixel7', 'iphone-13', '
 
 const THEMES = [['notes', 'Margin Notes'], ['sloth', 'Cozy Sloth'], ['blocks', 'Bold Blocks'], ['pixel', 'Pixel Quest'], ['riso', 'Riso Zine']];
 for (const [name, label] of THEMES) {
-  test(`NFR-DEV-03-${name}`, `${label} (dark) on Pixel 7: Learn, Progress, Library and More pass axe color-contrast`, async ({ session }) => {
+  test(`NFR-DEV-03-${name}`, `${name === 'blocks' ? '[FB-81] ' : ''}${label} (dark) on Pixel 7: Learn, Progress, Library and More pass axe color-contrast`, async ({ session }) => {
     const d = DEVICES.find((x) => x.key === 'pixel7');
     const s = await openDevice(session, d, { storage: { 'lv-dark': 'true' } });
     await tab(s, 'More'); await U.click(s, { label }); await sleep(300);
@@ -121,14 +121,14 @@ for (const [name, label] of THEMES) {
     }
     record(`NFR-DEV-03-${name}`, { violations: bad.length });
     ok(!bad.length, `${bad.length} contrast violations: ${bad.slice(0, 5).join(' | ')}`);
-  }, name === 'blocks' ? { known: 'FINDING-2: Bold Blocks dark, Learn: <em> #702e20 on #ff5a36 = 3.22:1 (< 4.5:1)' } : {});
+  });
 }
 
 // ---- font scaling: the app is rem-based, so Android "font size" maps to the root font size ----
 for (const pct of [130, 200]) {
   for (const key of ['android-small', 'pixel7', 'iphone-se']) {
     const d = DEVICES.find((x) => x.key === key);
-    test(`NFR-DEV-04-${pct}-${key}`, `${d.label} at ${pct}% font: no horizontal overflow, nothing clipped, Pause/Next/nav still reachable`, async ({ session }) => {
+    test(`NFR-DEV-04-${pct}-${key}`, `${pct === 200 ? '[FB-82] ' : ''}${d.label} at ${pct}% font: no horizontal overflow, nothing clipped, Pause/Next/nav still reachable`, async ({ session }) => {
       const s = await openDevice(session, d);
       await s.page.evaluate((p) => { document.documentElement.style.fontSize = p + '%'; }, pct);
       await sleep(500);
@@ -148,6 +148,6 @@ for (const pct of [130, 200]) {
         }
       }
       ok(!issues.length, `${d.label} @${pct}%: ${issues.join(' | ')}`);
-    }, pct === 200 ? { known: 'FINDING-3: at 200% font the Progress week strip and a Library button run past the right edge' } : {});
+    });
   }
 }

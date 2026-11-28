@@ -82,7 +82,7 @@ function hostile(kind) {
   return f;
 }
 for (const kind of ['abort', '503', 'hang']) {
-  test(`NFR-REL-04-${kind}`, `Supabase unreachable (${kind}): signed-in user still gets a card from local data, can advance and browse, within budget`, async ({ session }) => {
+  test(`NFR-REL-04-${kind}`, `${kind === 'hang' ? '[FB-83] ' : ''}Supabase unreachable (${kind}): signed-in user still gets a card from local data, can advance and browse, within budget`, async ({ session }) => {
     const s = await session({ fakeInstance: hostile(kind), allow: NET_NOISE });
     s.allow.push(...NET_NOISE);
     const t0 = Date.now();
@@ -94,5 +94,5 @@ for (const kind of ['abort', '503', 'hang']) {
     await sweepTabs(s);
     const body = await U.body(s);
     ok(!/Something went wrong|Application error|Unexpected/i.test(body), 'no crash screen');
-  }, { timeout: 90000, ...(kind === 'hang' ? { known: 'FINDING-4: backend that never answers leaves Learn on "Gathering today\'s wordy surprises…" with no timeout/local fallback (>25 s)' } : {}) });
+  }, { timeout: 90000 });
 }

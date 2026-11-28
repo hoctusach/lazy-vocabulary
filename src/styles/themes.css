@@ -280,6 +280,7 @@ body.theme-blocks .lv-meaning { font-style: normal !important; font-weight: 500;
 body.theme-blocks .lv-example { border: 2px dashed var(--lv-ink); border-radius: 10px; padding: 8px 10px; font-style: normal !important; }
 body.theme-blocks .lv-translation { display: inline-block; background: #FF5A36; color: #111; border: 2.5px solid #111; border-radius: 10px; padding: 5px 10px; font-weight: 800; font-style: normal !important; transform: rotate(-2deg); box-shadow: 3px 3px 0 #111; }
 body.theme-blocks .lv-translation em { font-style: normal; }
+body.theme-blocks .lv-translation em[data-empty] { opacity: 1 !important; color: #3b140a; } /* [FB-81] placeholder: 0.6 opacity gave 3.22:1 on #FF5A36 */
 body.theme-blocks .lv-ipa { background: var(--lv-ink); color: var(--lv-bg); padding: 2px 6px; border-radius: 6px; font-size: 12px; }
 body.theme-blocks .lv-card-mascot { display: block; width: 62px; height: 62px; right: 12px; top: 8px; border: 3px solid #111; border-radius: 50%; background: #FFD23F; box-shadow: 3px 3px 0 #111; object-fit: cover; object-position: 50% 30%; transform: rotate(10deg); }
 body.theme-blocks button.lv-ctl { border-width: 3px; border-color: var(--lv-ink); box-shadow: 4px 4px 0 var(--lv-ink); font-weight: 700; border-radius: 16px; }
