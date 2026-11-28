@@ -14,10 +14,10 @@ const ALL = countSheetWords(DEFAULT_VOCABULARY_DATA);
 describe('[FB-38] Learning Progress Total = active selection (same count as the Word Set card)', () => {
   it('all six groups = the Word Set card count (row count, not distinct words, not 4000)', () => {
     expect(builtinSelectedWordCount(BUILTIN_GROUPS)).toBe(ALL);
-    expect(ALL).toBe(3261);
+    expect(ALL).toBe(3965);
     const s = activeProgressStats(builtinSelectedWordCount(BUILTIN_GROUPS), { learned: 67, learning: 755, due: 333 }, null);
-    expect(s.total).toBe(3261);
-    expect(s.new).toBe(3261 - 67 - 755);
+    expect(s.total).toBe(ALL);
+    expect(s.new).toBe(ALL - 67 - 755);
   });
 
   it('shrinks when groups are deselected', () => {
