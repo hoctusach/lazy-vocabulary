@@ -5,26 +5,29 @@ const { ok, eq, waitText, click, body, boot, tab, importFile, waitWord, ctl, wor
 
 const ymd = (d) => { const x = new Date(d); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getDate()).padStart(2, '0')}`; };
 const openProgress = async (s) => { await tab(s, 'Progress'); await waitText(s, 'Quiz me'); };
-const expand = async (s, name) => { await click(s, { textHas: name }); await sleep(400); };
+const expand = async (s, name) => { await click(s, name === 'TODAY' ? { text: name } : { textHas: name }); await sleep(400); };
 // [FB-50] Word Summary is on the Learn tab, under the card player.
-const openSummary = async (s) => { await tab(s, 'Learn'); await expand(s, 'Word Summary'); };
+const openSummary = async (s) => { await tab(s, 'Learn'); await expand(s, 'TODAY'); };
 const flat = async (s) => (await body(s)).replace(/\s+/g, ' ');
 
 test('PROG-03', '[FB-39][FB-50] Progress tab: Streak, then Learning Progress (open); no Word Summary', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s);
   for (const t of ['Add a friend', 'Learning Progress', 'Due Review']) await waitText(s, t);
   const t = await body(s);
-  ok(!t.includes('Word Summary'), 'Word Summary must not be on Progress');
+  ok(!t.includes('TODAY\n') && !(await s.page.evaluate(() => { const e = document.querySelector('[data-testid="word-summary-section"]'); return !!e && e.offsetParent !== null; })), 'TODAY card must not be on Progress');
   ok(t.indexOf('Learning Progress') < t.indexOf('Add a friend'), 'Learning Progress directly under Streak');
 });
-test('LEARN-WS', '[FB-50] Word Summary sits on Learn, below the card player', async ({ session }) => {
+test('LEARN-WS', '[FB-50][FB-85] Word Summary card is titled TODAY (no "Word Summary" text) and sits on Learn, below the card player', async ({ session }) => {
   const s = await session({}); await boot(s);
-  await waitText(s, 'Word Summary');
+  await waitText(s, 'TODAY');
   const below = await s.page.evaluate(() => {
     const h = document.querySelector('main h1'); const ws = document.querySelector('[data-testid="word-summary-section"]');
     return !!h && !!ws && (h.compareDocumentPosition(ws) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
   });
-  ok(below, 'Word Summary not below the card');
+  ok(below, 'TODAY card not below the card');
+  const head = await s.page.evaluate(() => [...document.querySelectorAll('[data-testid="word-summary-section"] h3')].map((h) => h.textContent.trim()));
+  eq(head, ['TODAY']);
+  ok(!(await body(s)).includes('Word Summary'), '[FB-85] old title must be gone');
 });
 test('PROG-04', 'Learning Progress tiles', async ({ session }) => {
   const s = await session({}); await boot(s); await openProgress(s); await waitText(s, 'Due Review');
