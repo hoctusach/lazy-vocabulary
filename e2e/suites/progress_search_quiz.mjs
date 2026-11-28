@@ -50,6 +50,18 @@ test('PROG-05b', '[FB-70] NEW TODAY rows say when Next is not scheduled yet, nev
   ok(/Review #0 · Next: after you learn it/.test(t), 'new label: ' + t.slice(t.indexOf('NEW TODAY'), t.indexOf('NEW TODAY') + 300));
   ok(!/Review #0 · Next: —/.test(t), 'no bare dash');
 });
+test('PROG-05c', '[FB-71] Word Summary row is one tappable tile: no eye icon, tap opens the existing word popup', async ({ session }) => {
+  const s = await session({}); await boot(s); await importFile(s, 'setA.csv'); await waitText(s, 'was added to your selection'); await U.builtinOff(s);
+  await openSummary(s);
+  const info = await s.page.evaluate(() => {
+    const row = document.querySelector('button.lv-row[aria-label^="View"]');
+    return { row: !!row, eye: document.querySelectorAll('[data-testid="word-summary-section"] svg.lucide-eye').length, nested: row ? row.querySelectorAll('button').length : -1 };
+  });
+  ok(info.row && info.eye === 0 && info.nested === 0, 'row/eye/nested: ' + JSON.stringify(info));
+  await s.page.evaluate(() => document.querySelector('.lv-row .lv-row-word').click()); await sleep(600);
+  await waitText(s, 'Quick Search');
+  const v = await s.page.$eval('input[placeholder="Search word..."]', (e) => e.value); ok(/aaa\d/.test(v), 'prefilled: ' + v);
+});
 test('PROG-06', 'Empty summaries', async ({ session }) => {
   const s = await session({ signedIn: false }); await s.goto('/'); await waitText(s, 'Access your vocabulary');
   // Gate blocks the UI; use a signed-in user with a server that has no selection instead.

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, Eye, ListChecks } from 'lucide-react';
+import { ChevronDown, ChevronRight, ListChecks } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 
@@ -49,15 +49,13 @@ const Lane: React.FC<{
     <div className="lv-lane-list">
       {items.length > 0 ? (
         items.map((w, i) => (
-          <div key={`${w.word}-${i}`} className="lv-row">
-            <div className="min-w-0">
-              <div className="lv-row-word">{w.word}</div>
-              <div className="lv-row-meta">{meta(w)}</div>
-            </div>
-            <button type="button" aria-label={viewLabel(w)} onClick={() => onView(w.word)}>
-              <Eye className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </div>
+          <button key={`${w.word}-${i}`} type="button" className="lv-row" aria-label={viewLabel(w)} onClick={() => onView(w.word)}>
+            <span className="lv-row-text">
+              <span className="lv-row-word">{w.word}</span>
+              <span className="lv-row-meta">{meta(w)}</span>
+            </span>
+            <ChevronRight className="lv-row-chev h-5 w-5" aria-hidden="true" />
+          </button>
         ))
       ) : (
         <div className="lv-row-empty">{empty}</div>
