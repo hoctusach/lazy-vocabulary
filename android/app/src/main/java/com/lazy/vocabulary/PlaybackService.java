@@ -40,7 +40,8 @@ public class PlaybackService extends Service {
     static final int NOTIFICATION_ID = 4711;
     static final String ACTION_START = "com.lazy.vocabulary.playback.START";
     static final String ACTION_UPDATE = "com.lazy.vocabulary.playback.UPDATE";
-    static final String ACTION_STOP = "com.lazy.vocabulary.playback.STOP";
+    /** Internal only (swipe-dismiss of the notification, and the JS stop() call). NOT a notification button (FB-73). */
+    static final String ACTION_DISMISS = "com.lazy.vocabulary.playback.DISMISS";
     static final String ACTION_PAUSE = "com.lazy.vocabulary.playback.PAUSE";
     static final String ACTION_PLAY = "com.lazy.vocabulary.playback.PLAY";
     static final String ACTION_NEXT = "com.lazy.vocabulary.playback.NEXT";
@@ -180,7 +181,7 @@ public class PlaybackService extends Service {
             shutdown();
             return START_NOT_STICKY;
         }
-        if (ACTION_STOP.equals(action)) {
+        if (ACTION_DISMISS.equals(action)) {
             shutdown();
             return START_NOT_STICKY;
         }
@@ -579,8 +580,8 @@ public class PlaybackService extends Service {
                 .setContentText(text)
                 .setStyle(new NotificationCompat.BigTextStyle().setBigContentTitle(title).bigText(big.length() == 0 ? text : big))
                 .setContentIntent(contentPi)
-                // Swipe-away of a paused (dismissible) card stops the service cleanly.
-                .setDeleteIntent(servicePi(ACTION_STOP, 4))
+                // Swipe-away (paused card; Android 14+ also lets users dismiss the foreground card) ends the session cleanly.
+                .setDeleteIntent(servicePi(ACTION_DISMISS, 4))
                 .setOngoing(playing)
                 .setOnlyAlertOnce(true)
                 .setSilent(true)
@@ -592,7 +593,7 @@ public class PlaybackService extends Service {
             b.addAction(android.R.drawable.ic_media_play, "Play", servicePi(ACTION_PLAY, 3));
         }
         b.addAction(android.R.drawable.ic_media_next, "Next", servicePi(ACTION_NEXT, 2));
-        b.addAction(android.R.drawable.ic_menu_close_clear_cancel, "Stop", servicePi(ACTION_STOP, 5));
+        // [FB-73] No Stop button: Pause/Play toggles, the session + foreground notification stay alive while paused.
         if (Build.VERSION.SDK_INT >= 31) {
             b.setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE);
         }
