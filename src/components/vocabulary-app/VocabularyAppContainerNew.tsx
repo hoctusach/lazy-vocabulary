@@ -79,7 +79,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
     playCurrentWord
   });
 
-  // [FB-52] The native service owns the upcoming queue. Built once per list/voice/mute change (current word read from a
+  // [FB-52] The native service owns the upcoming queue (the same list the in-app player walks: `initialWords`). Built once per list/voice/mute change (current word read from a
   // ref); the index of the card inside it travels with every word update, so no re-push per word.
   const showDefaultVi = useShouldShowDefaultVi();
   const [overrideTick, setOverrideTick] = React.useState(0);
@@ -93,7 +93,7 @@ const VocabularyAppContainerNew: React.FC<VocabularyAppContainerNewProps> = ({
   const nativeQueue = useMemo(
     () =>
       hasData
-        ? buildNativeQueue(vocabularyService.getWordList(), currentWordRef.current, {
+        ? buildNativeQueue(initialWords ?? [], currentWordRef.current, { // [FB-87][FB-88] today's playlist, never the full catalog sheet
             voiceName: selectedVoiceName || getFavoriteVoice(), // [FB-61] never an empty voice before the list loads
             rate: getSpeechRate(),
             muted: isMuted,
